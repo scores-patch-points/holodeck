@@ -765,6 +765,7 @@ button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visi
             <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;font:500 13px 'Hanken Grotesk';color:var(--mut)">
               <span style="width:8px;height:8px;border-radius:50%;background:{{ ak.dot }};flex:none"></span>
               <span style="color:var(--ink2)">{{ ak.status }}</span>
+              <sc-if value="{{ ak.hdSealed }}" hint-placeholder-val="{{ false }}"><span title="{{ ak.hdLine }}" style="font:600 11px 'JetBrains Mono';letter-spacing:.06em;text-transform:uppercase;color:#56d364;border:1px solid #2ea043;border-radius:999px;padding:2px 8px">sealed-external</span></sc-if>
               <span style="font:400 12px 'JetBrains Mono';color:var(--dim)">{{ ak.ixLine }}</span>
               <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
                 <sc-if value="{{ ak.hasModels }}" hint-placeholder-val="{{ false }}"><select value="{{ ak.model }}" onChange="{{ ak.onModel }}" style="background:var(--s1);border:1px solid var(--line2);border-radius:8px;color:var(--ink);font:500 13px 'Hanken Grotesk';padding:5px 8px;cursor:pointer;outline:none"><sc-for list="{{ ak.models }}" as="m" hint-placeholder-count="2"><option value="{{ m.v }}">{{ m.label }}</option></sc-for></select></sc-if>
@@ -4321,7 +4322,7 @@ class Component extends DCLogic {
       this._overviewRoot = root; this._overviewMount = M.mountOverview(root, { ...options, docs: this.analysis().docs });
     }).catch(e => { this._overviewLoading = null; root.textContent = 'Overview unavailable: ' + e.message; });
   }
-  state = { corpus: null, added: loadAdded(), view: new URLSearchParams(location.search).has('work') ? 'ask' : 'summary', akMode: new URLSearchParams(location.search).get('work') === 'notebook' ? 'notebook' : new URLSearchParams(location.search).get('work') === 'fold' ? 'generate' : 'chat', akFocus: new URLSearchParams(location.search).get('fullscreen') === '1', akConvList: false, akNotes: {}, sel: null, f: {}, q: '', readDoc: null, showPos: false, showAdd: false, showSettings: false, draftText: '', fw: {}, note: '', theme: loadTheme(), railOpen: loadRailOpen(), segOpen: loadSegOpen(), topicsQ: '', topicsPage: 0, dragging: false, busy: '', just: null, readMode: 'original', htmlVer: 0, txAsk: null, txPrior: 'workspace', txLang: 'en', txModel: 'base', txBusy: false, txProg: '', ground: { on: true, names: true, figures: true, dates: true, sentences: true }, wsRenaming: false, wsNameDraft: '', stripRead: { mode: 'Relate', domain: 'Interpretation', grain: 'Pattern' }, folder: null, folderDraft: '' };
+  state = { corpus: null, added: loadAdded(), view: new URLSearchParams(location.search).has('work') ? 'ask' : 'summary', akMode: new URLSearchParams(location.search).get('work') === 'notebook' ? 'notebook' : new URLSearchParams(location.search).get('work') === 'fold' ? 'generate' : 'chat', akFocus: new URLSearchParams(location.search).get('fullscreen') === '1' || new URLSearchParams(location.search).get('work') === 'chat', akConvList: false, akNotes: {}, sel: null, f: {}, q: '', readDoc: null, showPos: false, showAdd: false, showSettings: false, draftText: '', fw: {}, note: '', theme: loadTheme(), railOpen: loadRailOpen(), segOpen: loadSegOpen(), topicsQ: '', topicsPage: 0, dragging: false, busy: '', just: null, readMode: 'original', htmlVer: 0, txAsk: null, txPrior: 'workspace', txLang: 'en', txModel: 'base', txBusy: false, txProg: '', ground: { on: true, names: true, figures: true, dates: true, sentences: true }, wsRenaming: false, wsNameDraft: '', stripRead: { mode: 'Relate', domain: 'Interpretation', grain: 'Pattern' }, folder: null, folderDraft: '' };
   _html = {};
 
   componentDidMount() {
@@ -5279,9 +5280,17 @@ class Component extends DCLogic {
   tabBtn(on) { return { bg: on ? 'var(--sel)' : 'transparent', bd: on ? '#8b5cf6' : 'var(--line2)', fw: on ? 600 : 500 }; }
   // ---------- Ask the Fold: The Fold's grounded conversation over this workspace, answered by a model on this machine ----------
   askMod() { if (!this._askP) this._askP = import(new URL('holodeck-ask.js', location.href).href).then(M => { this._askM = M; return M; }); return this._askP; }
-  akModels() { const M = this._askM; const think = n => !!(M && M.isThinkingModel && M.isThinkingModel(n)); const wl = M ? M.WEBLLM_MODELS.filter(m => !think(m.id)).map(m => ({ v: 'webllm:' + m.id, label: m.label + ' · ' + m.size, size: m.size, name: m.label.replace(/ · in this tab$/, '') })) : []; const ol = (this._oll && this._oll.ok ? this._oll.models || [] : []).filter(m => !think(m.name)).map(m => ({ v: m.name, label: m.name + ' · Ollama', name: m.name })); return [...wl, ...ol]; }
+  // The chat lane onto heimdall's bridge (holodeck-chat-lane.js) — separate
+  // from heimdallMod() (holodeck-heimdall.js), the fold's fleet-door module.
+  chatLaneMod() { if (!this._hdP) this._hdP = import(new URL('holodeck-chat-lane.js', location.href).href).then(H => { this._hdM = H; return H; }); return this._hdP; }
+  akModels() { const M = this._askM; const think = n => !!(M && M.isThinkingModel && M.isThinkingModel(n)); const wl = M ? M.WEBLLM_MODELS.filter(m => !think(m.id)).map(m => ({ v: 'webllm:' + m.id, label: m.label + ' · ' + m.size, size: m.size, name: m.label.replace(/ · in this tab$/, '') })) : []; const ol = (this._oll && this._oll.ok ? this._oll.models || [] : []).filter(m => !think(m.name)).map(m => ({ v: m.name, label: m.name + ' · Ollama', name: m.name }));
+    // The heimdall bridge: the fleet, linked hosts, and the sealed outside
+    // providers. A sealed model is labelled as such and, when chosen, the
+    // turn runs under the sealed boundary (raw spans withheld).
+    const hd = (this._hdm && this._hdm.ok ? this._hdm.models || [] : []).filter(m => !think(m.name)).map(m => ({ v: 'heimdall:' + m.name, label: m.name + (m.sealed ? ' · ' + (m.provider || 'sealed') + ' · sealed' : ' · fleet'), name: m.name, sealed: m.sealed }));
+    return [...wl, ...ol, ...hd]; }
   akModel() { const S = this.state; const ms = this.akModels(); let saved = null; try { saved = localStorage.getItem('fold-explorer-ak-model'); } catch (e) {} const want = S.akModel || saved; if (want && ms.some(m => m.v === want)) return want; return 'webllm:gemma-2-2b-it-q4f16_1-MLC'; }
-  llmOk() { const m = this.akModel(); const M = this._askM; if (m.startsWith('webllm:')) return !!(M && M.webgpu()); return !!(this._oll && this._oll.ok); }
+  llmOk() { const m = this.akModel(); const M = this._askM; if (m.startsWith('webllm:')) return !!(M && M.webgpu()); if (m.startsWith('heimdall:')) return !!(this._hdm && this._hdm.ok); return !!(this._oll && this._oll.ok); }
   async akLoad() { const M = await this.askMod(); const m = this.akModel(); if (!m.startsWith('webllm:') || M.webllmLoaded(m.slice(7))) return true; if (!M.webgpu()) { this.setState({ akErr: 'This browser has no WebGPU, so a model can’t run in this tab. Chrome or Edge with hardware acceleration on can.' }); return false; }
     this.setState({ akLoad: { text: 'Starting…', p: 0 }, akErr: '' }); let last = 0;
     try { await M.loadWebLLM(m.slice(7), pr => { const now = Date.now(); if (now - last > 150) { last = now; this.setState({ akLoad: { text: pr.text || '', p: pr.progress || 0 } }); } }); this.setState({ akLoad: null }); return true; }
@@ -5301,7 +5310,11 @@ class Component extends DCLogic {
     } catch (e) {}
     finally { this._akAutoBusy = false; }
   }
-  akProbe() { this._oll = { pending: true }; this.askMod().then(M => M.probe()).then(p => { this._oll = p; this.forceUpdate(); }).catch(e => { this._oll = { ok: false, why: String(e && e.message || e) }; this.forceUpdate(); }); }
+  akProbe() { this._oll = { pending: true }; this.askMod().then(M => M.probe()).then(p => { this._oll = p; this.forceUpdate(); }).catch(e => { this._oll = { ok: false, why: String(e && e.message || e) }; this.forceUpdate(); });
+    this._hdm = { pending: true }; this.chatLaneMod().then(H => H.probe()).then(p => { this._hdm = p; this.forceUpdate(); }).catch(e => { this._hdm = { ok: false, why: String(e && e.message || e) }; this.forceUpdate(); }); }
+  // True when the selected model is a heimdall bridge model the bridge marks
+  // sealed-only — the turn then runs under the sealed boundary.
+  hdSealedOf(name) { if (!String(name || '').startsWith('heimdall:')) return false; const hd = this._hdm && this._hdm.ok ? (this._hdm.models || []) : []; const m = hd.find(x => name === 'heimdall:' + x.name); return !!(m && m.sealed); }
   convKey() { return 'holodeck-fold:' + this.corpusId(); }
   convsKey() { return 'holodeck-convs:' + this.corpusId(); }
   emptyConv() { const M = this._askM; return M && M.emptyConv ? M.emptyConv() : { summary: { topic: null, flow: null, entities: [], context: null, records: [], folds: [], turnCount: 0 }, history: [], turns: [] }; }
@@ -5394,7 +5407,7 @@ class Component extends DCLogic {
     if (!A0.docs.some(d => this.counted(d))) { this.setState({ akRefuse: { q }, akQ: '', akPending: '' }); return; }
     if (this._akFold) { try { this._akFold.abort(); } catch (e) {} this._akFold = null; }
     const M = await this.askMod(); if (!this._conv) this._conv = M.emptyConv();
-    if (!this.llmOk()) { this.setState({ akErr: this.akModel().startsWith('webllm:') ? 'This browser has no WebGPU, so the model can’t run in this tab.' : 'Ollama isn’t reachable on this machine.', akQ: q }); return; }
+    if (!this.llmOk()) { this.setState({ akErr: this.akModel().startsWith('webllm:') ? 'This browser has no WebGPU, so the model can’t run in this tab.' : this.akModel().startsWith('heimdall:') ? 'The heimdall bridge isn’t reachable on this machine — start it (heimdall up) and reload.' : 'Ollama isn’t reachable on this machine.', akQ: q }); return; }
     this.setState({ akPending: q, akQ: '', akRefuse: null }); if (!(await this.akLoad())) { this.setState({ akPending: '', akQ: q }); return; }
     if (!this._ix) { this.setState({ akBusy: 'indexing', akPending: q, akQ: '' }); for (let i = 0; i < 200 && !this._ix; i++) await new Promise(r => setTimeout(r, 100)); if (!this._ix) { this.setState({ akBusy: '', akErr: 'The passages are still being indexed. Try again in a moment.', akQ: q, akPending: '' }); return; } }
     let computed = null; try { computed = await this.askComputed(q); } catch (e) {}
@@ -5406,7 +5419,13 @@ class Component extends DCLogic {
     const ac = new AbortController(); this._akAbort = ac; let last = 0;
     this.setState({ akBusy: 'retrieving', akQ: '', akStream: '', akPending: q, akErr: '', akComputed: computed });
     const sourceDocs = A0.docs.filter(d => this.counted(d) && (d.text || '').trim().length > 40);
-    try { const r = await M.turn(this._conv, this._ix, q, { model: this.akModel(), computed, reading, retrievalQ, resolved, docs: sourceDocs, signal: ac.signal, onStage: st => this.setState({ akBusy: st }), onToken: t => { const now = Date.now(); if (now - last > 50) { last = now; this.setState({ akStream: t }); } }, deferFold: true, onFold: (folded, ref) => { if (this._conv !== r.conv) return; r.conv.summary = folded; r.turn.refresh = ref; this.saveConv(); this.forceUpdate(); } });
+    // The sealed boundary: a heimdall model the bridge marks sealed-only runs
+    // under sealed-external — holodeck-ask withholds verbatim spans and the
+    // lane carries heimdall_privacy:"sealed-external".
+    const mSel = this.akModel();
+    const hdSel = this._hdm && this._hdm.ok ? (this._hdm.models || []).find(x => mSel === 'heimdall:' + x.name) : null;
+    const privacy = hdSel && hdSel.sealed ? 'sealed-external' : 'local-raw';
+    try { const r = await M.turn(this._conv, this._ix, q, { model: this.akModel(), privacy, computed, reading, retrievalQ, resolved, docs: sourceDocs, signal: ac.signal, onStage: st => this.setState({ akBusy: st }), onToken: t => { const now = Date.now(); if (now - last > 50) { last = now; this.setState({ akStream: t }); } }, deferFold: true, onFold: (folded, ref) => { if (this._conv !== r.conv) return; r.conv.summary = folded; r.turn.refresh = ref; this.saveConv(); this.forceUpdate(); } });
       this._akFold = r.fold ? { abort: () => r.fold.abort(), conv: r.conv } : null;
       this._conv = r.conv; this._lastMsgs = r.turn.messages; this.saveConv(); this.setState({ akBusy: '', akStream: '', akPending: '', akComputed: null });
       if ((this.state.akMode || 'chat') === 'notebook') { try { await this.syncNotebookLog(); } catch (e) {} }
@@ -5560,7 +5579,8 @@ class Component extends DCLogic {
     return { ak: { on: true, onSrc: akPane !== 'data', onData: akPane === 'data', nbRef: this._nbRef,
  ready: this.llmOk(), pending: false, refuse, gap: isWL ? !gpu && !!MM : !(O && O.ok), why: isWL ? 'navigator.gpu is not available in this browser' : (O.why || ''), isWL, noGpu: isWL && MM && !gpu, needLoad: isWL && gpu && !loaded && !LD, loading: !!LD, loadText: LD ? LD.text : '', loadPct: LD ? Math.round((LD.p || 0) * 100) + '%' : '0%', load: () => this.akLoad(), mName: mInfo.name, mSize: mInfo.size || '',
       dot: isWL ? (loaded ? 'var(--ok)' : gpu ? 'var(--amber)' : 'var(--bad)') : O.ok ? 'var(--ok)' : 'var(--bad)',
-      status: isWL ? (loaded ? mInfo.name + ' running in this tab · nothing leaves it' : !MM ? 'Starting…' : gpu ? mInfo.name + ' runs in this tab once loaded' : 'This browser can’t run a model in the tab') : O.ok ? model + ' via Ollama on this machine' : 'Ollama isn’t reachable',
+      status: String(this.akModel()).startsWith('heimdall:') ? (this._hdm && this._hdm.ok ? 'heimdall · ' + (this.hdSealedOf(this.akModel()) ? 'sealed-external — projection only' : 'fleet · local') : 'heimdall bridge isn’t reachable') : (isWL ? (loaded ? mInfo.name + ' running in this tab · nothing leaves it' : !MM ? 'Starting…' : gpu ? mInfo.name + ' runs in this tab once loaded' : 'This browser can’t run a model in the tab') : O.ok ? model + ' via Ollama on this machine' : 'Ollama isn’t reachable'),
+      hdSealed: this.hdSealedOf(this.akModel()), hdLine: this.hdSealedOf(this.akModel()) ? 'sealed-external — verbatim spans withheld; the reading only.' : '',
       models: ms.map(m => ({ v: m.v, label: m.label })), hasModels: ms.length > 1, model, onModel: e => { const v = e.target.value; try { localStorage.setItem('fold-explorer-ak-model', v); } catch (er) {} this.setState({ akModel: v }); setTimeout(() => { try { this.akAutoLoad(); } catch (er) {} }, 0); }, retry: () => this.akProbe(),
       ixLine: this._ix ? plural(this._ix.chunks.length, 'passage') + ' from ' + plural(Object.keys(this._ix.texts).length, 'source') : 'Indexing passages…',
       turns, hasTurns: turns.length > 0, noTurns: turns.length === 0 && !S.akPending,

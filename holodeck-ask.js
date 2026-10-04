@@ -10,6 +10,7 @@ import { chunkSource, retrieve, buildSourceBlock, openQuestions, readRange, toke
 import { meetingBoundaries } from './vendor/eoreader7/native/organs/speaker.js';
 import { buildFactBlock, dedupeSourceText } from './vendor/eoreader7/native/organs/fact-block.js';
 import { makeEngineRelationReader, readCorpus, blankMarkup } from './holodeck-reader.js';
+import * as HH from './holodeck-chat-lane.js';
 let _reader = null; const reader = () => _reader || (_reader = makeEngineRelationReader());
 import { ladder, conclusionOf, select } from './holodeck-summary.js';
 // Gary, the prompt archon: he owns what the mouth is handed, in what order, and
@@ -153,6 +154,11 @@ export function index(docs) {
 
 async function chat(base, model, messages, opts = {}) {
   if (String(model).startsWith('webllm:')) return chatWebLLM(String(model).slice(7), messages, opts);
+  // A heimdall model rides the heimdall bridge (the fleet, linked hosts, and
+  // the sealed outside providers). For a sealed model the lane sends
+  // heimdall_privacy:"sealed-external" and the caller must have withheld
+  // verbatim spans (turn()'s sealed guard) — the bridge refuses otherwise.
+  if (String(model).startsWith('heimdall:')) return HH.chat(HH.HEIMDALL, String(model).slice(9), messages, { onToken: opts.onToken, format: opts.format, maxTokens: opts.maxTokens, signal: opts.signal, sealed: !!opts.sealed });
   const { onToken, format, maxTokens, signal } = opts;
   const body = { model, messages, stream: !!onToken, keep_alive: '3600s', options: { num_ctx: 4096, temperature: 0.2, ...(maxTokens ? { num_predict: maxTokens } : {}) } };
   if (format) body.format = format;
@@ -170,8 +176,14 @@ async function chat(base, model, messages, opts = {}) {
 
 // One turn. `conv` = { summary, history, turns }. `computed` is an optional block of values computed from the
 // Records database (never asked of the model); it rides into the prompt as material and onto the record.
-export async function turn(conv, IX, question, { base = OLLAMA, model = DEFAULT_MODEL, computed = null, reading = null, retrievalQ = null, resolved = null, ctx = 4096, onToken, onStage, signal, deferFold = false, onFold = null, docs = null, summarize = true } = {}) {
+export async function turn(conv, IX, question, { base = OLLAMA, model = DEFAULT_MODEL, computed = null, reading = null, retrievalQ = null, resolved = null, ctx = 4096, onToken, onStage, signal, deferFold = false, onFold = null, docs = null, summarize = true, privacy = 'local-raw' } = {}) {
   const t0 = Date.now(); const turnNo = (conv.summary.turnCount || 0) + 1;
+  // THE SEALED BOUNDARY: an outside executor (heimdall frontier/remote model)
+  // may only receive the projection the Fold builds. When the caller selects
+  // sealed-external, the verbatim spans are withheld from build() below and
+  // the heimdall lane carries heimdall_privacy:"sealed-external". Raw material
+  // never leaves for a stronger model's convenience (spec §2.I).
+  const sealed = privacy === 'sealed-external';
   const folded = conv.summary.records.flatMap(r => r.refs || []);
   onStage && onStage('retrieving');
   const qTerms = [...new Set(tokenize(retrievalQ || question))];
@@ -239,9 +251,12 @@ export async function turn(conv, IX, question, { base = OLLAMA, model = DEFAULT_
     : null;
   const build = (off, facts, fold) => {
     // The verbatim material ALWAYS rides (the surf's spans when the surf bound,
-    // else the deduped source). The fold is added beside it, never instead.
-    const raw = facts && !facts.empty ? spanBlock : buildSourceBlock(dedupeSourceText(off, relations));
-    let sb = [facts ? facts.text : null, fold, raw].filter(Boolean).join('\n\n');
+    // else the deduped source) — EXCEPT under the sealed boundary, where an
+    // outside executor may only see the reading, never the raw spans. The
+    // withholding is declared in the prompt, so the absence is not silence.
+    const raw = sealed ? null : (facts && !facts.empty ? spanBlock : buildSourceBlock(dedupeSourceText(off, relations)));
+    const sealedNote = sealed ? 'The material\u2019s reading only — verbatim spans are withheld for this executor. Ask what the reading says; it cannot quote the source.' : null;
+    let sb = [facts ? facts.text : null, fold, raw, sealedNote].filter(Boolean).join('\n\n');
     if (reading && reading.text) sb = (sb ? sb + '\n\n' : '') + 'What the reader established about the names asked about:\n' + reading.text;
     if (computed && computed.text) sb = (sb ? sb + '\n\n' : '') + 'Counted from the workspace records:\n' + computed.text;
     return FOLD.buildTurnMessages({ basePrompt: activePrompt, summary: conv.summary, history, question, sourceBlock: sb }); };
@@ -257,7 +272,7 @@ export async function turn(conv, IX, question, { base = OLLAMA, model = DEFAULT_
   const sentChars = FOLD.charCount(messages);
   const transcriptChars = conv.history.reduce((n, m) => n + (m.content || '').length, 0) + question.length;
   onStage && onStage('answering');
-  const res = await chat(base, model, messages, { onToken, signal, maxTokens: 700 });
+  const res = await chat(base, model, messages, { onToken, signal, maxTokens: 700, sealed });
   const answer = stripSelfCitations(res.text).text;
   onStage && onStage('checking');
   const attr = offered.length ? coverage(answer, offered, IX.chunks) : [];
@@ -277,7 +292,7 @@ export async function turn(conv, IX, question, { base = OLLAMA, model = DEFAULT_
   const refreshSummary = async (from, sig) => {
     try {
       const up = FOLD.buildSummaryUpdatePrompt(from, [...(from.folds || []), foldLine]);
-      const r2 = await chat(base, model, [{ role: 'system', content: FOLD.FOLD_SYSTEM_PROMPT }, { role: 'user', content: up }], { format: FOLD.FOLD_SCHEMA, maxTokens: 300, signal: sig });
+      const r2 = await chat(base, model, [{ role: 'system', content: FOLD.FOLD_SYSTEM_PROMPT }, { role: 'user', content: up }], { format: FOLD.FOLD_SCHEMA, maxTokens: 300, signal: sig, sealed });
       const next = FOLD.updateSummaryWithFold(from, foldLine, r2.text);
       const w = FOLD.extractSummaryFindings(from.entities, next.entities, { records: FOLD.projectRecords(next), folds: next.folds });
       if (w.ok) return { summary: next, refresh: { ok: true } };
@@ -301,7 +316,8 @@ export async function turn(conv, IX, question, { base = OLLAMA, model = DEFAULT_
   const t = { n: turnNo, question, answer, used: used.map(ref => ({ ref, text: String(readRange(IX.texts, ref) || '').trim().slice(0, 700) })), offered: offered.map(c => ({ ref: c.ref, source: c.source, start: c.start, end: c.end, label: c.label, text: c.text.slice(0, 700) })),
     attr: attr.map(a => ({ text: a.text, ref: a.ref || null, via: a.via || null })), findings: (grounding.findings || []).map(f => ({ text: f.text, kind: f.atomKind, start: f.start, end: f.end, echoesQuestion: !!f.echoesQuestion })),
     examined: !!grounding.examined, record, foldLine, refresh, computed, synopsis, gary: garyCheck, reading: reading ? { lines: reading.lines } : null, notes, resolved: resolved && resolved.length ? resolved : null, sentChars, transcriptChars, messages, model, ms: Date.now() - t0,
-    tokens: res.stats ? { out: res.stats.eval_count, in: res.stats.prompt_eval_count, secs: res.stats.total_duration ? res.stats.total_duration / 1e9 : null } : null };
+    tokens: res.stats ? { out: res.stats.eval_count, in: res.stats.prompt_eval_count, secs: res.stats.total_duration ? res.stats.total_duration / 1e9 : null } : null,
+    sealed, rawWithheld: sealed ? (factBlock && factBlock.spans && factBlock.spans.length ? factBlock.spans.length : (offered.length || 0)) : 0 };
   return { conv: { summary, history: [...conv.history, { role: 'user', content: question }, { role: 'assistant', content: answer }], turns: [...conv.turns, t] }, turn: t, fold };
 }
 
