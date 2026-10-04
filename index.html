@@ -2545,6 +2545,31 @@ button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visi
             </div>
             <sc-if value="{{ ing.ytdlNote }}" hint-placeholder-val="{{ '' }}"><span style="font:400 13px/1.45 'Hanken Grotesk';color:var(--ink2);text-wrap:pretty">{{ ing.ytdlNote }}</span></sc-if>
           </section>
+          <section style="background:var(--s1);border:1px solid var(--line);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:10px">
+            <span style="font:600 12px 'JetBrains Mono';letter-spacing:.08em;text-transform:uppercase;color:var(--mut)">Reasoning · privacy mode</span>
+            <span style="font:400 13px/1.5 'Hanken Grotesk';color:var(--mut);text-wrap:pretty">The mode selects what leaves the device and which lanes may answer. Keys for frontier models live on the heimdall machine (<code>heimdall key &lt;provider&gt; &lt;key&gt;</code>), never in this browser; a sealed job only reaches a frontier provider after heimdall’s gate sees its mode on the wire.</span>
+            <div style="display:flex;gap:6px;flex-wrap:wrap">
+              <sc-for list="{{ ing.modes }}" as="m" hint-placeholder-count="5"><button onClick="{{ m.on }}" style="background:{{ m.bg }};border:1px solid {{ m.bd }};color:{{ m.col }};border-radius:999px;padding:5px 12px;cursor:pointer;font:600 12px 'JetBrains Mono'">{{ m.label }}</button></sc-for>
+            </div>
+            <span style="font:400 12px/1.45 'Hanken Grotesk';color:var(--dim);text-wrap:pretty">{{ ing.modeNote }}</span>
+            <sc-if value="{{ ing.sealedOn }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <span style="font:600 12px 'JetBrains Mono';letter-spacing:.08em;text-transform:uppercase;color:var(--mut)">Heimdall relay</span>
+                <div style="display:flex;gap:8px;flex-wrap:wrap">
+                  <input defaultValue="{{ ing.relay }}" onChange="{{ ing.onRelay }}" placeholder="http://127.0.0.1:8790" style="flex:1 1 200px;min-width:0;background:var(--s2);border:1px solid var(--line2);border-radius:8px;padding:6px 10px;font:500 13px 'JetBrains Mono';color:var(--ink);outline:none"></input>
+                  <button onClick="{{ ing.onRelayCheck }}" style="background:none;border:1px solid var(--line2);border-radius:8px;padding:5px 12px;cursor:pointer;font:500 13px 'Hanken Grotesk';color:var(--ink2);white-space:nowrap">Check heimdall</button>
+                </div>
+                <sc-if value="{{ ing.relayNote }}" hint-placeholder-val="{{ '' }}"><span style="font:400 13px/1.45 'Hanken Grotesk';color:var(--ink2);text-wrap:pretty">{{ ing.relayNote }}</span></sc-if>
+                <sc-if value="{{ ing.hasProv }}" hint-placeholder-val="{{ false }}"><span style="font:400 12px/1.45 'JetBrains Mono';color:var(--mut);overflow-wrap:anywhere">{{ ing.provLine }}</span></sc-if>
+                <span style="font:600 12px 'JetBrains Mono';letter-spacing:.08em;text-transform:uppercase;color:var(--mut)">Model</span>
+                <div style="display:flex;gap:8px;flex-wrap:wrap">
+                  <input defaultValue="{{ ing.llmModel }}" onChange="{{ ing.onLlmModel }}" placeholder="anthropic:claude-sonnet-4-…" style="flex:1 1 200px;min-width:0;background:var(--s2);border:1px solid var(--line2);border-radius:8px;padding:6px 10px;font:500 13px 'JetBrains Mono';color:var(--ink);outline:none"></input>
+                  <button onClick="{{ ing.onLlmTest }}" style="background:none;border:1px solid var(--line2);border-radius:8px;padding:5px 12px;cursor:pointer;font:500 13px 'Hanken Grotesk';color:var(--ink2);white-space:nowrap">Test</button>
+                </div>
+                <span style="font:400 12px/1.45 'Hanken Grotesk';color:var(--dim);text-wrap:pretty">The relay lists the models the configured providers expose. The request carries <code>heimdall_privacy:"{{ ing.modeWire }}"</code> and heimdall refuses anything else to a frontier model.</span>
+              </div>
+            </sc-if>
+          </section>
       </div>
     </div>
   </sc-if>
@@ -4692,20 +4717,55 @@ class Component extends DCLogic {
   _fallbackCopy(t) { const ta = document.createElement('textarea'); ta.value = t; ta.style.position = 'fixed'; ta.style.opacity = '0'; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); } catch (e) {} ta.remove(); }
   later(key, fn, ms) { this._deb = this._deb || {}; this._debFn = this._debFn || {}; clearTimeout(this._deb[key]); this._debFn[key] = fn; this._deb[key] = setTimeout(() => { delete this._deb[key]; const f = this._debFn[key]; delete this._debFn[key]; if (f) f(); }, ms || 450); }
   flush() { const F = this._debFn || {}; Object.keys(F).forEach(k => { clearTimeout((this._deb || {})[k]); delete this._deb[k]; const f = F[k]; delete F[k]; f(); }); }
-  llmCfg() { if (!this._llm) { try { this._llm = JSON.parse(localStorage.getItem('fold-explorer-llm') || 'null'); } catch (e) {} this._llm = { url: 'http://localhost:11434', model: 'llama3.1', ...(this._llm || {}) }; } return this._llm; }
+  llmCfg() { if (!this._llm) { try { this._llm = JSON.parse(localStorage.getItem('fold-explorer-llm') || 'null'); } catch (e) {} this._llm = { url: 'http://localhost:11434', model: 'llama3.1', key: '', relay: 'http://127.0.0.1:8790', mode: 'local', ...(this._llm || {}) }; } return this._llm; }
   setLlm(p) { this._llm = { ...this.llmCfg(), ...p }; try { localStorage.setItem('fold-explorer-llm', JSON.stringify(this._llm)); } catch (e) {} }
+  // Privacy modes (spec §27): the mode selects what leaves the device and
+  // which lanes are eligible. local = nothing leaves. The sealed modes tag the
+  // request `heimdall_privacy:"sealed-external"` so heimdall's gate lets it to
+  // a frontier executor ONLY in that state; explicit is conscious disclosure.
+  llmModes() { return [
+    { id: 'local', label: 'Local', note: 'Nothing leaves this machine — Ollama / LM Studio / the fleet.' },
+    { id: 'blind', label: 'Blind', note: 'Witness-independent formal structure only (opaque symbols, constraints, no observed values).' },
+    { id: 'semantic-sealed', label: 'Semantic-sealed', note: 'Opaque identities; some meaningful predicates/categories survive.' },
+    { id: 'attested', label: 'Attested', note: 'Richer material, but only to a verified TEE / trusted self-hosted runtime.' },
+    { id: 'explicit', label: 'Explicit', note: 'You consciously authorize raw disclosure to the chosen provider.' },
+  ]; }
+  async frontierStatus() {
+    const relay = (this.llmCfg().relay || '').replace(/\/+$/, '');
+    if (!relay) return { ok: false, note: 'no relay URL set' };
+    try {
+      const r = await fetch(relay + '/api/frontier', { signal: AbortSignal.timeout(5000) });
+      if (!r.ok) return { ok: false, note: 'relay at ' + relay + ' answered ' + r.status + ' — is heimdall up? (heimdall up)' };
+      const j = await r.json();
+      if (!j.configured) return { ok: true, note: 'Heimdall has no frontier providers configured yet — set one with `heimdall key <provider> <key>` on this machine.', providers: [] };
+      return { ok: true, note: 'Configured on this machine (keys never reach the browser):', providers: j.providers.map(p => p.model) };
+    } catch (e) { return { ok: false, note: 'can’t reach the heimdall relay at ' + relay + ' (' + (e.message || e) + ')' }; }
+  }
   async localLLM(system, user) {
-    const { url, model } = this.llmCfg(); const base = url.replace(/\/+$/, ''); const msgs = [{ role: 'system', content: system }, { role: 'user', content: user }];
-    const oai = /\/v1$/.test(base) || /:1234\b|:8080\b|:5000\b/.test(base);
+    const { url, model, key, mode, relay } = this.llmCfg();
+    const sealed = mode !== 'local';
+    // Frontier/reasoning modes go through the heimdall relay with the privacy
+    // mode tagged on the wire; heimdall holds the provider keys and its gate
+    // only lets a sealed-external (or explicit) job reach a frontier executor.
+    const base = (sealed && relay ? relay : url).replace(/\/+$/, '');
+    const msgs = [{ role: 'system', content: system }, { role: 'user', content: user }];
     const ctl = new AbortController(); const to = setTimeout(() => ctl.abort(), 120000);
     try {
-      const r = oai ? await fetch((/\/v1$/.test(base) ? base : base + '/v1') + '/chat/completions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ model, messages: msgs, temperature: 0, max_tokens: 900 }), signal: ctl.signal })
-        : await fetch(base + '/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ model, messages: msgs, stream: false, options: { temperature: 0 } }), signal: ctl.signal });
-      if (!r.ok) throw new Error('HTTP ' + r.status + ' from ' + base);
-      const j = await r.json(); return ((oai ? j.choices && j.choices[0] && j.choices[0].message && j.choices[0].message.content : j.message && j.message.content) || '').trim();
+      let r;
+      if (sealed) {
+        r = await fetch(base + '/v1/chat/completions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ model, messages: msgs, temperature: 0, max_tokens: 900, heimdall_privacy: mode === 'explicit' ? 'explicit' : 'sealed-external' }), signal: ctl.signal });
+      } else {
+        const oai = /\/v1$/.test(base) || /:1234\b|:8080\b|:5000\b/.test(base);
+        const h = { 'Content-Type': 'application/json' };
+        if (key) h['Authorization'] = 'Bearer ' + key;
+        r = oai ? await fetch((/\/v1$/.test(base) ? base : base + '/v1') + '/chat/completions', { method: 'POST', headers: h, body: JSON.stringify({ model, messages: msgs, temperature: 0, max_tokens: 900 }), signal: ctl.signal })
+          : await fetch(base + '/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ model, messages: msgs, stream: false, options: { temperature: 0 } }), signal: ctl.signal });
+      }
+      if (!r.ok) { const t = await r.text().catch(() => ''); throw new Error('HTTP ' + r.status + ' from ' + base + (t ? ' — ' + t.slice(0, 160) : '')); }
+      const j = await r.json(); return ((j.choices && j.choices[0] && j.choices[0].message && j.choices[0].message.content) || '').trim();
     } finally { clearTimeout(to); }
   }
-  async testLLM() { this.setState({ llmTest: 'Testing…' }); try { const t = await this.localLLM('Reply with the single word OK.', 'Say OK.'); this.setState({ llmTest: t ? 'Connected: ' + this.llmCfg().model + ' replied “' + short(t, 30) + '”' : 'Connected, but the model returned nothing' }); } catch (e) { this.setState({ llmTest: 'Can’t reach ' + this.llmCfg().url + ' (' + (e.name === 'AbortError' ? 'timed out' : e.message) + '). If it’s Ollama, start it with OLLAMA_ORIGINS=* so this page may call it.' }); } }
+  async testLLM() { this.setState({ llmTest: 'Testing…' }); try { const t = await this.localLLM('Reply with the single word OK.', 'Say OK.'); const cfg = this.llmCfg(); this.setState({ llmTest: t ? (cfg.mode === 'local' ? 'Connected: ' + cfg.model + ' replied “' + short(t, 30) + '”' : 'Connected: ' + cfg.model + ' replied “' + short(t, 30) + '” via heimdall (mode: ' + cfg.mode + ')') : 'Connected, but the model returned nothing' }); } catch (e) { this.setState({ llmTest: 'Can’t reach ' + this.llmCfg().url + ' (' + (e.name === 'AbortError' ? 'timed out' : e.message) + '). If it’s Ollama, start it with OLLAMA_ORIGINS=* so this page may call it.' }); } }
   gIndex(A) {
     if (this._gi && this._gi.A === A) return this._gi;
     const STOP = new Set('that this with from were have been will would their there which about into also than them they then these those such more most some other only over very said says year years'.split(' '));
@@ -5704,6 +5764,13 @@ class Component extends DCLogic {
       engine: (() => { try { return localStorage.getItem('hd:engine') || ''; } catch (e) { return ''; } })(),
       onEngine: e => { try { const v = (e.target.value || '').trim(); if (v) localStorage.setItem('hd:engine', v); else localStorage.removeItem('hd:engine'); HD_ENG.url = null; HD_ENG.downAt = 0; } catch (x) {} },
       engineReadExisting: () => this.engineReadExisting({}), engineBusy: !!S.engBusy, engineBtn: S.engBusy ? 'Re-reading…' : 'Re-read existing sources', engineNote: this._engNote || '',
+      modes: this.llmModes().map(mo => ({ label: mo.label, bg: this.llmCfg().mode === mo.id ? 'var(--sel2)' : 'transparent', bd: this.llmCfg().mode === mo.id ? 'var(--acc)' : 'var(--line2)', col: this.llmCfg().mode === mo.id ? 'var(--ink)' : 'var(--mut)', on: () => { this.setLlm({ mode: mo.id }); this.forceUpdate(); } })),
+      modeNote: (this.llmModes().find(mo => mo.id === this.llmCfg().mode) || {}).note || '', sealedOn: this.llmCfg().mode !== 'local',
+      modeWire: this.llmCfg().mode === 'explicit' ? 'explicit' : 'sealed-external',
+      relay: this.llmCfg().relay || '', onRelay: e => this.setLlm({ relay: e.target.value.trim() }),
+      onRelayCheck: () => this.frontierStatus().then(r => { this._relayNote = r.note; this._prov = r.providers || []; this.forceUpdate(); }).catch(e => { this._relayNote = String(e.message || e); this._prov = []; this.forceUpdate(); }),
+      relayNote: this._relayNote || '', hasProv: !!(this._prov && this._prov.length), provLine: this._prov ? 'Models heimdall offers: ' + this._prov.join(' · ') : '',
+      llmModel: this.llmCfg().model, onLlmModel: e => this.setLlm({ model: e.target.value.trim() }), onLlmTest: () => this.testLLM(), llmTest: S.llmTest || '',
       txNeeded: txNeeded.map(d => ({ title: d.title, onPick: e => { const f = e.target.files && e.target.files[0]; if (f) this.transcribeFile(f, d); e.target.value = ''; } })), hasTx: txNeeded.length > 0,
       chain: (n.chain || []).slice().reverse().slice(0, 40).map(b => ({ title: (b.meta && (b.meta.title || b.meta.filename)) || 'block', kind: (b.meta && b.meta.kind) || '', hash: b.block ? b.block.slice(0, 16) : '', prev: b.prev ? b.prev.slice(0, 10) : 'genesis', by: b.sender || '', ok: b.linked && b.self ? 'linked' : 'broken', okCol: b.linked && b.self ? 'var(--ok)' : 'var(--bad)' })), hasChain: !!(n.chain && n.chain.length), chainLine: n.chain ? plural(n.chain.length, 'block') + ' · ' + (n.chainOk === false ? 'the chain is broken somewhere' : 'every block links to the one before') : '', onLoadRoom: () => this.loadFromRoom(), onRefresh: () => this.netDo('Refresh', () => this.refreshRoom()),
       onPubAll: () => this.publishAll(), pubAllLabel: this._pubAll ? 'Stop publishing' : 'Publish every source', pubAllLine: this._pubAll ? 'Publishing ' + (this._pubAll.done + this._pubAll.skipped + this._pubAll.failed) + ' of ' + this._pubAll.total + ' · ' + this._pubAll.done + ' new, ' + this._pubAll.skipped + ' already in the chain' : 'Adds each source’s original bytes (capture, PDF, transcript) as a block, and sends web sources to archive.org. Sources already in the chain are skipped, so it can be stopped and resumed.', canPubAll: !!(s && !s.guest && R.pub),
@@ -5850,7 +5917,7 @@ class Component extends DCLogic {
     const gen = { kinds: [['brief', 'Brief'], ['timeline', 'Timeline']].map(([k, l]) => ({ label: l, ...seg(gk === k), onClick: () => this.setState({ gKind: k }) })),
       modes: [['mech', 'Quotes'], ['model', 'Model']].map(([k, l]) => ({ label: l, ...seg(gm === k), onClick: () => this.setState({ gMode: k }) })),
       prompt: S.gSubj != null ? S.gSubj : this.defaultSubject(A), onPrompt: e => this.setState({ gSubj: e.target.value }), onKey: e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); this.generate(); } },
-      onRun: () => this.generate(), isModel: gm === 'model', llmUrl: this.llmCfg().url, llmModel: this.llmCfg().model, onLlmUrl: e => this.setLlm({ url: e.target.value.trim() }), onLlmModel: e => this.setLlm({ model: e.target.value.trim() }), onLlmTest: () => this.testLLM(), llmTest: S.llmTest || 'Runs on your machine. Ollama (…:11434) or any OpenAI-compatible server (LM Studio …:1234/v1). Nothing is sent anywhere else.', runLabel: S.gen ? 'Working…' : 'Fill the document', op: S.gen ? 0.6 : 1,
+      onRun: () => this.generate(), isModel: gm === 'model', llmUrl: this.llmCfg().url, llmModel: this.llmCfg().model, onLlmUrl: e => this.setLlm({ url: e.target.value.trim() }), onLlmModel: e => this.setLlm({ model: e.target.value.trim() }), onLlmTest: () => this.testLLM(), llmTest: S.llmTest || (this.llmCfg().mode === 'local' ? 'Runs on your machine. Ollama (…:11434) or any OpenAI-compatible server (LM Studio …:1234/v1). Nothing is sent anywhere else.' : 'Reasoning mode: ' + this.llmCfg().mode + ' — sent to the heimdall relay (keys stay on the machine), which refuses anything but the sealed/explicit tag to a frontier model.'), runLabel: S.gen ? 'Working…' : 'Fill the document', op: S.gen ? 0.6 : 1,
       thread: genThread, hasThread: genThread.length > 0, ...genFoldNav,
       hint: (gk === 'timeline' ? 'Finds dated statements that name the subject, one per source, in date order.' : 'Runs four searches (who leads it, budget, what audits found, how it responded) and adds each section with its excerpts.') + (gm === 'model' ? ' Your local model writes each sentence from those excerpts only; the same mechanical check runs on everything it writes.' : ' Each claim is a quote, so every word comes from the source.') };
     const wr = { wKey: String(S.wKey || 0), onText: e => { const had = !!(this._wText || '').trim(); this._wText = e.target.value; if (had !== !!this._wText.trim()) this.forceUpdate(); }, onGround: () => this.groundWriting(), op: (this._wText || '').trim() ? 1 : 0.5 };
