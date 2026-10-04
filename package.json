@@ -5,6 +5,9 @@
   "description": "the fold \u2014 the reading/research surface of The Fold. No build step; index.html is the app. Playwright is installed only for driving the live page (drive-holodeck.mjs).",
   "scripts": {
     "serve": "python3 -m http.server 8813 --bind 127.0.0.1",
+    "vendor:chat": "node vendor-chat.mjs",
+    "vendor:chat:check": "node vendor-chat.mjs --check",
+    "vendor:check": "node vendor-sync.mjs --check && node vendor-chat.mjs --check",
     "drive": "node drive-holodeck.mjs",
     "test:overview": "node --test holodeck-overview.test.mjs",
     "notebook": "node tools/notebook-server.mjs",
