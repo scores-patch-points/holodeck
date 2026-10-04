@@ -115,3 +115,11 @@ fast: 2 files · 1 affected test pass · law: ok (WARN pre-existing dup eoreader
 | Kondo | P10 | index.html (sweep) | fixed | removed `corrVals`, `rdPanel`/`rdReading`, `readerHint`, `isOriginal`/`faithOn`, `repo` modal, `openNewWs`/`openTask`, `just` panel, `svGroups`, `hasSrcRows`, `showLabels`, `setFw`, `_o`; all stashed with addresses; `S.just` state kept (NEW badge) |
 | Lévi-Strauss | — | — | noted | no stashed piece matches this diff's open problems; 2 matches are pre-existing eoreader7/vendor |
 clean: none further routed
+
+## 2026-10-04 — constitutive ethos spec M7: situated view over FoldTrace@1 (the-fold, main)
+fast: 2 files · 5 affected tests pass · law: ok
+| lens | citation | file:line | verdict | one line |
+| Dijkstra | holodeck-trace.js:41 | the-fold/holodeck-trace.js | fixed | refusal recognized only from explicit marker (refusal:true or exact literal "declined"), never inferred from prose |
+| Holmes | holodeck-trace.js:32 | the-fold/holodeck-trace.js | fixed | observed vs withheld participants kept distinct; absent perspective rendered absent, never invented |
+| Simon/Chekhov | holodeck-trace.js | the-fold/holodeck-trace.js | fixed | imported by holodeck-trace.test.mjs (5/5) |
+clean: Feynman, Frankfurt, Kondo, Lévi-Strauss, Ostrom, Pearl, Greenberg, Alexander (routed, nothing to report)
