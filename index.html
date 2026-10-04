@@ -5390,7 +5390,7 @@ class Component extends DCLogic {
     if (this._akWrapEl === el) return; if (this._akRO) { this._akRO.disconnect(); this._akRO = null; } this._akWrapEl = el; if (!el || typeof ResizeObserver === 'undefined') return;
     this._akRO = new ResizeObserver(() => { const nar = el.clientWidth < ART_CHAT_W + ART_PANE_W + ART_GAP; if (nar !== !!this._akNarrow) { this._akNarrow = nar; this.forceUpdate(); } }); this._akRO.observe(el);
   };
-  askReady() { const m = this.akModel(); const M = this._askM; if (m.startsWith('webllm:')) return !!(M && M.webllmLoaded(m.slice(7))); return !!(this._oll && this._oll.ok); }
+  askReady() { const m = this.akModel(); const M = this._askM; if (m.startsWith('webllm:')) return !!(M && M.webllmLoaded(m.slice(7))); if (m.startsWith('heimdall:')) return !!(this._hdm && this._hdm.ok); return !!(this._oll && this._oll.ok); }
   // A question is answered, never briefed: with ground and a ready model, straight to the Ask
   // pipeline; with ground but no model loaded, the record's own answer; with no ground at all, a
   // cited refusal (II.3, the descent test — resolution, never invention) that offers to gather, keep, or add — never a silent conversion to ingest.
@@ -5403,13 +5403,25 @@ class Component extends DCLogic {
   }
   async askSend(qIn) {
     const q = String(qIn ?? this.state.akQ ?? '').trim(); if (!q || this.state.akBusy) return;
+    const M = await this.askMod();
     const A0 = this.analysis();
-    if (!A0.docs.some(d => this.counted(d))) { this.setState({ akRefuse: { q }, akQ: '', akPending: '' }); return; }
+    const hasDocs = A0.docs.some(d => this.counted(d));
+    // Plain conversation is answered conversationally, never refused for
+    // lacking ground it never claimed. A substantive question with no kept
+    // source is still refused under II.3 (the descent test — resolution,
+    // never invention).
+    if (!hasDocs && !(M && M.isSmallTalk && M.isSmallTalk(q))) { this.setState({ akRefuse: { q }, akQ: '', akPending: '' }); return; }
     if (this._akFold) { try { this._akFold.abort(); } catch (e) {} this._akFold = null; }
-    const M = await this.askMod(); if (!this._conv) this._conv = M.emptyConv();
+    if (!this._conv) this._conv = M.emptyConv();
     if (!this.llmOk()) { this.setState({ akErr: this.akModel().startsWith('webllm:') ? 'This browser has no WebGPU, so the model can’t run in this tab.' : this.akModel().startsWith('heimdall:') ? 'The heimdall bridge isn’t reachable on this machine — start it (heimdall up) and reload.' : 'Ollama isn’t reachable on this machine.', akQ: q }); return; }
     this.setState({ akPending: q, akQ: '', akRefuse: null }); if (!(await this.akLoad())) { this.setState({ akPending: '', akQ: q }); return; }
-    if (!this._ix) { this.setState({ akBusy: 'indexing', akPending: q, akQ: '' }); for (let i = 0; i < 200 && !this._ix; i++) await new Promise(r => setTimeout(r, 100)); if (!this._ix) { this.setState({ akBusy: '', akErr: 'The passages are still being indexed. Try again in a moment.', akQ: q, akPending: '' }); return; } }
+    if (!this._ix) {
+      // An empty workspace still greets: small talk rides the plain prompt
+      // against an empty index, no ground claimed. Substantive questions wait
+      // for the real index as before.
+      if (!hasDocs) this._ix = M.index([]);
+      else { this.setState({ akBusy: 'indexing', akPending: q, akQ: '' }); for (let i = 0; i < 200 && !this._ix; i++) await new Promise(r => setTimeout(r, 100)); if (!this._ix) { this.setState({ akBusy: '', akErr: 'The passages are still being indexed. Try again in a moment.', akQ: q, akPending: '' }); return; } }
+    }
     let computed = null; try { computed = await this.askComputed(q); } catch (e) {}
     if (!this._rix) { try { this._rix = await loadReadingIndex(false); } catch (e) {} }
     let retrievalQ = q, resolved = [];
