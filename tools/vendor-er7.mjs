@@ -30,7 +30,7 @@ const HERE = path.dirname(fileURLToPath(import.meta.url));
 const FOLD = path.resolve(HERE, "..");
 const SRC = process.argv.includes("--src")
   ? process.argv[process.argv.indexOf("--src") + 1]
-  : "/Users/mlacy/Documents/3.0/eoreader7";
+  : "/Users/mlacy/Documents/3.0/khora";
 const DEST = path.join(FOLD, "vendor", "eoreader7");
 const DRY = process.argv.includes("--dry");
 

@@ -21,12 +21,12 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { composedRelations } from "../eoreader7/native/adapters/text/gfp-relations-composed.js";
-import { classifyWord, dominantClass } from "../eoreader7/native/adapters/text/wordclass.js";
-import { claimFromTriple, render as renderClaim } from "../eoreader7/native/kernel/gfp-claim.js";
+import { composedRelations } from "../khora/native/adapters/text/gfp-relations-composed.js";
+import { classifyWord, dominantClass } from "../khora/native/adapters/text/wordclass.js";
+import { claimFromTriple, render as renderClaim } from "../khora/native/kernel/gfp-claim.js";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
-const ER7 = path.join(HERE, "..", "eoreader7");
+const ER7 = path.join(HERE, "..", "khora");
 const P = path.join(ER7, "native", "priors");
 const read = (f) => (fs.existsSync(path.join(P, f)) ? JSON.parse(fs.readFileSync(path.join(P, f), "utf8")) : null);
 

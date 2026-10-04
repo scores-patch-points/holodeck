@@ -27,7 +27,7 @@ date: 2026-09-25T19:46:51Z
 | Fold Explorer v6.dc.html — meeting transcripts | sources.json, readings/*-TRANSCRIPT.json, transcripts/*.segments.json, transcripts/*.txt |
 | Fold Explorer v6.dc.html — demo drop | research/opioid-settlement-audit/extracted-text.txt |
 | Fold Explorer v6.dc.html — Reader · Restated | derived/*.txt (tested against derived/AUD-HID-2023.txt) |
-| Fold Explorer v6.dc.html — What changed the picture | clovenbradshaw-ctrl/eoreader7: native/docs/THE-HOLOGRAPH.md |
+| Fold Explorer v6.dc.html — What changed the picture | scores-patch-points/khora: native/docs/THE-HOLOGRAPH.md |
 | Fold Explorer v6.dc.html — Reading (reading-worker.js) | ground-readings/f3affd2e11370118-causalTextPerceiver_reviseTextFold_refresh25.jsonl.zst, .jsonl.cursor |
 
 | Fold Explorer v7.dc.html — Records (holodeck-records.js) | clovenbradshaw-ctrl/bare-metal-eo-matrix-app: src/fold.js, public/data-chat.js (vendored unchanged under vendor/bare-metal/; src/operators.js replaced by a local no-network shim) |
@@ -36,13 +36,13 @@ date: 2026-09-25T19:46:51Z
 | Referent links (holodeck-links.js) — arrow-of-time gate | eoreader7: native/organs/regime.js (vendored byte-identical under vendor/eoreader7/native/organs/; its only import, native/kernel/cube.js `GRAINS`, was already vendored). The identity gate's arrow-of-time check rides Kelsen's validity-window precedence (step 1 of the fixed order), never a re-derived temporal rule |
 | Omnilingual summary lens (holodeck-lang.js) — UniMorph priors | eoreader7: native/priors/declension-rus.json (vendored byte-identical under vendor/eoreader7/native/priors/; the English irregular tail morphology-eng.json and pos-eng.json were already vendored). Loaded as data, injected via `setPriors` — never a model |
 
-| Fold Explorer v7.dc.html — Ask the Fold → Data notebook (holodeck-notebook.js) | clovenbradshaw-ctrl/eoreader7: native/kernel/sha256.js, native/the-fold/surface/{bench,notebook,notebook-store,notebook-workspace}.mjs — **byte-identical**, copied by `node vendor-sync.mjs`, hashes and commit in `vendor/eoreader7/NOTEBOOK-VENDOR.json`; `node vendor-sync.mjs --check` fails on drift |
+| Fold Explorer v7.dc.html — Ask the Fold → Data notebook (holodeck-notebook.js) | scores-patch-points/khora: native/kernel/sha256.js, native/the-fold/surface/{bench,notebook,notebook-store,notebook-workspace}.mjs — **byte-identical**, copied by `node vendor-sync.mjs`, hashes and commit in `vendor/eoreader7/NOTEBOOK-VENDOR.json`; `node vendor-sync.mjs --check` fails on drift |
 
-| fold · chat (vendor/fold-chat/) | **scores-patch-points/fold-chat @ bd6e513** — the standalone chat surface (LibreChat-style UX: artifacts, memory, presets, Chat/Code modes), vendored **byte-identical** by `node vendor-chat.mjs`; hashes and commit in `vendor/fold-chat/CHAT-VENDOR.json`; `node vendor-chat.mjs --check` fails on drift. It routes every inference through the heimdall bridge, so vendoring the UI vendors no model and no key. The fold's own integrated chat is `index.html?work=chat` (holodeck-chat-lane.js); this vendored page is the standalone reference/deployment surface |
+| fold · chat (vendor/fold-chat/) | **scores-patch-points/the-fold @ bd6e513** — the standalone chat surface (LibreChat-style UX: artifacts, memory, presets, Chat/Code modes), vendored **byte-identical** by `node vendor-chat.mjs`; hashes and commit in `vendor/fold-chat/CHAT-VENDOR.json`; `node vendor-chat.mjs --check` fails on drift. It routes every inference through the heimdall bridge, so vendoring the UI vendors no model and no key. The fold's own integrated chat is `index.html?work=chat` (holodeck-chat-lane.js); this vendored page is the standalone reference/deployment surface |
 | Coding machine (opencode) — behind heimdall | **scores-patch-points/opencode-fold @ f33899a** — vendored **by reference** (`vendor/opencode-fold/VENDOR.json`), never byte-copied: a ~560MB white-label fork of `anomalyco/opencode` that carries its own upstream-tracking contract (opencode-fold `UPSTREAM.md` + `brand/manifest.json`). Heimdall dispatches coding to a local `opencode serve` via `src/opencode-lane.js` + the bridge's `POST /api/code`; opencode's own model calls point back at the bridge's `/v1`, so routing stays heimdall's |
 
 ## Sync history
-- 2026-10-04 · **fold · chat vendored + opencode by reference**: `vendor/fold-chat/` byte-identical from `scores-patch-points/fold-chat @ bd6e513` (CHAT-VENDOR.json; `node vendor-chat.mjs --check`); `vendor/opencode-fold/VENDOR.json` pins the machine door by reference (MIT; update via its own UPSTREAM.md). Everything routes through heimdall; the falsifier `node vendor-chat.mjs --check` is green and its drift control is red.
+- 2026-10-04 · **fold · chat vendored + opencode by reference**: `vendor/fold-chat/` byte-identical from `scores-patch-points/the-fold @ bd6e513` (CHAT-VENDOR.json; `node vendor-chat.mjs --check`); `vendor/opencode-fold/VENDOR.json` pins the machine door by reference (MIT; update via its own UPSTREAM.md). Everything routes through heimdall; the falsifier `node vendor-chat.mjs --check` is green and its drift control is red.
 - 2026-10-02 · Persistent Jupyter integration: workspace/store files copied byte-identically from EOReader7; individual source commits and hashes are in NOTEBOOK-VENDOR.json. The new local runtime lives in tools/notebook-server.mjs and tools/jupyter-session.py.
 - 2026-09-30 · eoreader7 @f18069e (branch ccr-f706e8c6-ymunv8, not yet on main) — Data notebook pane: the three ledger files vendored by script; the notebook server itself is NOT vendored (it runs from an eoreader7 checkout)
 - 2026-09-25T19:11:34Z · ohs-custody @40cf318 — no upstream changes; same-bytes badges, Ingest & publish view
@@ -53,4 +53,4 @@ date: 2026-09-25T19:46:51Z
 - 2026-09-24T15:05:34Z · ohs-custody — kinds/medium, meeting video, attribution
 - 2026-09-24T14:25:59Z · ohs-custody — bytes captures, headings, surprise view, filters in hero/side panel
 - 2026-09-24T05:53:55Z · ohs-custody — first load of the manifest and derived texts into v5
-- 2026-09-23T22:39:49Z · clovenbradshaw-ctrl/eoreader7 (native/) — kernel terrain, patterns, shadow/echo → Fold Explorer.dc.html
+- 2026-09-23T22:39:49Z · scores-patch-points/khora (native/) — kernel terrain, patterns, shadow/echo → Fold Explorer.dc.html
