@@ -14,10 +14,13 @@
 
 import * as client from "./fold-chat-client.js";
 import { artifactsOf, previewable } from "./fold-chat-artifacts.js";
+import { mdHtml } from "./fold-chat-render.js";
 import * as memory from "./fold-chat-memory.js";
 import * as ground from "./fold-chat-ground.js";
 import * as web from "./fold-chat-web.js";
-import { classifyTurn, GENERATE_NUDGE, checkable, wantsWeb } from "./fold-chat-discourse.js";
+import { classifyTurn, GENERATE_NUDGE, checkable, wantsWeb, generationArtifact } from "./fold-chat-discourse.js";
+import * as topic from "./fold-chat-topic.js";
+import { PHOSPHOR, PHOSPHOR_VIEWBOX } from "./fold-chat-icons.js";
 import * as FOLD from "./vendor/the-fold/fold.js";
 
 const DEFAULT_BRIDGE = "http://localhost:8790";
@@ -38,6 +41,19 @@ function icon(name) {
   const p = document.createElementNS(NS, "path");
   p.setAttribute("d", name === "folder" ? "M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" : "M12 3l9 5-9 5-9-5zM3 13l9 5 9-5");
   svg.append(p); return svg;
+}
+// A Phosphor icon, by name, from the vendored set (fold-chat-icons.js). The
+// chat's topic icon — the same mark in the sidebar and on the assistant's
+// messages, so a conversation wears what it became about.
+function phosphor(name, size = 16) {
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.createElementNS(NS, "svg");
+  svg.setAttribute("viewBox", PHOSPHOR_VIEWBOX);
+  svg.setAttribute("fill", "currentColor");
+  svg.setAttribute("width", String(size)); svg.setAttribute("height", String(size));
+  svg.setAttribute("aria-hidden", "true");
+  svg.innerHTML = PHOSPHOR[name] || PHOSPHOR[topic.FALLBACK_ICON] || "";
+  return svg;
 }
 const now = () => new Date().toISOString();
 const sid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
@@ -159,7 +175,7 @@ export function mount(root, opts = {}) {
     railToggle: $("railToggle"), railNew: $("railNew"), railSearch: $("railSearch"), railEvidence: $("railEvidence"), railTheme: $("railTheme"), railSettings: $("railSettings"),
     side: $("side"), models: $("models"), projects: $("projects"), chats: $("chats"), projAdd: $("projAdd"), projNewProject: $("projNewProject"), chatNew: $("chatNew"),
     agentSlot: $("agentSlot"), engagementSlot: $("engagementSlot"), curModel: $("curModel"), webToggle: $("webToggle"),
-    topNew: $("topNew"), topFocus: $("topFocus"), sealBadge: $("sealBadge"),
+    topNew: $("topNew"), topFocus: $("topFocus"), groundToggle: $("groundToggle"), sealBadge: $("sealBadge"),
     welcome: $("welcome"), welcomeSub: $("welcomeSub"), thread: $("thread"), threadCol: $("threadCol"), stage: $("stage"), main: document.querySelector("main.main"),
     composerWrap: $("composerWrap"), composer: $("composer"), input: $("input"), send: $("send"), attach: $("attach"), mic: $("mic"),
     footer: $("footer"), drawer: $("drawer"), toast: $("toast"), footEvidence: $("footEvidence"), ver: $("ver"),
@@ -248,7 +264,7 @@ export function mount(root, opts = {}) {
     if (E.curModel) E.curModel.textContent = m ? m.id : "";
     const sealed = !!s?.sealed;
     if (E.sealBadge) E.sealBadge.className = "sealbadge " + (sealed ? "seal-on" : "seal-off");
-    E.welcomeSub.textContent = sealed ? "sealed-external — verbatim spans withheld; the reading only" : "Contact: The Fold";
+    E.welcomeSub.textContent = sealed ? "sealed-external — verbatim spans withheld; the reading only" : "";
   }
 
   /* ---------------- projects ---------------- */
@@ -357,6 +373,22 @@ export function mount(root, opts = {}) {
     if (t >= startToday - 7 * 864e5) return "Previous 7 days";
     return "Older";
   }
+  // What a chat has BECOME. Until the conversation has found its subject the
+  // chat keeps the provisional name (its opening words) and the plain provider
+  // mark. Once it has run TURNS_TO_NAME turns, the name is redrawn from the
+  // salient terms of the whole exchange, and the icon is the Phosphor mark most
+  // similar to it — then both are LOCKED, so the chat's identity is stable. A
+  // name the person set by hand is never touched (titleAuto === false).
+  function maybeName(s) {
+    if (!s || s.titleAuto === false || s.named) return;
+    const msgs = s.messages || [];
+    if (topic.userTurns(msgs) < topic.TURNS_TO_NAME) return;
+    const { title, icon } = topic.topicOf(msgs);
+    if (title) s.title = title;
+    s.icon = icon;
+    s.named = true;
+    save("fold-chat:sessions", sessions);
+  }
   function renderChats() {
     E.chats.innerHTML = "";
     let list = Object.values(sessions);
@@ -376,7 +408,9 @@ export function mount(root, opts = {}) {
     g.append(el("div", "group-label", label));
     for (const s of arr) {
       const row = el("div", "chat" + (s.id === activeId ? " on" : ""));
-      const ic = el("span", "cicon"); ic.style.background = providerColor(s.model);
+      const ic = el("span", "cicon" + (s.icon ? " glyph" : ""));
+      if (s.icon) { ic.style.color = providerColor(s.model); ic.append(phosphor(s.icon)); }
+      else ic.style.background = providerColor(s.model);
       const t = el("span", "ct", s.title || "New chat");
       const menu = el("button", "menu", "⋯");
       menu.onclick = (ev) => { ev.stopPropagation(); chatMenu(s.id, menu); };
@@ -390,10 +424,22 @@ export function mount(root, opts = {}) {
     const s = sessions[id]; if (!s) return;
     menuAt(anchor, [
       { label: s.pinned ? "Unpin" : "Pin", onClick: () => { s.pinned = !s.pinned; save("fold-chat:sessions", sessions); renderChats(); } },
-      { label: "Rename…", onClick: async () => { const n = await askDialog({ title: "Rename chat", value: s.title || "", okLabel: "Rename" }); if (n) { s.title = n; save("fold-chat:sessions", sessions); renderChats(); } } },
+      { label: "Rename…", onClick: async () => { const n = await askDialog({ title: "Rename chat", value: s.title || "", okLabel: "Rename" }); if (n) { s.title = n; s.titleAuto = false; save("fold-chat:sessions", sessions); renderChats(); } } },
       { label: "Move to project…", onClick: () => moveToProject(s) },
       { sep: true },
-      { label: "Delete", danger: true, onClick: () => { delete sessions[id]; if (activeId === id) activeId = null; save("fold-chat:sessions", sessions); renderChats(); if (!activeId) newChat(); } },
+      { label: "Delete", danger: true, onClick: () => {
+        const wasActive = activeId === id;
+        delete sessions[id];
+        save("fold-chat:sessions", sessions);
+        // Deleting the open chat must not resurrect a fresh "New chat" in its
+        // place — that read as "delete does nothing". Fall to the next most
+        // recent chat in view, or to the empty welcome when none are left.
+        if (wasActive) {
+          const pool = (filterProject ? Object.values(sessions).filter((s) => s.project === filterProject) : Object.values(sessions))
+            .sort((a, b) => new Date(b.updated || b.createdAt || 0) - new Date(a.updated || a.createdAt || 0));
+          if (pool.length) open(pool[0].id); else closeThread();
+        } else renderChats();
+      } },
     ]);
   }
   async function moveToProject(s) {
@@ -428,20 +474,32 @@ export function mount(root, opts = {}) {
   function open(id) {
     activeId = id;
     const s = sessions[id];
+    // A conversation that already found its subject (a chat from before this
+    // feature, or one whose reply arrived while the tab was closed) is named
+    // and given its icon the moment it is opened.
+    maybeName(s);
     E.threadCol.innerHTML = "";
     const msgs = s?.messages || [];
     setView(!msgs.length);
     for (let i = 0; i < msgs.length; i++) appendMsg(msgs[i].role, msgs[i].content, { sealed: msgs[i].sealed, index: i, grounding: msgs[i].grounding, model: s?.model, cwd: msgs[i].cwd });
-    renderChats(); renderModels(); updateSeal();
+    renderChats(); renderModels(); updateSeal(); paintGrounding();
   }
   function newChat() {
     const id = sid();
     const m = models.find((x) => !x.sealed) || models[0] || null;
     const p = filterProject ? projects[filterProject] : null;
-    sessions[id] = { id, title: "New chat", messages: [], model: m?.id || "", sealed: !!m?.sealed, project: filterProject, preset: p?.preset || preset, cwd: p?.cwd || null, createdAt: now(), updated: now() };
+    sessions[id] = { id, title: "New chat", titleAuto: true, named: false, icon: null, messages: [], grounding: true, model: m?.id || "", sealed: !!m?.sealed, project: filterProject, preset: p?.preset || preset, cwd: p?.cwd || null, createdAt: now(), updated: now() };
     save("fold-chat:sessions", sessions);
     open(id);
     E.input.focus();
+  }
+  // No chat is open: the welcome state, with nothing selected. Reached when the
+  // last chat is deleted — the send path (and every + button) opens a new one.
+  function closeThread() {
+    activeId = null;
+    E.threadCol.innerHTML = "";
+    setView(true);
+    renderChats(); renderModels(); updateSeal(); paintGrounding();
   }
   function cloneSession(src, overrides) {
     // Forks and continues are the same conversation moved forward: they keep
@@ -449,7 +507,8 @@ export function mount(root, opts = {}) {
     // silently drop the link the way the old code did.
     return {
       id: overrides.id, title: overrides.title, messages: overrides.messages,
-      model: src.model, sealed: src.sealed, preset: src.preset,
+      titleAuto: src.titleAuto !== false, named: !!src.named, icon: src.icon ?? null,
+      model: src.model, sealed: src.sealed, preset: src.preset, grounding: src.grounding !== false,
       project: src.project ?? null, cwd: src.cwd ?? null,
       facts: src.facts ? { ...src.facts } : undefined,
       attachments: src.attachments ? src.attachments.map((a) => ({ ...a })) : undefined,
@@ -465,6 +524,15 @@ export function mount(root, opts = {}) {
   }
 
   /* ---------------- rendering a message ---------------- */
+  // A prose block renders as markdown: headings, lists, tables, links, code —
+  // everything escaped first, so the model's words become markup, never code.
+  function prose(body, text) {
+    const t = String(text || "").trim();
+    if (!t) return;
+    const d = el("div", "md");
+    d.innerHTML = mdHtml(t);
+    body.append(d);
+  }
   function renderArtifact(body, art) {
     const card = el("div", "art");
     const bar = el("div", "art-bar");
@@ -503,46 +571,11 @@ export function mount(root, opts = {}) {
     );
     const panel = el("div", "disc-panel");
 
-    // The facing page: the same turn as a book spread — SOURCES on the left
-    // (each cited passage numbered S#, its permanent address and the verbatim
-    // snip read from the real material), RESPONSE on the right with every
-    // sentence tagged [S#] to what it draws from or [M] for the mouth's own
-    // prose. The holodeck's construction, laid beside the disclosure.
-    if (rec.facing && rec.facing.has) {
-      const face = el("div", "facing");
-      const left = el("div", "face-sources");
-      left.append(el("div", "disc-label", "Sources"));
-      for (const s of rec.facing.sources) {
-        const card = el("div", "face-source");
-        card.append(el("span", "face-n", s.n));
-        card.append(el("code", "face-addr", s.address));
-        card.append(el("div", "face-snip", s.text));
-        left.append(card);
-      }
-      const right = el("div", "face-response");
-      right.append(el("div", "disc-label", "Response"));
-      for (const r of rec.facing.response) {
-        const row = el("div", "face-sent" + (r.grounded ? "" : " m"));
-        row.append(el("span", "face-tag" + (r.grounded ? "" : " m"), "[" + r.tag + "]"));
-        row.append(el("span", "face-text", r.text));
-        if (r.address) row.append(el("code", "face-ground", "grounded on " + r.address));
-        right.append(row);
-      }
-      face.append(left, right);
-      panel.append(face);
-    }
-
-    // Grounding — what was addressed, what is not in the material.
-    if (rec.sources && rec.sources.length) {
-      panel.append(el("div", "disc-label", "Addressed sources"));
-      const ul = el("div", "disc-sources");
-      for (const s of rec.sources) {
-        const row = el("div", "disc-source");
-        row.append(el("code", "disc-ref", s.address), el("span", "disc-text", s.text));
-        ul.append(row);
-      }
-      panel.append(ul);
-    }
+    // The facing page is the ANSWER now (renderFacingAnswer, below): a turn
+    // that carries material renders as the spread, so the disclosure keeps only
+    // the meta — what the material does not support, the ungrounded sentences,
+    // the web reads, and the route foot. A no-material turn has no sources to
+    // list, so there is nothing to re-render here.
 
     const bad = [...(rec.unsupported?.numbers || []), ...(rec.unsupported?.names || [])];
     if (bad.length) {
@@ -580,17 +613,92 @@ export function mount(root, opts = {}) {
     body.append(box);
   }
 
+  // THE FACING PAGE AS THE ANSWER — the spread a turn with material renders as.
+  // SOURCES on the left (each cited passage numbered S#, its permanent address,
+  // and the verbatim snip read from the real material), RESPONSE on the right
+  // (every sentence tagged [S#] to the passage it draws from, or [M] for the
+  // mouth's own prose). On desktop it is the two-page book spread; on mobile it
+  // becomes the tagged response and a [S#] chip opens the source's snip in a
+  // bottom sheet.
+  function renderFacingAnswer(body, rec, meta) {
+    const face = rec?.facing;
+    if (!face || !face.has) return;
+    const spread = el("div", "facing answer");
+    const left = el("div", "face-sources");
+    left.append(el("div", "disc-label", "Sources"));
+    for (const s of face.sources) {
+      const card = el("div", "face-source");
+      card.append(el("span", "face-n", s.n));
+      card.append(el("code", "face-addr", s.address));
+      card.append(el("div", "face-snip", s.text));
+      left.append(card);
+    }
+    const right = el("div", "face-response");
+    right.append(el("div", "disc-label", "Response"));
+    for (const r of face.response) {
+      const row = el("div", "face-sent" + (r.grounded ? "" : " m"));
+      const chip = el("span", "face-tag" + (r.grounded ? "" : " m"), "[" + r.tag + "]");
+      if (r.grounded) {
+        const src = face.sources.find((s) => s.n === r.tag);
+        chip.title = src ? `grounded on ${src.address} — tap to read` : "grounded";
+        chip.onclick = () => { if (src) faceSheet(src); };
+      } else {
+        chip.title = "the mouth's own prose — not grounded in the material";
+        chip.onclick = () => toast("the mouth's own prose — not grounded in the material");
+      }
+      row.append(chip, el("span", "face-text", r.text));
+      if (r.address) row.append(el("code", "face-ground", "grounded on " + r.address));
+      right.append(row);
+    }
+    spread.append(left, right);
+    body.append(spread);
+  }
+
+  // The bottom sheet a source chip opens: the address and the verbatim snip,
+  // read straight from the record — nothing re-summarized.
+  function faceSheet(src) {
+    const modal = el("div", "modal");
+    const sheet = el("div", "sheet");
+    const head = el("div", "sheet-head");
+    head.append(el("h2", "", src.n), el("div", "grow"));
+    const close = el("button", "sheet-close"); close.innerHTML = CLOSE_SVG;
+    head.append(close);
+    sheet.append(head);
+    if (src.address) sheet.append(el("div", "face-sheet-addr", src.address));
+    if (src.text) sheet.append(el("div", "face-sheet-snip", src.text));
+    const done = () => modal.remove();
+    close.onclick = done;
+    modal.onclick = (e) => { if (e.target === modal) done(); };
+    modal.append(sheet);
+    document.body.append(modal);
+  }
+
   function appendMsg(role, content, meta = {}) {
     const wrap = el("div", "msg " + role);
-    const av = el("div", "av", role === "user" ? "You" : "F");
+    const av = el("div", "av");
+    // The assistant wears the chat's topic icon (the Phosphor mark the sidebar
+    // shows); the person keeps "You". Until a topic emerges, the fold's own "F".
+    const sIcon = role === "assistant" ? sessions[activeId]?.icon : null;
+    if (role === "user") av.textContent = "You";
+    else if (sIcon && PHOSPHOR[sIcon]) { av.classList.add("topic"); av.append(phosphor(sIcon, 17)); av.title = sIcon; }
+    else av.textContent = "F";
     const body = el("div", "body");
     if (meta.sealed) body.classList.add("sealed-body");
     if (role === "assistant") {
       if (meta.cwd) body.append(el("span", "chip folderchip", "📁 " + meta.cwd));
+      // THE FACING PAGE IS THE ANSWER: a turn that carried material renders as
+      // the book spread (renderFacingAnswer) — the model's own prose block is
+      // skipped because the spread IS the response, sentence by sentence.
+      // Code/artifacts (fenced blocks) still render beside it. When the thread
+      // hides grounding, or no material was carried, the plain prose is the
+      // answer exactly as before.
+      const showDisclosure = transparency && sessions[activeId]?.grounding !== false;
+      const face = showDisclosure && meta.grounding?.facing?.has ? meta.grounding.facing : null;
       for (const b of artifactsOf(content)) {
-        if (b.kind === "prose") { if (b.text.trim()) body.append(el("div", "", b.text.trim())); }
+        if (b.kind === "prose") { if (!face) prose(body, b.text); }
         else renderArtifact(body, b.artifact);
       }
+      if (face) renderFacingAnswer(body, meta.grounding, meta);
       if (meta.index != null) {
         const acts = el("div", "actions");
         const cont = el("button", "act", "continue"); cont.onclick = () => continueFrom(meta.index);
@@ -598,8 +706,9 @@ export function mount(root, opts = {}) {
         const disc = el("button", "act", "disclosure"); disc.onclick = () => { const d = body.querySelector(".disclosure"); if (d) d.hidden = !d.hidden; };
         acts.append(cont, fork, disc); body.append(acts);
       }
-      if (transparency && meta.grounding && meta.grounding.code) renderCodeDisclosure(body, meta.grounding, meta);
-      else if (transparency && meta.grounding && meta.grounding.examined) renderDisclosure(body, meta.grounding, meta);
+      if (showDisclosure && meta.grounding && meta.grounding.code) renderCodeDisclosure(body, meta.grounding, meta);
+      else if (showDisclosure && meta.grounding && meta.grounding.generate) renderGenerateDisclosure(body, meta.grounding, meta);
+      else if (showDisclosure && meta.grounding) renderDisclosure(body, meta.grounding, meta);
     } else {
       body.textContent = content;
       if (meta.index != null) {
@@ -640,6 +749,54 @@ export function mount(root, opts = {}) {
     box.append(head, panel);
     body.append(box);
   }
+  // The generation turn's disclosure: the same collapsed block, but it reports
+  // what penelope's generation system DID — the void it detected, the units it
+  // wrote one prompt at a time, who filled each (field / hunt / mouth), and the
+  // verdict — so a writing turn is as inspectable as a chat turn, and the fold
+  // shows that writing happened across prompts, not one big draw.
+  function renderGenerateDisclosure(body, rec, meta) {
+    const box = el("div", "disclosure");
+    const head = el("button", "disc-head");
+    head.type = "button";
+    const n = (rec.units || []).length;
+    const stages = Object.entries(rec.stages || {})
+      .map(([k, v]) => `${k}:${v}`)
+      .join(" · ");
+    head.append(
+      el("span", "disc-caret", "▸"),
+      el("span", "disc-title", "generation record"),
+      el("span", "disc-sub", `${n} unit(s)`),
+      el("span", "disc-line", `${rec.status || "unverified"}${stages ? " · " + stages : ""}`),
+    );
+    const panel = el("div", "disc-panel");
+    if (rec.void) {
+      panel.append(el("div", "disc-label", "Void"));
+      const v = el("div", "disc-text");
+      v.textContent = `${rec.void.kind} — ${rec.void.reason || ""}${rec.void.satisfy ? " · " + rec.void.satisfy : ""}${rec.void.source ? " · hunted " + rec.void.source : ""}`;
+      panel.append(v);
+    }
+    if ((rec.units || []).length) {
+      panel.append(el("div", "disc-label", "Units (one prompt each)"));
+      const ul = el("div", "disc-ungrounded");
+      for (const u of rec.units.slice(0, 12)) ul.append(el("div", "disc-text", u));
+      panel.append(ul);
+    }
+    panel.append(el("div", "disc-label", "Per-stage outcome"));
+    const ul2 = el("div", "disc-ungrounded");
+    for (const [k, v] of Object.entries(rec.stages || {})) ul2.append(el("div", "disc-text", `${k}: ${v}`));
+    if (!(rec.stages && Object.keys(rec.stages).length)) ul2.append(el("div", "disc-text", "no outcomes recorded"));
+    panel.append(ul2);
+    if (rec.verdict) panel.append(el("div", "disc-text", "verdict · " + rec.verdict));
+    if (rec.materialization && (rec.materialization.folded || rec.materialization.widget)) {
+      panel.append(el("div", "disc-label", "Materialization"));
+      panel.append(el("div", "disc-text", `folded ${rec.materialization.folded || ""}${rec.materialization.widget ? " · widget " + rec.materialization.widget : ""}`));
+    }
+    panel.append(el("div", "disc-foot", `${meta.model || "penelope"} · generation via penelope's weave${rec.model ? " · " + rec.model : ""}`));
+    head.onclick = () => { const open = box.classList.toggle("open"); head.setAttribute("aria-expanded", open ? "true" : "false"); };
+    box.append(head, panel);
+    body.append(box);
+  }
+
   function liveBody() { const b = appendMsg("assistant", "", {}); b.classList.add("live"); return b; }
 
   /* ---------------- memory: edit / continue ---------------- */
@@ -676,13 +833,35 @@ export function mount(root, opts = {}) {
   // greeting is not a claim, so it is never checked for grounding (the
   // holodeck's lesson). A message counts only when it carries a substantive
   // body of its own (a pasted document), never chit-chat.
+  //
+  // THE SHORT EXCHANGE IS THE EXCEPTION: when the whole conversation is small
+  // enough to ride the context verbatim, the turns themselves ARE what the
+  // model was given, so they are the material the answer is checked against —
+  // a turn like "well?" is read against the thread it continues, never as
+  // "nothing carried". The threshold is characters, because what matters is
+  // whether the exchange fits the window, not how it was chopped into turns.
+  const VERBATIM_MAX_CHARS = 1600;
+  function conversationVerbatim(s) {
+    const msgs = (s.messages || []).filter((x) => x.role !== "system");
+    const total = msgs.reduce((n, m) => n + String(m.content || "").length, 0);
+    return msgs.length > 1 && total > 0 && total <= VERBATIM_MAX_CHARS;
+  }
   function materialOf(s) {
     const out = [];
     for (const a of s.attachments || []) {
       if (a.reading) out.push({ ref: `attachment · ${a.name}`, source: a.name, text: a.reading });
     }
-    const pasted = (s.messages || []).filter((x) => x.role === "user" && !x.attachment && String(x.content || "").trim().length >= 240);
-    pasted.forEach((x, i) => out.push({ ref: `you · pasted ${i + 1}`, source: `S${i + 1}`, text: x.content }));
+    const users = (s.messages || []).filter((x) => x.role === "user" && !x.attachment);
+    // The current question is the last user turn; it is not material to check
+    // the answer against, so the short-exchange material is what came before.
+    const prior = users.slice(0, -1);
+    if (conversationVerbatim(s) && prior.length) {
+      const convo = prior.map((x) => String(x.content || "").trim()).filter(Boolean).join("\n");
+      if (convo) out.push({ ref: "the conversation · carried verbatim", source: "S1", text: convo });
+    } else {
+      const pasted = users.filter((x) => String(x.content || "").trim().length >= 240);
+      pasted.forEach((x, i) => out.push({ ref: `you · pasted ${i + 1}`, source: `S${i + 1}`, text: x.content }));
+    }
     return out;
   }
   // The mechanical S1: discourse fields COMPUTED from the conversation, no
@@ -758,6 +937,21 @@ export function mount(root, opts = {}) {
     const say = (msg) => { if (E.stage) E.stage.textContent = msg; };
     const kindWord = { smalltalk: "greeting", generate: "writing request", research: "question of fact", chat: "conversation" }[kind] || kind;
     say(`turn · ${kindWord}${webOn ? (kind === "research" ? " · web on" : " · web off for this turn") : ""}`);
+    // THE GENERATION LANE (2026-10-04): a writing request for an artifact
+    // penelope's generation system holds leaves the single-draw chat and rides
+    // the weave — void detection (units read from the ask, a void read with a
+    // hunt) and writing across prompts (one unit per draw, field → hunt →
+    // mouth, test decides). The record of that (units, outcomes, verdict) is
+    // the disclosure, so the fold shows it happened.
+    if (kind === "generate" && generationArtifact(question)) {
+      // The weave is the richer path, but it must never be a single point of
+      // failure for a write request: if penelope's generation errors (no model,
+      // weave down, empty artifact), fall through to the fold's own writer
+      // rather than showing "generation error" on a plain "write an essay".
+      const ok = await generateTurn(id, s, question, body, ac, { say, m });
+      if (ok) return;
+      say("turn · writing request · penelope's weave did not answer · writing it here…");
+    }
     let webPassages = [], webTrace = null, sourceBlock = null;
     const wantWeb = wantsWeb(kind, webOn);
     if (wantWeb) {
@@ -779,13 +973,21 @@ export function mount(root, opts = {}) {
     } else {
       say(kind === "generate" ? `turn · ${kindWord} · writing it now…` : `turn · ${kindWord} · ${m.sealed ? "sealed-external" : "local"} · writing the answer…`);
     }
-    // The generate nudge rides the base prompt; it is not a second system
-    // message (WebLLM rejects those), and it does not pollute the fold.
-    const turnBase = kind === "generate" ? [basePrompt, GENERATE_NUDGE].filter(Boolean).join("\n\n") : basePrompt;
+    // A generate turn replaces the persona with the writer, it does not append
+    // to it — the reading persona and the write instruction are opposite
+    // directives and a small model hedges when handed both (measured: a
+    // 265-char teaser with "fold persona + nudge" against a 2,200-char essay
+    // from the nudge alone). The identity/facts line still rides, so the fold
+    // never states a personal fact it was not given.
+    const identityLine = memory.systemContext({ readerName, facts: s.facts || {} });
+    const turnBase = kind === "generate" ? [GENERATE_NUDGE, identityLine].filter(Boolean).join("\n\n") : basePrompt;
     // THE MESSAGE ARRAY: one system message (base + past discourse + records +
     // source block), then at most a small recency window of raw messages, then
-    // the question — never the whole transcript.
-    const messages = FOLD.buildTurnMessages({ basePrompt: turnBase, summary: s.summary, history: history.slice(0, -1), question, sourceBlock });
+    // the question — never the whole transcript. A short exchange is the one
+    // case sent whole: the bound is a budget, and what fits inside it is
+    // carried verbatim, so a continuation like "well?" has the thread to read.
+    const recencyWindow = conversationVerbatim(s) ? history.length : undefined;
+    const messages = FOLD.buildTurnMessages({ basePrompt: turnBase, summary: s.summary, history: history.slice(0, -1), question, sourceBlock, recencyWindow });
     try {
       const out = await client.chat(m.id, messages, {
         base: bridge, privacy: "sealed-external",
@@ -837,6 +1039,7 @@ export function mount(root, opts = {}) {
       const idx = s.messages.length;
       s.messages.push({ role: "assistant", content: text, at: now(), grounding: record });
       s.sealed = !!m.sealed;
+      maybeName(s);
       save("fold-chat:sessions", sessions);
       const live = body.closest(".msg"); if (live) live.remove();
       appendMsg("assistant", text, { sealed: m.sealed, index: idx, grounding: record, model: m.id });
@@ -855,6 +1058,12 @@ export function mount(root, opts = {}) {
   // edits the same place the project stands. The model the door reasons with is
   // itself routed by heimdall (a `heimdall` provider pointing at the bridge's
   // /v1), so no model is reached outside the fold stack.
+  // A writing request rides penelope's weave, which hunts and draws many times.
+  // Declared budget, not an estimate: past this the turn falls back to the
+  // fold's own single-draw writer rather than holding the composer hostage.
+  // (Measured live: the weave can hang past 100s with no error, so this is the
+  // ceiling on how long a plain "write me…" can wait before the fold writes it.)
+  const WEAVE_TIMEOUT_MS = 480000;
   const CODE_MODEL = { providerID: "heimdall", modelID: "qwen2.5-coder:1.5b" };
   function codeModelRef() { try { const v = JSON.parse(localStorage.getItem("fold-chat:codemodel") || "null"); return v || CODE_MODEL; } catch { return CODE_MODEL; } }
   function sessionCwd(s) { return s?.cwd || (s?.project ? projects[s.project]?.cwd : null) || null; }
@@ -867,29 +1076,42 @@ export function mount(root, opts = {}) {
     try {
       // ITERATE VIA THE RECORD: a session that already coded continues its own
       // conductor session (the EOT ledger for code) — the next turn builds on
-      // what the last one did, never a fresh session.
+      // what the last one did, never a fresh session. The prior id is sent on
+      // every turn; the id the door RETURNS is persisted immediately (before an
+      // error can drop it), so a follow-up always continues the same session.
       const out = await client.code(s.messages[s.messages.length - 1].content, { base: bridge, title: s.title, model: codeModelRef(), sessionId: s.codeSessionId || null, cwd });
-      if (out.sessionId) s.codeSessionId = out.sessionId;
+      if (out.sessionId) { s.codeSessionId = out.sessionId; save("fold-chat:sessions", sessions); }
       E.stage.textContent = "";
       body.classList.remove("live"); body.textContent = "";
       if (cwd) body.append(el("span", "chip folderchip", "📁 " + cwd));
-      if (Array.isArray(out.activity) && out.activity.length) {
+      // A small coding model sometimes returns the CALL as text
+      // (`{"name":"write","arguments":{…}}`) rather than letting the door
+      // execute it. That is a tool invocation, never prose: split it out, show
+      // it as activity, and only ship real prose as the answer.
+      const split = client.splitToolCalls(out.text || "");
+      const calls = Array.isArray(split.calls) ? split.calls : [];
+      const activity = [...(Array.isArray(out.activity) ? out.activity : []),
+        ...calls.map((c) => ({ tool: c.name, status: "requested", title: c.arguments?.filePath || c.arguments?.command || null }))];
+      if (activity.length) {
         const list = el("div", "activity");
-        for (const a of out.activity) list.append(el("div", "actrow", `${a.tool}${a.title ? " · " + a.title : ""}${a.status ? "  [" + a.status + "]" : ""}`));
+        for (const a of activity) list.append(el("div", "actrow", `${a.tool}${a.title ? " · " + a.title : ""}${a.status ? "  [" + a.status + "]" : ""}`));
         body.append(list);
       }
-      const text = out.text || "(the machine door returned no text)";
+      const text = split.text || (calls.length
+        ? "(the machine door returned only a tool request — " + calls.map((c) => c.name).join(", ") + " — nothing was executed)"
+        : "(the machine door returned no text)");
       for (const b of artifactsOf(text)) {
-        if (b.kind === "prose") { if (b.text.trim()) body.append(el("div", "", b.text.trim())); }
+        if (b.kind === "prose") prose(body, b.text);
         else renderArtifact(body, b.artifact);
       }
       const idx = s.messages.length;
       // The code turn carries its own record: the tools that ran, the folder,
       // and the lane. Disclosed on the message like a chat turn, so the fold's
       // transparency holds across both engagements.
-      const codeRec = { code: true, cwd, lane: out.lane || "opencode", activity: out.activity || [], ms: out.ms };
+      const codeRec = { code: true, cwd, lane: out.lane || "opencode", activity, ms: out.ms };
       s.messages.push({ role: "assistant", content: text, at: now(), codeSessionId: s.codeSessionId, cwd, grounding: codeRec });
       s.updated = now();
+      maybeName(s);
       save("fold-chat:sessions", sessions);
       const live = body.closest(".msg"); if (live) live.remove();
       appendMsg("assistant", text, { index: idx, cwd, grounding: codeRec, model: codeModelRef().modelID });
@@ -898,6 +1120,61 @@ export function mount(root, opts = {}) {
       E.stage.textContent = ""; body.classList.remove("live"); body.textContent = "error: " + err.message;
     } finally {
       E.send.disabled = false; E.input.disabled = false; E.input.focus(); refreshMeter();
+    }
+  }
+
+  // The generation lane — a writing request (essay / report / piece) rides
+  // penelope's generation system (the weave): void detection and writing
+  // across prompts. The record of that — the units the void named, who filled
+  // each (field / hunt / mouth), the verdict — is the disclosure, so the fold
+  // shows it happened instead of hiding the seam.
+  async function generateTurn(id, s, question, body, ac, { say, m }) {
+    E.send.disabled = true; E.input.disabled = true;
+    say("turn · writing request · penelope's generation · void detection · one unit per prompt…");
+    try {
+      // The weave DRAWS, so it needs a model — the model the person picked
+      // rides the request (measured: a model-less weave call returns "model
+      // required" and the write dies). The id is the plain Ollama name the
+      // bridge's weave forwards to penelope's mouth.
+      //
+      // BOUNDED: a weave hunts and draws many times and, measured live, can
+      // hang for 100s+ with the composer disabled and no error. A write request
+      // must never wedge the surface, so the weave gets a declared budget; on
+      // expiry the caller falls through to the fold's own writer.
+      const weaveSignal = ac.signal && AbortSignal.any ? AbortSignal.any([ac.signal, AbortSignal.timeout(WEAVE_TIMEOUT_MS)]) : (AbortSignal.timeout ? AbortSignal.timeout(WEAVE_TIMEOUT_MS) : ac.signal);
+      const gen = await client.generate(question, { base: bridge, artifact: "text", model: m?.id || null, signal: weaveSignal });
+      const text = String(gen?.artifact?.value ?? "").trim();
+      if (!text) throw new Error(gen?.error || "penelope's generation returned no piece");
+      const units = (gen?.evidence?.units || []).map((u) => u.name);
+      const stages = {};
+      for (const o of gen?.evidence?.outcomes || []) stages[o.stage] = (stages[o.stage] || 0) + 1;
+      const genRec = {
+        generate: true,
+        void: gen?.void ?? null,
+        units,
+        stages,
+        verdict: gen?.verification?.verdict?.reason ?? null,
+        materialization: gen?.materialization ?? null,
+        model: gen?.model ?? null,
+        status: gen?.status ?? "unverified",
+      };
+      const idx = s.messages.length;
+      s.messages.push({ role: "assistant", content: text, at: now(), generate: genRec });
+      s.updated = now();
+      maybeName(s);
+      save("fold-chat:sessions", sessions);
+      const live = body.closest(".msg"); if (live) live.remove();
+      E.stage.textContent = "";
+      appendMsg("assistant", text, { index: idx, grounding: genRec, model: m.id });
+      renderChats();
+      return true;
+    } catch (err) {
+      // Hand the turn back to the caller to write it here (the fold's own
+      // writer). Never surface a raw backend error on a plain write request.
+      E.stage.textContent = ""; body.classList.remove("live");
+      return false;
+    } finally {
+      E.send.disabled = false; E.input.disabled = false; E.input.focus();
     }
   }
 
@@ -1082,6 +1359,20 @@ export function mount(root, opts = {}) {
   E.railEvidence.onclick = E.footEvidence.onclick = (e) => { e.preventDefault(); toggleDrawer(); };
   E.railTheme.onclick = () => { const cur = document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark"; document.documentElement.setAttribute("data-theme", cur); try { localStorage.setItem("fold-chat:theme", cur); } catch (e) {} };
   E.topFocus.onclick = () => { if (!document.fullscreenElement) document.documentElement.requestFullscreen?.().catch(() => {}); else document.exitFullscreen?.(); };
+  // Grounding disclosure — per THREAD. Each conversation decides whether its
+  // turns carry the grounding record. The toggle sits on the open thread and
+  // the setting lives on the session, so a fork/continue inherits it.
+  function threadGroundingOn() { return sessions[activeId]?.grounding !== false; }
+  function paintGrounding() { if (!E.groundToggle) return; E.groundToggle.hidden = !activeId; E.groundToggle.classList.toggle("on", threadGroundingOn()); }
+  function setGrounding(on) {
+    if (!activeId || !sessions[activeId]) return;
+    sessions[activeId].grounding = !!on;
+    sessions[activeId].updated = now();
+    save("fold-chat:sessions", sessions);
+    toast(on ? "grounding on — this thread shows its disclosure" : "grounding off — this thread hides its disclosure");
+    open(activeId);
+  }
+  if (E.groundToggle) E.groundToggle.onclick = () => setGrounding(!threadGroundingOn());
   // Web search on/off — a turn searches the keyless sources and grounds on them.
   function paintWeb() { if (E.webToggle) E.webToggle.classList.toggle("on", webOn); }
   if (E.webToggle) E.webToggle.onclick = () => {
@@ -1143,6 +1434,7 @@ export function mount(root, opts = {}) {
   try { const t = localStorage.getItem("fold-chat:theme"); if (t) document.documentElement.setAttribute("data-theme", t); } catch (e) {}
   renderProjects();
   paintWeb();
+  paintGrounding();
   // Auto-detect the bridge first (the override, then the standard local port),
   // then list whatever it serves. A page served from GitHub Pages finds the
   // person's own heimdall this way, with no URL to type.
