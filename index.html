@@ -4214,7 +4214,7 @@ const whenOf = (st, d) => d.pubLabel || (d.year ? String(d.year) : 'Undated');
 const assertLine = (st, A) => { const d = A.docById[st.doc]; const w = whoSays(st, A); return (w ? w.who + (w.how === 'quoted' ? ' (quoted)' : w.how === 'publisher' ? '' : ' (' + w.how + ')') + ' · ' : '') + d.title + ' · ' + whenOf(st, d); };
 
 /* ── the strip: sources · segment · read — EOQL in polish, glyphs out ── */
-const EOQ_GLYPH = { NUL:'∅', SIG:'○', INS:'●', SEG:'｜', CON:'⤫', SYN:'△', DEF:'⊢', EVA:'⊨', REC:'◉', AND:'∧', OR:'∨', NOT:'¬' };
+const EOQ_GLYPH = { NUL:'∅', SIG:'○', INS:'●', SEG:'｜', CON:'⋈', SYN:'△', DEF:'⊢', EVA:'⊨', REC:'◉', AND:'∧', OR:'∨', NOT:'¬' };
 const EOQ_TOKENS = Object.keys(EOQ_GLYPH);
 const eoqlGlyphText = s => String(s || '').replace(new RegExp('\\b(' + EOQ_TOKENS.join('|') + ')\\b', 'g'), m => EOQ_GLYPH[m]);
 const eoqlSplit = (s, ch) => { const out = []; let d = 0, cur = ''; for (const c of String(s)) { if (c === '(') d++; else if (c === ')') d--; if (c === ch && d === 0) { out.push(cur); cur = ''; } else cur += c; } out.push(cur); return out.map(x => x.trim()).filter(Boolean); };
