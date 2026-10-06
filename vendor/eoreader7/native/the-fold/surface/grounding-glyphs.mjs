@@ -7,7 +7,12 @@
 //
 //   ∅− ∅+ ∅*   ○− ○+ ○*   ●− ●+ ●*    Existence (NUL SIG INS)
 //   ｜− ｜+ ｜*  ⋈− ⋈+ ⋈*   △− △+ △*    Structure (SEG CON SYN)
-//   ⊢− ⊢+ ⊢*   ⊨− ⊨+ ⊨*   ⊛− ⊛+ ⊛*    Interpretation (DEF EVA REC)
+//   ⊢− ⊢+ ⊢*   ⊨− ⊨+ ⊨*   ◉− ◉+ ◉*    Interpretation (DEF EVA REC)
+//
+// REC's glyph is ◉ (a ring around a filled circle: the retraced run kept as
+// record, ●, inside a new open frame, ○). It was ⊛ until 2026-10-06; ⊛ never
+// matched its stated rationale. Source: eo-wiki, "Operator Naming", Practitioner
+// Glyphs. Records written earlier keep ⊛; read both as REC.
 //
 // The prose per cell (the plain-language grounding name) and the null it owes
 // (THE-NULL-STATES' pairing rule: every positive finding an organ lands has a
@@ -15,8 +20,22 @@
 // and THE-NULL-STATES.md — never invented here. Pure: no I/O, no DOM.
 
 export const OPERATOR_GLYPHS = Object.freeze({
-  NUL: "∅", SIG: "○", INS: "●", SEG: "｜", CON: "⋈", SYN: "△", DEF: "⊢", EVA: "⊨", REC: "⊛",
+  NUL: "∅", SIG: "○", INS: "●", SEG: "｜", CON: "⋈", SYN: "△", DEF: "⊢", EVA: "⊨", REC: "◉",
 });
+/** REC has been drawn three ways: ⊛ (the wiki until 2026-10-06), ↬ (penelope's
+ *  tapestry, chosen for its one-cell width) and ◉ (now). Records written under
+ *  an earlier mark still carry it, so anything that ingests an older version
+ *  reads the glyph through operatorOfGlyph, never a table of its own. Only
+ *  unambiguous marks belong here: △ was once INS and is now SYN, so it is not
+ *  aliased. */
+export const LEGACY_GLYPHS = Object.freeze({ "⊛": "REC", "↬": "REC" });
+const GLYPH_OPERATOR = Object.freeze({
+  ...Object.fromEntries(Object.entries(OPERATOR_GLYPHS).map(([op, g]) => [g, op])),
+  ...LEGACY_GLYPHS,
+});
+/** The operator a glyph stands for, current or legacy; null for anything else. */
+export const operatorOfGlyph = (g) => GLYPH_OPERATOR[g] ?? null;
+
 export const OPERATOR_GREEK = Object.freeze({
   NUL: "ν", SIG: "σ", INS: "α", SEG: "κ", CON: "ε", SYN: "η", DEF: "δ", EVA: "ψ", REC: "Ω",
 });
