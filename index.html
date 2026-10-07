@@ -753,9 +753,6 @@ button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visi
           <sc-if value="{{ ak.convListOpen }}" hint-placeholder-val="{{ false }}"><div onClick="{{ ak.convCloseList }}" style="position:fixed;inset:0;z-index:55"></div></sc-if>
         </div>
       </sc-if>
-      <sc-if value="{{ ak.chatEmbed }}" hint-placeholder-val="{{ false }}">
-        <iframe src="{{ ak.chatSrc }}" title="The Fold chat" style="display:block;width:100%;height:calc(100vh - 96px);min-height:600px;border:0;background:var(--bg);color-scheme:inherit"></iframe>
-      </sc-if>
       <sc-if value="{{ ak.onData }}" hint-placeholder-val="{{ false }}">
         <div ref="{{ ak.nbRef }}" data-hd-notebook style="min-height:50vh"></div>
       </sc-if>
@@ -2918,7 +2915,8 @@ function hdEngineHosts() { let u = null; try { u = localStorage.getItem('hd:engi
 async function hdEngineRead(name, text) {
   if (!HD_ENG.url && Date.now() - HD_ENG.downAt < 60000) return null;
   for (const host of HD_ENG.url ? [HD_ENG.url] : hdEngineHosts()) {
-    const ctl = new AbortController(), timer = setTimeout(() => ctl.abort(), 120000);
+    hdT('engine', 'ask', 'Asking the eoreader7 engine (' + host.replace(/^https?:\/\//, '') + ') to read “' + hdCut(name, 50) + '”…');
+    const ctl = new AbortController(), timer = setTimeout(() => ctl.abort(), 20000);
     try {
       const r = await fetch(host + '/v1/read', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ name, text: text.slice(0, 60000) }), signal: ctl.signal });
       const j = await r.json(); if (!r.ok || j.schema !== 'EORead@1') { if (HD_ENG.url === host) HD_ENG.url = null; continue; }
@@ -4165,7 +4163,7 @@ async function readAny(file) {
           const rest = String(r.html || '').replace(/^[\s\S]*?<\/figure>/, '');
           const struct = text ? '<p style="' + TAG_STYLE.P + '">' + esc(text.replace(/\s+/g, ' ').trim()) + '</p>' : '';
           const nProps = (read.activation && read.activation.proposals.length) || 0;
-          r = { ...r, html: fig + rest + struct, screen: read.screen || null, hasImg: true, activation: read.activation, text: [r.text, text].filter(Boolean).join('\n\n'), note: (r.note ? r.note + ' ' : '') + (words ? 'Read ' + words + ' words of text from the pixels (visual model + OCR); the most likely reading' + (nProps ? ' takes ' + nProps + ' name' + (nProps === 1 ? '' : 's') + ' from the profile' : ' is shown beneath it') + '.' : 'No text was read from it; it is measured only.') };
+          r = { ...r, html: fig + rest + struct, screen: read.screen || null, hasImg: true, activation: read.activation, text: [r.text, text].filter(Boolean).join('\n\n'), needsRead: words ? undefined : true, note: (r.note ? r.note + ' ' : '') + (words ? 'Read ' + words + ' words of text from the pixels (visual model + OCR); the most likely reading' + (nProps ? ' takes ' + nProps + ' name' + (nProps === 1 ? '' : 's') + ' from the profile' : ' is shown beneath it') + '.' : 'This image isn’t readable yet — I couldn’t get any text out of it. Let me process it (read the pixels with OCR) so I can read it; ask me again once it’s done.') };
         }
       }
       return { title, year, ...r }; }
@@ -4182,13 +4180,15 @@ async function readText(file, M) {
       const buf = await file.arrayBuffer(); const pdfjs = await pdfLib(); const pdf = await pdfjs.getDocument({ data: new Uint8Array(buf).slice() }).promise; let text = '';
       const pages = []; for (let i = 1; i <= Math.min(pdf.numPages, PDF_MAX_PAGES); i++) { pages.push(text.length); const c = await (await pdf.getPage(i)).getTextContent(); for (const it of c.items) text += (it.str || '') + (it.hasEOL ? '\n' : ' '); text += '\n'; }
       hdT('decode', 'pdf', 'Read the text layer of ' + pages.length + ' of ' + pdf.numPages + ' pages', { pages: pages.length });
+      const hadTextLayer = text.trim().length > 0;
       let ocrPages = 0;
       if (!text.trim() && hdOcrOn()) { try { const R = await hdRead(); const o = await R.ocrPdf(pdf, { maxPages: 20, onProgress: p => hdT('decode', 'ocr', 'OCR is reading page ' + p.page + ' of ' + p.of) }); if (o && o.text.trim()) { text = o.text; ocrPages = o.pages; hdT('decode', 'ocr', 'No text layer; OCR read ' + o.pages + ' of ' + pdf.numPages + ' pages'); } } catch (e) { hdT('decode', 'ocr-fail', 'OCR could not run (' + e.message + ')'); } }
       // Images embedded in the PDF: each is extracted and read the same way a dropped image is
       // (2D visual model + OCR + activation against the profile), shown clickable, and folded in.
       let figHtml = '', figText = '', figs = 0;
+      if (!hadTextLayer) hdT('screen', 'figures-skip', 'No text layer (a scan) — the ' + pdf.numPages + ' pages were read by OCR; the pages are not re-read as separate figures');
       try {
-        const images = await hdPdfFigures(pdf, PDF_MAX_PAGES);
+        const images = hadTextLayer ? await hdPdfFigures(pdf, PDF_MAX_PAGES) : [];
         if (images.length) hdT('screen', 'figures', 'Found ' + images.length + ' embedded image' + (images.length === 1 ? '' : 's') + ' in the PDF — reading each', { n: images.length });
         for (const f of images) {
           const dataUrl = hdCanvasDataURL(f.img, 1400); if (!dataUrl) continue;
@@ -4205,7 +4205,7 @@ async function readText(file, M) {
       } catch (e) { hdT('screen', 'figures-fail', 'Embedded images could not be read (' + (e && e.message || e) + ')'); }
       const fullText = [text, figText].filter(x => x && x.trim()).join('\n\n');
       const hasFigs = figs > 0;
-      return { title, year, type: 'PDF', format: hasFigs ? 'html' : 'pdf', html: hasFigs ? (text.trim() ? '<p style="' + TAG_STYLE.P + '">' + esc(text.replace(/\s+/g, ' ').trim()) + '</p>' : '') + figHtml : undefined, text: fullText, pages, pdf: buf, figures: figs || undefined, note: (text.trim() ? (ocrPages ? 'No text layer — read by OCR (' + ocrPages + ' pages). ' : '') : title + ' has no text layer (it may be scanned). ') + (hasFigs ? 'Read ' + figs + ' embedded image' + (figs === 1 ? '' : 's') + ' for text (visual model + OCR + activation).' : (text.trim() ? null : 'Nothing in it can be linked.')) };
+      return { title, year, type: 'PDF', format: hasFigs ? 'html' : 'pdf', html: hasFigs ? (text.trim() ? '<p style="' + TAG_STYLE.P + '">' + esc(text.replace(/\s+/g, ' ').trim()) + '</p>' : '') + figHtml : undefined, text: fullText, pages, pdf: buf, figures: figs || undefined, needsRead: fullText.trim() ? undefined : true, note: (text.trim() ? (ocrPages ? 'No text layer — read by OCR (' + ocrPages + ' pages). ' : '') : 'This PDF isn’t readable yet — it looks scanned and I couldn’t read it. Let me process it (read the pages with OCR) so I can read it; ask me again once it’s done. ') + (hasFigs ? 'Read ' + figs + ' embedded image' + (figs === 1 ? '' : 's') + ' for text (visual model + OCR + activation).' : (text.trim() ? null : '')) };
     }
     let html = '';
     if (['docx', 'pptx', 'xlsx', 'odt', 'odp', 'ods', 'epub'].includes(ext)) {
@@ -5764,7 +5764,7 @@ class Component extends DCLogic {
         onDismiss: () => this.setState({ akRefuse: null }),
         links: live.slice(0, 5).map(d => ({ title: short(d.title || d.url, 60), onOpen: () => window.open(d.url, '_blank', 'noopener') })), hasLinks: live.length > 0 };
     })();
-    return { ak: { on: true, onSrc: akPane !== 'data' && (S.akMode || 'chat') !== 'chat', onData: akPane === 'data', chatEmbed: (S.akMode || 'chat') === 'chat', chatSrc: new URL('vendor/fold-chat/index.html', location.href).href, nbRef: this._nbRef,
+    return { ak: { on: true, onSrc: akPane !== 'data', onData: akPane === 'data', chatEmbed: false, nbRef: this._nbRef,
  ready: this.llmOk(), pending: false, refuse, gap: isWL ? !gpu && !!MM : !(O && O.ok), why: isWL ? 'navigator.gpu is not available in this browser' : (O.why || ''), isWL, noGpu: isWL && MM && !gpu, needLoad: isWL && gpu && !loaded && !LD, loading: !!LD, loadText: LD ? LD.text : '', loadPct: LD ? Math.round((LD.p || 0) * 100) + '%' : '0%', load: () => this.akLoad(), mName: mInfo.name, mSize: mInfo.size || '',
       dot: isWL ? (loaded ? 'var(--ok)' : gpu ? 'var(--amber)' : 'var(--bad)') : O.ok ? 'var(--ok)' : 'var(--bad)',
       status: String(this.akModel()).startsWith('heimdall:') ? (this._hdm && this._hdm.ok ? 'heimdall · ' + (this.hdSealedOf(this.akModel()) ? 'sealed-external — projection only' : 'fleet · local') : 'heimdall bridge isn’t reachable') : (isWL ? (loaded ? mInfo.name + ' running in this tab · nothing leaves it' : !MM ? 'Starting…' : gpu ? mInfo.name + ' runs in this tab once loaded' : 'This browser can’t run a model in the tab') : O.ok ? model + ' via Ollama on this machine' : 'Ollama isn’t reachable'),
@@ -5813,7 +5813,7 @@ class Component extends DCLogic {
       notGen: (S.akMode || 'chat') !== 'generate',
       art, isGen, mainFlex: isGen && art.has && !art.narrow ? '1 1 ' + ART_CHAT_W + 'px' : '1 1 480px', asideFlex: isGen ? (art.has && !art.narrow ? '1 1 ' + ART_PANE_W + 'px' : '0 0 0px') : '0 1 290px', asideMin: isGen ? (art.has && !art.narrow ? '320px' : '0px') : '250px', wrapRef: this.akWrapRef, asideZ: art.back ? 90 : 'auto',
       showReset: turns.length > 0 && !isGen, showEx: !isGen && turns.length === 0 && !S.akPending, busyAny: !!S.akBusy,
-      showConvTabs: !isGen && (S.akMode || 'chat') !== 'chat',
+      showConvTabs: !isGen,
       convTabs: (this._convs || []).filter(c => c.open).map(c => { const on = c.id === this._convId; return { title: c.title || 'New conversation', on, bg: on ? 'var(--sel)' : 'transparent', bd: on ? 'var(--acc2)' : 'var(--line)', col: on ? 'var(--ink)' : 'var(--mut)', onClick: () => this.convOpen(c.id), onClose: ev => this.convClose(c.id, ev) }; }),
       convListOpen: !!S.akConvList, convToggleList: () => this.setState({ akConvList: !S.akConvList }), convCloseList: () => this.setState({ akConvList: false }),
       convList: (this._convs || []).slice().sort((a, b) => b.updated - a.updated).map(c => ({ title: c.title || 'New conversation', when: c.updated ? new Date(c.updated).toLocaleString() : '', onOpen: () => this.convOpen(c.id), onDelete: ev => this.convDelete(c.id, ev) })),
