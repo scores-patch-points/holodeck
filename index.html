@@ -4221,9 +4221,13 @@ async function readText(file, M) {
         }
         if (figs) hdT('activation', 'folded', 'Read ' + figs + ' embedded image' + (figs === 1 ? '' : 's') + '; their text is now part of the reading');
       } catch (e) { hdT('screen', 'figures-fail', 'Embedded images could not be read (' + (e && e.message || e) + ')'); }
+      // The ignore faculty (khora's, consumed here): a recurring short line —
+      // furniture or a watermark — is BLANKED, not deleted, and disclosed.
+      let ignored = [];
+      try { const I = (await import(new URL('holodeck-ignore.js', location.href).href)).planIgnores(text, { pages: pdf.numPages }); if (I.removed) { text = I.kept; ignored = I.ignored; hdT('ignore', 'subtract', 'Subtracted ' + I.removed + ' recurring line(s) from the field of vision (running head/footer, boilerplate, or a watermark); kept on the record: ' + I.ignored.slice(0, 3).map(x => x.text).join('; '), { ignored: I.ignored }); } } catch (e) {}
       const fullText = [text, figText].filter(x => x && x.trim()).join('\n\n');
       const hasFigs = figs > 0;
-      return { title, year, type: 'PDF', format: hasFigs ? 'html' : 'pdf', html: hasFigs ? (text.trim() ? '<p style="' + TAG_STYLE.P + '">' + esc(text.replace(/\s+/g, ' ').trim()) + '</p>' : '') + figHtml : undefined, text: fullText, pages, pdf: buf, figures: figs || undefined, needsRead: fullText.trim() ? undefined : true, note: (text.trim() ? (ocrPages ? 'No text layer — read by OCR (' + ocrPages + ' pages). ' : '') : 'This PDF isn’t readable yet — it looks scanned and I couldn’t read it. Let me process it (read the pages with OCR) so I can read it; ask me again once it’s done. ') + (hasFigs ? 'Read ' + figs + ' embedded image' + (figs === 1 ? '' : 's') + ' for text (visual model + OCR + activation).' : (text.trim() ? null : '')) };
+      return { title, year, type: 'PDF', format: hasFigs ? 'html' : 'pdf', html: hasFigs ? (text.trim() ? '<p style="' + TAG_STYLE.P + '">' + esc(text.replace(/\s+/g, ' ').trim()) + '</p>' : '') + figHtml : undefined, text: fullText, pages, pdf: buf, figures: figs || undefined, ignored: ignored.length ? ignored : undefined, needsRead: fullText.trim() ? undefined : true, note: (text.trim() ? (ocrPages ? 'No text layer — read by OCR (' + ocrPages + ' pages). ' : '') : 'This PDF isn’t readable yet — it looks scanned and I couldn’t read it. Let me process it (read the pages with OCR) so I can read it; ask me again once it’s done. ') + (hasFigs ? 'Read ' + figs + ' embedded image' + (figs === 1 ? '' : 's') + ' for text (visual model + OCR + activation).' : (text.trim() ? null : '')) };
     }
     let html = '';
     if (['docx', 'pptx', 'xlsx', 'odt', 'odp', 'ods', 'epub'].includes(ext)) {
@@ -5293,13 +5297,18 @@ class Component extends DCLogic {
   // and tesseract over the stored bytes, then re-read the workspace with the text.
   async processRead(id) {
     const d = this.analysis().docById[id]; if (!d) return;
-    this.setState({ busy: 'Processing “' + short(d.title, 40) + '” — reading the pixels…' });
+    // Drive the live animation: the same player the ingest uses opens in real
+    // time and follows the trace, so the read is watched, not just toasted.
+    const T = hdTraceStart('CV + OCR · ' + short(d.title, 40));
+    hdT('bytes', 'file', d.title + ' — reading the pixels (visual model + OCR), in this browser');
+    this.setState({ busy: 'Reading the pixels of “' + short(d.title, 30) + '”…' });
     try {
       let text = '';
       if (d.format === 'pdf' || d.type === 'PDF' || d.pdf) {
         const buf = await idbGet('pdf:' + id).catch(() => null); if (!buf) throw new Error('this PDF’s bytes aren’t stored in this browser');
         const pdfjs = await pdfLib(); const pdf = await pdfjs.getDocument({ data: new Uint8Array(buf).slice() }).promise;
-        const R = await hdRead(); const o = await R.ocrPdf(pdf, { maxPages: 20, onProgress: p => this.setState({ busy: 'Reading page ' + p.page + ' of ' + p.of + '…' }) });
+        hdT('decode', 'pdf', pdf.numPages + ' pages — reading the pixels of each');
+        const R = await hdRead(); const o = await R.ocrPdf(pdf, { maxPages: 20, onProgress: p => { this.setState({ busy: 'Reading page ' + p.page + ' of ' + p.of + '…' }); hdT('decode', 'ocr', 'Page ' + p.page + ' of ' + p.of + ' — reading the pixels'); } });
         text = (o && o.text) || '';
       } else {
         let bmp = null;
@@ -5310,11 +5319,13 @@ class Component extends DCLogic {
         const read = await hdImageReading(bmp, d.title); text = read.text || read.raw || '';
       }
       const n = (String(text).match(/\S+/g) || []).length;
-      if (!n) { this.setState({ busy: '', note: 'Still couldn’t read any text from “' + d.title + '” — it may be a photo with no text, or too low-resolution.' }); return; }
+      if (!n) { hdT('decode', 'done', 'No text could be read from it'); this.setState({ busy: '', note: 'Still couldn’t read any text from “' + d.title + '” — it may be a photo with no text, or too low-resolution.' }); return; }
       this.replaceAddedDoc(id, { text, note: 'Processed: read ' + n + ' words from the pixels (visual model + OCR). A machine reading, not the document’s own words.', needsRead: undefined, measured: true });
       this._key = null; this._ix = null; this._db = null; this._gi = null;
+      hdT('activation', 'done', 'Read “' + hdCut(d.title, 40) + '” — ' + n + ' words folded into the reading');
       this.setState({ busy: '', note: 'Read “' + d.title + '” — ' + n + ' words from the pixels.', htmlVer: (this.state.htmlVer || 0) + 1 });
-    } catch (e) { this.setState({ busy: '', note: 'Couldn’t process it: ' + (e && e.message || e) }); }
+    } catch (e) { hdT('decode', 'fail', 'Couldn’t process it: ' + (e && e.message || e)); this.setState({ busy: '', note: 'Couldn’t process it: ' + (e && e.message || e) }); }
+    finally { T.done = true; T.ms = performance.now() - T.t0; HD_TR = null; }
   }
   replaceAddedDoc(id, patch) {
     const cid = this.corpusId();
@@ -7625,6 +7636,7 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
         if (d.transcribed) lines.push({ k: 'Transcribed', v: ((d.media && d.media.model ? d.media.model.split('/').pop() : 'Whisper')) + ' — a machine reading, not the recording.' });
         if (d.format === 'pdf' || d.type === 'PDF') lines.push({ k: 'PDF', v: (String(d.text || '').trim() ? 'text layer read' + (d.figures ? ' · ' + d.figures + ' embedded figure(s) read' : '') : 'no text layer (scanned) — read by OCR') });
         if (d.custody || d.custodyStatus) lines.push({ k: 'Custody', v: (d.custody || 'captured') + (d.custodyStatus ? ' · ' + d.custodyStatus : '') });
+        (d.ignored || []).forEach(x => lines.push({ k: 'Ignored · ' + x.rule, v: '“' + x.text + '” — ' + x.evidence + ' (kept on the record, blanked from the reading)' }));
         this.alterationsFor(id).forEach(e => lines.push({ k: 'Altered · ' + e.by, v: new Date(e.at).toLocaleString() + (e.note ? ' · ' + e.note : '') }));
         return { has: true, id, lines, editOpen: S.editOpen === id, noEdit: S.editOpen !== id, draft: S.editDraft != null ? S.editDraft : String(d.text || ''),
           perms: 'Permissions — (stub) there is no permission model yet. Edits are kept only in this browser and attributed to ' + this.who() + '.',
