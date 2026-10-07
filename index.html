@@ -2191,6 +2191,24 @@ button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visi
             <sc-if value="{{ rdPins.has }}" hint-placeholder-val="{{ false }}"><button onClick="{{ goDraft }}" style="all:unset;cursor:pointer;font:600 14px var(--sans);color:var(--acc);white-space:nowrap" style-hover="text-decoration:underline">{{ rdPins.label }}</button></sc-if>
           </div>
           </div>
+          <sc-if value="{{ rdProv.has }}" hint-placeholder-val="{{ false }}">
+            <details class="hd-disclosure" style="border-top:1px solid var(--line);padding:4px 34px 0;background:var(--s2)">
+              <summary>How this was read &amp; altered</summary>
+              <div style="display:flex;flex-direction:column;gap:5px;padding:8px 0 12px">
+                <sc-for list="{{ rdProv.lines }}" as="p" hint-placeholder-count="3">
+                  <div style="display:grid;grid-template-columns:200px minmax(0,1fr);gap:4px 12px;align-items:baseline">
+                    <span style="font:600 12px var(--mono);color:var(--mut)">{{ p.k }}</span><span style="font:400 13.5px/1.45 var(--sans);color:var(--ink2);text-wrap:pretty">{{ p.v }}</span>
+                  </div>
+                </sc-for>
+                <span style="font:400 12.5px/1.45 var(--sans);color:var(--dim);margin-top:6px">{{ rdProv.perms }}</span>
+                <sc-if value="{{ rdProv.editOpen }}" hint-placeholder-val="{{ false }}">
+                  <textarea defaultValue="{{ rdProv.draft }}" onChange="{{ rdProv.onDraft }}" rows="10" style="margin-top:8px;width:100%;box-sizing:border-box;background:var(--s1);border:1px solid var(--line2);border-radius:8px;color:var(--ink);padding:10px 12px;font:400 13.5px/1.5 var(--serif);resize:vertical"></textarea>
+                  <div style="display:flex;gap:8px;margin-top:6px"><button onClick="{{ rdProv.onSave }}" style="background:var(--acc2);border:0;color:#fff;border-radius:8px;padding:6px 14px;cursor:pointer;font:600 14px var(--sans)">Save edit (tracked)</button><button onClick="{{ rdProv.onCancel }}" style="background:none;border:1px solid var(--line2);border-radius:8px;padding:5px 12px;cursor:pointer;font:500 14px var(--sans);color:var(--ink2)">Cancel</button></div>
+                </sc-if>
+                <sc-if value="{{ rdProv.noEdit }}" hint-placeholder-val="{{ true }}"><button onClick="{{ rdProv.onEdit }}" style="align-self:flex-start;margin-top:6px;background:none;border:1px solid var(--line2);border-radius:8px;padding:5px 12px;cursor:pointer;font:500 14px var(--sans);color:var(--ink2)" style-hover="border-color:var(--acc)">Edit the text…</button></sc-if>
+              </div>
+            </details>
+          </sc-if>
           <sc-if value="{{ rdFaith.has }}" hint-placeholder-val="{{ false }}">
             <div style="border-top:1px solid var(--line);padding:10px 34px;font:400 13px/1.45 var(--sans);color:var(--mut);background:var(--s2);text-wrap:pretty">{{ rdFaith.note }}</div>
           </sc-if>
@@ -4413,7 +4431,7 @@ class Component extends DCLogic {
       this._overviewRoot = root; this._overviewMount = M.mountOverview(root, { ...options, docs: this.analysis().docs });
     }).catch(e => { this._overviewLoading = null; root.textContent = 'Overview unavailable: ' + e.message; });
   }
-  state = { corpus: null, added: loadAdded(), view: new URLSearchParams(location.search).has('work') ? 'ask' : 'summary', akMode: new URLSearchParams(location.search).get('work') === 'notebook' ? 'notebook' : new URLSearchParams(location.search).get('work') === 'fold' ? 'generate' : 'chat', akFocus: new URLSearchParams(location.search).get('fullscreen') === '1' || new URLSearchParams(location.search).get('work') === 'chat', akConvList: false, akNotes: {}, sel: null, f: {}, q: '', readDoc: null, showPos: false, showAdd: false, showSettings: false, draftText: '', fw: {}, note: '', theme: loadTheme(), railOpen: loadRailOpen(), segOpen: loadSegOpen(), topicsQ: '', topicsPage: 0, dragging: false, busy: '', just: null, readMode: 'original', htmlVer: 0, txAsk: null, txPrior: 'workspace', txLang: 'en', txModel: 'base', txBusy: false, txProg: '', ground: { on: true, names: true, figures: true, dates: true, sentences: true }, wsRenaming: false, wsNameDraft: '', stripRead: { mode: 'Relate', domain: 'Interpretation', grain: 'Pattern' }, folder: null, folderDraft: '', mxOpen: false, mxErr: '', mxBusy: false };
+  state = { corpus: null, added: loadAdded(), view: new URLSearchParams(location.search).has('work') ? 'ask' : 'summary', akMode: new URLSearchParams(location.search).get('work') === 'notebook' ? 'notebook' : new URLSearchParams(location.search).get('work') === 'fold' ? 'generate' : 'chat', akFocus: new URLSearchParams(location.search).get('fullscreen') === '1' || new URLSearchParams(location.search).get('work') === 'chat', akConvList: false, akNotes: {}, sel: null, f: {}, q: '', readDoc: null, showPos: false, showAdd: false, showSettings: false, draftText: '', fw: {}, note: '', theme: loadTheme(), railOpen: loadRailOpen(), segOpen: loadSegOpen(), topicsQ: '', topicsPage: 0, dragging: false, busy: '', just: null, readMode: 'original', htmlVer: 0, txAsk: null, txPrior: 'workspace', txLang: 'en', txModel: 'base', txBusy: false, txProg: '', ground: { on: true, names: true, figures: true, dates: true, sentences: true }, wsRenaming: false, wsNameDraft: '', stripRead: { mode: 'Relate', domain: 'Interpretation', grain: 'Pattern' }, folder: null, folderDraft: '', mxOpen: false, mxErr: '', mxBusy: false, editOpen: null, editDraft: null };
   _html = {};
 
   componentDidMount() {
@@ -5253,6 +5271,23 @@ class Component extends DCLogic {
       const bytes = JSON.stringify({ source: r.source, model: r.model, video_id: d0.media.id, segments: r.segments, priors: r.priors || { prompt: prompt ? priorNote : 'none', language: lang } });
       if (this._net && this._net.s && !this._net.s.guest && this.wsRooms().pub) this.publish({ bytes, meta: { kind: 'transcript', title, url: d0.url, ytid: d0.media.id, mime: 'application/json', filename: title.replace(/[^\w-]+/g, '-').slice(0, 60) + '.segments.json' } }).catch(() => {});
     } catch (e) { this.setState({ txBusy: false, txProg: '', note: 'Transcription failed: ' + (e && e.message || e) }); }
+  }
+  // Who is editing: the signed-in account, else this device. The attribution an
+  // alteration carries (the permissions stub stands in for a real model).
+  who() { const s = this._net && this._net.s; return (s && s.user) ? s.user : 'you · this device'; }
+  alterationsFor(id) { try { const all = JSON.parse(localStorage.getItem('holodeck-alterations-v1') || '{}'); return (all[this.corpusId()] || []).filter(e => e.doc === id); } catch (e) { return []; } }
+  // Edit a source's text. The change is kept and attributed (append-only log);
+  // this is the stub the permission model will later gate.
+  saveEdit(id) {
+    const d = this.analysis().docById[id]; if (!d) return;
+    const next = String(this.state.editDraft != null ? this.state.editDraft : d.text || '');
+    const before = String(d.text || '');
+    if (next === before) { this.setState({ editOpen: null, editDraft: null }); return; }
+    const entry = { id: 'e' + Date.now().toString(36), at: new Date().toISOString(), by: this.who(), doc: id, kind: 'edit', note: 'text edited (' + before.length.toLocaleString() + ' → ' + next.length.toLocaleString() + ' characters)' };
+    try { const all = JSON.parse(localStorage.getItem('holodeck-alterations-v1') || '{}'); const cid = this.corpusId(); all[cid] = [...(all[cid] || []), entry]; localStorage.setItem('holodeck-alterations-v1', JSON.stringify(all)); } catch (e) {}
+    this.replaceAddedDoc(id, { text: next, edited: true, editedBy: entry.by, editedAt: entry.at });
+    this._key = null; this._ix = null; this._db = null; this._gi = null;
+    this.setState({ editOpen: null, editDraft: null, busy: '', htmlVer: (this.state.htmlVer || 0) + 1, note: 'Edited “' + short(d.title, 40) + '” — kept and attributed to ' + entry.by + '.' });
   }
   // Manually push CV + OCR over an existing picture or scan: the 2D visual model
   // and tesseract over the stored bytes, then re-read the workspace with the text.
@@ -7580,6 +7615,21 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
       modeOriginal: () => this.setState({ readMode: 'original' }), modePlain: () => this.setState({ readMode: 'plain' }),
       readerHasUrl: !!(S.readDoc && A.docById[S.readDoc] && A.docById[S.readDoc].url), readerUrl: (S.readDoc && A.docById[S.readDoc] && A.docById[S.readDoc].url) || '',
       readerSourceLabel: S.readDoc && A.docById[S.readDoc] && A.docById[S.readDoc].url ? (/wikipedia.org/.test(A.docById[S.readDoc].url) ? (A.docById[S.readDoc].live ? 'Live from Wikipedia' : 'Excerpt from Wikipedia') + ' · CC BY-SA 4.0 ↗' : 'Open original ↗') : '',
+      rdProv: (() => {
+        const id = S.readDoc, d = id && A.docById[id]; if (!d) return { has: false, noEdit: true };
+        const lines = [];
+        lines.push({ k: 'Read into the workspace', v: plural((A.stsByDoc[id] || []).length, 'statement') + ' from ' + String(d.text || '').length.toLocaleString() + ' characters · ' + (d.type || 'Source') });
+        if (d.measured) lines.push({ k: 'Pixels measured', v: 'size, colour and detail read from the image itself — no model.' });
+        if (d.screen || d.hasImg) lines.push({ k: 'Structure & text read', v: 'the 2D visual model + OCR turned the pixels into regions and words — a machine reading.' });
+        if (d.needsRead) lines.push({ k: '⚠ Not readable yet', v: 'nothing has been read from it — use “Read the pixels (CV + OCR)”.' });
+        if (d.transcribed) lines.push({ k: 'Transcribed', v: ((d.media && d.media.model ? d.media.model.split('/').pop() : 'Whisper')) + ' — a machine reading, not the recording.' });
+        if (d.format === 'pdf' || d.type === 'PDF') lines.push({ k: 'PDF', v: (String(d.text || '').trim() ? 'text layer read' + (d.figures ? ' · ' + d.figures + ' embedded figure(s) read' : '') : 'no text layer (scanned) — read by OCR') });
+        if (d.custody || d.custodyStatus) lines.push({ k: 'Custody', v: (d.custody || 'captured') + (d.custodyStatus ? ' · ' + d.custodyStatus : '') });
+        this.alterationsFor(id).forEach(e => lines.push({ k: 'Altered · ' + e.by, v: new Date(e.at).toLocaleString() + (e.note ? ' · ' + e.note : '') }));
+        return { has: true, id, lines, editOpen: S.editOpen === id, noEdit: S.editOpen !== id, draft: S.editDraft != null ? S.editDraft : String(d.text || ''),
+          perms: 'Permissions — (stub) there is no permission model yet. Edits are kept only in this browser and attributed to ' + this.who() + '.',
+          onEdit: () => this.setState({ editOpen: id, editDraft: String(d.text || '') }), onDraft: e => this.setState({ editDraft: e.target.value }), onSave: () => this.saveEdit(id), onCancel: () => this.setState({ editOpen: null, editDraft: null }) };
+      })(),
       rParas, showPos: S.showPos, togglePos: () => this.setState({ showPos: !S.showPos }), closeReader: () => this.goBack(),
       ...(() => { const det = this.details(A, F, D); const pf = this.profileVals(A, det); pf.noProfile = !pf.has;
         const narrow = typeof window !== 'undefined' && window.innerWidth < SIDE_PANEL_MIN_VW; this._narrow = narrow;
