@@ -493,6 +493,8 @@ button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visi
                       <button onClick="{{ d.onDiscard }}" style="background:none;border:1px solid var(--line2);border-radius:8px;padding:5px 12px;cursor:pointer;font:500 14px var(--sans);color:var(--ink2)" style-hover="border-color:var(--bad)">Discard</button>
                     </sc-if>
                     <button onClick="{{ d.onRead }}" style="background:none;border:1px solid var(--line2);border-radius:8px;padding:5px 12px;cursor:pointer;font:500 14px var(--sans);color:var(--ink2)" style-hover="border-color:var(--acc)">{{ d.readLabel }}</button>
+                    <sc-if value="{{ d.canProcess }}" hint-placeholder-val="{{ false }}"><button onClick="{{ d.onProcess }}" title="Run the visual model and OCR over its pixels, read in the browser" style="background:{{ d.needsRead ? 'var(--acc2)' : 'none' }};border:1px solid {{ d.needsRead ? 'var(--acc2)' : 'var(--line2)' }};border-radius:8px;padding:5px 12px;cursor:pointer;font:500 14px var(--sans);color:{{ d.needsRead ? '#fff' : 'var(--ink2)' }};white-space:nowrap" style-hover="border-color:var(--acc)">Read the pixels (CV + OCR)</button></sc-if>
+                    <sc-if value="{{ d.canTranscribe }}" hint-placeholder-val="{{ false }}"><button onClick="{{ d.onTranscribe }}" title="Transcribe this recording — local service if set, else in this browser" style="background:none;border:1px solid var(--line2);border-radius:8px;padding:5px 12px;cursor:pointer;font:500 14px var(--sans);color:var(--ink2);white-space:nowrap" style-hover="border-color:var(--acc)">Transcribe it</button></sc-if>
                   </div>
                   <details class="hd-disclosure" style="padding:8px 0 0;margin-top:auto">
                     <summary>Source details &amp; actions</summary>
@@ -5254,6 +5256,33 @@ class Component extends DCLogic {
       if (this._net && this._net.s && !this._net.s.guest && this.wsRooms().pub) this.publish({ bytes, meta: { kind: 'transcript', title, url: d0.url, ytid: d0.media.id, mime: 'application/json', filename: title.replace(/[^\w-]+/g, '-').slice(0, 60) + '.segments.json' } }).catch(() => {});
     } catch (e) { this.setState({ txBusy: false, txProg: '', note: 'Transcription failed: ' + (e && e.message || e) }); }
   }
+  // Manually push CV + OCR over an existing picture or scan: the 2D visual model
+  // and tesseract over the stored bytes, then re-read the workspace with the text.
+  async processRead(id) {
+    const d = this.analysis().docById[id]; if (!d) return;
+    this.setState({ busy: 'Processing “' + short(d.title, 40) + '” — reading the pixels…' });
+    try {
+      let text = '';
+      if (d.format === 'pdf' || d.type === 'PDF' || d.pdf) {
+        const buf = await idbGet('pdf:' + id).catch(() => null); if (!buf) throw new Error('this PDF’s bytes aren’t stored in this browser');
+        const pdfjs = await pdfLib(); const pdf = await pdfjs.getDocument({ data: new Uint8Array(buf).slice() }).promise;
+        const R = await hdRead(); const o = await R.ocrPdf(pdf, { maxPages: 20, onProgress: p => this.setState({ busy: 'Reading page ' + p.page + ' of ' + p.of + '…' }) });
+        text = (o && o.text) || '';
+      } else {
+        let bmp = null;
+        const du = (this._html && this._html['img:' + id]) || (typeof HD_PENDING_IMG !== 'undefined' && HD_PENDING_IMG['img:' + d.title]);
+        if (du) { const blob = await (await fetch(du)).blob(); bmp = await createImageBitmap(blob).catch(() => null); }
+        if (!bmp) { const buf = await idbGet('media:' + id).catch(() => null); if (buf) bmp = await createImageBitmap(new Blob([buf])).catch(() => null); }
+        if (!bmp) throw new Error('this image’s bytes aren’t stored in this browser');
+        const read = await hdImageReading(bmp, d.title); text = read.text || read.raw || '';
+      }
+      const n = (String(text).match(/\S+/g) || []).length;
+      if (!n) { this.setState({ busy: '', note: 'Still couldn’t read any text from “' + d.title + '” — it may be a photo with no text, or too low-resolution.' }); return; }
+      this.replaceAddedDoc(id, { text, note: 'Processed: read ' + n + ' words from the pixels (visual model + OCR). A machine reading, not the document’s own words.', needsRead: undefined, measured: true });
+      this._key = null; this._ix = null; this._db = null; this._gi = null;
+      this.setState({ busy: '', note: 'Read “' + d.title + '” — ' + n + ' words from the pixels.', htmlVer: (this.state.htmlVer || 0) + 1 });
+    } catch (e) { this.setState({ busy: '', note: 'Couldn’t process it: ' + (e && e.message || e) }); }
+  }
   replaceAddedDoc(id, patch) {
     const cid = this.corpusId();
     const added = { ...this.state.added, [cid]: (this.state.added[cid] || []).map(d => d.id === id ? { ...d, ...patch } : d) };
@@ -7010,7 +7039,7 @@ class Component extends DCLogic {
       const badges = [...(d.medium ? [{ label: d.medium === 'Video' || d.medium === 'Audio' ? d.medium + (d.transcribed ? ' · machine transcript' : ' · not transcribed') : d.medium, color: MEDIUM_C[d.medium] || 'var(--mut)' }] : []), ...(d.standing ? [{ label: d.standing, color: STANDING_C[d.standing] || 'var(--mut)' }] : []), ...((d.recordings || []).map(r => ({ label: 'Video linked · not transcribed', color: 'var(--date)' }))), ...(d.sameAs ? [{ label: 'Same bytes as ' + short(d.sameAsTitle || '', 36), color: 'var(--amber)' }] : []), ...(d.custodyStatus && d.custodyStatus !== 'captured' ? [{ label: d.custody, color: /missing|failed|not-located|no-text/.test(d.custodyStatus) ? 'var(--bad)' : 'var(--amber)' }] : [])];
       const vid = !!(d.media && d.media.kind === 'youtube');
       const tr = this.traceFor(d.id);
-      return { ...c, op: 1, isVid: vid, noVid: !vid, thumbBg: vid ? 'url(https://i.ytimg.com/vi/' + d.media.id + '/hqdefault.jpg)' : 'none', readLabel: 'Open source', ...(vid ? { onSelect: () => this.read(d.id) } : {}), badges, hasBadges: badges.length > 0, hasDistinct: !!dd, distinct: dd ? dd.label + ' · ' + pct(dd.a) + ' of its statements vs ' + pct(dd.b) + ' elsewhere' : '', hasFold: this._fold.length > 0, fold: inF + ' of ' + all.length + ' statements touch the topic', stats: (narrowed ? ((FbyDoc[d.id] || []).length).toLocaleString() + ' of ' + plural(all.length, 'statement') + ' in this selection' : plural(all.length, 'statement')) + ' · ' + plural(nm.size, 'name'), isSeen: m.status === 'seen', isKept: m.status !== 'seen', hasReplay: !!tr, onReplay: () => tr && import(new URL('holodeck-ingest-player.js', location.href).href).then(M => M.open(tr)), canUnkeep: m.status !== 'seen' && !this.baseDocs(this.corpusId()).some(x => x.id === d.id),
+      return { ...c, op: 1, isVid: vid, noVid: !vid, thumbBg: vid ? 'url(https://i.ytimg.com/vi/' + d.media.id + '/hqdefault.jpg)' : 'none', readLabel: 'Open source', ...(vid ? { onSelect: () => this.read(d.id) } : {}), badges, hasBadges: badges.length > 0, hasDistinct: !!dd, distinct: dd ? dd.label + ' · ' + pct(dd.a) + ' of its statements vs ' + pct(dd.b) + ' elsewhere' : '', hasFold: this._fold.length > 0, fold: inF + ' of ' + all.length + ' statements touch the topic', stats: (narrowed ? ((FbyDoc[d.id] || []).length).toLocaleString() + ' of ' + plural(all.length, 'statement') + ' in this selection' : plural(all.length, 'statement')) + ' · ' + plural(nm.size, 'name'), isSeen: m.status === 'seen', isKept: m.status !== 'seen', hasReplay: !!tr, onReplay: () => tr && import(new URL('holodeck-ingest-player.js', location.href).href).then(M => M.open(tr)), canUnkeep: m.status !== 'seen' && !this.baseDocs(this.corpusId()).some(x => x.id === d.id), needsRead: !!d.needsRead, onProcess: () => this.processRead(d.id), canProcess: !!(d.type === 'Image' || d.type === 'PDF' || d.format === 'pdf' || d.pdf || d.hasImg), canTranscribe: !!((d.medium === 'Audio' || d.medium === 'Video' || d.type === 'Audio' || d.type === 'Video') && !d.transcribed), onTranscribe: () => this.transcribeLocal(d),
         ...(() => { const on = this._inf[d.id] || null;
           return { originText: on ? on.why + ' ' + short(A.docById[on.of].title, 40) : 'Independent · shares no claims or outlet with another source', originDep: !!on, originCol: on ? 'var(--amber)' : 'var(--mut)' }; })(),
         drawsX: 0, drawOptions: drawOpts,
