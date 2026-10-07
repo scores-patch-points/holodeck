@@ -1,0 +1,37 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>holodeck-store selftest</title>
+<script type="module">
+import { openStore } from '../holodeck-store.js';
+
+const OLLAMA = 'http://127.0.0.1:11435';
+async function embed(text) {
+  const r = await fetch(`${OLLAMA}/api/embed`, {
+    method: 'POST', headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ model: 'nomic-embed-text', input: [text] }),
+  });
+  if (!r.ok) throw new Error('embed ' + r.status);
+  return new Float32Array((await r.json()).embeddings[0]);
+}
+
+window.__result = { status: 'running' };
+try {
+  const s = await openStore({ corpus: 'nashville' });
+  const id = s.ids()[0];
+  const imp = await s.impression(id);
+  const lex = await s.searchLexical('MOTOROLA', { limit: 5 });
+  let sem = null;
+  try { sem = await s.searchSemantic('surveillance cameras monitoring public spaces', { embed, limit: 8 }); }
+  catch (e) { sem = { error: String(e && e.message || e) }; }
+  window.__result = {
+    status: 'ok',
+    count: s.count(),
+    hasVectors: s.hasVectors(),
+    impLen: (imp || '').length,
+    lexicalMotorola: lex.map((h) => ({ id: h.id, start: h.start })),
+    semantic: sem,
+  };
+} catch (e) {
+  window.__result = { status: 'error', error: String((e && e.message) || e) };
+}
+</script>

@@ -181,3 +181,26 @@ Each entry records a decision, dated, without erasing prior entries.
   privilege any single store.
 - **Provenance is preserved through search.** A hit is a byte span to confirm by
   reading, never a similarity score standing as evidence.
+
+### 2026-10-07 — the foundation, implemented
+
+- **The packer and the first adapter land.** `tools/pack-corpus.mjs` is generic:
+  a normalized `items.json` packs to a small **hot index** (`hot.json` —
+  identity, pointers, byte offsets) and a packed **cold blob**
+  (`impressions.bin`, UTF-8). `tools/from-nashville.mjs` is the first adapter
+  that produces `items.json` from an existing corpus; adapters are how a new
+  source is added, not changes to the framework.
+- **The store lands.** `holodeck-store.js` loads the hot index, writes the cold
+  blob **once** into **OPFS**, and reads any item's impression by **byte
+  offset** on demand — never loading the whole blob into the workspace. It also
+  runs the **lexical baseline**, returning pointers and spans.
+- **The search layer lands.** `tools/build-embeddings.mjs` builds item-level
+  vectors once over the packed corpus and emits a **random null of the same
+  shape** alongside. `searchSemantic` uses the vectors as a **proposer** and
+  reports the null's top score so the **lift is measured**.
+- **Verified headlessly.** OPFS round-trip, offset reads (multi-byte text
+  intact), lexical hits on a real term, and semantic search with a measured
+  lift (top hit ≈ 0.52 vs null ≈ 0.11).
+- **Still open.** The store is a module; it is **not yet wired into the surface
+  UI**, and the corpus text is the impressions, not yet the fetched full text.
+  Both are the next fold, not a change to this plan.
