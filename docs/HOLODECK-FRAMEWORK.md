@@ -204,3 +204,24 @@ Each entry records a decision, dated, without erasing prior entries.
 - **Still open.** The store is a module; it is **not yet wired into the surface
   UI**, and the corpus text is the impressions, not yet the fetched full text.
   Both are the next fold, not a change to this plan.
+
+### 2026-10-07 — the append-only index, implemented
+
+- **The index is an append-only log.** `index.log.jsonl` is the source of truth
+  (records: `doc`, `chunk`, `vector`, `tombstone`); `vectors.f16` is an
+  append-only binary sidecar (one row per vector); `current.json` is a
+  **replayable fold** the surface loads. Nothing in the log is rewritten;
+  retractions are tombstones; re-embedding appends new rows tagged with their
+  model. Tools: `tools/index-log.mjs`, `tools/build-index.mjs`,
+  `tools/fold-index.mjs`.
+- **Ingest is idempotent and incremental.** Re-running `build-index` adds only
+  documents not already in the log; the fold is rebuilt by replay.
+- **Measured, and it is smaller than the text.** 87 full contracts → 4,307
+  chunks at **dim 256, fp16**: `vectors.f16` **2.2 MB** vs corpus text
+  **3.0 MB** (~0.73×). The fp16 half-float sidecar round-trips at ~5e-5 error.
+- **The surface reads the fold, not the log.** `holodeck-store.js` loads
+  `current.json` + `vectors.f16` and searches chunk-level, returning **spans**;
+  the null control is generated on the fly (never stored).
+- **A database is a fold of this log.** `tools/index-to-db.mjs` (next) replays
+  the same records into SQLite/Postgres; the log stays the record, as with every
+  other ledger here.
