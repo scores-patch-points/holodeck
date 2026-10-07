@@ -750,6 +750,9 @@ button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visi
           <sc-if value="{{ ak.convListOpen }}" hint-placeholder-val="{{ false }}"><div onClick="{{ ak.convCloseList }}" style="position:fixed;inset:0;z-index:55"></div></sc-if>
         </div>
       </sc-if>
+      <sc-if value="{{ ak.chatEmbed }}" hint-placeholder-val="{{ false }}">
+        <iframe src="{{ ak.chatSrc }}" title="The Fold chat (vendored byte-identical from scores-patch-points/the-fold)" style="display:block;width:100%;height:calc(100vh - 130px);min-height:560px;border:1px solid var(--line);border-radius:12px;background:var(--bg)"></iframe>
+      </sc-if>
       <sc-if value="{{ ak.onData }}" hint-placeholder-val="{{ false }}">
         <div ref="{{ ak.nbRef }}" data-hd-notebook style="min-height:50vh"></div>
       </sc-if>
@@ -5758,7 +5761,7 @@ class Component extends DCLogic {
         onDismiss: () => this.setState({ akRefuse: null }),
         links: live.slice(0, 5).map(d => ({ title: short(d.title || d.url, 60), onOpen: () => window.open(d.url, '_blank', 'noopener') })), hasLinks: live.length > 0 };
     })();
-    return { ak: { on: true, onSrc: akPane !== 'data', onData: akPane === 'data', nbRef: this._nbRef,
+    return { ak: { on: true, onSrc: akPane !== 'data' && (S.akMode || 'chat') !== 'chat', onData: akPane === 'data', chatEmbed: (S.akMode || 'chat') === 'chat', chatSrc: new URL('vendor/fold-chat/index.html', location.href).href, nbRef: this._nbRef,
  ready: this.llmOk(), pending: false, refuse, gap: isWL ? !gpu && !!MM : !(O && O.ok), why: isWL ? 'navigator.gpu is not available in this browser' : (O.why || ''), isWL, noGpu: isWL && MM && !gpu, needLoad: isWL && gpu && !loaded && !LD, loading: !!LD, loadText: LD ? LD.text : '', loadPct: LD ? Math.round((LD.p || 0) * 100) + '%' : '0%', load: () => this.akLoad(), mName: mInfo.name, mSize: mInfo.size || '',
       dot: isWL ? (loaded ? 'var(--ok)' : gpu ? 'var(--amber)' : 'var(--bad)') : O.ok ? 'var(--ok)' : 'var(--bad)',
       status: String(this.akModel()).startsWith('heimdall:') ? (this._hdm && this._hdm.ok ? 'heimdall · ' + (this.hdSealedOf(this.akModel()) ? 'sealed-external — projection only' : 'fleet · local') : 'heimdall bridge isn’t reachable') : (isWL ? (loaded ? mInfo.name + ' running in this tab · nothing leaves it' : !MM ? 'Starting…' : gpu ? mInfo.name + ' runs in this tab once loaded' : 'This browser can’t run a model in the tab') : O.ok ? model + ' via Ollama on this machine' : 'Ollama isn’t reachable'),
