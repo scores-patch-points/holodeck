@@ -358,10 +358,10 @@ button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visi
       </sc-if>
 
       <sc-if value="{{ showDropStrip }}" hint-placeholder-val="{{ false }}">
-        <div style="display:flex;align-items:center;gap:8px 12px;flex-wrap:wrap;font:400 14px var(--sans);color:var(--mut);padding:2px 0">
-          <span style="white-space:nowrap">Drop, paste or link anything to add it.</span>
-          <button draggable="true" onDragStart="{{ demo.onDragStart }}" onClick="{{ demo.onClick }}" title="Drag onto the page (or click)" style="display:flex;align-items:center;gap:6px;background:var(--s1);border:1px solid var(--line2);border-radius:6px;padding:3px 10px;cursor:grab;font:500 14px var(--sans);color:var(--ink2)" style-hover="border-color:var(--acc)">Try: {{ demo.label }}</button>
-          <span style="margin-left:auto;display:flex;align-items:center;gap:6px;white-space:nowrap"><a ref="{{ bookmarkletRef }}" title="Drag to your bookmarks bar, then click it on any page" style="font:600 14px var(--sans);text-decoration:none;cursor:grab">✦ Explore this page</a><span style="font-size:12px">drag to bookmarks bar</span></span>
+        <div style="display:flex;align-items:center;gap:8px 10px;flex-wrap:wrap;font:400 14px var(--sans);color:var(--mut);box-sizing:border-box;max-width:720px;padding:8px 12px;background:var(--s1);border:1px solid var(--line);border-radius:10px">
+          <span style="min-width:0">Drop, paste or link anything to add it.</span>
+          <button draggable="true" onDragStart="{{ demo.onDragStart }}" onClick="{{ demo.onClick }}" title="Drag onto the page (or click)" style="display:flex;align-items:center;gap:6px;background:var(--s2);border:1px solid var(--line2);border-radius:6px;padding:3px 10px;cursor:grab;font:500 14px var(--sans);color:var(--ink2)" style-hover="border-color:var(--acc)">Try: {{ demo.label }}</button>
+          <span style="display:flex;align-items:center;gap:6px;white-space:nowrap"><a ref="{{ bookmarkletRef }}" title="Drag to your bookmarks bar, then click it on any page" style="font:600 14px var(--sans);text-decoration:none;cursor:grab;color:var(--acc)">✦ Explore this page</a><span style="font-size:12px;color:var(--dim)">drag to bookmarks bar</span></span>
         </div>
       </sc-if>
 
@@ -380,7 +380,7 @@ button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visi
               </div>
             </sc-if>
             <h1 style="margin:0;font:500 30px/1.2 var(--serif);color:var(--ink);text-wrap:pretty">{{ crumbLast.label }}</h1>
-            <p style="margin:0;color:var(--mut);font-size:15px;text-wrap:pretty">{{ hdr.sub }}{{ sr.sub }}</p>
+            <p style="margin:0;color:var(--mut);font-size:15px;text-wrap:pretty;max-width:760px">{{ hdr.sub }}{{ sr.sub }}</p>
             <sc-if value="{{ sr.hasOthers }}" hint-placeholder-val="{{ false }}">
               <div style="display:flex;align-items:center;gap:6px 8px;flex-wrap:wrap;margin-top:4px">
                 <span style="font:400 14px var(--sans);color:var(--mut)">Also narrowed to</span>
