@@ -6,6 +6,7 @@
 // 400 is the summary, the records, and the last exchanges — never the transcript. Whatever the model is, it only
 // ever rides in as the mouth of this full pipeline — it never runs outside it.
 import * as FOLD from './vendor/the-fold/fold.js';
+import { mechanicalRefresh } from './holodeck-carry.js';
 import { chunkSource, retrieve, buildSourceBlock, openQuestions, readRange, tokenize, foldDiacritics } from './vendor/eoreader7/native/organs/source.js';
 import { meetingBoundaries } from './vendor/eoreader7/native/organs/speaker.js';
 import { buildFactBlock, dedupeSourceText } from './vendor/eoreader7/native/organs/fact-block.js';
@@ -176,7 +177,7 @@ async function chat(base, model, messages, opts = {}) {
 
 // One turn. `conv` = { summary, history, turns }. `computed` is an optional block of values computed from the
 // Records database (never asked of the model); it rides into the prompt as material and onto the record.
-export async function turn(conv, IX, question, { base = OLLAMA, model = DEFAULT_MODEL, computed = null, reading = null, retrievalQ = null, resolved = null, ctx = 4096, onToken, onStage, signal, deferFold = false, onFold = null, docs = null, summarize = true, privacy = 'local-raw' } = {}) {
+export async function turn(conv, IX, question, { base = OLLAMA, model = DEFAULT_MODEL, computed = null, reading = null, retrievalQ = null, resolved = null, ctx = 4096, onToken, onStage, signal, deferFold = false, onFold = null, docs = null, summarize = true, privacy = 'local-raw', rix = null, carry = 'model' } = {}) {
   const t0 = Date.now(); const turnNo = (conv.summary.turnCount || 0) + 1;
   // THE SEALED BOUNDARY: an outside executor (heimdall frontier/remote model)
   // may only receive the projection the Fold builds. When the caller selects
@@ -289,7 +290,16 @@ export async function turn(conv, IX, question, { base = OLLAMA, model = DEFAULT_
   // The turn is recorded the moment its answer and addressed record exist. The summary refresh (System 2's
   // discourse fold) is a SECOND model call, and it is never allowed to hold up the record or the next message:
   // when deferred it runs after this returns, and the caller folds its result back in when it lands.
+  // CARRY = 'mechanical' (THE-HOLOGRAPH §6): the discourse fields are COMPUTED from the history and the material's cast
+  // (holodeck-carry.js) — no second model call, no drift. Default stays 'model' until the mechanical carry has been measured
+  // against it; when the cast is empty the mechanical path says why and the model refresh below runs as before.
   const refreshSummary = async (from, sig) => {
+    if (carry === 'mechanical' && rix) {
+      try {
+        const m = mechanicalRefresh({ FOLD, from, foldLine, rix, history: conv.history, question, answer, used });
+        if (m.refresh.ok) return m;
+      } catch (e) { /* fall through to the model refresh */ }
+    }
     try {
       const up = FOLD.buildSummaryUpdatePrompt(from, [...(from.folds || []), foldLine]);
       const r2 = await chat(base, model, [{ role: 'system', content: FOLD.FOLD_SYSTEM_PROMPT }, { role: 'user', content: up }], { format: FOLD.FOLD_SCHEMA, maxTokens: 300, signal: sig, sealed });

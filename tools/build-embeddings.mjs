@@ -16,7 +16,7 @@ const limit = args.limit ? parseInt(args.limit, 10) : 0;
 const OLLAMA = args.ollama || 'http://127.0.0.1:11435';
 
 const hot = JSON.parse(readFileSync(join(store, 'hot.json'), 'utf8'));
-const cold = readFileSync(join(store, 'impressions.bin'));
+const cold = readFileSync(join(store, hot.cold.file));
 const dec = new TextDecoder();
 const items = limit ? hot.items.slice(0, limit) : hot.items;
 const texts = items.map((it) => dec.decode(cold.subarray(it.off[0], it.off[1])).slice(0, maxChars));

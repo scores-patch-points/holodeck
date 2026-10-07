@@ -5,21 +5,23 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Library search — holodeck</title>
 <style>
-  :root { color-scheme: dark; --page:#0d0d0d; --surface:#1a1a19; --ink:#fff; --mut:#898781; --line:#2c2c2a; --acc:#8b5cf6; --ok:#1baf7a; --warn:#eda100; }
-  * { box-sizing:border-box } body { margin:0; background:var(--page); color:var(--ink); font:400 15px/1.5 'Hanken Grotesk',system-ui,sans-serif }
+  /* aligned to the canonical fold (scores-patch-points/the-fold): graphite + one calm blue, local fonts only */
+  :root { color-scheme: dark; --page:#17171a; --surface:#1c1c20; --ink:#f4f4f6; --mut:#9d9da8; --line:#2e2e33; --acc:#8ab4ff; --ok:#56d364; --warn:#f0b429;
+    --sans:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif; --mono:ui-monospace,SFMono-Regular,Menlo,monospace; --serif:Georgia,"Times New Roman",serif; }
+  * { box-sizing:border-box } body { margin:0; background:var(--page); color:var(--ink); font:400 15px/1.5 var(--sans) }
   header { padding:18px 22px; border-bottom:1px solid var(--line); position:sticky; top:0; background:var(--page); z-index:2 }
-  h1 { font:600 16px 'Hanken Grotesk'; margin:0 0 2px } .sub { color:var(--mut); font:400 12px 'JetBrains Mono',monospace }
+  h1 { font:600 16px var(--sans); margin:0 0 2px } .sub { color:var(--mut); font:400 12px var(--mono) }
   form { display:flex; gap:8px; margin-top:12px }
-  input { flex:1; background:var(--surface); border:1px solid var(--line); color:var(--ink); border-radius:8px; padding:9px 12px; font:500 14px 'JetBrains Mono',monospace; outline:none }
-  button { background:var(--acc); border:0; color:#fff; border-radius:8px; padding:9px 16px; font:600 14px 'Hanken Grotesk'; cursor:pointer }
+  input { flex:1; background:var(--surface); border:1px solid var(--line); color:var(--ink); border-radius:8px; padding:9px 12px; font:500 14px var(--mono); outline:none }
+  button { background:var(--acc); border:0; color:var(--page); border-radius:8px; padding:9px 16px; font:600 14px var(--sans); cursor:pointer }
   main { padding:16px 22px 60px; max-width:900px }
-  h2 { font:600 13px 'JetBrains Mono',monospace; color:var(--mut); text-transform:uppercase; letter-spacing:.06em; margin:22px 0 8px }
+  h2 { font:600 13px var(--mono); color:var(--mut); text-transform:uppercase; letter-spacing:.06em; margin:22px 0 8px }
   .hit { border:1px solid var(--line); border-radius:10px; padding:11px 13px; margin-bottom:9px; background:var(--surface) }
-  .hit .t { font:600 14px 'Hanken Grotesk' } .hit .s { color:var(--mut); font:400 12.5px 'JetBrains Mono',monospace; margin-top:4px }
-  .hit .q { color:var(--ink); margin-top:7px; font:400 13.5px/1.45 'Newsreader',serif }
-  .badge { font:500 11px 'JetBrains Mono',monospace; padding:1px 6px; border-radius:5px; margin-left:7px }
-  .num { color:var(--acc) } .null { color:var(--mut) } a { color:#7aa2ff } mark { background:#3a2a66; color:#fff }
-  .note { color:var(--mut); font:400 12.5px 'JetBrains Mono',monospace }
+  .hit .t { font:600 14px var(--sans) } .hit .s { color:var(--mut); font:400 12.5px var(--mono); margin-top:4px }
+  .hit .q { color:var(--ink); margin-top:7px; font:400 13.5px/1.45 var(--serif) }
+  .badge { font:500 11px var(--mono); padding:1px 6px; border-radius:5px; margin-left:7px }
+  .num { color:var(--acc) } .null { color:var(--mut) } a { color:var(--acc) } mark { background:#243b6b; color:#fff }
+  .note { color:var(--mut); font:400 12.5px var(--mono) }
 </style>
 </head>
 <body>

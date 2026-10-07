@@ -1,0 +1,19 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>seeding the fold — Metro Nashville contracts…</title>
+<script>
+// Seed the Metro Nashville ePAV contract corpus (verbatim excerpts from
+// nashville-legistar-archive/contract-ledger.jsonl) and open the app.
+// Same-origin as index.html, so localStorage carries.
+(async () => {
+  try {
+    const docs = await (await fetch('nashville-contracts-seed.json')).json();
+    localStorage.setItem('fold-explorer-added', JSON.stringify({ custom: docs }));
+    localStorage.setItem('holodeck-purged-legacy', '1');
+    location.replace('index.html');
+  } catch (e) {
+    document.body = document.createElement('body');
+    document.body.textContent = 'Seed failed: ' + e.message;
+  }
+})();
+</script>
