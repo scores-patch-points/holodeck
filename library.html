@@ -28,9 +28,7 @@
   <div class="sub" id="status">loading store…</div>
   <form id="f"><input id="q" placeholder="search the library — a term, or a meaning" autocomplete="off"><button>Search</button></form>
 </header>
-<main>
-  <div id="out"></div>
-</main>
+<main><div id="out"></div></main>
 <script type="module">
 import { openStore } from './holodeck-store.js';
 
@@ -39,7 +37,7 @@ const $ = (s) => document.querySelector(s);
 const esc = (s) => String(s).replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
 const mark = (s, q) => esc(s).replace(new RegExp('(' + q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'ig'), '<mark>$1</mark>');
 async function embed(text) {
-  const r = await fetch(`${OLLAMA}/api/embed`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ model: 'nomic-embed-text', input: [text] }) });
+  const r = await fetch(`${OLLAMA}/api/embed`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ model: 'nomic-embed-text', input: ['search_query: ' + text] }) });
   if (!r.ok) throw new Error('embed ' + r.status);
   return new Float32Array((await r.json()).embeddings[0]);
 }
@@ -47,7 +45,7 @@ async function embed(text) {
 let store = null;
 openStore({ corpus: 'nashville' }).then((s) => {
   store = s;
-  $('#status').textContent = `${s.count().toLocaleString()} items · lexical baseline + semantic proposer (lift measured against a null) · ${s.hasVectors() ? 'vectors ready' : 'no vectors'}`;
+  $('#status').textContent = `${s.count().toLocaleString()} sources · ${s.hasIndex() ? 'chunk index ready' : 'no index'} · lexical baseline + semantic proposer (lift vs null)`;
 }).catch((e) => { $('#status').textContent = 'store failed: ' + e.message; });
 
 $('#f').addEventListener('submit', async (e) => {
@@ -58,24 +56,27 @@ $('#f').addEventListener('submit', async (e) => {
   $('#status').textContent = 'searching…';
   const out = $('#out'); out.innerHTML = '';
 
-  const lex = await store.searchLexical(q, { limit: 12 });
+  const lex = await store.searchLexical(q, { limit: 10 });
   out.innerHTML += `<h2>Lexical baseline · ${lex.length} hit(s)</h2>` + (lex.length ? lex.map((h) => `
     <div class="hit"><div class="t">${esc(h.title)}</div>
       <div class="q">…${mark(h.snippet, q)}…</div>
       <div class="s">span ${h.start}–${h.end}${h.pointer ? ` · <a href="${esc(h.pointer.url || h.pointer.archive || '#')}" target="_blank" rel="noopener">open source ↗</a>` : ''}</div>
-    </div>`).join('') : '<div class="note">no lexical hit</div>');
+    </div>`).join('') : '<div class="note">no lexical hit — the words asked for are not in the text</div>');
 
-  let sem = null;
-  try { sem = await store.searchSemantic(q, { embed, limit: 12 }); } catch (e) { sem = { error: e.message }; }
-  if (sem && sem.hits) {
-    out.innerHTML += `<h2>Semantic proposer · top ${sem.hits[0].score} vs null ${sem.topNull} (lift ${sem.lift})</h2>` + sem.hits.map((h, i) => `
-      <div class="hit"><div class="t">${esc(h.title || h.id)}
-        <span class="badge num">${h.score}</span><span class="badge null">null ${sem.null[i] ? sem.null[i].score : ''}</span></div>
-        <div class="s">proposal — confirm by reading</div></div>`).join('');
-  } else if (sem) {
-    out.innerHTML += `<h2>Semantic proposer</h2><div class="note">unavailable: ${esc(sem.error || 'no vectors')}</div>`;
+  let ix = null;
+  try { ix = await store.searchIndex(q, { embed, limit: 10 }); } catch (e) { ix = { error: e.message }; }
+  if (ix && ix.hits) {
+    const uniq = []; const seen = new Set();
+    for (const h of ix.hits) { if (seen.has(h.id)) continue; seen.add(h.id); uniq.push(h); }
+    out.innerHTML += `<h2>Semantic proposer · top ${ix.topHit} vs null ${ix.topNull} (lift ${ix.lift})</h2>` +
+      ix.hits.map((h) => `<div class="hit"><div class="t">${esc(h.title || h.id)}
+        <span class="badge num">${h.score}</span></div>
+        <div class="s">chunk span ${h.span[0]}–${h.span[1]} · proposal — confirm by reading</div></div>`).join('') +
+      `<div class="note" style="margin-top:6px">${uniq.length} distinct source(s) among ${ix.hits.length} chunks · ${ix.null ? 'null: ' + ix.null.slice(0, 3).join(', ') : ''}</div>`;
+  } else if (ix) {
+    out.innerHTML += `<h2>Semantic proposer</h2><div class="note">unavailable: ${esc(ix.error || 'no index')}</div>`;
   }
-  $('#status').textContent = `“${q}” — ${lex.length} lexical, ${sem && sem.hits ? sem.hits.length : 0} semantic`;
+  $('#status').textContent = `“${q}” — ${lex.length} lexical, ${ix && ix.hits ? ix.hits.length : 0} semantic`;
 });
 </script>
 </body>

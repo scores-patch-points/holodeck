@@ -1,17 +1,12 @@
-// holodeck-store.js — the two-tier corpus store for the holodeck.
+// holodeck-store.js — the two-tier corpus store AND the append-only search index.
 //
-// A corpus is packed (tools/pack-corpus.mjs) into:
-//   hot.json         small: identity, metadata, pointers, byte offsets  -> resident
-//   impressions.bin  large: concatenated UTF-8 impression text          -> cold (OPFS)
+// Packed corpus (tools/pack-corpus.mjs): hot.json (resident) + impressions.bin (OPFS).
+// Append-only index (tools/build-index.mjs -> tools/fold-index.mjs):
+//   index.log.jsonl   source of truth (doc/chunk/vector/tombstone records)
+//   vectors.f16       fp16 rows
+//   current.json      the fold the surface loads (chunks + spans + row refs)
 //
-// The search layer (tools/build-embeddings.mjs) adds:
-//   vectors.f32      one normalized vector per item (search-only)
-//   null.f32         a random control of the same shape (so lift is measured)
-//   vecmeta.json     { model, dim, count, ids[] }
-//
-// This module loads the hot index, keeps the cold blob in OPFS (written once
-// from the served file, then read by byte offset on demand), never loads the
-// whole cold blob into the workspace, and treats embeddings as a proposer only.
+// Embeddings are a PROPOSER only: a hit is a span to confirm by reading.
 
 const DB = 'holodeck-store';
 
@@ -40,51 +35,47 @@ async function opfsSlice(path, start, end) {
   return new Uint8Array(await f.slice(start, end).arrayBuffer());
 }
 
-function norm(v) {
-  let s = 0;
-  for (const x of v) s += x * x;
-  s = Math.sqrt(s) || 1;
-  const o = new Float32Array(v.length);
-  for (let i = 0; i < v.length; i++) o[i] = v[i] / s;
-  return o;
+function norm(v) { let s = 0; for (const x of v) s += x * x; s = Math.sqrt(s) || 1; const o = new Float32Array(v.length); for (let i = 0; i < v.length; i++) o[i] = v[i] / s; return o; }
+function halfToF32(buf, count) {
+  const dv = new DataView(buf.buffer, buf.byteOffset, buf.byteLength);
+  const out = new Float32Array(count);
+  for (let i = 0; i < count; i++) {
+    const h = dv.getUint16(i * 2, true);
+    const sign = (h & 0x8000) ? -1 : 1, exp = (h >> 10) & 0x1f, mant = h & 0x3ff;
+    let v;
+    if (exp === 0) v = mant * Math.pow(2, -24);
+    else if (exp === 31) v = mant ? NaN : Infinity;
+    else v = (1 + mant / 1024) * Math.pow(2, exp - 15);
+    out[i] = sign * v;
+  }
+  return out;
 }
 
 export async function openStore({ base = '', corpus = 'nashville', fetchImpl = fetch } = {}) {
   const dir = `${base}/store/${corpus}`;
   const hot = await (await fetchImpl(`${dir}/hot.json`)).json();
   const coldPath = `${DB}/${corpus}/${hot.cold.file}`;
-
-  if (!(await opfsHas(coldPath))) {
-    const buf = await (await fetchImpl(`${dir}/${hot.cold.file}`)).arrayBuffer();
-    await opfsWrite(coldPath, buf);
-  }
+  if (!(await opfsHas(coldPath))) await opfsWrite(coldPath, await (await fetchImpl(`${dir}/${hot.cold.file}`)).arrayBuffer());
 
   const byId = new Map(hot.items.map((it) => [it.id, it]));
   const dec = new TextDecoder();
 
-  // Optional search layer (T4). Absent until build-embeddings has run.
-  let vec = null, nul = null, vm = null;
+  // append-only search index fold (optional)
+  let fold = null, idxVec = null, rowMeta = [];
   try {
-    vm = await (await fetchImpl(`${dir}/vecmeta.json`)).json();
-    vec = new Float32Array(await (await fetchImpl(`${dir}/vectors.f32`)).arrayBuffer());
-    nul = new Float32Array(await (await fetchImpl(`${dir}/null.f32`)).arrayBuffer());
-  } catch { /* no vectors yet — lexical only */ }
-
-  const scoreAt = (mat, qv, i, dim) => { let s = 0; for (let j = 0; j < dim; j++) s += qv[j] * mat[i * dim + j]; return s; };
-  const rank = (mat, qv, dim, n, k) => {
-    const a = new Array(n);
-    for (let i = 0; i < n; i++) a[i] = [i, scoreAt(mat, qv, i, dim)];
-    a.sort((x, y) => y[1] - x[1]);
-    return a.slice(0, k);
-  };
+    fold = await (await fetchImpl(`${dir}/current.json`)).json();
+    const vb = new Uint8Array(await (await fetchImpl(`${dir}/${fold.vector.file}`)).arrayBuffer());
+    idxVec = halfToF32(vb, fold.vector.rows * fold.dim);
+    rowMeta = new Array(fold.vector.rows);
+    for (const it of fold.items) for (const c of it.chunks) if (c && c.row != null) rowMeta[c.row] = { id: it.id, title: it.title, span: c.off };
+  } catch { /* no index fold yet */ }
 
   return {
-    corpus,
-    hot,
+    corpus, hot,
     count: () => hot.items.length,
     item: (id) => byId.get(id) || null,
     ids: () => hot.items.map((it) => it.id),
-    hasVectors: () => !!vec,
+    hasIndex: () => !!idxVec,
 
     async impression(id) {
       const it = byId.get(id);
@@ -92,45 +83,39 @@ export async function openStore({ base = '', corpus = 'nashville', fetchImpl = f
       return dec.decode(await opfsSlice(coldPath, it.off[0], it.off[1]));
     },
 
-    // Lexical baseline: the deterministic first rung. Reads the cold blob once,
-    // returns pointers + in-impression spans — never a decision.
+    // Lexical baseline over the packed impressions.
     async searchLexical(q, { limit = 25 } = {}) {
       const needle = String(q).toLowerCase().trim();
       if (!needle) return [];
-      const fh = await opfsFile(coldPath, false);
-      const all = new Uint8Array(await (await fh.getFile()).arrayBuffer());
+      const all = new Uint8Array(await (await (await opfsFile(coldPath, false)).getFile()).arrayBuffer());
       const hits = [];
       for (const it of hot.items) {
         const seg = dec.decode(all.subarray(it.off[0], it.off[1]));
         const i = seg.toLowerCase().indexOf(needle);
         if (i < 0) continue;
-        hits.push({
-          id: it.id, title: it.title, pointer: it.pointer || null,
-          start: i, end: i + needle.length,
-          snippet: seg.slice(Math.max(0, i - 45), i + needle.length + 45).replace(/\s+/g, ' ').trim(),
-        });
+        hits.push({ id: it.id, title: it.title, pointer: it.pointer || null, start: i, end: i + needle.length, snippet: seg.slice(Math.max(0, i - 45), i + needle.length + 45).replace(/\s+/g, ' ').trim() });
         if (hits.length >= limit) break;
       }
       return hits;
     },
 
-    // Semantic search: embeddings as a PROPOSER. `embed(text) -> Float32Array`
-    // is supplied by the caller (a local model). Returns the nearest items plus
-    // the same query against the random null, so the lift is visible.
-    async searchSemantic(q, { embed, limit = 15 } = {}) {
-      if (!vec || !embed || !vm) return null;
-      const dim = vm.dim, n = vm.count;
+    // Chunk-level semantic search over the append-only index. `embed(text)`
+    // is supplied by the caller and MUST prefix with 'search_query: ' (the
+    // index was built with 'search_document: '). Returns proposer hits with
+    // real spans, plus the same query against a random null of equal shape.
+    async searchIndex(q, { embed, limit = 15, nullControl = true } = {}) {
+      if (!idxVec || !embed || !fold) return null;
+      const dim = fold.dim, n = fold.vector.rows;
       const qv = norm(await embed(q));
-      const hits = rank(vec, qv, dim, n, limit).map(([i, s]) => ({ id: vm.ids[i], title: byId.get(vm.ids[i])?.title || null, score: +s.toFixed(4) }));
-      const nulh = rank(nul, qv, dim, n, limit).map(([i, s]) => ({ id: vm.ids[i], score: +s.toFixed(4) }));
-      return {
-        query: q,
-        hits,
-        null: nulh,
-        topHit: hits[0]?.score ?? null,
-        topNull: nulh[0]?.score ?? null,
-        lift: hits[0] && nulh[0] ? +(hits[0].score - nulh[0].score).toFixed(4) : null,
-      };
+      const rank = (mat) => { const a = new Array(n); for (let i = 0; i < n; i++) { let s = 0; for (let j = 0; j < dim; j++) s += qv[j] * mat[i * dim + j]; a[i] = [i, s]; } a.sort((x, y) => y[1] - x[1]); return a.slice(0, limit); };
+      const hits = rank(idxVec).map(([i, s]) => ({ ...rowMeta[i], score: +s.toFixed(4) }));
+      let nul = null;
+      if (nullControl) {
+        const nr = new Float32Array(n * dim);
+        for (let i = 0; i < n; i++) { let ss = 0; for (let j = 0; j < dim; j++) { const x = Math.random() * 2 - 1; nr[i * dim + j] = x; ss += x * x; } ss = Math.sqrt(ss) || 1; for (let j = 0; j < dim; j++) nr[i * dim + j] /= ss; }
+        nul = rank(nr).map(([i, s]) => +(s).toFixed(4));
+      }
+      return { query: q, hits, null: nul, topHit: hits[0]?.score ?? null, topNull: nul ? nul[0] : null, lift: nul ? +(hits[0].score - nul[0]).toFixed(4) : null };
     },
   };
 }
