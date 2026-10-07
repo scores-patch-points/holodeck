@@ -198,8 +198,7 @@ button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visi
         <sc-if value="{{ omniPending }}" hint-placeholder-val="{{ false }}"><button onClick="{{ omniGo }}" style="margin:3px;border:0;background:var(--acc2);color:#fff;border-radius:6px;padding:4px 12px;cursor:pointer;font:600 13px var(--sans);white-space:nowrap">Search ↵</button></sc-if>
         <sc-if value="{{ omniUrl }}" hint-placeholder-val="{{ false }}"><button onClick="{{ omniOpen }}" style="margin:3px;border:0;background:var(--acc2);color:#fff;border-radius:6px;padding:4px 12px;cursor:pointer;font:600 14px var(--sans)">Open page ↵</button></sc-if>
       </div>
-      <button onClick="{{ openLibrary }}" title="Library — the packed corpus: lexical baseline + semantic proposer with a measured null" style="flex:none;display:flex;align-items:center;gap:8px;background:none;border:1px solid var(--line2);border-radius:999px;padding:5px 12px;cursor:pointer;font:500 13px var(--sans);color:var(--ink2)" style-hover="border-color:var(--acc)"><span style="font:500 13px var(--mono);color:var(--acc)">▤</span>Library</button>
-      <button onClick="{{ openSettings }}" title="Settings — account, sync and sharing" style="flex:none;display:flex;align-items:center;gap:8px;background:none;border:1px solid var(--line2);border-radius:999px;padding:5px 12px;cursor:pointer;font:500 13px var(--sans);color:var(--ink2)" style-hover="border-color:var(--acc)"><span style="width:8px;height:8px;border-radius:50%;background:{{ acctOn ? 'var(--ok)' : 'var(--dim)' }}"></span>{{ acctLabel }} <span style="font-size:15px">⚙</span></button>
+      <button onClick="{{ openSettings }}" title="{{ acctTitle }}" style="flex:none;display:inline-flex;align-items:center;gap:7px;box-sizing:border-box;background:none;border:1px solid var(--line2);border-radius:999px;padding:5px 11px;cursor:pointer;font:500 13px/1 var(--sans);color:var(--ink2);white-space:nowrap;max-width:230px" style-hover="border-color:var(--acc);color:var(--ink)"><span style="width:8px;height:8px;border-radius:50%;background:{{ acctOn ? 'var(--ok)' : 'var(--dim)' }};flex:none"></span><span style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ acctLabel }}</span><span aria-hidden="true" title="Settings" style="flex:none;font-size:14px;line-height:1;opacity:.75">⚙</span></button>
     </div>
     <div style="max-width:1230px;margin:0 auto;padding:0 20px 8px;position:relative">
       <sc-if value="{{ hasContent }}" hint-placeholder-val="{{ true }}">
@@ -2506,72 +2505,6 @@ button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visi
               <sc-if value="{{ ing.hasShare }}" hint-placeholder-val="{{ false }}"><input readOnly="{{ true }}" value="{{ ing.share }}" style="background:var(--s2);border:1px solid var(--line2);border-radius:8px;padding:5px 10px;font:500 12px var(--mono);color:var(--ink2);outline:none"></input></sc-if>
             </sc-if>
           </section>
-          <section style="background:var(--s1);border:1px solid var(--line);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:10px">
-            <span style="font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mut)">Compute workers · Heimdall</span>
-            <sc-if value="{{ ing.notSignedIn }}" hint-placeholder-val="{{ true }}"><span style="font:400 13px/1.45 var(--sans);color:var(--mut);text-wrap:pretty">Invites are minted under your own Matrix account — sign in above first.</span></sc-if>
-            <sc-if value="{{ ing.canWrite }}" hint-placeholder-val="{{ false }}">
-              <span style="font:400 13px/1.5 var(--sans);color:var(--mut);text-wrap:pretty">Send the link to any phone or laptop — it downloads a small model and becomes a compute worker for your fleet. The link is short on purpose: type it by hand on the remote computer.</span>
-              <div style="display:flex;gap:8px;flex-wrap:wrap"><button onClick="{{ ing.onHdMint }}" style="background:var(--acc2);border:0;color:#fff;border-radius:8px;padding:6px 14px;cursor:pointer;font:600 14px var(--sans)">{{ ing.hdBusy ? 'Minting…' : 'Create worker invite' }}</button></div>
-              <sc-if value="{{ ing.hasHd }}" hint-placeholder-val="{{ false }}">
-                <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><input readOnly="{{ true }}" value="{{ ing.hdLink }}" style="flex:1 1 200px;min-width:0;background:var(--s2);border:1px solid var(--line2);border-radius:8px;padding:5px 10px;font:500 12px var(--mono);color:var(--ink2);outline:none"></input><button onClick="{{ ing.onHdCopy }}" style="background:none;border:1px solid var(--line2);border-radius:8px;padding:5px 12px;cursor:pointer;font:500 13px var(--sans);color:var(--ink2)">Copy</button></div>
-                <span style="font:400 13px/1.45 var(--sans);color:var(--mut);text-wrap:pretty">{{ ing.hdNote }}</span>
-              </sc-if>
-              <div style="display:flex;gap:8px;flex-wrap:wrap"><input onChange="{{ ing.onHdCode }}" inputmode="numeric" placeholder="6-digit code from your worker" style="flex:1 1 180px;min-width:0;background:var(--s2);border:1px solid var(--line2);border-radius:8px;padding:6px 10px;font:500 13px var(--mono);color:var(--ink);outline:none"></input><button onClick="{{ ing.onHdRecord }}" style="background:none;border:1px solid var(--line2);border-radius:8px;padding:5px 12px;cursor:pointer;font:500 13px var(--sans);color:var(--ink2)">Record code</button></div>
-              <span style="font:400 12px/1.45 var(--sans);color:var(--dim);text-wrap:pretty">The worker reads you its 6-digit code; you record it here. Acceptance is confirmed live by the heimdall site against this same account — the registry is one, whatever surface minted the invite.</span>
-            </sc-if>
-          </section>
-          <section style="background:var(--s1);border:1px solid var(--line);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:10px">
-            <span style="font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mut)">Reading engine · eoreader7</span>
-            <span style="font:400 13px/1.5 var(--sans);color:var(--mut);text-wrap:pretty">A source added now is read by the eoreader7 engine (model-free) when it is reachable; a source already in this workspace was read with the surface’s own reader only. Point at the engine here and re-read what is already here, without re-adding it. Leave blank for the defaults <code>http://127.0.0.1:11436</code> and <code>:11476</code>.</span>
-            <div style="display:flex;gap:8px;flex-wrap:wrap">
-              <input defaultValue="{{ ing.engine }}" onChange="{{ ing.onEngine }}" placeholder="http://127.0.0.1:11436" style="flex:1 1 200px;min-width:0;background:var(--s2);border:1px solid var(--line2);border-radius:8px;padding:6px 10px;font:500 13px var(--mono);color:var(--ink);outline:none"></input>
-              <button onClick="{{ ing.engineReadExisting }}" style="background:var(--acc2);border:0;color:#fff;border-radius:8px;padding:6px 14px;cursor:pointer;font:600 14px var(--sans);white-space:nowrap">{{ ing.engineBtn }}</button>
-            </div>
-            <sc-if value="{{ ing.engineNote }}" hint-placeholder-val="{{ false }}"><span style="font:400 13px/1.45 var(--sans);color:var(--mut);text-wrap:pretty">{{ ing.engineNote }}</span></sc-if>
-          </section>
-          <section style="background:var(--s1);border:1px solid var(--line);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:10px">
-            <span style="font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mut)">YouTube captions · yt-dlp on this machine</span>
-            <span style="font:400 13px/1.5 var(--sans);color:var(--mut);text-wrap:pretty">The browser cannot read YouTube, and neither can Pyodide — its networking is the browser’s own fetch, under the same CORS rules. <code>tools/ytdl-helper.py</code> runs yt-dlp natively beside eoreader7, so captions are read from your own machine, not a relay. Leave blank for the default <code>http://127.0.0.1:11450</code>.</span>
-            <div style="display:flex;gap:8px;flex-wrap:wrap">
-              <input defaultValue="{{ ing.ytdl }}" onChange="{{ ing.onYtdl }}" placeholder="http://127.0.0.1:11450" style="flex:1 1 200px;min-width:0;background:var(--s2);border:1px solid var(--line2);border-radius:8px;padding:6px 10px;font:500 13px var(--mono);color:var(--ink);outline:none"></input>
-              <button onClick="{{ ing.ytdlTest }}" style="background:none;border:1px solid var(--line2);border-radius:8px;padding:5px 12px;cursor:pointer;font:500 14px var(--sans);color:var(--ink2);white-space:nowrap">Test</button>
-            </div>
-            <sc-if value="{{ ing.ytdlNote }}" hint-placeholder-val="{{ '' }}"><span style="font:400 13px/1.45 var(--sans);color:var(--ink2);text-wrap:pretty">{{ ing.ytdlNote }}</span></sc-if>
-          </section>
-          <section style="background:var(--s1);border:1px solid var(--line);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:10px">
-            <span style="font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mut)">Local transcription · mlx-whisper</span>
-            <span style="font:400 13px/1.5 var(--sans);color:var(--mut);text-wrap:pretty">Audio and video are transcribed on this machine by <code>tools/asr-server.py</code> (MLX Whisper on the Metal GPU) — no relay, nothing leaves the machine. If it isn’t running, the surface falls back to the in-browser recognizer. Start it with <code>npm run asr</code>. Leave blank for the default <code>http://127.0.0.1:11460</code>; set <code>off</code> to disable.</span>
-            <div style="display:flex;gap:8px;flex-wrap:wrap">
-              <input defaultValue="{{ ing.localAsr }}" onChange="{{ ing.onLocalAsr }}" placeholder="http://127.0.0.1:11460" style="flex:1 1 200px;min-width:0;background:var(--s2);border:1px solid var(--line2);border-radius:8px;padding:6px 10px;font:500 13px var(--mono);color:var(--ink);outline:none"></input>
-              <button onClick="{{ ing.localAsrTest }}" style="background:none;border:1px solid var(--line2);border-radius:8px;padding:5px 12px;cursor:pointer;font:500 14px var(--sans);color:var(--ink2);white-space:nowrap">Test</button>
-            </div>
-            <sc-if value="{{ ing.localAsrNote }}" hint-placeholder-val="{{ '' }}"><span style="font:400 13px/1.45 var(--sans);color:var(--ink2);text-wrap:pretty">{{ ing.localAsrNote }}</span></sc-if>
-          </section>
-          <section style="background:var(--s1);border:1px solid var(--line);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:10px">
-            <span style="font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mut)">Reasoning · privacy mode</span>
-            <span style="font:400 13px/1.5 var(--sans);color:var(--mut);text-wrap:pretty">The mode selects what leaves the device and which lanes may answer. Keys for frontier models live on the heimdall machine (<code>heimdall key &lt;provider&gt; &lt;key&gt;</code>), never in this browser; a sealed job only reaches a frontier provider after heimdall’s gate sees its mode on the wire.</span>
-            <div style="display:flex;gap:6px;flex-wrap:wrap">
-              <sc-for list="{{ ing.modes }}" as="m" hint-placeholder-count="5"><button onClick="{{ m.on }}" style="background:{{ m.bg }};border:1px solid {{ m.bd }};color:{{ m.col }};border-radius:999px;padding:5px 12px;cursor:pointer;font:600 12px var(--mono)">{{ m.label }}</button></sc-for>
-            </div>
-            <span style="font:400 12px/1.45 var(--sans);color:var(--dim);text-wrap:pretty">{{ ing.modeNote }}</span>
-            <sc-if value="{{ ing.sealedOn }}" hint-placeholder-val="{{ false }}">
-              <div style="display:flex;flex-direction:column;gap:8px">
-                <span style="font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mut)">Heimdall relay</span>
-                <div style="display:flex;gap:8px;flex-wrap:wrap">
-                  <input defaultValue="{{ ing.relay }}" onChange="{{ ing.onRelay }}" placeholder="http://127.0.0.1:8790" style="flex:1 1 200px;min-width:0;background:var(--s2);border:1px solid var(--line2);border-radius:8px;padding:6px 10px;font:500 13px var(--mono);color:var(--ink);outline:none"></input>
-                  <button onClick="{{ ing.onRelayCheck }}" style="background:none;border:1px solid var(--line2);border-radius:8px;padding:5px 12px;cursor:pointer;font:500 13px var(--sans);color:var(--ink2);white-space:nowrap">Check heimdall</button>
-                </div>
-                <sc-if value="{{ ing.relayNote }}" hint-placeholder-val="{{ '' }}"><span style="font:400 13px/1.45 var(--sans);color:var(--ink2);text-wrap:pretty">{{ ing.relayNote }}</span></sc-if>
-                <sc-if value="{{ ing.hasProv }}" hint-placeholder-val="{{ false }}"><span style="font:400 12px/1.45 var(--mono);color:var(--mut);overflow-wrap:anywhere">{{ ing.provLine }}</span></sc-if>
-                <span style="font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mut)">Model</span>
-                <div style="display:flex;gap:8px;flex-wrap:wrap">
-                  <input defaultValue="{{ ing.llmModel }}" onChange="{{ ing.onLlmModel }}" placeholder="anthropic:claude-sonnet-4-…" style="flex:1 1 200px;min-width:0;background:var(--s2);border:1px solid var(--line2);border-radius:8px;padding:6px 10px;font:500 13px var(--mono);color:var(--ink);outline:none"></input>
-                  <button onClick="{{ ing.onLlmTest }}" style="background:none;border:1px solid var(--line2);border-radius:8px;padding:5px 12px;cursor:pointer;font:500 13px var(--sans);color:var(--ink2);white-space:nowrap">Test</button>
-                </div>
-                <span style="font:400 12px/1.45 var(--sans);color:var(--dim);text-wrap:pretty">The relay lists the models the configured providers expose. The request carries <code>heimdall_privacy:"{{ ing.modeWire }}"</code> and heimdall refuses anything else to a frontier model.</span>
-              </div>
-            </sc-if>
-          </section>
       </div>
     </div>
   </sc-if>
@@ -2902,9 +2835,75 @@ const CELL = {}; ROWS.forEach(r => r.cells.forEach(c => { CELL[c[0]] = { id: c[0
 // Ingest trace. While HD_TR is set, the real ingest functions below report each step they take; the replay player
 // (holodeck-ingest-player.js) animates exactly these events. With no trace running, every hook is one null check.
 let HD_TR = null;
-function hdTraceStart(label) { if (HD_TR) return HD_TR; HD_TR = { schema: 'HolodeckIngestTrace@1', label, startedAt: new Date().toISOString(), t0: performance.now(), ev: [], focus: new Set(), docs: [] }; hdT('bytes', 'start', 'Ingest started: ' + label); return HD_TR; }
+function hdTraceStart(label) { if (HD_TR) return HD_TR; HD_TR = { schema: 'HolodeckIngestTrace@1', label, startedAt: new Date().toISOString(), t0: performance.now(), ev: [], focus: new Set(), docs: [] }; hdT('bytes', 'start', 'Ingest started: ' + label);
+  // Open the play-along animation now, so the read is visible WHILE it happens (not only after). It follows the
+  // trace as it grows and can be exited at any time; hdFinish later flips the same window from live to replay.
+  try { import(new URL('holodeck-ingest-player.js', location.href).href).then(M => M.open(HD_TR, { live: true })).catch(() => {}); } catch (e) {}
+  return HD_TR; }
 function hdT(stage, kind, msg, data) { const T = HD_TR; if (T) T.ev.push({ t: performance.now() - T.t0, stage, kind, msg, ...(data || {}) }); }
 const hdF = doc => !!HD_TR && HD_TR.focus.has(doc);
+
+// ---- images: a shared reader for a dropped image AND for a figure embedded in a PDF ----
+// The pixels go through the 2D visual model, then OCR, then an ACTIVATION pass: the text the
+// pixels gave is read against the names and profiles the workspace already holds. A token the
+// memory knows is confirmation; a token one edit from a known name is proposed as the most
+// likely reading. An unknown stays unknown — nothing is invented to fill a gap (disclosed).
+const HD_PENDING_IMG = {};
+let HD_KNOWN_NAMES = null;
+function hdLev(a, b) { a = String(a).toLowerCase(); b = String(b).toLowerCase(); const m = a.length, n = b.length; if (!m) return n; if (!n) return m; let prev = Array.from({ length: n + 1 }, (_, i) => i), cur = new Array(n + 1); for (let i = 1; i <= m; i++) { cur[0] = i; for (let j = 1; j <= n; j++) cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)); const t = prev; prev = cur; cur = t; } return prev[n]; }
+function hdMostLikely(text, known) {
+  text = String(text || '').replace(/[ \t]+/g, ' ').replace(/\n{3,}/g, '\n\n').trim();
+  if (!text) return { text: '', known: [], proposals: [] };
+  const K = (known || []).filter(n => n && n.length >= 3); const Kset = new Map(); K.forEach(n => Kset.set(n.toLowerCase(), n));
+  let names = []; try { names = [...new Set(splitSentences(text).flatMap(se => findNames(se.t).map(n => n.name)))].filter(n => n.length >= 3); } catch (e) {}
+  const hits = [], props = []; let out = text;
+  for (const nm of names) {
+    const key = nm.toLowerCase(); if (Kset.has(key)) { hits.push(Kset.get(key)); continue; }
+    let best = null, bd = 99; for (const k of K) { if (Math.abs(k.length - nm.length) > 4) continue; const d = hdLev(nm, k); if (d < bd) { bd = d; best = k; } }
+    const lim = nm.replace(/\W/g, '').length >= 8 ? 2 : 1;
+    if (best && bd <= lim) { const re = new RegExp('(^|[^\\p{L}\\p{N}])' + nm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '(?![\\p{L}\\p{N}])', 'gu'); out = out.replace(re, '$1' + best); props.push({ surface: nm, likely: best, why: 'one edit from a name the workspace already holds (edit distance ' + bd + ')' }); }
+    else hits.push(nm);
+  }
+  return { text: out, known: [...new Set(hits)], proposals: props };
+}
+async function hdImageReading(bmp, label) {
+  let text = '', sc = null;
+  try { const S = await import(new URL('holodeck-screen.js', location.href).href); sc = await S.readScreenImage(bmp, { name: label, tr: hdT, tessSrc: (() => { try { return localStorage.getItem('hd:tess') || null; } catch (e) { return null; } })() }); if (sc && sc.text) text = sc.text; hdT('screen', 'done', 'Visual model of ' + label + ': ' + ((sc && sc.elements) || []).length + ' elements, ' + Object.keys((sc && sc.tokens) || {}).length + ' token groups'); }
+  catch (e) { hdT('screen', 'fail', 'The 2D model did not run for ' + label + ' (' + (e && e.message || e) + '); falling back to flat OCR'); }
+  if (!text && hdOcrOn()) { try { const R = await hdRead(); const t = await R.ocrImage(bmp, p => hdT('decode', 'ocr', 'OCR ' + label + ' ' + (p.status || '') + (p.progress != null ? ' ' + Math.round(p.progress * 100) + '%' : ''))); if (t && t.trim().length > 6) { text = t.trim(); hdT('decode', 'ocr', 'OCR read ' + (text.match(/\S+/g) || []).length + ' words from ' + label); } } catch (e) { hdT('decode', 'ocr-fail', 'OCR could not run for ' + label + ' (' + (e && e.message || e) + ')'); } }
+  const act = hdMostLikely(text, HD_KNOWN_NAMES);
+  if (act.text) hdT('activation', 'most-likely', label + ' most likely says: ' + hdCut(act.text.replace(/\s+/g, ' '), 220) + (act.proposals.length ? ' · ' + act.proposals.length + ' name' + (act.proposals.length === 1 ? '' : 's') + ' read from the profile' : ''), { proposals: act.proposals, known: act.known, raw: text });
+  return { text: act.text || text, raw: text, screen: sc, activation: act };
+}
+function hdCanvasDataURL(img, maxpx) {
+  try {
+    const W0 = img.width, H0 = img.height; let W = W0, H = H0; if (maxpx && Math.max(W, H) > maxpx) { const s = maxpx / Math.max(W, H); W = Math.round(W * s); H = Math.round(H * s); }
+    const d = img.data; const tmp = document.createElement('canvas'); tmp.width = W0; tmp.height = H0; const tc = tmp.getContext('2d');
+    if (d && d.length === W0 * H0 * 4) { const id = tc.createImageData(W0, H0); id.data.set(d); tc.putImageData(id, 0, 0); }
+    else if (d && d.length === W0 * H0 * 3) { const id = tc.createImageData(W0, H0); for (let i = 0, j = 0; i < d.length; i += 3, j += 4) { id.data[j] = d[i]; id.data[j + 1] = d[i + 1]; id.data[j + 2] = d[i + 2]; id.data[j + 3] = 255; } tc.putImageData(id, 0, 0); }
+    else return null;
+    if (W === W0 && H === H0) return tmp.toDataURL('image/png');
+    const c = document.createElement('canvas'); c.width = W; c.height = H; c.getContext('2d').drawImage(tmp, 0, 0, W, H); return c.toDataURL('image/png');
+  } catch (e) { return null; }
+}
+async function hdPdfFigures(pdf, pageCap) {
+  const out = [], MAX = 12, MIN = 70; let OPS; try { OPS = (await pdfLib()).OPS; } catch (e) { return out; }
+  for (let p = 1; p <= Math.min(pdf.numPages, pageCap || pdf.numPages) && out.length < MAX; p++) {
+    let page, ops; try { page = await pdf.getPage(p); ops = await page.getOperatorList(); } catch (e) { continue; }
+    for (let i = 0; i < ops.fnArray.length && out.length < MAX; i++) {
+      const fn = ops.fnArray[i], args = ops.argsArray[i];
+      if (fn !== OPS.paintImageXObject && fn !== OPS.paintInlineImageXObject) continue;
+      let img = null;
+      try {
+        if (fn === OPS.paintInlineImageXObject) img = args[0];
+        else { const nm = args[0]; img = await new Promise(res => { let done = false; try { const v = page.objs.get(nm); if (v) { done = true; return res(v); } } catch (e) {} const to = setTimeout(() => { if (!done) res(null); }, 4000); try { page.objs.get(nm, v => { done = true; clearTimeout(to); res(v); }); } catch (e) { clearTimeout(to); res(null); } }); }
+      } catch (e) {}
+      if (!img || !img.width || img.width < MIN || img.height < MIN) continue;
+      out.push({ page: p, img });
+    }
+  }
+  return out;
+}
 
 // The engine: eoreader7's POST /v1/read reads each added document through the session reader (model-free). The Holodeck
 // draws what comes back and treats its surfaces as a witness beside its own finder; it never lets them replace it.
@@ -4146,25 +4145,22 @@ async function readAny(file) {
     if (r) { hdT('decode', 'done', 'Read as ' + r.type + (r.note ? ' — ' + r.note : ''), { type: r.type });
       // An image is only pixels: measure it (above), then read any text in it by OCR, marked as machine-read.
       if (r.type === 'Image') {
-        // The image's middle layer: read its 2D model in this tab (flat-region geometry + tesseract
-        // word boxes → elements with region [x,y,w,h], roles, design tokens, typed gaps). This is
-        // what makes an image answer "what is where"; flat OCR alone gives only a string. Falls back
-        // to plain OCR text if the model cannot run.
-        try {
-          const S = await import(new URL('holodeck-screen.js', location.href).href);
-          const bmp = await createImageBitmap(file);
-          const sc = await S.readScreenImage(bmp, { name: title, tr: hdT, tessSrc: (() => { try { return localStorage.getItem('hd:tess') || null; } catch (e) { return null; } })() });
-          if (sc && sc.elements && sc.elements.length) {
-            const words = (sc.text.match(/\S+/g) || []).length;
-            const imgUrl = await new Promise(res => { const fr = new FileReader(); fr.onload = () => res(fr.result); fr.readAsDataURL(file); });
-            this._pendingImg = this._pendingImg || {}; this._pendingImg['img:' + (title || name)] = imgUrl;
-            const struct = '<p style="' + TAG_STYLE.P + '">' + esc(sc.text.replace(/\s+/g, ' ').trim()) + '</p>';
-            r = { ...r, html: r.html + struct, screen: sc, hasImg: true, note: (r.note ? r.note + ' ' : '') + 'Read for structure: ' + sc.elements.length + ' elements with a region, ' + words + ' words of text (a machine reading from the pixels and OCR boxes, no vision model).' };
-            hdT('screen', 'done', 'The 2D model: ' + sc.elements.length + ' elements, ' + Object.keys(sc.tokens || {}).length + ' token groups');
-            r.text = [r.text, sc.text].filter(Boolean).join('\n\n');
-          }
-        } catch (e) { hdT('screen', 'fail', 'The 2D model did not run (' + e.message + '); falling back to flat OCR'); }
-        if (!r.screen && hdOcrOn()) { try { const R = await hdRead(); const t = await R.ocrImage(file, p => hdT('decode', 'ocr', 'OCR ' + (p.status || '') + (p.progress != null ? ' ' + Math.round(p.progress * 100) + '%' : ''))); if (t && t.trim().length > 12) { const n = (t.trim().match(/\S+/g) || []).length; r = { ...r, html: r.html + t.split(/\n\s*\n/).map(x => '<p style="' + TAG_STYLE.P + '">' + esc(x.replace(/\s+/g, ' ').trim()) + '</p>').join(''), text: [r.text, t].filter(Boolean).join('\n\n'), note: (r.note ? r.note + ' ' : '') + 'OCR read ' + n + ' words from it (a machine reading, not the image’s own text).' }; hdT('decode', 'ocr', 'OCR read the image: ' + n + ' words'); } } catch (e) { hdT('decode', 'ocr-fail', 'OCR could not run (' + e.message + ')'); } }
+        // The image goes through the shared reader: the 2D visual model, then OCR, then an
+        // ACTIVATION pass read against the names/profiles the workspace already holds. The image
+        // is kept clickable (a lightbox link); the most-likely text is added to the reading.
+        const bmp = await createImageBitmap(file).catch(() => null);
+        if (bmp) {
+          const imgUrl = await new Promise(res => { const fr = new FileReader(); fr.onload = () => res(fr.result); fr.readAsDataURL(file); });
+          HD_PENDING_IMG['img:' + (title || name)] = imgUrl;
+          const read = await hdImageReading(bmp, title || name);
+          const words = (String(read.raw || '').match(/\S+/g) || []).length;
+          const text = read.text || read.raw || '';
+          const fig = '<figure style="margin:10px 0"><a href="' + imgUrl + '" target="_blank" rel="noopener"><img src="' + imgUrl + '" alt="' + esc(title) + '" style="max-width:100%;border:1px solid var(--line);border-radius:8px;cursor:zoom-in" title="Click to open full size"></a></figure>';
+          const rest = String(r.html || '').replace(/^[\s\S]*?<\/figure>/, '');
+          const struct = text ? '<p style="' + TAG_STYLE.P + '">' + esc(text.replace(/\s+/g, ' ').trim()) + '</p>' : '';
+          const nProps = (read.activation && read.activation.proposals.length) || 0;
+          r = { ...r, html: fig + rest + struct, screen: read.screen || null, hasImg: true, activation: read.activation, text: [r.text, text].filter(Boolean).join('\n\n'), note: (r.note ? r.note + ' ' : '') + (words ? 'Read ' + words + ' words of text from the pixels (visual model + OCR); the most likely reading' + (nProps ? ' takes ' + nProps + ' name' + (nProps === 1 ? '' : 's') + ' from the profile' : ' is shown beneath it') + '.' : 'No text was read from it; it is measured only.') };
+        }
       }
       return { title, year, ...r }; }
   } catch (e) { hdT('decode', 'fail', 'Media reader failed (' + e.message + '); falling back to the text readers'); }
@@ -4176,13 +4172,34 @@ async function readText(file, M) {
   const year = new Date(file.lastModified || Date.now()).getFullYear();
   let type = ext ? ext.toUpperCase() : 'File';
   try {
-    if (ext === 'pdf' || file.type === 'application/pdf') {
+      if (ext === 'pdf' || file.type === 'application/pdf') {
       const buf = await file.arrayBuffer(); const pdfjs = await pdfLib(); const pdf = await pdfjs.getDocument({ data: new Uint8Array(buf).slice() }).promise; let text = '';
       const pages = []; for (let i = 1; i <= Math.min(pdf.numPages, PDF_MAX_PAGES); i++) { pages.push(text.length); const c = await (await pdf.getPage(i)).getTextContent(); for (const it of c.items) text += (it.str || '') + (it.hasEOL ? '\n' : ' '); text += '\n'; }
       hdT('decode', 'pdf', 'Read the text layer of ' + pages.length + ' of ' + pdf.numPages + ' pages', { pages: pages.length });
       let ocrPages = 0;
       if (!text.trim() && hdOcrOn()) { try { const R = await hdRead(); const o = await R.ocrPdf(pdf, { maxPages: 20, onProgress: p => hdT('decode', 'ocr', 'OCR is reading page ' + p.page + ' of ' + p.of) }); if (o && o.text.trim()) { text = o.text; ocrPages = o.pages; hdT('decode', 'ocr', 'No text layer; OCR read ' + o.pages + ' of ' + pdf.numPages + ' pages'); } } catch (e) { hdT('decode', 'ocr-fail', 'OCR could not run (' + e.message + ')'); } }
-      return { title, year, type: 'PDF', format: 'pdf', text, pages, pdf: buf, note: text.trim() ? (ocrPages ? 'No text layer — read by OCR (' + ocrPages + ' pages). A machine reading, not the document’s own text.' : null) : title + ' has no text layer (it may be scanned) — its pages are shown, but nothing in it can be linked.' };
+      // Images embedded in the PDF: each is extracted and read the same way a dropped image is
+      // (2D visual model + OCR + activation against the profile), shown clickable, and folded in.
+      let figHtml = '', figText = '', figs = 0;
+      try {
+        const images = await hdPdfFigures(pdf, PDF_MAX_PAGES);
+        if (images.length) hdT('screen', 'figures', 'Found ' + images.length + ' embedded image' + (images.length === 1 ? '' : 's') + ' in the PDF — reading each', { n: images.length });
+        for (const f of images) {
+          const dataUrl = hdCanvasDataURL(f.img, 1400); if (!dataUrl) continue;
+          let bmp = null; try { const blob = await (await fetch(dataUrl)).blob(); bmp = await createImageBitmap(blob); } catch (e) { bmp = null; }
+          if (!bmp) continue;
+          const read = await hdImageReading(bmp, 'figure on page ' + f.page);
+          const t = String(read.text || read.raw || '').trim();
+          const nProps = (read.activation && read.activation.proposals.length) || 0;
+          figHtml += '<figure style="margin:14px 0"><a href="' + dataUrl + '" target="_blank" rel="noopener"><img src="' + dataUrl + '" alt="figure on page ' + f.page + '" style="max-width:100%;border:1px solid var(--line);border-radius:8px;cursor:zoom-in" title="Click to open full size"></a><figcaption style="font:400 13px var(--sans);color:var(--mut);margin-top:6px">Figure · page ' + f.page + (nProps ? ' · ' + nProps + ' name' + (nProps === 1 ? '' : 's') + ' read from the profile' : '') + '</figcaption>' + (t ? '<p style="' + TAG_STYLE.P + '">' + esc(t.replace(/\s+/g, ' ').trim()) + '</p>' : '') + '</figure>';
+          if (t) figText += '\n\n' + t;
+          figs++;
+        }
+        if (figs) hdT('activation', 'folded', 'Read ' + figs + ' embedded image' + (figs === 1 ? '' : 's') + '; their text is now part of the reading');
+      } catch (e) { hdT('screen', 'figures-fail', 'Embedded images could not be read (' + (e && e.message || e) + ')'); }
+      const fullText = [text, figText].filter(x => x && x.trim()).join('\n\n');
+      const hasFigs = figs > 0;
+      return { title, year, type: 'PDF', format: hasFigs ? 'html' : 'pdf', html: hasFigs ? (text.trim() ? '<p style="' + TAG_STYLE.P + '">' + esc(text.replace(/\s+/g, ' ').trim()) + '</p>' : '') + figHtml : undefined, text: fullText, pages, pdf: buf, figures: figs || undefined, note: (text.trim() ? (ocrPages ? 'No text layer — read by OCR (' + ocrPages + ' pages). ' : '') : title + ' has no text layer (it may be scanned). ') + (hasFigs ? 'Read ' + figs + ' embedded image' + (figs === 1 ? '' : 's') + ' for text (visual model + OCR + activation).' : (text.trim() ? null : 'Nothing in it can be linked.')) };
     }
     let html = '';
     if (['docx', 'pptx', 'xlsx', 'odt', 'odp', 'ods', 'epub'].includes(ext)) {
@@ -4451,7 +4468,7 @@ class Component extends DCLogic {
   async ingest(dt) {
     if (!dt) return;
     const files = await hdFilesFromDataTransfer(dt);
-    if (files.length) { hdTraceStart(files.length === 1 ? files[0].name : plural(files.length, 'file')); this.setState({ busy: 'Reading ' + plural(files.length, 'file') + '…' }); const list = []; for (const fl of files) list.push(await readAny(fl)); this.addDocs(list); return; }
+    if (files.length) { try { HD_KNOWN_NAMES = Object.keys(this.analysis().names || {}); } catch (e) {} hdTraceStart(files.length === 1 ? files[0].name : plural(files.length, 'file')); this.setState({ busy: 'Reading ' + plural(files.length, 'file') + '…', showAdd: false }); const list = []; for (const fl of files) list.push(await readAny(fl)); this.addDocs(list); return; }
     let text = (dt.getData('text/plain') || '').trim(); const html = dt.getData('text/html') || '';
     if (!text) text = ((dt.getData('text/uri-list') || '').split('\n').find(l => l && l[0] !== '#') || '').trim();
     const title = dt.getData('application/x-fold-title'); const year = +dt.getData('application/x-fold-year') || null; const fallback = dt.getData('application/x-fold-fallback') || null;
@@ -4760,7 +4777,7 @@ class Component extends DCLogic {
   _fallbackCopy(t) { const ta = document.createElement('textarea'); ta.value = t; ta.style.position = 'fixed'; ta.style.opacity = '0'; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); } catch (e) {} ta.remove(); }
   later(key, fn, ms) { this._deb = this._deb || {}; this._debFn = this._debFn || {}; clearTimeout(this._deb[key]); this._debFn[key] = fn; this._deb[key] = setTimeout(() => { delete this._deb[key]; const f = this._debFn[key]; delete this._debFn[key]; if (f) f(); }, ms || 450); }
   flush() { const F = this._debFn || {}; Object.keys(F).forEach(k => { clearTimeout((this._deb || {})[k]); delete this._deb[k]; const f = F[k]; delete F[k]; f(); }); }
-  llmCfg() { if (!this._llm) { try { this._llm = JSON.parse(localStorage.getItem('fold-explorer-llm') || 'null'); } catch (e) {} this._llm = { url: 'http://localhost:11434', model: 'llama3.1', key: '', relay: 'http://127.0.0.1:8790', mode: 'local', ...(this._llm || {}) }; } return this._llm; }
+  llmCfg() { if (!this._llm) { try { this._llm = JSON.parse(localStorage.getItem('fold-explorer-llm') || 'null'); } catch (e) {} this._llm = { url: 'http://localhost:11434', model: 'llama3.1', key: '', ...(this._llm || {}), mode: 'local' }; } return this._llm; }
   setLlm(p) { this._llm = { ...this.llmCfg(), ...p }; try { localStorage.setItem('fold-explorer-llm', JSON.stringify(this._llm)); } catch (e) {} }
   // Privacy modes (spec §27): the mode selects what leaves the device and
   // which lanes are eligible. local = nothing leaves. The sealed modes tag the
@@ -4785,30 +4802,23 @@ class Component extends DCLogic {
     } catch (e) { return { ok: false, note: 'can’t reach the heimdall relay at ' + relay + ' (' + (e.message || e) + ')' }; }
   }
   async localLLM(system, user) {
-    const { url, model, key, mode, relay } = this.llmCfg();
-    const sealed = mode !== 'local';
-    // Frontier/reasoning modes go through the heimdall relay with the privacy
-    // mode tagged on the wire; heimdall holds the provider keys and its gate
-    // only lets a sealed-external (or explicit) job reach a frontier executor.
-    const base = (sealed && relay ? relay : url).replace(/\/+$/, '');
+    // All inference is local. Ollama (…:11434) or any OpenAI-compatible server
+    // (LM Studio …:1234/v1). No relay, no heimdall bridge — nothing leaves the machine.
+    const { url, model, key } = this.llmCfg();
+    const base = String(url || 'http://localhost:11434').replace(/\/+$/, '');
     const msgs = [{ role: 'system', content: system }, { role: 'user', content: user }];
     const ctl = new AbortController(); const to = setTimeout(() => ctl.abort(), 120000);
     try {
-      let r;
-      if (sealed) {
-        r = await fetch(base + '/v1/chat/completions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ model, messages: msgs, temperature: 0, max_tokens: 900, heimdall_privacy: mode === 'explicit' ? 'explicit' : 'sealed-external' }), signal: ctl.signal });
-      } else {
-        const oai = /\/v1$/.test(base) || /:1234\b|:8080\b|:5000\b/.test(base);
-        const h = { 'Content-Type': 'application/json' };
-        if (key) h['Authorization'] = 'Bearer ' + key;
-        r = oai ? await fetch((/\/v1$/.test(base) ? base : base + '/v1') + '/chat/completions', { method: 'POST', headers: h, body: JSON.stringify({ model, messages: msgs, temperature: 0, max_tokens: 900 }), signal: ctl.signal })
-          : await fetch(base + '/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ model, messages: msgs, stream: false, options: { temperature: 0 } }), signal: ctl.signal });
-      }
+      const oai = /\/v1$/.test(base) || /:1234\b|:8080\b|:5000\b/.test(base);
+      const h = { 'Content-Type': 'application/json' };
+      if (key) h['Authorization'] = 'Bearer ' + key;
+      const r = oai ? await fetch((/\/v1$/.test(base) ? base : base + '/v1') + '/chat/completions', { method: 'POST', headers: h, body: JSON.stringify({ model, messages: msgs, temperature: 0, max_tokens: 900 }), signal: ctl.signal })
+        : await fetch(base + '/api/chat', { method: 'POST', headers: h, body: JSON.stringify({ model, messages: msgs, stream: false, options: { temperature: 0 } }), signal: ctl.signal });
       if (!r.ok) { const t = await r.text().catch(() => ''); throw new Error('HTTP ' + r.status + ' from ' + base + (t ? ' — ' + t.slice(0, 160) : '')); }
       const j = await r.json(); return ((j.choices && j.choices[0] && j.choices[0].message && j.choices[0].message.content) || '').trim();
     } finally { clearTimeout(to); }
   }
-  async testLLM() { this.setState({ llmTest: 'Testing…' }); try { const t = await this.localLLM('Reply with the single word OK.', 'Say OK.'); const cfg = this.llmCfg(); this.setState({ llmTest: t ? (cfg.mode === 'local' ? 'Connected: ' + cfg.model + ' replied “' + short(t, 30) + '”' : 'Connected: ' + cfg.model + ' replied “' + short(t, 30) + '” via heimdall (mode: ' + cfg.mode + ')') : 'Connected, but the model returned nothing' }); } catch (e) { this.setState({ llmTest: 'Can’t reach ' + this.llmCfg().url + ' (' + (e.name === 'AbortError' ? 'timed out' : e.message) + '). If it’s Ollama, start it with OLLAMA_ORIGINS=* so this page may call it.' }); } }
+  async testLLM() { this.setState({ llmTest: 'Testing…' }); try { const t = await this.localLLM('Reply with the single word OK.', 'Say OK.'); const cfg = this.llmCfg(); this.setState({ llmTest: t ? 'Connected: ' + cfg.model + ' replied “' + short(t, 30) + '”' : 'Connected, but the model returned nothing' }); } catch (e) { this.setState({ llmTest: 'Can’t reach ' + this.llmCfg().url + ' (' + (e.name === 'AbortError' ? 'timed out' : e.message) + '). If it’s Ollama, start it with OLLAMA_ORIGINS=* so this page may call it.' }); } }
   gIndex(A) {
     if (this._gi && this._gi.A === A) return this._gi;
     const STOP = new Set('that this with from were have been will would their there which about into also than them they then these those such more most some other only over very said says year years'.split(' '));
@@ -5154,7 +5164,7 @@ class Component extends DCLogic {
     this.addDocs([x]); this._net.cand = (this._net.cand || []).filter(o => o !== c); N.saveToArchive(c.url).then(ok => ok && this.ilog('Asked archive.org to save ' + c.url)); if (pub) await this.publish({ bytes: JSON.stringify({ title, url: c.url, ytid: c.ytid || null, found: c.watch || null }), meta: { kind: c.ytid ? 'video-link' : 'link', title, url: c.url, ytid: c.ytid || null, mime: 'application/json', filename: (c.ytid || 'link') + '.json' } }); }); }
   async publish({ bytes, meta }, noRefresh) { const N = await this.net(); const s = this._net && this._net.s; const room = this.wsRooms().pub; if (!s || s.guest) throw new Error('sign in with an account to publish'); if (!room) throw new Error('create or join the public room first'); if (!noRefresh) await this.refreshRoom(); const b = await N.appendBlock(s, room, bytes, meta, this._net.head); this._net.head = b.block; (this._net.chain = this._net.chain || []).push({ ...b, linked: true, self: true, ts: Date.now(), sender: s.user }); this.ilog('Published block ' + b.block.slice(0, 12) + ' · ' + (meta.title || meta.filename)); this.forceUpdate(); return b; }
   asrMod() { if (!this._asrP) this._asrP = import(new URL('holodeck-asr.js', location.href).href); return this._asrP; }
-  asrUrl() { try { const v = localStorage.getItem('hd:asr'); if (v === 'off') return null; return (v || 'http://127.0.0.1:11460'); } catch (e) { return 'http://127.0.0.1:11460'; } }
+  asrUrl() { try { const v = localStorage.getItem('hd:asr'); if (!v || v === 'off') return null; return v; } catch (e) { return null; } }
   async transcribeAny(buf, onProgress, model, opts) {
     const url = this.asrUrl();
     if (url) {
@@ -5447,11 +5457,9 @@ class Component extends DCLogic {
   // from heimdallMod() (holodeck-heimdall.js), the fold's fleet-door module.
   chatLaneMod() { if (!this._hdP) this._hdP = import(new URL('holodeck-chat-lane.js', location.href).href).then(H => { this._hdM = H; return H; }); return this._hdP; }
   akModels() { const M = this._askM; const think = n => !!(M && M.isThinkingModel && M.isThinkingModel(n)); const wl = M ? M.WEBLLM_MODELS.filter(m => !think(m.id)).map(m => ({ v: 'webllm:' + m.id, label: m.label + ' · ' + m.size, size: m.size, name: m.label.replace(/ · in this tab$/, '') })) : []; const ol = (this._oll && this._oll.ok ? this._oll.models || [] : []).filter(m => !think(m.name)).map(m => ({ v: m.name, label: m.name + ' · Ollama', name: m.name }));
-    // The heimdall bridge: the fleet, linked hosts, and the sealed outside
-    // providers. A sealed model is labelled as such and, when chosen, the
-    // turn runs under the sealed boundary (raw spans withheld).
-    const hd = (this._hdm && this._hdm.ok ? this._hdm.models || [] : []).filter(m => !think(m.name)).map(m => ({ v: 'heimdall:' + m.name, label: m.name + (m.sealed ? ' · ' + (m.provider || 'sealed') + ' · sealed' : ' · fleet'), name: m.name, sealed: m.sealed }));
-    return [...wl, ...ol, ...hd]; }
+    // Everything runs in the browser: an in-tab WebLLM model, or a local Ollama
+    // server on this machine. No heimdall bridge, no relay.
+    return [...wl, ...ol]; }
   akModel() { const S = this.state; const ms = this.akModels(); let saved = null; try { saved = localStorage.getItem('fold-explorer-ak-model'); } catch (e) {} const want = S.akModel || saved; if (want && ms.some(m => m.v === want)) return want; return 'webllm:gemma-2-2b-it-q4f16_1-MLC'; }
   llmOk() { const m = this.akModel(); const M = this._askM; if (m.startsWith('webllm:')) return !!(M && M.webgpu()); if (m.startsWith('heimdall:')) return !!(this._hdm && this._hdm.ok); return !!(this._oll && this._oll.ok); }
   async akLoad() { const M = await this.askMod(); const m = this.akModel(); if (!m.startsWith('webllm:') || M.webllmLoaded(m.slice(7))) return true; if (!M.webgpu()) { this.setState({ akErr: 'This browser has no WebGPU, so a model can’t run in this tab. Chrome or Edge with hardware acceleration on can.' }); return false; }
@@ -5473,8 +5481,7 @@ class Component extends DCLogic {
     } catch (e) {}
     finally { this._akAutoBusy = false; }
   }
-  akProbe() { this._oll = { pending: true }; this.askMod().then(M => M.probe()).then(p => { this._oll = p; this.forceUpdate(); }).catch(e => { this._oll = { ok: false, why: String(e && e.message || e) }; this.forceUpdate(); });
-    this._hdm = { pending: true }; this.chatLaneMod().then(H => H.probe()).then(p => { this._hdm = p; this.forceUpdate(); }).catch(e => { this._hdm = { ok: false, why: String(e && e.message || e) }; this.forceUpdate(); }); }
+  akProbe() { this._oll = { pending: true }; this.askMod().then(M => M.probe()).then(p => { this._oll = p; this.forceUpdate(); }).catch(e => { this._oll = { ok: false, why: String(e && e.message || e) }; this.forceUpdate(); }); }
   // True when the selected model is a heimdall bridge model the bridge marks
   // sealed-only — the turn then runs under the sealed boundary.
   hdSealedOf(name) { if (!String(name || '').startsWith('heimdall:')) return false; const hd = this._hdm && this._hdm.ok ? (this._hdm.models || []) : []; const m = hd.find(x => name === 'heimdall:' + x.name); return !!(m && m.sealed); }
@@ -6023,7 +6030,7 @@ class Component extends DCLogic {
     const gen = { kinds: [['brief', 'Brief'], ['timeline', 'Timeline']].map(([k, l]) => ({ label: l, ...seg(gk === k), onClick: () => this.setState({ gKind: k }) })),
       modes: [['mech', 'Quotes'], ['model', 'Model']].map(([k, l]) => ({ label: l, ...seg(gm === k), onClick: () => this.setState({ gMode: k }) })),
       prompt: S.gSubj != null ? S.gSubj : this.defaultSubject(A), onPrompt: e => this.setState({ gSubj: e.target.value }), onKey: e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); this.generate(); } },
-      onRun: () => this.generate(), isModel: gm === 'model', llmUrl: this.llmCfg().url, llmModel: this.llmCfg().model, onLlmUrl: e => this.setLlm({ url: e.target.value.trim() }), onLlmModel: e => this.setLlm({ model: e.target.value.trim() }), onLlmTest: () => this.testLLM(), llmTest: S.llmTest || (this.llmCfg().mode === 'local' ? 'Runs on your machine. Ollama (…:11434) or any OpenAI-compatible server (LM Studio …:1234/v1). Nothing is sent anywhere else.' : 'Reasoning mode: ' + this.llmCfg().mode + ' — sent to the heimdall relay (keys stay on the machine), which refuses anything but the sealed/explicit tag to a frontier model.'), runLabel: S.gen ? 'Working…' : 'Fill the document', op: S.gen ? 0.6 : 1,
+      onRun: () => this.generate(), isModel: gm === 'model', llmUrl: this.llmCfg().url, llmModel: this.llmCfg().model, onLlmUrl: e => this.setLlm({ url: e.target.value.trim() }), onLlmModel: e => this.setLlm({ model: e.target.value.trim() }), onLlmTest: () => this.testLLM(), llmTest: S.llmTest || 'Runs on your machine. Ollama (…:11434) or any OpenAI-compatible server (LM Studio …:1234/v1). Nothing is sent anywhere else.', runLabel: S.gen ? 'Working…' : 'Fill the document', op: S.gen ? 0.6 : 1,
       thread: genThread, hasThread: genThread.length > 0, ...genFoldNav,
       hint: (gk === 'timeline' ? 'Finds dated statements that name the subject, one per source, in date order.' : 'Runs four searches (who leads it, budget, what audits found, how it responded) and adds each section with its excerpts.') + (gm === 'model' ? ' Your local model writes each sentence from those excerpts only; the same mechanical check runs on everything it writes.' : ' Each claim is a quote, so every word comes from the source.') };
     const wr = { wKey: String(S.wKey || 0), onText: e => { const had = !!(this._wText || '').trim(); this._wText = e.target.value; if (had !== !!this._wText.trim()) this.forceUpdate(); }, onGround: () => this.groundWriting(), op: (this._wText || '').trim() ? 1 : 0.5 };
@@ -6641,7 +6648,7 @@ class Component extends DCLogic {
     // with no readable text still stays uncounted — isLiveDoc, below — so a blocked link is not counted either.)
     nd.forEach(d => { d.status = 'source'; });
     if (!(T.focus instanceof Set)) T.focus = new Set(T.focus || []); nd.forEach(d => T.focus.add(d.id)); nd.forEach(d => hdT('store', 'mint', 'Stored \u201c' + hdCut(d.title, 60) + '\u201d as ' + d.id + (list[nd.indexOf(d)].html ? ' \u00b7 full page kept; ' + d.text.length.toLocaleString() + ' characters indexed for search' + (d.text.length >= 60000 ? ' (the cap; the reading below uses the whole page)' : '') : ' \u00b7 ' + d.text.length.toLocaleString() + ' characters kept'), { doc: d.id }));
-    nd.forEach((d, i) => { const x = list[i]; if (x.html) { this._html[d.id] = x.html; idbPut('html:' + d.id, x.html).catch(() => {}); } if (x.pdf) idbPut('pdf:' + d.id, x.pdf).catch(() => {}); if (x.buf) idbPut('media:' + d.id, x.buf).catch(() => {}); if (d.hasImg && this._pendingImg) { const u = this._pendingImg['img:' + d.title]; if (u) { this._html['img:' + d.id] = u; idbPut('img:' + d.id, u).catch(() => {}); delete this._pendingImg['img:' + d.title]; } } });
+    nd.forEach((d, i) => { const x = list[i]; if (x.html) { this._html[d.id] = x.html; idbPut('html:' + d.id, x.html).catch(() => {}); } if (x.pdf) idbPut('pdf:' + d.id, x.pdf).catch(() => {}); if (x.buf) idbPut('media:' + d.id, x.buf).catch(() => {}); if (d.hasImg && HD_PENDING_IMG['img:' + d.title]) { const u = HD_PENDING_IMG['img:' + d.title]; this._html['img:' + d.id] = u; idbPut('img:' + d.id, u).catch(() => {}); delete HD_PENDING_IMG['img:' + d.title]; } });
     // Store first, then paint: each source lands in the workspace (and its bytes in IndexedDB) before the read and
     // the fold, so Sources fills in as the files arrive instead of freezing until the whole batch is done.
     const added = { ...this.state.added, [id]: [...(this.state.added[id] || []), ...nd] };
@@ -7554,7 +7561,7 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
       heroRef: r => { this._hero = r; }, onHeroKey: e => { if (e.key === 'Enter') { const v = (e.target.value || '').trim(); if (v) { if (isOmniUrl(v)) omniOpen(v); else omniGo(v); } } },
       onHeroGo: () => { const v = ((this._hero && this._hero.value) || '').trim(); if (v) { if (isOmniUrl(v)) omniOpen(v); else omniGo(v); } },
       showSettings: S.showSettings, openSettings: () => this.setState({ showSettings: true }), closeSettings: () => this.setState({ showSettings: false }), closeSettingsBg: e => { if (e.target === e.currentTarget) this.setState({ showSettings: false }); },
-      acctLabel: (this._net && this._net.s && !this._net.s.guest) ? (this._net.s.ephemeral ? 'Temporary' : this._net.s.user) : 'Local', acctOn: !!(this._net && this._net.s && !this._net.s.guest),
+      acctLabel: (this._net && this._net.s && !this._net.s.guest) ? (this._net.s.ephemeral ? 'Temporary' : this._net.s.user) : 'Local', acctOn: !!(this._net && this._net.s && !this._net.s.guest), acctTitle: (this._net && this._net.s && this._net.s.user) ? this._net.s.user + ' — settings (account, sync, sharing)' : 'Settings — account, sync and sharing',
       mxOpen: S.mxOpen, mxBusy: !!S.mxBusy, mxErr: S.mxErr || '', mxSubmit: S.mxBusy ? 'Signing in…' : 'Sign in',
       mxSignedIn: !!(this._net && this._net.s && !this._net.s.guest), mxNotSignedIn: !(this._net && this._net.s),
       mxWho: (this._net && this._net.s) ? (this._net.s.guest ? 'Guest · ' + this._net.s.user + ' · read only' : (this._net.s.ephemeral ? 'Temporary account · ' + this._net.s.user : this._net.s.user)) : '',
@@ -7563,7 +7570,6 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
       onMxKey: e => { if (e.key === 'Enter') this.doLogin(); },
       doLogin: () => this.doLogin(), doGuest: () => this.doGuest(), doLogout: () => { this.signOut(); this.setState({ mxOpen: false }); },
       openLogin: () => this.openLogin(), closeLogin: () => this.closeLogin(), closeLoginBg: e => { if (e.target === e.currentTarget) this.closeLogin(); },
-      openLibrary: () => { try { window.open(new URL('library.html', location.href).href, '_blank', 'noopener'); } catch (e) { location.href = 'library.html'; } },
       showAdd: S.showAdd, draftText: S.draftText,
       onDraftText: e => this.setState({ draftText: e.target.value }),
       add: S.showAdd ? this.addVals() : undefined,

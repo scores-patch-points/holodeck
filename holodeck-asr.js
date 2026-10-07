@@ -8,14 +8,14 @@
 
 const DEFAULT_URL = 'http://127.0.0.1:11460';
 
-// `hd:asr` holds the service URL; 'off' disables the local rung entirely
-// (in-browser only). Absent means the default loopback URL.
+// Everything is in-browser by default: transcription uses the in-tab recognizer unless
+// `hd:asr` names a local service (set it to a URL to opt into tools/asr-server.py).
 export function asrUrl() {
   try {
     const v = localStorage.getItem('hd:asr');
-    if (v === 'off') return null;
-    return (v || DEFAULT_URL).replace(/\/+$/, '');
-  } catch (e) { return DEFAULT_URL; }
+    if (!v || v === 'off') return null;
+    return v.replace(/\/+$/, '');
+  } catch (e) { return null; }
 }
 
 export async function health(url) {
