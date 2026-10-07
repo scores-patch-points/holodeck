@@ -751,7 +751,7 @@ button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visi
         </div>
       </sc-if>
       <sc-if value="{{ ak.chatEmbed }}" hint-placeholder-val="{{ false }}">
-        <iframe src="{{ ak.chatSrc }}" title="The Fold chat (vendored byte-identical from scores-patch-points/the-fold)" style="display:block;width:100%;height:calc(100vh - 130px);min-height:560px;border:1px solid var(--line);border-radius:12px;background:var(--bg)"></iframe>
+        <iframe src="{{ ak.chatSrc }}" title="The Fold chat" style="display:block;width:100%;height:calc(100vh - 96px);min-height:600px;border:0;background:var(--bg);color-scheme:inherit"></iframe>
       </sc-if>
       <sc-if value="{{ ak.onData }}" hint-placeholder-val="{{ false }}">
         <div ref="{{ ak.nbRef }}" data-hd-notebook style="min-height:50vh"></div>
@@ -4467,7 +4467,7 @@ class Component extends DCLogic {
       }
     } else { this._akN = undefined; this._akWasPend = false; } }
   askEl() { return document.getElementById('ak-composer'); }
-  applyTheme() { document.documentElement.dataset.theme = this.state.theme; }
+  applyTheme() { document.documentElement.dataset.theme = this.state.theme; try { localStorage.setItem('fold-chat:theme', this.state.theme); } catch (e) {} }
   async ingest(dt) {
     if (!dt) return;
     const files = await hdFilesFromDataTransfer(dt);
@@ -5810,7 +5810,7 @@ class Component extends DCLogic {
       notGen: (S.akMode || 'chat') !== 'generate',
       art, isGen, mainFlex: isGen && art.has && !art.narrow ? '1 1 ' + ART_CHAT_W + 'px' : '1 1 480px', asideFlex: isGen ? (art.has && !art.narrow ? '1 1 ' + ART_PANE_W + 'px' : '0 0 0px') : '0 1 290px', asideMin: isGen ? (art.has && !art.narrow ? '320px' : '0px') : '250px', wrapRef: this.akWrapRef, asideZ: art.back ? 90 : 'auto',
       showReset: turns.length > 0 && !isGen, showEx: !isGen && turns.length === 0 && !S.akPending, busyAny: !!S.akBusy,
-      showConvTabs: !isGen,
+      showConvTabs: !isGen && (S.akMode || 'chat') !== 'chat',
       convTabs: (this._convs || []).filter(c => c.open).map(c => { const on = c.id === this._convId; return { title: c.title || 'New conversation', on, bg: on ? 'var(--sel)' : 'transparent', bd: on ? 'var(--acc2)' : 'var(--line)', col: on ? 'var(--ink)' : 'var(--mut)', onClick: () => this.convOpen(c.id), onClose: ev => this.convClose(c.id, ev) }; }),
       convListOpen: !!S.akConvList, convToggleList: () => this.setState({ akConvList: !S.akConvList }), convCloseList: () => this.setState({ akConvList: false }),
       convList: (this._convs || []).slice().sort((a, b) => b.updated - a.updated).map(c => ({ title: c.title || 'New conversation', when: c.updated ? new Date(c.updated).toLocaleString() : '', onOpen: () => this.convOpen(c.id), onDelete: ev => this.convDelete(c.id, ev) })),
@@ -7865,13 +7865,8 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
   // tried to and never actually wired into surprise()'s real scorer.
   // Readers are counts over structural slots (no text), so they are kept in this browser between visits; a reader trained under other declared numbers is refused, not reused.
   restoreReaders() {
-    try {
-      const raw = localStorage.getItem('holodeck-readers-v1'); if (!raw || this._persp) return;
-      import(new URL('holodeck-perspectives.js', location.href).href).then(M => {
-        const r = M.reviveReaders(JSON.parse(raw)); if (!r || this._persp) return;
-        this._perspM = M; this._persp = r; this._su = null; this._hb = null; this.forceUpdate();
-      }).catch(() => {});
-    } catch (e) {}
+    // The perspectives are induced from the content in view now, so there is no
+    // shipped reader to restore — they are rebuilt from the sources each time.
   }
   // ---- the top bar: Sources / Filtering / Perspectives ------------------------------------------------------------------
   // Sources = what is included; Filtering = how it is sliced (a real condition builder, applied to every view through match());
@@ -8029,20 +8024,21 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
     const pubMs = d => { const t = Date.parse(d.published || ''); return !isNaN(t) ? t : d.year ? Date.UTC(d.year, 0, 1) : Infinity; };
     const docs = A.docs.filter(d => (!this._cnt || this._cnt.has(d.id)) && !offDocs[d.id]).sort((x, y) => pubMs(x) - pubMs(y) || di[x.id] - di[y.id]);
     const byDoc = {}; A.sts.forEach(st => { if (!st.ref) (byDoc[st.doc] = byDoc[st.doc] || []).push(st); });
-    const GEN = (M && M.GENRES) ? M.GENRES : [{ id: 'lit', label: 'Literature' }, { id: 'ency', label: 'Encyclopedic' }, { id: 'gov', label: 'Government & legal' }];
-    const COLOR = { lit: 'var(--amber)', ency: 'var(--blue)', gov: 'var(--green)' };
+    const GEN = (this._perspList && this._perspList.length) ? this._perspList : ((M && M.GENRES) ? M.GENRES : []);
+    const PALETTE = ['var(--amber)', 'var(--blue)', 'var(--green)', 'var(--pink)', 'var(--date)', 'var(--acc)', 'var(--ok)', 'var(--bad)'];
+    const COLOR = {}; GEN.forEach((g, i) => { COLOR[g.id] = PALETTE[i % PALETTE.length]; });
     const label = id => (GEN.find(g => g.id === id) || {}).label || id;
     const active = GEN.filter(g => !off[g.id]).map(g => g.id);
     const pairs = {}; let top = []; const docN = {}; A.docs.forEach(d => { docN[d.id] = (byDoc[d.id] || []).length; });
     const recs = docs.map(d => {
       const all = byDoc[d.id] || []; const inSlice = all.filter(st => Fs.has(st.id));
-      const r = { d, all: all.length, lit: inSlice.length, notable: { lit: 0, ency: 0, gov: 0 }, mixed: 0 };
+      const r = { d, all: all.length, lit: inSlice.length, notable: {}, mixed: 0 };
       if (R && M && inSlice.length) {
-        // each source is its own stream with its own picture, exactly as each genre document was read
+        // each source is its own stream with its own picture, exactly as each perspective's own sources were read
         const facts = M.factsAlong(all.map(st => st.text)); const idx = new Map(all.map((st, i) => [st.id, i]));
         inSlice.forEach(st => {
-          const sc = M.scorePerspectives(R, facts[idx.get(st.id)]);
-          GEN.forEach(g => { if (sc[g.id] && sc[g.id].notable) r.notable[g.id]++; });
+          const sc = M.scorePerspectives(R, facts[idx.get(st.id)], GEN);
+          GEN.forEach(g => { if (sc[g.id] && sc[g.id].notable) r.notable[g.id] = (r.notable[g.id] || 0) + 1; });
           const on = active.filter(id => sc[id]); if (on.length < 2) return;
           const yes = on.filter(id => sc[id].notable), no = on.filter(id => !sc[id].notable);
           if (!yes.length || !no.length) return;
@@ -8059,7 +8055,7 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
     for (let i = 0; i < recs.length; i += per) {
       const g = recs.slice(i, i + per); const sum = f => g.reduce((t, r) => t + f(r), 0);
       cols.push({ id: g.length === 1 ? g[0].d.id : null, name: g.length === 1 ? g[0].d.title : plural(g.length, 'source') + ' · ' + short(g[0].d.title, 26) + ' … ' + short(g[g.length - 1].d.title, 26),
-        all: sum(r => r.all), lit: sum(r => r.lit), mixed: sum(r => r.mixed), notable: { lit: sum(r => r.notable.lit), ency: sum(r => r.notable.ency), gov: sum(r => r.notable.gov) } });
+        all: sum(r => r.all), lit: sum(r => r.lit), mixed: sum(r => r.mixed), notable: Object.fromEntries(GEN.map(g => [g.id, sum(r => r.notable[g.id] || 0)])) });
     }
     const pct = (n, of) => of ? Math.round(100 * n / of) : 0;
     const bar = (n, of) => n ? 'max(3px,' + pct(n, of) + '%)' : '1px';
@@ -8070,8 +8066,8 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
       return { id: g.id, label: g.label, color: COLOR[g.id], on, chipOp: on ? 1 : 0.45, chipBd: on ? COLOR[g.id] : 'var(--line2)',
         tip: on ? 'Reading through ' + g.label + ' — click to set this perspective aside' : g.label + ' is set aside — click to bring it back',
         onToggle: () => { const cur = { ...(this.state.hbOff || {}) }; if (!cur[g.id] && active.length <= 1) return; cur[g.id] = !cur[g.id]; this.setState({ hbOff: cur }); },
-        cols: cols.map(c => ({ grow: Math.max(1, Math.sqrt(c.all)).toFixed(2), color: COLOR[g.id], h: on ? bar(c.notable[g.id], c.lit) : '1px', op: on ? 1 : 0.25,
-          tip: c.name + ' — ' + label(g.id) + ' finds ' + c.notable[g.id] + ' of ' + plural(c.lit, 'statement') + ' notable' })) }; });
+        cols: cols.map(c => ({ grow: Math.max(1, Math.sqrt(c.all)).toFixed(2), color: COLOR[g.id], h: on ? bar(c.notable[g.id] || 0, c.lit) : '1px', op: on ? 1 : 0.25,
+          tip: c.name + ' — ' + label(g.id) + ' finds ' + (c.notable[g.id] || 0) + ' of ' + plural(c.lit, 'statement') + ' notable' })) }; });
     const part = cols.map(c => ({ grow: Math.max(1, Math.sqrt(c.all)).toFixed(2), h: bar(c.mixed, c.lit), tip: c.name + ' — the perspectives part ways on ' + c.mixed + ' of ' + plural(c.lit, 'statement') }));
     const nSt = cols.reduce((t, c) => t + c.lit, 0), nMixed = cols.reduce((t, c) => t + c.mixed, 0);
     const bestPair = Object.entries(pairs).sort((a, b) => b[1] - a[1])[0];
@@ -8086,16 +8082,25 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
     v.hasPartings = v.partings.length > 0;
     this._hb = { A, key, v }; return v;
   }
+  // The perspectives are EXTRACTED FROM THE CONTENT WE ARE LOOKING AT: each
+  // distinct kind of source in view is its own reader, built from that kind's
+  // own sentences here, with its own "notable" line (the top 15% of what it has
+  // itself read). No shipped lit/ency/gov corpus. Rebuilt when the sources
+  // change; a workspace of one kind yields one perspective, a mixed one parts.
   ensurePerspectives() {
-    if (this._perspLoading || this._persp) return;
+    if (this._perspLoading) return;
+    const A = this.analysis();
+    const docs = A.docs.filter(d => String(d.text || '').trim());
+    const key = docs.map(d => d.id).join(',');
+    if (this._persp && this._perspKey === key) return;
+    if (!docs.length) { this.setState({ busy: '' }); return; }
     this._perspLoading = true;
-    this.setState({ busy: 'Reading three ways from live_priors: literature, encyclopedic, government & legal…' });
+    this.setState({ busy: 'Naming the perspectives in this content…' });
     import(new URL('holodeck-perspectives.js', location.href).href).then(M => {
       this._perspM = M;
-      return M.buildAllGenres(LP_SETS, (id, label, n, t, s) => this.setState({ busy: 'Reading as ' + label.toLowerCase() + '… ' + n + ' / ' + t + ' documents, ' + s + ' sentences' }));
-    }).then(holos => {
-      this._persp = holos; this._perspLoading = false; this._su = null; this._hb = null;
-      try { localStorage.setItem('holodeck-readers-v1', JSON.stringify(this._perspM.serializeReaders(holos))); } catch (e) {}
+      const { list, readers } = M.derivePerspectives(A, (n, t, name) => this.setState({ busy: 'Reading the perspectives in this content… ' + n + ' / ' + t + ' · for ' + name }));
+      this._persp = readers; this._perspList = list; this._perspKey = key; this._perspLoading = false; this._su = null; this._hb = null;
+      try { localStorage.removeItem('holodeck-readers-v1'); } catch (e) {}
       this.setState({ busy: '', suVer: (this.state.suVer || 0) + 1 });
     }).catch(e => { this._perspLoading = false; this.setState({ busy: '' }); console.error('perspectives failed', e); });
   }
