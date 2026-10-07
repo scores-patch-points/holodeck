@@ -357,14 +357,6 @@ button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visi
         </div>
       </sc-if>
 
-      <sc-if value="{{ showDropStrip }}" hint-placeholder-val="{{ false }}">
-        <div style="display:flex;align-items:center;gap:8px 10px;flex-wrap:wrap;font:400 14px var(--sans);color:var(--mut);box-sizing:border-box;max-width:720px;padding:8px 12px;background:var(--s1);border:1px solid var(--line);border-radius:10px">
-          <span style="min-width:0">Drop, paste or link anything to add it.</span>
-          <button draggable="true" onDragStart="{{ demo.onDragStart }}" onClick="{{ demo.onClick }}" title="Drag onto the page (or click)" style="display:flex;align-items:center;gap:6px;background:var(--s2);border:1px solid var(--line2);border-radius:6px;padding:3px 10px;cursor:grab;font:500 14px var(--sans);color:var(--ink2)" style-hover="border-color:var(--acc)">Try: {{ demo.label }}</button>
-          <span style="display:flex;align-items:center;gap:6px;white-space:nowrap"><a ref="{{ bookmarkletRef }}" title="Drag to your bookmarks bar, then click it on any page" style="font:600 14px var(--sans);text-decoration:none;cursor:grab;color:var(--acc)">✦ Explore this page</a><span style="font-size:12px;color:var(--dim)">drag to bookmarks bar</span></span>
-        </div>
-      </sc-if>
-
       <sc-if value="{{ hdrShow }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap">
           <div style="flex:1 1 320px;min-width:0;display:flex;flex-direction:column;gap:4px">
@@ -7480,7 +7472,6 @@ class Component extends DCLogic {
       corpusId: cid, corpusOptions: opts, q: S.q, corpusName: this.corpusName(), segList, hasSegments, segOpen, segToggleLabel, segCount, toggleSegOpen, addAsFold, navTop, navRead, navExplore, navRest,
       topicsList, hasTopics, topicsNote, hasTopicsNote, topicsStrayN, showTopicsStray, onTopicsStray, scope,
       topicsHasSearch, topicsSearchVal, onTopicsSearch, topicsHasPager, topicsPagerLine, onTopicsPrev, onTopicsNext, topicsHasPrev, topicsHasNext, topicsPageN: (topicsPage + 1) + ' of ' + topicsPages,
-      bookmarkletRef: this.bookmarkletRef,
       toggleTheme: () => { const th = S.theme === 'dark' ? 'light' : 'dark'; try { localStorage.setItem('fold-explorer-theme', th); } catch (e) {} this.setState({ theme: th }); },
       workspaceClass: S.akFocus && view === 'ask' ? 'hd-workspace-surface hd-focus' : 'hd-workspace-surface',
       railOpen: S.railOpen, railIcon: S.railOpen ? '‹' : '›', railTitle: S.railOpen ? 'Collapse' : 'Expand',
@@ -7490,8 +7481,6 @@ class Component extends DCLogic {
       toggleRail: () => { const open = !S.railOpen; try { localStorage.setItem('fold-explorer-rail', open ? '1' : '0'); } catch (e) {} this.setState({ railOpen: open }); },
       themeIcon: S.theme === 'dark' ? '☀' : '☾', themeTitle: S.theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode',
       dragging: S.dragging, isBusy: !!S.busy, busy: S.busy,
-      showDropStrip: isEmpty || (view !== 'reader' && view !== 'profile' && view !== 'ask' && view !== 'draft'),
-      demo: { title: demo.title, label: demo.url ? demo.title + ' — Wikipedia link' : demo.title + '.txt', onClick: () => demo.url ? this.ingestUrl(demo.url, { title: demo.title, year: demo.year, fallback: demo.text }) : this.addDocs([{ title: demo.title, year: demo.year, type: 'Text', text: demo.text }]), onDragStart: e => { if (demo.url) { e.dataTransfer.setData('text/uri-list', demo.url); e.dataTransfer.setData('text/plain', demo.url); e.dataTransfer.setData('application/x-fold-fallback', demo.text); } else e.dataTransfer.setData('text/plain', demo.text); e.dataTransfer.setData('application/x-fold-title', demo.title); e.dataTransfer.setData('application/x-fold-year', String(demo.year)); e.dataTransfer.effectAllowed = 'copy'; } },
       onCorpus: e => this.setState({ corpus: e.target.value, view: 'summary', sel: null, f: {}, readDoc: null, folder: null, folderDraft: '' }),
       onSearch: e => this.setState({ q: e.target.value }),
       hasFilters: chips.length > 0 && view !== 'search', chips, srcTuple, clearAll: () => this.setState(s => ({ f: {}, fw: {}, q: '', ...(s.view === 'search' ? { view: s.prevView || 'summary' } : {}) })),
