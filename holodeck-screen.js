@@ -26,6 +26,8 @@ async function loadTess(base) {
 // background), so a dark/colourful UI screenshot is left alone. Measured on a
 // faded clinical form this took the read from 0 fields to several.
 function binarize(cv) {
+  // Optics live in Alhazen (scores-patch-points/Alhazen); use it when present.
+  if (typeof window !== "undefined" && window.Alhazen && window.Alhazen.binarizeCanvas) return window.Alhazen.binarizeCanvas(cv);
   try {
     const cx = cv.getContext('2d', { willReadFrequently: true });
     const im = cx.getImageData(0, 0, cv.width, cv.height), d = im.data;
