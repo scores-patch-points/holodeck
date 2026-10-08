@@ -332,6 +332,21 @@
     };
   }
 
+  // ── FIELD PRIORS — the ABILITY (pure, no IO) to learn a label→format lexicon
+  // from observed (label, value) pairs and apply it. A project that vendors
+  // Alhazen owns the LOG (append-only) and the folded PRIORS; the mechanism lives
+  // here. Nothing is saved by Alhazen itself — observe()/fold()/apply() are the
+  // whole capability; persistence and provenance are the caller's.
+  function createFieldPriors(seed) {
+    const by = (seed && seed.by) || {};
+    const observe = (label, value, fmt) => { const c = snake(label); if (!c) return; const e = by[c] || (by[c] = { n: 0, formats: {} }); e.n++; const f = fmt || valueFormat(value); e.formats[f] = (e.formats[f] || 0) + 1; };
+    const majority = (e) => Object.entries(e.formats).sort((a, b) => b[1] - a[1])[0];
+    const typeOf = (label) => { const e = by[snake(label)]; if (!e) return null; const [format, k] = majority(e); return { format, n: e.n, confident: k / e.n >= 0.6 }; };
+    const fold = () => { const lexicon = {}; for (const [k, e] of Object.entries(by)) { const [format, c] = majority(e); lexicon[k] = { format, n: e.n, confident: c / e.n >= 0.6 }; } return { schema: "FieldPriors@1", observations: Object.values(by).reduce((s, e) => s + e.n, 0), labels: Object.keys(lexicon).length, lexicon }; };
+    const apply = (fields) => (fields || []).map((f) => { const t = typeOf(f.label); if (t && t.confident && (!f.type || f.type === "text")) return { ...f, type: t.format, learned: true }; return f; });
+    return { schema: "FieldPriors@1", by, observe, typeOf, fold, apply };
+  }
+
   // ── GET BETTER: propose rules from a reading + its ground truth ──────────
   // `truth` is a template of what the page truly holds:
   //   { kind, fields:[{label, value, box}], columns?, records? }
@@ -1641,7 +1656,7 @@
 
   return { binarizeData, binarizeCanvas, valueFormat, extractFormFields, snake, titleLine, readGridFromElements, readGridFromText, inventTuples, structuralProposer,
            frameStats, palette, backgroundOf, inkMask, segmentMask, classifyRegion, textBands, classifyScene, readImage,
-           learnFrom, applyRules, scoreRead, createRuleLedger,
+           learnFrom, applyRules, scoreRead, createRuleLedger, createFieldPriors,
            overlapFrac, roleClass, layersOf, read3D, readPointCloud, liftTo3D, EYES, sniff, reconcile, look,
            trailToRGBA, read4D, trackMotions, trackObjects, motionBlurOfImage, createPheromone, prepare, runEye, swarm,
            depthFromCues, stereoDepth, motionParallax, perceiveDepth, skinMask, detectFaces, learnSalience, readSigns,
