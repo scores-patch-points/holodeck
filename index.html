@@ -493,7 +493,7 @@ button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visi
                       <button onClick="{{ d.onDiscard }}" style="background:none;border:1px solid var(--line2);border-radius:8px;padding:5px 12px;cursor:pointer;font:500 14px var(--sans);color:var(--ink2)" style-hover="border-color:var(--bad)">Discard</button>
                     </sc-if>
                     <button onClick="{{ d.onRead }}" style="background:none;border:1px solid var(--line2);border-radius:8px;padding:5px 12px;cursor:pointer;font:500 14px var(--sans);color:var(--ink2)" style-hover="border-color:var(--acc)">{{ d.readLabel }}</button>
-                    <sc-if value="{{ d.canProcess }}" hint-placeholder-val="{{ false }}"><button onClick="{{ d.onProcess }}" title="Run the visual model and OCR over its pixels, read in the browser" style="background:{{ d.needsRead ? 'var(--acc2)' : 'none' }};border:1px solid {{ d.needsRead ? 'var(--acc2)' : 'var(--line2)' }};border-radius:8px;padding:5px 12px;cursor:pointer;font:500 14px var(--sans);color:{{ d.needsRead ? '#fff' : 'var(--ink2)' }};white-space:nowrap" style-hover="border-color:var(--acc)">Read the pixels (CV + OCR)</button></sc-if>
+                    <sc-if value="{{ d.canProcess }}" hint-placeholder-val="{{ false }}"><button onClick="{{ d.onProcess }}" title="Run the eyes you have switched on over its pixels, read in the browser" style="background:{{ d.needsRead ? 'var(--acc2)' : 'none' }};border:1px solid {{ d.needsRead ? 'var(--acc2)' : 'var(--line2)' }};border-radius:8px;padding:5px 12px;cursor:pointer;font:500 14px var(--sans);color:{{ d.needsRead ? '#fff' : 'var(--ink2)' }};white-space:nowrap" style-hover="border-color:var(--acc)">Read the pixels (eyes)</button></sc-if>
                     <sc-if value="{{ d.canTranscribe }}" hint-placeholder-val="{{ false }}"><button onClick="{{ d.onTranscribe }}" title="Transcribe this recording — local service if set, else in this browser" style="background:none;border:1px solid var(--line2);border-radius:8px;padding:5px 12px;cursor:pointer;font:500 14px var(--sans);color:var(--ink2);white-space:nowrap" style-hover="border-color:var(--acc)">Transcribe it</button></sc-if>
                     <button onClick="{{ d.onSolo }}" title="Solo — fade the other sources; solo several; click again to bring them back" style="background:{{ d.soloOn ? 'var(--sel)' : 'none' }};border:1px solid {{ d.soloOn ? 'var(--acc)' : 'var(--line2)' }};border-radius:8px;padding:5px 12px;cursor:pointer;font:500 14px var(--sans);color:{{ d.soloOn ? 'var(--ink)' : 'var(--ink2)' }};white-space:nowrap" style-hover="border-color:var(--acc)">{{ d.soloLabel }}</button>
                   </div>
@@ -503,6 +503,16 @@ button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visi
                   <sc-if value="{{ d.hasBadges }}" hint-placeholder-val="{{ false }}">
                     <div style="display:flex;gap:5px;flex-wrap:wrap">
                       <sc-for list="{{ d.badges }}" as="b" hint-placeholder-count="2"><span style="display:flex;align-items:center;gap:5px;font:500 12px var(--sans);color:var(--ink2);border:1px solid var(--line2);border-radius:5px;padding:0 7px"><span style="width:7px;height:7px;border-radius:50%;background:{{ b.color }}"></span>{{ b.label }}</span></sc-for>
+                    </div>
+                  </sc-if>
+                  <sc-if value="{{ d.hasEyes }}" hint-placeholder-val="{{ false }}">
+                    <div style="display:flex;flex-direction:column;gap:6px">
+                      <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+                        <span style="font:600 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--dim)">Eyes</span>
+                        <sc-for list="{{ d.eyesRows }}" as="e" hint-placeholder-count="3"><button onClick="{{ e.onToggle }}" title="{{ e.note }}" style="background:{{ e.on ? 'var(--sel)' : 'transparent' }};border:1px solid {{ e.on ? 'var(--acc2)' : 'var(--line2)' }};border-radius:999px;padding:2px 10px;cursor:pointer;font:500 12px var(--sans);color:{{ e.on ? 'var(--ink)' : 'var(--mut)' }};white-space:nowrap" style-hover="border-color:var(--acc)">{{ e.label }}</button></sc-for>
+                        <button onClick="{{ d.onProcess }}" style="background:none;border:1px solid var(--line2);border-radius:999px;padding:2px 10px;cursor:pointer;font:500 12px var(--sans);color:var(--ink2);white-space:nowrap" style-hover="border-color:var(--acc)">Read with these eyes</button>
+                      </div>
+                      <span style="font:400 12px var(--sans);color:var(--mut);text-wrap:pretty">{{ d.eyesNote }}</span>
                     </div>
                   </sc-if>
                   <sc-if value="{{ d.hasDistinct }}" hint-placeholder-val="{{ false }}"><span style="font:500 14px var(--sans);color:var(--acc)">{{ d.distinct }}</span></sc-if>
@@ -2896,6 +2906,66 @@ async function hdImageReading(bmp, label) {
   if (act.text) hdT('activation', 'most-likely', label + ' most likely says: ' + hdCut(act.text.replace(/\s+/g, ' '), 220) + (act.proposals.length ? ' · ' + act.proposals.length + ' name' + (act.proposals.length === 1 ? '' : 's') + ' read from the profile' : ''), { proposals: act.proposals, known: act.known, raw: text });
   return { text: act.text || text, raw: text, screen: sc, activation: act };
 }
+let _hdScreen = null;
+const hdScreenMod = () => _hdScreen || (_hdScreen = import(new URL('holodeck-screen.js', location.href).href));
+let _hdEyes = null;
+const hdEyesMod = () => _hdEyes || (_hdEyes = import(new URL('holodeck-eyes.js', location.href).href));
+// One rendered page, read by the eyes that were ASKED for — never all three automatically. The
+// text layer is the PDF's own characters; the model eye is the measured 2D layout (image→HTML);
+// the OCR eye is tesseract's flat string; layers are the pixel stack (background/ink/wash/negative).
+async function hdPdfEyes(pdf, opts) {
+  opts = opts || {}; const maxPages = opts.maxPages || 20, scale = opts.scale || 2, onProgress = opts.onProgress, tr = opts.tr || hdT;
+  const E = await hdEyesMod(); const S = await hdScreenMod();
+  const eyes = (opts.eyes && opts.eyes.length) ? opts.eyes.slice() : E.baseEyes({ kind: 'pdf', textLayer: false });
+  const wantLayers = opts.layers === true || (opts.layers !== false && eyes.includes('model'));
+  const tessSrc = (() => { try { return localStorage.getItem('hd:tess') || null; } catch (e) { return null; } })();
+  const n = Math.min(pdf.numPages || 0, maxPages); const entries = [], overlay = [], layerRows = []; let blanks = 0;
+  for (let i = 1; i <= n; i++) {
+    if (onProgress) onProgress({ page: i, of: n });
+    const page = await pdf.getPage(i); const vp = page.getViewport({ scale }); const cv = document.createElement('canvas');
+    cv.width = Math.ceil(vp.width); cv.height = Math.ceil(vp.height); const ctx = cv.getContext('2d', { willReadFrequently: true });
+    await page.render({ canvasContext: ctx, viewport: vp }).promise;
+    const entry = { page: i, w: cv.width, h: cv.height };
+    if (eyes.includes('textlayer')) { try { const tc = await page.getTextContent(); const t = tc.items.map(it => (it.str || '') + (it.hasEOL ? '\n' : ' ')).join(''); if (t.replace(/\s/g, '')) entry.textlayer = { text: t }; } catch (e) {} }
+    let sc = null;
+    if (eyes.includes('model') || eyes.includes('ocr')) { try { sc = await S.readScreenImage(cv, { name: 'page ' + i, tr, tessSrc }); } catch (e) { tr('screen', 'fail', 'The 2D model did not run for page ' + i + ' (' + (e && e.message || e) + ')'); } }
+    if (sc && eyes.includes('model')) { const c = S.contentOf ? S.contentOf(sc) : null; if (c && c.text.trim()) entry.model = { text: c.text, elements: c.elements }; }
+    if (sc && eyes.includes('ocr') && sc.raw && sc.raw.trim()) entry.ocr = { text: sc.raw };
+    if (wantLayers) { try { const im = ctx.getImageData(0, 0, cv.width, cv.height); const L = E.layerModel({ width: im.width, height: im.height, data: im.data }); if (L) { entry.layers = L; layerRows.push({ page: i, background: L.background, watermark: L.watermark, ink: L.ink, negative: L.negativeCells, layers: L.layers.map(x => ({ role: x.role, region: x.region, alpha: x.alpha })) }); } } catch (e) { tr('screen', 'layers-fail', 'Layer inference did not run for page ' + i + ' (' + (e && e.message || e) + ')'); } }
+    if (entry.model) overlay.push({ page: i, width: cv.width, height: cv.height, text: entry.model.text, elements: entry.model.elements });
+    if (entry.textlayer || entry.model || entry.ocr) { entries.push(entry); blanks = 0; } else if (++blanks >= 2) break;
+  }
+  const rec = E.reconcilePages(entries, { eyes });
+  // The overlay only carries pages whose CHOSEN eye was the 2D model — its element offsets are into
+  // that model's page text, so a page the model did not win would misalign. One page in, one out.
+  const chosenByPage = new Map(rec.pages.map(p => [p.page, p.chosen]));
+  const overlayOk = overlay.filter(o => chosenByPage.get(o.page) === 'model');
+  return { text: rec.text, pageEntries: rec.pages, ledger: rec.ledger, overlayModels: overlayOk, layers: layerRows, eyes: rec.eyes, count: rec.pages.length, read: n };
+}
+// The surface's own copy of the eye registry, so the card can name them before the module loads
+// (holodeck-eyes.js is the source of truth; hdEyesForPdf syncs from it when it runs).
+const HD_EYES = [
+  { id: 'textlayer', label: 'Text layer', note: 'the PDF’s own embedded characters — exact, only when the file carries them' },
+  { id: 'ocr', label: 'Flat OCR', note: 'tesseract’s raw string — lands most text, carries no positions' },
+  { id: 'model', label: '2D model', note: 'the measured layout (image→HTML): text regions with positions' },
+];
+// The orchestration: SENSE the eyes from the sniff + the stigmergic trail, run them, ESCALATE one
+// eye only if the first pass landed too little (as needed), and write the outcome back to the
+// trail. `floor` is characters-per-page below which the pass is too thin to trust.
+async function hdEyesForPdf(pdf, opts) {
+  opts = opts || {}; const E = await hdEyesMod(); const trails = E.loadTrails();
+  const sensed = (opts.eyes && opts.eyes.length) ? { eyes: opts.eyes, basis: 'chosen', note: 'the eyes you asked for' } : E.senseEyes({ kind: 'pdf', textLayer: false, trails });
+  hdT('eyes', 'sense', 'Eyes for this source: ' + sensed.eyes.map(e => (E.EYE[e] || {}).label || e).join(' · ') + ' (' + sensed.basis + ' — ' + sensed.note + ')', { eyes: sensed.eyes });
+  let res = await hdPdfEyes(pdf, { ...opts, eyes: sensed.eyes });
+  const floor = opts.floor != null ? opts.floor : 40;
+  if (res.count && res.text.replace(/\s/g, '').length < res.count * floor) {
+    const nxt = E.escalate({ eyes: sensed.eyes, chars: res.text.length }, trails);
+    if (nxt) { hdT('eyes', 'escalate', nxt.note, { eyes: nxt.eyes }); const esc = await hdPdfEyes(pdf, { ...opts, eyes: nxt.eyes }); if (esc.text.replace(/\s/g, '').length > res.text.replace(/\s/g, '').length) res = esc; }
+  }
+  E.recordTrail('pdf', res.pageEntries, { order: E.EYE_IDS });
+  res.summary = E.summarize({ pages: res.pageEntries, eyes: res.eyes }, res.layers);
+  return res;
+}
 function hdCanvasDataURL(img, maxpx) {
   try {
     const W0 = img.width, H0 = img.height; let W = W0, H = H0; if (maxpx && Math.max(W, H) > maxpx) { const s = maxpx / Math.max(W, H); W = Math.round(W * s); H = Math.round(H * s); }
@@ -4199,8 +4269,18 @@ async function readText(file, M) {
       const pages = []; for (let i = 1; i <= Math.min(pdf.numPages, PDF_MAX_PAGES); i++) { pages.push(text.length); const c = await (await pdf.getPage(i)).getTextContent(); for (const it of c.items) text += (it.str || '') + (it.hasEOL ? '\n' : ' '); text += '\n'; }
       hdT('decode', 'pdf', 'Read the text layer of ' + pages.length + ' of ' + pdf.numPages + ' pages', { pages: pages.length });
       const hadTextLayer = text.trim().length > 0;
-      let ocrPages = 0;
-      if (!text.trim() && hdOcrOn()) { try { const R = await hdRead(); const o = await R.ocrPdf(pdf, { maxPages: 20, onProgress: p => hdT('decode', 'ocr', 'OCR is reading page ' + p.page + ' of ' + p.of) }); if (o && o.text.trim()) { text = o.text; ocrPages = o.pages; hdT('decode', 'ocr', 'No text layer; OCR read ' + o.pages + ' of ' + pdf.numPages + ' pages'); } } catch (e) { hdT('decode', 'ocr-fail', 'OCR could not run (' + e.message + ')'); } }
+      let ocrPages = 0, ocrModel = null, eyesMeta = null, layers = null, eyesDetail = null;
+      if (!hadTextLayer && hdOcrOn()) {
+        try {
+          const res = await hdEyesForPdf(pdf, { maxPages: 20, scale: 2, onProgress: p => hdT('eyes', 'page', 'Page ' + p.page + ' of ' + p.of + ' — the eyes are looking') });
+          if (res && res.text.trim()) { text = res.text; ocrPages = res.count; ocrModel = res.overlayModels; layers = res.layers; eyesMeta = res.summary; eyesDetail = { eyes: res.eyes, pageEntries: res.pageEntries, layers: res.layers };
+            hdT('eyes', 'done', 'Eyes read ' + res.count + ' of ' + pdf.numPages + ' pages — ' + (eyesMeta.chosen ? Object.entries(eyesMeta.chosen).map(([e, n]) => n + '× ' + e).join(', ') : 'nothing landed') + (eyesMeta.watermarkPages ? ' · a watermark layer on ' + eyesMeta.watermarkPages + ' page(s)' : '') + (eyesMeta.disagreements ? ' · ' + eyesMeta.disagreements + ' disagreement(s) kept as witnesses' : '')); }
+        } catch (e) { hdT('eyes', 'fail', 'The eyes could not read the pages (' + (e && e.message || e) + '); falling back to flat OCR'); }
+        if (!text.trim()) { try { const R = await hdRead(); const o = await R.ocrPdf(pdf, { maxPages: 20, onProgress: p => hdT('decode', 'ocr', 'OCR is reading page ' + p.page + ' of ' + p.of) }); if (o && o.text.trim()) { text = o.text; ocrPages = o.pages; hdT('decode', 'ocr', 'No text layer; OCR read ' + o.pages + ' of ' + pdf.numPages + ' pages'); } } catch (e) { hdT('decode', 'ocr-fail', 'OCR could not run (' + e.message + ')'); } }
+      } else if (hadTextLayer) {
+        eyesMeta = { eyes: ['textlayer'], chosen: { textlayer: pages.length }, pages: pages.length, disagreements: 0, watermarkPages: 0 };
+        hdT('eyes', 'sense', 'Eyes for this source: Text layer (sniff — the PDF carries its own characters; no OCR needed)');
+      }
       // Images embedded in the PDF: each is extracted and read the same way a dropped image is
       // (2D visual model + OCR + activation against the profile), shown clickable, and folded in.
       let figHtml = '', figText = '', figs = 0;
@@ -4225,9 +4305,14 @@ async function readText(file, M) {
       // furniture or a watermark — is BLANKED, not deleted, and disclosed.
       let ignored = [];
       try { const I = (await import(new URL('holodeck-ignore.js', location.href).href)).planIgnores(text, { pages: pdf.numPages }); if (I.removed) { text = I.kept; ignored = I.ignored; hdT('ignore', 'subtract', 'Subtracted ' + I.removed + ' recurring line(s) from the field of vision (running head/footer, boilerplate, or a watermark); kept on the record: ' + I.ignored.slice(0, 3).map(x => x.text).join('; '), { ignored: I.ignored }); } } catch (e) {}
+      // The pixel twin of the ignore faculty: a wash the layers named (a large faint component) is
+      // disclosed as a layer, never silently thrown away — its alpha and the negative-pixel residual
+      // stay on the record so a watermark can be subtracted rather than guessed at.
+      const wmPages = (layers || []).filter(l => l.watermark && l.watermark.present);
+      if (wmPages.length) hdT('screen', 'layers', 'A watermark layer (a large faint wash) on ' + wmPages.length + ' page(s): alpha ≈ ' + (wmPages.reduce((s, l) => s + (l.watermark.meanAlpha || 0), 0) / wmPages.length).toFixed(2) + ' — measured from the pixels, kept beside the text', { pages: wmPages.map(l => l.page) });
       const fullText = [text, figText].filter(x => x && x.trim()).join('\n\n');
       const hasFigs = figs > 0;
-      return { title, year, type: 'PDF', format: hasFigs ? 'html' : 'pdf', html: hasFigs ? (text.trim() ? '<p style="' + TAG_STYLE.P + '">' + esc(text.replace(/\s+/g, ' ').trim()) + '</p>' : '') + figHtml : undefined, text: fullText, pages, pdf: buf, figures: figs || undefined, ignored: ignored.length ? ignored : undefined, needsRead: fullText.trim() ? undefined : true, note: (text.trim() ? (ocrPages ? 'No text layer — read by OCR (' + ocrPages + ' pages). ' : '') : 'This PDF isn’t readable yet — it looks scanned and I couldn’t read it. Let me process it (read the pages with OCR) so I can read it; ask me again once it’s done. ') + (hasFigs ? 'Read ' + figs + ' embedded image' + (figs === 1 ? '' : 's') + ' for text (visual model + OCR + activation).' : (text.trim() ? null : '')) };
+      return { title, year, type: 'PDF', format: hasFigs ? 'html' : 'pdf', html: hasFigs ? (text.trim() ? '<p style="' + TAG_STYLE.P + '">' + esc(text.replace(/\s+/g, ' ').trim()) + '</p>' : '') + figHtml : undefined, text: fullText, pages, pdf: buf, ocr: ocrModel || undefined, eyes: eyesMeta || undefined, eyesDetail: eyesDetail || undefined, figures: figs || undefined, ignored: ignored.length ? ignored : undefined, needsRead: fullText.trim() ? undefined : true, note: (text.trim() ? (ocrPages ? 'No text layer — read by OCR (' + ocrPages + ' pages). ' : '') : 'This PDF isn’t readable yet — it looks scanned and I couldn’t read it. Let me process it (read the pages with OCR) so I can read it; ask me again once it’s done. ') + (hasFigs ? 'Read ' + figs + ' embedded image' + (figs === 1 ? '' : 's') + ' for text (visual model + OCR + activation).' : (text.trim() ? null : '')) };
     }
     let html = '';
     if (['docx', 'pptx', 'xlsx', 'odt', 'odp', 'ods', 'epub'].includes(ext)) {
@@ -5303,13 +5388,17 @@ class Component extends DCLogic {
     hdT('bytes', 'file', d.title + ' — reading the pixels (visual model + OCR), in this browser');
     this.setState({ busy: 'Reading the pixels of “' + short(d.title, 30) + '”…' });
     try {
-      let text = '';
+      let text = ''; const patch = {};
       if (d.format === 'pdf' || d.type === 'PDF' || d.pdf) {
         const buf = await idbGet('pdf:' + id).catch(() => null); if (!buf) throw new Error('this PDF’s bytes aren’t stored in this browser');
         const pdfjs = await pdfLib(); const pdf = await pdfjs.getDocument({ data: new Uint8Array(buf).slice() }).promise;
         hdT('decode', 'pdf', pdf.numPages + ' pages — reading the pixels of each');
-        const R = await hdRead(); const o = await R.ocrPdf(pdf, { maxPages: 20, onProgress: p => { this.setState({ busy: 'Reading page ' + p.page + ' of ' + p.of + '…' }); hdT('decode', 'ocr', 'Page ' + p.page + ' of ' + p.of + ' — reading the pixels'); } });
-        text = (o && o.text) || '';
+        const onProgress = p => { this.setState({ busy: 'Reading page ' + p.page + ' of ' + p.of + '…' }); hdT('eyes', 'page', 'Page ' + p.page + ' of ' + p.of + ' — the eyes are looking'); };
+        const chosen = Array.isArray(this.state.eyes) && this.state.eyes.length ? this.state.eyes : null;
+        let m = null; try { m = await hdEyesForPdf(pdf, { maxPages: 20, scale: 2, onProgress, eyes: chosen }); } catch (e) { hdT('eyes', 'fail', 'The eyes could not read the pages (' + (e && e.message || e) + '); falling back to flat OCR'); }
+        if (m && m.text.trim()) { text = m.text; await idbPut('ocr:' + id, m.overlayModels).catch(() => {}); await idbPut('eyes:' + id, { eyes: m.eyes, pageEntries: m.pageEntries, layers: m.layers }).catch(() => {});
+          patch.eyes = m.summary; hdT('eyes', 'done', 'Positioned ' + m.overlayModels.reduce((a, p) => a + p.elements.length, 0) + ' text regions across ' + m.count + ' pages — the overlay can click them'); }
+        else { const R = await hdRead(); const o = await R.ocrPdf(pdf, { maxPages: 20, onProgress }); text = (o && o.text) || ''; }
       } else {
         let bmp = null;
         const du = (this._html && this._html['img:' + id]) || (typeof HD_PENDING_IMG !== 'undefined' && HD_PENDING_IMG['img:' + d.title]);
@@ -5320,12 +5409,35 @@ class Component extends DCLogic {
       }
       const n = (String(text).match(/\S+/g) || []).length;
       if (!n) { hdT('decode', 'done', 'No text could be read from it'); this.setState({ busy: '', note: 'Still couldn’t read any text from “' + d.title + '” — it may be a photo with no text, or too low-resolution.' }); return; }
-      this.replaceAddedDoc(id, { text, note: 'Processed: read ' + n + ' words from the pixels (visual model + OCR). A machine reading, not the document’s own words.', needsRead: undefined, measured: true });
+      this.replaceAddedDoc(id, { ...patch, text, note: 'Processed: read ' + n + ' words from the pixels (the eyes: ' + ((patch.eyes && patch.eyes.eyes) || ['model']).join(' · ') + '). A machine reading, not the document’s own words.', needsRead: undefined, measured: true });
       this._key = null; this._ix = null; this._db = null; this._gi = null;
       hdT('activation', 'done', 'Read “' + hdCut(d.title, 40) + '” — ' + n + ' words folded into the reading');
       this.setState({ busy: '', note: 'Read “' + d.title + '” — ' + n + ' words from the pixels.', htmlVer: (this.state.htmlVer || 0) + 1 });
     } catch (e) { hdT('decode', 'fail', 'Couldn’t process it: ' + (e && e.message || e)); this.setState({ busy: '', note: 'Couldn’t process it: ' + (e && e.message || e) }); }
     finally { T.done = true; T.ms = performance.now() - T.t0; HD_TR = null; }
+  }
+  // The eyes a source offers, and which of them are switched on. The selection lives in
+  // state.eyes (null = the sensed default); a click toggles one, never all-or-nothing. The note
+  // says what the eyes actually did last time (chosen per page, a watermark layer, disagreements).
+  eyesCard(d) {
+    const ran = (d.eyes && d.eyes.eyes) || null;
+    const sel = Array.isArray(this.state.eyes) && this.state.eyes.length ? this.state.eyes : (ran || ['model']);
+    const rows = HD_EYES.map(e => ({ ...e, on: sel.includes(e.id), onToggle: () => this.toggleEye(e.id, d) }));
+    let note = 'Not read by the eyes yet — switch on the eyes you want, then read the pixels.';
+    if (d.eyes) {
+      const chosen = Object.entries(d.eyes.chosen || {}).map(([e, n]) => n + '× ' + ((HD_EYES.find(x => x.id === e) || {}).label || e)).join(', ') || 'nothing landed';
+      note = 'Read by ' + (d.eyes.eyes || []).map(e => (HD_EYES.find(x => x.id === e) || {}).label || e).join(' · ') + ' over ' + plural(d.eyes.pages || 0, 'page') + ': ' + chosen + '.';
+      if (d.eyes.watermarkPages) note += ' A watermark layer (a large faint wash) was measured on ' + plural(d.eyes.watermarkPages, 'page') + '.';
+      if (d.eyes.disagreements) note += ' ' + plural(d.eyes.disagreements, 'disagreement') + ' between the eyes kept as witnesses, not merged away.';
+    }
+    return { rows, note };
+  }
+  toggleEye(id, d) {
+    const ran = (d && d.eyes && d.eyes.eyes) || null;
+    const base = Array.isArray(this.state.eyes) && this.state.eyes.length ? this.state.eyes : (ran || ['model']);
+    const next = base.includes(id) ? base.filter(x => x !== id) : [...base, id];
+    if (!next.length) { this.toast('At least one eye stays on.'); return; }
+    this.setState({ eyes: next });
   }
   replaceAddedDoc(id, patch) {
     const cid = this.corpusId();
@@ -6417,8 +6529,10 @@ class Component extends DCLogic {
     if (!buf) { el.innerHTML = '<p style="color:var(--mut)">The original PDF isn’t stored in this browser, so only its text can be shown — switch to “Text only”.</p>'; return; }
     try {
       const pdfjs = await pdfLib(); const pdf = await pdfjs.getDocument({ data: new Uint8Array(buf).slice() }).promise;
+      let ocr = null; try { ocr = await idbGet('ocr:' + d.id); } catch (e) {}
       if (this._rKey !== key) return; el.innerHTML = ''; this._ptr = { S: 0, M: 0 }; let off = 0; const W = Math.min(el.clientWidth || 760, 900);
       const mctx = document.createElement('canvas').getContext('2d');
+      const ocrPage = new Map(); if (ocr && ocr.length) { let o = 0; ocr.forEach(p => { ocrPage.set(p.page, { p, start: o }); o += p.text.length + 2; }); }
       for (let i = 1; i <= Math.min(pdf.numPages, PDF_MAX_PAGES); i++) {
         if (this._rKey !== key) return;
         const page = await pdf.getPage(i); const v1 = page.getViewport({ scale: 1 }); const scale = W / v1.width; const vp = page.getViewport({ scale }); const dpr = window.devicePixelRatio || 1;
@@ -6427,6 +6541,19 @@ class Component extends DCLogic {
         const layer = document.createElement('div'); layer.style.cssText = 'position:absolute;inset:0;line-height:1';
         wrap.appendChild(cv); wrap.appendChild(layer); el.appendChild(wrap);
         await page.render({ canvasContext: cv.getContext('2d'), viewport: page.getViewport({ scale: scale * dpr }) }).promise;
+        // A scanned page has no PDF text layer: its overlay is the image→HTML model read at ingest —
+        // each text region becomes a transparent, positioned span, grounded to d.text by the model's
+        // own offsets (the pages joined by '\n\n'), so a statement on the page is clickable.
+        if (ocrPage.has(i)) {
+          const rec = ocrPage.get(i); const k = vp.width / rec.p.width;
+          for (const e of rec.p.elements) {
+            const r = e.region; const hh = r[3] * k, ww = r[2] * k;
+            const sp = document.createElement('span'); sp.style.cssText = 'position:absolute;left:' + (r[0] * k) + 'px;top:' + (r[1] * k) + 'px;font:' + hh + 'px sans-serif;white-space:pre;color:transparent;transform-origin:0 0';
+            mctx.font = hh + 'px sans-serif'; const nat = mctx.measureText(e.text).width || 1; if (ww > 0) sp.style.transform = 'scaleX(' + (ww / nat) + ')';
+            const fr = this.makeFrag(e.text, rec.start + e.start, R, true, A); if (fr) sp.appendChild(fr); else sp.textContent = e.text; layer.appendChild(sp);
+          }
+          continue;
+        }
         const tc = await page.getTextContent();
         for (const it of tc.items) {
           const s = off; off += (it.str || '').length + 1; if (!it.str || !it.str.trim()) continue;
@@ -6607,7 +6734,7 @@ class Component extends DCLogic {
     // The image's own bytes go to IndexedDB (as a blob), not localStorage: the sidecar kept on the
     // doc is only the addressable model (elements/tokens/gaps/text), never the pixels or the raw
     // tree, so a page of images cannot blow the workspace quota.
-    try { const slim = {}; for (const cid in added) slim[cid] = (added[cid] || []).map(d => { if (!d.screen) return d; const { model, ...sc } = d.screen; return { ...d, screen: sc }; }); localStorage.setItem('fold-explorer-added', JSON.stringify(slim)); } catch (e) {}
+    try { const slim = {}; for (const cid in added) slim[cid] = (added[cid] || []).map(d => { let x = d; if (d.ocr || d.eyesDetail) { const { ocr, eyesDetail, ...r } = d; x = r; } if (d.screen) { const { model, ...sc } = d.screen; x = { ...x, screen: sc }; } return x; }); localStorage.setItem('fold-explorer-added', JSON.stringify(slim)); } catch (e) {}
   }
   // The Notebook is kept two ways from the same conversation: a real .ipynb you can download, and a plain
   // log kept as a source in this workspace, so what happened in the notebook can be read and asked about.
@@ -6708,7 +6835,7 @@ class Component extends DCLogic {
       // carries it too (the faithful capture keeps <meta>), so whoSays can name the author or publisher.
       let aut = x.authors || null, pub = x.published || null, pl = x.pubLabel || null, pu = x.publisher || null;
       if (!aut && !pub && _HDR && x.html && /^(html|page)$/i.test(x.format || '')) { try { const m = _HDR.metaOf(new DOMParser().parseFromString(x.html, 'text/html')); aut = m.authors; pub = m.published; pl = m.pubLabel; pu = m.publisher; } catch (e) {} }
-      return { ...(typeof x.text === 'string' && (!x.format || x.format === 'text') && !x.html && !x.extra?.media ? { overviewReceivedText: x.text } : {}), id: 'u' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), title: x.title || 'Untitled', year: x.year || null, type: x.type || 'Text', format: x.format || 'text', hasHtml: !!x.html, url: x.url || null, pages: x.pages || null, ...(x.extra || {}), measured: !!x.measured, text: x.format === 'pdf' ? (x.text || '') : x.html ? pageText(x.html, x.format).slice(0, 60000) : (x.text || ''), ...(aut && aut.length ? { authors: aut } : {}), ...(pub ? { published: pub } : {}), ...(pl ? { pubLabel: pl } : {}), ...(pu ? { publisher: pu } : {}), ...(x.challenge ? { challenge: x.challenge } : {}), ...(x.anchor ? { anchor: x.anchor } : {}), ...(x.rateLimited ? { rateLimited: x.rateLimited } : {}) }; });
+      return { ...(typeof x.text === 'string' && (!x.format || x.format === 'text') && !x.html && !x.extra?.media ? { overviewReceivedText: x.text } : {}), id: 'u' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), title: x.title || 'Untitled', year: x.year || null, type: x.type || 'Text', format: x.format || 'text', hasHtml: !!x.html, url: x.url || null, pages: x.pages || null, ...(x.extra || {}), measured: !!x.measured, text: x.format === 'pdf' ? (x.text || '') : x.html ? pageText(x.html, x.format).slice(0, 60000) : (x.text || ''), ...(aut && aut.length ? { authors: aut } : {}), ...(pub ? { published: pub } : {}), ...(pl ? { pubLabel: pl } : {}), ...(pu ? { publisher: pu } : {}), ...(x.challenge ? { challenge: x.challenge } : {}), ...(x.anchor ? { anchor: x.anchor } : {}), ...(x.eyes ? { eyes: x.eyes } : {}), ...(x.rateLimited ? { rateLimited: x.rateLimited } : {}) }; });
     // The hang (holodeck-hang.js): which lens reveals the most meaning here, measured per doc, never assumed.
     // Directions in localStorage hd:hang-directions can prefer one hang over another; every flip is logged.
     try {
@@ -6727,7 +6854,7 @@ class Component extends DCLogic {
     // with no readable text still stays uncounted — isLiveDoc, below — so a blocked link is not counted either.)
     nd.forEach(d => { d.status = 'source'; });
     if (!(T.focus instanceof Set)) T.focus = new Set(T.focus || []); nd.forEach(d => T.focus.add(d.id)); nd.forEach(d => hdT('store', 'mint', 'Stored \u201c' + hdCut(d.title, 60) + '\u201d as ' + d.id + (list[nd.indexOf(d)].html ? ' \u00b7 full page kept; ' + d.text.length.toLocaleString() + ' characters indexed for search' + (d.text.length >= 60000 ? ' (the cap; the reading below uses the whole page)' : '') : ' \u00b7 ' + d.text.length.toLocaleString() + ' characters kept'), { doc: d.id }));
-    nd.forEach((d, i) => { const x = list[i]; if (x.html) { this._html[d.id] = x.html; idbPut('html:' + d.id, x.html).catch(() => {}); } if (x.pdf) idbPut('pdf:' + d.id, x.pdf).catch(() => {}); if (x.buf) idbPut('media:' + d.id, x.buf).catch(() => {}); if (d.hasImg && HD_PENDING_IMG['img:' + d.title]) { const u = HD_PENDING_IMG['img:' + d.title]; this._html['img:' + d.id] = u; idbPut('img:' + d.id, u).catch(() => {}); delete HD_PENDING_IMG['img:' + d.title]; } });
+    nd.forEach((d, i) => { const x = list[i]; if (x.html) { this._html[d.id] = x.html; idbPut('html:' + d.id, x.html).catch(() => {}); } if (x.pdf) idbPut('pdf:' + d.id, x.pdf).catch(() => {}); if (x.ocr) idbPut('ocr:' + d.id, x.ocr).catch(() => {}); if (x.eyesDetail) idbPut('eyes:' + d.id, x.eyesDetail).catch(() => {}); if (x.buf) idbPut('media:' + d.id, x.buf).catch(() => {}); if (d.hasImg && HD_PENDING_IMG['img:' + d.title]) { const u = HD_PENDING_IMG['img:' + d.title]; this._html['img:' + d.id] = u; idbPut('img:' + d.id, u).catch(() => {}); delete HD_PENDING_IMG['img:' + d.title]; } });
     // Store first, then paint: each source lands in the workspace (and its bytes in IndexedDB) before the read and
     // the fold, so Sources fills in as the files arrive instead of freezing until the whole batch is done.
     const added = { ...this.state.added, [id]: [...(this.state.added[id] || []), ...nd] };
@@ -7083,7 +7210,7 @@ class Component extends DCLogic {
       const badges = [...(d.medium ? [{ label: d.medium === 'Video' || d.medium === 'Audio' ? d.medium + (d.transcribed ? ' · machine transcript' : ' · not transcribed') : d.medium, color: MEDIUM_C[d.medium] || 'var(--mut)' }] : []), ...(d.standing ? [{ label: d.standing, color: STANDING_C[d.standing] || 'var(--mut)' }] : []), ...((d.recordings || []).map(r => ({ label: 'Video linked · not transcribed', color: 'var(--date)' }))), ...(d.sameAs ? [{ label: 'Same bytes as ' + short(d.sameAsTitle || '', 36), color: 'var(--amber)' }] : []), ...(d.custodyStatus && d.custodyStatus !== 'captured' ? [{ label: d.custody, color: /missing|failed|not-located|no-text/.test(d.custodyStatus) ? 'var(--bad)' : 'var(--amber)' }] : [])];
       const vid = !!(d.media && d.media.kind === 'youtube');
       const tr = this.traceFor(d.id);
-      return { ...c, op: 1, isVid: vid, noVid: !vid, thumbBg: vid ? 'url(https://i.ytimg.com/vi/' + d.media.id + '/hqdefault.jpg)' : 'none', readLabel: 'Open source', ...(vid ? { onSelect: () => this.read(d.id) } : {}), badges, hasBadges: badges.length > 0, hasDistinct: !!dd, distinct: dd ? dd.label + ' · ' + pct(dd.a) + ' of its statements vs ' + pct(dd.b) + ' elsewhere' : '', hasFold: this._fold.length > 0, fold: inF + ' of ' + all.length + ' statements touch the topic', stats: (narrowed ? ((FbyDoc[d.id] || []).length).toLocaleString() + ' of ' + plural(all.length, 'statement') + ' in this selection' : plural(all.length, 'statement')) + ' · ' + plural(nm.size, 'name'), isSeen: m.status === 'seen', isKept: m.status !== 'seen', hasReplay: !!tr, onReplay: () => tr && import(new URL('holodeck-ingest-player.js', location.href).href).then(M => M.open(tr)), canUnkeep: m.status !== 'seen' && !this.baseDocs(this.corpusId()).some(x => x.id === d.id), needsRead: !!d.needsRead, onProcess: () => this.processRead(d.id), canProcess: !!(d.type === 'Image' || d.type === 'PDF' || d.format === 'pdf' || d.pdf || d.hasImg), canTranscribe: !!((d.medium === 'Audio' || d.medium === 'Video' || d.type === 'Audio' || d.type === 'Video') && !d.transcribed), onTranscribe: () => this.transcribeLocal(d), cardStyle: 'border-color:' + (c.bd || 'var(--line)') + ';opacity:' + ((S.solo && S.solo.length && !S.solo.includes(d.id)) ? '0.28' : '1') + ';transition:opacity .25s ease', soloOn: !!(S.solo && S.solo.includes(d.id)), soloLabel: (S.solo && S.solo.includes(d.id)) ? 'Showing only this source' : 'Only this source', onSolo: () => this.setState(s => { const cur = Array.isArray(s.solo) ? s.solo : []; return { solo: cur.includes(d.id) ? cur.filter(x => x !== d.id) : [...cur, d.id] }; }),
+      return { ...c, op: 1, isVid: vid, noVid: !vid, thumbBg: vid ? 'url(https://i.ytimg.com/vi/' + d.media.id + '/hqdefault.jpg)' : 'none', readLabel: 'Open source', ...(vid ? { onSelect: () => this.read(d.id) } : {}), badges, hasBadges: badges.length > 0, hasDistinct: !!dd, distinct: dd ? dd.label + ' · ' + pct(dd.a) + ' of its statements vs ' + pct(dd.b) + ' elsewhere' : '', hasFold: this._fold.length > 0, fold: inF + ' of ' + all.length + ' statements touch the topic', stats: (narrowed ? ((FbyDoc[d.id] || []).length).toLocaleString() + ' of ' + plural(all.length, 'statement') + ' in this selection' : plural(all.length, 'statement')) + ' · ' + plural(nm.size, 'name'), isSeen: m.status === 'seen', isKept: m.status !== 'seen', hasReplay: !!tr, onReplay: () => tr && import(new URL('holodeck-ingest-player.js', location.href).href).then(M => M.open(tr)), canUnkeep: m.status !== 'seen' && !this.baseDocs(this.corpusId()).some(x => x.id === d.id), needsRead: !!d.needsRead, onProcess: () => this.processRead(d.id), canProcess: !!(d.type === 'Image' || d.type === 'PDF' || d.format === 'pdf' || d.pdf || d.hasImg), ...(() => { const ec = (d.type === 'Image' || d.type === 'PDF' || d.format === 'pdf' || d.pdf || d.hasImg) ? this.eyesCard(d) : null; return { hasEyes: !!ec, eyesRows: ec ? ec.rows : [], eyesNote: ec ? ec.note : '' }; })(), canTranscribe: !!((d.medium === 'Audio' || d.medium === 'Video' || d.type === 'Audio' || d.type === 'Video') && !d.transcribed), onTranscribe: () => this.transcribeLocal(d), cardStyle: 'border-color:' + (c.bd || 'var(--line)') + ';opacity:' + ((S.solo && S.solo.length && !S.solo.includes(d.id)) ? '0.28' : '1') + ';transition:opacity .25s ease', soloOn: !!(S.solo && S.solo.includes(d.id)), soloLabel: (S.solo && S.solo.includes(d.id)) ? 'Showing only this source' : 'Only this source', onSolo: () => this.setState(s => { const cur = Array.isArray(s.solo) ? s.solo : []; return { solo: cur.includes(d.id) ? cur.filter(x => x !== d.id) : [...cur, d.id] }; }),
         ...(() => { const on = this._inf[d.id] || null;
           return { originText: on ? on.why + ' ' + short(A.docById[on.of].title, 40) : 'Independent · shares no claims or outlet with another source', originDep: !!on, originCol: on ? 'var(--amber)' : 'var(--mut)' }; })(),
         drawsX: 0, drawOptions: drawOpts,

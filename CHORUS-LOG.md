@@ -123,3 +123,15 @@ fast: 2 files · 5 affected tests pass · law: ok
 | Holmes | holodeck-trace.js:32 | the-fold/holodeck-trace.js | fixed | observed vs withheld participants kept distinct; absent perspective rendered absent, never invented |
 | Simon/Chekhov | holodeck-trace.js | the-fold/holodeck-trace.js | fixed | imported by holodeck-trace.test.mjs (5/5) |
 clean: Feynman, Frankfurt, Kondo, Lévi-Strauss, Ostrom, Pearl, Greenberg, Alexander (routed, nothing to report)
+
+## 2026-10-07 — extraction eyes: three witnesses, a per-page reconciliation, and the pixel layer stack (main, eyes)
+fast: 5 files · 9 tests pass · law: ok
+| lens | citation | file:line | verdict | one line |
+| Dijkstra | coverage scored with a Latin range | holodeck-eyes.js:138 | fixed | `cov` now counts `\p{L}\p{N}` in any script, so a CJK/Arabic page is never scored empty; a CJK case pins it |
+| Simon/Chekhov | a new module no test imports | holodeck-eyes.test.mjs | fixed | holodeck-eyes / screen-core / screen are now imported by a real test (9 pins: layers, reconciliation, sensing, trails, contentOf, dominant) |
+| Feynman | declared thresholds, no measured golden | holodeck-eyes.js:103 | noted | RECONCILE_MARGIN, watermarkAlpha/Extent, foreground, sense bias 1.2 and the 40-char escalation floor are DECLARED initial settings with a stated basis, not calibrated against a corpus — disclosed here as such |
+| Kondo | a stored detail nothing reads yet | index.html:4294 | noted | `eyes:<id>` (per-page witnesses, layer rows) is written to idb for the coming layers panel; nascent, not dead |
+| Frankfurt | a duplicated eye registry | index.html:2904 | noted | HD_EYES mirrors holodeck-eyes.js so the card can name the eyes before the module loads; the module is the source of truth and hdEyesForPdf labels from it |
+| Diaconis | a measurement was touched | index.html:6838 | clean | the normalized doc now carries the eyes summary (pages/chosen/watermark/disagreements); the counts are the reconciliation's own, no null invented |
+| Alexander | the composition seam | holodeck-screen.js:61 | clean | contentOf → reconcile → overlay cohere; the overlay only carries pages the model won (one page in, one out), pinned by test |
+clean: none (all seven routed lenses reported above; Marshall not routed — no law edited or cited)

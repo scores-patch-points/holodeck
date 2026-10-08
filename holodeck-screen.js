@@ -39,11 +39,13 @@ export async function readScreenImage(img, opts = {}) {
   const cx = cv.getContext('2d', { willReadFrequently: true }); cx.drawImage(img, 0, 0, W, H);
   const { data } = cx.getImageData(0, 0, W, H);
   tr('screen', 'decode', 'Decoded ' + W + ' × ' + H + ' pixels for the 2D model', { w: W, h: H });
-  let words = [];
+  let words = [], raw = '';
   try {
     const T = await loadTess(opts.tessSrc); tr('screen', 'ocr', 'Reading the image’s word boxes with tesseract');
     const r = await T.recognize(cv, 'eng', { logger: m => { if (opts.onProgress && m && m.status) opts.onProgress(m); } });
-    words = wordsFromTess((r && r.data) || {});
+    const data = (r && r.data) || {};
+    words = wordsFromTess(data);
+    raw = String(data.text || '').replace(/\s+\n/g, '\n').trim();
     tr('screen', 'ocr', 'Tesseract returned ' + words.length + ' word boxes', { words: words.length });
   } catch (e) { tr('screen', 'ocr-fail', 'No word boxes (OCR did not run: ' + e.message + ')'); }
   const model = buildScreenModel({ width: W, height: H, data }, words, opts.core || {});
@@ -53,7 +55,24 @@ export async function readScreenImage(img, opts = {}) {
   const gaps = gapsOf({ lines: wordsToLines(words), report: {} }, model, 1);
   const text = readingTextOf({ width: W, height: H, unit: model.unit, root: model.root, stats: model.stats, tokens, elements, source: {} }, {});
   const ledger = ledgerLinesOf({ source: { name: opts.name || 'image' }, elements }, { image: opts.name || 'image' });
-  return { schema: 'EOScreenLook@1', width: W, height: H, unit: model.unit, model, elements, tokens, gaps, text, ledger, words: words.length };
+  return { schema: 'EOScreenLook@1', width: W, height: H, unit: model.unit, model, elements, tokens, gaps, text, ledger, raw, words: words.length };
+}
+
+/** The page's CONTENT from the measured model: its text nodes in reading order, each with the
+ *  region [x,y,w,h] it was read from, and the page text they compose with each element's
+ *  [start,end) into it. `screen.text` is the LAYOUT reading ("Looking at the image…"); this is the
+ *  words themselves, positioned — what an overlay anchors to. Offsets are the model's own, so a
+ *  caller that builds the document text the same way (elements joined by '\n') can slice it. */
+export function contentOf(screen) {
+  const els = (screen.elements || []).filter(e => e.type === 'text' && e.text && e.text.trim() && e.region)
+    .slice().sort((a, b) => a.region[1] - b.region[1] || a.region[0] - b.region[0]);
+  let text = ''; const out = [];
+  for (const e of els) {
+    const t = e.text.trim(); if (text) text += '\n';
+    const start = text.length; out.push({ id: e.id, role: e.role, region: e.region, text: t, start, end: start + t.length });
+    text += t;
+  }
+  return { text, elements: out, width: screen.width, height: screen.height };
 }
 
 // OCR words → the line shape gapsOf expects (a line per distinct OCR line index is overkill here;
