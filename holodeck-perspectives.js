@@ -79,7 +79,7 @@ const HD_ACCOUNT = (() => {
   } catch (e) {}
   return 'scores-patch-points';
 })();
-const LP_RAW = 'https://raw.githubusercontent.com/' + HD_ACCOUNT + '/ethos/main/';
+const LP_RAW = 'https://raw.githubusercontent.com/' + HD_ACCOUNT + '/Zenodotus/main/';
 
 // Received closed classes (priors.js, lang/en — every entry names its
 // giver). A sentence-initial capital carries no evidence of a name (the

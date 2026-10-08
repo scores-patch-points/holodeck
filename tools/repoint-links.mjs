@@ -11,7 +11,7 @@
 //   --set-account=<name>   also write it into fold-workspace.json (and move the
 //                          current account into legacy-accounts)
 //   --dirs                 also rewrite sibling dir prefixes (../eoreader7/→../khora/,
-//                          ../live_priors/→../ethos/); OFF (publish-time step)
+//                          ../live_priors/→../Zenodotus/); OFF (publish-time step)
 import fs from "node:fs";
 import path from "node:path";
 import { ACCOUNT, LEGACY, MIGRATING, RENAME, TEXT_EXT, isSkippedFile, repos, trackedFiles, transformLinks, declaration, DECL_PATH } from "./fold-account.mjs";
@@ -37,7 +37,7 @@ const decide = (org, repo) => {
 
 const DIR_RENAMES = [
   [/(^|[^A-Za-z0-9_.-])(?:\.\.\/)+eoreader7\//g, "$1../khora/"],
-  [/(^|[^A-Za-z0-9_.-])(?:\.\.\/)+live_priors\//g, "$1../ethos/"],
+  [/(^|[^A-Za-z0-9_.-])(?:\.\.\/)+live_priors\//g, "$1../Zenodotus/"],
 ];
 
 const changedLines = (a, b) => { const A = a.split("\n"), B = b.split("\n"); let n = 0; for (let i = 0; i < Math.max(A.length, B.length); i++) if (A[i] !== B[i]) n++; return n; };
