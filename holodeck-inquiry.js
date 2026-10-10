@@ -201,6 +201,16 @@ export function answerFromFold({
   const contests = detectContests(edges);
   emit({ stage: 'falsify', contests: contests.length });
 
+  // ── The §12 outcome, as one typed status: what the interface may show in one
+  // word. `from-the-fold` (answered from local evidence), `contested` (the
+  // material supports incompatible readings, §1.5), `freshness` (a current
+  // source is required, §9), or `unresolved` (a gap, answered onward). The
+  // disposition stays as the finer record; status is its displayable face.
+  const fresh = asksFreshness(asking);
+  const status = answer
+    ? (contests.length ? 'contested' : 'from-the-fold')
+    : (fresh ? 'freshness' : 'unresolved');
+
   // ── Stage F — DECIDE. An exact local answer is a complete disposition; a
   // missing one is a typed gap, never an automatic external search (§9). The
   // gap type distinguishes "the question needed more than the exact doors give"
@@ -287,6 +297,7 @@ export function answerFromFold({
     inquiries: Object.freeze(answer ? [] : [planNextEncounter({ gap: gaps[0] ?? null, question: asking, privacy, capabilities: { localRead: true, web: false, model: false, modelRequired: false } })]),
     answer,
     disposition,
+    status,
     resources: Object.freeze({ modelCalls: 0, externalRequests: 0, ms: Date.now() - startedAt }),
     events: Object.freeze(events),
   });
@@ -375,11 +386,13 @@ function toHyperedge(e) {
 /** renderInquiry(inquiry) -> one plain line of what happened, for the interface
  *  (§12's unobtrusive indicator). Never a dashboard. */
 export function renderInquiry(inquiry) {
-  const q = inquiry?.question ?? '';
   if (!inquiry || inquiry.schema !== INQUIRY_SCHEMA) return { line: 'Unresolved.', detail: 'no fold inquiry was recorded' };
-  if (inquiry.answer) return { line: `From the Fold — ${inquiry.answer.kind}.`, detail: inquiry.answer.text };
-  const g = inquiry.gaps?.[0];
-  return { line: 'Unresolved — answered onward to the mouth.', detail: g ? `${g.type}: ${g.detail}` : '' };
+  switch (inquiry.status) {
+    case 'from-the-fold': return { line: `From the Fold — ${inquiry.answer.kind}.`, detail: inquiry.answer.text };
+    case 'contested': return { line: 'Contested — the material supports incompatible readings.', detail: (inquiry.contests || []).map((c) => `${c.positive.length} vs ${c.negative.length}`).join('; ') };
+    case 'freshness': return { line: 'Unresolved — needs a current source.', detail: inquiry.inquiries?.[0]?.declined?.detail ?? '' };
+    default: { const g = inquiry.gaps?.[0]; return { line: 'Unresolved — answered onward to the mouth.', detail: g ? `${g.type}: ${g.detail}` : '' }; }
+  }
 }
 
 /**

@@ -162,6 +162,16 @@ test('FALSIFIER — same pair, same polarity is NOT a contest (no phantom confli
   assert.deepEqual([...inq.contests], []);
 });
 
+test('§12 status is typed: from-the-fold / contested / freshness / unresolved', () => {
+  const ans = answerFromFold({ question: 'Fill in the blank: "The capital of France is ______."', passages: PASSAGES });
+  assert.equal(ans.status, 'from-the-fold');
+  const contested = answerFromFold({ question: 'Fill in the blank: "The capital of France is ______."', passages: PASSAGES, edges: [F('e1', 'Alice', 'supports', 'x', '+', 'd#1-2'), F('e2', 'Alice', 'supports', 'x', '-', 'd#3-4')] });
+  assert.equal(contested.status, 'contested');
+  assert.match(renderInquiry(contested).line, /Contested/);
+  assert.equal(answerFromFold({ question: 'Who is the current mayor of Nashville?', passages: PASSAGES }).status, 'freshness');
+  assert.equal(answerFromFold({ question: 'Explain why the capital of France matters.', passages: PASSAGES }).status, 'unresolved');
+});
+
 test('standing is typed by door, and renderInquiry says what happened in one line', () => {
   assert.equal(standingForDoor('comparison'), 'derived');
   assert.equal(standingForDoor('cloze'), 'witnessed');
