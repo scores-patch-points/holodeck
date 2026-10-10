@@ -223,9 +223,10 @@ export function answerFromFold({
   // source is required, §9), or `unresolved` (a gap, answered onward). The
   // disposition stays as the finer record; status is its displayable face.
   const fresh = asksFreshness(asking);
-  const status = answer
-    ? (contests.length ? 'contested' : 'from-the-fold')
-    : (fresh ? 'freshness' : 'unresolved');
+  // Contested trumps: incompatible readings are the surface outcome whether or
+  // not an exact door also answered (§12 "Contested: surviving evidence
+  // supports incompatible interpretations").
+  const status = contests.length ? 'contested' : (answer ? 'from-the-fold' : (fresh ? 'freshness' : 'unresolved'));
 
   // ── Stage F — DECIDE. An exact local answer is a complete disposition; a
   // missing one is a typed gap, never an automatic external search (§9). The
