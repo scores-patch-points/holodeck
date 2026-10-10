@@ -202,6 +202,15 @@ export function answerFromFold({
   const hyperEdges = (Array.isArray(edges) ? edges : []).map(toHyperedge).filter(Boolean);
   let derivations = [];
   let derivation = null;
+  // ── Stage E (contradiction), computed BEFORE derivation so the licensing
+  // wall can see it: where two witnessed edges assert the SAME referent pair
+  // with OPPOSITE polarity, the material contradicts itself (§8/§14). The
+  // contest is PRESERVED — both sides and their addresses kept, neither is
+  // chosen, and nothing here decides which is true.
+  const contests = detectContests(edges);
+  const contestedPairs = new Set();
+  for (const c of contests) for (const x of [...(c.positive ?? []), ...(c.negative ?? [])]) contestedPairs.add(pairKey(x.from, x.to));
+  emit({ stage: 'falsify', contests: contests.length });
   if (hyperEdges.length) {
     let chains = [], wall = { licensed: [], withheld: [] };
     try { chains = relationCompositionChains(hyperEdges); } catch { chains = []; }
@@ -220,6 +229,14 @@ export function answerFromFold({
     const licensedFor = (c) => wall.licensed.find((l) => l.leftPredicate === c.leftEdge.relation && l.rightPredicate === c.rightEdge.relation && l.from === c.from && l.bridge === c.bridge && l.to === c.to) ?? null;
     derivations = chains.map((c) => {
       const lic = licensedFor(c);
+      // §8/§16.5 IN THIS RUNG — dependent invalidation: a premise that
+      // participates in a material contest is not a sound base, so the
+      // dependent composition is WITHDRAWN even when a GIVEN affordance would
+      // license it (a disputed premise never stays asserted). Withdrawal is a
+      // disposition, never a deletion — premises and addresses remain on the
+      // record, and a later uncontested reading can re-open them.
+      const disputed = [pairKey(c.from, c.bridge), pairKey(c.bridge, c.to)].some((k) => contestedPairs.has(k));
+      const standing = disputed ? 'withdrawn' : (lic ? 'licensed' : 'withheld');
       return Object.freeze({
         schema: 'DerivedCandidate@1',
         from: c.from,
@@ -229,11 +246,14 @@ export function answerFromFold({
         premises: Object.freeze([c.leftEdge.id, c.rightEdge.id]),
         witnesses: Object.freeze([]),               // stated nowhere — never its own witness
         provenance: Object.freeze([c.leftEdge.witness, c.rightEdge.witness].filter(Boolean)),
-        standing: lic ? 'licensed' : 'withheld',    // licensed only under a GIVEN affordance
+        standing,
+        withdrawnBy: disputed ? 'premise contested in the material (§8)' : null,
         giver: lic ? (lic.provenance?.giver ?? null) : null,
-        basis: lic
-          ? 'witnessed relation adjacency through an earned shared referent, under a GIVEN composition affordance'
-          : 'witnessed relation adjacency through an earned shared referent — unlicensed without a GIVEN composition affordance',
+        basis: disputed
+          ? 'composition withdrawn — one of its premises is asserted with opposite polarity elsewhere in the material; dependents reopen'
+          : lic
+            ? 'witnessed relation adjacency through an earned shared referent, under a GIVEN composition affordance'
+            : 'witnessed relation adjacency through an earned shared referent — unlicensed without a GIVEN composition affordance',
       });
     });
     derivation = Object.freeze({
@@ -242,20 +262,12 @@ export function answerFromFold({
       chains: chains.length,
       licensed: wall.licensed.length,
       withheld: wall.withheld.length,
+      withdrawn: derivations.filter((d) => d.standing === 'withdrawn').length,
       givers: Object.freeze([...new Set(wall.licensed.map((l) => l.provenance?.giver).filter(Boolean))]),
       reason: wall.withheld[0]?.reason ?? null,
     });
   }
   emit({ stage: 'derive', chains: derivation?.chains ?? 0, withheld: derivation?.withheld ?? 0 });
-
-  // ── Stage E (contradiction). Where two witnessed edges assert the SAME
-  // referent pair with OPPOSITE polarity, the material contradicts itself. The
-  // inquiry PRESERVES the contest — both edges and their addresses are kept,
-  // neither is chosen (§8: preserve competing interpretations where neither has
-  // been refuted; §14: contradictory witnesses are investigated, not resolved
-  // by picking the stronger prose). Nothing here decides which is true.
-  const contests = detectContests(edges);
-  emit({ stage: 'falsify', contests: contests.length });
 
   // ── The §12 outcome, as one typed status: what the interface may show in one
   // word. `from-the-fold` (answered from local evidence), `contested` (the
@@ -365,6 +377,7 @@ export function answerFromFold({
 }
 
 const freezeList = (a) => Object.freeze([...(a ?? [])]);
+const pairKey = (a, b) => [String(a ?? '').toLowerCase(), String(b ?? '').toLowerCase()].sort().join('|');
 
 /**
  * toHyperedge(edge) -> EOHyperedge@1 | null

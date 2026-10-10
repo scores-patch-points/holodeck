@@ -126,6 +126,29 @@ test('Stage D → E licenses a composition ONLY under a GIVEN declaration (giver
   assert.deepEqual([...inq.derivation.givers], ['the school']);
 });
 
+test('§8 — a derivative whose premise is contested is WITHDRAWN, never asserted (§16.5, this rung)', () => {
+  const edges = [F('e1', 'A', 'parent', 'B', '+', 'd#1-2'), F('e2', 'A', 'parent', 'B', '-', 'd#3-4'), F('e3', 'B', 'parent', 'C', '+', 'd#5-6')];
+  const inq = answerFromFold({ question: 'Who is connected?', passages: [], edges });
+  assert.equal(inq.contests.length, 1, 'the contradictory pair is preserved');
+  const d = inq.derivations[0];
+  assert.equal(d.standing, 'withdrawn', 'a disputed premise withdraws the dependent');
+  assert.match(d.withdrawnBy, /contested/);
+  assert.equal(inq.derivation.withdrawn, 1);
+});
+
+test('control — an uncontested chain is withheld without a giver and licensed under one', () => {
+  let log = createDeclarationLog();
+  const p = proposeCandidate(log, { kind: 'transitive', rel: 'parent', acquisition: 't', source: 't' });
+  log = promote(p.log, p.id, { giver: 'the school' }).log;
+  const Ego = [F('e1', 'A', 'parent', 'B', '+', 'd#1-2'), F('e3', 'B', 'parent', 'C', '+', 'd#5-6')];
+  const bare = answerFromFold({ question: 'Who is connected?', passages: [], edges: Ego });
+  assert.equal(bare.derivations[0].standing, 'withheld');
+  assert.equal(bare.derivation.withdrawn, 0);
+  const lic = answerFromFold({ question: 'Who is connected?', passages: [], edges: Ego, declarations: log });
+  assert.equal(lic.derivations[0].standing, 'licensed');
+  assert.equal(lic.derivation.withdrawn, 0);
+});
+
 test('no edges means no derivation — never a phantom composition', () => {
   const inq = answerFromFold({ question: 'Fill in the blank: "The capital of France is ______."', passages: PASSAGES });
   assert.equal(inq.derivation, null);
