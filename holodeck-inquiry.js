@@ -284,7 +284,7 @@ export function answerFromFold({
     contests: Object.freeze(contests),
     coverage: Object.freeze({ localSources: activated.distinctSources, passages: activated.passages, complete: null }),
     gaps: Object.freeze(gaps),
-    inquiries: Object.freeze(answer ? [] : [planNextEncounter({ gap: gaps[0] ?? null, privacy, capabilities: { localRead: true, web: false, model: false, modelRequired: false } })]),
+    inquiries: Object.freeze(answer ? [] : [planNextEncounter({ gap: gaps[0] ?? null, question: asking, privacy, capabilities: { localRead: true, web: false, model: false, modelRequired: false } })]),
     answer,
     disposition,
     resources: Object.freeze({ modelCalls: 0, externalRequests: 0, ms: Date.now() - startedAt }),
@@ -399,29 +399,46 @@ export function renderInquiry(inquiry) {
  * outright. A search is never the default procedure; the reason it was declined
  * is recorded on the plan.
  */
-export function planNextEncounter({ gap = null, capabilities = {}, privacy = 'local-first', budget = null } = {}) {
+export function planNextEncounter({ gap = null, question = '', capabilities = {}, privacy = 'local-first', budget = null } = {}) {
   const canWeb = capabilities.web === true;
   const offline = privacy === 'offline-only';
+  const fresh = asksFreshness(question);
+  // §9 step 4: a time-sensitive question needs current primary-source
+  // verification even when the Fold holds an older answer. What it holds is
+  // "correct as of its source date", which is NOT "verified current" (§9). When
+  // freshness is flagged the plan names the need and REQUIRES authorization; it
+  // never silently answers a current-state question from stale material.
+  const method = fresh ? 'retrieve-primary-source' : 'report-gap';
   return Object.freeze({
     schema: 'InquiryPlan@1',
     gap,
+    freshness: fresh,
     alternativesToDiscriminate: Object.freeze([]),
-    expectedObservation: null,
-    wouldChange: null,
-    method: 'report-gap',
+    expectedObservation: fresh ? 'a current primary source stating the present value' : null,
+    wouldChange: fresh ? 'the Fold\'s held value, if it has drifted since its source date' : null,
+    method,
     sourceCandidates: Object.freeze([]),
-    privacyEffect: 'none',
-    authorization: canWeb && !offline ? 'required' : 'not-required',
+    privacyEffect: fresh ? 'egress required to verify currency' : 'none',
+    authorization: (fresh || (canWeb && !offline)) ? 'required' : 'not-required',
     estimatedCost: Object.freeze({ modelCalls: 0, externalRequests: 0, ...(budget != null ? { budget } : {}) }),
-    stopCondition: 'the gap is reported; no retrieval is attempted without a named hypothesis and, for any egress, an authorization that changes the privacy scope',
+    stopCondition: 'no retrieval is attempted without a named need and, for any egress, an authorization that changes the privacy scope',
     result: Object.freeze({ status: 'proposed', ran: false }),
     declined: Object.freeze({
-      reason: offline ? 'offline_only' : (gap ? gap.type : 'no_gap'),
+      reason: offline ? 'offline_only' : fresh ? 'freshness_requires_current_source' : (gap ? gap.type : 'no_gap'),
       detail: offline
         ? 'privacy is offline-only — egress is forbidden; the gap stands'
-        : 'no named hypothesis, freshness requirement, or authorization — a search here would be undirected egress',
+        : fresh
+          ? 'the question is time-sensitive — what the Fold holds is correct as of its source date but is not verified current; a current primary source is required, and egress must be authorized'
+          : 'no named hypothesis, freshness requirement, or authorization — a search here would be undirected egress',
     }),
   });
 }
+
+// The declared freshness signals (§9): words that mark a question as being about
+// the PRESENT state of a changing thing, where an ingested record may be stale.
+// A shape rule over the question, never a threshold, and never a verdict about
+// the material — only that currency must be checked, not assumed.
+const FRESHNESS_RE = /\b(?:current(?:ly)?|right now|these days|as of \d{4}|today|latest|up[- ]to[- ]date|still (?:in office|serves?|holds?|leads?)|who is the (?:current )?(?:mayor|president|vice president|ceo|chair(?:man|woman|person)?|governor|senator|representative|congressman|congresswoman|prime minister|sheriff|district attorney|attorney general|treasurer|clerk|speaker)|new(?:ly)? (?:elected|appointed|installed))\b/i;
+export const asksFreshness = (question) => FRESHNESS_RE.test(String(question ?? ''));
 
 export default { answerFromFold, planNextEncounter, renderInquiry, INQUIRY_SCHEMA, ANSWER_SCHEMA, standingForDoor };

@@ -4,7 +4,7 @@
 // genuinely reject.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { answerFromFold, renderInquiry, standingForDoor, detectContests, INQUIRY_SCHEMA } from './holodeck-inquiry.js';
+import { answerFromFold, renderInquiry, standingForDoor, detectContests, asksFreshness, INQUIRY_SCHEMA } from './holodeck-inquiry.js';
 
 const PASSAGES = [
   { ref: 'doc#0-95', source: 'doc', start: 0, end: 95, text: 'France is a country in Europe. The capital of France is Paris. It has many museums.' },
@@ -112,6 +112,31 @@ test('FALSIFIER — offline-only forbids egress and names why', () => {
   assert.equal(inq.inquiries[0].declined.reason, 'offline_only');
   assert.equal(inq.inquiries[0].estimatedCost.externalRequests, 0);
   assert.equal(inq.resources.externalRequests, 0);
+});
+
+test('Stage F — a time-sensitive question requires current verification, not a stale answer (§9/§14)', () => {
+  assert.equal(asksFreshness('Who is the current mayor of Nashville?'), true);
+  assert.equal(asksFreshness('Explain the treaty of 1815.'), false);
+  const inq = answerFromFold({ question: 'Who is the current mayor of Nashville?', passages: PASSAGES });
+  const p = inq.inquiries[0];
+  assert.equal(p.freshness, true);
+  assert.equal(p.method, 'retrieve-primary-source');
+  assert.equal(p.authorization, 'required');
+  assert.equal(p.declined.reason, 'freshness_requires_current_source');
+  assert.equal(p.result.ran, false);
+  assert.equal(inq.resources.externalRequests, 0);
+});
+
+test('FALSIFIER — offline, a fresh question names the block and egress stays zero', () => {
+  const inq = answerFromFold({ question: 'Who is the current mayor of Nashville?', passages: [], privacy: 'offline-only' });
+  assert.equal(inq.inquiries[0].declined.reason, 'offline_only');
+  assert.equal(inq.resources.externalRequests, 0);
+});
+
+test('a static question is NOT flagged fresh (no phantom currency demand)', () => {
+  const inq = answerFromFold({ question: 'Explain why the capital of France matters.', passages: PASSAGES });
+  assert.equal(inq.inquiries[0].freshness, false);
+  assert.equal(inq.inquiries[0].method, 'report-gap');
 });
 
 test('an answered inquiry proposes nothing — no plan to search for what it already has', () => {
