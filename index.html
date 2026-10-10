@@ -890,10 +890,17 @@ button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visi
                     <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;padding-top:4px">
                       <sc-if value="{{ t.hasNotesLine }}" hint-placeholder-val="{{ false }}"><button onClick="{{ t.onNotesToggle }}" style="background:none;border:0;padding:0;cursor:pointer;font:500 13px var(--sans);color:{{ t.notesOpen ? 'var(--ink2)' : 'var(--dim)' }}" style-hover="color:var(--acc)">{{ t.notesLabel }}</button></sc-if>
                       <sc-if value="{{ t.hasProv }}" hint-placeholder-val="{{ false }}"><span title="What the Fold did before any model" style="font:600 12px var(--mono);color:{{ t.provColor }};white-space:nowrap">{{ t.provLine }}</span></sc-if>
+                      <sc-if value="{{ t.hasInquiry }}" hint-placeholder-val="{{ false }}"><button onClick="{{ t.onInqToggle }}" style="background:none;border:0;padding:0;cursor:pointer;font:500 13px var(--sans);color:{{ t.inqOpen ? 'var(--ink2)' : 'var(--dim)' }}" style-hover="color:var(--acc)">{{ t.inqLabel }}</button></sc-if>
                       <span style="font:500 12px var(--mono);color:var(--dim);flex:1;min-width:0">{{ t.rec }}</span>
                       <sc-if value="{{ t.canGen }}" hint-placeholder-val="{{ false }}"><button onClick="{{ t.onGen }}" title="Turn this answer’s cited passages into a Draft document" style="background:none;border:1px solid var(--line2);border-radius:8px;padding:4px 12px;cursor:pointer;font:500 13px var(--sans);color:var(--acc)" style-hover="border-color:var(--acc)">Generate a document →</button></sc-if>
                     </div>
                     <span style="font:400 12px var(--mono);color:var(--dim)">{{ t.fold }}</span>
+                    <sc-if value="{{ t.inqOpen }}" hint-placeholder-val="{{ false }}">
+                      <div style="margin-top:6px;background:var(--s2);border:1px solid var(--line);border-radius:10px;padding:9px 12px;display:flex;flex-direction:column;gap:3px">
+                        <span style="font:600 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--acc)">The inquiry — what the Fold did before any model</span>
+                        <sc-for list="{{ t.inqLines }}" as="x" hint-placeholder-count="0"><span style="font:400 12px/1.5 var(--mono);color:var(--ink2);text-wrap:pretty">{{ x.l }}</span></sc-for>
+                      </div>
+                    </sc-if>
                   </div>
                 </div>
               </sc-if>
@@ -960,11 +967,18 @@ button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visi
                     <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:10px">
                       <sc-if value="{{ t.hasNotesLine }}" hint-placeholder-val="{{ false }}"><button onClick="{{ t.onNotesToggle }}" style="background:none;border:0;padding:0;cursor:pointer;font:500 13px var(--sans);color:{{ t.notesOpen ? 'var(--ink2)' : 'var(--dim)' }}" style-hover="color:var(--acc)">{{ t.notesLabel }}</button></sc-if>
                       <sc-if value="{{ t.hasProv }}" hint-placeholder-val="{{ false }}"><span title="What the Fold did before any model" style="font:600 12px var(--mono);color:{{ t.provColor }};white-space:nowrap">{{ t.provLine }}</span></sc-if>
+                      <sc-if value="{{ t.hasInquiry }}" hint-placeholder-val="{{ false }}"><button onClick="{{ t.onInqToggle }}" style="background:none;border:0;padding:0;cursor:pointer;font:500 13px var(--sans);color:{{ t.inqOpen ? 'var(--ink2)' : 'var(--dim)' }}" style-hover="color:var(--acc)">{{ t.inqLabel }}</button></sc-if>
                       <span style="font:500 12px var(--mono);color:var(--ink2);flex:1;min-width:0">{{ t.rec }}</span>
                       <sc-if value="{{ t.canGen }}" hint-placeholder-val="{{ false }}"><button onClick="{{ t.onGen }}" title="Turn this answer’s cited passages into a Draft document" style="background:none;border:1px solid var(--line2);border-radius:8px;padding:4px 12px;cursor:pointer;font:500 13px var(--sans);color:var(--acc)" style-hover="border-color:var(--acc)">Generate a document →</button></sc-if>
                     </div>
                     <span style="font:400 12px var(--mono);color:var(--dim)">Folded to: {{ t.fold }}</span>
                     <span style="font:400 12px var(--mono);color:var(--dim)">{{ t.meter }} · {{ t.meta }}</span>
+                    <sc-if value="{{ t.inqOpen }}" hint-placeholder-val="{{ false }}">
+                      <div style="margin-top:6px;background:var(--s2);border:1px solid var(--line);border-radius:10px;padding:9px 12px;display:flex;flex-direction:column;gap:3px">
+                        <span style="font:600 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--acc)">The inquiry — what the Fold did before any model</span>
+                        <sc-for list="{{ t.inqLines }}" as="x" hint-placeholder-count="0"><span style="font:400 12px/1.5 var(--mono);color:var(--ink2);text-wrap:pretty">{{ x.l }}</span></sc-for>
+                      </div>
+                    </sc-if>
                   </section>
                 </div>
               </sc-if>
@@ -5860,6 +5874,20 @@ class Component extends DCLogic {
         rec: 'On record · turn ' + t.n + ' · ' + recBits.join(' · '), fold: t.foldLine, meter: 'Sent ' + t.sentChars.toLocaleString() + ' characters in place of a ' + t.transcriptChars.toLocaleString() + '-character transcript', meta: (t.noModel ? 'the Fold · no model' : t.model) + (t.tokens && t.tokens.secs ? ' · ' + t.tokens.secs.toFixed(1) + ' s' : '') + (t.refresh && !t.refresh.ok && t.refresh.why ? ' · summary kept: ' + short(t.refresh.why, 120) : ''),
         hasProv: !!(t.foldInquiry && t.disposition), provColor: (t.foldInquiry && t.foldInquiry.answer) ? 'var(--acc)' : 'var(--mut)',
         provLine: t.foldInquiry ? (t.foldInquiry.answer ? 'From the Fold · ' + t.foldInquiry.answer.kind + (t.foldInquiry.derivation && t.foldInquiry.derivation.chains ? ' · ' + plural(t.foldInquiry.derivation.chains, 'composition') + ' derived' : '') : 'Unresolved · answered onward to the model') : '',
+        hasInquiry: !!t.foldInquiry, inqOpen: !!(S.akInq && S.akInq[i]), inqLabel: !!(S.akInq && S.akInq[i]) ? 'Hide the inquiry' : 'Inquiry',
+        onInqToggle: () => this.setState(st => ({ akInq: { ...(st.akInq || {}), [i]: !((st.akInq || {})[i]) } })),
+        inqLines: (() => { const fi = t.foldInquiry; if (!fi) return []; const L = [];
+          L.push('Disposition · ' + fi.disposition);
+          L.push('Activated · ' + fi.activated.passages + ' passage(s) from ' + fi.activated.distinctSources + ' source(s)');
+          if (fi.answer) L.push('Answered by · the ' + fi.answer.kind + ' door (' + fi.answer.standing + ') — no model');
+          if (fi.derivation) L.push('Derived · ' + fi.derivation.chains + ' chain(s), ' + fi.derivation.licensed + ' licensed, ' + fi.derivation.withheld + ' withheld (needs a giver)');
+          for (const c of (fi.contests || [])) L.push('Contested · ' + c.positive.map(x => x.from + ' ' + x.label + ' ' + x.to).join(' / ') + '   vs   ' + c.negative.map(x => x.from + ' ' + x.label + ' ' + x.to).join(' / '));
+          for (const g of (fi.gaps || [])) L.push('Gap · ' + g.type + ' — ' + g.detail);
+          for (const p of (fi.inquiries || [])) L.push('Next · ' + p.method + (p.declined ? ' (' + p.declined.reason + ')' : ''));
+          L.push('Consulted · ' + (fi.priors.consulted || []).join('; '));
+          if ((fi.priors.applicableUnavailable || []).length) L.push('Unavailable · ' + fi.priors.applicableUnavailable.join('; '));
+          if ((fi.priors.excluded || []).length) L.push('Not in play · ' + fi.priors.excluded.join('; '));
+          return L.map(l => ({ l })); })(),
         canGen: gen, onGen: () => this.askToDraft(t),
         notesOpen: !!(S.akNotes && S.akNotes[i]), notesLabel: !!(S.akNotes && S.akNotes[i]) ? 'Hide what the model was given' : 'What the model was given', onNotesToggle: () => this.setState(st => ({ akNotes: { ...(st.akNotes || {}), [i]: !((st.akNotes || {})[i]) } })),
         i, onRun: e => { let q = t.question; try { const cell = e && e.target && e.target.closest ? e.target.closest('[data-cell]') : null; const ta = cell && cell.querySelector('textarea'); if (ta && String(ta.value).trim()) q = ta.value; } catch (er) {} this.askSend(String(q).trim()); } }; });
