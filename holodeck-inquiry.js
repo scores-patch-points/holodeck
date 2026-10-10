@@ -50,11 +50,12 @@
 // are the caller's already-held local evidence, injected. An `offline-only`
 // privacy frame is honored by construction: this module makes zero external
 // requests on any path.
-import { answerBeforeTheModel } from './vendor/eoreader7/native/the-fold/answerable.js';
+import { answerBeforeTheModel, wantsProse } from './vendor/eoreader7/native/the-fold/answerable.js';
 import { declare, frameOf } from './vendor/eoreader7/native/kernel/retrieval-frame.js';
 import { relationCompositionChains, evaluateRelationCompositions } from './vendor/eoreader7/native/kernel/relation-composition.js';
 import { hyperedge } from './vendor/eoreader7/native/kernel/hypergraph.js';
 import { chemistryFor } from './vendor/eoreader7/native/organs/derivation.js';
+import { answerSpan, shownText } from './vendor/fold-chat/fold-chat-answerspan.js';
 
 export const INQUIRY_SCHEMA = 'FoldInquiry@1';
 export const ANSWER_SCHEMA = 'FoldAnswer@1';
@@ -73,6 +74,7 @@ const STANDING_OF_DOOR = Object.freeze({
   'which-passage': 'witnessed',
   comparison: 'derived',
   'prior-answer': 'received',
+  'answer-span': 'witnessed',
 });
 export const standingForDoor = (kind) => STANDING_OF_DOOR[kind] ?? 'unmeasured';
 
@@ -149,6 +151,43 @@ export function answerFromFold({
           standing: standingForDoor(a.kind),
           addresses: freezeList(a.addresses),
           why: a.why ?? null,
+        });
+      }
+    } catch { answer = null; }
+  }
+
+  // ── Stage C (extractive rung) — THE SMALLEST SPAN THAT ANSWERS. When the
+  // exact doors decline and material is in scope, the P2 organ (the app's own
+  // fold-chat-answerspan, COMPOSED, never re-derived) answers a factual wh-ask
+  // (figure/date/name/place/definition) extractively: the minimal clause,
+  // verbatim, no model. It self-gates — below its declared confidence the same
+  // typed gap stands, and a question the material does not state is not
+  // answered. The span's `ref` is a byte address into local material.
+  if (!answer && !wantsProse(asking) && (passages ?? []).length) {
+    try {
+      const forSpan = (passages ?? []).map((p) => ({ ...p, title: p.title ?? p.source ?? null }));
+      const sp = answerSpan(asking, forSpan);
+      const span = sp?.spans && sp.spans[0];
+      const spanText = span ? (shownText(sp) || span.shown || span.text) : null;
+      if (span && spanText && String(spanText).trim().length >= 2) {
+        // The span's address: the passage it came from (+passageIndex) plus its
+        // range, rebased to the source's byte space. `passages` and the span's
+        // forSpan array are 1:1, so the index resolves to the caller's passage.
+        const srcPassage = (passages ?? [])[span.passageIndex];
+        const rel = span.rewrite?.source ?? { start: span.start ?? 0, end: span.end ?? span.start ?? 0 };
+        const s0 = Number.isFinite(rel.start) ? rel.start : 0;
+        const e0 = Number.isFinite(rel.end) ? rel.end : s0;
+        const srcName = (srcPassage && (srcPassage.source ?? String(srcPassage.ref ?? 'src'))) || 'src';
+        const address = srcPassage && e0 >= s0
+          ? `${String(srcName).split('#')[0]}#${(srcPassage.start || 0) + s0}-${(srcPassage.start || 0) + e0}`
+          : null;
+        answer = Object.freeze({
+          schema: ANSWER_SCHEMA,
+          kind: 'answer-span',
+          text: String(spanText).trim(),
+          standing: 'witnessed',
+          addresses: freezeList([address].filter(Boolean)),
+          why: 'the smallest span that answers, verbatim from the material (the composed P2 organ)',
         });
       }
     } catch { answer = null; }

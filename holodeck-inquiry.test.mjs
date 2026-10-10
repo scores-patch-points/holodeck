@@ -91,6 +91,25 @@ test('FALSIFIER — Stage E withholds an unlicensed composition (a prior nominat
   assert.equal(inq.derivations[0].standing, 'withheld');
 });
 
+test('Stage C extractive rung — the smallest span that answers, verbatim, no model', () => {
+  const passages = [{ ref: 'ethanol#0-80', source: 'ethanol', title: 'Ethanol', start: 0, end: 80, text: 'Ethanol boils at 78.37 °C, a colorless alcohol used as fuel.' }];
+  const inq = answerFromFold({ question: 'What is the boiling point of ethanol?', passages });
+  assert.equal(inq.disposition, 'answered-from-fold');
+  assert.equal(inq.answer.kind, 'answer-span');
+  assert.equal(inq.answer.standing, 'witnessed');
+  assert.ok(inq.answer.addresses.length >= 1);
+  assert.match(inq.answer.addresses[0], /#\d+-\d+$/, 'the answer descends to a byte address in local material');
+  assert.match(inq.answer.text, /78\.37/);
+  assert.equal(inq.resources.modelCalls, 0);
+});
+
+test('FALSIFIER — a question the material does not state is NOT answered by the span organ', () => {
+  const passages = [{ ref: 'ethanol#0-80', source: 'ethanol', title: 'Ethanol', start: 0, end: 80, text: 'Ethanol boils at 78.37 °C, a colorless alcohol used as fuel.' }];
+  const inq = answerFromFold({ question: 'Who invented the telephone?', passages });
+  assert.equal(inq.answer, null);
+  assert.equal(inq.disposition, 'gap');
+});
+
 test('Stage D → E licenses a composition ONLY under a GIVEN declaration (giver named)', () => {
   const edges = [E('e1', 'parent', 'A', 'B', 'doc#10-14'), E('e2', 'parent', 'B', 'C', 'doc#20-24')];
   const bare = answerFromFold({ question: 'Who is connected?', passages: [], edges });

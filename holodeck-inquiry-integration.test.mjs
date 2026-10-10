@@ -57,6 +57,16 @@ test('Stage D/E run on the REAL reader: composition chains, then withheld (no GI
   assert.ok(out.turn.foldInquiry.derivations.every((x) => x.witnesses.length === 0));
 });
 
+test('the extractive span door answers a factual wh-ask from local material — no model, no egress', async () => {
+  const docs = [{ id: 'ethanol', title: 'Ethanol', text: 'Ethanol boils at 78.37 °C and is a colorless alcohol used as fuel.' }];
+  const IX = index(docs);
+  const out = await turn(emptyConv(), IX, 'What is the boiling point of ethanol?', { model: 'webllm:none', base: 'http://127.0.0.1:1' });
+  assert.equal(out.turn.noModel, true);
+  assert.equal(out.turn.foldInquiry.answer.kind, 'answer-span');
+  assert.match(out.turn.answer, /78\.37/);
+  assert.equal(out.turn.foldInquiry.resources.modelCalls, 0);
+});
+
 test('the model-free computation door answers a numeric question — no model, no egress (§14)', async () => {
   const docs = [{ id: 'd', title: 'd', text: 'The treaty was signed in 1805. The second treaty was signed in 1841.' }];
   const IX = index(docs);
