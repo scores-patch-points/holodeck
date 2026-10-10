@@ -192,6 +192,15 @@ export function answerFromFold({
   }
   emit({ stage: 'derive', chains: derivation?.chains ?? 0, withheld: derivation?.withheld ?? 0 });
 
+  // ── Stage E (contradiction). Where two witnessed edges assert the SAME
+  // referent pair with OPPOSITE polarity, the material contradicts itself. The
+  // inquiry PRESERVES the contest — both edges and their addresses are kept,
+  // neither is chosen (§8: preserve competing interpretations where neither has
+  // been refuted; §14: contradictory witnesses are investigated, not resolved
+  // by picking the stronger prose). Nothing here decides which is true.
+  const contests = detectContests(edges);
+  emit({ stage: 'falsify', contests: contests.length });
+
   // ── Stage F — DECIDE. An exact local answer is a complete disposition; a
   // missing one is a typed gap, never an automatic external search (§9). The
   // gap type distinguishes "the question needed more than the exact doors give"
@@ -227,6 +236,7 @@ export function answerFromFold({
     event('DEF', 'question framed and admitted to the record'),
     event('SEG', `activation scoped to ${activated.distinctSources} local source(s), ${activated.passages} passage(s)`),
     ...(derivations.length ? [event('SYN', `${derivations.length} composition candidate(s) derived from ${derivation.edges} edge(s) — ${derivation.withheld} withheld (no GIVEN affordance)`)] : []),
+    ...(contests.length ? [event('CON', `${contests.length} referent pair(s) asserted with opposite polarity — preserved as contest`)] : []),
     ...(answer
       ? [event('INS', `answered locally by the ${answer.kind} door — ${answer.standing}`), event('EVA', 'the answer carries its address(es); the model was not asked')]
       : [event('NUL', 'no exact local answer — a typed gap, not a search')]),
@@ -267,9 +277,11 @@ export function answerFromFold({
         detail: `${derivation.withheld} of ${derivation.chains} chain(s) withheld (no giver)`,
       }] : []),
       ...(derivations.length ? [{ test: 'a derived candidate carries no witnesses of its own (no self-corroboration)', result: 'held' }] : []),
+      ...(contests.length ? [{ test: 'a referent pair asserted with opposite polarity is preserved as a contest, not resolved', result: 'contested', detail: `${contests.length} contested pair(s)` }] : []),
     ]),
     derivations: Object.freeze(derivations),
     derivation,
+    contests: Object.freeze(contests),
     coverage: Object.freeze({ localSources: activated.distinctSources, passages: activated.passages, complete: null }),
     gaps: Object.freeze(gaps),
     inquiries: Object.freeze(answer ? [] : [planNextEncounter({ gap: gaps[0] ?? null, privacy, capabilities: { localRead: true, web: false, model: false, modelRequired: false } })]),
@@ -297,6 +309,44 @@ const freezeList = (a) => Object.freeze([...(a ?? [])]);
  * EOHyperedge@1 shape passes through untouched. An edge missing either face or
  * a relation is dropped (a typed non-entry, never a guess).
  */
+/**
+ * detectContests(edges) -> Contest@1[]
+ *
+ * Two witnessed edges that assert the SAME referent pair with OPPOSITE
+ * polarity contradict each other. The contest keeps both sides and their
+ * addresses — the inquiry does not pick the stronger-looking one (§8/§14).
+ * Only polarity conflict over a shared pair is detected here; scope, tense and
+ * identity conflicts are named future work, not silently folded in.
+ */
+export function detectContests(edges) {
+  const list = (Array.isArray(edges) ? edges : []).filter((e) => e && e.label && (e.end1Face ?? e.end1) && (e.end2Face ?? e.end2));
+  const byPair = new Map();
+  for (const e of list) {
+    const key = [String(e.end1Face ?? e.end1).toLowerCase(), String(e.end2Face ?? e.end2).toLowerCase()].sort().join('|');
+    if (!byPair.has(key)) byPair.set(key, []);
+    byPair.get(key).push(e);
+  }
+  const side = (xs) => xs.map((e) => Object.freeze({
+    label: String(e.label),
+    from: String(e.end1Face ?? e.end1),
+    to: String(e.end2Face ?? e.end2),
+    addresses: freezeList([...(e.refs ?? []), ...((e.spans ?? []).map((s) => `${s.ref}#${s.start}-${s.end}`))]),
+  }));
+  const contests = [];
+  for (const group of byPair.values()) {
+    const positive = group.filter((e) => (e.polarity ?? '+') !== '-');
+    const negative = group.filter((e) => e.polarity === '-');
+    if (!positive.length || !negative.length) continue;
+    contests.push(Object.freeze({
+      schema: 'Contest@1',
+      positive: Object.freeze(side(positive)),
+      negative: Object.freeze(side(negative)),
+      basis: 'two witnessed edges assert the same referent pair with opposite polarity — neither is chosen; both addresses stand',
+    }));
+  }
+  return contests;
+}
+
 function toHyperedge(e) {
   if (!e) return null;
   if (e.schema === 'EOHyperedge@1') return e;

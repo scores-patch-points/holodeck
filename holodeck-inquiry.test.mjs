@@ -4,7 +4,7 @@
 // genuinely reject.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { answerFromFold, renderInquiry, standingForDoor, INQUIRY_SCHEMA } from './holodeck-inquiry.js';
+import { answerFromFold, renderInquiry, standingForDoor, detectContests, INQUIRY_SCHEMA } from './holodeck-inquiry.js';
 
 const PASSAGES = [
   { ref: 'doc#0-95', source: 'doc', start: 0, end: 95, text: 'France is a country in Europe. The capital of France is Paris. It has many museums.' },
@@ -117,6 +117,24 @@ test('FALSIFIER — offline-only forbids egress and names why', () => {
 test('an answered inquiry proposes nothing — no plan to search for what it already has', () => {
   const inq = answerFromFold({ question: 'Fill in the blank: "The capital of France is ______."', passages: PASSAGES });
   assert.deepEqual([...inq.inquiries], []);
+});
+
+const F = (id, a, l, b, pol, w) => ({ id, end1Face: a, end2Face: b, label: l, polarity: pol, refs: [w], spans: [{ ref: w.split('#')[0], start: 0, end: 1 }] });
+
+test('Stage E — opposite polarity over the same pair is PRESERVED as a contest, not resolved', () => {
+  const edges = [F('e1', 'Alice', 'supports', 'the treaty', '+', 'doc#10-20'), F('e2', 'Alice', 'supports', 'the treaty', '-', 'doc#40-50')];
+  const inq = answerFromFold({ question: 'What did Alice do about the treaty?', passages: [], edges });
+  assert.equal(inq.contests.length, 1);
+  assert.equal(inq.contests[0].positive.length, 1);
+  assert.equal(inq.contests[0].negative.length, 1);
+  assert.match(inq.contests[0].basis, /neither is chosen/);
+});
+
+test('FALSIFIER — same pair, same polarity is NOT a contest (no phantom conflict)', () => {
+  const edges = [F('e1', 'Alice', 'supports', 'the treaty', '+', 'doc#10-20'), F('e2', 'Alice', 'supports', 'the treaty', '+', 'doc#40-50')];
+  assert.equal(detectContests(edges).length, 0);
+  const inq = answerFromFold({ question: 'What did Alice do about the treaty?', passages: [], edges });
+  assert.deepEqual([...inq.contests], []);
 });
 
 test('standing is typed by door, and renderInquiry says what happened in one line', () => {
