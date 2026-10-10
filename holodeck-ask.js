@@ -178,7 +178,7 @@ async function chat(base, model, messages, opts = {}) {
 
 // One turn. `conv` = { summary, history, turns }. `computed` is an optional block of values computed from the
 // Records database (never asked of the model); it rides into the prompt as material and onto the record.
-export async function turn(conv, IX, question, { base = OLLAMA, model = DEFAULT_MODEL, computed = null, reading = null, retrievalQ = null, resolved = null, ctx = 4096, onToken, onStage, signal, deferFold = false, onFold = null, docs = null, summarize = true, privacy = 'local-raw', rix = null, carry = 'model' } = {}) {
+export async function turn(conv, IX, question, { base = OLLAMA, model = DEFAULT_MODEL, computed = null, reading = null, retrievalQ = null, resolved = null, ctx = 4096, onToken, onStage, signal, deferFold = false, onFold = null, docs = null, summarize = true, privacy = 'local-raw', rix = null, carry = 'model', declarations = null } = {}) {
   const t0 = Date.now(); const turnNo = (conv.summary.turnCount || 0) + 1;
   // THE SEALED BOUNDARY: an outside executor (heimdall frontier/remote model)
   // may only receive the projection the Fold builds. When the caller selects
@@ -284,6 +284,7 @@ export async function turn(conv, IX, question, { base = OLLAMA, model = DEFAULT_
     question,
     passages: offered,
     edges: (relations && relations.edges) || [],
+    declarations,
     transcript: conv.turns,
     chunksByRef: new Map(IX.chunks.map((c) => [c.ref, c])),
     cursor: turnNo,
