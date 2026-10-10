@@ -12,6 +12,7 @@ import { meetingBoundaries } from './vendor/eoreader7/native/organs/speaker.js';
 import { buildFactBlock, dedupeSourceText } from './vendor/eoreader7/native/organs/fact-block.js';
 import { makeEngineRelationReader, readCorpus, blankMarkup } from './holodeck-reader.js';
 import * as HH from './holodeck-chat-lane.js';
+import { answerFromFold } from './holodeck-inquiry.js';
 let _reader = null; const reader = () => _reader || (_reader = makeEngineRelationReader());
 import { ladder, conclusionOf, select } from './holodeck-summary.js';
 // Gary, the prompt archon: he owns what the mouth is handed, in what order, and
@@ -273,8 +274,24 @@ export async function turn(conv, IX, question, { base = OLLAMA, model = DEFAULT_
   const sentChars = FOLD.charCount(messages);
   const transcriptChars = conv.history.reduce((n, m) => n + (m.content || '').length, 0) + question.length;
   onStage && onStage('answering');
-  const res = await chat(base, model, messages, { onToken, signal, maxTokens: 700, sealed });
-  const answer = stripSelfCitations(res.text).text;
+  // THE FOLD ANSWERS FIRST (spec §9, "can the Fold answer?"): before any model
+  // draw, the exact, addressed doors answer from local evidence alone. When one
+  // fires, the model is not asked — a mechanical answer is never laundered
+  // through a mouth. Otherwise the turn proceeds to the model exactly as
+  // before. The attempt is recorded either way as a FoldInquiry@1
+  // (holodeck-inquiry.js), and its disposition rides on the turn.
+  const foldInquiry = answerFromFold({
+    question,
+    passages: offered,
+    edges: (relations && relations.edges) || [],
+    transcript: conv.turns,
+    chunksByRef: new Map(IX.chunks.map((c) => [c.ref, c])),
+    cursor: turnNo,
+    workspace: IX.workspace ?? null,
+  });
+  let res = null, answer = null;
+  if (foldInquiry.answer) { answer = foldInquiry.answer.text; onStage && onStage('fold-answer'); }
+  else { res = await chat(base, model, messages, { onToken, signal, maxTokens: 700, sealed }); answer = stripSelfCitations(res.text).text; }
   onStage && onStage('checking');
   const attr = offered.length ? coverage(answer, offered, IX.chunks) : [];
   const castSet = new Set(((reading && reading.surfaces) || []).map(x => foldDiacritics(String(x).toLowerCase())));
@@ -283,7 +300,7 @@ export async function turn(conv, IX, question, { base = OLLAMA, model = DEFAULT_
   const unsupported = unsupportedClaims(grounding);
   const used = [...new Set(attr.map(a => a.ref).filter(Boolean))];
   const open = openQuestions(question, offered, used);
-  const channels = [synopsis && synopsis.text ? 'summary' : null, notes && !notes.empty ? 'notes' : null, offered.length ? 'material' : null, reading ? 'reading' : null, computed && computed.text ? 'records' : null, 'model'].filter(Boolean);
+  const channels = [synopsis && synopsis.text ? 'summary' : null, notes && !notes.empty ? 'notes' : null, offered.length ? 'material' : null, reading ? 'reading' : null, computed && computed.text ? 'records' : null, foldInquiry.answer ? 'fold' : null, foldInquiry.answer ? null : 'model'].filter(Boolean);
   const record = FOLD.buildWarrantRecord({ turn: turnNo, plane: 'world', gist: FOLD.mechanicalFoldLine(question, answer), channels, refs: used, unsupported, open });
   const withRecord = FOLD.addWarrantRecord(conv.summary, record);
   const foldLine = FOLD.mechanicalFoldLine(question, answer);
@@ -314,7 +331,11 @@ export async function turn(conv, IX, question, { base = OLLAMA, model = DEFAULT_
   let summary = FOLD.advanceSummaryFold(withRecord, foldLine);
   let refresh = { ok: false, why: '', pending: !!deferFold };
   let fold = null;
-  if (deferFold) {
+  if (foldInquiry.answer) {
+    // The Fold answered exactly. No second model call is spent folding a turn
+    // that needed no mouth (spec §9: an exact answer is not laundered).
+    refresh = { ok: false, why: 'answered from the Fold — no model fold spent' };
+  } else if (deferFold) {
     const foldAc = new AbortController();
     const onOuterAbort = () => { try { foldAc.abort(); } catch (e) {} };
     if (signal) signal.addEventListener('abort', onOuterAbort, { once: true });
@@ -325,8 +346,8 @@ export async function turn(conv, IX, question, { base = OLLAMA, model = DEFAULT_
   }
   const t = { n: turnNo, question, answer, used: used.map(ref => ({ ref, text: String(readRange(IX.texts, ref) || '').trim().slice(0, 700) })), offered: offered.map(c => ({ ref: c.ref, source: c.source, start: c.start, end: c.end, label: c.label, text: c.text.slice(0, 700) })),
     attr: attr.map(a => ({ text: a.text, ref: a.ref || null, via: a.via || null })), findings: (grounding.findings || []).map(f => ({ text: f.text, kind: f.atomKind, start: f.start, end: f.end, echoesQuestion: !!f.echoesQuestion })),
-    examined: !!grounding.examined, record, foldLine, refresh, computed, synopsis, gary: garyCheck, reading: reading ? { lines: reading.lines } : null, notes, resolved: resolved && resolved.length ? resolved : null, sentChars, transcriptChars, messages, model, ms: Date.now() - t0,
-    tokens: res.stats ? { out: res.stats.eval_count, in: res.stats.prompt_eval_count, secs: res.stats.total_duration ? res.stats.total_duration / 1e9 : null } : null,
+    examined: !!grounding.examined, record, foldLine, refresh, computed, synopsis, gary: garyCheck, reading: reading ? { lines: reading.lines } : null, notes, resolved: resolved && resolved.length ? resolved : null, sentChars, transcriptChars, messages, model, ms: Date.now() - t0, foldInquiry, noModel: !!foldInquiry.answer, disposition: foldInquiry.disposition,
+    tokens: res && res.stats ? { out: res.stats.eval_count, in: res.stats.prompt_eval_count, secs: res.stats.total_duration ? res.stats.total_duration / 1e9 : null } : null,
     sealed, rawWithheld: sealed ? (factBlock && factBlock.spans && factBlock.spans.length ? factBlock.spans.length : (offered.length || 0)) : 0 };
   return { conv: { summary, history: [...conv.history, { role: 'user', content: question }, { role: 'assistant', content: answer }], turns: [...conv.turns, t] }, turn: t, fold };
 }
