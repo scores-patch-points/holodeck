@@ -6,6 +6,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { answerFromFold, renderInquiry, standingForDoor, detectContests, asksFreshness, INQUIRY_SCHEMA } from './holodeck-inquiry.js';
 import { createDeclarationLog, proposeCandidate, promote } from './vendor/eoreader7/native/interpretation/declarations.js';
+import { mathInstance, aboutArithmetic } from './holodeck-math.js';
 
 const PASSAGES = [
   { ref: 'doc#0-95', source: 'doc', start: 0, end: 95, text: 'France is a country in Europe. The capital of France is Paris. It has many museums.' },
@@ -187,6 +188,24 @@ test('§12 status is typed: from-the-fold / contested / freshness / unresolved',
   assert.match(renderInquiry(contested).line, /Contested/);
   assert.equal(answerFromFold({ question: 'Who is the current mayor of Nashville?', passages: PASSAGES }).status, 'freshness');
   assert.equal(answerFromFold({ question: 'Explain why the capital of France matters.', passages: PASSAGES }).status, 'unresolved');
+});
+
+test('the computation door answers mechanically when the engine is present, no model (§14)', async () => {
+  assert.equal(aboutArithmetic('How many years apart are 1805 and 1841?'), true);
+  assert.equal(aboutArithmetic('Why does the treaty matter?'), false);
+  const math = await mathInstance();
+  const inq = answerFromFold({ question: 'How many years apart are 1805 and 1841?', passages: PASSAGES, math });
+  assert.equal(inq.disposition, 'answered-from-fold');
+  assert.equal(inq.answer.kind, 'comparison');
+  assert.equal(inq.answer.standing, 'derived');
+  assert.equal(inq.resources.modelCalls, 0);
+  assert.match(inq.answer.text, /36/);
+});
+
+test('FALSIFIER — without the engine the same question is a gap, never a guessed number', () => {
+  const inq = answerFromFold({ question: 'How many years apart are 1805 and 1841?', passages: PASSAGES });
+  assert.equal(inq.answer, null);
+  assert.equal(inq.disposition, 'gap');
 });
 
 test('the record is immutable and survives a JSON round-trip (§16.9 replay)', () => {

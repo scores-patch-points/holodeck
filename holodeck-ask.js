@@ -13,6 +13,7 @@ import { buildFactBlock, dedupeSourceText } from './vendor/eoreader7/native/orga
 import { makeEngineRelationReader, readCorpus, blankMarkup } from './holodeck-reader.js';
 import * as HH from './holodeck-chat-lane.js';
 import { answerFromFold } from './holodeck-inquiry.js';
+import { mathInstance, aboutArithmetic } from './holodeck-math.js';
 let _reader = null; const reader = () => _reader || (_reader = makeEngineRelationReader());
 import { ladder, conclusionOf, select } from './holodeck-summary.js';
 // Gary, the prompt archon: he owns what the mouth is handed, in what order, and
@@ -280,10 +281,16 @@ export async function turn(conv, IX, question, { base = OLLAMA, model = DEFAULT_
   // through a mouth. Otherwise the turn proceeds to the model exactly as
   // before. The attempt is recorded either way as a FoldInquiry@1
   // (holodeck-inquiry.js), and its disposition rides on the turn.
+  // The computation door needs the math engine; it is loaded lazily, ONLY when
+  // the question looks arithmetic (aboutArithmetic), so non-numeric turns never
+  // pay the vendor load.
+  let math = null;
+  if (aboutArithmetic(question)) { try { math = await mathInstance(); } catch { math = null; } }
   const foldInquiry = answerFromFold({
     question,
     passages: offered,
     edges: (relations && relations.edges) || [],
+    math,
     declarations,
     transcript: conv.turns,
     chunksByRef: new Map(IX.chunks.map((c) => [c.ref, c])),
