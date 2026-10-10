@@ -14,6 +14,7 @@ import { makeEngineRelationReader, readCorpus, blankMarkup } from './holodeck-re
 import * as HH from './holodeck-chat-lane.js';
 import { answerFromFold } from './holodeck-inquiry.js';
 import { mathInstance, aboutArithmetic } from './holodeck-math.js';
+import { activationRetrieval } from './holodeck-activation.js';
 let _reader = null; const reader = () => _reader || (_reader = makeEngineRelationReader());
 import { ladder, conclusionOf, select } from './holodeck-summary.js';
 // Gary, the prompt archon: he owns what the mouth is handed, in what order, and
@@ -190,13 +191,19 @@ export async function turn(conv, IX, question, { base = OLLAMA, model = DEFAULT_
   const folded = conv.summary.records.flatMap(r => r.refs || []);
   onStage && onStage('retrieving');
   const qTerms = [...new Set(tokenize(retrievalQ || question))];
-  const ranked = retrieve(IX.chunks, retrievalQ || question, 8, folded).map(c => narrow(c, qTerms));
-  // HOW the Fold retrieved (spec §7/§16.6): the method is disclosed on the
-  // turn and the inquiry record. Today this is the workspace chunk index
-  // (term surface); meaning-activation (the vendored activation-retrieval
-  // organ) is the intended replacement and is named honestly as not wired yet
-  // rather than silently claimed.
-  const retrievalMeta = { basis: 'surface', source: 'workspace chunk index (term)', chunks: IX.chunks.length, why: 'meaning activation is not wired into this path yet' };
+  // §7 MEANING ACTIVATION (holodeck-activation.js), composed, no second engine:
+// retrieve by the referents the reading ADMITTED (rix.cast → the engine's own
+// identity index via readingIndexFromLog), hop-0/structure over the mention
+// book. When the question resolves to no referent the term retriever stands —
+// the organ's own `basis` rule — and the method is disclosed either way on the
+// turn and the inquiry record (§16.6).
+  let activation = null;
+  try { activation = activationRetrieval({ rix, IX, question: retrievalQ || question, transcript: conv.turns, seen: folded, limit: 8 }); } catch { activation = null; }
+  const ranked0 = activation ? activation.passages : retrieve(IX.chunks, retrievalQ || question, 8, folded);
+  const retrievalMeta = activation
+    ? { basis: 'activation', source: 'meaning activation over the workspace cast', resolution: activation.meta.resolution, active: activation.meta.active.length, hop1: activation.meta.hop1.length, window: activation.meta.window, grain: activation.meta.grain, why: activation.meta.why, fallback: false }
+    : { basis: 'surface', source: 'workspace chunk index (term)', chunks: IX.chunks.length, why: 'meaning activation resolved no referent', fallback: true };
+  const ranked = ranked0.map(c => narrow(c, qTerms));
   const history = conv.history.slice(-2).map(m => ({ ...m, content: m.content.length > 1200 ? m.content.slice(0, 1200) + '…' : m.content }));
   // THE SURF AND FOLD (eoreader7 / the-fold holon.js): the passages are read by the engine's own relation reader,
   // and what the model receives is that reading as defeasible NOTES plus only the byte-addressed spans that bound
@@ -361,7 +368,7 @@ export async function turn(conv, IX, question, { base = OLLAMA, model = DEFAULT_
   }
   const t = { n: turnNo, question, answer, used: used.map(ref => ({ ref, text: String(readRange(IX.texts, ref) || '').trim().slice(0, 700) })), offered: offered.map(c => ({ ref: c.ref, source: c.source, start: c.start, end: c.end, label: c.label, text: c.text.slice(0, 700) })),
     attr: attr.map(a => ({ text: a.text, ref: a.ref || null, via: a.via || null })), findings: (grounding.findings || []).map(f => ({ text: f.text, kind: f.atomKind, start: f.start, end: f.end, echoesQuestion: !!f.echoesQuestion })),
-    examined: !!grounding.examined, record, foldLine, refresh, computed, synopsis, gary: garyCheck, reading: reading ? { lines: reading.lines } : null, notes, resolved: resolved && resolved.length ? resolved : null, sentChars, transcriptChars, messages, model, ms: Date.now() - t0, foldInquiry, noModel: !!foldInquiry.answer, disposition: foldInquiry.disposition,
+    examined: !!grounding.examined, record, foldLine, refresh, computed, synopsis, gary: garyCheck, reading: reading ? { lines: reading.lines } : null, notes, resolved: resolved && resolved.length ? resolved : null, sentChars, transcriptChars, messages, model, ms: Date.now() - t0, foldInquiry, noModel: !!foldInquiry.answer, disposition: foldInquiry.disposition, retrieval: retrievalMeta,
     tokens: res && res.stats ? { out: res.stats.eval_count, in: res.stats.prompt_eval_count, secs: res.stats.total_duration ? res.stats.total_duration / 1e9 : null } : null,
     sealed, rawWithheld: sealed ? (factBlock && factBlock.spans && factBlock.spans.length ? factBlock.spans.length : (offered.length || 0)) : 0 };
   return { conv: { summary, history: [...conv.history, { role: 'user', content: question }, { role: 'assistant', content: answer }], turns: [...conv.turns, t] }, turn: t, fold };

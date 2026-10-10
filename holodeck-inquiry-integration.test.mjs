@@ -67,6 +67,17 @@ test('the extractive span door answers a factual wh-ask from local material — 
   assert.equal(out.turn.foldInquiry.resources.modelCalls, 0);
 });
 
+test('the turn retrieves by meaning-activation when the reading admits a referent (basis recorded)', async () => {
+  const rix = { cast: [{ id: 'france', surfaces: ['France'] }] };
+  const docs = [{ id: 'd', title: 'Paris', text: 'France is a country in Europe. The capital of France is Paris. It has many museums.' }];
+  const IX = index(docs);
+  const out = await turn(emptyConv(), IX, 'What is the capital of France?', { model: 'webllm:none', base: 'http://127.0.0.1:1', rix });
+  assert.equal(out.turn.retrieval.basis, 'activation');
+  assert.equal(out.turn.retrieval.fallback, false);
+  assert.ok(out.turn.offered.length >= 1);
+  assert.ok(out.turn.foldInquiry.retrieval.basis, 'activation');
+});
+
 test('the model-free computation door answers a numeric question — no model, no egress (§14)', async () => {
   const docs = [{ id: 'd', title: 'd', text: 'The treaty was signed in 1805. The second treaty was signed in 1841.' }];
   const IX = index(docs);
