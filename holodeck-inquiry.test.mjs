@@ -5,6 +5,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { answerFromFold, renderInquiry, standingForDoor, detectContests, asksFreshness, INQUIRY_SCHEMA } from './holodeck-inquiry.js';
+import { createDeclarationLog, proposeCandidate, promote } from './vendor/eoreader7/native/interpretation/declarations.js';
 
 const PASSAGES = [
   { ref: 'doc#0-95', source: 'doc', start: 0, end: 95, text: 'France is a country in Europe. The capital of France is Paris. It has many museums.' },
@@ -87,6 +88,22 @@ test('FALSIFIER — Stage E withholds an unlicensed composition (a prior nominat
   assert.equal(inq.derivation.withheld, 1);
   assert.match(inq.derivation.reason, /GIVEN Hyperlexicon affordance/);
   assert.equal(inq.derivations[0].standing, 'withheld');
+});
+
+test('Stage D → E licenses a composition ONLY under a GIVEN declaration (giver named)', () => {
+  const edges = [E('e1', 'parent', 'A', 'B', 'doc#10-14'), E('e2', 'parent', 'B', 'C', 'doc#20-24')];
+  const bare = answerFromFold({ question: 'Who is connected?', passages: [], edges });
+  assert.equal(bare.derivation.licensed, 0, 'no register → withheld');
+  assert.equal(bare.derivations[0].standing, 'withheld');
+  // a GIVEN transitive(parent) declaration with a named giver is the licence
+  let log = createDeclarationLog();
+  const p = proposeCandidate(log, { kind: 'transitive', rel: 'parent', acquisition: 'test', source: 'test' });
+  log = promote(p.log, p.id, { giver: 'the school' }).log;
+  const inq = answerFromFold({ question: 'Who is connected?', passages: [], edges, declarations: log });
+  assert.equal(inq.derivation.licensed, 1);
+  assert.equal(inq.derivations[0].standing, 'licensed');
+  assert.equal(inq.derivations[0].giver, 'the school');
+  assert.deepEqual([...inq.derivation.givers], ['the school']);
 });
 
 test('no edges means no derivation — never a phantom composition', () => {

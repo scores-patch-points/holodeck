@@ -5880,7 +5880,7 @@ class Component extends DCLogic {
           L.push('Disposition · ' + fi.disposition);
           L.push('Activated · ' + fi.activated.passages + ' passage(s) from ' + fi.activated.distinctSources + ' source(s)');
           if (fi.answer) L.push('Answered by · the ' + fi.answer.kind + ' door (' + fi.answer.standing + ') — no model');
-          if (fi.derivation) L.push('Derived · ' + fi.derivation.chains + ' chain(s), ' + fi.derivation.licensed + ' licensed, ' + fi.derivation.withheld + ' withheld (needs a giver)');
+          if (fi.derivation) L.push('Derived · ' + fi.derivation.chains + ' chain(s), ' + fi.derivation.licensed + ' licensed' + (fi.derivation.givers && fi.derivation.givers.length ? ' under ' + fi.derivation.givers.join(', ') : '') + ', ' + fi.derivation.withheld + ' withheld' + (fi.derivation.withheld ? ' (needs a giver)' : ''));
           for (const c of (fi.contests || [])) L.push('Contested · ' + c.positive.map(x => x.from + ' ' + x.label + ' ' + x.to).join(' / ') + '   vs   ' + c.negative.map(x => x.from + ' ' + x.label + ' ' + x.to).join(' / '));
           for (const g of (fi.gaps || [])) L.push('Gap · ' + g.type + ' — ' + g.detail);
           for (const p of (fi.inquiries || [])) L.push('Next · ' + p.method + (p.declined ? ' (' + p.declined.reason + ')' : ''));

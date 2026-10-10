@@ -54,6 +54,7 @@ import { answerBeforeTheModel } from './vendor/eoreader7/native/the-fold/answera
 import { declare, frameOf } from './vendor/eoreader7/native/kernel/retrieval-frame.js';
 import { relationCompositionChains, evaluateRelationCompositions } from './vendor/eoreader7/native/kernel/relation-composition.js';
 import { hyperedge } from './vendor/eoreader7/native/kernel/hypergraph.js';
+import { chemistryFor } from './vendor/eoreader7/native/organs/derivation.js';
 
 export const INQUIRY_SCHEMA = 'FoldInquiry@1';
 export const ANSWER_SCHEMA = 'FoldAnswer@1';
@@ -92,6 +93,7 @@ export function answerFromFold({
   question,
   passages = [],
   edges = [],
+  declarations = null,
   transcript = [],
   chunksByRef = null,
   math = null,
@@ -163,30 +165,44 @@ export function answerFromFold({
   if (hyperEdges.length) {
     let chains = [], wall = { licensed: [], withheld: [] };
     try { chains = relationCompositionChains(hyperEdges); } catch { chains = []; }
-    // ── Stage E — FALSIFY. Every chain is run against the licensing wall with
-    // NO affordance injected, so nothing can be licensed: a composition is
-    // admitted only under a GIVEN Hyperlexicon affordance (§1.2 — a prior may
-    // nominate, never establish). What survives is a withheld candidate with
-    // its reason, never a fact. This is the wall working, not a gap.
-    try { wall = evaluateRelationCompositions(hyperEdges, null); } catch { /* no wall available */ }
-    derivations = chains.map((c) => Object.freeze({
-      schema: 'DerivedCandidate@1',
-      from: c.from,
-      bridge: c.bridge,
-      to: c.to,
-      via: Object.freeze([c.leftEdge.relation, c.rightEdge.relation]),
-      premises: Object.freeze([c.leftEdge.id, c.rightEdge.id]),
-      witnesses: Object.freeze([]),               // stated nowhere — never its own witness
-      provenance: Object.freeze([c.leftEdge.witness, c.rightEdge.witness].filter(Boolean)),
-      standing: 'withheld',                       // unlicensed without a GIVEN affordance
-      basis: 'witnessed relation adjacency through an earned shared referent — unlicensed without a GIVEN composition affordance',
-    }));
+    // Chemistry comes from the declarations register's GIVEN tier alone
+    // (derivation.js::chemistryFor → reaction.js::affordancesFromDeclarations):
+    // a transitive(r) declaration with a NAMED giver licenses r∘r ⇒ r. With no
+    // register there is no chemistry, and every chain is withheld.
+    let chemistry = null;
+    try { if (declarations) chemistry = chemistryFor(declarations).chemistry; } catch { chemistry = null; }
+    // ── Stage E — FALSIFY. Every chain is run against the licensing wall. A
+    // composition is admitted only under a GIVEN Hyperlexicon affordance
+    // (§1.2 — a prior may nominate, never establish); anything else is a
+    // withheld candidate with its reason, never a fact. With no register this
+    // withholds everything, which is the wall working, not a gap.
+    try { wall = evaluateRelationCompositions(hyperEdges, chemistry); } catch { /* no wall available */ }
+    const licensedFor = (c) => wall.licensed.find((l) => l.leftPredicate === c.leftEdge.relation && l.rightPredicate === c.rightEdge.relation && l.from === c.from && l.bridge === c.bridge && l.to === c.to) ?? null;
+    derivations = chains.map((c) => {
+      const lic = licensedFor(c);
+      return Object.freeze({
+        schema: 'DerivedCandidate@1',
+        from: c.from,
+        bridge: c.bridge,
+        to: c.to,
+        via: Object.freeze([c.leftEdge.relation, c.rightEdge.relation]),
+        premises: Object.freeze([c.leftEdge.id, c.rightEdge.id]),
+        witnesses: Object.freeze([]),               // stated nowhere — never its own witness
+        provenance: Object.freeze([c.leftEdge.witness, c.rightEdge.witness].filter(Boolean)),
+        standing: lic ? 'licensed' : 'withheld',    // licensed only under a GIVEN affordance
+        giver: lic ? (lic.provenance?.giver ?? null) : null,
+        basis: lic
+          ? 'witnessed relation adjacency through an earned shared referent, under a GIVEN composition affordance'
+          : 'witnessed relation adjacency through an earned shared referent — unlicensed without a GIVEN composition affordance',
+      });
+    });
     derivation = Object.freeze({
       schema: 'DerivationWall@1',
       edges: hyperEdges.length,
       chains: chains.length,
       licensed: wall.licensed.length,
       withheld: wall.withheld.length,
+      givers: Object.freeze([...new Set(wall.licensed.map((l) => l.provenance?.giver).filter(Boolean))]),
       reason: wall.withheld[0]?.reason ?? null,
     });
   }
