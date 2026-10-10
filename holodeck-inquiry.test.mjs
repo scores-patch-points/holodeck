@@ -4,7 +4,7 @@
 // genuinely reject.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { answerFromFold, renderInquiry, standingForDoor, detectContests, asksFreshness, INQUIRY_SCHEMA } from './holodeck-inquiry.js';
+import { answerFromFold, renderInquiry, standingForDoor, detectContests, asksFreshness, planNextEncounter, INQUIRY_SCHEMA } from './holodeck-inquiry.js';
 import { createDeclarationLog, proposeCandidate, promote } from './vendor/eoreader7/native/interpretation/declarations.js';
 import { mathInstance, aboutArithmetic } from './holodeck-math.js';
 
@@ -149,6 +149,33 @@ test('FALSIFIER — offline, a fresh question names the block and egress stays z
   const inq = answerFromFold({ question: 'Who is the current mayor of Nashville?', passages: [], privacy: 'offline-only' });
   assert.equal(inq.inquiries[0].declined.reason, 'offline_only');
   assert.equal(inq.resources.externalRequests, 0);
+});
+
+test('§11 — ask-before-egress records a consent decision, never a silent search', () => {
+  const inq = answerFromFold({ question: 'Who is the current mayor of Nashville?', passages: [], privacy: 'ask-before-egress' });
+  const p = inq.inquiries[0];
+  assert.equal(p.authorization, 'must-ask');
+  assert.equal(p.declined.reason, 'egress_requires_consent');
+  assert.ok(p.disclosureScope);
+  assert.match(p.privacyEffect, /consent/);
+  // a granted consent moves the plan, but it still cannot run here (no web)
+  const g = planNextEncounter({ gap: inq.gaps[0], question: 'Who is the current mayor of Nashville?', privacy: 'ask-before-egress', authorization: 'granted', capabilities: { web: true } });
+  assert.equal(g.authorization, 'granted');
+  assert.equal(g.result.ran, false);
+});
+
+test('§11 — selective-authorized-egress names authorized sources, egress pending a named grant', () => {
+  const p = planNextEncounter({ gap: { type: 'not_yet_read' }, question: 'Who is the current mayor of Nashville?', privacy: 'selective-authorized-egress', capabilities: { web: true } });
+  assert.equal(p.authorization, 'required');
+  assert.equal(p.declined.reason, 'egress_authorization_required');
+  assert.match(p.privacyEffect, /authorized sources/);
+});
+
+test('§11 — the capability gap is disclosed when the surface cannot run the encounter', () => {
+  const p = planNextEncounter({ gap: { type: 'not_yet_read' }, question: 'Who is the current mayor of Nashville?', privacy: 'local-first' });
+  assert.equal(p.sourceCapability, 'none');
+  assert.match(p.declined.detail, /no web capability/);
+  assert.equal(p.result.ran, false);
 });
 
 test('a static question is NOT flagged fresh (no phantom currency demand)', () => {

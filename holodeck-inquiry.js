@@ -428,38 +428,72 @@ export function renderInquiry(inquiry) {
  * outright. A search is never the default procedure; the reason it was declined
  * is recorded on the plan.
  */
-export function planNextEncounter({ gap = null, question = '', capabilities = {}, privacy = 'local-first', budget = null } = {}) {
+export function planNextEncounter({ gap = null, question = '', capabilities = {}, privacy = 'local-first', budget = null, authorization = null } = {}) {
   const canWeb = capabilities.web === true;
   const offline = privacy === 'offline-only';
   const fresh = asksFreshness(question);
-  // §9 step 4: a time-sensitive question needs current primary-source
-  // verification even when the Fold holds an older answer. What it holds is
-  // "correct as of its source date", which is NOT "verified current" (§9). When
-  // freshness is flagged the plan names the need and REQUIRES authorization; it
-  // never silently answers a current-state question from stale material.
-  const method = fresh ? 'retrieve-primary-source' : 'report-gap';
+  const egressNeeded = fresh;   // freshness names the need regardless of capability; whether it can RUN is disclosed below
+  let sourceCapability = canWeb ? 'web' : 'none';
+  // ── §11 privacy ladder, one dimension, never collapsed into the method.
+  //  offline-only                — egress forbidden outright.
+  //  ask-before-egress           — any egress is a real action requiring the
+  //                                person's consent; the plan records `must-ask`
+  //                                unless a grant arrived, and names the scope.
+  //  selective-authorized-egress — egress allowed ONLY for named authorized
+  //                                sources; disclosure scope recorded.
+  //  local-first (default)       — egress needs a named need + authorization.
+  let authorizationState = 'not-required';
+  let privacyEffect = 'none';
+  let disclosureScope = null;
+  let declined = null;
+  let method = 'report-gap';
+
+  if (offline) {
+    authorizationState = 'forbidden';
+    method = 'report-gap';
+    declined = { reason: 'offline_only', detail: 'privacy is offline-only — egress is forbidden; the gap stands' };
+  } else if (!egressNeeded) {
+    method = 'report-gap';
+    declined = { reason: gap ? gap.type : 'no_gap', detail: 'no named hypothesis, freshness requirement, or authorization — a search here would be undirected egress' };
+  } else {
+    method = 'retrieve-primary-source';
+    if (privacy === 'ask-before-egress') {
+      authorizationState = authorization === 'granted' ? 'granted' : 'must-ask';
+      privacyEffect = 'disclosure is a real action — it requires the person\'s consent';
+      disclosureScope = 'a current primary source for: ' + (String(question ?? '').slice(0, 90));
+      if (authorizationState === 'must-ask') declined = { reason: 'egress_requires_consent', detail: 'the question needs a current source, but privacy is ask-before-egress and no consent was granted' };
+    } else if (privacy === 'selective-authorized-egress') {
+      authorizationState = authorization === 'granted' ? 'granted' : 'required';
+      privacyEffect = 'disclosure scoped to authorized sources only';
+      disclosureScope = 'authorized primary source for: ' + (String(question ?? '').slice(0, 90));
+      if (authorizationState === 'required') declined = { reason: 'egress_authorization_required', detail: 'the source class is authorized but egress is not yet granted for this inquiry' };
+    } else {
+      authorizationState = authorization === 'granted' ? 'granted' : 'required';
+      privacyEffect = 'egress required to verify currency';
+      disclosureScope = 'a current primary source for: ' + (String(question ?? '').slice(0, 90));
+      declined = { reason: 'freshness_requires_current_source', detail: 'the question is time-sensitive — what the Fold holds is correct as of its source date but is not verified current; a current primary source is required, and egress must be authorized' };
+    }
+  }
+
+  if (egressNeeded && !canWeb && declined) declined.detail += ' — this surface has no web capability, so the encounter cannot run here';
   return Object.freeze({
     schema: 'InquiryPlan@1',
     gap,
     freshness: fresh,
+    privacy,
+    sourceCapability,
     alternativesToDiscriminate: Object.freeze([]),
     expectedObservation: fresh ? 'a current primary source stating the present value' : null,
     wouldChange: fresh ? 'the Fold\'s held value, if it has drifted since its source date' : null,
     method,
     sourceCandidates: Object.freeze([]),
-    privacyEffect: fresh ? 'egress required to verify currency' : 'none',
-    authorization: (fresh || (canWeb && !offline)) ? 'required' : 'not-required',
+    privacyEffect,
+    disclosureScope,
+    authorization: authorizationState,
     estimatedCost: Object.freeze({ modelCalls: 0, externalRequests: 0, ...(budget != null ? { budget } : {}) }),
     stopCondition: 'no retrieval is attempted without a named need and, for any egress, an authorization that changes the privacy scope',
     result: Object.freeze({ status: 'proposed', ran: false }),
-    declined: Object.freeze({
-      reason: offline ? 'offline_only' : fresh ? 'freshness_requires_current_source' : (gap ? gap.type : 'no_gap'),
-      detail: offline
-        ? 'privacy is offline-only — egress is forbidden; the gap stands'
-        : fresh
-          ? 'the question is time-sensitive — what the Fold holds is correct as of its source date but is not verified current; a current primary source is required, and egress must be authorized'
-          : 'no named hypothesis, freshness requirement, or authorization — a search here would be undirected egress',
-    }),
+    declined: Object.freeze(declined ?? { reason: gap ? gap.type : 'no_gap', detail: 'no named hypothesis, freshness requirement, or authorization — a search here would be undirected egress' }),
   });
 }
 
