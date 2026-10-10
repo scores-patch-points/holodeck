@@ -102,6 +102,7 @@ export function answerFromFold({
   cursor = null,
   workspace = null,
   privacy = 'local-first',
+  retrieval = null,
   onEvent = null,
 } = {}) {
   const startedAt = Date.now();
@@ -350,6 +351,7 @@ export function answerFromFold({
     contests: Object.freeze(contests),
     coverage: Object.freeze({ localSources: activated.distinctSources, passages: activated.passages, complete: null }),
     gaps: Object.freeze(gaps),
+    retrieval: retrieval ? Object.freeze({ ...retrieval }) : null,
     inquiries: Object.freeze(answer ? [] : [planNextEncounter({ gap: gaps[0] ?? null, question: asking, privacy, capabilities: { localRead: true, web: false, model: false, modelRequired: false } })]),
     answer,
     disposition,

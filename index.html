@@ -5879,6 +5879,7 @@ class Component extends DCLogic {
         inqLines: (() => { const fi = t.foldInquiry; if (!fi) return []; const L = [];
           L.push('Disposition · ' + fi.disposition);
           L.push('Activated · ' + fi.activated.passages + ' passage(s) from ' + fi.activated.distinctSources + ' source(s)');
+          L.push('Retrieved by · ' + (fi.retrieval ? fi.retrieval.basis + ' (' + fi.retrieval.source + ')' : 'local passages'));
           if (fi.answer) L.push('Answered by · the ' + fi.answer.kind + ' door (' + fi.answer.standing + ') — no model');
           if (fi.derivation) L.push('Derived · ' + fi.derivation.chains + ' chain(s), ' + fi.derivation.licensed + ' licensed' + (fi.derivation.givers && fi.derivation.givers.length ? ' under ' + fi.derivation.givers.join(', ') : '') + ', ' + fi.derivation.withheld + ' withheld' + (fi.derivation.withheld ? ' (needs a giver)' : ''));
           for (const c of (fi.contests || [])) L.push('Contested · ' + c.positive.map(x => x.from + ' ' + x.label + ' ' + x.to).join(' / ') + '   vs   ' + c.negative.map(x => x.from + ' ' + x.label + ' ' + x.to).join(' / '));

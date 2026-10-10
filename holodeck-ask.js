@@ -191,6 +191,12 @@ export async function turn(conv, IX, question, { base = OLLAMA, model = DEFAULT_
   onStage && onStage('retrieving');
   const qTerms = [...new Set(tokenize(retrievalQ || question))];
   const ranked = retrieve(IX.chunks, retrievalQ || question, 8, folded).map(c => narrow(c, qTerms));
+  // HOW the Fold retrieved (spec §7/§16.6): the method is disclosed on the
+  // turn and the inquiry record. Today this is the workspace chunk index
+  // (term surface); meaning-activation (the vendored activation-retrieval
+  // organ) is the intended replacement and is named honestly as not wired yet
+  // rather than silently claimed.
+  const retrievalMeta = { basis: 'surface', source: 'workspace chunk index (term)', chunks: IX.chunks.length, why: 'meaning activation is not wired into this path yet' };
   const history = conv.history.slice(-2).map(m => ({ ...m, content: m.content.length > 1200 ? m.content.slice(0, 1200) + '…' : m.content }));
   // THE SURF AND FOLD (eoreader7 / the-fold holon.js): the passages are read by the engine's own relation reader,
   // and what the model receives is that reading as defeasible NOTES plus only the byte-addressed spans that bound
@@ -292,6 +298,7 @@ export async function turn(conv, IX, question, { base = OLLAMA, model = DEFAULT_
     edges: (relations && relations.edges) || [],
     math,
     declarations,
+    retrieval: retrievalMeta,
     transcript: conv.turns,
     chunksByRef: new Map(IX.chunks.map((c) => [c.ref, c])),
     cursor: turnNo,
