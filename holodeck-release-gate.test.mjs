@@ -48,10 +48,23 @@ row('16.4', 'a prior cannot create facts', 'met', async () => {
   assert.ok(inq.derivations.every((d) => d.standing === 'withheld'));
 });
 
-// 16.5 — premise withdrawal invalidates dependent conclusions. UNMET: the
-// surface has no shared claim store; dependency withdrawal lives in the khora
-// ledger (fold-claims / hyperlexicon concede). Disclosed, not faked.
-row('16.5', 'premise withdrawal invalidates dependents', 'unmet', null, 'no claim store in this surface; the khora ledger owns withdrawal (fold-claims, hyperlexicon concede) — not wired here');
+// 16.5 — premise withdrawal invalidates dependent conclusions. PARTIAL: the
+// surface rung is live — a composition whose premise participates in a material
+// contest is withdrawn, never asserted (§8). The full cross-turn claim store
+// (a withdrawn premise reopening every artifact that rested on it, through a
+// shared ledger) still lives in the khora organs (fold-claims / hyperlexicon
+// concede) and is not wired to this surface — disclosed, never faked.
+row('16.5', 'premise withdrawal invalidates dependents (surface rung)', 'partial', async () => {
+  const edges = [
+    { id: 'e1', end1Face: 'A', end2Face: 'B', label: 'parent', polarity: '+', refs: ['d#1-2'], spans: [{ ref: 'd', start: 1, end: 2 }] },
+    { id: 'e2', end1Face: 'A', end2Face: 'B', label: 'parent', polarity: '-', refs: ['d#3-4'], spans: [{ ref: 'd', start: 3, end: 4 }] },
+    { id: 'e3', end1Face: 'B', end2Face: 'C', label: 'parent', polarity: '+', refs: ['d#5-6'], spans: [{ ref: 'd', start: 5, end: 6 }] },
+  ];
+  const inq = answerFromFold({ question: 'Who is connected?', passages: [], edges });
+  assert.equal(inq.contests.length, 1, 'the contradictory premise is preserved as a contest');
+  assert.equal(inq.derivations[0].standing, 'withdrawn', 'the dependent is withdrawn, never asserted');
+  assert.equal(inq.derivation.withdrawn, 1);
+}, 'full cross-turn store not wired to this surface (khora claims ledger owns it)');
 
 // 16.6 — external retrieval happens only for a recorded, authorized inquiry or
 // an explicit user request.
@@ -90,15 +103,16 @@ row('16.9', 'the record replays', 'met', async () => {
 row('16.10', 'held-out end-to-end evaluation', 'unmet', null, 'requires §15 arms and independently adjudicated labels — not yet run');
 
 for (const r of ROWS) {
-  if (r.status === 'met') {
+  if (r.status === 'met' || r.status === 'partial') {
     test(`§16.${r.id} — ${r.name}`, async () => { await r.check(); });
   }
 }
 
-test('the release gate names its status: met rows hold, unmet rows are disclosed', () => {
+test('the release gate names its status: met+partial hold, unmet rows are disclosed', () => {
   const met = ROWS.filter((r) => r.status === 'met');
-  const unmet = ROWS.filter((r) => r.status !== 'met');
-  assert.ok(met.length >= 8, `expected a real met set, got ${met.length}`);
+  const partial = ROWS.filter((r) => r.status === 'partial');
+  const unmet = ROWS.filter((r) => r.status === 'unmet');
+  assert.ok(met.length + partial.length >= 8, `expected a real met set, got ${met.length}+${partial.length}`);
   assert.ok(unmet.length >= 1, 'the gate must disclose what is not yet satisfied');
-  console.log('release gate: ' + met.length + ' met, ' + unmet.length + ' unmet (' + unmet.map((u) => '§' + u.id).join(', ') + ') — unmet disclosed, never rubber-stamped');
+  console.log('release gate: ' + met.length + ' met, ' + partial.length + ' partial, ' + unmet.length + ' unmet (' + unmet.map((u) => '§' + u.id).join(', ') + ') — disclosed, never rubber-stamped');
 });
