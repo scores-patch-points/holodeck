@@ -172,6 +172,22 @@ test('§12 status is typed: from-the-fold / contested / freshness / unresolved',
   assert.equal(answerFromFold({ question: 'Explain why the capital of France matters.', passages: PASSAGES }).status, 'unresolved');
 });
 
+test('the record is immutable and survives a JSON round-trip (§16.9 replay)', () => {
+  const inq = answerFromFold({
+    question: 'Fill in the blank: "The capital of France is ______."',
+    passages: PASSAGES,
+    edges: [E('e1', 'parent', 'A', 'B', 'doc#10-14'), E('e2', 'parent', 'B', 'C', 'doc#20-24')],
+  });
+  assert.equal(Object.isFrozen(inq), true, 'the record is a frozen, append-only artifact');
+  assert.equal(Object.isFrozen(inq.events), true);
+  const back = JSON.parse(JSON.stringify(inq));
+  assert.equal(back.schema, 'FoldInquiry@1');
+  assert.equal(back.status, 'from-the-fold');
+  assert.equal(back.answer.text, inq.answer.text);
+  assert.equal(back.derivation.chains, 1);
+  assert.equal(back.events[0].op, 'DEF');
+});
+
 test('standing is typed by door, and renderInquiry says what happened in one line', () => {
   assert.equal(standingForDoor('comparison'), 'derived');
   assert.equal(standingForDoor('cloze'), 'witnessed');
