@@ -28,7 +28,7 @@ python3 -m http.server 8000
 
 ## Content
 
-The workspace starts empty — there are no built-in sample corpora. Add anything: paste text, drop files, **drop a whole folder or choose one in the Add panel** (its files, and any nested folders, are read in place), point the omni bar at any URL, or give the Add panel a GitHub repo (`owner/repo` or a `github.com` URL) and its text files are pulled in and read. Everything you add lives in a browser-local "Your content" workspace. There is no relay of our own: a page is fetched **directly** from its own site first. Genuinely unrelated content you bring in can be split into its own workspace with "Fork" once it's recognized as a separate topic, rather than staying mixed in with everything else.
+The workspace starts empty — there are no built-in sample corpora. Add anything: paste text, drop files, **drop a whole folder or choose one in the Add panel** (its files, and any nested folders, are read in place), point the omni bar at any URL, or give the Add panel a GitHub repo (`owner/repo` or a `github.com` URL) and its text files are pulled in and read. Everything you add lives in a browser-local "Your content" workspace. Name a fresh one in the rail's **＋ New** box (or press Enter in it) to start an empty workspace and land in **Add & publish** for a separate strand of work. There is no relay of our own: a page is fetched **directly** from its own site first. Genuinely unrelated content you bring in can be split into its own workspace with "Fork" once it's recognized as a separate topic, rather than staying mixed in with everything else.
 
 ## Reading a page that blocks being read
 
@@ -109,6 +109,17 @@ Measured head-to-head on the pipeline's own sample (a landing page): flat OCR ga
 ## Transcription, proven local
 
 `falsify.reading.mjs` proves transcription on the machine, offline: `mlx_whisper` (whisper-small-mlx) transcribed an 8.7k-word audio file, and ffmpeg extracted a video's audio track which was then transcribed — each transcript fed back through the reading as a source. This is the two-rung path the surface offers for a video with no caption track.
+
+## Snip and stitch, by typing
+
+A clip sentence in the Ask box is a **cut**, never a question: the parser (`holodeck-clip.js`, deterministic, no model) finds the id, the spans, and the name, and the yt-dlp helper (`tools/ytdl-helper.py`, the same 127.0.0.1 helper caption reading already uses) cuts real bytes.
+
+```
+clip   2:28:00-2:29:35 from wNHXllwtgBk named evanssegall      -> one mp4 under clips/
+stitch 0:30-0:45 and 2:00-2:10 from wNHXllwtgBk as undercroft  -> both spans joined into one mp4
+```
+
+The cut is `yt-dlp --download-sections` on this machine; a stitch runs the parts through ffmpeg into one normalized file (part dims/fps/channels don't matter). The result lands in `clips/<name>.mp4`, served by this server at `/clips/<name>.mp4`, and is added as a doc with the words cut from the caption track when one exists. The standalone chat app (`the-fold`, vendored as `vendor/fold-chat`) types the same grammar through `fold-chat-clip.js`. Tests: `holodeck-clip.test.mjs`, `fold-chat/fold-chat-clip.test.mjs`. Falsifying control: any ordinary question parsing to a clip, or a clip sentence returning null.
 
 ## Status
 

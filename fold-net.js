@@ -180,7 +180,8 @@ export async function transcribe(fileOrBuf, onProgress, model, opts) {
   const extra = { return_timestamps: true, chunk_length_s: 30 };
   if (decPrefix) extra.decoder_input_ids = decPrefix;
   if (lang && !englishOnly) extra.language = lang;
-  for (let o = 0; o < pcm.length; o += CH) { onProgress && onProgress({ stage: 'transcribing', pct: Math.round(o / pcm.length * 100) });
+  const nChunks = Math.max(1, Math.ceil(pcm.length / CH));
+  for (let o = 0, ci = 0; o < pcm.length; o += CH, ci++) { onProgress && onProgress({ stage: 'transcribing', pct: Math.round(o / pcm.length * 100), i: ci + 1, n: nChunks });
     const r = await _asr(pcm.subarray(o, Math.min(pcm.length, o + CH)), extra);
     const base = o / 16000; (r.chunks || [{ timestamp: [0, CH / 16000], text: r.text }]).forEach(c => { const t = (c.text || '').trim(); if (t) segs.push({ start: +(base + (c.timestamp[0] || 0)).toFixed(2), end: +(base + (c.timestamp[1] || c.timestamp[0] || 0)).toFixed(2), text: t }); }); }
   onProgress && onProgress({ stage: 'done', pct: 100 });
