@@ -6267,7 +6267,7 @@ class Component extends DCLogic {
     if (view !== 'ingest' && !this.state.showSettings) return { ing: { on: false } }; this.netInit(); const S = this.state; const n = this._net || {}; const s = n.s; const R = this.wsRooms(); const cfg = this.netCfg(); const W = (n.cfg && n.cfg.watches) || [];
     const txNeeded = A.docs.filter(d => d.media && d.media.kind === 'youtube' && !d.media.segN && !d.lazy).slice(0, 20);
     const tpv = this.txProgVals();
-    return { ing: { on: view === 'ingest', showTx: txNeeded.length > 0 || tpv.busy || !!(n.asr && n.asr.stage !== 'done'), busy: S.netBusy || '', isBusy: !!S.netBusy,
+    return { ing: { on: view === 'ingest', showTx: true, busy: S.netBusy || '', isBusy: !!S.netBusy,
       signedIn: !!s, notSignedIn: !s, isGuest: !!(s && s.guest), canWrite: !!(s && !s.guest), isTemp: !!(s && s.ephemeral) || !!n.shareTemp, who: s ? (s.ephemeral ? 'Temporary account on this device' : s.user + (s.guest ? ' · guest (read only)' : '')) : '', tempNote: n.shareTemp ? 'You opened a shared link while signed in as ' + (s && s.user) + '. Merge it to bring the shared rooms into this account.' : 'You were given this account by a shared link, so you can read and add without signing up. Keep it, merge it into an account you already have, or leave it on this device.',
       onKeepPw: e => { this._kp = e.target.value; }, onKeepName: e => { this._kn = e.target.value; }, onKeep: () => this.keepAccount(this._kp, this._kn), onMergeU: e => { this._mu = e.target.value; }, onMergeP: e => { this._mp = e.target.value; }, onMerge: () => this.mergeAccount(this._mu, this._mp),
       onShare: () => this.makeShare(), share: n.share || '', hasShare: !!n.share, server: cfg.server || 'hyphae.social',
