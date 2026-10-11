@@ -1,0 +1,150 @@
+{
+ "schema": "LayoutPrior@1",
+ "family": "quake-list",
+ "giver": "er7-comp-harvest 2026-10-01",
+ "recipe": "fetch HTML (UA er7-quake-test/launch-test), strip scripts/styles, read list-row structure by hand-verified markers; image-look NAMED GAP (no local vision model, no screenshot tooling)",
+ "gate": {
+  "module": "consensus-gate.mjs ConsensusGate@1",
+  "params": {
+   "alpha": 0.05,
+   "minN": 3,
+   "maxN": 12
+  },
+  "labels": [
+   "null",
+   "T/M/P",
+   "weak",
+   "M/P/T",
+   "null",
+   "null",
+   "null",
+   "null"
+  ],
+  "verdict": "MORE",
+  "detail": "n=3 witnesses agree nowhere (K=3); needs HIGHER agreement"
+ },
+ "row_spec": {
+  "order": "magnitude-badge, place, time (newest-first)",
+  "standing": "CANDIDATE \u2014 gate MORE, not callable"
+ },
+ "provenance": [
+  {
+   "url": "https://earthquake.usgs.gov/earthquakes/map/",
+   "fetched": "2026-10-01",
+   "bytes": 96100,
+   "sha256": "619dd7e6b68fe75354b1b737985e60aafa42886db9870f341d7a9b44eaaf8efd",
+   "witness_label": "shell-claim",
+   "evidence": [
+    {
+     "marker": "Magnitude",
+     "byte_offset": 94869,
+     "snip": "a href=\"/earthquakes/feed/v1.0/summary/2.5_day.atom\" target=\"_blank\">           Magnitude 2.5+ Earthquakes, Past Day ATOM Feed         </a>         or our other <a href=\"/earthquakes/feed/\" target=\"_blank\">earthquake feeds</a>.       </p>     </noscript>     <script>       document.querySelector('us"
+    }
+   ],
+   "raw_bytes_note": "full bytes hashed at fetch; file in experiment scratch (non-permanent)"
+  },
+  {
+   "url": "https://www.emsc-csem.org/Earthquake/",
+   "fetched": "2026-10-01",
+   "bytes": 14564,
+   "sha256": "c5db50ad0fcd0213aa058e211b66d09840ae3e68f9714c0eaf304bcd6240d6f8",
+   "witness_label": "T/M/P",
+   "evidence": [
+    {
+     "marker": "Lat.",
+     "byte_offset": 12143,
+     "snip": "></th> \t\t</th><th class=\"tbdat\">Date & Time<div>UTC</div></th><th class=\"tblat\">Lat.<div>degrees</div></th><th class=\"tblon\">Lon.<div>degrees</div></th><th class=\"tbdep\">Depth<div>km</div></th><th class=\"tbmag\">Mag.<span>[+]</span></th><th class=\"tbreg\">Region</th></tr></thead> \t\t<tbody></tbody> \t\t<"
+    },
+    {
+     "marker": "Mag.",
+     "byte_offset": 12274,
+     "snip": "iv>degrees</div></th><th class=\"tbdep\">Depth<div>km</div></th><th class=\"tbmag\">Mag.<span>[+]</span></th><th class=\"tbreg\">Region</th></tr></thead> \t\t<tbody></tbody> \t\t</table> \t\t</div><div class=\"page-cont\"><div class=\"pag spei spei2\">\u00ab</div><div class=\"pag spei spei1\">\u2039</div><div class=\"pag\">1</di"
+    }
+   ],
+   "raw_bytes_note": "full bytes hashed at fetch; file in experiment scratch (non-permanent)"
+  },
+  {
+   "url": "https://earthquaketrack.com/recent",
+   "fetched": "2026-10-01",
+   "bytes": 162060,
+   "sha256": "178a3f5d2f112239fec64bcca8e44dcca832c121c15e2cb6ca49075a22bf626b",
+   "witness_label": "weak",
+   "evidence": [
+    {
+     "marker": "Filter By Magnitude",
+     "byte_offset": 86629,
+     "snip": "a-bs-toggle=\"dropdown\" aria-expanded=\"false\" id=\"biggest-dropdown-78455\">       Filter By Magnitude       <span class=\"caret\"></span>     </button>     <ul class=\"dropdown-menu\" aria-labelledby=\"biggest-dropdown-78455\">       <li class=\"tab active\"><a class=\"dropdown-item active\" href=\"/recent\">No F"
+    }
+   ],
+   "raw_bytes_note": "full bytes hashed at fetch; file in experiment scratch (non-permanent)"
+  },
+  {
+   "url": "https://www.volcanodiscovery.com/earthquakes/today.html",
+   "fetched": "2026-10-01",
+   "bytes": 441226,
+   "sha256": "08c386a35142ffa780c168a8509fda366fbec770f0b30d4e81d90788d76ad390",
+   "witness_label": "M/P/T",
+   "evidence": [
+    {
+     "marker": "Latest quakes worldwide",
+     "byte_offset": 61506,
+     "snip": "b>Earthquake activity near average</b></div></i></div></div> <h1 class=\"normal\">Latest quakes worldwide in the past 24 hours<span class=\"optional\"> on Thursday, October 1, 2026</span><span class=\"optional\"> - list, stats and map</span></h1> <div class=\"h3 small highlight\"><a href=\"https://www.volcan"
+    },
+    {
+     "marker": "Mag.&nbsp;",
+     "byte_offset": 62419,
+     "snip": " style=\"white-space:normal\"><b><a href=\"earthquakes/greece.html?quake=23403542\">Mag.&nbsp;<span class=\"magCircle mag2\">2.7</span> earthquake Gulf of Patras - W. Greece</a></b> - <nowrap style=\"font-weight:normal\"><span class=\"ageStr\" data-time=\"1790860768\"></span></nowrap></td></tr><tr><td><b>Latest"
+    },
+    {
+     "marker": "widely felt",
+     "byte_offset": 61987,
+     "snip": "hquakes/japan/chiba.html\">Chiba</a>, <a href=\"earthquakes/japan.html\">Japan</a> widely felt - <script>writeAge(1790857631)</script></div><table id=\"topSummary\" class=\"dataTable small\" style=\"display:block;margin:0 auto var(--paddingM)\" cellpadding=\"0\" cellspacing=\"0\"><tr><td onclick=\"document.getEle"
+    }
+   ],
+   "raw_bytes_note": "full bytes hashed at fetch; file in experiment scratch (non-permanent)"
+  },
+  {
+   "url": "https://scedc.caltech.edu/recent/",
+   "fetched": "2026-10-01",
+   "bytes": 4875,
+   "sha256": "908927a0c371dc5fb59a287aa8e164053ff08f52fbe515fcd630ebd1581bc655",
+   "witness_label": "empty",
+   "evidence": [],
+   "raw_bytes_note": "full bytes hashed at fetch; file in experiment scratch (non-permanent)"
+  },
+  {
+   "url": "https://ds.iris.edu/seismon/",
+   "fetched": "2026-10-01",
+   "bytes": 56802,
+   "sha256": "4b6d48024d147fb641ca9ac43034c557adcf3993ccef35f360e126c73f0dc638",
+   "witness_label": "empty",
+   "evidence": [],
+   "raw_bytes_note": "full bytes hashed at fetch; file in experiment scratch (non-permanent)"
+  },
+  {
+   "url": "https://earthquake-report.com/",
+   "fetched": "2026-10-01",
+   "bytes": 180352,
+   "sha256": "9e692bc7bbfb5a50bc4a0864e421e0e535637d625853ebed4a2e1b12a3d9c610",
+   "witness_label": "miss-parked",
+   "evidence": [],
+   "raw_bytes_note": "full bytes hashed at fetch; file in experiment scratch (non-permanent)"
+  },
+  {
+   "url": "https://earthquake.usgs.gov/earthquakes/map/?listOnlyShown=true",
+   "fetched": "2026-10-01",
+   "bytes": 96100,
+   "sha256": "619dd7e6b68fe75354b1b737985e60aafa42886db9870f341d7a9b44eaaf8efd",
+   "witness_label": "shell-dup",
+   "evidence": [],
+   "raw_bytes_note": "full bytes hashed at fetch; file in experiment scratch (non-permanent)"
+  }
+ ],
+ "history": [
+  {
+   "date": "2026-10-01",
+   "event": "seeded from quake-exp harvest",
+   "gate": "MORE"
+  }
+ ]
+}

@@ -1,0 +1,157 @@
+{
+ "n": 30,
+ "clean": 15,
+ "fake": 15,
+ "variants": {
+  "full detector (builtins + core-module attrs + stdlib module names)": {
+   "TPR": 0.9333333333333333,
+   "TPRci": [
+    0.7018346989112436,
+    0.9881331046384678
+   ],
+   "tp": 14,
+   "FPR": 0.06666666666666667,
+   "FPRci": [
+    0.011866895361532319,
+    0.2981653010887565
+   ],
+   "fp": 1,
+   "falsePositiveIds": [
+    "c01:os.listdir/os.getcwd"
+   ],
+   "missedIds": [
+    "f15(method)"
+   ]
+  },
+  "full detector, truncation-aware (POST-HOC: modules whose list is at the cap are unverifiable, a typed gap)": {
+   "TPR": 0.8,
+   "TPRci": [
+    0.548145510759447,
+    0.9295245070826609
+   ],
+   "tp": 12,
+   "FPR": 0,
+   "FPRci": [
+    0,
+    0.20388330359648707
+   ],
+   "fp": 0,
+   "falsePositiveIds": [],
+   "missedIds": [
+    "f01(modattr)",
+    "f02(modattr)",
+    "f15(method)"
+   ]
+  },
+  "bare names only (builtins from the prior)": {
+   "TPR": 0.2,
+   "TPRci": [
+    0.0704754929173392,
+    0.4518544892405531
+   ],
+   "tp": 3,
+   "FPR": 0,
+   "FPRci": [
+    0,
+    0.20388330359648707
+   ],
+   "fp": 0,
+   "falsePositiveIds": [],
+   "missedIds": [
+    "f01(modattr)",
+    "f02(modattr)",
+    "f03(modattr)",
+    "f04(modattr)",
+    "f05(modattr)",
+    "f06(modattr)",
+    "f07(modattr)",
+    "f08(modattr)",
+    "f09(modattr)",
+    "f10(modattr)",
+    "f14(module)",
+    "f15(method)"
+   ]
+  },
+  "module attributes only (coreApi of 25 modules)": {
+   "TPR": 0.6666666666666666,
+   "TPRci": [
+    0.4171354755711992,
+    0.8482367565633053
+   ],
+   "tp": 10,
+   "FPR": 0.06666666666666667,
+   "FPRci": [
+    0.011866895361532319,
+    0.2981653010887565
+   ],
+   "fp": 1,
+   "falsePositiveIds": [
+    "c01:os.listdir/os.getcwd"
+   ],
+   "missedIds": [
+    "f11(bare)",
+    "f12(bare)",
+    "f13(bare)",
+    "f14(module)",
+    "f15(method)"
+   ]
+  },
+  "module names only": {
+   "TPR": 0.06666666666666667,
+   "TPRci": [
+    0.011866895361532319,
+    0.2981653010887565
+   ],
+   "tp": 1,
+   "FPR": 0,
+   "FPRci": [
+    0,
+    0.20388330359648707
+   ],
+   "fp": 0,
+   "falsePositiveIds": [],
+   "missedIds": [
+    "f01(modattr)",
+    "f02(modattr)",
+    "f03(modattr)",
+    "f04(modattr)",
+    "f05(modattr)",
+    "f06(modattr)",
+    "f07(modattr)",
+    "f08(modattr)",
+    "f09(modattr)",
+    "f10(modattr)",
+    "f11(bare)",
+    "f12(bare)",
+    "f13(bare)",
+    "f15(method)"
+   ]
+  }
+ },
+ "byKind": {
+  "modattr": {
+   "n": 10,
+   "detected": 8
+  },
+  "bare": {
+   "n": 3,
+   "detected": 3
+  },
+  "module": {
+   "n": 1,
+   "detected": 1
+  },
+  "method": {
+   "n": 1,
+   "detected": 0
+  }
+ },
+ "prior": {
+  "builtins": 158,
+  "coreModules": 25,
+  "stdlibModules": 300
+ },
+ "baselineSyntaxOnly": {
+  "note": "py_compile accepts all 30 snippets: TPR 0/15, FPR 0/15 (every injected fake is syntactically valid)"
+ }
+}

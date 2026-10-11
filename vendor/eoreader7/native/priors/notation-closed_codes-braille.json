@@ -1,0 +1,186 @@
+{
+ "schema": "NotationPrior@1",
+ "family": "closed_codes",
+ "kind": "braille-table",
+ "giver": {
+  "name": "English Braille / Unified English Braille grade-1 (uncontracted) cells, indicators and punctuation",
+  "url": "https://en.wikipedia.org/wiki/English_Braille",
+  "cell_identity_giver": "Unicode Character Database names BRAILLE PATTERN DOTS-xxxx (python unicodedata)",
+  "licence_note": "en.wikipedia tables CC BY-SA 4.0 (attribution in PROVENANCE.md); cites BANA EBAE 2002 / ICEB UEB 2013",
+  "audit": {
+   "pybraille_MIT": {
+    "letters": [
+     26,
+     26
+    ],
+    "digits": [
+     10,
+     10
+    ],
+    "disagreements": [
+     "semicolon (oracle error)",
+     "parentheses (oracle is EBAE one-cell, giver UEB two-cell)"
+    ]
+   }
+  }
+ },
+ "built": "2026-10-06",
+ "train": {
+  "sources": [
+   "moby-dick",
+   "origin-of-species",
+   "pride-and-prejudice",
+   "tale-of-two-cities"
+  ],
+  "sentences": 25917,
+  "chars": 3588959,
+  "text_sha256": "55bb1a08d2a3f726c05956efddd7ef6c46ed396bb70cbd1950ef8e7be9912d37"
+ },
+ "rule": "priors REFUSE or NOMINATE, never admit: a unit absent from the table is a typed gap, never a guess",
+ "letters": {
+  "a": "⠁",
+  "b": "⠃",
+  "c": "⠉",
+  "d": "⠙",
+  "e": "⠑",
+  "f": "⠋",
+  "g": "⠛",
+  "h": "⠓",
+  "i": "⠊",
+  "j": "⠚",
+  "k": "⠅",
+  "l": "⠇",
+  "m": "⠍",
+  "n": "⠝",
+  "o": "⠕",
+  "p": "⠏",
+  "q": "⠟",
+  "r": "⠗",
+  "s": "⠎",
+  "t": "⠞",
+  "u": "⠥",
+  "v": "⠧",
+  "w": "⠺",
+  "x": "⠭",
+  "y": "⠽",
+  "z": "⠵"
+ },
+ "digits": {
+  "0": "⠚",
+  "1": "⠁",
+  "2": "⠃",
+  "3": "⠉",
+  "4": "⠙",
+  "5": "⠑",
+  "6": "⠋",
+  "7": "⠛",
+  "8": "⠓",
+  "9": "⠊"
+ },
+ "indicators": {
+  "numeric": "⠼",
+  "grade1_letter": "⠰",
+  "capital": "⠠"
+ },
+ "punct_cells": {
+  ",": [
+   "⠂"
+  ],
+  ";": [
+   "⠆"
+  ],
+  ":": [
+   "⠒"
+  ],
+  ".": [
+   "⠲"
+  ],
+  "!": [
+   "⠖"
+  ],
+  "?": [
+   "⠦"
+  ],
+  "'": [
+   "⠄"
+  ],
+  "-": [
+   "⠤"
+  ]
+ },
+ "punct_multi_cell": {
+  "(": [
+   "⠐",
+   "⠣"
+  ],
+  ")": [
+   "⠐",
+   "⠜"
+  ],
+  "quote_open": [
+   "⠘",
+   "⠦"
+  ],
+  "quote_close": [
+   "⠘",
+   "⠴"
+  ]
+ },
+ "space_cells": [
+  "⠀",
+  " "
+ ],
+ "rules": {
+  "numeric_mode": "numeric indicator opens numeric mode; letter cells a-j read as digits 1-9,0; ',' and '.' continue it only when a digit cell follows; any other cell or a space ends it",
+  "grade1_letter_after_number": "a letter a-j directly after a number needs the grade-1 letter indicator",
+  "capital": "one capital indicator before the letter; two before a word of >=2 letters that is all capitals",
+  "scope": "grade-1 (uncontracted) text; contractions, formatting indicators beyond capitals/numeric, Nemeth, music and IPA braille are NOT in this prior (typed gaps)"
+ },
+ "counts": {
+  "from": "TRAIN",
+  "cell_counts": {
+   "⠀": 632480,
+   "⠁": 229563,
+   "⠂": 63495,
+   "⠃": 47890,
+   "⠄": 5132,
+   "⠅": 18787,
+   "⠇": 118724,
+   "⠉": 77296,
+   "⠊": 201581,
+   "⠋": 68062,
+   "⠍": 72321,
+   "⠎": 187049,
+   "⠏": 49744,
+   "⠐": 1494,
+   "⠑": 363130,
+   "⠒": 1132,
+   "⠓": 174489,
+   "⠕": 210941,
+   "⠗": 169582,
+   "⠘": 12701,
+   "⠙": 117074,
+   "⠚": 3451,
+   "⠛": 57542,
+   "⠜": 742,
+   "⠝": 200955,
+   "⠞": 257652,
+   "⠟": 3556,
+   "⠠": 58269,
+   "⠣": 752,
+   "⠤": 8099,
+   "⠥": 77609,
+   "⠦": 8886,
+   "⠧": 28833,
+   "⠭": 4576,
+   "⠰": 1,
+   "⠲": 29577,
+   "⠴": 6321,
+   "⠵": 2122,
+   "⠺": 60983,
+   "⠼": 1671,
+   "⠽": 54723
+  },
+  "n_cells": 3688987
+ }
+}

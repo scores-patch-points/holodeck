@@ -1,0 +1,82 @@
+{
+ "$comment": "The germline GUIDE ARRAY \u2014 an explicit corpus of coding memory. Data only, no code. Staged here for transfer to eoPriors; nothing in packages/ may hardcode any of it.",
+ "schema": "GuideArrayPrior@1",
+ "provenance": {
+  "source": "Seeded from goldens/germline run traces (2026-08-16 session): two refusals and one survivor, local Qwen2.5-1.5B guide-emitter, gates per packages/host/germline.js germline@0",
+  "built_by": "session 01V37pTs2vxBqvUL9fBM4EEw, via the recorded run.json traces"
+ },
+ "notes": [
+  "entries: guides with their outcomes \u2014 survivors AND refusals, equal weight. Refusals are the negative spacers scan rules get mined from (two already were: the return-scan and the newline hint).",
+  "Consumed by packages/host/guide-array.js: selectGuide retrieves survivors only, current germline version only, by task-token overlap; every retrieved guide re-earns through the gates against the CALLER\\u0027s fixture (memory never bypasses selection).",
+  "Append via appendEntry (pure, content-hash deduped, never deletes)."
+ ],
+ "entries": [
+  {
+   "template": "perceiver",
+   "germline_version": "germline@0",
+   "task": "Units are the non-empty lines of the text. The reduced series is the number of words on each line read so far (split on whitespace).",
+   "fillings": {
+    "load_body": "return text.split('\n').map(line => line.trim().split(/\b/).length)",
+    "unit_count_expr": "units.length",
+    "reduce_body": "return units.slice(0, readTo).map(unit => unit.length)"
+   },
+   "giver": "local-model qwen2.5-1.5b via germline-e2e.mjs",
+   "outcome": {
+    "survived": false,
+    "gate": "imports",
+    "gap": "not_earned",
+    "lesson": "a guide needing string escapes was JSON-mangled (raw newline in a JS literal); the model could not repair even with a typed hint \u2014 prefer tasks expressible with regex literals, or grammar-constrain hole content to exclude quotes"
+   },
+   "fixture": {
+    "path": "scripts/adversarial/fixtures/frankenstein-excerpt.txt"
+   },
+   "id": "db2a0248"
+  },
+  {
+   "template": "perceiver",
+   "germline_version": "germline@0",
+   "task": "Units are the words of the text, split on whitespace (use a regex literal, not a string). The reduced series is the character length of each word read so far.",
+   "fillings": {
+    "load_body": "units = text.split(/\\s+/);",
+    "unit_count_expr": "units.length",
+    "reduce_body": "readTo = max(2, floor((readTo * fraction))); units = units.slice(0, readTo); return units.map(unit => unit.length);"
+   },
+   "giver": "local-model qwen2.5-1.5b via germline-e2e.mjs",
+   "outcome": {
+    "survived": false,
+    "gate": "scan/behavior",
+    "gap": "not_earned",
+    "lesson": "assigned to an undeclared variable instead of returning \u2014 mined into the return-scan (statements holes must return), which now refuses this class before assembly"
+   },
+   "fixture": {
+    "path": "scripts/adversarial/fixtures/frankenstein-excerpt.txt"
+   },
+   "id": "a58c626d"
+  },
+  {
+   "template": "perceiver",
+   "germline_version": "germline@0",
+   "task": "Units are the words of the text, split on whitespace (use a regex literal, not a string). The reduced series is the character length of each word read so far.",
+   "fillings": {
+    "load_body": "return text.split(/[.?!]/).filter(s => s.trim().length > 0);",
+    "unit_count_expr": "units.length",
+    "reduce_body": "return units.slice(0, readTo).map(s => s.length);"
+   },
+   "giver": "local-model qwen2.5-1.5b via germline-e2e.mjs (repair round)",
+   "outcome": {
+    "survived": true,
+    "cleared": [
+     "imports",
+     "contract",
+     "behavior",
+     "physics"
+    ],
+    "caveat": "contract-true, intent-unverified: splits on sentence punctuation where the task said whitespace \u2014 the missing fifth gate (task-derived intent check) is documented in goldens/germline/README.md"
+   },
+   "fixture": {
+    "path": "scripts/adversarial/fixtures/frankenstein-excerpt.txt"
+   },
+   "id": "cae8fd4f"
+  }
+ ]
+}

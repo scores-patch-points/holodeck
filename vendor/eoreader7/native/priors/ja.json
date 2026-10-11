@@ -1,0 +1,129 @@
+{
+  "$comment": "A LANGUAGE prior. Data only, no code. Measured off real public-domain Japanese prose by scripts/build-lang-prior-ja.mjs — the engine receives it through bin/priors/lang/, nothing in packages/ hardcodes any of it.",
+  "schema": "AbbreviationPrior@3",
+  "language": "ja",
+  "provenance": {
+    "source": "scripts/build-lang-prior-ja.mjs — measured from udhr-jpn.txt; udhr-jpn_osaka.txt; udhr-jpn_tokyo.txt; aozora789_Wagahaiwa_Nekodearu__Natsume_Soseki_.txt",
+    "built_by": "scripts/build-lang-prior-ja.mjs (absorption: rules read off the corpus, never asserted)",
+    "corpus_register": "Two registers, pooled: modern legal (UN Universal Declaration of Human Rights, Japanese, OHCHR) and Meiji-era literary (Aozora Bunko #789, Natsume Sōseki's 吾輩は猫である 1905–06, 新字新仮名, public domain)"
+  },
+  "declared_params": {
+    "candidate_terminators": [
+      "。",
+      "．",
+      "！",
+      "？",
+      "…",
+      ".",
+      "!",
+      "?"
+    ],
+    "qualification_rule": "count >= 5 AND <50% of occurrences bound inside tokens (digit.digit or letter.letter) — line-break boundary tests are Latin-brained and were measured failing on unspaced scripts",
+    "candidate_closers": [
+      "」",
+      "』",
+      "）",
+      "”",
+      "'",
+      "\"",
+      "〕"
+    ]
+  },
+  "measured": {
+    "corpus_chars": 386787,
+    "per_file": [
+      {
+        "file": "udhr-jpn.txt",
+        "chars": 5091,
+        "marks": {
+          "。": 65,
+          "…": 0,
+          "？": 0,
+          "！": 0,
+          ".": 0
+        }
+      },
+      {
+        "file": "udhr-jpn_osaka.txt",
+        "chars": 5097,
+        "marks": {
+          "。": 67,
+          "…": 0,
+          "？": 0,
+          "！": 0,
+          ".": 0
+        }
+      },
+      {
+        "file": "udhr-jpn_tokyo.txt",
+        "chars": 5073,
+        "marks": {
+          "。": 66,
+          "…": 0,
+          "？": 0,
+          "！": 0,
+          ".": 0
+        }
+      },
+      {
+        "file": "aozora789_Wagahaiwa_Nekodearu__Natsume_Soseki_.txt",
+        "chars": 371522,
+        "marks": {
+          "。": 7489,
+          "…": 433,
+          "？": 141,
+          "！": 8,
+          ".": 8
+        }
+      }
+    ],
+    "terminator_counts": {
+      "。": 7687,
+      "…": 433,
+      "？": 141,
+      "！": 8,
+      ".": 8
+    },
+    "closing_quotes": [
+      {
+        "char": "」",
+        "count": 246
+      }
+    ],
+    "latin_abbreviation_candidates": {
+      "www": 2,
+      "aozora": 2,
+      "gr": 2,
+      "separation": 1
+    }
+  },
+  "sentence_terminators": [
+    "。",
+    "…",
+    "？",
+    "！"
+  ],
+  "closing_quote_chars": [
+    "」"
+  ],
+  "abbreviations": [],
+  "relation_case_markers": {
+    "subject": [
+      "は",
+      "が"
+    ],
+    "object": [
+      "を"
+    ],
+    "clauseBreakers": [
+      "、"
+    ]
+  },
+  "notes": [
+    "@3 (2026-08-21) adds sentence_terminators/closing_quote_chars alongside @2's additive-provenance keys — additive only; @1/@2 files remain valid and mean the same thing they always meant.",
+    "The engine's frozen default set (spans.js SENTENCE_TERMINATORS, giver script/latn) covers . ! ? … — this prior EXTENDS reception to fullwidth marks (。！？…), it does not replace the Latin defaults.",
+    "Ellipsis '…' qualified only if measured above; single-character '…' vs two-cell '……' both reduce to the same code point.",
+    "Segmentation (unspaced text -> word surfaces) is NOT claimed by this prior — that is a different organ and a different measurement.",
+    "relation_case_markers feeds perceiver/text/case-relations.js, the layer UNDERNEATH SVO word order: role is read off the received particle, not position. The role MAPPING (は/が -> subject, を -> object) is closed-class linguistic knowledge declared in this builder's CASE_MARKER_CANDIDATES; the corpus measurement decides which candidates are real here. Consumed only when a document declares language \"ja\"."
+  ]
+}

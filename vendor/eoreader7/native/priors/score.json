@@ -1,0 +1,660 @@
+{
+ "schema": "Goal6Score@1",
+ "proxy": "LLM panel — five context-isolated readers sharing one base model; an upper bound on independence, never a human ceiling; file access was prohibited by instruction, not by sandbox (residual disclosed)",
+ "floor": 0.4,
+ "panelVsStored": {
+  "en": {
+   "n": 40,
+   "cell": "16/40 (40%)",
+   "op": "16/40 (40%)",
+   "grain": "38/40 (95%)"
+  },
+  "ar": {
+   "n": 40,
+   "cell": "25/40 (63%)",
+   "op": "27/40 (68%)",
+   "grain": "38/40 (95%)"
+  },
+  "es": {
+   "n": 40,
+   "cell": "14/40 (35%)",
+   "op": "15/40 (38%)",
+   "grain": "37/40 (93%)"
+  },
+  "zh": {
+   "n": 40,
+   "cell": "28/40 (70%)",
+   "op": "28/40 (70%)",
+   "grain": "37/40 (93%)"
+  },
+  "sw": {
+   "n": 40,
+   "cell": "21/40 (53%)",
+   "op": "24/40 (60%)",
+   "grain": "36/40 (90%)"
+  }
+ },
+ "panelVsPanel": {
+  "cell": {
+   "kappa": 0.31,
+   "unanimousProps": 6,
+   "categories": 15
+  },
+  "op": {
+   "kappa": 0.323,
+   "unanimousProps": 8,
+   "categories": 9
+  },
+  "grain": {
+   "kappa": 0.525,
+   "unanimousProps": 30,
+   "categories": 3
+  },
+  "strata": {
+   "construction-split": {
+    "props": 20,
+    "cell": 0.2922008547008546,
+    "grain": 0.4401378122308349
+   },
+   "stored-unanimous": {
+    "props": 20,
+    "cell": 0.3212365591397851,
+    "grain": 0.6097137901127501
+   }
+  }
+ },
+ "verdictAgainstFloor": {
+  "cell": "kappa 0.310 is BELOW the declared 0.4 floor — reported, not certified",
+  "op": "kappa 0.323 is BELOW the declared 0.4 floor — reported, not certified",
+  "grain": "kappa 0.525 clears the declared 0.4 floor"
+ },
+ "disagreements": {
+  "en": [
+   {
+    "prop": "udhr:advent-aspiration",
+    "stored": "DEF·Figure",
+    "blind": "EVA·Figure",
+    "because": "participle of 'proclaim' — a claim (this advent stands as the highest aspiration) held forth against its holders; one specific proclamation of one specific claim"
+   },
+   {
+    "prop": "udhr:compelled-to-rebellion",
+    "stored": "INS·Pattern",
+    "blind": "SIG·Pattern",
+    "because": "'is not to be compelled' is polarity plus force (modality wall); the act is 'have recourse' — turning to a course, translocation-like standing-toward; rebellion is an act-kind"
+   },
+   {
+    "prop": "udhr:states-pledged",
+    "stored": "CON·Figure",
+    "blind": "EVA·Figure",
+    "because": "pledging holds a commitment-claim (that they will achieve X) against its holders; one specific completed pledge, so Figure"
+   },
+   {
+    "prop": "udhr:endowed-reason",
+    "stored": "CON·Pattern",
+    "blind": "INS·Pattern",
+    "because": "copula rule 1: participle of 'endow' — bestowal brings reason and conscience into presence in the patient (Generate·Existence); generic over the kind 'all human beings'"
+   },
+   {
+    "prop": "udhr:no-distinction-status",
+    "stored": "SEG·Pattern",
+    "blind": "DEF·Pattern",
+    "because": "light-verb 'make a distinction' = distinguishing, DEF's own example — bounding meaning between persons by status; the '-' polarity never moves the operator; a class of distinctions → Pattern"
+   },
+   {
+    "prop": "udhr:life-liberty-security",
+    "stored": "SIG·Pattern",
+    "blind": "EVA·Pattern",
+    "because": "a right is a claim held by its holder (Relate·Interpretation); normative scope over everyone → Pattern"
+   },
+   {
+    "prop": "udhr:no-slavery",
+    "stored": "CON·Pattern",
+    "blind": "SIG·Ground",
+    "because": "'held in' keeps the patient placed within a state — placement reads SIG with grain from what it lands on: slavery/servitude is a state → Ground; negation is polarity, never NUL"
+   },
+   {
+    "prop": "udhr:no-torture",
+    "stored": "CON·Pattern",
+    "blind": "SIG·Pattern",
+    "because": "'subjected to' places the patient under treatment — placement → SIG; lands on torture/treatment/punishment, kinds of act → Pattern; polarity handled elsewhere"
+   },
+   {
+    "prop": "udhr:effective-remedy",
+    "stored": "SIG·Pattern",
+    "blind": "EVA·Pattern",
+    "because": "'has the right to' holds a claim against its holder; normative scope over everyone → Pattern"
+   },
+   {
+    "prop": "udhr:no-arbitrary-arrest",
+    "stored": "CON·Pattern",
+    "blind": "SIG·Pattern",
+    "because": "'subjected to' is placement-under → SIG; arrest/detention/exile are act-kinds → Pattern; the prohibition is polarity, not a different act"
+   },
+   {
+    "prop": "udhr:presumed-innocent",
+    "stored": "SIG·Pattern",
+    "blind": "EVA·Pattern",
+    "because": "a right held by anyone in the class 'charged with a penal offence' — claim held against holder, kind-scope → Pattern"
+   },
+   {
+    "prop": "udhr:no-heavier-penalty",
+    "stored": "INS·Pattern",
+    "blind": "SIG·Pattern",
+    "because": "'imposed' = laid upon — the translocation wall ('was laid') reads placement as SIG; normative scope over the kind of retroactive penalties → Pattern; 'nor' is polarity"
+   },
+   {
+    "prop": "udhr:no-arbitrary-interference",
+    "stored": "CON·Pattern",
+    "blind": "SIG·Pattern",
+    "because": "'subjected to' is placement-under → SIG; interference/attacks are act-kinds under a norm → Pattern; polarity handled elsewhere"
+   },
+   {
+    "prop": "udhr:protection-of-law",
+    "stored": "SIG·Pattern",
+    "blind": "EVA·Pattern",
+    "because": "'has the right to' holds a claim against its holder; everyone = kind-scope → Pattern"
+   },
+   {
+    "prop": "udhr:seek-asylum",
+    "stored": "SIG·Pattern",
+    "blind": "EVA·Pattern",
+    "because": "'has the right to' holds a claim against its holder; everyone = kind-scope → Pattern"
+   },
+   {
+    "prop": "udhr:family-protected",
+    "stored": "SIG·Pattern",
+    "blind": "EVA·Pattern",
+    "because": "'is entitled to' holds an entitlement-claim against its holder, same family as 'has the right to'; the family as kind → Pattern"
+   },
+   {
+    "prop": "udhr:freedom-of-thought",
+    "stored": "SIG·Pattern",
+    "blind": "EVA·Pattern",
+    "because": "'has the right to' holds a claim against its holder; everyone = kind-scope → Pattern"
+   },
+   {
+    "prop": "udhr:take-part-government",
+    "stored": "SIG·Pattern",
+    "blind": "EVA·Pattern",
+    "because": "'has the right to' holds a claim against its holder; everyone = kind-scope → Pattern"
+   },
+   {
+    "prop": "udhr:will-expressed-elections",
+    "stored": "SIG·Pattern",
+    "blind": "INS·Pattern",
+    "because": "copula rule 1: participle of 'express' — making the will manifest brings its appearance forth (Generate·Existence); periodic elections are a recurrence → Pattern"
+   },
+   {
+    "prop": "udhr:right-to-work",
+    "stored": "SIG·Pattern",
+    "blind": "EVA·Pattern",
+    "because": "'has the right to' holds a claim against its holder; everyone = kind-scope → Pattern"
+   },
+   {
+    "prop": "udhr:just-remuneration",
+    "stored": "SIG·Pattern",
+    "blind": "EVA·Pattern",
+    "because": "'has the right to' holds a claim against anyone in the class 'who works' → Pattern"
+   },
+   {
+    "prop": "udhr:standard-of-living",
+    "stored": "SIG·Pattern",
+    "blind": "EVA·Pattern",
+    "because": "'has the right to' holds a claim against its holder; everyone = kind-scope → Pattern"
+   },
+   {
+    "prop": "udhr:education-directed",
+    "stored": "SIG·Pattern",
+    "blind": "CON·Pattern",
+    "because": "'directed to' orients education toward its aims — an arrangement held in relation, neither side made or unmade; kind-level aims under a norm → Pattern"
+   },
+   {
+    "prop": "udhr:no-destructive-interpretation",
+    "stored": "DEF·Ground",
+    "blind": "REC·Pattern",
+    "because": "'interpreted as implying' is frame-production, REC's own example 'reinterpreted'; the '-' polarity never moves the operator; any such reading, class-wide → Pattern"
+   }
+  ],
+  "ar": [
+   {
+    "prop": "udhr:compelled-to-rebellion",
+    "stored": "INS·Pattern",
+    "blind": "CON·Pattern",
+    "because": "يضطر is necessity marking (force, stripped); the act is التمرد على — standing-against the arrangement of tyranny and oppression; generic المرء scope"
+   },
+   {
+    "prop": "udhr:states-pledged",
+    "stored": "CON·Figure",
+    "blind": "REC·Figure",
+    "because": "تعهدت brings a new normative commitment into being — Generate·Interpretation; one collective pledge-act by the member states"
+   },
+   {
+    "prop": "udhr:promote-respect",
+    "stored": "REC·Pattern",
+    "blind": "SIG·Pattern",
+    "because": "سعى is a motion verb (strive/go toward) — translocation reads SIG; normative scope over every individual and organ promotes to Pattern"
+   },
+   {
+    "prop": "udhr:endowed-reason",
+    "stored": "CON·Pattern",
+    "blind": "INS·Pattern",
+    "because": "passive وهبوا — the bestowal brings reason and conscience into being in the endowed; claim over all humankind as a kind"
+   },
+   {
+    "prop": "udhr:no-slavery",
+    "stored": "CON·Pattern",
+    "blind": "SEG·Pattern",
+    "because": "deontic لا يجوز stripped; enslaving cuts a person out of free standing into servitude — removal in the arrangement of persons; any-person scope"
+   },
+   {
+    "prop": "udhr:no-torture",
+    "stored": "CON·Pattern",
+    "blind": "SIG·Pattern",
+    "because": "يعرض لـ = exposed/laid open to — placement before a treatment (was-laid family reads SIG); any-person and treatment-kinds scope"
+   },
+   {
+    "prop": "udhr:no-arbitrary-arrest",
+    "stored": "CON·Pattern",
+    "blind": "SEG·Pattern",
+    "because": "deontic stripped; arrest/detention/exile seize, bound and remove the person — cutting an arrangement; any-person scope"
+   },
+   {
+    "prop": "udhr:no-heavier-penalty",
+    "stored": "INS·Pattern",
+    "blind": "SIG·Pattern",
+    "because": "توقع = made to fall / laid upon — translocation-placement of a penalty (was-laid family); generic law-scope landing"
+   },
+   {
+    "prop": "udhr:no-arbitrary-interference",
+    "stored": "CON·Pattern",
+    "blind": "SIG·Pattern",
+    "because": "يعرض لـ = exposed/laid open to interference — placement-under; any-person and interference-kinds scope"
+   },
+   {
+    "prop": "udhr:marriage-consent",
+    "stored": "CON·Pattern",
+    "blind": "SYN·Pattern",
+    "because": "أبرم = seal/conclude (root image: twist a rope tight) — a binding contractual whole produced, Generate·Structure; marriage-contract as kind under norm"
+   },
+   {
+    "prop": "udhr:opinion-right-includes",
+    "stored": "CON·Pattern",
+    "blind": "CON·Figure",
+    "because": "يشمل = contains/encompasses — arrangement held in relation (whole–parts), CON's own example; the extent of this one specific right"
+   },
+   {
+    "prop": "udhr:technical-available",
+    "stored": "INS·Pattern",
+    "blind": "SYN·Pattern",
+    "because": "deontic ينبغي stripped; تعميم = make general — produces the arrangement of universal provision, Generate·Structure; generality is law-like scope"
+   },
+   {
+    "prop": "udhr:higher-accessible",
+    "stored": "INS·Pattern",
+    "blind": "SYN·Pattern",
+    "because": "deontic stripped; ييسر = make easy — produces open equal access (a re-arranged gate), Generate·Structure; for-all normative scope"
+   },
+   {
+    "prop": "udhr:limitation-purpose",
+    "stored": "REC·Pattern",
+    "blind": "SIG·Pattern",
+    "because": "ضمان = keep recognition and respect standing/secured — presence held firm in relation; others'-rights normative scope"
+   },
+   {
+    "prop": "udhr:no-destructive-interpretation",
+    "stored": "NUL·Ground",
+    "blind": "NUL·Pattern",
+    "because": "existential-negative ليس في هذا الإعلان نص ('there is no provision…') — the absence IS the act; any-provision-of-that-kind scope"
+   }
+  ],
+  "es": [
+   {
+    "prop": "udhr:recognition-foundation",
+    "stored": "SIG·Figure",
+    "blind": "CON·Ground",
+    "because": "tener por base holds conditions on their foundation — an arrangement held in relation, landing on world-conditions (la libertad, la justicia y la paz en el mundo), a whole state."
+   },
+   {
+    "prop": "udhr:advent-aspiration",
+    "stored": "DEF·Figure",
+    "blind": "EVA·Figure",
+    "because": "proclamado como = held up/judged as la aspiración más elevada — a claim held by its proclaimers; one specific claim about one advent, a unique superlative identity."
+   },
+   {
+    "prop": "udhr:compelled-to-rebellion",
+    "stored": "INS·Pattern",
+    "blind": "SIG·Pattern",
+    "because": "verse compelido a = be driven to a recourse — translocative standing-toward (polarity handled elsewhere); generic el hombre under normative scope promotes to Pattern."
+   },
+   {
+    "prop": "udhr:promote-respect",
+    "stored": "REC·Pattern",
+    "blind": "INS·Pattern",
+    "because": "promover = foster respect into wider being via teaching — Generate·Existence; norm over individuals and institutions as kinds."
+   },
+   {
+    "prop": "udhr:endowed-reason",
+    "stored": "CON·Pattern",
+    "blind": "INS·Pattern",
+    "because": "dotados is the participle of dotar: reason and conscience conferred, subject as patient — Generate·Existence; standing truth over all human beings as a kind."
+   },
+   {
+    "prop": "udhr:no-distinction-status",
+    "stored": "SEG·Pattern",
+    "blind": "DEF·Pattern",
+    "because": "hacer distinción = distinguish, bounding persons by category (DEF's own example); negation is polarity, not the act; scope over a kind of distinction."
+   },
+   {
+    "prop": "udhr:life-liberty-security",
+    "stored": "SIG·Pattern",
+    "blind": "EVA·Pattern",
+    "because": "tiene derecho a = an entitlement-claim held by its holder — Relate·Interpretation; normative universal scope over todo individuo promotes to Pattern."
+   },
+   {
+    "prop": "udhr:effective-remedy",
+    "stored": "SIG·Pattern",
+    "blind": "EVA·Pattern",
+    "because": "tiene derecho a = a claim to a remedy held by the holder; norm over toda persona as a kind."
+   },
+   {
+    "prop": "udhr:no-arbitrary-arrest",
+    "stored": "CON·Pattern",
+    "blind": "SEG·Pattern",
+    "because": "detenido/preso/desterrado = seized, confined, expelled — removal from the arrangement (SEG's 'removed', 'excluded'); modality and polarity never move it; universal norm."
+   },
+   {
+    "prop": "udhr:presumed-innocent",
+    "stored": "SIG·Pattern",
+    "blind": "EVA·Pattern",
+    "because": "tiene derecho a que se presuma = an entitlement-claim held; norm over the kind toda persona acusada de delito."
+   },
+   {
+    "prop": "udhr:no-heavier-penalty",
+    "stored": "INS·Pattern",
+    "blind": "SIG·Pattern",
+    "because": "imponer = lay a penalty upon — the wall's 'was laid' translocation reading; tampoco is polarity; the norm lands on any case of the kind."
+   },
+   {
+    "prop": "udhr:no-arbitrary-interference",
+    "stored": "CON·Pattern",
+    "blind": "SIG·Pattern",
+    "because": "ser objeto de = stand as the target of interferences — standing-as, polarity aside; universal normative scope over nadie/everyone."
+   },
+   {
+    "prop": "udhr:protection-of-law",
+    "stored": "SIG·Pattern",
+    "blind": "EVA·Pattern",
+    "because": "tiene derecho a la protección = a claim to legal protection held; norm over toda persona as a kind."
+   },
+   {
+    "prop": "udhr:seek-asylum",
+    "stored": "SIG·Pattern",
+    "blind": "EVA·Pattern",
+    "because": "tiene derecho a buscar asilo = a claim held to seek and enjoy asylum; universal normative scope over the kind."
+   },
+   {
+    "prop": "udhr:family-protected",
+    "stored": "SIG·Pattern",
+    "blind": "EVA·Pattern",
+    "because": "tiene derecho a = a claim to protection held by the family; generic normative scope over the family as kind."
+   },
+   {
+    "prop": "udhr:freedom-of-thought",
+    "stored": "SIG·Pattern",
+    "blind": "EVA·Pattern",
+    "because": "tiene derecho a la libertad de pensamiento = an entitlement-claim held; norm over toda persona."
+   },
+   {
+    "prop": "udhr:opinion-right-includes",
+    "stored": "CON·Pattern",
+    "blind": "CON·Figure",
+    "because": "incluye = contains — part-whole held in relation (CON's 'contains'); este derecho is one specific claim, so Figure."
+   },
+   {
+    "prop": "udhr:take-part-government",
+    "stored": "SIG·Pattern",
+    "blind": "EVA·Pattern",
+    "because": "tiene derecho a participar = a claim to take part held; universal norm over the kind."
+   },
+   {
+    "prop": "udhr:right-to-work",
+    "stored": "SIG·Pattern",
+    "blind": "EVA·Pattern",
+    "because": "tiene derecho al trabajo = an entitlement-claim held; norm over toda persona as a kind."
+   },
+   {
+    "prop": "udhr:just-remuneration",
+    "stored": "SIG·Pattern",
+    "blind": "EVA·Pattern",
+    "because": "tiene derecho a una remuneración = a claim held; norm over the kind toda persona que trabaja."
+   },
+   {
+    "prop": "udhr:standard-of-living",
+    "stored": "SIG·Pattern",
+    "blind": "EVA·Pattern",
+    "because": "tiene derecho a un nivel de vida adecuado = a claim held; universal normative scope over the kind."
+   },
+   {
+    "prop": "udhr:children-protection",
+    "stored": "SIG·Pattern",
+    "blind": "EVA·Pattern",
+    "because": "tienen derecho a igual protección = a claim held; norm over todos los niños as a kind."
+   },
+   {
+    "prop": "udhr:education-directed",
+    "stored": "SIG·Pattern",
+    "blind": "CON·Pattern",
+    "because": "tendrá por objeto holds education toward its aim — the same hold-as arrangement as tener por base; normative scope over education as a kind."
+   },
+   {
+    "prop": "udhr:development-in-community",
+    "stored": "INS·Pattern",
+    "blind": "SYN·Pattern",
+    "because": "desarrollar su personalidad = bring the personality to formed fullness — a whole produced; modality stripped; norm over toda persona as a kind."
+   },
+   {
+    "prop": "udhr:limitation-purpose",
+    "stored": "REC·Pattern",
+    "blind": "INS·Pattern",
+    "because": "asegurar = make-secure, bringing recognition and respect firmly into being — Generate·Existence; generic legal limitations habitually so aimed read Pattern."
+   },
+   {
+    "prop": "udhr:no-destructive-interpretation",
+    "stored": "DEF·Ground",
+    "blind": "REC·Pattern",
+    "because": "interpretarse en el sentido de = producing a reading/frame (REC's 'reinterpreted' family); nada/podrá are polarity and force; the ban scopes over all construals as a kind."
+   }
+  ],
+  "zh": [
+   {
+    "prop": "udhr:advent-aspiration",
+    "stored": "DEF·Figure",
+    "blind": "EVA·Figure",
+    "because": "被宣布为 is a participle of 宣布 (proclaim/declare-as): a judgment publicly held by its proclaimers, subject read as patient; it lands on one specific claim — the advent as the highest aspiration."
+   },
+   {
+    "prop": "udhr:compelled-to-rebellion",
+    "stored": "INS·Pattern",
+    "blind": "CON·Ground",
+    "because": "进行反叛 is standing-against — mankind held in oppositional arrangement with tyranny and oppression (Relate·Structure); polarity is set aside, and the act lands on the whole condition of tyrannical rule."
+   },
+   {
+    "prop": "udhr:states-pledged",
+    "stored": "CON·Figure",
+    "blind": "EVA·Pattern",
+    "because": "誓愿 (pledge/vow) is a commitment-claim the member states hold themselves to (Relate·Interpretation); its content, universal respect and observance of rights, is a normative practice."
+   },
+   {
+    "prop": "udhr:endowed-reason",
+    "stored": "CON·Pattern",
+    "blind": "SIG·Pattern",
+    "because": "赋有 states dispositional endowment — reason and conscience as a standing innate property of the kind; the dispositional-property reading (copula rule 4) gives SIG at Pattern."
+   },
+   {
+    "prop": "udhr:no-distinction-status",
+    "stored": "SEG·Pattern",
+    "blind": "DEF·Pattern",
+    "because": "区别 is distinguishing — Differentiate·Interpretation ('distinguished' is DEF's own example); 不得 is polarity/force and never moves the operator; normative scope over the kind."
+   },
+   {
+    "prop": "udhr:no-torture",
+    "stored": "INS·Pattern",
+    "blind": "SIG·Pattern",
+    "because": "加以 (and 施以) state laying/inflicting treatment upon a person — an application read like 'was laid' under the translocation wall; deontic negation aside, it lands on persons under normative kind scope."
+   },
+   {
+    "prop": "udhr:no-arbitrary-arrest",
+    "stored": "INS·Pattern",
+    "blind": "SIG·Pattern",
+    "because": "The stated relation is the same application verb 加以 — arrest, detention, exile laid upon a person; 不得 is force; normative kind scope over anyone."
+   },
+   {
+    "prop": "udhr:presumed-innocent",
+    "stored": "SIG·Pattern",
+    "blind": "EVA·Pattern",
+    "because": "视为 is regard/consider-as ('considered' is EVA's own example): a claim of innocence held toward the accused; 有权/被 are force and voice; a normative rule of judgment over the kind of all accused."
+   },
+   {
+    "prop": "udhr:no-arbitrary-interference",
+    "stored": "SEG·Pattern",
+    "blind": "CON·Pattern",
+    "because": "干涉 is meddling engagement with the arrangement of one's private life, family, home and correspondence — Relate·Structure; 不得任意 is force; normative scope over the kind."
+   },
+   {
+    "prop": "udhr:family-protected",
+    "stored": "CON·Pattern",
+    "blind": "SIG·Pattern",
+    "because": "受...保护 states standing under / receiving protection — presence held in relation; 应 is force; a norm over the kind family."
+   },
+   {
+    "prop": "udhr:will-expressed-elections",
+    "stored": "SIG·Pattern",
+    "blind": "INS·Pattern",
+    "because": "予以表现 is being given expression — making the will appear that was not manifest before, Generate·Existence; it lands on 定期的 (periodic) elections, an explicit recurrence."
+   },
+   {
+    "prop": "udhr:no-destructive-interpretation",
+    "stored": "DEF·Ground",
+    "blind": "REC·Pattern",
+    "because": "解释为 is construe/interpret-as — producing a framing over the text (the 'reinterpreted' family, Generate·Interpretation); 不得 is force; a rule of construction over any provision as a kind."
+   }
+  ],
+  "sw": [
+   {
+    "prop": "udhr:advent-aspiration",
+    "stored": "DEF·Figure",
+    "blind": "EVA·Figure",
+    "because": "head act kutangazwa = proclaimed-that — a claim publicly asserted and held (cf. demonstrated) → EVA; one specific proclaimed claim → Figure."
+   },
+   {
+    "prop": "udhr:compelled-to-rebellion",
+    "stored": "INS·Pattern",
+    "blind": "SIG·Pattern",
+    "because": "asishurutizwe = not-be-obliged: obligation is force (wall); the act left is kuomba msaada — turning to a recourse, a standing-toward → SIG; generic 'mtu' under the norm → Pattern."
+   },
+   {
+    "prop": "udhr:states-pledged",
+    "stored": "CON·Figure",
+    "blind": "EVA·Figure",
+    "because": "kuahidi = pledge — a commitment held by/against the pledging states (relate·interpretation) → EVA; one collective undertaking → Figure."
+   },
+   {
+    "prop": "udhr:endowed-reason",
+    "stored": "CON·Pattern",
+    "blind": "INS·Pattern",
+    "because": "kujaliwa = be granted/endowed — the bestowal brings reason and conscience forth in them, beside 'was born' → INS; all humans → Pattern."
+   },
+   {
+    "prop": "udhr:no-torture",
+    "stored": "INS·Pattern",
+    "blind": "SIG·Pattern",
+    "because": "teswa/adhibiwa/dharauliwa/tendewa kinyama — hostile handling and regard, standing-against the person's being → SIG; negation/deontic are force; any person → Pattern."
+   },
+   {
+    "prop": "udhr:no-arbitrary-arrest",
+    "stored": "CON·Pattern",
+    "blind": "SEG·Pattern",
+    "because": "kamatwa/fungiwa/hamishwa — seized, shut away, removed from one's country: the person cut out of their place ('removed', 'excluded') → SEG; any person → Pattern."
+   },
+   {
+    "prop": "udhr:act-not-offence-then",
+    "stored": "CON·Pattern",
+    "blind": "EVA·Pattern",
+    "because": "kupinga sheria = to stand against / contravene the law — an act held against a norm (relate·interpretation) → EVA; polarity handled elsewhere; 'any act' → Pattern."
+   },
+   {
+    "prop": "udhr:no-heavier-penalty",
+    "stored": "INS·Pattern",
+    "blind": "SIG·Pattern",
+    "because": "kupewa adhabu = be given / laid under a penalty — conveyance onto the person (cf. 'was laid') → SIG; deontic negative is force; a general sentencing rule → Pattern."
+   },
+   {
+    "prop": "udhr:no-arbitrary-interference",
+    "stored": "SEG·Pattern",
+    "blind": "SIG·Ground",
+    "because": "kuingiliwa (ingia = enter) — intrusion is a translocation → SIG (wall); the motion lands in the private sphere, a field → Ground."
+   },
+   {
+    "prop": "udhr:family-unit-society",
+    "stored": "CON·Pattern",
+    "blind": "SIG·Pattern",
+    "because": "ni + kiungo cha asili cha jamii: copula classing the family as a natural organ of society (rule 2, class/kind) → SIG Pattern."
+   },
+   {
+    "prop": "udhr:family-protected",
+    "stored": "SIG·Pattern",
+    "blind": "EVA·Pattern",
+    "because": "kustahili = deserve/merit — a worth-judgment holding the family to protection (relate·interpretation) → EVA; the family as kind → Pattern."
+   },
+   {
+    "prop": "udhr:opinion-right-includes",
+    "stored": "CON·Pattern",
+    "blind": "CON·Figure",
+    "because": "kuhusu = concern/encompass — the right holds these freedoms within its scope ('contains') → CON; haki hii, one specific claim → Figure."
+   },
+   {
+    "prop": "udhr:children-protection",
+    "stored": "CON·Pattern",
+    "blind": "SIG·Pattern",
+    "because": "lazima is force; kutunzwa = be tended / kept well — a sustained caring hold on their being → SIG; all children → Pattern."
+   },
+   {
+    "prop": "udhr:education-free",
+    "stored": "INS·Pattern",
+    "blind": "SIG·Pattern",
+    "because": "yapasa is force; kutolewa = be put forth/provided — education conveyed to its recipients (give family) → SIG; education under a general norm → Pattern."
+   },
+   {
+    "prop": "udhr:elementary-compulsory",
+    "stored": "CON·Pattern",
+    "blind": "SIG·Pattern",
+    "because": "kuhudhuria = be present at — attendance is presence held at ('stood at') → SIG; kwa lazima is force; a required general practice → Pattern."
+   },
+   {
+    "prop": "udhr:education-directed",
+    "stored": "INS·Pattern",
+    "blind": "SIG·Pattern",
+    "because": "kutolewa kwa madhumuni ya — the act is still the giving-forth of education (give family) → SIG; purpose is adjunct; education under a general norm → Pattern."
+   },
+   {
+    "prop": "udhr:development-in-community",
+    "stored": "SIG·Pattern",
+    "blind": "SIG·Ground",
+    "because": "inaweza is force; kupatikana kati yao = be findable among them — presence located within the community (locative, rule 5) → SIG; lands on a field → Ground."
+   },
+   {
+    "prop": "udhr:limitation-purpose",
+    "stored": "CON·Pattern",
+    "blind": "SIG·Pattern",
+    "because": "kulinda = guard / watch over — a protective standing toward due respect → SIG; its object is a required norm over others' rights and freedoms → Pattern."
+   },
+   {
+    "prop": "udhr:no-destructive-interpretation",
+    "stored": "NUL·Ground",
+    "blind": "NUL·Pattern",
+    "because": "Hakuna = 'there is no' — existential negative, the absence is the act (wall) → NUL; it denies every instance of a kind of words → Pattern."
+   }
+  ]
+ },
+ "at": "2026-08-31T17:29:09.650Z"
+}

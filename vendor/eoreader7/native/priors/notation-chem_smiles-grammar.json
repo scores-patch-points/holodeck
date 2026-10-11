@@ -1,0 +1,212 @@
+{
+ "kind": "ChemNotationGrammar@1",
+ "family": "chem_smiles",
+ "givers": [
+  {
+   "name": "Daylight SMILES Theory Manual (Weininger 1988; Daylight CIS)",
+   "url": "https://ics.uci.edu/~dock/manuals/DaylightTheoryManual/theory.smiles.html",
+   "use": "FACTS ONLY (token classes, organic subset, normal valences); no text stored"
+  },
+  {
+   "name": "OpenSMILES specification v1.0",
+   "url": "https://github.com/opensmiles/OpenSMILES",
+   "license": "GFDL-1.2 (not on the family's permitted-licence list): read once to cross-check the grammar facts, NOT stored",
+   "use": "cross-check of: aliphatic_organic, aromatic_organic, bracket-atom grammar, bond symbols, ring-bond forms, normal valences"
+  },
+  {
+   "name": "InChI Technical Manual (IUPAC-InChI/InChI)",
+   "url": "https://github.com/IUPAC-InChI/InChI/blob/dev/INCHI-1-DOC/InChI_TechMan.pdf",
+   "license": "MIT",
+   "fetched": "2026-10-06",
+   "raw": "raw/inchi/InChI_TechMan.pdf",
+   "use": "layer prefixes /c /h /q /p /b /t /m /s /i /f /o (+ /r /z); formula layer = Hill-sorted; H atoms never numbered"
+  },
+  {
+   "name": "SELFIES 2.2.0 engine alphabet (Krenn et al. 2020)",
+   "url": "https://github.com/aspuru-guzik-group/selfies",
+   "license": "MIT",
+   "use": "get_semantic_robust_alphabet() + the token pattern verified on TRAIN SELFIES"
+  }
+ ],
+ "smiles": {
+  "organic_subset": [
+   "B",
+   "C",
+   "N",
+   "O",
+   "P",
+   "S",
+   "F",
+   "Cl",
+   "Br",
+   "I"
+  ],
+  "aromatic_organic": [
+   "b",
+   "c",
+   "n",
+   "o",
+   "p",
+   "s"
+  ],
+  "aromatic_bracket": [
+   "b",
+   "c",
+   "n",
+   "o",
+   "p",
+   "s",
+   "se",
+   "as"
+  ],
+  "wildcard": "*",
+  "bond_chars": {
+   "-": "single",
+   "=": "double",
+   "#": "triple",
+   "$": "quadruple",
+   ":": "aromatic",
+   "/": "single",
+   "\\": "single",
+   "~": "any"
+  },
+  "ring_closure": [
+   "digit",
+   "%nn",
+   "%(nnn)"
+  ],
+  "valences": {
+   "B": [
+    3
+   ],
+   "C": [
+    4
+   ],
+   "N": [
+    3,
+    5
+   ],
+   "O": [
+    2
+   ],
+   "P": [
+    3,
+    5
+   ],
+   "S": [
+    2,
+    4,
+    6
+   ],
+   "F": [
+    1
+   ],
+   "Cl": [
+    1
+   ],
+   "Br": [
+    1
+   ],
+   "I": [
+    1
+   ]
+  },
+  "note": "an implicit bond between two aromatic atoms is 'single or aromatic' (OpenSMILES); the reader labels it 'aromatic' by the default rule and resolves it at end of text"
+ },
+ "inchi": {
+  "header": "InChI=",
+  "versions": [
+   "1S",
+   "1"
+  ],
+  "layers": {
+   "c": "connections",
+   "h": "hydrogens",
+   "q": "charge",
+   "p": "protons",
+   "b": "double_bond_stereo",
+   "t": "sp3_stereo",
+   "m": "inversion",
+   "s": "stereo_type",
+   "i": "isotopic",
+   "f": "fixed_h",
+   "o": "transposition",
+   "r": "reconnected",
+   "z": "polymer"
+  }
+ },
+ "selfies": {
+  "alphabet": [
+   "#B",
+   "#B-1",
+   "#Branch1",
+   "#Branch2",
+   "#Branch3",
+   "#C",
+   "#C+1",
+   "#C-1",
+   "#N",
+   "#N+1",
+   "#O+1",
+   "#P",
+   "#P+1",
+   "#P-1",
+   "#S",
+   "#S+1",
+   "#S-1",
+   "=B",
+   "=B+1",
+   "=B-1",
+   "=Branch1",
+   "=Branch2",
+   "=Branch3",
+   "=C",
+   "=C+1",
+   "=C-1",
+   "=N",
+   "=N+1",
+   "=N-1",
+   "=O",
+   "=O+1",
+   "=P",
+   "=P+1",
+   "=P-1",
+   "=Ring1",
+   "=Ring2",
+   "=Ring3",
+   "=S",
+   "=S+1",
+   "=S-1",
+   "B",
+   "B+1",
+   "B-1",
+   "Br",
+   "Branch1",
+   "Branch2",
+   "Branch3",
+   "C",
+   "C+1",
+   "C-1",
+   "Cl",
+   "F",
+   "H",
+   "I",
+   "N",
+   "N+1",
+   "N-1",
+   "O",
+   "O+1",
+   "O-1",
+   "P",
+   "P+1",
+   "P-1",
+   "Ring1",
+   "Ring2",
+   "Ring3",
+   "S",
+   "S+1",
+   "S-1"
+  ],
+  "structural_pattern": "^[=#/\\\\-]?(?:[0-9]+)?(?:[A-Z][a-z]?|\\*)(?:@@?)?(?:H[0-9])?(?:[+-][0-9]+)?$|^[=#]?(?:Branch|Ring)[123]$"
+ }
+}

@@ -1,0 +1,43 @@
+{
+  "schema": "RoleConfig@1",
+  "language": "ukr",
+  "provenance": {
+    "builder": "eoreader7 native/scripts/build-role-config.mjs",
+    "source": "/private/tmp/claude-501/tb/ukr/train.conllu",
+    "min_volume": 20,
+    "null_draws": 200,
+    "null_alpha": 0.05,
+    "null_seed": 1,
+    "note": "position stats and marker candidates are both derived mechanically from this treebank's own gold dependency annotations — never hand-typed or asserted from general linguistic knowledge. A marker candidate is admitted only when its real precision beats the (1-alpha) quantile of a within-sentence role-label shuffle (II.23), never a fixed ratio — and (S122) that quantile is the MAX-STATISTIC across every eligible closed-class candidate tried, not a per-candidate null, so the admitted marker is significant against the whole search, not merely against itself."
+  },
+  "object": {
+    "total": 4720,
+    "before": 1310,
+    "after": 3410,
+    "dominantSide": "after",
+    "reliability": 0.722457627118644,
+    "usable": true,
+    "marker": {
+      "form": "свій",
+      "precision": 0.6666666666666666,
+      "nullCeiling": 0.23333333333333334,
+      "volume": 30,
+      "recall": 0.00423728813559322
+    }
+  },
+  "subject": {
+    "total": 6012,
+    "before": 4699,
+    "after": 1313,
+    "dominantSide": "before",
+    "reliability": 0.7816034597471723,
+    "usable": true,
+    "marker": {
+      "form": "була",
+      "hits": 46,
+      "total": 114,
+      "precision": 0.40350877192982454,
+      "nullCeiling": 0.2608695652173913
+    }
+  }
+}

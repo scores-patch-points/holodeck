@@ -1,0 +1,81 @@
+{
+  "source": "Multi-VALUE (VernAcular Language Understanding Evaluation)",
+  "url": "https://github.com/SALT-NLP/multi-value",
+  "project_url": "https://value-nlp.org",
+  "paper": "Ziems, Held, Yang, Dhamala, Gupta, Yang (2023) \"Multi-VALUE: A Framework for Cross-Dialectal English NLP\", ACL 2023, https://aclanthology.org/2023.acl-long.44",
+  "license": "Apache License 2.0 (Copyright 2019 William Held, Caleb Ziems, Diyi Yang), verified by fetching the repository's own LICENSE file directly (https://raw.githubusercontent.com/SALT-NLP/multi-value/main/LICENSE) on 2026-08-27. The LICENSE file additionally carries a non-legally-binding acceptable-use request appended below the Apache text: the authors ask users not to use Multi-VALUE for deception, impersonation, mockery, discrimination, hate speech, targeted harassment, or cultural appropriation, and to prioritize the dignity and privacy of all people; that request is reproduced verbatim in the staged docs/LICENSE file and should be honored by any downstream use of these rules.",
+  "content_type": "RULES, NOT CORPUS TEXT -- this pocket stages a rule-based synthetic dialect transformation ENGINE (source code + its lexical/feature-rule tables), not naturalistic dialect speech or text. Any dialect text this engine PRODUCES is synthetic, machine-transformed Standard English and must never be treated as, or mixed with, authentic native-speaker dialect data staged elsewhere in this repo (e.g. coraal/, twitteraae/, creoleval/).",
+  "fetched_at": "2026-08-27",
+  "fetch_method": "git clone --depth 1 https://github.com/SALT-NLP/multi-value.git (shallow clone of the live main branch), then selective copy of in-scope files into this pocket.",
+  "coverage": "Staged the full rule-transformation engine relevant to this pocket's purpose: 100% of the core Python package (src/multivalue/ -- BaseDialect.py's ~190 dialect-feature transformation rules, Dialects.py's 50 dialect-vector definitions, the custom inflection module, and the repo's own build scripts for its lexical resource tables) plus 100% of the small/medium lexical rule-support tables in resources/ that the engine actually loads at runtime (confirmed by grepping src/multivalue/*.py for each resource file's usage, not assumed). This is NOT a sample by row/document count the way a corpus pocket would be -- it is close to the complete rule-definition surface of the repository, deliberately EXCLUDING large bundled third-party datasets that are not themselves rule definitions and are out of this pocket's scope (see excluded[] below). Excludes the repo's experiment/training harness (coqa_exp/, run_glue*.py, train_combined_adapter.sh, eval_mt.py) and its Mechanical Turk annotation templates (hit/), which are evaluation/crowdsourcing infrastructure rather than rule definitions or reference documentation.",
+  "entries": [
+    { "id": "BaseDialect.py", "title": "Core rule engine: ~190 native-speaker-validated dialect feature transformation rules (spaCy/stanza-based, one method per linguistic feature, e.g. negative_concord, she_inanimate_objects, zero_plural)", "size_bytes": 148052, "file": "11-multi-language/dialects-pidgins-creoles/multi-value/src/multivalue/BaseDialect.py" },
+    { "id": "Dialects.py", "title": "50 dialect definitions, each an attestation-weighted vector over BaseDialect's feature rules (e.g. SoutheastAmericanEnclaveDialect, IndianDialect, ColloquialSingaporeDialect)", "size_bytes": 13205, "file": "11-multi-language/dialects-pidgins-creoles/multi-value/src/multivalue/Dialects.py" },
+    { "id": "multivalue/__init__.py", "size_bytes": 199, "file": "11-multi-language/dialects-pidgins-creoles/multi-value/src/multivalue/__init__.py" },
+    { "id": "build_attestation_vectors.py", "title": "Build script: derives resources/attestation_vectors.csv from eWAVE (input eWAVE CSV itself not staged here -- see excluded[])", "size_bytes": 1130, "file": "11-multi-language/dialects-pidgins-creoles/multi-value/src/multivalue/build_attestation_vectors.py" },
+    { "id": "build_benefactive_ditransitive_verb_list.py", "size_bytes": 1930, "file": "11-multi-language/dialects-pidgins-creoles/multi-value/src/multivalue/build_benefactive_ditransitive_verb_list.py" },
+    { "id": "build_coqa_value.py", "title": "Build script for the Multi-VALUE CoQA dialectal benchmark (not itself staged -- pulls external CoQA data)", "size_bytes": 2937, "file": "11-multi-language/dialects-pidgins-creoles/multi-value/src/multivalue/build_coqa_value.py" },
+    { "id": "build_hit_csv.py", "size_bytes": 2625, "file": "11-multi-language/dialects-pidgins-creoles/multi-value/src/multivalue/build_hit_csv.py" },
+    { "id": "build_value.py", "size_bytes": 6684, "file": "11-multi-language/dialects-pidgins-creoles/multi-value/src/multivalue/build_value.py" },
+    { "id": "inflect/__init__.py", "size_bytes": 0, "file": "11-multi-language/dialects-pidgins-creoles/multi-value/src/multivalue/inflect/__init__.py" },
+    { "id": "inflect/base.py", "title": "Custom inflection engine base (fork of the `inflect` PyPI package's logic, per repo comments)", "size_bytes": 6594, "file": "11-multi-language/dialects-pidgins-creoles/multi-value/src/multivalue/inflect/base.py" },
+    { "id": "inflect/english.py", "size_bytes": 5561, "file": "11-multi-language/dialects-pidgins-creoles/multi-value/src/multivalue/inflect/english.py" },
+    { "id": "resources/feature_id_to_function_name.json", "title": "Feature list: maps each of the ~190 numbered linguistic features to its rule function name(s) in BaseDialect.py", "size_bytes": 5491, "file": "11-multi-language/dialects-pidgins-creoles/multi-value/resources/feature_id_to_function_name.json" },
+    { "id": "resources/attestation_vectors.csv", "title": "Per-feature attestation strength (0.0-1.0) for each of the 50 dialects, derived from eWAVE by build_attestation_vectors.py", "size_bytes": 49239, "file": "11-multi-language/dialects-pidgins-creoles/multi-value/resources/attestation_vectors.csv" },
+    { "id": "resources/varieties.csv", "title": "The 50 dialects with abbreviation, lat/long, and world region", "size_bytes": 3876, "file": "11-multi-language/dialects-pidgins-creoles/multi-value/resources/varieties.csv" },
+    { "id": "resources/unittests.json", "title": "The repo's own unit-test fixtures for the transformation rules (input SAE sentence -> expected dialect output per feature)", "size_bytes": 20189, "file": "11-multi-language/dialects-pidgins-creoles/multi-value/resources/unittests.json" },
+    { "id": "resources/people_terms.csv", "title": "Lexical swap list: race/ethnicity/identity terms used by lexical-substitution rules", "size_bytes": 54083, "file": "11-multi-language/dialects-pidgins-creoles/multi-value/resources/people_terms.csv" },
+    { "id": "resources/noun_concreteness.json", "title": "Noun -> concreteness-rating lookup table (a processed dict derived from Brysbaert/Warriner/Kuperman concreteness norms, third-party in origin -- see excluded[] for the raw source file this was built from), consulted by has_concrete_object() to condition some rules", "size_bytes": 523529, "file": "11-multi-language/dialects-pidgins-creoles/multi-value/resources/noun_concreteness.json" },
+    { "id": "resources/mass_nouns.txt", "size_bytes": 13515, "file": "11-multi-language/dialects-pidgins-creoles/multi-value/resources/mass_nouns.txt" },
+    { "id": "resources/transitive_dobj_verbs.txt", "size_bytes": 12559, "file": "11-multi-language/dialects-pidgins-creoles/multi-value/resources/transitive_dobj_verbs.txt" },
+    { "id": "resources/ditransitive_dobj_verbs.txt", "size_bytes": 3577, "file": "11-multi-language/dialects-pidgins-creoles/multi-value/resources/ditransitive_dobj_verbs.txt" },
+    { "id": "resources/benefactive_verbs.txt", "size_bytes": 1256, "file": "11-multi-language/dialects-pidgins-creoles/multi-value/resources/benefactive_verbs.txt" },
+    { "id": "resources/adv_adj_flat.json", "size_bytes": 762, "file": "11-multi-language/dialects-pidgins-creoles/multi-value/resources/adv_adj_flat.json" },
+    { "id": "resources/adv_adj_degree_modifier.json", "size_bytes": 325, "file": "11-multi-language/dialects-pidgins-creoles/multi-value/resources/adv_adj_degree_modifier.json" },
+    { "id": "resources/negatives.json", "size_bytes": 372, "file": "11-multi-language/dialects-pidgins-creoles/multi-value/resources/negatives.json" },
+    { "id": "resources/negatives_no_more.json", "size_bytes": 85, "file": "11-multi-language/dialects-pidgins-creoles/multi-value/resources/negatives_no_more.json" },
+    { "id": "resources/possessives.json", "size_bytes": 158, "file": "11-multi-language/dialects-pidgins-creoles/multi-value/resources/possessives.json" },
+    { "id": "resources/pron_obj_to_subj.json", "size_bytes": 80, "file": "11-multi-language/dialects-pidgins-creoles/multi-value/resources/pron_obj_to_subj.json" },
+    { "id": "resources/det_plural.json", "size_bytes": 100, "file": "11-multi-language/dialects-pidgins-creoles/multi-value/resources/det_plural.json" },
+    { "id": "resources/det_possessive_obj.json", "size_bytes": 108, "file": "11-multi-language/dialects-pidgins-creoles/multi-value/resources/det_possessive_obj.json" },
+    { "id": "resources/modals_past.json", "size_bytes": 49, "file": "11-multi-language/dialects-pidgins-creoles/multi-value/resources/modals_past.json" },
+    { "id": "resources/reflexives_aave.json", "size_bytes": 74, "file": "11-multi-language/dialects-pidgins-creoles/multi-value/resources/reflexives_aave.json" },
+    { "id": "resources/reflexives_emphatic.json", "size_bytes": 117, "file": "11-multi-language/dialects-pidgins-creoles/multi-value/resources/reflexives_emphatic.json" },
+    { "id": "resources/reflexives_number_swap.json", "size_bytes": 146, "file": "11-multi-language/dialects-pidgins-creoles/multi-value/resources/reflexives_number_swap.json" },
+    { "id": "resources/reflexives_obj_pron.json", "size_bytes": 43, "file": "11-multi-language/dialects-pidgins-creoles/multi-value/resources/reflexives_obj_pron.json" },
+    { "id": "resources/reflexives_regularized.json", "size_bytes": 76, "file": "11-multi-language/dialects-pidgins-creoles/multi-value/resources/reflexives_regularized.json" },
+    { "id": "resources/reflexives_subj.json", "size_bytes": 66, "file": "11-multi-language/dialects-pidgins-creoles/multi-value/resources/reflexives_subj.json" },
+    { "id": "docs/README.md", "title": "Repo's own README (setup, usage example, PyPI package `value-nlp`, full ACL citation)", "size_bytes": 3377, "file": "11-multi-language/dialects-pidgins-creoles/multi-value/docs/README.md" },
+    { "id": "docs/LICENSE", "title": "Repo's own LICENSE file, verbatim (Apache 2.0 + the authors' appended acceptable-use request)", "size_bytes": 1100, "file": "11-multi-language/dialects-pidgins-creoles/multi-value/docs/LICENSE" },
+    { "id": "docs/requirements.txt", "size_bytes": 134, "file": "11-multi-language/dialects-pidgins-creoles/multi-value/docs/requirements.txt" },
+    { "id": "docs/tests.py", "title": "Repo's own top-level unittest runner for the transformation rules", "size_bytes": 1107, "file": "11-multi-language/dialects-pidgins-creoles/multi-value/docs/tests.py" },
+    { "id": "docs/repl.py", "title": "Small interactive REPL script for trying dialect transforms by hand", "size_bytes": 808, "file": "11-multi-language/dialects-pidgins-creoles/multi-value/docs/repl.py" }
+  ],
+  "excluded": [
+    {
+      "item": "resources/ewave.csv (1.9MB)",
+      "reason": "out-of-scope/duplicate: this is a bundled copy of eWAVE (the electronic World Atlas of Varieties of English) parameter/attestation data -- a third-party linguistic database, not a Multi-VALUE rule definition. It is used only by the build script build_attestation_vectors.py to derive the much smaller resources/attestation_vectors.csv, which IS staged. eWAVE itself is already staged as its own separate pocket in this repo (manifests/ewave-manifest.json, 11-multi-language/dialects-pidgins-creoles/ewave/) with its own license verification -- staging it a second time here would duplicate that pocket and blur which pocket owns eWAVE's own licensing facts."
+    },
+    {
+      "item": "resources/concreteness.csv (10MB)",
+      "reason": "out-of-scope/third-party: this is the Brysbaert, Warriner & Kuperman (2014) concreteness-norms dataset for ~40,000 English words, a separate academic resource with its own provenance and licensing, not a Multi-VALUE rule definition. It is not referenced anywhere in the current src/multivalue/*.py (confirmed by grep) -- the engine only consults the much smaller, already-processed resources/noun_concreteness.json, which IS staged. Staging the raw 10MB third-party norms file would misrepresent this pocket's subject (dialect transformation rules) and would need its own independent license check this task was not scoped to do."
+    },
+    {
+      "item": "resources/verb_transitivity.tsv (1.3MB)",
+      "reason": "out-of-scope: a large derived verb-frequency/transitivity table (repo comment credits https://github.com/wilcoxeg/verb_transitivity), used only as a build-time input for generating the small transitive_dobj_verbs.txt / ditransitive_dobj_verbs.txt / benefactive_verbs.txt lists (confirmed by grep -- not loaded anywhere at runtime by BaseDialect.py or Dialects.py). Those small derived lists ARE staged; the large raw frequency table they were built from is not itself a rule."
+    },
+    {
+      "item": "hit/ directory (72KB)",
+      "reason": "out-of-scope: Amazon Mechanical Turk HIT templates/instructions for the human-validation study behind the 189 features. Crowdsourcing task infrastructure, not a rule definition or the requested reference documentation (README/feature list/paper reference)."
+    },
+    {
+      "item": "coqa_exp/ directory (~220KB) and run_glue.py, run_glue_adapterhub.py, train_combined_adapter.sh, eval_mt.py, pull_coqa.sh",
+      "reason": "out-of-scope: model fine-tuning and evaluation harness for the paper's downstream experiments (QA/GLUE/MT stress tests), not part of the dialect transformation rule engine itself."
+    },
+    {
+      "item": "requirements-pinned model downloads triggered by downloads.sh (spaCy en_core_web_sm, NLTK wordnet, stanza English pipeline)",
+      "reason": "out-of-scope: these are third-party NLP model downloads the engine depends on at runtime, not part of this repository and not fetched here; noted only so a downstream consumer knows the staged code cannot run standalone without separately installing them, per this pocket's own license note (LICENSE + requirements.txt are staged so this dependency is visible)."
+    }
+  ],
+  "notes": "This pocket's engine PRODUCES synthetic dialect text; it does not contain any. The output of these rules (e.g. transform('I talked with them yesterday') under a given Dialect object) is a mechanically-generated approximation of a dialect feature, native-speaker-VALIDATED at the level of individual feature rules (per the ACL paper's human evaluation) but not itself naturalistic speech from any real speaker. Anything generated by running this code should be labeled 'synthetic (Multi-VALUE rule-transform)' and kept separate from this repo's authentic-speech pockets (coraal/, twitteraae/, apics/, creoleval/, kreyol-mt/)."
+}

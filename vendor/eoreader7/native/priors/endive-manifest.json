@@ -1,0 +1,65 @@
+{
+  "source": "ENDIVE / EnDive (Cross-Dialect Benchmark for Fairness and Performance in LLMs)",
+  "url": "https://huggingface.co/abhaygupta1266 (14 dataset repos confirmed under this account; the combined-metadata repo is https://huggingface.co/datasets/abhaygupta1266/EnDive_All_Datasets, and the 13 per-task repos are https://huggingface.co/datasets/abhaygupta1266/{wsc,sst-2,multirc,copa,boolq,folio,gsm8k,humaneval,mbpp,svamp,logic_bench_mcq,logic_bench_yn,novelhopqa})",
+  "status": "gated -- staged as metadata-only pending a confirmed license or redistribution grant for the dialect-translated text",
+  "paper": "Gupta, Cheung, Meng, Sayyed, Zhu, Liao, O'Brien. 'EnDive: A Cross-Dialect Benchmark for Fairness and Performance in Large Language Models.' Findings of ACL: EMNLP 2025. Also arXiv:2504.07100, OpenReview id C7Mwox3C1u.",
+  "license": "UNVERIFIED -- staged as metadata-only pending confirmation. No `license` field or tag exists on any of the 14 HuggingFace dataset repository cards under abhaygupta1266 (confirmed via the HF datasets API `cardData`/`tags` for every repo, and via each repo's raw README.md YAML frontmatter for boolq and EnDive_All_Datasets directly), and no license, terms-of-use, or redistribution statement was found anywhere in the introducing paper's readable text at any of arXiv (HTML and PDF), OpenReview, or the ACL Anthology page. The repos are NOT HuggingFace-'gated' in the access-request sense (gated:false on every repo checked; no login or approval is required to download them) -- the license is simply never stated, at every source checked, which is the 'cannot determine the license' case this repo's own staging rules require treating as ambiguous rather than open.",
+  "license_verification": {
+    "checked_at": "2026-08-27",
+    "sources_checked": [
+      "https://huggingface.co/api/datasets/abhaygupta1266/{wsc,sst-2,multirc,copa,boolq,folio,gsm8k,humaneval,mbpp,svamp,logic_bench_mcq,logic_bench_yn,novelhopqa,EnDive_All_Datasets} -- all 14 repos, fetched directly via the HF datasets API; `cardData.license` and `tags` checked on every one, none present",
+      "https://huggingface.co/datasets/abhaygupta1266/boolq/raw/main/README.md and https://huggingface.co/datasets/abhaygupta1266/EnDive_All_Datasets/raw/main/README.md -- raw YAML frontmatter fetched directly, no `license:` key in either",
+      "https://arxiv.org/html/2504.07100v1 and https://arxiv.org/pdf/2504.07100 -- fetched and searched for 'license', 'CC BY', 'MIT', 'Apache', 'terms of use', 'publicly release', 'available for research', none found relating to the dataset (only arXiv's own boilerplate paper-license line, which covers the PDF, not the data)",
+      "https://openreview.net/forum?id=C7Mwox3C1u -- listing checked, no dataset license statement found",
+      "https://aclanthology.org/2025.findings-emnlp.913/ -- ACL Anthology page checked, no dataset license statement found (only ACL's own copyright notice for the paper itself)",
+      "web search for a companion GitHub repository for the paper -- none found; the paper's own text gives no code/data repository URL beyond the HuggingFace dataset repos already checked"
+    ],
+    "result": "No open license, no research-only-with-a-named-license tag, and no explicit redistribution statement found for the EnDive dialect-translated text at any source checked. Staged as metadata-only rather than guessed in either direction, per this repo's rule 2."
+  },
+  "fetched_at": "2026-08-27",
+  "coverage": "Zero dialect-translated rows staged (0% of the ~35,614 dialect-translated rows counted across the 12 dialect-split task repos' own published per-split example counts, and 0% of NovelHopQA's 4,345 rows, which use a different hop_1..hop_4 split scheme with no dialect column observed in its own published schema). Per dialect, 0 of an estimated 7,273 (AAVE), 4,118 (IndE), 8,192 (JamE), 8,074 (CollSgE), and 7,957 (ChcE) rows across the 12 dialect-split repos were fetched -- all five dialect counts are read from each repo's own published `dataset_info.splits` metadata, not from downloading or reading any row. What is staged instead is 100% of what this pass judged safely redistributable at the current, undetermined licensing status: an original, fully-sourced description of the dataset's construction, methodology, per-repo schema, and per-dialect row counts (metadata only), plus the license-verification record above.",
+  "not_staged": [
+    {
+      "item": "All 12 dialect-split per-task parquet datasets (wsc, sst-2, multirc, copa, boolq, folio, gsm8k, humaneval, mbpp, svamp, logic_bench_mcq, logic_bench_yn) -- the actual SAE-vs-dialect translated text pairs and BLEU scores, ~35,614 rows total across 5 dialect splits each",
+      "reason": "gated -- no license or redistribution statement found anywhere for this text after checking all 14 HF repo cards and the introducing paper at three venues (arXiv, OpenReview, ACL Anthology). Never downloaded."
+    },
+    {
+      "item": "abhaygupta1266/novelhopqa (4,345 rows across hop_1..hop_4 splits)",
+      "reason": "gated -- same account, same absent-license finding; also structurally anomalous against the paper's 5-dialect framing (no dialect column observed in its own published schema), which was not resolved because resolving it would require downloading and reading row content, which this pass declined to do given the licensing status."
+    },
+    {
+      "item": "abhaygupta1266/EnDive_All_Datasets (combined repo of per-task per-dialect filtered_bleu_scores.csv files)",
+      "reason": "gated -- same absent-license finding; also, per its own file listing, this repo appears to hold only BLEU-score CSVs, not the underlying translated text, so even if licensing were resolved it would not by itself supply representative dialect text."
+    }
+  ],
+  "entries": [
+    {
+      "title": "ENDIVE / EnDive -- dataset and methodology description",
+      "type": "metadata_description",
+      "derived_from": [
+        "Gupta et al., 'EnDive: A Cross-Dialect Benchmark for Fairness and Performance in Large Language Models,' Findings of ACL: EMNLP 2025 / arXiv:2504.07100 (read via direct fetch of the arXiv HTML and PDF, and the ACL Anthology page)",
+        "https://huggingface.co/api/datasets/abhaygupta1266/* -- schema (dataset_info.features) and per-split row counts for all 14 repos, fetched directly via the HF datasets API on 2026-08-27",
+        "https://huggingface.co/datasets/abhaygupta1266/boolq/raw/main/README.md -- raw YAML frontmatter, fetched directly"
+      ],
+      "contains_dialect_text": false,
+      "words": 750,
+      "chars": 5686,
+      "file": "11-multi-language/dialects-pidgins-creoles/endive/dataset-description.txt"
+    },
+    {
+      "title": "ENDIVE -- gating rationale and pocket README",
+      "type": "manifest_readme",
+      "contains_dialect_text": false,
+      "words": 304,
+      "chars": 2004,
+      "file": "11-multi-language/dialects-pidgins-creoles/endive/README.md"
+    }
+  ],
+  "totals": {
+    "documents": 2,
+    "total_words": 1054,
+    "total_chars": 7690,
+    "dialect_rows_staged": 0,
+    "dialect_rows_counted_but_not_fetched": 39959
+  }
+}

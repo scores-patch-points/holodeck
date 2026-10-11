@@ -1,0 +1,2329 @@
+{
+ "schema": "CodeLexPrior@1",
+ "language": "python",
+ "grammar": "python",
+ "provenance": {
+  "giver": "tree-sitter grammar `python` (tree-sitter-language-pack via eval/coding-competence/gold.py, gold-1), TRAIN repositories only",
+  "goldVersion": "gold-1",
+  "trainRepos": [
+   {
+    "repo": "dmlc/xgboost",
+    "url": "https://github.com/dmlc/xgboost",
+    "commit": "baa25e6a0853c97b593e189f1691dffc2050c200",
+    "license": "apache-2.0",
+    "license_text_family": "apache-2.0"
+   },
+   {
+    "repo": "exo-explore/exo",
+    "url": "https://github.com/exo-explore/exo",
+    "commit": "21a54c5ea0230a3bec1e1a786d200126c7e34ec6",
+    "license": "apache-2.0",
+    "license_text_family": "apache-2.0"
+   },
+   {
+    "repo": "gradio-app/gradio",
+    "url": "https://github.com/gradio-app/gradio",
+    "commit": "dea2bf33d79338b2e607689d4b77b9b37d31293b",
+    "license": "apache-2.0",
+    "license_text_family": "apache-2.0"
+   },
+   {
+    "repo": "xai-org/x-algorithm",
+    "url": "https://github.com/xai-org/x-algorithm",
+    "commit": "b412112d03f27acbfd668e0cc040abcafa1080c1",
+    "license": "apache-2.0",
+    "license_text_family": "apache-2.0"
+   }
+  ],
+  "trainFiles": [
+   {
+    "rel": "tests/python-gpu/test_device_quantile_dmatrix.py",
+    "repo": "dmlc/xgboost",
+    "sha256": "04955913c105b0ac1f3e466a42e467bb4148c08ae0176ca43eaabbf8762493ce",
+    "bytes": 8224
+   },
+   {
+    "rel": "src/exo/utils/tests/test_pidfile.py",
+    "repo": "exo-explore/exo",
+    "sha256": "060ee64982799fe436459095e7fb776e0ef513556afd5fb8bbc39563d3a4bf25",
+    "bytes": 1731
+   },
+   {
+    "rel": "demo/fake_diffusion/run.py",
+    "repo": "gradio-app/gradio",
+    "sha256": "040b87dd674f56524901e6e07f958c0eba4c816f686856e25064c75c24175e2e",
+    "bytes": 535
+   },
+   {
+    "rel": "grox/core/lm/convo.py",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "0371196478efc9babe34525250c2355159ad8ea8584b6ee5c8f6d0079ddecba1",
+    "bytes": 18696
+   },
+   {
+    "rel": "python-package/xgboost/testing/interaction_constraints.py",
+    "repo": "dmlc/xgboost",
+    "sha256": "05589fccb5d75bf29d47844612eb4bcb66357c078b71e0da811f31e9b8ab4739",
+    "bytes": 3700
+   },
+   {
+    "rel": "src/exo/utils/info_gatherer/net_profile.py",
+    "repo": "exo-explore/exo",
+    "sha256": "0751b33d5f3c3957cfebe80ed3e7cee72462c59fdd7aa5d90aa6cafbeae25aa9",
+    "bytes": 3795
+   },
+   {
+    "rel": "gradio/_vendor/aiofiles/threadpool/utils.py",
+    "repo": "gradio-app/gradio",
+    "sha256": "079f5d499c0efd666cd9d145c9c29e03dd620f65eada7370d44145f183012399",
+    "bytes": 1868
+   },
+   {
+    "rel": "grox/flows/ptos/generators.py",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "0709a6490539063afc99277294805828e2d6002d777693a829d8e7d9cfe4500a",
+    "bytes": 4897
+   },
+   {
+    "rel": "tests/python/with_omp_limit.py",
+    "repo": "dmlc/xgboost",
+    "sha256": "0ab2d136d3f63cd6656419c8c4bff84f8858991fe655b4e3dc6e499e70d14713",
+    "bytes": 683
+   },
+   {
+    "rel": "src/exo/master/tests/conftest.py",
+    "repo": "exo-explore/exo",
+    "sha256": "0b44f2604ede74243858a2c022e2537ac1b8e018965183eee9aae533388a13bb",
+    "bytes": 1021
+   },
+   {
+    "rel": "gradio/components/custom_html_components/audio_gallery.py",
+    "repo": "gradio-app/gradio",
+    "sha256": "0bce7e53c7a1d26ccf2518332c14a7532819b0b7576ab5dc622fd0ea1464ef7b",
+    "bytes": 6944
+   },
+   {
+    "rel": "phoenix/xrex/utils/profiler.py",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "0b793cf317c09f092cf08efd83677724d9e42c4907b9da306b4c37b2dcd86912",
+    "bytes": 3397
+   },
+   {
+    "rel": "demo/guide-python/continuation.py",
+    "repo": "dmlc/xgboost",
+    "sha256": "0be3ba5a1788811c8fc07f400b1e65d86becbf9d00f2d5383c3fa4a15b6c1bef",
+    "bytes": 3876
+   },
+   {
+    "rel": "src/exo/routing/tests/test_event_buffer.py",
+    "repo": "exo-explore/exo",
+    "sha256": "150347431eff3b326176bea1e933a9c6ecba3a0165d551b624b1b882e461b9e4",
+    "bytes": 4507
+   },
+   {
+    "rel": "gradio/cli/commands/components/install_component.py",
+    "repo": "gradio-app/gradio",
+    "sha256": "0cfc8ebf7655aa4b0399c6daf43b3b5f610f19d7b4c2f62c1a79df71c96c42c1",
+    "bytes": 6619
+   },
+   {
+    "rel": "grox/flows/reply_spam/plan_reply_ranking.py",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "0c3d026873acdf91cbd5d34babc7c8c93b96c71fbb2553cf94ca46dba11fe9e5",
+    "bytes": 939
+   },
+   {
+    "rel": "python-package/xgboost/__init__.py",
+    "repo": "dmlc/xgboost",
+    "sha256": "0d4c5d73d45da08ec871a6219ba2ae95a0673d09ac4dda20800500a65d4659c0",
+    "bytes": 1314
+   },
+   {
+    "rel": "src/exo/worker/tests/unittests/test_mlx/test_tp_bit_exact.py",
+    "repo": "exo-explore/exo",
+    "sha256": "165b49d62c997bd04e09506aaaa434b7c1c7f2930b95f72de1147ffb2d06fccd",
+    "bytes": 13240
+   },
+   {
+    "rel": "test/test_state_holder.py",
+    "repo": "gradio-app/gradio",
+    "sha256": "11c9a87ae577add67fd5893038ff3d3522952af21db127c4d6d3ce2099299b4a",
+    "bytes": 972
+   },
+   {
+    "rel": "phoenix/xrex/driver/config_factory.py",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "12b0f451a89dbed0705b1da4a03d25cb9a3edb5bd813a704732e1d5ce417c5c7",
+    "bytes": 1751
+   },
+   {
+    "rel": "python-package/xgboost/collective.py",
+    "repo": "dmlc/xgboost",
+    "sha256": "159e76054396346596f2ac0deb3200cfdf7aefcf83baeb4424c1b88941e653ed",
+    "bytes": 10776
+   },
+   {
+    "rel": "tests/test_resilience.py",
+    "repo": "exo-explore/exo",
+    "sha256": "1ac18fe66195ee4e260a36dd0d3880a0b2d173505d1362925930e7a7332bc00b",
+    "bytes": 1852
+   },
+   {
+    "rel": "demo/show_progress_on/run.py",
+    "repo": "gradio-app/gradio",
+    "sha256": "16e4cf5010d4a81b4516b8b04227f8fdc1a7f51a7e31155bc1fd328949bcdab1",
+    "bytes": 730
+   },
+   {
+    "rel": "phoenix/python/training/xai-checkpointing/xai_checkpointing/orbax_encrypted.py",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "1cbb86cc31721f0c9d7f3b9eb600e773329d3e4dbff276db042e6fc4a8d68ce7",
+    "bytes": 14317
+   },
+   {
+    "rel": "demo/guide-python/sklearn_parallel.py",
+    "repo": "dmlc/xgboost",
+    "sha256": "1692cb69cc661547315c03588aa2593d51836bf71d0781279012ed0d0d5cce16",
+    "bytes": 966
+   },
+   {
+    "rel": "src/exo/utils/keyed_backoff.py",
+    "repo": "exo-explore/exo",
+    "sha256": "1b46a8c8ca436e88673405c49cf296946a5534abb614008a721415ffe47e0308",
+    "bytes": 1201
+   },
+   {
+    "rel": "scripts/delete_old_spaces.py",
+    "repo": "gradio-app/gradio",
+    "sha256": "18c62b9342ee8c3cebeef0ba15ae63bb5775211f14da2912ca69c7430fa68ca9",
+    "bytes": 1516
+   },
+   {
+    "rel": "grox/core/data_loaders/descendant_id_provider.py",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "2191e6628ef318093b6c76f00313eed3b41fd9d7917fe981e9e5b4aad67c18a1",
+    "bytes": 992
+   },
+   {
+    "rel": "tests/python/test_updaters.py",
+    "repo": "dmlc/xgboost",
+    "sha256": "1e9f3144884ca69537092915b49e35404ad661a775a8c1a4a30de85f0855264a",
+    "bytes": 11621
+   },
+   {
+    "rel": "src/exo/api/tests/test_claude_tool_use.py",
+    "repo": "exo-explore/exo",
+    "sha256": "1eb2350362c7e875652fb579d4a230e1c3cb709b2e3b2ed0c8160be83d8990ef",
+    "bytes": 10138
+   },
+   {
+    "rel": "gradio/themes/ocean.py",
+    "repo": "gradio-app/gradio",
+    "sha256": "1a514cd945f25164ef577fde68023c28288512da98e6b2abdb647f219de14798",
+    "bytes": 3824
+   },
+   {
+    "rel": "grox/flows/ptos/plan_safety_ptos_realtime_with_signals.py",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "23c9979d45318fc6ee515217769f2ffe573bbc75cd3ff2d66f08a23e08a01cf5",
+    "bytes": 1511
+   },
+   {
+    "rel": "python-package/xgboost/testing/basic_models.py",
+    "repo": "dmlc/xgboost",
+    "sha256": "1fc490301311af5d9f87a03fc2ea01dc472040c4e311b5f0fd71dcce62eef9a9",
+    "bytes": 2079
+   },
+   {
+    "rel": "src/exo/worker/tests/unittests/test_mlx/test_prefix_cache_architectures.py",
+    "repo": "exo-explore/exo",
+    "sha256": "1fe2db11d76fac35ea22266cc6b8ece7ac3946ebdbaca251a76476a45c377be5",
+    "bytes": 12000
+   },
+   {
+    "rel": "js/tootils/src/_demo_runner.py",
+    "repo": "gradio-app/gradio",
+    "sha256": "21e3fa4cf46fb56580bda212f03b8eb1225e3639af6caf38cd30190a01e38104",
+    "bytes": 1180
+   },
+   {
+    "rel": "adult-content/training.py",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "2d0119cf5f14510d32561442326199cee443959c52acd1b58a394887d54ea521",
+    "bytes": 2242
+   },
+   {
+    "rel": "tests/python/test_linear.py",
+    "repo": "dmlc/xgboost",
+    "sha256": "20c21389d0e4f82928a6f2d30777218f9359a5624729e83945a4891501c81a85",
+    "bytes": 3913
+   },
+   {
+    "rel": "src/exo/worker/engines/mlx/patches/opt_batch_gen.py",
+    "repo": "exo-explore/exo",
+    "sha256": "216694dca125b74801610c6de3378177622ba5b88831ad3b3090481494e4a16c",
+    "bytes": 4682
+   },
+   {
+    "rel": "demo/barplot_component/run.py",
+    "repo": "gradio-app/gradio",
+    "sha256": "23404d8fcd09f0d85ce4918c424e8c6fe5547b8330d97de3f1e0ff56a848ae48",
+    "bytes": 416
+   },
+   {
+    "rel": "phoenix/xrex/utils/sharding.py",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "338a73ce0dbcfc3239a571e99b0bde1a797337e1d856591ce7f50a2a06262ef8",
+    "bytes": 2320
+   },
+   {
+    "rel": "tests/test_distributed/test_gpu_with_dask/test_gpu_external_memory.py",
+    "repo": "dmlc/xgboost",
+    "sha256": "2b84effd07373398d727c63393fdebbb2952a2bb7483ff318aedb3b0f0a7c146",
+    "bytes": 2360
+   },
+   {
+    "rel": "src/exo/utils/info_gatherer/macmon.py",
+    "repo": "exo-explore/exo",
+    "sha256": "28076ad165190afccc5c5f6c999988594877f1d440094e4275b95b4d067c6b27",
+    "bytes": 2033
+   },
+   {
+    "rel": "demo/image_classifier_2/run.py",
+    "repo": "gradio-app/gradio",
+    "sha256": "2685cf2578e523eeb3a9825011fb15950a218214fd5b83198e6b24feb71f2b36",
+    "bytes": 795
+   },
+   {
+    "rel": "grox/flows/mm_emb/renderer_v82.py",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "358908044ca4d80ec7559300cb11f3979fd0cefc01477966ebbc0e04ea0777ae",
+    "bytes": 11770
+   },
+   {
+    "rel": "demo/dask/dask_learning_to_rank.py",
+    "repo": "dmlc/xgboost",
+    "sha256": "2d54b405fa3058e3f086de5b2a1889448d8cd986bcc6d857903093dc3dbdf11b",
+    "bytes": 6695
+   },
+   {
+    "rel": "src/exo/download/tests/test_re_download.py",
+    "repo": "exo-explore/exo",
+    "sha256": "29f90d214566d5bb7d56e33fbe3026dd7dbb97d10dadd20f3e8dde6824df3c9b",
+    "bytes": 7873
+   },
+   {
+    "rel": "demo/text_generation/run.py",
+    "repo": "gradio-app/gradio",
+    "sha256": "26fc80e1ab72fd530d1341dad264c4af12f1ba9682464ff94b448bf9270a17d6",
+    "bytes": 563
+   },
+   {
+    "rel": "phoenix/xrex/inference/oss_bench/bench.py",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "38535b1bce54057f1b2cadce5b33f805a992c399b78a3748d4e5abbf8cb882c4",
+    "bytes": 16076
+   },
+   {
+    "rel": "python-package/xgboost/_typing.py",
+    "repo": "dmlc/xgboost",
+    "sha256": "36547edb957e64f383688cbbe2623419fbe6ca487bc7e7d10a0990b5fb9b3028",
+    "bytes": 2979
+   },
+   {
+    "rel": "src/exo/worker/engines/image/__init__.py",
+    "repo": "exo-explore/exo",
+    "sha256": "35863ccb6810ba7f849e5dbae5cb980ef64da69175d469b4c32eee6bd5d4e3eb",
+    "bytes": 390
+   },
+   {
+    "rel": "demo/dataframe_datetime_long/run.py",
+    "repo": "gradio-app/gradio",
+    "sha256": "27585784bc2d776642c9530307053ed7687d5ac157769bdc170a4880588a5fe3",
+    "bytes": 1736
+   },
+   {
+    "rel": "grox/core/data_loaders/message_queue_loader.py",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "3df795d417cc9cfc2d5f33f2397e0468590ac422c8f6a4a9164334a6a983fab4",
+    "bytes": 790
+   },
+   {
+    "rel": "tests/test_distributed/test_with_spark/utils.py",
+    "repo": "dmlc/xgboost",
+    "sha256": "36b053372c5a34474d6a5d9966ab9077367c06ba89ff9674065a32540481e0c6",
+    "bytes": 863
+   },
+   {
+    "rel": "src/exo/worker/engines/mlx/tests/test_extract_top_logprobs.py",
+    "repo": "exo-explore/exo",
+    "sha256": "3a7f7217f53c0fadea3486e1d1baf37556116e6b919d021d1eff4bfdd905a0b8",
+    "bytes": 2404
+   },
+   {
+    "rel": "demo/validator_simple/run.py",
+    "repo": "gradio-app/gradio",
+    "sha256": "31a70cd2131fd2dc4f6038354f5f89ad160ad23b71058d2ce9c017a58dd58805",
+    "bytes": 1121
+   },
+   {
+    "rel": "phoenix/xrex/configs/config_loader.py",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "41888b4f0bf69a3a4d2f2881863f835daeac2435ea143543c7cd347670bb9dcc",
+    "bytes": 3354
+   },
+   {
+    "rel": "python-package/xgboost/_data_utils.py",
+    "repo": "dmlc/xgboost",
+    "sha256": "40af2b04310003d507b59cfa64af3820b14fd788ecc6941d29098211aa2457ba",
+    "bytes": 25408
+   },
+   {
+    "rel": "src/exo/download/tests/test_model_dirs.py",
+    "repo": "exo-explore/exo",
+    "sha256": "3e5405f52bc84859055b96bb8a2c82f5f18be3f04a1cdc30719043a11986aa36",
+    "bytes": 11524
+   },
+   {
+    "rel": "demo/count_generator/run.py",
+    "repo": "gradio-app/gradio",
+    "sha256": "3406260bd57d7b29e4bc51694397f8960bb69b681ab6bdf46891138b6d15d3e2",
+    "bytes": 523
+   },
+   {
+    "rel": "phoenix/xrex/utils/cluster.py",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "41a0eccba7b1627506c8ec366e76af478a79f223e10dc52e22b9e4409a14d289",
+    "bytes": 976
+   },
+   {
+    "rel": "python-package/xgboost/dask/__init__.py",
+    "repo": "dmlc/xgboost",
+    "sha256": "47e1ab9c4617a07509ea25444711323dba73ae9485bbe8671856d9b1c76e2492",
+    "bytes": 78848
+   },
+   {
+    "rel": "src/exo/worker/runner/supervisor.py",
+    "repo": "exo-explore/exo",
+    "sha256": "3f973c2f60d7197a9f06ae215a291a71ecd6029a860963ca12b20fedea1ad53c",
+    "bytes": 16330
+   },
+   {
+    "rel": "test/test_docker/test_reverse_proxy_fastapi_mount/test_reverse_proxy_fastapi_mount.py",
+    "repo": "gradio-app/gradio",
+    "sha256": "3eeeb0635ae8ec210578eb8346d9f02774cc61ec3bad048f82edeef1423779ea",
+    "bytes": 2624
+   },
+   {
+    "rel": "bdsm/runtime/login_starter_pack_counter.py",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "45db6cec0b46994d8d110395ff29f158110b25421873a756856898bccc40040f",
+    "bytes": 3250
+   },
+   {
+    "rel": "python-package/xgboost/testing/updater.py",
+    "repo": "dmlc/xgboost",
+    "sha256": "4bb5232d0d06e7d92ee89dd40fda2e7af06b64ffbb0a000860df551fa215eb61",
+    "bytes": 24925
+   },
+   {
+    "rel": "src/exo/api/types/openai_responses.py",
+    "repo": "exo-explore/exo",
+    "sha256": "443cf8e94caa6e323a30bc986c5148908203f9228be037d143c85106bd4b400a",
+    "bytes": 18466
+   },
+   {
+    "rel": "client/python/gradio_client/snippet.py",
+    "repo": "gradio-app/gradio",
+    "sha256": "4007cd425d5bbf31d1e24f6e3dd4f22439b003d51d9d6da878009f1259923193",
+    "bytes": 9425
+   },
+   {
+    "rel": "phoenix/xrex/eval/evaluator_recsys.py",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "4611ea3d444a41f2de664f0467aea55212752ce7e7a814f3331596056a802431",
+    "bytes": 903
+   },
+   {
+    "rel": "tests/python-gpu/test_gpu_eval_metrics.py",
+    "repo": "dmlc/xgboost",
+    "sha256": "4bcd12df0b08a46d4fb076a55f2e7c58867ea4e3ec32f750429b3b987027076f",
+    "bytes": 3289
+   },
+   {
+    "rel": "src/exo/shared/types/memory.py",
+    "repo": "exo-explore/exo",
+    "sha256": "45c43d93e33ac9e3a9a2ee4240cbc718c7a657da53f4f56a418d08188a601825",
+    "bytes": 5033
+   },
+   {
+    "rel": "gradio/queueing.py",
+    "repo": "gradio-app/gradio",
+    "sha256": "404d0e79bceb575652b3c9d5e520875890022aaa1670331f6015c332d215a1db",
+    "bytes": 47145
+   },
+   {
+    "rel": "phoenix/xrex/driver/local.py",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "4dd6cca3231ddcc11b144f48a7191ffdeb6a8172596221d9e826da3fc237d6a9",
+    "bytes": 2676
+   },
+   {
+    "rel": "tests/python/test_quantile_dmatrix.py",
+    "repo": "dmlc/xgboost",
+    "sha256": "51f45dfbe5a9d2dfabeeb26c1d301f9c66e2b76e1e2f01d3fb39bfd6feda2688",
+    "bytes": 15184
+   },
+   {
+    "rel": "tmp/old_tests/get_all_models_on_cluster.py",
+    "repo": "exo-explore/exo",
+    "sha256": "45dcbb5674272d9ea254c0cc92217bc381f827ea070d66a08bc814ce84a3e666",
+    "bytes": 1000
+   },
+   {
+    "rel": "demo/workflow_vlm_html_comparison/run.py",
+    "repo": "gradio-app/gradio",
+    "sha256": "47d3a48678c4c72eedd18980e918b4d2275ff28d79fd1b6a4f8eccf4a647dbb9",
+    "bytes": 1892
+   },
+   {
+    "rel": "phoenix/xrex/models/recsys_gen_recs_model.py",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "5a61d2dffa91e3950217e92230e8fc3d7929d9d1cfaed77fd36095988843884e",
+    "bytes": 33199
+   },
+   {
+    "rel": "python-package/xgboost/tracker.py",
+    "repo": "dmlc/xgboost",
+    "sha256": "5320439a198dedef5529e97fdde731b1f0c67c162ef8ada0058dd34f5343335b",
+    "bytes": 4539
+   },
+   {
+    "rel": "src/exo/shared/election.py",
+    "repo": "exo-explore/exo",
+    "sha256": "4628236e64dc11248167e6877e1cb2bebdaea8e9e7ce29c60aba828a9ab00a8a",
+    "bytes": 10827
+   },
+   {
+    "rel": "demo/pending_inputs/run.py",
+    "repo": "gradio-app/gradio",
+    "sha256": "4b2c78615298b10e0b38b77023c0b5c5762bb6b0a1ae15e6c662356e56ef809c",
+    "bytes": 3099
+   },
+   {
+    "rel": "phoenix/xrex/utils/pyspy_profiler.py",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "5f92504432df47e168c685c4499af25c52228471af6d3cdffdacb566b318860a",
+    "bytes": 2154
+   },
+   {
+    "rel": "python-package/xgboost/sklearn.py",
+    "repo": "dmlc/xgboost",
+    "sha256": "5b15d905ee7ce58fff4e671115038645bdd5fcd78ca6d6c5b347bb0a2f130cda",
+    "bytes": 89513
+   },
+   {
+    "rel": "src/exo/__main__.py",
+    "repo": "exo-explore/exo",
+    "sha256": "499bb3b2cc8ff51b105aba65a90e2cbe17bfe6faddb7b8d8bf742cbec4a0ba04",
+    "bytes": 947
+   },
+   {
+    "rel": "demo/text_analysis/run.py",
+    "repo": "gradio-app/gradio",
+    "sha256": "557dd39be18593180c5cec21025a69293fb5c062d70f6d39d4c085cd733780fa",
+    "bytes": 960
+   },
+   {
+    "rel": "grox/libs/blobstore_http/blobstore.py",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "6003d63034a9970d46771536b9c4e534001c94db274d3d619069fb2ff0d88231",
+    "bytes": 5240
+   },
+   {
+    "rel": "tests/python-gpu/test_large_input.py",
+    "repo": "dmlc/xgboost",
+    "sha256": "5daa4e094ce0de34eb0949cde77bb0c6bc5edcfc5ef5a1488286c1aab47348cc",
+    "bytes": 1791
+   },
+   {
+    "rel": "src/exo/shared/tests/test_node_id_persistence.py",
+    "repo": "exo-explore/exo",
+    "sha256": "567e943dc7eb0823b9e9c4a8f056ed2379594a368df0b701b7d6b79ff780403d",
+    "bytes": 2999
+   },
+   {
+    "rel": "demo/theme_new_step_1/run.py",
+    "repo": "gradio-app/gradio",
+    "sha256": "56484eb0d042756eeb6575a0399fba6e3d9ea82c4b1673bb9df79f4d0abe7e1c",
+    "bytes": 598
+   },
+   {
+    "rel": "grox/flows/upa/task_grok_upa_action_with_labels.py",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "63e95dd58108b42333a10381eadc98cf4ae0ea06cf8b4331953f86eb09d9e437",
+    "bytes": 2529
+   },
+   {
+    "rel": "doc/sphinx_util.py",
+    "repo": "dmlc/xgboost",
+    "sha256": "5ebab9e1d8881bc332b40e48e9f0a7292dd2003d454b4e8b8e652b9aa8064e1f",
+    "bytes": 448
+   },
+   {
+    "rel": "src/exo/utils/fs.py",
+    "repo": "exo-explore/exo",
+    "sha256": "5700caafb144aef14f10d0d7e52badfb8dafa68e1dcf8d64fd2ee308b05db34e",
+    "bytes": 904
+   },
+   {
+    "rel": "demo/blocks_random_slider/run.py",
+    "repo": "gradio-app/gradio",
+    "sha256": "568495c783861d5d752074ab207b4a1efafa919d492199d4fd9e9348f5fa929a",
+    "bytes": 616
+   },
+   {
+    "rel": "grox/flows/ptos/task_safety_ptos_adult_content_cross_validation.py",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "64cee499822e6812f2ba9584bdbcf095e1c0b12a4baeca8aaa5d8a34d9e787f6",
+    "bytes": 6041
+   },
+   {
+    "rel": "demo/guide-python/individual_trees.py",
+    "repo": "dmlc/xgboost",
+    "sha256": "5f786051409d9b031ca5cfaad73f9bdcc8602e76d23bbc4028c555f7c0410e6b",
+    "bytes": 3377
+   },
+   {
+    "rel": "src/exo/utils/reactive.py",
+    "repo": "exo-explore/exo",
+    "sha256": "582a6d6dd55b7d36bad249638514a73709433f89950ff17db10ce2545475b8a4",
+    "bytes": 696
+   },
+   {
+    "rel": "gradio/components/checkboxgroup.py",
+    "repo": "gradio-app/gradio",
+    "sha256": "5ed225859e2facb23537fe7395079b89de73e373de0a850858d2f2f755573d2c",
+    "bytes": 9282
+   },
+   {
+    "rel": "grox/flows/reply_spam/classifier_multi_step_reply_spam.py",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "68bf8628ea5d83a7dbdccf9880856463f2907687d40845db5c2e8b38b680c05d",
+    "bytes": 8840
+   },
+   {
+    "rel": "tests/test_distributed/test_gpu_with_dask/test_gpu_ranking.py",
+    "repo": "dmlc/xgboost",
+    "sha256": "616aee7c62aece1a55e27d957b4bb8bbdaeb65f8d28f9e4eda16cfe7f70d1e9c",
+    "bytes": 590
+   },
+   {
+    "rel": "src/exo/worker/disaggregated/protocol.py",
+    "repo": "exo-explore/exo",
+    "sha256": "5f76e5ef76e4319c88083e95a03e5c57dcb43d7034a7fca27933c04a8a001877",
+    "bytes": 3682
+   },
+   {
+    "rel": "demo/custom_path/run.py",
+    "repo": "gradio-app/gradio",
+    "sha256": "615614c7a652228fc9b5b1c3525d8dd60db1e8934dde6f84a18d17c36902a15a",
+    "bytes": 1380
+   },
+   {
+    "rel": "grox/libs/wily_cli/wily_client.py",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "728f03666f83d815efa61ee87dd1a84f730ba1362e01748ad428e0f561f31542",
+    "bytes": 4482
+   },
+   {
+    "rel": "demo/guide-python/quantile_data_iterator.py",
+    "repo": "dmlc/xgboost",
+    "sha256": "6de732ff9d1729a244fabb98a5ca818621473619fcc70f7619b0b39d39173d2c",
+    "bytes": 4076
+   },
+   {
+    "rel": "tests/conftest.py",
+    "repo": "exo-explore/exo",
+    "sha256": "617c27f9407fd1079c2bab5c2dc7d1dbdf8f41f5e4eff6281060bba0925b2cbc",
+    "bytes": 5676
+   },
+   {
+    "rel": "demo/dialogue_mock_diarization/run.py",
+    "repo": "gradio-app/gradio",
+    "sha256": "63e627f0a47a8632b2906db60765c7e0788d24a629080b60c94b2b6568201f2c",
+    "bytes": 1111
+   },
+   {
+    "rel": "phoenix/python/training/xai-checkpointing/xai_checkpointing/load.py",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "766e4fab827c5eefad8f663c5e70d22304683f44d700bfcbaf43e74a2e4ef206",
+    "bytes": 20950
+   },
+   {
+    "rel": "ops/script/prepare_jvm_release.py",
+    "repo": "dmlc/xgboost",
+    "sha256": "6f00bdad9345874225d81156f24b3ac056bcbe8f62e7104289df709f2301fcb5",
+    "bytes": 8730
+   },
+   {
+    "rel": "src/exo/api/types/claude_api.py",
+    "repo": "exo-explore/exo",
+    "sha256": "61d7d3c9cc42958bff34d0b94e12b1f9ed2b090951a03ee0b5788e1714a3467f",
+    "bytes": 6378
+   },
+   {
+    "rel": "gradio/layouts/column.py",
+    "repo": "gradio-app/gradio",
+    "sha256": "67ad638b7362cca8e61baa3dbcf2573394663246658567bb3baf0459757043c9",
+    "bytes": 3884
+   },
+   {
+    "rel": "phoenix/reference/train_step.py",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "892dc4642fa7ad6ab5a8fc5d211c92bc143cbd261c3e0d6ebd57a9847e3c4241",
+    "bytes": 5318
+   },
+   {
+    "rel": "demo/aft_survival/aft_survival_viz_demo.py",
+    "repo": "dmlc/xgboost",
+    "sha256": "72b410d22cd2eee085456ca0352eb6d328d6f4d0b7e853889e4dca6109e64e82",
+    "bytes": 4188
+   },
+   {
+    "rel": "src/exo/shared/tests/test_xdg_paths.py",
+    "repo": "exo-explore/exo",
+    "sha256": "6b870f2126aa9aa4b0fa75bde370c692222c77f60aa624943cb59e2ffc33b02c",
+    "bytes": 6915
+   },
+   {
+    "rel": "gradio/_vendor/aiofiles/threadpool/text.py",
+    "repo": "gradio-app/gradio",
+    "sha256": "7cd9a9c363c4923d0165295d8a925702066a5462f100b71f38c8ae0d0e7811ab",
+    "bytes": 1223
+   },
+   {
+    "rel": "bdsm/tests/test_pipeline_security.py",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "8b41efce0de80c9f5c1318edda688ff4d7c413dd39e5b35c74ccfdeb1b786640",
+    "bytes": 766
+   },
+   {
+    "rel": "demo/dask/gpu_training.py",
+    "repo": "dmlc/xgboost",
+    "sha256": "7664cf2afeb02b2b2dd70f05f60da93cee255f0b15e015fc24d87bf091d446c0",
+    "bytes": 3230
+   },
+   {
+    "rel": "src/exo/shared/tests/test_election.py",
+    "repo": "exo-explore/exo",
+    "sha256": "753fa7c594d2e081d7890c9d66115ec19175d07afe8da2e937ad013c6fcd844f",
+    "bytes": 14216
+   },
+   {
+    "rel": "demo/mcp_letter_counter_app/run.py",
+    "repo": "gradio-app/gradio",
+    "sha256": "802be65ebb8c17914cee55f5746db4dcbd15401ed50b75a7544da09e9a98918c",
+    "bytes": 3094
+   },
+   {
+    "rel": "grox/libs/kafka_cli/multi_region_producer.py",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "8e3ae2c290ba6f2d4c4e9136cf57cf1bd84a726ec1c2de46058d538ec606b38e",
+    "bytes": 6191
+   },
+   {
+    "rel": "python-package/xgboost/spark/params.py",
+    "repo": "dmlc/xgboost",
+    "sha256": "7bd97304eee60ee8a818a1e735c6126a2a75ed6ba576dc03e06e9ccd3a621568",
+    "bytes": 3172
+   },
+   {
+    "rel": "src/exo/worker/tests/unittests/conftest.py",
+    "repo": "exo-explore/exo",
+    "sha256": "762443f31637c4826303af0b25bbdea85f290f2dc326dc86a671af78c60b8238",
+    "bytes": 3170
+   },
+   {
+    "rel": "js/_website/generate_jsons/src/docs/__init__.py",
+    "repo": "gradio-app/gradio",
+    "sha256": "83089ff99c1d42c796bdf1c80409bd1a5df924bd60a54c0cf82454fd8719b61c",
+    "bytes": 18044
+   },
+   {
+    "rel": "grox/flows/ptos/classifier.py",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "8f3cc0cef1a6fb1f2b5b012ec24569feaba4864341ec5059fe766207ea05c1aa",
+    "bytes": 32240
+   },
+   {
+    "rel": "demo/guide-python/gpu_tree_shap.py",
+    "repo": "dmlc/xgboost",
+    "sha256": "7c4e882e16fe434a88c59bee09ea9a44ba39960bbefd2671303dce5206a9a337",
+    "bytes": 1697
+   },
+   {
+    "rel": "bench/exo_eval.py",
+    "repo": "exo-explore/exo",
+    "sha256": "7681040d25fc7a2055a0a0286e53ab9257ca3ac57a720f75a5519b264356ceb8",
+    "bytes": 61850
+   },
+   {
+    "rel": "demo/cancel_events/run.py",
+    "repo": "gradio-app/gradio",
+    "sha256": "8543fe5c3f0e47b8c6e7d2fbbf46561893d3d466ada8d874e4d0cb71102a5023",
+    "bytes": 2881
+   },
+   {
+    "rel": "grox/flows/ptos/task_safety_ptos_media_injected_adult_infrared_video_spam_detection.py",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "928d464e9b4819375708f56e6143d5acfc201911540a3b5f26246e19b1ed7757",
+    "bytes": 7647
+   },
+   {
+    "rel": "demo/guide-python/callbacks.py",
+    "repo": "dmlc/xgboost",
+    "sha256": "88d966089442a5b323bbfcfa231c87ce1dd49b45aa607c7f1769f32bc1a99dac",
+    "bytes": 4967
+   },
+   {
+    "rel": "src/exo/download/tests/test_rate_limit_handling.py",
+    "repo": "exo-explore/exo",
+    "sha256": "79f2cad6485e4a10d0cd4a8bf19cf91ea65602317eb0b817e8664f7fe2695a33",
+    "bytes": 13400
+   },
+   {
+    "rel": "test/test_docker/test_reverse_proxy_root_path/test_reverse_proxy_root_path.py",
+    "repo": "gradio-app/gradio",
+    "sha256": "8bcea97fcf307ba28945f672d40b0877f6d67cc4c700b5ae34fada160aee1f49",
+    "bytes": 2632
+   },
+   {
+    "rel": "phoenix/python/common/xai-gimmick/src/xai_gimmick/__init__.py",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "9b4e9981703a777704b1f7f0bcc2ed291b9a3270d53d38c1d39f6389c3217aa3",
+    "bytes": 948
+   },
+   {
+    "rel": "demo/kaggle-higgs/higgs-pred.py",
+    "repo": "dmlc/xgboost",
+    "sha256": "8ad0a6908811d614fa52c11900a0b785414a8c3f9f25db26fa0d4d6287b2d0e2",
+    "bytes": 1142
+   },
+   {
+    "rel": "src/exo/utils/pydantic_ext.py",
+    "repo": "exo-explore/exo",
+    "sha256": "7bb79afe468b865a1b0c6b449b95af6d248028582ef6bcbf1bc1214ddb81ed27",
+    "bytes": 1213
+   },
+   {
+    "rel": "gradio/components/button.py",
+    "repo": "gradio-app/gradio",
+    "sha256": "8f84bb868f442293fa05c8ebb9edae938e88acb0519d81b1b5f10fab5068b856",
+    "bytes": 6102
+   },
+   {
+    "rel": "grox/core/data_loaders/asr_processor.py",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "a06c1c661a6ce3d5280834b3f8172c0f775ceb1a8c5a5bb8efec3b6321d86516",
+    "bytes": 13590
+   },
+   {
+    "rel": "tests/python/test_collective.py",
+    "repo": "dmlc/xgboost",
+    "sha256": "8c3b2e8173f495363d7d13b7ad375b177339a9cec05382851d5958bf042b5d24",
+    "bytes": 1545
+   },
+   {
+    "rel": "src/exo/worker/engines/mlx/disaggregated/tests/test_protocol_roundtrip.py",
+    "repo": "exo-explore/exo",
+    "sha256": "7f232c2a9ff7c87f8aa9103e83e91068fae1c78ece4b378877d23dede5665de7",
+    "bytes": 3800
+   },
+   {
+    "rel": "demo/blocks_joined/run.py",
+    "repo": "gradio-app/gradio",
+    "sha256": "929c2e379cb4599defbbe009c14cc4027a631af6447462cc180dabd97fa9f448",
+    "bytes": 1236
+   },
+   {
+    "rel": "clip/utils/io_utils.py",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "a20617fc9775f426e7c1a89f7fba8c47c60ce644ca3330e38476486ad6489abf",
+    "bytes": 1431
+   },
+   {
+    "rel": "tests/python/test_early_stopping.py",
+    "repo": "dmlc/xgboost",
+    "sha256": "94b9a5e40892fde95ee68aac5f07d690363a68a3672938e4be4db76eb6b83191",
+    "bytes": 5270
+   },
+   {
+    "rel": "src/exo/worker/engines/image/builder.py",
+    "repo": "exo-explore/exo",
+    "sha256": "827d0b21970a97c075c0c029169bbf135ae9f6d95da2e3bb8a005ae23ebfa370",
+    "bytes": 7124
+   },
+   {
+    "rel": "gradio/components/gallery.py",
+    "repo": "gradio-app/gradio",
+    "sha256": "92a2b89e949a1ae21d52f8a8f8e4bc4bd305499c671d7f52149fe72a5e24d9a7",
+    "bytes": 17445
+   },
+   {
+    "rel": "phoenix/xrex/cutedsl/ranker_fa4/cute_dsl_utils.py",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "a4edcb19484b9152ec1eca7f66c93f2de25853d5463669d326765265d695af50",
+    "bytes": 5953
+   },
+   {
+    "rel": "tests/python-gpu/test_gpu_linear.py",
+    "repo": "dmlc/xgboost",
+    "sha256": "a1121841dbce97418af8d40536d26010fffea10481930a2f3e8696ef689612fd",
+    "bytes": 3457
+   },
+   {
+    "rel": "src/exo/shared/tests/test_resolve_reasoning_params.py",
+    "repo": "exo-explore/exo",
+    "sha256": "88bff8fb89197895a7befd294dcce22336b92393433996fe427331746a4b195d",
+    "bytes": 1106
+   },
+   {
+    "rel": "test/test_utils.py",
+    "repo": "gradio-app/gradio",
+    "sha256": "98089927db114caafb05b5f74941a390e41686e9a55665b64988d2d05c04e9da",
+    "bytes": 37523
+   },
+   {
+    "rel": "phoenix/xrex/utils/nsys.py",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "a5371aab2f72cc996eefc894612b921a9533671e35ebf808a30f977bf5340ab3",
+    "bytes": 885
+   },
+   {
+    "rel": "tests/test_distributed/test_with_dask/conftest.py",
+    "repo": "dmlc/xgboost",
+    "sha256": "a45ca7b9f74034960f77aa46d2e3e02cb0a6d9c2ae49b2af762fe7b1be47faed",
+    "bytes": 1562
+   },
+   {
+    "rel": "src/exo/shared/topology.py",
+    "repo": "exo-explore/exo",
+    "sha256": "92958b465ba426272ce3106504a08a74ceb46c64497d162b08aca2c0ff6b1134",
+    "bytes": 11439
+   },
+   {
+    "rel": "gradio/image_utils.py",
+    "repo": "gradio-app/gradio",
+    "sha256": "999274eed3a3e4940577668c23933912d8609269a8c6af3a1e7e4083ef76a6f9",
+    "bytes": 12148
+   },
+   {
+    "rel": "grox/flows/reply_spam/classifier_reply_ranking.py",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "a86480bf5dcf0a009c9b78d2f2d435c072183387ba51330a47fde0ae93ecef8b",
+    "bytes": 6446
+   },
+   {
+    "rel": "tests/python/test_with_scipy.py",
+    "repo": "dmlc/xgboost",
+    "sha256": "a7f79a0e42279c1a99096cde6a405b497d17f8cbfb172425a3257c51e28cbf0f",
+    "bytes": 2623
+   },
+   {
+    "rel": "src/exo/worker/runner/llm_inference/tool_parsers.py",
+    "repo": "exo-explore/exo",
+    "sha256": "98ca062e37d535bed4737abe483c56150f75da387ef39b4dd5052b3ec7af0eb1",
+    "bytes": 8419
+   },
+   {
+    "rel": "demo/image_watermark/run.py",
+    "repo": "gradio-app/gradio",
+    "sha256": "99c32096c2e8c455f7d972eb7b8b51e1f575d67d3726fda7de58f575322bdebc",
+    "bytes": 889
+   },
+   {
+    "rel": "grox/core/data_loaders/embedding_ranked_key_frames.py",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "aa6405c2aff0bd930e64afdff5cb70a55f8f6919a92d151dc3edd12cbcc05635",
+    "bytes": 6821
+   },
+   {
+    "rel": "python-package/xgboost/spark/data.py",
+    "repo": "dmlc/xgboost",
+    "sha256": "ab6c6958b5cea3787510865c8c316d5ef04976e137dc8837c2d571c2bd27aaf3",
+    "bytes": 12602
+   },
+   {
+    "rel": "tools/src/exo_tools/harness.py",
+    "repo": "exo-explore/exo",
+    "sha256": "a5ca488bf85a5c9e31d5ef5f3fa76d3d1e787834eeb1d176130566fa9a0c293a",
+    "bytes": 22053
+   },
+   {
+    "rel": "demo/hello_blocks/run.py",
+    "repo": "gradio-app/gradio",
+    "sha256": "9ac1033b5dce6c099952f30989ab3e099a1a739f07ff6d188dbec46886640b98",
+    "bytes": 338
+   },
+   {
+    "rel": "phoenix/xrex/data/recsys/feature_config.py",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "b7610b1cb8c244b2e3828d23003bd38173598a9041bdb07da53f12a7a585c65a",
+    "bytes": 5403
+   },
+   {
+    "rel": "tests/python-gpu/test_gpu_basic_models.py",
+    "repo": "dmlc/xgboost",
+    "sha256": "b28ac80f64872deabf75ff9c8f7b71bf5f691522526e147e5fda743d7112df16",
+    "bytes": 2476
+   },
+   {
+    "rel": "src/exo/worker/tests/unittests/test_mlx/test_tokenizers.py",
+    "repo": "exo-explore/exo",
+    "sha256": "a8c3b5eeab54959d04d8f72c4642464ebb69bcee390ecdf0aec40e6c1a11d004",
+    "bytes": 13426
+   },
+   {
+    "rel": "scripts/benchmark_latency_mcp.py",
+    "repo": "gradio-app/gradio",
+    "sha256": "a0b6f331103420fc47f7aeb1c0cc30b31deaae3a2a14f0ff9f0de8b86a444019",
+    "bytes": 3659
+   },
+   {
+    "rel": "phoenix/xrex/data/rust_kafka_recsys.py",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "b915fe6e5b0df31495aab80f41c0b1c38ab3c268f367594c4a5011fbdc6acf87",
+    "bytes": 21007
+   },
+   {
+    "rel": "tests/python/test_with_arrow.py",
+    "repo": "dmlc/xgboost",
+    "sha256": "c207fbbfea887ee1b85b0b10556806b79f8c1ce6f65977c2258a5b6e57394199",
+    "bytes": 4634
+   },
+   {
+    "rel": "src/exo/worker/tests/unittests/test_mlx/test_auto_parallel.py",
+    "repo": "exo-explore/exo",
+    "sha256": "ad0bcdd421b0a147a7519b1e52483112a48c36bf5267dca94c543f0f47af4b1f",
+    "bytes": 4563
+   },
+   {
+    "rel": "demo/stock_forecast/run.py",
+    "repo": "gradio-app/gradio",
+    "sha256": "a12720e46bae2d630cbc0d09787972d3914a2fa104b0b7da73372bf65b45cf9b",
+    "bytes": 1146
+   },
+   {
+    "rel": "phoenix/xrex/utils/utils.py",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "bd01eadde97ebaa2b0973878ec7f66e3447ed50f71fb417d0a8fa99cae0b2e97",
+    "bytes": 10574
+   },
+   {
+    "rel": "python-package/xgboost/testing/data.py",
+    "repo": "dmlc/xgboost",
+    "sha256": "c4ed2b39c438c369dc7f01acf5ebf997c452b4d733beb240f41129195b38ec86",
+    "bytes": 36074
+   },
+   {
+    "rel": "src/exo/utils/task_group.py",
+    "repo": "exo-explore/exo",
+    "sha256": "b2948e3dac3b9da490eaf90635e8568094ce0e5f1ceaf6b3d6c0d518ee999491",
+    "bytes": 2110
+   },
+   {
+    "rel": "demo/examples_component/run.py",
+    "repo": "gradio-app/gradio",
+    "sha256": "ac4ad9201081dfe273fef847e072dd49fd94d3eb2f253ea74ab332f1c407e4cc",
+    "bytes": 673
+   },
+   {
+    "rel": "grox/flows/ptos/task_ptos_spam_detection.py",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "c2409cbc50451ebdc12532598f351956be82a51102f03d611def5836e9e6d131",
+    "bytes": 2399
+   },
+   {
+    "rel": "tests/python/test_openmp.py",
+    "repo": "dmlc/xgboost",
+    "sha256": "cbdbb221a1fd978d86688766290209667f7246c43e5aaf67f679569498226276",
+    "bytes": 3251
+   },
+   {
+    "rel": "src/exo/api/tests/test_chat_completions_stream.py",
+    "repo": "exo-explore/exo",
+    "sha256": "ba71e8459eed335db8354f63be5671f9782b5cf201fb7615091e71c17930413f",
+    "bytes": 6655
+   },
+   {
+    "rel": "gradio/cli/commands/components/build.py",
+    "repo": "gradio-app/gradio",
+    "sha256": "ad46227f937776168683b8fa55b573938e391cd4bdf83d57de0fbab4578f5b8e",
+    "bytes": 6808
+   },
+   {
+    "rel": "bdsm/tests/test_loss.py",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "d08c9fd577fe912f4a7622371f1c4743bfdc32b9cb339e17b9365212176bc774",
+    "bytes": 2070
+   },
+   {
+    "rel": "python-package/xgboost/dask/data.py",
+    "repo": "dmlc/xgboost",
+    "sha256": "ccec69776710d8bb45b4080e0e74d10c0f2f3800a14d2c0eab4669cc13b94874",
+    "bytes": 13807
+   },
+   {
+    "rel": "tmp/old_tests/test_vision_cache.py",
+    "repo": "exo-explore/exo",
+    "sha256": "bb1a9ad68ca66672f6fc65243aaea562d58618584075f16f1faa6d00e78a4907",
+    "bytes": 2230
+   },
+   {
+    "rel": "demo/image_editor_sketchpad/run.py",
+    "repo": "gradio-app/gradio",
+    "sha256": "aeff8bfee51547d7e040039f8a4ae497d5f7654ec37e9c95636f96171eee9274",
+    "bytes": 519
+   },
+   {
+    "rel": "phoenix/xrex/models/recsys_sid.py",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "d1bbad6eaadafd775f916e6b473ae2497215457c6965e7bd851473cdc7572548",
+    "bytes": 2288
+   },
+   {
+    "rel": "python-package/xgboost/testing/utils.py",
+    "repo": "dmlc/xgboost",
+    "sha256": "d13976e2bb7ccf5bed0a896035bc19741d51c9939621882c3450ca6408a23c3f",
+    "bytes": 1387
+   },
+   {
+    "rel": "src/exo/download/impl_shard_downloader.py",
+    "repo": "exo-explore/exo",
+    "sha256": "bf764224fcd37e7685c18cadad080ea0e729d04d64034ae3ab0c7f0a77b47d02",
+    "bytes": 9528
+   },
+   {
+    "rel": "demo/kitchen_sink_random/constants.py",
+    "repo": "gradio-app/gradio",
+    "sha256": "b2614e03f9872ccd608bc86a4a8434c98fbf9ad03b52d9ba4f260f06a0a41096",
+    "bytes": 1278
+   },
+   {
+    "rel": "grox/core/plans/registry.py",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "d461a7bd3bfbbfb5d1bc33075c17a1620a29e88116a48773568092c8d2a11a78",
+    "bytes": 412
+   },
+   {
+    "rel": "python-package/xgboost/spark/__init__.py",
+    "repo": "dmlc/xgboost",
+    "sha256": "d6651ca8ef8825f6eaf2ef6464fa4250b65df9ab056689a740c105e5e5aa3713",
+    "bytes": 536
+   },
+   {
+    "rel": "src/exo/utils/tests/test_channels.py",
+    "repo": "exo-explore/exo",
+    "sha256": "c490fc325d8f50b37aefb3b507d844e28f6a17226920732458e81a3090a9c128",
+    "bytes": 3228
+   },
+   {
+    "rel": "gradio/components/markdown.py",
+    "repo": "gradio-app/gradio",
+    "sha256": "b4dc2c86028d9341a45c632ade24ae7c0f6a97af7943370c5ff0f996e9f92bb4",
+    "bytes": 9165
+   },
+   {
+    "rel": "grox/flows/reply_spam/plan_spam_comment.py",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "d5ec178c82c7b4d8b5b0f3208e445ea19fcef24c8e990a412281b42a1e647897",
+    "bytes": 906
+   },
+   {
+    "rel": "tests/python/test_tracker.py",
+    "repo": "dmlc/xgboost",
+    "sha256": "d8bc6c16259479143bac41607bc95b30ed7e35975312cc6f519e715179388c5a",
+    "bytes": 10024
+   },
+   {
+    "rel": "src/exo/worker/runner/runner.py",
+    "repo": "exo-explore/exo",
+    "sha256": "c99bc3cf88eccbac90b6709ff3278e4016c6d2284e1032af7abe577b6117858d",
+    "bytes": 13585
+   },
+   {
+    "rel": "test/components/test_slider.py",
+    "repo": "gradio-app/gradio",
+    "sha256": "b4ddd29c1ac7876b12475431ccef43b2e8203e612219c7e646c839479b3f619a",
+    "bytes": 3435
+   },
+   {
+    "rel": "grox/core/services/service.py",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "d7a4778438447eb60f3b49ec6f6a3851f3d82c2680eb2be3903649ea59be4452",
+    "bytes": 2174
+   },
+   {
+    "rel": "tests/python/test_demos.py",
+    "repo": "dmlc/xgboost",
+    "sha256": "da8f0a3e15a40b4f706c37d9650ccaa1cd030b870ffd2dfbd4007196ce6a534f",
+    "bytes": 6716
+   },
+   {
+    "rel": "src/exo/worker/engines/mlx/constants.py",
+    "repo": "exo-explore/exo",
+    "sha256": "cef1c82ac8a44a8817db8634dbbd65e06ecdd5675d759b488eae853306e280eb",
+    "bytes": 517
+   },
+   {
+    "rel": "gradio/themes/utils/colors.py",
+    "repo": "gradio-app/gradio",
+    "sha256": "c000cf0e8cc7712ab0d3a156bcaa02101d737914db078488c9a81e796cd470fb",
+    "bytes": 6576
+   },
+   {
+    "rel": "phoenix/xrex/cuda/__init__.py",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "d85ead807ff09371a76790691d970154a2a55732abd10675df416928fd9b9bbf",
+    "bytes": 1299
+   },
+   {
+    "rel": "python-package/xgboost/core.py",
+    "repo": "dmlc/xgboost",
+    "sha256": "db4982ead0f5ca9bd82f1f1dcb5d26ad9defcac316014430765f7c65bcaf501f",
+    "bytes": 118692
+   },
+   {
+    "rel": "tests/framework.py",
+    "repo": "exo-explore/exo",
+    "sha256": "d0468944c017e794109a308ac186cd2a083de70a8bc26b908602c919b38cd11d",
+    "bytes": 6676
+   },
+   {
+    "rel": "demo/super_html/run.py",
+    "repo": "gradio-app/gradio",
+    "sha256": "c18ef07a2980a9e5c1fe0519ace50c2c6677194c563b0e4e8f75151dbe5670fd",
+    "bytes": 16214
+   },
+   {
+    "rel": "phoenix/python/common/xai-proto/backend_proxy.py",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "d943a20593fa8b296d636c16e9844ab49de5a5dff93f8a53d9858d840db38764",
+    "bytes": 1072
+   },
+   {
+    "rel": "python-package/xgboost/testing/data_iter.py",
+    "repo": "dmlc/xgboost",
+    "sha256": "dbc08b3e65ae536d72a12f2e3ca1baaf1f09511797bd1cc3476da559590da899",
+    "bytes": 5028
+   },
+   {
+    "rel": "src/exo/download/coordinator.py",
+    "repo": "exo-explore/exo",
+    "sha256": "d0fe621b2d7786f1c724fef549401567e1ef35b5491f25c1da447e3ab167b8ba",
+    "bytes": 20217
+   },
+   {
+    "rel": "demo/chatbot_core_components/run.py",
+    "repo": "gradio-app/gradio",
+    "sha256": "c2abbe0af39f1654aadd57a6b8f91b3a2fdf8468ec89d23bc82d16abb12ce4cb",
+    "bytes": 10442
+   },
+   {
+    "rel": "grox/core/tasks/task_asr.py",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "d9a5ecda96d74d424b182d326cdb8febd7a9928c7c5ffb3611dae8662d1e87ae",
+    "bytes": 5989
+   },
+   {
+    "rel": "tests/test_distributed/test_with_dask/test_external_memory.py",
+    "repo": "dmlc/xgboost",
+    "sha256": "e214892a5efbaa33fd00cdc5d3574f2a8dfbf278e94c1b4e67a80be64ea856d5",
+    "bytes": 915
+   },
+   {
+    "rel": "src/exo/api/tests/test_openai_responses_api.py",
+    "repo": "exo-explore/exo",
+    "sha256": "d6d831bb60547f7ea484edb1dd73af1bf5b155d5b190cc64a0aa4c1c823a0752",
+    "bytes": 9420
+   },
+   {
+    "rel": "demo/image_editor_inpainting/run.py",
+    "repo": "gradio-app/gradio",
+    "sha256": "cd8369f09129e6d5e1bf9e88cc0997308a44089a6654279c9c7cfb7d3b0c8bb8",
+    "bytes": 887
+   },
+   {
+    "rel": "phoenix/xrex/inference/checkpoint_storage.py",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "db99d89cf85bcf509cc26a03ca8013f7788ecf5c6f6bda46886b28ca0622b2c6",
+    "bytes": 11129
+   },
+   {
+    "rel": "tests/python/test_survival.py",
+    "repo": "dmlc/xgboost",
+    "sha256": "e3dac553923a43100f88a38caa47600879df94cb7ed74bd2ed722201d92fec98",
+    "bytes": 5890
+   },
+   {
+    "rel": "src/exo/master/tests/test_master.py",
+    "repo": "exo-explore/exo",
+    "sha256": "e0501fb7dc0b45072ee0466402415a960fe5e2d6da6817fe289d3b65096832a4",
+    "bytes": 9191
+   },
+   {
+    "rel": "scripts/sync_frontend.py",
+    "repo": "gradio-app/gradio",
+    "sha256": "d5bdfd6532d83cff4f7b5152c12239c1baa7d83b8c1705c1c70cbb26cf6fca1a",
+    "bytes": 2711
+   },
+   {
+    "rel": "phoenix/xrex/optimizers/recsys/config.py",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "e599478488980650c8fa3b11fc0f5df6818b0699df3ab2b4bf53fcf49026e90e",
+    "bytes": 1136
+   },
+   {
+    "rel": "tests/python-gpu/test_gpu_with_sklearn.py",
+    "repo": "dmlc/xgboost",
+    "sha256": "e5fdfd065efa4643461822dd706ebfe459927e3e2305ac3b6424379e434a30d3",
+    "bytes": 9786
+   },
+   {
+    "rel": "src/exo/download/shard_downloader.py",
+    "repo": "exo-explore/exo",
+    "sha256": "e5abd303d1070442ebd97167107ddf2cd06e5b6534fbc7bd889573e77456274b",
+    "bytes": 3350
+   },
+   {
+    "rel": "test/test_queueing.py",
+    "repo": "gradio-app/gradio",
+    "sha256": "db013706305fa9f98f055e0cc8a52352372c55288926f4844883fc11aa546eb2",
+    "bytes": 13644
+   },
+   {
+    "rel": "grox/flows/reply_spam/classifier_coordinated_spam.py",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "e8968b64c1ccdd385915990c085abb1612c68b3a6e1dedd9c2a4941cb1bede74",
+    "bytes": 8439
+   },
+   {
+    "rel": "ops/script/change_version.py",
+    "repo": "dmlc/xgboost",
+    "sha256": "e76d228c6bf7af5acab64aeda893010ca20505c3a5a5eaa5235744569f59b19d",
+    "bytes": 4860
+   },
+   {
+    "rel": "src/exo/worker/engines/mlx/vision.py",
+    "repo": "exo-explore/exo",
+    "sha256": "e648150f66b52468a441686e7df7619afeec0b5d3de42a7dfe3fe08f5c6c11f2",
+    "bytes": 33487
+   },
+   {
+    "rel": "gradio/_simple_templates/simpletextbox.py",
+    "repo": "gradio-app/gradio",
+    "sha256": "dd0b2d9484e4d8c76b0cb9c8f07e062807ee5bb2a4d05a7b74315785277940fd",
+    "bytes": 5856
+   },
+   {
+    "rel": "grox/core/data_loaders/kafka_loader.py",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "ef9169949bbf60862a19cfa093f02fa7f0ce172435b8bf778c0a8268a822215c",
+    "bytes": 9269
+   },
+   {
+    "rel": "demo/dask/sklearn_gpu_training.py",
+    "repo": "dmlc/xgboost",
+    "sha256": "eb406b21f22f0c4c491f8c96059c698252e65ace891f9c710748d9ec6324aa24",
+    "bytes": 1530
+   },
+   {
+    "rel": "src/exo/shared/types/multiaddr.py",
+    "repo": "exo-explore/exo",
+    "sha256": "e7f1287277a3dd161a50be9c4bf049be37f486475dc67d84ab867b6017f8a816",
+    "bytes": 2322
+   },
+   {
+    "rel": "demo/tax_calculator/run.py",
+    "repo": "gradio-app/gradio",
+    "sha256": "df3506c1c58693b86ff017259123660b8f779cc36296a15c3c2e11bb863198ad",
+    "bytes": 1253
+   },
+   {
+    "rel": "grox/core/tasks/disable_rules.py",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "f015d699909befe1c73243eac17ba6cc2fbd26269079ff8bb1e0042e23afced8",
+    "bytes": 561
+   },
+   {
+    "rel": "python-package/xgboost/objective.py",
+    "repo": "dmlc/xgboost",
+    "sha256": "ec9c3ca1844b4c580429aa13183dbecf96641de24b30f2ccb52b44f78410d33e",
+    "bytes": 2398
+   },
+   {
+    "rel": "src/exo/worker/engines/image/models/flux/config.py",
+    "repo": "exo-explore/exo",
+    "sha256": "e874973736e09b505e93dfd72b85ed29bcfa959468abfafed33c047fcd76ab6e",
+    "bytes": 1406
+   },
+   {
+    "rel": "demo/llm_claude/run.py",
+    "repo": "gradio-app/gradio",
+    "sha256": "e0284177bcf93ce7b8315f28926aa9aec92fe61ca599d02b381c5e1643106a6b",
+    "bytes": 1415
+   },
+   {
+    "rel": "phoenix/xrex/inference/status_server.py",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "f106ba422fa1937c0b9cadaac9f7e5c0c4967cc3e3126bd9555104a322421fe8",
+    "bytes": 5907
+   },
+   {
+    "rel": "tests/python/test_plotting.py",
+    "repo": "dmlc/xgboost",
+    "sha256": "ec9f54e4d413183f70b4b8cf82f0641d5a64392285d0b44fba08f0d0f874796a",
+    "bytes": 4494
+   },
+   {
+    "rel": "tmp/gen_card.py",
+    "repo": "exo-explore/exo",
+    "sha256": "ee0b6bf15c56c86bef6b8bc12dd3860c2805c065510e60c9799b5194c841948c",
+    "bytes": 860
+   },
+   {
+    "rel": "scripts/load_test/gradio_app.py",
+    "repo": "gradio-app/gradio",
+    "sha256": "ed9904b2bb5c41b63a6df9f4d0a968a0e5b07fbea4bbde17c127c7bbb4747b38",
+    "bytes": 694
+   },
+   {
+    "rel": "phoenix/xrex/cutedsl/ranker_fa4/flash_bwd.py",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "f1d2752d59575292a56db87bf8ce7d6b9a0513971562d21d40f4618830eb8c77",
+    "bytes": 81306
+   },
+   {
+    "rel": "demo/kaggle-higgs/speedtest.py",
+    "repo": "dmlc/xgboost",
+    "sha256": "f6e05a0b042aeab8b761a79070e641a4e0b314d46edbd7acdce0e047b099f9a1",
+    "bytes": 2067
+   },
+   {
+    "rel": "src/exo/worker/engines/mlx/auto_parallel.py",
+    "repo": "exo-explore/exo",
+    "sha256": "f854d7dbcfd79c03725ddb19c215d95884362fb40b00d96c75bcfae58683cce1",
+    "bytes": 64601
+   },
+   {
+    "rel": "demo/highlight_pdf/run.py",
+    "repo": "gradio-app/gradio",
+    "sha256": "efaa6791d0cfff4947b8b28ffbdba76e47d5ed7d29635625d5c067a922464100",
+    "bytes": 1788
+   },
+   {
+    "rel": "grox/core/data_loaders/data_types.py",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "f2bcf2ebd37cb56b2007c2af898b52009dc15b65226ba7eef9b30c5984f191d6",
+    "bytes": 32814
+   },
+   {
+    "rel": "ops/script/change_scala_version.py",
+    "repo": "dmlc/xgboost",
+    "sha256": "f96c5eedb5573cec022f59114990006637c48dc2b68d9ecc29beb5a449cdcc5e",
+    "bytes": 2936
+   },
+   {
+    "rel": "src/exo/worker/engines/image/pipeline/kv_cache.py",
+    "repo": "exo-explore/exo",
+    "sha256": "ff1ecbb39ea5704270a0780fa2a786c0c1a276518f565004b89bfc545c945416",
+    "bytes": 2590
+   },
+   {
+    "rel": "demo/reversible_flow/run.py",
+    "repo": "gradio-app/gradio",
+    "sha256": "f74b6c91e038ff15edc93672cc8b4119159ca1fd0555fdf8083edb0e5eadf9e8",
+    "bytes": 312
+   },
+   {
+    "rel": "phoenix/xrex/utils/metrics.py",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "f84f50e4ee6cb705bfdbb0069a60b973f97ed2717469fab8c5226e75a63c251f",
+    "bytes": 5014
+   },
+   {
+    "rel": "tests/python/test_multi_target.py",
+    "repo": "dmlc/xgboost",
+    "sha256": "ffdced9312dcb4f5d538015c33855955fa66fc627094fa3074e35e5df55e2371",
+    "bytes": 11198
+   },
+   {
+    "rel": "tmp/run_llm.py",
+    "repo": "exo-explore/exo",
+    "sha256": "ff32693ae59075e56ebe592a73a07bc888f2601bc8195747aca8dc35bd40f328",
+    "bytes": 2558
+   },
+   {
+    "rel": "gradio/components/dataframe.py",
+    "repo": "gradio-app/gradio",
+    "sha256": "ff3b63ce7aa60658c4d8b7f4102099bd5bc9839308c87bc1c99b809bf6088521",
+    "bytes": 30719
+   },
+   {
+    "rel": "grox/libs/video_tools/key_frames.py",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "fe98a84948570e8b03b3e618e45e1ce7ec989d082d5dcf2907fa2f8a0de3224c",
+    "bytes": 5941
+   }
+  ],
+  "trainTokens": 276204,
+  "builder": "eval/coding-competence/build-lex-prior.mjs",
+  "derive": {
+   "MIN_WORD_COUNT": 3,
+   "MIN_WORD_REPOS": 2,
+   "MIN_SYMBOL_COUNT": 1,
+   "MUNCH_PRECISION": 0.5,
+   "OPENER_MIN_COUNT": 5,
+   "OPENER1_PRECISION": 0.95,
+   "OPENER2_PRECISION": 0.99,
+   "LCP_SHARE": 0.99,
+   "STRING_MIN_COUNT": 5,
+   "STRING_OPEN_PRECISION": 0.95,
+   "MATCH_MIN": 0.9,
+   "EXTRA_MIN_COUNT": 20,
+   "EXTRA_PRECISION": 0.9,
+   "PREFIX_MIN_COUNT": 20,
+   "PREFIX_ATTACH": 0.5,
+   "SUFFIX_MIN_COUNT": 20,
+   "SUFFIX_ATTACH": 0.5,
+   "COND_MIN_COUNT": 5,
+   "COND_PRECISION": 0.95,
+   "INTERP_MIN_COUNT": 20,
+   "INTERP_MIN_SHARE": 0.02,
+   "STRPREFIX_MIN_COUNT": 3,
+   "SAMPLE": 400,
+   "IDENT_SAMPLE_MIN": 300
+  },
+  "note": "Derived from TRAIN gold only (split by repository). Every threshold is in provenance.derive. A prior nominates and refuses; it never admits an identity.",
+  "selection": {
+   "split": "train",
+   "maxFiles": 100000,
+   "maxBytes": 200000,
+   "goldErrTol": 0.02,
+   "eligible": 241,
+   "excluded": {
+    "restricted": 1,
+    "tooBig": 0
+   },
+   "gaps": [],
+   "builtAt": "2026-10-05"
+  }
+ },
+ "words": {
+  "keyword": [
+   "__future__",
+   "and",
+   "as",
+   "assert",
+   "async",
+   "await",
+   "break",
+   "case",
+   "class",
+   "continue",
+   "def",
+   "del",
+   "elif",
+   "else",
+   "except",
+   "finally",
+   "for",
+   "from",
+   "global",
+   "if",
+   "import",
+   "in",
+   "is",
+   "lambda",
+   "nonlocal",
+   "not",
+   "or",
+   "pass",
+   "raise",
+   "return",
+   "try",
+   "while",
+   "with",
+   "yield"
+  ],
+  "literal": [
+   "False",
+   "None",
+   "True"
+  ],
+  "counts": {
+   "import": 2056,
+   "as": 584,
+   "from": 1275,
+   "class": 432,
+   "def": 2290,
+   "None": 3753,
+   "True": 763,
+   "False": 490,
+   "with": 473,
+   "assert": 1006,
+   "__future__": 36,
+   "return": 1823,
+   "del": 28,
+   "not": 1040,
+   "try": 199,
+   "in": 1383,
+   "finally": 28,
+   "for": 1040,
+   "yield": 72,
+   "if": 2723,
+   "lambda": 101,
+   "is": 738,
+   "else": 756,
+   "and": 385,
+   "elif": 188,
+   "case": 25,
+   "raise": 310,
+   "continue": 98,
+   "async": 334,
+   "await": 380,
+   "break": 40,
+   "except": 197,
+   "or": 255,
+   "global": 3,
+   "pass": 75,
+   "while": 57,
+   "nonlocal": 5,
+   "self": 4436,
+   "str": 1882,
+   "int": 999,
+   "np": 855,
+   "list": 634,
+   "data": 542,
+   "Optional": 523,
+   "X": 509,
+   "Any": 466,
+   "y": 464,
+   "isinstance": 462,
+   "value": 441,
+   "bool": 424,
+   "append": 417,
+   "gr": 411,
+   "dict": 395,
+   "i": 393,
+   "get": 388,
+   "result": 388,
+   "logger": 386,
+   "len": 372,
+   "pytest": 366,
+   "name": 361,
+   "path": 349,
+   "float": 348,
+   "cute": 332,
+   "os": 323,
+   "args": 319,
+   "model": 309,
+   "dtype": 302,
+   "layer": 297,
+   "cls": 289,
+   "array": 284,
+   "shape": 283,
+   "xgb": 283,
+   "cutlass": 278,
+   "client": 277,
+   "x": 269,
+   "mx": 266,
+   "ctypes": 234,
+   "params": 229,
+   "ValueError": 217,
+   "type": 215,
+   "Path": 214,
+   "config": 211,
+   "time": 210,
+   "jax": 207,
+   "exo": 201,
+   "key": 195,
+   "info": 193,
+   "size": 191,
+   "label": 185,
+   "mark": 185,
+   "tm": 184,
+   "v": 184,
+   "Xy": 182,
+   "post": 182,
+   "cfg": 180,
+   "jnp": 179,
+   "ndarray": 179,
+   "Dict": 171,
+   "kwargs": 171,
+   "output": 170,
+   "p": 170,
+   "model_id": 167,
+   "DMatrix": 166,
+   "e": 165,
+   "event": 165,
+   "group": 164,
+   "json": 157,
+   "tuple": 157,
+   "join": 156,
+   "content": 152,
+   "__init__": 151,
+   "demo": 149,
+   "handle": 149,
+   "k": 147,
+   "range": 146,
+   "device": 145,
+   "df": 144,
+   "Array": 143,
+   "t": 142,
+   "base_margin": 141,
+   "booster": 141,
+   "s": 141,
+   "f": 140,
+   "fn": 140,
+   "n_features": 140,
+   "Tuple": 139,
+   "m": 139,
+   "n_samples": 139,
+   "Union": 137,
+   "Literal": 136,
+   "param": 136,
+   "DataFrame": 132,
+   "feature_types": 132,
+   "pd": 132,
+   "text": 131,
+   "asyncio": 130,
+   "r": 130,
+   "ArrayLike": 129,
+   "timeout": 129,
+   "BaseModel": 128,
+   "train": 128,
+   "response": 127,
+   "node_id": 126,
+   "feature_names": 125,
+   "Sequence": 122,
+   "Callable": 120,
+   "grox": 120,
+   "rng": 120,
+   "shared": 120,
+   "add": 119,
+   "qid": 118,
+   "List": 117,
+   "results": 116,
+   "n": 115,
+   "gradio": 114,
+   "set": 114,
+   "testing": 112,
+   "types": 112,
+   "Image": 111,
+   "convo": 111,
+   "dtrain": 111,
+   "xgboost": 111,
+   "Metrics": 110,
+   "const_expr": 110,
+   "events": 109,
+   "Exception": 108,
+   "tree_method": 108,
+   "cast": 107,
+   "enable_categorical": 106,
+   "items": 106,
+   "self_attn": 106,
+   "typing": 106,
+   "c": 105,
+   "error": 105,
+   "start": 105,
+   "_DaskCollection": 104,
+   "shard": 103,
+   "res": 102,
+   "match": 101,
+   "predict": 101,
+   "mlp": 100,
+   "re": 99,
+   "random": 97,
+   "total": 97,
+   "cp": 96,
+   "weight": 96,
+   "utils": 95,
+   "__name__": 94,
+   "bytes": 94,
+   "w": 94,
+   "msg": 93,
+   "evals": 91,
+   "print": 91,
+   "rank": 91,
+   "max_bin": 90,
+   "status": 90,
+   "values": 90,
+   "_LIB": 89,
+   "classmethod": 89,
+   "missing": 89,
+   "ref": 89,
+   "part": 88,
+   "core": 87,
+   "d": 87,
+   "it": 87,
+   "numpy": 87,
+   "frozen": 86,
+   "warning": 86,
+   "counter": 85,
+   "QuantileDMatrix": 84,
+   "n_workers": 84,
+   "num_boost_round": 83,
+   "sum": 83,
+   "_check_call": 82,
+   "batch": 82,
+   "hasattr": 82,
+   "id": 82,
+   "logging": 82,
+   "patch": 82,
+   "raises": 82,
+   "strip": 81,
+   "url": 81,
+   "float32": 80,
+   "iteration_range": 80,
+   "dd": 79,
+   "raw": 79,
+   "Event": 78,
+   "body": 78,
+   "cache": 78,
+   "out": 78,
+   "skipif": 78,
+   "buf": 77,
+   "super": 77,
+   "parameters": 76,
+   "state": 76,
+   "metrics": 75,
+   "send": 75,
+   "getattr": 74,
+   "obj": 74,
+   "reason": 74,
+   "request": 74,
+   "sys": 74,
+   "worker": 74,
+   "axis": 73,
+   "evals_result": 73,
+   "lines": 73,
+   "subprocess": 73,
+   "nn": 72,
+   "add_argument": 71,
+   "columns": 71,
+   "models": 71,
+   "open": 71,
+   "sleep": 71,
+   "task": 71,
+   "attributes": 70,
+   "update": 70,
+   "val": 70,
+   "ModelId": 69,
+   "byref": 69,
+   "constants": 69,
+   "debug": 69,
+   "enumerate": 69,
+   "item": 69,
+   "smem_copy_params": 69,
+   "b": 68,
+   "cmd": 68,
+   "fit": 68,
+   "mode": 68,
+   "payload": 68,
+   "reshape": 68,
+   "NodeId": 67,
+   "default": 67,
+   "description": 67,
+   "field": 67,
+   "all_to_sharded_linear": 66,
+   "astype": 66,
+   "keys": 66,
+   "Post": 65,
+   "labels": 65,
+   "metric": 65,
+   "Booster": 64,
+   "Textbox": 64,
+   "img": 64,
+   "layers": 64,
+   "tmp_path": 64,
+   "TypeError": 63,
+   "dataset": 63,
+   "strategies": 63,
+   "ctx": 62,
+   "extend": 62,
+   "line": 62,
+   "preds": 62,
+   "run": 61,
+   "Int32": 60,
+   "anyio": 60,
+   "channel": 60,
+   "copy": 60,
+   "help": 60,
+   "idx": 60,
+   "parser": 60,
+   "usage": 60,
+   "Tensor": 59,
+   "a": 59,
+   "buffer": 59,
+   "indptr": 59,
+   "object": 59,
+   "messages": 58,
+   "close": 57,
+   "loads": 57,
+   "metadata": 57,
+   "feature_weights": 56,
+   "int32": 56,
+   "parts": 56,
+   "pathlib": 56,
+   "prompt": 56,
+   "eval": 55,
+   "eval_set": 55,
+   "mixer": 55,
+   "model_card": 55,
+   "assert_allclose": 54,
+   "func": 54,
+   "inputs": 54,
+   "tree": 54,
+   "user": 54,
+   "Module": 53,
+   "chunks": 53,
+   "dataclass": 53,
+   "message": 53,
+   "parametrize": 53,
+   "property": 53,
+   "split": 53,
+   "world_size": 53,
+   "clf": 52,
+   "distributed": 52,
+   "index": 52,
+   "mask": 52,
+   "plt": 52
+  },
+  "identifierSample": [
+   "self",
+   "str",
+   "int",
+   "np",
+   "list",
+   "data",
+   "Optional",
+   "X",
+   "Any",
+   "y",
+   "isinstance",
+   "value",
+   "bool",
+   "append",
+   "gr",
+   "dict",
+   "i",
+   "get",
+   "result",
+   "logger",
+   "len",
+   "pytest",
+   "name",
+   "path",
+   "float",
+   "cute",
+   "os",
+   "args",
+   "model",
+   "dtype",
+   "layer",
+   "cls",
+   "array",
+   "shape",
+   "xgb",
+   "cutlass",
+   "client",
+   "x",
+   "mx",
+   "ctypes",
+   "params",
+   "ValueError",
+   "type",
+   "Path",
+   "config",
+   "time",
+   "jax",
+   "exo",
+   "key",
+   "info",
+   "size",
+   "label",
+   "mark",
+   "tm",
+   "v",
+   "Xy",
+   "post",
+   "cfg",
+   "jnp",
+   "ndarray",
+   "Dict",
+   "kwargs",
+   "output",
+   "p",
+   "model_id",
+   "DMatrix",
+   "e",
+   "event",
+   "group",
+   "json",
+   "tuple",
+   "join",
+   "content",
+   "__init__",
+   "demo",
+   "handle",
+   "k",
+   "range",
+   "device",
+   "df",
+   "Array",
+   "t",
+   "base_margin",
+   "booster",
+   "s",
+   "f",
+   "fn",
+   "n_features",
+   "Tuple",
+   "m",
+   "n_samples",
+   "Union",
+   "Literal",
+   "param",
+   "DataFrame",
+   "feature_types",
+   "pd",
+   "text",
+   "asyncio",
+   "r",
+   "ArrayLike",
+   "timeout",
+   "BaseModel",
+   "train",
+   "response",
+   "node_id",
+   "feature_names",
+   "Sequence",
+   "Callable",
+   "grox",
+   "rng",
+   "shared",
+   "add",
+   "qid",
+   "List",
+   "results",
+   "n",
+   "gradio",
+   "set",
+   "testing",
+   "types",
+   "Image",
+   "convo",
+   "dtrain",
+   "xgboost",
+   "Metrics",
+   "const_expr",
+   "events",
+   "Exception",
+   "tree_method",
+   "cast",
+   "enable_categorical",
+   "items",
+   "self_attn",
+   "typing",
+   "c",
+   "error",
+   "start",
+   "_DaskCollection",
+   "shard",
+   "res",
+   "match",
+   "predict",
+   "mlp",
+   "re",
+   "random",
+   "total",
+   "cp",
+   "weight",
+   "utils",
+   "__name__",
+   "bytes",
+   "w",
+   "msg",
+   "evals",
+   "print",
+   "rank",
+   "max_bin",
+   "status",
+   "values",
+   "_LIB",
+   "classmethod",
+   "missing",
+   "ref",
+   "part",
+   "core",
+   "d",
+   "it",
+   "numpy",
+   "frozen",
+   "warning",
+   "counter",
+   "QuantileDMatrix",
+   "n_workers",
+   "num_boost_round",
+   "sum",
+   "_check_call",
+   "batch",
+   "hasattr",
+   "id",
+   "logging",
+   "patch",
+   "raises",
+   "strip",
+   "url",
+   "float32",
+   "iteration_range",
+   "dd",
+   "raw",
+   "Event",
+   "body",
+   "cache",
+   "out",
+   "skipif",
+   "buf",
+   "super",
+   "parameters",
+   "state",
+   "metrics",
+   "send",
+   "getattr",
+   "obj",
+   "reason",
+   "request",
+   "sys",
+   "worker",
+   "axis",
+   "evals_result",
+   "lines",
+   "subprocess",
+   "nn",
+   "add_argument",
+   "columns",
+   "models",
+   "open",
+   "sleep",
+   "task",
+   "attributes",
+   "update",
+   "val",
+   "ModelId",
+   "byref",
+   "constants",
+   "debug",
+   "enumerate",
+   "item",
+   "smem_copy_params",
+   "b",
+   "cmd",
+   "fit",
+   "mode",
+   "payload",
+   "reshape",
+   "NodeId",
+   "default",
+   "description",
+   "field",
+   "all_to_sharded_linear",
+   "astype",
+   "keys",
+   "Post",
+   "labels",
+   "metric",
+   "Booster",
+   "Textbox",
+   "img",
+   "layers",
+   "tmp_path",
+   "TypeError",
+   "dataset",
+   "strategies",
+   "ctx",
+   "extend",
+   "line",
+   "preds",
+   "run",
+   "Int32",
+   "anyio",
+   "channel",
+   "copy",
+   "help",
+   "idx",
+   "parser",
+   "usage",
+   "Tensor",
+   "a",
+   "buffer",
+   "indptr",
+   "object",
+   "messages",
+   "close",
+   "loads",
+   "metadata",
+   "feature_weights",
+   "int32",
+   "parts",
+   "pathlib",
+   "prompt",
+   "eval",
+   "eval_set",
+   "mixer",
+   "model_card",
+   "assert_allclose",
+   "func",
+   "inputs",
+   "tree",
+   "user",
+   "Module",
+   "chunks",
+   "dataclass",
+   "message",
+   "parametrize",
+   "property",
+   "split",
+   "world_size",
+   "clf",
+   "distributed",
+   "index",
+   "mask",
+   "plt"
+  ]
+ },
+ "wordChars": {
+  "extra": [],
+  "prefixes": [],
+  "suffix": []
+ },
+ "shape": {
+  "number": "literal",
+  "unknownWord": "identifier",
+  "unknownSymbol": "operator"
+ },
+ "comments": [
+  {
+   "open": "#",
+   "close": null,
+   "matchRate": 1,
+   "n": 1834
+  }
+ ],
+ "strings": [
+  {
+   "open": "\"",
+   "close": "\"",
+   "escape": "\\",
+   "multiline": false,
+   "trailing": false,
+   "interp": [],
+   "interpQuotes": [],
+   "prefixes": [
+    "b",
+    "f",
+    "r"
+   ],
+   "class": "string",
+   "matchRate": 1,
+   "n": 9856
+  },
+  {
+   "open": "\"\"\"",
+   "close": "\"\"\"",
+   "escape": null,
+   "multiline": true,
+   "trailing": false,
+   "interp": [],
+   "interpQuotes": [],
+   "prefixes": [
+    "f"
+   ],
+   "class": "string",
+   "matchRate": 1,
+   "n": 732
+  },
+  {
+   "open": "'",
+   "close": "'",
+   "escape": "\\",
+   "multiline": false,
+   "trailing": false,
+   "interp": [],
+   "interpQuotes": [],
+   "prefixes": [
+    "f",
+    "r"
+   ],
+   "class": "string",
+   "matchRate": 1,
+   "n": 59
+  }
+ ],
+ "conditional": [],
+ "symbols": {
+  "table": {
+   ",": "punctuation",
+   ".": "punctuation",
+   "(": "punctuation",
+   ")": "punctuation",
+   ":": "punctuation",
+   "=": "operator",
+   "@": "operator",
+   "**": "operator",
+   "->": "operator",
+   "[": "punctuation",
+   "]": "punctuation",
+   "{": "punctuation",
+   "}": "punctuation",
+   "-": "operator",
+   "-=": "operator",
+   "==": "operator",
+   "/": "operator",
+   "|": "operator",
+   ">": "operator",
+   "*": "operator",
+   "%": "operator",
+   "//": "operator",
+   "+": "operator",
+   "<": "operator",
+   "!=": "operator",
+   "*=": "operator",
+   ">=": "operator",
+   "|=": "operator",
+   "<=": "operator",
+   "+=": "operator",
+   ":=": "operator",
+   "<<": "operator",
+   ";": "punctuation",
+   "&": "operator",
+   "~": "operator",
+   "/=": "operator",
+   "^=": "operator",
+   "//=": "operator",
+   "...": "operator"
+  },
+  "maxLen": 3
+ },
+ "classShare": {
+  "keyword": 0.07406,
+  "identifier": 0.35903,
+  "punctuation": 0.39936,
+  "string": 0.03856,
+  "operator": 0.08454,
+  "literal": 0.03781,
+  "comment": 0.00664
+ }
+}

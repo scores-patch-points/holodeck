@@ -1,0 +1,477 @@
+{
+ "schema": "EOReadingGolden@1",
+ "specimen": "tempest-abjure",
+ "path": "01-literature-books/gutenberg/pg100_Complete_Works_of_Shakespeare.txt",
+ "rule": "goldens/reading/RULE.md",
+ "window": {
+  "start": 4272075,
+  "startText": "Ye elves of hills, brooks, standing lakes, and",
+  "end": 4273168,
+  "endText": "I’ll drown my book.",
+  "coordinates": "normalized body (container-stripped, CRLF-normalized); spans in RAW file coordinates"
+ },
+ "notes": "The Tempest 5.1, Prospero's abjuration (pg100 — the corpus's folger set holds no Tempest at all; see the suite header): REC·Ground ('this rough magic I here abjure' — a whole practice-field conceded), SEG·Figure ('I'll break my staff', 'rifted Jove's stout oak'), NUL·Figure ('I'll drown my book'), and the surveyed deeds that the abjuring closes. The vocative invocation's elves are addressed, not asserted (folded), but their relatives assert habitual acts and row; 'Weak masters though ye be' is a concessive parenthetical, folded (A2); '—which even now I do—' re-asserts the requiring it interrupts and is folded into that row's note.",
+ "revisions": [],
+ "rows": [
+  {
+   "subject": "ye that on the sands with printless foot",
+   "relation": "Do chase the ebbing Neptune, and do fly him",
+   "object": "When he comes back",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "restrictive-relative",
+   "prop": "tempest:elves-chase-neptune",
+   "ground": "tempest-5-1.1.1",
+   "role": "declared",
+   "because": "chase-and-flee — habitual translocation of the elf-kind (A5, pattern grain), the paired verbs kept as one serial row (the Swahili precedent); 'When he comes back' is the temporal boundary of the fleeing, kept in the object slot",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "the relative restricts the invoked 'ye' — the shore-elves as a kind",
+   "alternate": null,
+   "span": {
+    "start": 4428851,
+    "end": 4429980
+   },
+   "anchor": "Do chase the ebbing Neptune, and do fly him"
+  },
+  {
+   "subject": "you demi-puppets that",
+   "relation": "do the green sour ringlets make",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "INS",
+    "grain": "Pattern"
+   },
+   "clause": "restrictive-relative",
+   "prop": "tempest:puppets-make-ringlets",
+   "ground": "tempest-5-1.1.2",
+   "role": "declared",
+   "because": "making the fairy-rings — a habitual bringing-forth by the kind: Generate·Existence at pattern grain; 'By moonshine' is an adjunct (A2)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "the relative restricts the invoked demi-puppets",
+   "alternate": null,
+   "span": {
+    "start": 4428851,
+    "end": 4429980
+   },
+   "anchor": "By moonshine do the green sour ringlets make,"
+  },
+  {
+   "subject": "the ewe",
+   "relation": "not bites",
+   "object": "Whereof",
+   "polarity": "-",
+   "phasepost": {
+    "op": "CON",
+    "grain": "Pattern"
+   },
+   "clause": "restrictive-relative",
+   "prop": "tempest:ewe-not-bites",
+   "ground": "tempest-5-1.1.2.1",
+   "role": "declared",
+   "because": "biting is consuming CONTACT with the rings — the ewe stands off from them: Relate·Structure at pattern grain (habitual), negated: polarity − per R6",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "'Whereof' → the green sour ringlets, the head the relative restricts",
+   "alternate": {
+    "op": "SIG",
+    "grain": "Pattern",
+    "because": "the abstention readable as a plain condition of the kind"
+   },
+   "span": {
+    "start": 4428851,
+    "end": 4429980
+   },
+   "anchor": "Whereof the ewe not bites;"
+  },
+  {
+   "subject": "you whose pastime",
+   "relation": "Is",
+   "object": "to make midnight mushrooms",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "relative",
+   "prop": "tempest:pastime-mushrooms",
+   "ground": "tempest-5-1.1.3",
+   "role": "declared",
+   "because": "copula: the kind's pastime identified with the mushroom-making — a property of the kind (rule 3/4's shape), Relate·Existence at pattern grain; the making stays inside the identified pastime (A1)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 4428851,
+    "end": 4429980
+   },
+   "anchor": "Is to make midnight mushrooms,"
+  },
+  {
+   "subject": "you whose pastime",
+   "relation": "rejoice",
+   "object": "To hear the solemn curfew",
+   "polarity": "+",
+   "phasepost": {
+    "op": "EVA",
+    "grain": "Pattern"
+   },
+   "clause": "restrictive-relative",
+   "prop": "tempest:rejoice-curfew",
+   "ground": "tempest-5-1.1.3.1",
+   "role": "declared",
+   "because": "rejoicing — a delight held toward a content: Relate·Interpretation at pattern grain (habitual); the hearing stays inside the delighted-in content (A1)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "coordinated relative shares the mushroom-makers",
+   "alternate": null,
+   "span": {
+    "start": 4428851,
+    "end": 4429980
+   },
+   "anchor": "that rejoice\nTo hear the solemn curfew;"
+  },
+  {
+   "subject": "I",
+   "relation": "have bedimm’d",
+   "object": "The noontide sun",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SEG",
+    "grain": "Figure"
+   },
+   "clause": "main",
+   "prop": "tempest:bedimmed-sun",
+   "ground": "tempest-5-1.1.4",
+   "role": "declared",
+   "because": "bedimming CUTS DOWN the sun's standing radiance — one identified figure's output diminished: Differentiate·Structure at figure grain; 'by whose aid' credits the invoked helpers (adjunct, A2), and 'Weak masters though ye be' is a concessive parenthetical, folded (A2)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "'I' → Prospero, the speaker",
+   "alternate": {
+    "op": "DEF",
+    "grain": "Figure",
+    "because": "the dimming readable as marring the sun's manifest standing"
+   },
+   "span": {
+    "start": 4428851,
+    "end": 4429980
+   },
+   "anchor": "I have bedimm’d\nThe noontide sun,"
+  },
+  {
+   "subject": "I",
+   "relation": "call’d forth",
+   "object": "the mutinous winds",
+   "polarity": "+",
+   "phasepost": {
+    "op": "INS",
+    "grain": "Figure"
+   },
+   "clause": "coordinate",
+   "prop": "tempest:called-winds",
+   "ground": "tempest-5-1.1.5",
+   "role": "declared",
+   "because": "calling-FORTH summons into presence — the winds brought out into being-at-hand: Generate·Existence at figure grain",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "coordinated predicate shares 'I' → Prospero",
+   "alternate": null,
+   "span": {
+    "start": 4428851,
+    "end": 4429980
+   },
+   "anchor": "call’d forth the mutinous winds,"
+  },
+  {
+   "subject": "I",
+   "relation": "Set",
+   "object": "roaring war",
+   "polarity": "+",
+   "phasepost": {
+    "op": "INS",
+    "grain": "Figure"
+   },
+   "clause": "coordinate",
+   "prop": "tempest:set-war",
+   "ground": "tempest-5-1.1.6",
+   "role": "declared",
+   "because": "setting war roaring between sea and sky — the strife brought into being and set going: Generate·Existence at figure grain; '’twixt the green sea and the azur’d vault' is a locative adjunct (A2)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "coordinated predicate shares 'I' → Prospero",
+   "alternate": {
+    "op": "CON",
+    "grain": "Figure",
+    "because": "readable as the two fields set against each other — an arrangement"
+   },
+   "span": {
+    "start": 4428851,
+    "end": 4429980
+   },
+   "anchor": "Set roaring war:"
+  },
+  {
+   "subject": "I",
+   "relation": "Have I given",
+   "object": "fire",
+   "polarity": "+",
+   "phasepost": {
+    "op": "CON",
+    "grain": "Figure"
+   },
+   "clause": "coordinate",
+   "prop": "tempest:gave-fire-thunder",
+   "ground": "tempest-5-1.1.7",
+   "role": "declared",
+   "because": "giving fire TO the thunder — bestowal into another's keeping: the conferring family, Relate·Structure at figure grain; 'to the dread rattling thunder' fronts the recipient",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "'I' → Prospero",
+   "alternate": {
+    "op": "INS",
+    "grain": "Figure",
+    "because": "the arming readable as brought forth"
+   },
+   "span": {
+    "start": 4428851,
+    "end": 4429980
+   },
+   "anchor": "Have I given fire, and rifted Jove’s stout oak"
+  },
+  {
+   "subject": "I",
+   "relation": "rifted",
+   "object": "Jove’s stout oak With his own bolt",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SEG",
+    "grain": "Figure"
+   },
+   "clause": "coordinate",
+   "prop": "tempest:rifted-oak",
+   "ground": "tempest-5-1.1.8",
+   "role": "declared",
+   "because": "rifting SPLITS one identified thing — Differentiate·Structure at figure grain, the cut itself",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "coordinated predicate shares 'I' → Prospero",
+   "alternate": null,
+   "span": {
+    "start": 4428851,
+    "end": 4429980
+   },
+   "anchor": "rifted Jove’s stout oak\nWith his own bolt;"
+  },
+  {
+   "subject": "I",
+   "relation": "Have I made shake",
+   "object": "the strong-bas’d promontory",
+   "polarity": "+",
+   "phasepost": {
+    "op": "INS",
+    "grain": "Figure"
+   },
+   "clause": "coordinate",
+   "prop": "tempest:shook-promontory",
+   "ground": "tempest-5-1.1.9",
+   "role": "declared",
+   "because": "made-shake — the shaking generated in one landform, the causative making-family: Generate·Existence at figure grain",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "'I' → Prospero",
+   "alternate": null,
+   "span": {
+    "start": 4428851,
+    "end": 4429980
+   },
+   "anchor": "the strong-bas’d promontory\nHave I made shake,"
+  },
+  {
+   "subject": "I",
+   "relation": "pluck’d up",
+   "object": "The pine and cedar",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SEG",
+    "grain": "Figure"
+   },
+   "clause": "coordinate",
+   "prop": "tempest:plucked-trees",
+   "ground": "tempest-5-1.1.10",
+   "role": "declared",
+   "because": "plucking UP-BY-THE-ROOTS severs the trees from their ground — Differentiate·Structure at figure grain; 'by the spurs' names the grip (adjunct, A2)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "coordinated predicate shares 'I' → Prospero",
+   "alternate": null,
+   "span": {
+    "start": 4428851,
+    "end": 4429980
+   },
+   "anchor": "and by the spurs pluck’d up\nThe pine and cedar:"
+  },
+  {
+   "subject": "graves",
+   "relation": "Have wak’d their sleepers, op’d, and let ’em forth",
+   "object": "By my so potent art",
+   "polarity": "+",
+   "phasepost": {
+    "op": "INS",
+    "grain": "Figure"
+   },
+   "clause": "main",
+   "prop": "tempest:graves-waked-sleepers",
+   "ground": "tempest-5-1.1.11",
+   "role": "declared",
+   "because": "the serial (waked, oped, let forth — one row, the Swahili precedent): the sleepers ROUSED AND BROUGHT FORTH into standing presence — Generate·Existence at figure grain, the raising family (ἠγέρθη's own); 'at my command' and 'By my so potent art' are agency adjuncts (A2)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Figure",
+    "because": "the oping readable as the seal cut"
+   },
+   "span": {
+    "start": 4428851,
+    "end": 4429980
+   },
+   "anchor": "graves at my command\nHave wak’d their sleepers, op’d, and let ’em forth"
+  },
+  {
+   "subject": "I",
+   "relation": "abjure",
+   "object": "this rough magic",
+   "polarity": "+",
+   "phasepost": {
+    "op": "REC",
+    "grain": "Ground"
+   },
+   "clause": "main",
+   "prop": "tempest:abjure-magic",
+   "ground": "tempest-5-1.1.12",
+   "role": "declared",
+   "because": "abjuring solemnly RENOUNCES a held practice — and what is conceded here is not one act but the WHOLE OPERATIVE FIELD the speech has just surveyed (sun dimmed, winds called, oaks rifted, graves oped, all 'by my so potent art'): the re-zero on the ground of his own agency, a practice-field given up and a new ground begun — Generate·Interpretation at GROUND grain; 'here' marks the performative",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "'I' → Prospero",
+   "alternate": {
+    "op": "REC",
+    "grain": "Figure",
+    "because": "the deictic reading: 'this rough magic' as one named art rather than the field of practice"
+   },
+   "span": {
+    "start": 4428851,
+    "end": 4429980
+   },
+   "anchor": "But this rough magic\nI here abjure;"
+  },
+  {
+   "subject": "I",
+   "relation": "have requir’d",
+   "object": "Some heavenly music",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Figure"
+   },
+   "clause": "temporal-adjunct",
+   "prop": "tempest:required-music",
+   "ground": "tempest-5-1.1.13.1",
+   "role": "declared",
+   "because": "requiring PUTS FORTH a demand-sign for the music — Relate·Existence at figure grain; the parenthetical '—which even now I do,—' re-asserts this same requiring and is folded into this row (noted); 'To work mine end upon their senses' is a purpose adjunct (A1/A2) and 'that This airy charm is for' a micro-relative (R1)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "'I' → Prospero",
+   "alternate": null,
+   "span": {
+    "start": 4428851,
+    "end": 4429980
+   },
+   "anchor": "when I have requir’d\nSome heavenly music,"
+  },
+  {
+   "subject": "I",
+   "relation": "’ll break",
+   "object": "my staff",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SEG",
+    "grain": "Figure"
+   },
+   "clause": "main",
+   "prop": "tempest:break-staff",
+   "ground": "tempest-5-1.1.13",
+   "role": "declared",
+   "because": "breaking SEVERS one identified instrument — Differentiate·Structure at figure grain: the cut that enacts the abjuring",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "'I' → Prospero",
+   "alternate": null,
+   "span": {
+    "start": 4428851,
+    "end": 4429980
+   },
+   "anchor": "I’ll break my staff,"
+  },
+  {
+   "subject": "I",
+   "relation": "Bury",
+   "object": "it certain fathoms in the earth",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Figure"
+   },
+   "clause": "coordinate",
+   "prop": "tempest:bury-staff",
+   "ground": "tempest-5-1.1.14",
+   "role": "declared",
+   "because": "burying PLACES the broken staff into the earth — the A5 landing family, Relate·Existence at figure grain",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "coordinated predicate shares 'I' → Prospero; 'it' → my staff",
+   "alternate": null,
+   "span": {
+    "start": 4428851,
+    "end": 4429980
+   },
+   "anchor": "Bury it certain fathoms in the earth,"
+  },
+  {
+   "subject": "I",
+   "relation": "’ll drown",
+   "object": "my book",
+   "polarity": "+",
+   "phasepost": {
+    "op": "NUL",
+    "grain": "Figure"
+   },
+   "clause": "coordinate",
+   "prop": "tempest:drown-book",
+   "ground": "tempest-5-1.1.15",
+   "role": "declared",
+   "because": "drowning the book ENDS it — one identified thing made absent from the world of use, deeper than ever plummet sounded: the absence brought about as the act's own product (A4's family) at figure grain; the comparative 'deeper than did ever plummet sound' is the manner of the disposal, folded (R1)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "'I' → Prospero",
+   "alternate": {
+    "op": "SIG",
+    "grain": "Figure",
+    "because": "readable as the A5 placement — sunk to a place — rather than the ending"
+   },
+   "span": {
+    "start": 4428851,
+    "end": 4429980
+   },
+   "anchor": "I’ll drown my book."
+  }
+ ]
+}

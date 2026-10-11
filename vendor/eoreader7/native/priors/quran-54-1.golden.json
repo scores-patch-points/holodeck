@@ -1,0 +1,65 @@
+{
+ "schema": "EOReadingGolden@1",
+ "specimen": "quran-54-1",
+ "path": "14-holy-texts/tanzil-quran/quran_quran-uthmani.txt",
+ "rule": "goldens/reading/RULE.md",
+ "window": {
+  "start": 634531,
+  "startText": "ٱقْتَرَبَتِ ٱلسَّاعَةُ",
+  "end": 634573,
+  "endText": "وَٱنشَقَّ ٱلْقَمَرُ",
+  "coordinates": "normalized body (container-stripped, CRLF-normalized); spans in RAW file coordinates"
+ },
+ "notes": "Quran 54:1 (Uthmani): the moon split — SEG·Figure in Arabic (وَٱنشَقَّ, one identified body divided), the mark-15-38 ἐσχίσθη cell in a third language; with the Hour drawn near (SIG·Ground, the A5/ἤγγικεν family). Field strings derived mechanically from the file's bytes.",
+ "revisions": [],
+ "rows": [
+  {
+   "subject": "ٱلسَّاعَةُ",
+   "relation": "ٱقْتَرَبَتِ",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "main",
+   "prop": "quran:hour-near",
+   "ground": "quran-54.1.1",
+   "role": "declared",
+   "because": "ٱقْتَرَبَتِ (has drawn near) — translocation (A5) of a whole era-condition toward the present: Relate·Existence at GROUND grain, the mark-1-15 ἤγγικεν family",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 634454,
+    "end": 634773
+   },
+   "anchor": "ٱقْتَرَبَتِ ٱلسَّاعَةُ"
+  },
+  {
+   "subject": "ٱلْقَمَرُ",
+   "relation": "وَٱنشَقَّ",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SEG",
+    "grain": "Figure"
+   },
+   "clause": "coordinate",
+   "prop": "quran:moon-split",
+   "ground": "quran-54.1.2",
+   "role": "declared",
+   "because": "ٱنشَقَّ (split apart, middle voice) — ONE identified body divided into parts: Differentiate·Structure at figure grain — the mark-15-38 ἐσχίσθη cell, one document over",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 634454,
+    "end": 634773
+   },
+   "anchor": "وَٱنشَقَّ ٱلْقَمَرُ"
+  }
+ ]
+}

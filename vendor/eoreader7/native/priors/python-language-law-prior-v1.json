@@ -1,0 +1,3633 @@
+{
+ "schema": "LanguageLawPrior@1",
+ "language": "python",
+ "giver": {
+  "resource": "CPython (the actual Python engine, compiled to WASM as pyodide)",
+  "engine": {
+   "pyodide": "0.26.4",
+   "python": "3.12.1"
+  },
+  "manifests": null,
+  "note": "The Python language's own laws, introspected from the RUNNING engine — keyword.kwlist, ast node kinds (the grammar's structure), dir(builtins), sys.stdlib_module_names, and inspect.signature over the core library. Never hand-typed: this is a derived index over the engine, not a re-definition of it. Two received tables are disclosed as such: operator precedence (the PEG grammar is not introspectable data) and the declaration-recipe shapes (kept in step with eoreader7 code-structure.js). Semantics stay in the engine (compile/exec)."
+ },
+ "lexical": {
+  "keywords": [
+   "False",
+   "None",
+   "True",
+   "and",
+   "as",
+   "assert",
+   "async",
+   "await",
+   "break",
+   "class",
+   "continue",
+   "def",
+   "del",
+   "elif",
+   "else",
+   "except",
+   "finally",
+   "for",
+   "from",
+   "global",
+   "if",
+   "import",
+   "in",
+   "is",
+   "lambda",
+   "nonlocal",
+   "not",
+   "or",
+   "pass",
+   "raise",
+   "return",
+   "try",
+   "while",
+   "with",
+   "yield"
+  ],
+  "softKeywords": [
+   "_",
+   "case",
+   "match",
+   "type"
+  ],
+  "unicodeIdentifiers": {
+   "pep3131": true,
+   "greek": true,
+   "cjk": true,
+   "arabic": true,
+   "hangul": true,
+   "combining": true,
+   "emoji": false,
+   "note": "PEP 3131: identifiers are Unicode XID_Start/XID_Continue, not [A-Za-z_]. The engine parses Greek/CJK/Arabic/Hangul/combining-mark identifiers; emoji is correctly refused (not XID). Any identifier-recipe prior must use XID, not ASCII — the Western-centrism is in the recipe, never in the engine."
+  }
+ },
+ "grammar": {
+  "precedence": [
+   {
+    "op": "lambda",
+    "assoc": null,
+    "note": "lambda expression"
+   },
+   {
+    "op": "if-else",
+    "assoc": null,
+    "note": "conditional expression (a if C else b)"
+   },
+   {
+    "op": "or",
+    "assoc": "left"
+   },
+   {
+    "op": "and",
+    "assoc": "left"
+   },
+   {
+    "op": "not x",
+    "assoc": null,
+    "note": "boolean NOT"
+   },
+   {
+    "op": "== != < <= > >= is is not in not in",
+    "assoc": "chain",
+    "note": "comparisons; chainable"
+   },
+   {
+    "op": "|",
+    "assoc": "left",
+    "note": "bitwise OR / set union"
+   },
+   {
+    "op": "^",
+    "assoc": "left",
+    "note": "bitwise XOR / set symmetric difference"
+   },
+   {
+    "op": "&",
+    "assoc": "left",
+    "note": "bitwise AND / set intersection"
+   },
+   {
+    "op": "<< >>",
+    "assoc": "left",
+    "note": "shifts"
+   },
+   {
+    "op": "+ -",
+    "assoc": "left"
+   },
+   {
+    "op": "* @ / // %",
+    "assoc": "left",
+    "note": "multiply, matrix multiply, divide, floor divide, modulo"
+   },
+   {
+    "op": "+x -x ~x",
+    "assoc": null,
+    "note": "unary plus/minus/invert"
+   },
+   {
+    "op": "**",
+    "assoc": "right",
+    "note": "exponentiation (right-associative, the exception)"
+   },
+   {
+    "op": "await x",
+    "assoc": null
+   },
+   {
+    "op": "x[i] x[i:j] f(...) x.attr",
+    "assoc": null,
+    "note": "subscript, slice, call, attribute — highest binding"
+   }
+  ],
+  "precedenceGiver": "Python language reference §6.16 (operator precedence) — received table, not introspected",
+  "declarationRecipes": [
+   {
+    "kind": "function",
+    "shape": "def name(params) -> ret:",
+    "async": false
+   },
+   {
+    "kind": "function",
+    "shape": "async def name(params) -> ret:",
+    "async": true
+   },
+   {
+    "kind": "class",
+    "shape": "class Name(Base):",
+    "async": false
+   },
+   {
+    "kind": "lambda",
+    "shape": "lambda args: expr"
+   },
+   {
+    "kind": "comprehension",
+    "shape": "[x for x in it if p]",
+    "note": "also dict/set/gen forms"
+   }
+  ],
+  "statementKinds": [
+   "AnnAssign",
+   "Assert",
+   "Assign",
+   "AsyncFor",
+   "AsyncFunctionDef",
+   "AsyncWith",
+   "AugAssign",
+   "Break",
+   "ClassDef",
+   "Continue",
+   "Delete",
+   "Expr",
+   "For",
+   "FunctionDef",
+   "Global",
+   "If",
+   "Import",
+   "ImportFrom",
+   "Match",
+   "Nonlocal",
+   "Pass",
+   "Raise",
+   "Return",
+   "Try",
+   "TryStar",
+   "TypeAlias",
+   "While",
+   "With"
+  ],
+  "expressionKinds": [
+   "Attribute",
+   "Await",
+   "BinOp",
+   "BoolOp",
+   "Call",
+   "Compare",
+   "Constant",
+   "Dict",
+   "DictComp",
+   "FormattedValue",
+   "GeneratorExp",
+   "IfExp",
+   "JoinedStr",
+   "Lambda",
+   "List",
+   "ListComp",
+   "Name",
+   "NamedExpr",
+   "Set",
+   "SetComp",
+   "Slice",
+   "Starred",
+   "Subscript",
+   "Tuple",
+   "UnaryOp",
+   "Yield",
+   "YieldFrom"
+  ]
+ },
+ "builtins": [
+  "ArithmeticError",
+  "AssertionError",
+  "AttributeError",
+  "BaseException",
+  "BaseExceptionGroup",
+  "BlockingIOError",
+  "BrokenPipeError",
+  "BufferError",
+  "BytesWarning",
+  "ChildProcessError",
+  "ConnectionAbortedError",
+  "ConnectionError",
+  "ConnectionRefusedError",
+  "ConnectionResetError",
+  "DeprecationWarning",
+  "EOFError",
+  "Ellipsis",
+  "EncodingWarning",
+  "EnvironmentError",
+  "Exception",
+  "ExceptionGroup",
+  "False",
+  "FileExistsError",
+  "FileNotFoundError",
+  "FloatingPointError",
+  "FutureWarning",
+  "GeneratorExit",
+  "IOError",
+  "ImportError",
+  "ImportWarning",
+  "IndentationError",
+  "IndexError",
+  "InterruptedError",
+  "IsADirectoryError",
+  "KeyError",
+  "KeyboardInterrupt",
+  "LookupError",
+  "MemoryError",
+  "ModuleNotFoundError",
+  "NameError",
+  "None",
+  "NotADirectoryError",
+  "NotImplemented",
+  "NotImplementedError",
+  "OSError",
+  "OverflowError",
+  "PendingDeprecationWarning",
+  "PermissionError",
+  "ProcessLookupError",
+  "RecursionError",
+  "ReferenceError",
+  "ResourceWarning",
+  "RuntimeError",
+  "RuntimeWarning",
+  "StopAsyncIteration",
+  "StopIteration",
+  "SyntaxError",
+  "SyntaxWarning",
+  "SystemError",
+  "SystemExit",
+  "TabError",
+  "TimeoutError",
+  "True",
+  "TypeError",
+  "UnboundLocalError",
+  "UnicodeDecodeError",
+  "UnicodeEncodeError",
+  "UnicodeError",
+  "UnicodeTranslateError",
+  "UnicodeWarning",
+  "UserWarning",
+  "ValueError",
+  "Warning",
+  "ZeroDivisionError",
+  "___EvalCodeResultException",
+  "__build_class__",
+  "__debug__",
+  "__doc__",
+  "__import__",
+  "__loader__",
+  "__name__",
+  "__package__",
+  "__spec__",
+  "abs",
+  "aiter",
+  "all",
+  "anext",
+  "any",
+  "ascii",
+  "bin",
+  "bool",
+  "breakpoint",
+  "bytearray",
+  "bytes",
+  "callable",
+  "chr",
+  "classmethod",
+  "compile",
+  "complex",
+  "copyright",
+  "credits",
+  "delattr",
+  "dict",
+  "dir",
+  "divmod",
+  "enumerate",
+  "eval",
+  "exec",
+  "exit",
+  "filter",
+  "float",
+  "format",
+  "frozenset",
+  "getattr",
+  "globals",
+  "hasattr",
+  "hash",
+  "help",
+  "hex",
+  "id",
+  "input",
+  "int",
+  "isinstance",
+  "issubclass",
+  "iter",
+  "len",
+  "license",
+  "list",
+  "locals",
+  "map",
+  "max",
+  "memoryview",
+  "min",
+  "next",
+  "object",
+  "oct",
+  "open",
+  "ord",
+  "pow",
+  "print",
+  "property",
+  "quit",
+  "range",
+  "repr",
+  "reversed",
+  "round",
+  "set",
+  "setattr",
+  "slice",
+  "sorted",
+  "staticmethod",
+  "str",
+  "sum",
+  "super",
+  "tuple",
+  "type",
+  "vars",
+  "zip"
+ ],
+ "lexicon": {
+  "stdlibModules": [
+   "__future__",
+   "_abc",
+   "_aix_support",
+   "_ast",
+   "_asyncio",
+   "_bisect",
+   "_blake2",
+   "_bz2",
+   "_codecs",
+   "_codecs_cn",
+   "_codecs_hk",
+   "_codecs_iso2022",
+   "_codecs_jp",
+   "_codecs_kr",
+   "_codecs_tw",
+   "_collections",
+   "_collections_abc",
+   "_compat_pickle",
+   "_compression",
+   "_contextvars",
+   "_crypt",
+   "_csv",
+   "_ctypes",
+   "_curses",
+   "_curses_panel",
+   "_datetime",
+   "_dbm",
+   "_decimal",
+   "_elementtree",
+   "_frozen_importlib",
+   "_frozen_importlib_external",
+   "_functools",
+   "_gdbm",
+   "_hashlib",
+   "_heapq",
+   "_imp",
+   "_io",
+   "_json",
+   "_locale",
+   "_lsprof",
+   "_lzma",
+   "_markupbase",
+   "_md5",
+   "_msi",
+   "_multibytecodec",
+   "_multiprocessing",
+   "_opcode",
+   "_operator",
+   "_osx_support",
+   "_overlapped",
+   "_pickle",
+   "_posixshmem",
+   "_posixsubprocess",
+   "_py_abc",
+   "_pydatetime",
+   "_pydecimal",
+   "_pyio",
+   "_pylong",
+   "_queue",
+   "_random",
+   "_scproxy",
+   "_sha1",
+   "_sha2",
+   "_sha3",
+   "_signal",
+   "_sitebuiltins",
+   "_socket",
+   "_sqlite3",
+   "_sre",
+   "_ssl",
+   "_stat",
+   "_statistics",
+   "_string",
+   "_strptime",
+   "_struct",
+   "_symtable",
+   "_thread",
+   "_threading_local",
+   "_tkinter",
+   "_tokenize",
+   "_tracemalloc",
+   "_typing",
+   "_uuid",
+   "_warnings",
+   "_weakref",
+   "_weakrefset",
+   "_winapi",
+   "_zoneinfo",
+   "abc",
+   "aifc",
+   "antigravity",
+   "argparse",
+   "array",
+   "ast",
+   "asyncio",
+   "atexit",
+   "audioop",
+   "base64",
+   "bdb",
+   "binascii",
+   "bisect",
+   "builtins",
+   "bz2",
+   "cProfile",
+   "calendar",
+   "cgi",
+   "cgitb",
+   "chunk",
+   "cmath",
+   "cmd",
+   "code",
+   "codecs",
+   "codeop",
+   "collections",
+   "colorsys",
+   "compileall",
+   "concurrent",
+   "configparser",
+   "contextlib",
+   "contextvars",
+   "copy",
+   "copyreg",
+   "crypt",
+   "csv",
+   "ctypes",
+   "curses",
+   "dataclasses",
+   "datetime",
+   "dbm",
+   "decimal",
+   "difflib",
+   "dis",
+   "doctest",
+   "email",
+   "encodings",
+   "ensurepip",
+   "enum",
+   "errno",
+   "faulthandler",
+   "fcntl",
+   "filecmp",
+   "fileinput",
+   "fnmatch",
+   "fractions",
+   "ftplib",
+   "functools",
+   "gc",
+   "genericpath",
+   "getopt",
+   "getpass",
+   "gettext",
+   "glob",
+   "graphlib",
+   "grp",
+   "gzip",
+   "hashlib",
+   "heapq",
+   "hmac",
+   "html",
+   "http",
+   "idlelib",
+   "imaplib",
+   "imghdr",
+   "importlib",
+   "inspect",
+   "io",
+   "ipaddress",
+   "itertools",
+   "json",
+   "keyword",
+   "lib2to3",
+   "linecache",
+   "locale",
+   "logging",
+   "lzma",
+   "mailbox",
+   "mailcap",
+   "marshal",
+   "math",
+   "mimetypes",
+   "mmap",
+   "modulefinder",
+   "msilib",
+   "msvcrt",
+   "multiprocessing",
+   "netrc",
+   "nis",
+   "nntplib",
+   "nt",
+   "ntpath",
+   "nturl2path",
+   "numbers",
+   "opcode",
+   "operator",
+   "optparse",
+   "os",
+   "ossaudiodev",
+   "pathlib",
+   "pdb",
+   "pickle",
+   "pickletools",
+   "pipes",
+   "pkgutil",
+   "platform",
+   "plistlib",
+   "poplib",
+   "posix",
+   "posixpath",
+   "pprint",
+   "profile",
+   "pstats",
+   "pty",
+   "pwd",
+   "py_compile",
+   "pyclbr",
+   "pydoc",
+   "pydoc_data",
+   "pyexpat",
+   "queue",
+   "quopri",
+   "random",
+   "re",
+   "readline",
+   "reprlib",
+   "resource",
+   "rlcompleter",
+   "runpy",
+   "sched",
+   "secrets",
+   "select",
+   "selectors",
+   "shelve",
+   "shlex",
+   "shutil",
+   "signal",
+   "site",
+   "smtplib",
+   "sndhdr",
+   "socket",
+   "socketserver",
+   "spwd",
+   "sqlite3",
+   "sre_compile",
+   "sre_constants",
+   "sre_parse",
+   "ssl",
+   "stat",
+   "statistics",
+   "string",
+   "stringprep",
+   "struct",
+   "subprocess",
+   "sunau",
+   "symtable",
+   "sys",
+   "sysconfig",
+   "syslog",
+   "tabnanny",
+   "tarfile",
+   "telnetlib",
+   "tempfile",
+   "termios",
+   "textwrap",
+   "this",
+   "threading",
+   "time",
+   "timeit",
+   "tkinter",
+   "token",
+   "tokenize",
+   "tomllib",
+   "trace",
+   "traceback",
+   "tracemalloc",
+   "tty",
+   "turtle",
+   "turtledemo",
+   "types",
+   "typing",
+   "unicodedata",
+   "unittest",
+   "urllib",
+   "uu",
+   "uuid",
+   "venv",
+   "warnings",
+   "wave",
+   "weakref",
+   "webbrowser",
+   "winreg",
+   "winsound",
+   "wsgiref",
+   "xdrlib",
+   "xml",
+   "xmlrpc",
+   "zipapp",
+   "zipfile",
+   "zipimport",
+   "zlib",
+   "zoneinfo"
+  ],
+  "coreApi": {
+   "argparse": {
+    "Action": {
+     "kind": "callable",
+     "signature": "(option_strings, dest, nargs=None, const=None, default=None, type=None, choices=None, required=False, help=None, metavar=None)"
+    },
+    "ArgumentDefaultsHelpFormatter": {
+     "kind": "callable",
+     "signature": "(prog, indent_increment=2, max_help_position=24, width=None)"
+    },
+    "ArgumentError": {
+     "kind": "callable",
+     "signature": "(argument, message)"
+    },
+    "ArgumentParser": {
+     "kind": "callable",
+     "signature": "(prog=None, usage=None, description=None, epilog=None, parents=[], formatter_class=<class 'argparse.HelpFormatter'>, prefix_chars='-', fromfile_prefix_chars=None, argument_default=None, conflict_handler='error', add_help=True, allow_abbrev=True, exit_on_error=True)"
+    },
+    "ArgumentTypeError": {
+     "kind": "callable",
+     "signature": null
+    },
+    "BooleanOptionalAction": {
+     "kind": "callable",
+     "signature": "(option_strings, dest, default=None, type=<object object at 0x109d618>, choices=<object object at 0x109d618>, required=False, help=None, metavar=<object object at 0x109d618>)"
+    },
+    "FileType": {
+     "kind": "callable",
+     "signature": "(mode='r', bufsize=-1, encoding=None, errors=None)"
+    },
+    "HelpFormatter": {
+     "kind": "callable",
+     "signature": "(prog, indent_increment=2, max_help_position=24, width=None)"
+    },
+    "MetavarTypeHelpFormatter": {
+     "kind": "callable",
+     "signature": "(prog, indent_increment=2, max_help_position=24, width=None)"
+    },
+    "Namespace": {
+     "kind": "callable",
+     "signature": "(**kwargs)"
+    },
+    "ONE_OR_MORE": {
+     "kind": "constant",
+     "value": "'+'"
+    },
+    "OPTIONAL": {
+     "kind": "constant",
+     "value": "'?'"
+    },
+    "PARSER": {
+     "kind": "constant",
+     "value": "'A...'"
+    },
+    "REMAINDER": {
+     "kind": "constant",
+     "value": "'...'"
+    },
+    "RawDescriptionHelpFormatter": {
+     "kind": "callable",
+     "signature": "(prog, indent_increment=2, max_help_position=24, width=None)"
+    },
+    "RawTextHelpFormatter": {
+     "kind": "callable",
+     "signature": "(prog, indent_increment=2, max_help_position=24, width=None)"
+    },
+    "SUPPRESS": {
+     "kind": "constant",
+     "value": "'==SUPPRESS=='"
+    },
+    "ZERO_OR_MORE": {
+     "kind": "constant",
+     "value": "'*'"
+    },
+    "ngettext": {
+     "kind": "callable",
+     "signature": "(msgid1, msgid2, n)"
+    },
+    "warnings": {
+     "kind": "module"
+    }
+   },
+   "json": {
+    "JSONDecodeError": {
+     "kind": "callable",
+     "signature": "(msg, doc, pos)"
+    },
+    "JSONDecoder": {
+     "kind": "callable",
+     "signature": "(*, object_hook=None, parse_float=None, parse_int=None, parse_constant=None, strict=True, object_pairs_hook=None)"
+    },
+    "JSONEncoder": {
+     "kind": "callable",
+     "signature": "(*, skipkeys=False, ensure_ascii=True, check_circular=True, allow_nan=True, sort_keys=False, indent=None, separators=None, default=None)"
+    },
+    "codecs": {
+     "kind": "module"
+    },
+    "decoder": {
+     "kind": "module"
+    },
+    "detect_encoding": {
+     "kind": "callable",
+     "signature": "(b)"
+    },
+    "dump": {
+     "kind": "callable",
+     "signature": "(obj, fp, *, skipkeys=False, ensure_ascii=True, check_circular=True, allow_nan=True, cls=None, indent=None, separators=None, default=None, sort_keys=False, **kw)"
+    },
+    "dumps": {
+     "kind": "callable",
+     "signature": "(obj, *, skipkeys=False, ensure_ascii=True, check_circular=True, allow_nan=True, cls=None, indent=None, separators=None, default=None, sort_keys=False, **kw)"
+    },
+    "encoder": {
+     "kind": "module"
+    },
+    "load": {
+     "kind": "callable",
+     "signature": "(fp, *, cls=None, object_hook=None, parse_float=None, parse_int=None, parse_constant=None, object_pairs_hook=None, **kw)"
+    },
+    "loads": {
+     "kind": "callable",
+     "signature": "(s, *, cls=None, object_hook=None, parse_float=None, parse_int=None, parse_constant=None, object_pairs_hook=None, **kw)"
+    },
+    "scanner": {
+     "kind": "module"
+    }
+   },
+   "re": {
+    "A": {
+     "kind": "constant",
+     "value": "re.ASCII"
+    },
+    "ASCII": {
+     "kind": "constant",
+     "value": "re.ASCII"
+    },
+    "DEBUG": {
+     "kind": "constant",
+     "value": "re.DEBUG"
+    },
+    "DOTALL": {
+     "kind": "constant",
+     "value": "re.DOTALL"
+    },
+    "I": {
+     "kind": "constant",
+     "value": "re.IGNORECASE"
+    },
+    "IGNORECASE": {
+     "kind": "constant",
+     "value": "re.IGNORECASE"
+    },
+    "L": {
+     "kind": "constant",
+     "value": "re.LOCALE"
+    },
+    "LOCALE": {
+     "kind": "constant",
+     "value": "re.LOCALE"
+    },
+    "M": {
+     "kind": "constant",
+     "value": "re.MULTILINE"
+    },
+    "MULTILINE": {
+     "kind": "constant",
+     "value": "re.MULTILINE"
+    },
+    "Match": {
+     "kind": "callable",
+     "signature": "()"
+    },
+    "NOFLAG": {
+     "kind": "constant",
+     "value": "re.NOFLAG"
+    },
+    "Pattern": {
+     "kind": "callable",
+     "signature": "()"
+    },
+    "RegexFlag": {
+     "kind": "callable",
+     "signature": "(*values)"
+    },
+    "S": {
+     "kind": "constant",
+     "value": "re.DOTALL"
+    },
+    "Scanner": {
+     "kind": "callable",
+     "signature": "(lexicon, flags=0)"
+    },
+    "T": {
+     "kind": "constant",
+     "value": "re.TEMPLATE"
+    },
+    "TEMPLATE": {
+     "kind": "constant",
+     "value": "re.TEMPLATE"
+    },
+    "U": {
+     "kind": "constant",
+     "value": "re.UNICODE"
+    },
+    "UNICODE": {
+     "kind": "constant",
+     "value": "re.UNICODE"
+    },
+    "VERBOSE": {
+     "kind": "constant",
+     "value": "re.VERBOSE"
+    },
+    "X": {
+     "kind": "constant",
+     "value": "re.VERBOSE"
+    },
+    "compile": {
+     "kind": "callable",
+     "signature": "(pattern, flags=0)"
+    },
+    "copyreg": {
+     "kind": "module"
+    },
+    "enum": {
+     "kind": "module"
+    },
+    "error": {
+     "kind": "callable",
+     "signature": "(msg, pattern=None, pos=None)"
+    },
+    "escape": {
+     "kind": "callable",
+     "signature": "(pattern)"
+    },
+    "findall": {
+     "kind": "callable",
+     "signature": "(pattern, string, flags=0)"
+    },
+    "finditer": {
+     "kind": "callable",
+     "signature": "(pattern, string, flags=0)"
+    },
+    "fullmatch": {
+     "kind": "callable",
+     "signature": "(pattern, string, flags=0)"
+    },
+    "functools": {
+     "kind": "module"
+    },
+    "match": {
+     "kind": "callable",
+     "signature": "(pattern, string, flags=0)"
+    },
+    "purge": {
+     "kind": "callable",
+     "signature": "()"
+    },
+    "search": {
+     "kind": "callable",
+     "signature": "(pattern, string, flags=0)"
+    },
+    "split": {
+     "kind": "callable",
+     "signature": "(pattern, string, maxsplit=0, flags=0)"
+    },
+    "sub": {
+     "kind": "callable",
+     "signature": "(pattern, repl, string, count=0, flags=0)"
+    },
+    "subn": {
+     "kind": "callable",
+     "signature": "(pattern, repl, string, count=0, flags=0)"
+    },
+    "template": {
+     "kind": "callable",
+     "signature": "(pattern, flags=0)"
+    }
+   },
+   "os": {
+    "CLD_CONTINUED": {
+     "kind": "constant",
+     "value": "6"
+    },
+    "CLD_DUMPED": {
+     "kind": "constant",
+     "value": "3"
+    },
+    "CLD_EXITED": {
+     "kind": "constant",
+     "value": "1"
+    },
+    "CLD_KILLED": {
+     "kind": "constant",
+     "value": "2"
+    },
+    "CLD_STOPPED": {
+     "kind": "constant",
+     "value": "5"
+    },
+    "CLD_TRAPPED": {
+     "kind": "constant",
+     "value": "4"
+    },
+    "DirEntry": {
+     "kind": "callable",
+     "signature": "()"
+    },
+    "EX_CANTCREAT": {
+     "kind": "constant",
+     "value": "73"
+    },
+    "EX_CONFIG": {
+     "kind": "constant",
+     "value": "78"
+    },
+    "EX_DATAERR": {
+     "kind": "constant",
+     "value": "65"
+    },
+    "EX_IOERR": {
+     "kind": "constant",
+     "value": "74"
+    },
+    "EX_NOHOST": {
+     "kind": "constant",
+     "value": "68"
+    },
+    "EX_NOINPUT": {
+     "kind": "constant",
+     "value": "66"
+    },
+    "EX_NOPERM": {
+     "kind": "constant",
+     "value": "77"
+    },
+    "EX_NOUSER": {
+     "kind": "constant",
+     "value": "67"
+    },
+    "EX_OK": {
+     "kind": "constant",
+     "value": "0"
+    },
+    "EX_OSERR": {
+     "kind": "constant",
+     "value": "71"
+    },
+    "EX_OSFILE": {
+     "kind": "constant",
+     "value": "72"
+    },
+    "EX_PROTOCOL": {
+     "kind": "constant",
+     "value": "76"
+    },
+    "EX_SOFTWARE": {
+     "kind": "constant",
+     "value": "70"
+    },
+    "EX_TEMPFAIL": {
+     "kind": "constant",
+     "value": "75"
+    },
+    "EX_UNAVAILABLE": {
+     "kind": "constant",
+     "value": "69"
+    },
+    "EX_USAGE": {
+     "kind": "constant",
+     "value": "64"
+    },
+    "F_LOCK": {
+     "kind": "constant",
+     "value": "1"
+    },
+    "F_OK": {
+     "kind": "constant",
+     "value": "0"
+    },
+    "F_TEST": {
+     "kind": "constant",
+     "value": "3"
+    },
+    "F_TLOCK": {
+     "kind": "constant",
+     "value": "2"
+    },
+    "F_ULOCK": {
+     "kind": "constant",
+     "value": "0"
+    },
+    "GenericAlias": {
+     "kind": "callable",
+     "signature": null
+    },
+    "Mapping": {
+     "kind": "callable",
+     "signature": "()"
+    },
+    "MutableMapping": {
+     "kind": "callable",
+     "signature": "()"
+    },
+    "NGROUPS_MAX": {
+     "kind": "constant",
+     "value": "32"
+    },
+    "O_ACCMODE": {
+     "kind": "constant",
+     "value": "2097155"
+    },
+    "O_APPEND": {
+     "kind": "constant",
+     "value": "1024"
+    },
+    "O_ASYNC": {
+     "kind": "constant",
+     "value": "8192"
+    },
+    "O_CLOEXEC": {
+     "kind": "constant",
+     "value": "524288"
+    },
+    "O_CREAT": {
+     "kind": "constant",
+     "value": "64"
+    },
+    "O_DIRECT": {
+     "kind": "constant",
+     "value": "16384"
+    },
+    "O_DIRECTORY": {
+     "kind": "constant",
+     "value": "65536"
+    },
+    "O_DSYNC": {
+     "kind": "constant",
+     "value": "4096"
+    },
+    "O_EXCL": {
+     "kind": "constant",
+     "value": "128"
+    },
+    "O_EXEC": {
+     "kind": "constant",
+     "value": "2097152"
+    },
+    "O_LARGEFILE": {
+     "kind": "constant",
+     "value": "32768"
+    },
+    "O_NDELAY": {
+     "kind": "constant",
+     "value": "2048"
+    },
+    "O_NOATIME": {
+     "kind": "constant",
+     "value": "262144"
+    },
+    "O_NOCTTY": {
+     "kind": "constant",
+     "value": "256"
+    },
+    "O_NOFOLLOW": {
+     "kind": "constant",
+     "value": "131072"
+    },
+    "O_NONBLOCK": {
+     "kind": "constant",
+     "value": "2048"
+    },
+    "O_PATH": {
+     "kind": "constant",
+     "value": "2097152"
+    },
+    "O_RDONLY": {
+     "kind": "constant",
+     "value": "0"
+    },
+    "O_RDWR": {
+     "kind": "constant",
+     "value": "2"
+    },
+    "O_RSYNC": {
+     "kind": "constant",
+     "value": "1052672"
+    },
+    "O_SEARCH": {
+     "kind": "constant",
+     "value": "2097152"
+    },
+    "O_SYNC": {
+     "kind": "constant",
+     "value": "1052672"
+    },
+    "O_TMPFILE": {
+     "kind": "constant",
+     "value": "4259840"
+    },
+    "O_TRUNC": {
+     "kind": "constant",
+     "value": "512"
+    },
+    "O_TTY_INIT": {
+     "kind": "constant",
+     "value": "0"
+    },
+    "O_WRONLY": {
+     "kind": "constant",
+     "value": "1"
+    },
+    "POSIX_FADV_DONTNEED": {
+     "kind": "constant",
+     "value": "4"
+    },
+    "POSIX_FADV_NOREUSE": {
+     "kind": "constant",
+     "value": "5"
+    }
+   },
+   "pathlib": {
+    "EBADF": {
+     "kind": "constant",
+     "value": "8"
+    },
+    "ELOOP": {
+     "kind": "constant",
+     "value": "32"
+    },
+    "ENOENT": {
+     "kind": "constant",
+     "value": "44"
+    },
+    "ENOTDIR": {
+     "kind": "constant",
+     "value": "54"
+    },
+    "Path": {
+     "kind": "callable",
+     "signature": "(*args, **kwargs)"
+    },
+    "PosixPath": {
+     "kind": "callable",
+     "signature": "(*args, **kwargs)"
+    },
+    "PurePath": {
+     "kind": "callable",
+     "signature": "(*args, **kwargs)"
+    },
+    "PurePosixPath": {
+     "kind": "callable",
+     "signature": "(*args, **kwargs)"
+    },
+    "PureWindowsPath": {
+     "kind": "callable",
+     "signature": "(*args, **kwargs)"
+    },
+    "S_ISBLK": {
+     "kind": "callable",
+     "signature": null
+    },
+    "S_ISCHR": {
+     "kind": "callable",
+     "signature": null
+    },
+    "S_ISDIR": {
+     "kind": "callable",
+     "signature": null
+    },
+    "S_ISFIFO": {
+     "kind": "callable",
+     "signature": null
+    },
+    "S_ISLNK": {
+     "kind": "callable",
+     "signature": null
+    },
+    "S_ISREG": {
+     "kind": "callable",
+     "signature": null
+    },
+    "S_ISSOCK": {
+     "kind": "callable",
+     "signature": null
+    },
+    "Sequence": {
+     "kind": "callable",
+     "signature": "()"
+    },
+    "WindowsPath": {
+     "kind": "callable",
+     "signature": "(*args, **kwargs)"
+    },
+    "fnmatch": {
+     "kind": "module"
+    },
+    "functools": {
+     "kind": "module"
+    },
+    "io": {
+     "kind": "module"
+    },
+    "ntpath": {
+     "kind": "module"
+    },
+    "os": {
+     "kind": "module"
+    },
+    "posixpath": {
+     "kind": "module"
+    },
+    "re": {
+     "kind": "module"
+    },
+    "sys": {
+     "kind": "module"
+    },
+    "urlquote_from_bytes": {
+     "kind": "callable",
+     "signature": "(bs, safe='/')"
+    },
+    "warnings": {
+     "kind": "module"
+    }
+   },
+   "collections": {
+    "ChainMap": {
+     "kind": "callable",
+     "signature": "(*maps)"
+    },
+    "Counter": {
+     "kind": "callable",
+     "signature": "(iterable=None, /, **kwds)"
+    },
+    "OrderedDict": {
+     "kind": "callable",
+     "signature": null
+    },
+    "UserDict": {
+     "kind": "callable",
+     "signature": "(dict=None, /, **kwargs)"
+    },
+    "UserList": {
+     "kind": "callable",
+     "signature": "(initlist=None)"
+    },
+    "UserString": {
+     "kind": "callable",
+     "signature": "(seq)"
+    },
+    "abc": {
+     "kind": "module"
+    },
+    "defaultdict": {
+     "kind": "callable",
+     "signature": null
+    },
+    "deque": {
+     "kind": "callable",
+     "signature": null
+    },
+    "namedtuple": {
+     "kind": "callable",
+     "signature": "(typename, field_names, *, rename=False, defaults=None, module=None)"
+    }
+   },
+   "itertools": {
+    "accumulate": {
+     "kind": "callable",
+     "signature": "(iterable, func=None, *, initial=None)"
+    },
+    "batched": {
+     "kind": "callable",
+     "signature": "(iterable, n)"
+    },
+    "chain": {
+     "kind": "callable",
+     "signature": null
+    },
+    "combinations": {
+     "kind": "callable",
+     "signature": "(iterable, r)"
+    },
+    "combinations_with_replacement": {
+     "kind": "callable",
+     "signature": "(iterable, r)"
+    },
+    "compress": {
+     "kind": "callable",
+     "signature": "(data, selectors)"
+    },
+    "count": {
+     "kind": "callable",
+     "signature": "(start=0, step=1)"
+    },
+    "cycle": {
+     "kind": "callable",
+     "signature": "(iterable, /)"
+    },
+    "dropwhile": {
+     "kind": "callable",
+     "signature": "(predicate, iterable, /)"
+    },
+    "filterfalse": {
+     "kind": "callable",
+     "signature": "(function, iterable, /)"
+    },
+    "groupby": {
+     "kind": "callable",
+     "signature": "(iterable, key=None)"
+    },
+    "islice": {
+     "kind": "callable",
+     "signature": null
+    },
+    "pairwise": {
+     "kind": "callable",
+     "signature": "(iterable, /)"
+    },
+    "permutations": {
+     "kind": "callable",
+     "signature": "(iterable, r=None)"
+    },
+    "product": {
+     "kind": "callable",
+     "signature": null
+    },
+    "repeat": {
+     "kind": "callable",
+     "signature": null
+    },
+    "starmap": {
+     "kind": "callable",
+     "signature": "(function, iterable, /)"
+    },
+    "takewhile": {
+     "kind": "callable",
+     "signature": "(predicate, iterable, /)"
+    },
+    "tee": {
+     "kind": "callable",
+     "signature": "(iterable, n=2, /)"
+    },
+    "zip_longest": {
+     "kind": "callable",
+     "signature": null
+    }
+   },
+   "functools": {
+    "GenericAlias": {
+     "kind": "callable",
+     "signature": null
+    },
+    "RLock": {
+     "kind": "callable",
+     "signature": null
+    },
+    "WRAPPER_ASSIGNMENTS": {
+     "kind": "tuple"
+    },
+    "WRAPPER_UPDATES": {
+     "kind": "tuple"
+    },
+    "cache": {
+     "kind": "callable",
+     "signature": "(user_function, /)"
+    },
+    "cached_property": {
+     "kind": "callable",
+     "signature": "(func)"
+    },
+    "cmp_to_key": {
+     "kind": "callable",
+     "signature": "(mycmp)"
+    },
+    "get_cache_token": {
+     "kind": "callable",
+     "signature": "()"
+    },
+    "lru_cache": {
+     "kind": "callable",
+     "signature": "(maxsize=128, typed=False)"
+    },
+    "namedtuple": {
+     "kind": "callable",
+     "signature": "(typename, field_names, *, rename=False, defaults=None, module=None)"
+    },
+    "partial": {
+     "kind": "callable",
+     "signature": null
+    },
+    "partialmethod": {
+     "kind": "callable",
+     "signature": "(func, /, *args, **keywords)"
+    },
+    "recursive_repr": {
+     "kind": "callable",
+     "signature": "(fillvalue='...')"
+    },
+    "reduce": {
+     "kind": "callable",
+     "signature": null
+    },
+    "singledispatch": {
+     "kind": "callable",
+     "signature": "(func)"
+    },
+    "singledispatchmethod": {
+     "kind": "callable",
+     "signature": "(func)"
+    },
+    "total_ordering": {
+     "kind": "callable",
+     "signature": "(cls)"
+    },
+    "update_wrapper": {
+     "kind": "callable",
+     "signature": "(wrapper, wrapped, assigned=('__module__', '__name__', '__qualname__', '__doc__', '__annotations__', '__type_params__'), updated=('__dict__',))"
+    },
+    "wraps": {
+     "kind": "callable",
+     "signature": "(wrapped, assigned=('__module__', '__name__', '__qualname__', '__doc__', '__annotations__', '__type_params__'), updated=('__dict__',))"
+    }
+   },
+   "typing": {
+    "ABCMeta": {
+     "kind": "callable",
+     "signature": "(name, bases, namespace, /, **kwargs)"
+    },
+    "AbstractSet": {
+     "kind": "callable",
+     "signature": "(*args, **kwargs)"
+    },
+    "Annotated": {
+     "kind": "callable",
+     "signature": "(*args, **kwargs)"
+    },
+    "Any": {
+     "kind": "callable",
+     "signature": "(*args, **kwargs)"
+    },
+    "AnyStr": {
+     "kind": "TypeVar"
+    },
+    "AsyncContextManager": {
+     "kind": "callable",
+     "signature": "(*args, **kwargs)"
+    },
+    "AsyncGenerator": {
+     "kind": "callable",
+     "signature": "(*args, **kwargs)"
+    },
+    "AsyncIterable": {
+     "kind": "callable",
+     "signature": "(*args, **kwargs)"
+    },
+    "AsyncIterator": {
+     "kind": "callable",
+     "signature": "(*args, **kwargs)"
+    },
+    "Awaitable": {
+     "kind": "callable",
+     "signature": "(*args, **kwargs)"
+    },
+    "BinaryIO": {
+     "kind": "callable",
+     "signature": "()"
+    },
+    "ByteString": {
+     "kind": "callable",
+     "signature": "(*args, **kwargs)"
+    },
+    "CT_co": {
+     "kind": "TypeVar"
+    },
+    "Callable": {
+     "kind": "callable",
+     "signature": "(*args, **kwargs)"
+    },
+    "ChainMap": {
+     "kind": "callable",
+     "signature": "(*args, **kwargs)"
+    },
+    "ClassVar": {
+     "kind": "callable",
+     "signature": "(*args, **kwds)"
+    },
+    "Collection": {
+     "kind": "callable",
+     "signature": "(*args, **kwargs)"
+    },
+    "Concatenate": {
+     "kind": "callable",
+     "signature": "(*args, **kwds)"
+    },
+    "Container": {
+     "kind": "callable",
+     "signature": "(*args, **kwargs)"
+    },
+    "ContextManager": {
+     "kind": "callable",
+     "signature": "(*args, **kwargs)"
+    },
+    "Coroutine": {
+     "kind": "callable",
+     "signature": "(*args, **kwargs)"
+    },
+    "Counter": {
+     "kind": "callable",
+     "signature": "(*args, **kwargs)"
+    },
+    "DefaultDict": {
+     "kind": "callable",
+     "signature": "(*args, **kwargs)"
+    },
+    "Deque": {
+     "kind": "callable",
+     "signature": "(*args, **kwargs)"
+    },
+    "Dict": {
+     "kind": "callable",
+     "signature": "(*args, **kwargs)"
+    },
+    "EXCLUDED_ATTRIBUTES": {
+     "kind": "frozenset"
+    },
+    "Final": {
+     "kind": "callable",
+     "signature": "(*args, **kwds)"
+    },
+    "ForwardRef": {
+     "kind": "callable",
+     "signature": "(arg, is_argument=True, module=None, *, is_class=False)"
+    },
+    "FrozenSet": {
+     "kind": "callable",
+     "signature": "(*args, **kwargs)"
+    },
+    "Generator": {
+     "kind": "callable",
+     "signature": "(*args, **kwargs)"
+    },
+    "Generic": {
+     "kind": "callable",
+     "signature": "()"
+    },
+    "GenericAlias": {
+     "kind": "callable",
+     "signature": null
+    },
+    "Hashable": {
+     "kind": "callable",
+     "signature": "(*args, **kwargs)"
+    },
+    "IO": {
+     "kind": "callable",
+     "signature": "()"
+    },
+    "ItemsView": {
+     "kind": "callable",
+     "signature": "(*args, **kwargs)"
+    },
+    "Iterable": {
+     "kind": "callable",
+     "signature": "(*args, **kwargs)"
+    },
+    "Iterator": {
+     "kind": "callable",
+     "signature": "(*args, **kwargs)"
+    },
+    "KT": {
+     "kind": "TypeVar"
+    },
+    "KeysView": {
+     "kind": "callable",
+     "signature": "(*args, **kwargs)"
+    },
+    "List": {
+     "kind": "callable",
+     "signature": "(*args, **kwargs)"
+    },
+    "Literal": {
+     "kind": "callable",
+     "signature": "(*args, **kwds)"
+    },
+    "LiteralString": {
+     "kind": "callable",
+     "signature": "(*args, **kwds)"
+    },
+    "Mapping": {
+     "kind": "callable",
+     "signature": "(*args, **kwargs)"
+    },
+    "MappingView": {
+     "kind": "callable",
+     "signature": "(*args, **kwargs)"
+    },
+    "Match": {
+     "kind": "callable",
+     "signature": "(*args, **kwargs)"
+    },
+    "MethodDescriptorType": {
+     "kind": "callable",
+     "signature": "()"
+    },
+    "MethodWrapperType": {
+     "kind": "callable",
+     "signature": "()"
+    },
+    "MutableMapping": {
+     "kind": "callable",
+     "signature": "(*args, **kwargs)"
+    },
+    "MutableSequence": {
+     "kind": "callable",
+     "signature": "(*args, **kwargs)"
+    },
+    "MutableSet": {
+     "kind": "callable",
+     "signature": "(*args, **kwargs)"
+    },
+    "NamedTuple": {
+     "kind": "callable",
+     "signature": "(typename, fields=None, /, **kwargs)"
+    },
+    "NamedTupleMeta": {
+     "kind": "callable",
+     "signature": "(typename, bases, ns)"
+    },
+    "Never": {
+     "kind": "callable",
+     "signature": "(*args, **kwds)"
+    },
+    "NewType": {
+     "kind": "callable",
+     "signature": "(name, tp)"
+    },
+    "NoReturn": {
+     "kind": "callable",
+     "signature": "(*args, **kwds)"
+    },
+    "NotRequired": {
+     "kind": "callable",
+     "signature": "(*args, **kwds)"
+    },
+    "Optional": {
+     "kind": "callable",
+     "signature": "(*args, **kwds)"
+    },
+    "OrderedDict": {
+     "kind": "callable",
+     "signature": "(*args, **kwargs)"
+    },
+    "ParamSpec": {
+     "kind": "callable",
+     "signature": null
+    },
+    "ParamSpecArgs": {
+     "kind": "callable",
+     "signature": null
+    }
+   },
+   "sys": {
+    "abiflags": {
+     "kind": "constant",
+     "value": "''"
+    },
+    "activate_stack_trampoline": {
+     "kind": "callable",
+     "signature": "(backend, /)"
+    },
+    "addaudithook": {
+     "kind": "callable",
+     "signature": "(hook)"
+    },
+    "api_version": {
+     "kind": "constant",
+     "value": "1013"
+    },
+    "argv": {
+     "kind": "list"
+    },
+    "audit": {
+     "kind": "callable",
+     "signature": null
+    },
+    "base_exec_prefix": {
+     "kind": "constant",
+     "value": "'/'"
+    },
+    "base_prefix": {
+     "kind": "constant",
+     "value": "'/'"
+    },
+    "breakpointhook": {
+     "kind": "callable",
+     "signature": null
+    },
+    "builtin_module_names": {
+     "kind": "tuple"
+    },
+    "byteorder": {
+     "kind": "constant",
+     "value": "'little'"
+    },
+    "call_tracing": {
+     "kind": "callable",
+     "signature": "(func, args, /)"
+    },
+    "copyright": {
+     "kind": "constant",
+     "value": "'Copyright (c) 2001-2023 Python Software Foundation.\\nAll Rights Reserved.\\n\\nCopyright (c) 2000 BeOpen.com.\\nAll Rights Reserved.\\n\\nCopyright (c) 1995-2001 Corporation for National Research Initiatives.\\nAll Rights Reserved.\\n\\nCopyright (c) 1991-1995 Stichting Mathematisch Centrum, Amsterdam.\\nAll Rights Reserved.'"
+    },
+    "deactivate_stack_trampoline": {
+     "kind": "callable",
+     "signature": "()"
+    },
+    "displayhook": {
+     "kind": "callable",
+     "signature": "(object, /)"
+    },
+    "dont_write_bytecode": {
+     "kind": "constant",
+     "value": "True"
+    },
+    "exc_info": {
+     "kind": "callable",
+     "signature": "()"
+    },
+    "excepthook": {
+     "kind": "callable",
+     "signature": "(exc, /, value=<implicit>, tb=<implicit>, limit=None, file=None, chain=True)"
+    },
+    "exception": {
+     "kind": "callable",
+     "signature": "()"
+    },
+    "exec_prefix": {
+     "kind": "constant",
+     "value": "'/'"
+    },
+    "executable": {
+     "kind": "constant",
+     "value": "'/Users/mlacy/Documents/3.0/live_priors/scripts/build-language-law-prior.mjs'"
+    },
+    "exit": {
+     "kind": "callable",
+     "signature": "(status=None, /)"
+    },
+    "flags": {
+     "kind": "flags"
+    },
+    "float_info": {
+     "kind": "float_info"
+    },
+    "float_repr_style": {
+     "kind": "constant",
+     "value": "'short'"
+    },
+    "get_asyncgen_hooks": {
+     "kind": "callable",
+     "signature": "()"
+    },
+    "get_coroutine_origin_tracking_depth": {
+     "kind": "callable",
+     "signature": "()"
+    },
+    "get_int_max_str_digits": {
+     "kind": "callable",
+     "signature": "()"
+    },
+    "getallocatedblocks": {
+     "kind": "callable",
+     "signature": "()"
+    },
+    "getdefaultencoding": {
+     "kind": "callable",
+     "signature": "()"
+    },
+    "getdlopenflags": {
+     "kind": "callable",
+     "signature": "()"
+    },
+    "getfilesystemencodeerrors": {
+     "kind": "callable",
+     "signature": "()"
+    },
+    "getfilesystemencoding": {
+     "kind": "callable",
+     "signature": "()"
+    },
+    "getprofile": {
+     "kind": "callable",
+     "signature": "()"
+    },
+    "getrecursionlimit": {
+     "kind": "callable",
+     "signature": "()"
+    },
+    "getrefcount": {
+     "kind": "callable",
+     "signature": "(object, /)"
+    },
+    "getsizeof": {
+     "kind": "callable",
+     "signature": null
+    },
+    "getswitchinterval": {
+     "kind": "callable",
+     "signature": "()"
+    },
+    "gettrace": {
+     "kind": "callable",
+     "signature": "()"
+    },
+    "getunicodeinternedsize": {
+     "kind": "callable",
+     "signature": "()"
+    },
+    "hash_info": {
+     "kind": "hash_info"
+    },
+    "hexversion": {
+     "kind": "constant",
+     "value": "51118576"
+    },
+    "implementation": {
+     "kind": "SimpleNamespace"
+    },
+    "int_info": {
+     "kind": "int_info"
+    },
+    "intern": {
+     "kind": "callable",
+     "signature": "(string, /)"
+    },
+    "is_finalizing": {
+     "kind": "callable",
+     "signature": "()"
+    },
+    "is_stack_trampoline_active": {
+     "kind": "callable",
+     "signature": "()"
+    },
+    "maxsize": {
+     "kind": "constant",
+     "value": "2147483647"
+    },
+    "maxunicode": {
+     "kind": "constant",
+     "value": "1114111"
+    },
+    "meta_path": {
+     "kind": "list"
+    },
+    "modules": {
+     "kind": "dict"
+    },
+    "monitoring": {
+     "kind": "module"
+    },
+    "orig_argv": {
+     "kind": "list"
+    },
+    "path": {
+     "kind": "list"
+    },
+    "path_hooks": {
+     "kind": "list"
+    },
+    "path_importer_cache": {
+     "kind": "dict"
+    },
+    "platform": {
+     "kind": "constant",
+     "value": "'emscripten'"
+    },
+    "platlibdir": {
+     "kind": "constant",
+     "value": "'lib'"
+    },
+    "prefix": {
+     "kind": "constant",
+     "value": "'/'"
+    },
+    "pycache_prefix": {
+     "kind": "constant",
+     "value": "None"
+    }
+   },
+   "math": {
+    "acos": {
+     "kind": "callable",
+     "signature": "(x, /)"
+    },
+    "acosh": {
+     "kind": "callable",
+     "signature": "(x, /)"
+    },
+    "asin": {
+     "kind": "callable",
+     "signature": "(x, /)"
+    },
+    "asinh": {
+     "kind": "callable",
+     "signature": "(x, /)"
+    },
+    "atan": {
+     "kind": "callable",
+     "signature": "(x, /)"
+    },
+    "atan2": {
+     "kind": "callable",
+     "signature": "(y, x, /)"
+    },
+    "atanh": {
+     "kind": "callable",
+     "signature": "(x, /)"
+    },
+    "cbrt": {
+     "kind": "callable",
+     "signature": "(x, /)"
+    },
+    "ceil": {
+     "kind": "callable",
+     "signature": "(x, /)"
+    },
+    "comb": {
+     "kind": "callable",
+     "signature": "(n, k, /)"
+    },
+    "copysign": {
+     "kind": "callable",
+     "signature": "(x, y, /)"
+    },
+    "cos": {
+     "kind": "callable",
+     "signature": "(x, /)"
+    },
+    "cosh": {
+     "kind": "callable",
+     "signature": "(x, /)"
+    },
+    "degrees": {
+     "kind": "callable",
+     "signature": "(x, /)"
+    },
+    "dist": {
+     "kind": "callable",
+     "signature": "(p, q, /)"
+    },
+    "e": {
+     "kind": "constant",
+     "value": "2.718281828459045"
+    },
+    "erf": {
+     "kind": "callable",
+     "signature": "(x, /)"
+    },
+    "erfc": {
+     "kind": "callable",
+     "signature": "(x, /)"
+    },
+    "exp": {
+     "kind": "callable",
+     "signature": "(x, /)"
+    },
+    "exp2": {
+     "kind": "callable",
+     "signature": "(x, /)"
+    },
+    "expm1": {
+     "kind": "callable",
+     "signature": "(x, /)"
+    },
+    "fabs": {
+     "kind": "callable",
+     "signature": "(x, /)"
+    },
+    "factorial": {
+     "kind": "callable",
+     "signature": "(n, /)"
+    },
+    "floor": {
+     "kind": "callable",
+     "signature": "(x, /)"
+    },
+    "fmod": {
+     "kind": "callable",
+     "signature": "(x, y, /)"
+    },
+    "frexp": {
+     "kind": "callable",
+     "signature": "(x, /)"
+    },
+    "fsum": {
+     "kind": "callable",
+     "signature": "(seq, /)"
+    },
+    "gamma": {
+     "kind": "callable",
+     "signature": "(x, /)"
+    },
+    "gcd": {
+     "kind": "callable",
+     "signature": "(*integers)"
+    },
+    "hypot": {
+     "kind": "callable",
+     "signature": null
+    },
+    "inf": {
+     "kind": "constant",
+     "value": "inf"
+    },
+    "isclose": {
+     "kind": "callable",
+     "signature": "(a, b, *, rel_tol=1e-09, abs_tol=0.0)"
+    },
+    "isfinite": {
+     "kind": "callable",
+     "signature": "(x, /)"
+    },
+    "isinf": {
+     "kind": "callable",
+     "signature": "(x, /)"
+    },
+    "isnan": {
+     "kind": "callable",
+     "signature": "(x, /)"
+    },
+    "isqrt": {
+     "kind": "callable",
+     "signature": "(n, /)"
+    },
+    "lcm": {
+     "kind": "callable",
+     "signature": "(*integers)"
+    },
+    "ldexp": {
+     "kind": "callable",
+     "signature": "(x, i, /)"
+    },
+    "lgamma": {
+     "kind": "callable",
+     "signature": "(x, /)"
+    },
+    "log": {
+     "kind": "callable",
+     "signature": null
+    },
+    "log10": {
+     "kind": "callable",
+     "signature": "(x, /)"
+    },
+    "log1p": {
+     "kind": "callable",
+     "signature": "(x, /)"
+    },
+    "log2": {
+     "kind": "callable",
+     "signature": "(x, /)"
+    },
+    "modf": {
+     "kind": "callable",
+     "signature": "(x, /)"
+    },
+    "nan": {
+     "kind": "constant",
+     "value": "nan"
+    },
+    "nextafter": {
+     "kind": "callable",
+     "signature": "(x, y, /, *, steps=None)"
+    },
+    "perm": {
+     "kind": "callable",
+     "signature": "(n, k=None, /)"
+    },
+    "pi": {
+     "kind": "constant",
+     "value": "3.141592653589793"
+    },
+    "pow": {
+     "kind": "callable",
+     "signature": "(x, y, /)"
+    },
+    "prod": {
+     "kind": "callable",
+     "signature": "(iterable, /, *, start=1)"
+    },
+    "radians": {
+     "kind": "callable",
+     "signature": "(x, /)"
+    },
+    "remainder": {
+     "kind": "callable",
+     "signature": "(x, y, /)"
+    },
+    "sin": {
+     "kind": "callable",
+     "signature": "(x, /)"
+    },
+    "sinh": {
+     "kind": "callable",
+     "signature": "(x, /)"
+    },
+    "sqrt": {
+     "kind": "callable",
+     "signature": "(x, /)"
+    },
+    "sumprod": {
+     "kind": "callable",
+     "signature": "(p, q, /)"
+    },
+    "tan": {
+     "kind": "callable",
+     "signature": "(x, /)"
+    },
+    "tanh": {
+     "kind": "callable",
+     "signature": "(x, /)"
+    },
+    "tau": {
+     "kind": "constant",
+     "value": "6.283185307179586"
+    },
+    "trunc": {
+     "kind": "callable",
+     "signature": "(x, /)"
+    }
+   },
+   "random": {
+    "BPF": {
+     "kind": "constant",
+     "value": "53"
+    },
+    "LOG4": {
+     "kind": "constant",
+     "value": "1.3862943611198906"
+    },
+    "NV_MAGICCONST": {
+     "kind": "constant",
+     "value": "1.7155277699214135"
+    },
+    "RECIP_BPF": {
+     "kind": "constant",
+     "value": "1.1102230246251565e-16"
+    },
+    "Random": {
+     "kind": "callable",
+     "signature": "(x=None)"
+    },
+    "SG_MAGICCONST": {
+     "kind": "constant",
+     "value": "2.504077396776274"
+    },
+    "SystemRandom": {
+     "kind": "callable",
+     "signature": "(x=None)"
+    },
+    "TWOPI": {
+     "kind": "constant",
+     "value": "6.283185307179586"
+    },
+    "betavariate": {
+     "kind": "callable",
+     "signature": "(alpha, beta)"
+    },
+    "binomialvariate": {
+     "kind": "callable",
+     "signature": "(n=1, p=0.5)"
+    },
+    "choice": {
+     "kind": "callable",
+     "signature": "(seq)"
+    },
+    "choices": {
+     "kind": "callable",
+     "signature": "(population, weights=None, *, cum_weights=None, k=1)"
+    },
+    "expovariate": {
+     "kind": "callable",
+     "signature": "(lambd=1.0)"
+    },
+    "gammavariate": {
+     "kind": "callable",
+     "signature": "(alpha, beta)"
+    },
+    "gauss": {
+     "kind": "callable",
+     "signature": "(mu=0.0, sigma=1.0)"
+    },
+    "getrandbits": {
+     "kind": "callable",
+     "signature": "(k, /)"
+    },
+    "getstate": {
+     "kind": "callable",
+     "signature": "()"
+    },
+    "lognormvariate": {
+     "kind": "callable",
+     "signature": "(mu, sigma)"
+    },
+    "normalvariate": {
+     "kind": "callable",
+     "signature": "(mu=0.0, sigma=1.0)"
+    },
+    "paretovariate": {
+     "kind": "callable",
+     "signature": "(alpha)"
+    },
+    "randbytes": {
+     "kind": "callable",
+     "signature": "(n)"
+    },
+    "randint": {
+     "kind": "callable",
+     "signature": "(a, b)"
+    },
+    "random": {
+     "kind": "callable",
+     "signature": "()"
+    },
+    "randrange": {
+     "kind": "callable",
+     "signature": "(start, stop=None, step=1)"
+    },
+    "sample": {
+     "kind": "callable",
+     "signature": "(population, k, *, counts=None)"
+    },
+    "seed": {
+     "kind": "callable",
+     "signature": "(a=None, version=2)"
+    },
+    "setstate": {
+     "kind": "callable",
+     "signature": "(state)"
+    },
+    "shuffle": {
+     "kind": "callable",
+     "signature": "(x)"
+    },
+    "triangular": {
+     "kind": "callable",
+     "signature": "(low=0.0, high=1.0, mode=None)"
+    },
+    "uniform": {
+     "kind": "callable",
+     "signature": "(a, b)"
+    },
+    "vonmisesvariate": {
+     "kind": "callable",
+     "signature": "(mu, kappa)"
+    },
+    "weibullvariate": {
+     "kind": "callable",
+     "signature": "(alpha, beta)"
+    }
+   },
+   "datetime": {
+    "MAXYEAR": {
+     "kind": "constant",
+     "value": "9999"
+    },
+    "MINYEAR": {
+     "kind": "constant",
+     "value": "1"
+    },
+    "UTC": {
+     "kind": "timezone"
+    },
+    "date": {
+     "kind": "callable",
+     "signature": null
+    },
+    "datetime": {
+     "kind": "callable",
+     "signature": null
+    },
+    "datetime_CAPI": {
+     "kind": "PyCapsule"
+    },
+    "time": {
+     "kind": "callable",
+     "signature": null
+    },
+    "timedelta": {
+     "kind": "callable",
+     "signature": null
+    },
+    "timezone": {
+     "kind": "callable",
+     "signature": null
+    },
+    "tzinfo": {
+     "kind": "callable",
+     "signature": null
+    }
+   },
+   "csv": {
+    "Dialect": {
+     "kind": "callable",
+     "signature": "()"
+    },
+    "DictReader": {
+     "kind": "callable",
+     "signature": "(f, fieldnames=None, restkey=None, restval=None, dialect='excel', *args, **kwds)"
+    },
+    "DictWriter": {
+     "kind": "callable",
+     "signature": "(f, fieldnames, restval='', extrasaction='raise', dialect='excel', *args, **kwds)"
+    },
+    "Error": {
+     "kind": "callable",
+     "signature": null
+    },
+    "QUOTE_ALL": {
+     "kind": "constant",
+     "value": "1"
+    },
+    "QUOTE_MINIMAL": {
+     "kind": "constant",
+     "value": "0"
+    },
+    "QUOTE_NONE": {
+     "kind": "constant",
+     "value": "3"
+    },
+    "QUOTE_NONNUMERIC": {
+     "kind": "constant",
+     "value": "2"
+    },
+    "QUOTE_NOTNULL": {
+     "kind": "constant",
+     "value": "5"
+    },
+    "QUOTE_STRINGS": {
+     "kind": "constant",
+     "value": "4"
+    },
+    "Sniffer": {
+     "kind": "callable",
+     "signature": "()"
+    },
+    "StringIO": {
+     "kind": "callable",
+     "signature": "(initial_value='', newline='\\n')"
+    },
+    "excel": {
+     "kind": "callable",
+     "signature": "()"
+    },
+    "excel_tab": {
+     "kind": "callable",
+     "signature": "()"
+    },
+    "field_size_limit": {
+     "kind": "callable",
+     "signature": null
+    },
+    "get_dialect": {
+     "kind": "callable",
+     "signature": "(name)"
+    },
+    "list_dialects": {
+     "kind": "callable",
+     "signature": "()"
+    },
+    "re": {
+     "kind": "module"
+    },
+    "reader": {
+     "kind": "callable",
+     "signature": null
+    },
+    "register_dialect": {
+     "kind": "callable",
+     "signature": null
+    },
+    "types": {
+     "kind": "module"
+    },
+    "unix_dialect": {
+     "kind": "callable",
+     "signature": "()"
+    },
+    "unregister_dialect": {
+     "kind": "callable",
+     "signature": "(name)"
+    },
+    "writer": {
+     "kind": "callable",
+     "signature": null
+    }
+   },
+   "dataclasses": {
+    "Field": {
+     "kind": "callable",
+     "signature": "(default, default_factory, init, repr, hash, compare, metadata, kw_only)"
+    },
+    "FrozenInstanceError": {
+     "kind": "callable",
+     "signature": null
+    },
+    "FunctionType": {
+     "kind": "callable",
+     "signature": "(code, globals, name=None, argdefs=None, closure=None)"
+    },
+    "GenericAlias": {
+     "kind": "callable",
+     "signature": null
+    },
+    "InitVar": {
+     "kind": "callable",
+     "signature": "(type)"
+    },
+    "KW_ONLY": {
+     "kind": "_KW_ONLY_TYPE"
+    },
+    "MISSING": {
+     "kind": "_MISSING_TYPE"
+    },
+    "abc": {
+     "kind": "module"
+    },
+    "asdict": {
+     "kind": "callable",
+     "signature": "(obj, *, dict_factory=<class 'dict'>)"
+    },
+    "astuple": {
+     "kind": "callable",
+     "signature": "(obj, *, tuple_factory=<class 'tuple'>)"
+    },
+    "copy": {
+     "kind": "module"
+    },
+    "dataclass": {
+     "kind": "callable",
+     "signature": "(cls=None, /, *, init=True, repr=True, eq=True, order=False, unsafe_hash=False, frozen=False, match_args=True, kw_only=False, slots=False, weakref_slot=False)"
+    },
+    "field": {
+     "kind": "callable",
+     "signature": "(*, default=<dataclasses._MISSING_TYPE object at 0xc575e0>, default_factory=<dataclasses._MISSING_TYPE object at 0xc575e0>, init=True, repr=True, hash=None, compare=True, metadata=None, kw_only=<dataclasses._MISSING_TYPE object at 0xc575e0>)"
+    },
+    "fields": {
+     "kind": "callable",
+     "signature": "(class_or_instance)"
+    },
+    "functools": {
+     "kind": "module"
+    },
+    "inspect": {
+     "kind": "module"
+    },
+    "is_dataclass": {
+     "kind": "callable",
+     "signature": "(obj)"
+    },
+    "itertools": {
+     "kind": "module"
+    },
+    "keyword": {
+     "kind": "module"
+    },
+    "make_dataclass": {
+     "kind": "callable",
+     "signature": "(cls_name, fields, *, bases=(), namespace=None, init=True, repr=True, eq=True, order=False, unsafe_hash=False, frozen=False, match_args=True, kw_only=False, slots=False, weakref_slot=False, module=None)"
+    },
+    "re": {
+     "kind": "module"
+    },
+    "replace": {
+     "kind": "callable",
+     "signature": "(obj, /, **changes)"
+    },
+    "sys": {
+     "kind": "module"
+    },
+    "types": {
+     "kind": "module"
+    }
+   },
+   "textwrap": {
+    "TextWrapper": {
+     "kind": "callable",
+     "signature": "(width=70, initial_indent='', subsequent_indent='', expand_tabs=True, replace_whitespace=True, fix_sentence_endings=False, break_long_words=True, drop_whitespace=True, break_on_hyphens=True, tabsize=8, *, max_lines=None, placeholder=' [...]')"
+    },
+    "dedent": {
+     "kind": "callable",
+     "signature": "(text)"
+    },
+    "fill": {
+     "kind": "callable",
+     "signature": "(text, width=70, **kwargs)"
+    },
+    "indent": {
+     "kind": "callable",
+     "signature": "(text, prefix, predicate=None)"
+    },
+    "re": {
+     "kind": "module"
+    },
+    "shorten": {
+     "kind": "callable",
+     "signature": "(text, width, **kwargs)"
+    },
+    "wrap": {
+     "kind": "callable",
+     "signature": "(text, width=70, **kwargs)"
+    }
+   },
+   "enum": {
+    "CONFORM": {
+     "kind": "constant",
+     "value": "<FlagBoundary.CONFORM: 'conform'>"
+    },
+    "CONTINUOUS": {
+     "kind": "constant",
+     "value": "<EnumCheck.CONTINUOUS: 'no skipped integer values'>"
+    },
+    "DynamicClassAttribute": {
+     "kind": "callable",
+     "signature": "(fget=None, fset=None, fdel=None, doc=None)"
+    },
+    "EJECT": {
+     "kind": "constant",
+     "value": "<FlagBoundary.EJECT: 'eject'>"
+    },
+    "Enum": {
+     "kind": "callable",
+     "signature": "(new_class_name, /, names, *, module=None, qualname=None, type=None, start=1, boundary=None)"
+    },
+    "EnumCheck": {
+     "kind": "callable",
+     "signature": "(*values)"
+    },
+    "EnumMeta": {
+     "kind": "callable",
+     "signature": "(cls, bases, classdict, *, boundary=None, _simple=False, **kwds)"
+    },
+    "EnumType": {
+     "kind": "callable",
+     "signature": "(cls, bases, classdict, *, boundary=None, _simple=False, **kwds)"
+    },
+    "Flag": {
+     "kind": "callable",
+     "signature": "(new_class_name, /, names, *, module=None, qualname=None, type=None, start=1, boundary=None)"
+    },
+    "FlagBoundary": {
+     "kind": "callable",
+     "signature": "(*values)"
+    },
+    "IntEnum": {
+     "kind": "callable",
+     "signature": "(new_class_name, /, names, *, module=None, qualname=None, type=None, start=1, boundary=None)"
+    },
+    "IntFlag": {
+     "kind": "callable",
+     "signature": "(new_class_name, /, names, *, module=None, qualname=None, type=None, start=1, boundary=None)"
+    },
+    "KEEP": {
+     "kind": "constant",
+     "value": "<FlagBoundary.KEEP: 'keep'>"
+    },
+    "MappingProxyType": {
+     "kind": "callable",
+     "signature": null
+    },
+    "NAMED_FLAGS": {
+     "kind": "constant",
+     "value": "<EnumCheck.NAMED_FLAGS: 'multi-flag aliases may not contain unnamed flags'>"
+    },
+    "ReprEnum": {
+     "kind": "callable",
+     "signature": "(new_class_name, /, names, *, module=None, qualname=None, type=None, start=1, boundary=None)"
+    },
+    "STRICT": {
+     "kind": "constant",
+     "value": "<FlagBoundary.STRICT: 'strict'>"
+    },
+    "StrEnum": {
+     "kind": "callable",
+     "signature": "(new_class_name, /, names, *, module=None, qualname=None, type=None, start=1, boundary=None)"
+    },
+    "UNIQUE": {
+     "kind": "constant",
+     "value": "<EnumCheck.UNIQUE: 'one name per value'>"
+    },
+    "auto": {
+     "kind": "callable",
+     "signature": "(value=_auto_null)"
+    },
+    "bin": {
+     "kind": "callable",
+     "signature": "(num, max_bits=None)"
+    },
+    "bltns": {
+     "kind": "module"
+    },
+    "global_enum": {
+     "kind": "callable",
+     "signature": "(cls, update_str=False)"
+    },
+    "global_enum_repr": {
+     "kind": "callable",
+     "signature": "(self)"
+    },
+    "global_flag_repr": {
+     "kind": "callable",
+     "signature": "(self)"
+    },
+    "global_str": {
+     "kind": "callable",
+     "signature": "(self)"
+    },
+    "member": {
+     "kind": "callable",
+     "signature": "(value)"
+    },
+    "nonmember": {
+     "kind": "callable",
+     "signature": "(value)"
+    },
+    "pickle_by_enum_name": {
+     "kind": "callable",
+     "signature": "(self, proto)"
+    },
+    "pickle_by_global_name": {
+     "kind": "callable",
+     "signature": "(self, proto)"
+    },
+    "property": {
+     "kind": "callable",
+     "signature": "(fget=None, fset=None, fdel=None, doc=None)"
+    },
+    "reduce": {
+     "kind": "callable",
+     "signature": null
+    },
+    "show_flag_values": {
+     "kind": "callable",
+     "signature": "(value)"
+    },
+    "sys": {
+     "kind": "module"
+    },
+    "unique": {
+     "kind": "callable",
+     "signature": "(enumeration)"
+    },
+    "verify": {
+     "kind": "callable",
+     "signature": "(*checks)"
+    }
+   },
+   "subprocess": {
+    "CalledProcessError": {
+     "kind": "callable",
+     "signature": "(returncode, cmd, output=None, stderr=None)"
+    },
+    "CompletedProcess": {
+     "kind": "callable",
+     "signature": "(args, returncode, stdout=None, stderr=None)"
+    },
+    "DEVNULL": {
+     "kind": "constant",
+     "value": "-3"
+    },
+    "PIPE": {
+     "kind": "constant",
+     "value": "-1"
+    },
+    "Popen": {
+     "kind": "callable",
+     "signature": "(args, bufsize=-1, executable=None, stdin=None, stdout=None, stderr=None, preexec_fn=None, close_fds=True, shell=False, cwd=None, env=None, universal_newlines=None, startupinfo=None, creationflags=0, restore_signals=True, start_new_session=False, pass_fds=(), *, user=None, group=None, extra_groups=None, encoding=None, errors=None, text=None, umask=-1, pipesize=-1, process_group=None)"
+    },
+    "STDOUT": {
+     "kind": "constant",
+     "value": "-2"
+    },
+    "SubprocessError": {
+     "kind": "callable",
+     "signature": null
+    },
+    "TimeoutExpired": {
+     "kind": "callable",
+     "signature": "(cmd, timeout, output=None, stderr=None)"
+    },
+    "builtins": {
+     "kind": "module"
+    },
+    "call": {
+     "kind": "callable",
+     "signature": "(*popenargs, timeout=None, **kwargs)"
+    },
+    "check_call": {
+     "kind": "callable",
+     "signature": "(*popenargs, **kwargs)"
+    },
+    "check_output": {
+     "kind": "callable",
+     "signature": "(*popenargs, timeout=None, **kwargs)"
+    },
+    "contextlib": {
+     "kind": "module"
+    },
+    "errno": {
+     "kind": "module"
+    },
+    "fcntl": {
+     "kind": "constant",
+     "value": "None"
+    },
+    "getoutput": {
+     "kind": "callable",
+     "signature": "(cmd, *, encoding=None, errors=None)"
+    },
+    "getstatusoutput": {
+     "kind": "callable",
+     "signature": "(cmd, *, encoding=None, errors=None)"
+    },
+    "io": {
+     "kind": "module"
+    },
+    "list2cmdline": {
+     "kind": "callable",
+     "signature": "(seq)"
+    },
+    "locale": {
+     "kind": "module"
+    },
+    "os": {
+     "kind": "module"
+    },
+    "run": {
+     "kind": "callable",
+     "signature": "(*popenargs, input=None, capture_output=False, timeout=None, check=False, **kwargs)"
+    },
+    "select": {
+     "kind": "module"
+    },
+    "selectors": {
+     "kind": "module"
+    },
+    "signal": {
+     "kind": "module"
+    },
+    "sys": {
+     "kind": "module"
+    },
+    "threading": {
+     "kind": "module"
+    },
+    "time": {
+     "kind": "module"
+    },
+    "types": {
+     "kind": "module"
+    },
+    "warnings": {
+     "kind": "module"
+    }
+   },
+   "tempfile": {
+    "NamedTemporaryFile": {
+     "kind": "callable",
+     "signature": "(mode='w+b', buffering=-1, encoding=None, newline=None, suffix=None, prefix=None, dir=None, delete=True, *, errors=None, delete_on_close=True)"
+    },
+    "SpooledTemporaryFile": {
+     "kind": "callable",
+     "signature": "(max_size=0, mode='w+b', buffering=-1, encoding=None, newline=None, suffix=None, prefix=None, dir=None, *, errors=None)"
+    },
+    "TMP_MAX": {
+     "kind": "constant",
+     "value": "10000"
+    },
+    "TemporaryDirectory": {
+     "kind": "callable",
+     "signature": "(suffix=None, prefix=None, dir=None, ignore_cleanup_errors=False, *, delete=True)"
+    },
+    "TemporaryFile": {
+     "kind": "callable",
+     "signature": "(mode='w+b', buffering=-1, encoding=None, newline=None, suffix=None, prefix=None, dir=None, *, errors=None)"
+    },
+    "gettempdir": {
+     "kind": "callable",
+     "signature": "()"
+    },
+    "gettempdirb": {
+     "kind": "callable",
+     "signature": "()"
+    },
+    "gettempprefix": {
+     "kind": "callable",
+     "signature": "()"
+    },
+    "gettempprefixb": {
+     "kind": "callable",
+     "signature": "()"
+    },
+    "mkdtemp": {
+     "kind": "callable",
+     "signature": "(suffix=None, prefix=None, dir=None)"
+    },
+    "mkstemp": {
+     "kind": "callable",
+     "signature": "(suffix=None, prefix=None, dir=None, text=False)"
+    },
+    "mktemp": {
+     "kind": "callable",
+     "signature": "(suffix='', prefix='tmp', dir=None)"
+    },
+    "tempdir": {
+     "kind": "constant",
+     "value": "None"
+    },
+    "template": {
+     "kind": "constant",
+     "value": "'tmp'"
+    }
+   },
+   "shutil": {
+    "COPY_BUFSIZE": {
+     "kind": "constant",
+     "value": "65536"
+    },
+    "Error": {
+     "kind": "callable",
+     "signature": null
+    },
+    "ExecError": {
+     "kind": "callable",
+     "signature": null
+    },
+    "ReadError": {
+     "kind": "callable",
+     "signature": null
+    },
+    "RegistryError": {
+     "kind": "callable",
+     "signature": null
+    },
+    "SameFileError": {
+     "kind": "callable",
+     "signature": null
+    },
+    "SpecialFileError": {
+     "kind": "callable",
+     "signature": null
+    },
+    "chown": {
+     "kind": "callable",
+     "signature": "(path, user=None, group=None)"
+    },
+    "collections": {
+     "kind": "module"
+    },
+    "copy": {
+     "kind": "callable",
+     "signature": "(src, dst, *, follow_symlinks=True)"
+    },
+    "copy2": {
+     "kind": "callable",
+     "signature": "(src, dst, *, follow_symlinks=True)"
+    },
+    "copyfile": {
+     "kind": "callable",
+     "signature": "(src, dst, *, follow_symlinks=True)"
+    },
+    "copyfileobj": {
+     "kind": "callable",
+     "signature": "(fsrc, fdst, length=0)"
+    },
+    "copymode": {
+     "kind": "callable",
+     "signature": "(src, dst, *, follow_symlinks=True)"
+    },
+    "copystat": {
+     "kind": "callable",
+     "signature": "(src, dst, *, follow_symlinks=True)"
+    },
+    "copytree": {
+     "kind": "callable",
+     "signature": "(src, dst, symlinks=False, ignore=None, copy_function=<function copy2 at 0xcbf680>, ignore_dangling_symlinks=False, dirs_exist_ok=False)"
+    },
+    "disk_usage": {
+     "kind": "callable",
+     "signature": "(path)"
+    },
+    "errno": {
+     "kind": "module"
+    },
+    "fnmatch": {
+     "kind": "module"
+    },
+    "get_archive_formats": {
+     "kind": "callable",
+     "signature": "()"
+    },
+    "get_terminal_size": {
+     "kind": "callable",
+     "signature": "(fallback=(80, 24))"
+    },
+    "get_unpack_formats": {
+     "kind": "callable",
+     "signature": "()"
+    },
+    "ignore_patterns": {
+     "kind": "callable",
+     "signature": "(*patterns)"
+    },
+    "make_archive": {
+     "kind": "callable",
+     "signature": "(base_name, format, root_dir=None, base_dir=None, verbose=0, dry_run=0, owner=None, group=None, logger=None)"
+    },
+    "move": {
+     "kind": "callable",
+     "signature": "(src, dst, copy_function=<function copy2 at 0xcbf680>)"
+    },
+    "nt": {
+     "kind": "constant",
+     "value": "None"
+    },
+    "os": {
+     "kind": "module"
+    },
+    "posix": {
+     "kind": "module"
+    },
+    "register_archive_format": {
+     "kind": "callable",
+     "signature": "(name, function, extra_args=None, description='')"
+    },
+    "register_unpack_format": {
+     "kind": "callable",
+     "signature": "(name, extensions, function, extra_args=None, description='')"
+    },
+    "rmtree": {
+     "kind": "callable",
+     "signature": "(path, ignore_errors=False, onerror=None, *, onexc=None, dir_fd=None)"
+    },
+    "stat": {
+     "kind": "module"
+    },
+    "sys": {
+     "kind": "module"
+    },
+    "unpack_archive": {
+     "kind": "callable",
+     "signature": "(filename, extract_dir=None, format=None, *, filter=None)"
+    },
+    "unregister_archive_format": {
+     "kind": "callable",
+     "signature": "(name)"
+    },
+    "unregister_unpack_format": {
+     "kind": "callable",
+     "signature": "(name)"
+    },
+    "warnings": {
+     "kind": "module"
+    },
+    "which": {
+     "kind": "callable",
+     "signature": "(cmd, mode=1, path=None)"
+    }
+   },
+   "string": {
+    "Formatter": {
+     "kind": "callable",
+     "signature": "()"
+    },
+    "Template": {
+     "kind": "callable",
+     "signature": "(template)"
+    },
+    "ascii_letters": {
+     "kind": "constant",
+     "value": "'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'"
+    },
+    "ascii_lowercase": {
+     "kind": "constant",
+     "value": "'abcdefghijklmnopqrstuvwxyz'"
+    },
+    "ascii_uppercase": {
+     "kind": "constant",
+     "value": "'ABCDEFGHIJKLMNOPQRSTUVWXYZ'"
+    },
+    "capwords": {
+     "kind": "callable",
+     "signature": "(s, sep=None)"
+    },
+    "digits": {
+     "kind": "constant",
+     "value": "'0123456789'"
+    },
+    "hexdigits": {
+     "kind": "constant",
+     "value": "'0123456789abcdefABCDEF'"
+    },
+    "octdigits": {
+     "kind": "constant",
+     "value": "'01234567'"
+    },
+    "printable": {
+     "kind": "constant",
+     "value": "'0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!\"#$%&\\'()*+,-./:;<=>?@[\\\\]^_`{|}~ \\t\\n\\r\\x0b\\x0c'"
+    },
+    "punctuation": {
+     "kind": "constant",
+     "value": "'!\"#$%&\\'()*+,-./:;<=>?@[\\\\]^_`{|}~'"
+    },
+    "whitespace": {
+     "kind": "constant",
+     "value": "' \\t\\n\\r\\x0b\\x0c'"
+    }
+   },
+   "hashlib": {
+    "algorithms_available": {
+     "kind": "set"
+    },
+    "algorithms_guaranteed": {
+     "kind": "set"
+    },
+    "blake2b": {
+     "kind": "callable",
+     "signature": "(data=b'', /, *, digest_size=64, key=b'', salt=b'', person=b'', fanout=1, depth=1, leaf_size=0, node_offset=0, node_depth=0, inner_size=0, last_node=False, usedforsecurity=True)"
+    },
+    "blake2s": {
+     "kind": "callable",
+     "signature": "(data=b'', /, *, digest_size=32, key=b'', salt=b'', person=b'', fanout=1, depth=1, leaf_size=0, node_offset=0, node_depth=0, inner_size=0, last_node=False, usedforsecurity=True)"
+    },
+    "file_digest": {
+     "kind": "callable",
+     "signature": "(fileobj, digest, /, *, _bufsize=262144)"
+    },
+    "md5": {
+     "kind": "callable",
+     "signature": "(string=b'', *, usedforsecurity=True)"
+    },
+    "new": {
+     "kind": "callable",
+     "signature": "(name, data=b'', **kwargs)"
+    },
+    "sha1": {
+     "kind": "callable",
+     "signature": "(string=b'', *, usedforsecurity=True)"
+    },
+    "sha224": {
+     "kind": "callable",
+     "signature": "(string=b'', *, usedforsecurity=True)"
+    },
+    "sha256": {
+     "kind": "callable",
+     "signature": "(string=b'', *, usedforsecurity=True)"
+    },
+    "sha384": {
+     "kind": "callable",
+     "signature": "(string=b'', *, usedforsecurity=True)"
+    },
+    "sha3_224": {
+     "kind": "callable",
+     "signature": null
+    },
+    "sha3_256": {
+     "kind": "callable",
+     "signature": null
+    },
+    "sha3_384": {
+     "kind": "callable",
+     "signature": null
+    },
+    "sha3_512": {
+     "kind": "callable",
+     "signature": null
+    },
+    "sha512": {
+     "kind": "callable",
+     "signature": "(string=b'', *, usedforsecurity=True)"
+    },
+    "shake_128": {
+     "kind": "callable",
+     "signature": null
+    },
+    "shake_256": {
+     "kind": "callable",
+     "signature": null
+    }
+   },
+   "base64": {
+    "MAXBINSIZE": {
+     "kind": "constant",
+     "value": "57"
+    },
+    "MAXLINESIZE": {
+     "kind": "constant",
+     "value": "76"
+    },
+    "a85decode": {
+     "kind": "callable",
+     "signature": "(b, *, foldspaces=False, adobe=False, ignorechars=b' \\t\\n\\r\\x0b')"
+    },
+    "a85encode": {
+     "kind": "callable",
+     "signature": "(b, *, foldspaces=False, wrapcol=0, pad=False, adobe=False)"
+    },
+    "b16decode": {
+     "kind": "callable",
+     "signature": "(s, casefold=False)"
+    },
+    "b16encode": {
+     "kind": "callable",
+     "signature": "(s)"
+    },
+    "b32decode": {
+     "kind": "callable",
+     "signature": "(s, casefold=False, map01=None)"
+    },
+    "b32encode": {
+     "kind": "callable",
+     "signature": "(s)"
+    },
+    "b32hexdecode": {
+     "kind": "callable",
+     "signature": "(s, casefold=False)"
+    },
+    "b32hexencode": {
+     "kind": "callable",
+     "signature": "(s)"
+    },
+    "b64decode": {
+     "kind": "callable",
+     "signature": "(s, altchars=None, validate=False)"
+    },
+    "b64encode": {
+     "kind": "callable",
+     "signature": "(s, altchars=None)"
+    },
+    "b85decode": {
+     "kind": "callable",
+     "signature": "(b)"
+    },
+    "b85encode": {
+     "kind": "callable",
+     "signature": "(b, pad=False)"
+    },
+    "binascii": {
+     "kind": "module"
+    },
+    "bytes_types": {
+     "kind": "tuple"
+    },
+    "decode": {
+     "kind": "callable",
+     "signature": "(input, output)"
+    },
+    "decodebytes": {
+     "kind": "callable",
+     "signature": "(s)"
+    },
+    "encode": {
+     "kind": "callable",
+     "signature": "(input, output)"
+    },
+    "encodebytes": {
+     "kind": "callable",
+     "signature": "(s)"
+    },
+    "main": {
+     "kind": "callable",
+     "signature": "()"
+    },
+    "re": {
+     "kind": "module"
+    },
+    "standard_b64decode": {
+     "kind": "callable",
+     "signature": "(s)"
+    },
+    "standard_b64encode": {
+     "kind": "callable",
+     "signature": "(s)"
+    },
+    "struct": {
+     "kind": "module"
+    },
+    "urlsafe_b64decode": {
+     "kind": "callable",
+     "signature": "(s)"
+    },
+    "urlsafe_b64encode": {
+     "kind": "callable",
+     "signature": "(s)"
+    }
+   },
+   "statistics": {
+    "Counter": {
+     "kind": "callable",
+     "signature": "(iterable=None, /, **kwds)"
+    },
+    "Decimal": {
+     "kind": "callable",
+     "signature": "(value='0', context=None)"
+    },
+    "Fraction": {
+     "kind": "callable",
+     "signature": "(numerator=0, denominator=None)"
+    },
+    "LinearRegression": {
+     "kind": "callable",
+     "signature": "(slope, intercept)"
+    },
+    "NormalDist": {
+     "kind": "callable",
+     "signature": "(mu=0.0, sigma=1.0)"
+    },
+    "StatisticsError": {
+     "kind": "callable",
+     "signature": null
+    },
+    "bisect_left": {
+     "kind": "callable",
+     "signature": "(a, x, lo=0, hi=None, *, key=None)"
+    },
+    "bisect_right": {
+     "kind": "callable",
+     "signature": "(a, x, lo=0, hi=None, *, key=None)"
+    },
+    "correlation": {
+     "kind": "callable",
+     "signature": "(x, y, /, *, method='linear')"
+    },
+    "count": {
+     "kind": "callable",
+     "signature": "(start=0, step=1)"
+    },
+    "covariance": {
+     "kind": "callable",
+     "signature": "(x, y, /)"
+    },
+    "defaultdict": {
+     "kind": "callable",
+     "signature": null
+    },
+    "erf": {
+     "kind": "callable",
+     "signature": "(x, /)"
+    },
+    "exp": {
+     "kind": "callable",
+     "signature": "(x, /)"
+    },
+    "fabs": {
+     "kind": "callable",
+     "signature": "(x, /)"
+    },
+    "fmean": {
+     "kind": "callable",
+     "signature": "(data, weights=None)"
+    },
+    "fsum": {
+     "kind": "callable",
+     "signature": "(seq, /)"
+    },
+    "geometric_mean": {
+     "kind": "callable",
+     "signature": "(data)"
+    },
+    "groupby": {
+     "kind": "callable",
+     "signature": "(iterable, key=None)"
+    },
+    "harmonic_mean": {
+     "kind": "callable",
+     "signature": "(data, weights=None)"
+    },
+    "hypot": {
+     "kind": "callable",
+     "signature": null
+    },
+    "itemgetter": {
+     "kind": "callable",
+     "signature": "(item, /, *items)"
+    },
+    "linear_regression": {
+     "kind": "callable",
+     "signature": "(x, y, /, *, proportional=False)"
+    },
+    "log": {
+     "kind": "callable",
+     "signature": null
+    },
+    "math": {
+     "kind": "module"
+    },
+    "mean": {
+     "kind": "callable",
+     "signature": "(data)"
+    },
+    "median": {
+     "kind": "callable",
+     "signature": "(data)"
+    },
+    "median_grouped": {
+     "kind": "callable",
+     "signature": "(data, interval=1.0)"
+    },
+    "median_high": {
+     "kind": "callable",
+     "signature": "(data)"
+    },
+    "median_low": {
+     "kind": "callable",
+     "signature": "(data)"
+    },
+    "mode": {
+     "kind": "callable",
+     "signature": "(data)"
+    },
+    "multimode": {
+     "kind": "callable",
+     "signature": "(data)"
+    },
+    "namedtuple": {
+     "kind": "callable",
+     "signature": "(typename, field_names, *, rename=False, defaults=None, module=None)"
+    },
+    "numbers": {
+     "kind": "module"
+    },
+    "pstdev": {
+     "kind": "callable",
+     "signature": "(data, mu=None)"
+    },
+    "pvariance": {
+     "kind": "callable",
+     "signature": "(data, mu=None)"
+    },
+    "quantiles": {
+     "kind": "callable",
+     "signature": "(data, *, n=4, method='exclusive')"
+    },
+    "random": {
+     "kind": "module"
+    },
+    "reduce": {
+     "kind": "callable",
+     "signature": null
+    },
+    "repeat": {
+     "kind": "callable",
+     "signature": null
+    },
+    "sqrt": {
+     "kind": "callable",
+     "signature": "(x, /)"
+    },
+    "stdev": {
+     "kind": "callable",
+     "signature": "(data, xbar=None)"
+    },
+    "sumprod": {
+     "kind": "callable",
+     "signature": "(p, q, /)"
+    },
+    "sys": {
+     "kind": "module"
+    },
+    "tau": {
+     "kind": "constant",
+     "value": "6.283185307179586"
+    },
+    "variance": {
+     "kind": "callable",
+     "signature": "(data, xbar=None)"
+    }
+   },
+   "time": {
+    "CLOCK_BOOTTIME": {
+     "kind": "constant",
+     "value": "7"
+    },
+    "CLOCK_MONOTONIC": {
+     "kind": "constant",
+     "value": "1"
+    },
+    "CLOCK_MONOTONIC_RAW": {
+     "kind": "constant",
+     "value": "4"
+    },
+    "CLOCK_PROCESS_CPUTIME_ID": {
+     "kind": "constant",
+     "value": "2"
+    },
+    "CLOCK_REALTIME": {
+     "kind": "constant",
+     "value": "0"
+    },
+    "CLOCK_TAI": {
+     "kind": "constant",
+     "value": "11"
+    },
+    "CLOCK_THREAD_CPUTIME_ID": {
+     "kind": "constant",
+     "value": "3"
+    },
+    "altzone": {
+     "kind": "constant",
+     "value": "18000"
+    },
+    "asctime": {
+     "kind": "callable",
+     "signature": null
+    },
+    "clock_getres": {
+     "kind": "callable",
+     "signature": null
+    },
+    "clock_gettime": {
+     "kind": "callable",
+     "signature": null
+    },
+    "clock_gettime_ns": {
+     "kind": "callable",
+     "signature": null
+    },
+    "clock_settime": {
+     "kind": "callable",
+     "signature": null
+    },
+    "clock_settime_ns": {
+     "kind": "callable",
+     "signature": null
+    },
+    "ctime": {
+     "kind": "callable",
+     "signature": null
+    },
+    "daylight": {
+     "kind": "constant",
+     "value": "1"
+    },
+    "get_clock_info": {
+     "kind": "callable",
+     "signature": null
+    },
+    "gmtime": {
+     "kind": "callable",
+     "signature": null
+    },
+    "localtime": {
+     "kind": "callable",
+     "signature": null
+    },
+    "mktime": {
+     "kind": "callable",
+     "signature": null
+    },
+    "monotonic": {
+     "kind": "callable",
+     "signature": null
+    },
+    "monotonic_ns": {
+     "kind": "callable",
+     "signature": null
+    },
+    "perf_counter": {
+     "kind": "callable",
+     "signature": null
+    },
+    "perf_counter_ns": {
+     "kind": "callable",
+     "signature": null
+    },
+    "process_time": {
+     "kind": "callable",
+     "signature": null
+    },
+    "process_time_ns": {
+     "kind": "callable",
+     "signature": null
+    },
+    "pthread_getcpuclockid": {
+     "kind": "callable",
+     "signature": null
+    },
+    "sleep": {
+     "kind": "callable",
+     "signature": null
+    },
+    "strftime": {
+     "kind": "callable",
+     "signature": null
+    },
+    "strptime": {
+     "kind": "callable",
+     "signature": null
+    },
+    "struct_time": {
+     "kind": "callable",
+     "signature": "(iterable=(), /)"
+    },
+    "time": {
+     "kind": "callable",
+     "signature": null
+    },
+    "time_ns": {
+     "kind": "callable",
+     "signature": null
+    },
+    "timezone": {
+     "kind": "constant",
+     "value": "21600"
+    },
+    "tzname": {
+     "kind": "tuple"
+    }
+   }
+  },
+  "coreApiGiver": "inspect.signature over the live stdlib modules (the engine's own signatures), built at run time"
+ },
+ "counts": {
+  "keywords": 35,
+  "softKeywords": 4,
+  "builtins": 158,
+  "statementKinds": 28,
+  "expressionKinds": 27,
+  "stdlibModules": 300,
+  "coreApiModules": 25,
+  "coreApiCallables": 493
+ },
+ "builtAt": "2026-09-15T02:24:10.045Z"
+}

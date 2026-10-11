@@ -1,0 +1,346 @@
+{
+  "schema": "FoldReadingPrior@1",
+  "giver": "measured 2026-08-19, this session — order-4 interpolated Witten-Bell belief.js mixture-of-experts (packages/engine/generation/belief.js) and gzip-based Normalized Compression Distance, both run against a real corpus, not asserted",
+  "read": {
+    "title": "Leo Tolstoy, War and Peace (Project Gutenberg 2600)",
+    "source_path": "the legacy engine.1/scripts/corpus/pg2600-war-and-peace.txt",
+    "sha256": "2d5bb2ad5f422765e714617e21fa31bbaf8958aa79682c86fca6660fcc5d1b2b",
+    "forms_total": 656453
+  },
+  "declared_params": {
+    "order": 4,
+    "alpha": 0.7,
+    "gamma": 0.99995,
+    "rho": 0.9995,
+    "prior_cap": 90000,
+    "seed": 20260731,
+    "engine_bug_fixed": "scripts/imagine.mjs's cut-loop never called belief.witnessForm before this session — every gift's relevance weight was frozen at its initial value, producing a uniform ~1% share regardless of any real relevance. Fixed 2026-08-19 by mirroring scripts/relevance.mjs's causal witnessForm-then-observe pair. This artifact's mixture_* numbers are from the FIXED script."
+  },
+  "measurement_note": "Two independent axes measured, and they DISAGREE on ranking: the mixture-of-experts share (per-token mean log-likelihood, causally earned) is real — every one of 38 gifts beat its own shuffled-vocabulary control — but does not sort by literary genre (essays/philosophy rank at the top). Gzip NCD (shared-structure compression distance) sorts by genre as expected (novels cluster together, physics/philosophy cluster apart) but is a shallow, small-window measurement (gzip's 32KB window can't see long-range structure) and its own values are not noise-floor-tested the way the mixture share is. `recommended_priors` below is NCD-ranked because it's the measurement that answers the actual question this artifact exists for (which prior helps predict a NOVEL's continuations), not because it is the more rigorously validated of the two.",
+  "candidate_source": "live_priors/01-literature-books/{gitenberg,gutenberg} — English-language texts only, 5 non-English titles excluded by filename (Greek/French/Latin/German/Spanish)",
+  "priors": [
+    {
+      "id": "pg768_The_Adventures_of_Sherlock_Holmes.txt",
+      "ncd": 0.9920926487424984,
+      "ncd_rank": 1,
+      "mixture_real_share_pct": 1.446,
+      "mixture_ratio_vs_shuffled": 2.27,
+      "mixture_beats_floor": true
+    },
+    {
+      "id": "pg1661_The_Adventures_of_Tom_Sawyer.txt",
+      "ncd": 0.9928270823959133,
+      "ncd_rank": 2,
+      "mixture_real_share_pct": 1.57,
+      "mixture_ratio_vs_shuffled": 2.19,
+      "mixture_beats_floor": true
+    },
+    {
+      "id": "pg768_Wuthering-Heights.txt",
+      "ncd": 0.9928399623090657,
+      "ncd_rank": 3,
+      "mixture_real_share_pct": 1.382,
+      "mixture_ratio_vs_shuffled": 2.29,
+      "mixture_beats_floor": true
+    },
+    {
+      "id": "pg35_The-Time-Machine.txt",
+      "ncd": 0.9930520632063736,
+      "ncd_rank": 4,
+      "mixture_real_share_pct": 2.355,
+      "mixture_ratio_vs_shuffled": 2.12,
+      "mixture_beats_floor": true
+    },
+    {
+      "id": "pg8394_Beyond_Good_and_Evil_by_Nietzsche.txt",
+      "ncd": 0.993078531537016,
+      "ncd_rank": 5,
+      "mixture_real_share_pct": 2.057,
+      "mixture_ratio_vs_shuffled": 2.09,
+      "mixture_beats_floor": true
+    },
+    {
+      "id": "pg829_Gulliver-s-Travels.txt",
+      "ncd": 0.993079159140495,
+      "ncd_rank": 6,
+      "mixture_real_share_pct": 1.718,
+      "mixture_ratio_vs_shuffled": 2.34,
+      "mixture_beats_floor": true
+    },
+    {
+      "id": "pg2554_Crime-and-Punishment.txt",
+      "ncd": 0.9931844048595855,
+      "ncd_rank": 7,
+      "mixture_real_share_pct": 1.421,
+      "mixture_ratio_vs_shuffled": 2.44,
+      "mixture_beats_floor": true
+    },
+    {
+      "id": "pg84_Frankenstein.txt",
+      "ncd": 0.9932088397497785,
+      "ncd_rank": 8,
+      "mixture_real_share_pct": 1.996,
+      "mixture_ratio_vs_shuffled": 2.49,
+      "mixture_beats_floor": true
+    },
+    {
+      "id": "pg345_Dracula.txt",
+      "ncd": 0.9932373415208703,
+      "ncd_rank": 9,
+      "mixture_real_share_pct": 1.507,
+      "mixture_ratio_vs_shuffled": 2.2,
+      "mixture_beats_floor": true
+    },
+    {
+      "id": "pg2397_Leaves_of_Grass_by_Whitman.txt",
+      "ncd": 0.9934127503253982,
+      "ncd_rank": 10,
+      "mixture_real_share_pct": 1.972,
+      "mixture_ratio_vs_shuffled": 2.9,
+      "mixture_beats_floor": true
+    },
+    {
+      "id": "pg219_Heart-of-Darkness.txt",
+      "ncd": 0.9934424710833488,
+      "ncd_rank": 11,
+      "mixture_real_share_pct": 1.953,
+      "mixture_ratio_vs_shuffled": 2.03,
+      "mixture_beats_floor": true
+    },
+    {
+      "id": "pg215_The-Call-of-the-Wild.txt",
+      "ncd": 0.9935417273232577,
+      "ncd_rank": 12,
+      "mixture_real_share_pct": 1.765,
+      "mixture_ratio_vs_shuffled": 1.86,
+      "mixture_beats_floor": true
+    },
+    {
+      "id": "pg98_A_Tale_of_Two_Cities.txt",
+      "ncd": 0.9936211323151849,
+      "ncd_rank": 13,
+      "mixture_real_share_pct": 1.701,
+      "mixture_ratio_vs_shuffled": 2.31,
+      "mixture_beats_floor": true
+    },
+    {
+      "id": "pg1342_Pride_and_Prejudice.txt",
+      "ncd": 0.9936740689764697,
+      "ncd_rank": 14,
+      "mixture_real_share_pct": 1.663,
+      "mixture_ratio_vs_shuffled": 2.37,
+      "mixture_beats_floor": true
+    },
+    {
+      "id": "pg236_The-Jungle-Book.txt",
+      "ncd": 0.9936873031417909,
+      "ncd_rank": 15,
+      "mixture_real_share_pct": 1.273,
+      "mixture_ratio_vs_shuffled": 1.65,
+      "mixture_beats_floor": true
+    },
+    {
+      "id": "pg158_Emma.txt",
+      "ncd": 0.9936939202244515,
+      "ncd_rank": 16,
+      "mixture_real_share_pct": 1.382,
+      "mixture_ratio_vs_shuffled": 2.03,
+      "mixture_beats_floor": true
+    },
+    {
+      "id": "pg45_Anne-of-Green-Gables.txt",
+      "ncd": 0.9937203885550938,
+      "ncd_rank": 17,
+      "mixture_real_share_pct": 1.01,
+      "mixture_ratio_vs_shuffled": 1.84,
+      "mixture_beats_floor": true
+    },
+    {
+      "id": "pg13453_The_Divine_Comedy_by_Dante.txt",
+      "ncd": 0.9937213621495177,
+      "ncd_rank": 18,
+      "mixture_real_share_pct": 1.39,
+      "mixture_ratio_vs_shuffled": 2.3,
+      "mixture_beats_floor": true
+    },
+    {
+      "id": "pg174_The_Picture_of_Dorian_Gray.txt",
+      "ncd": 0.993733622720415,
+      "ncd_rank": 19,
+      "mixture_real_share_pct": 1.403,
+      "mixture_ratio_vs_shuffled": 1.91,
+      "mixture_beats_floor": true
+    },
+    {
+      "id": "pg55_The-Wonderful-Wizard-of-Oz.txt",
+      "ncd": 0.9937733252163786,
+      "ncd_rank": 20,
+      "mixture_real_share_pct": 1.275,
+      "mixture_ratio_vs_shuffled": 1.58,
+      "mixture_beats_floor": true
+    },
+    {
+      "id": "pg1400_Great-Expectations.txt",
+      "ncd": 0.9938262618776634,
+      "ncd_rank": 21,
+      "mixture_real_share_pct": 1.3,
+      "mixture_ratio_vs_shuffled": 2.26,
+      "mixture_beats_floor": true
+    },
+    {
+      "id": "pg120_Treasure-Island.txt",
+      "ncd": 0.9938593472909664,
+      "ncd_rank": 22,
+      "mixture_real_share_pct": 1.089,
+      "mixture_ratio_vs_shuffled": 1.86,
+      "mixture_beats_floor": true
+    },
+    {
+      "id": "pg36_The-War-of-the-Worlds.txt",
+      "ncd": 0.9938858156216087,
+      "ncd_rank": 23,
+      "mixture_real_share_pct": 1.578,
+      "mixture_ratio_vs_shuffled": 2.05,
+      "mixture_beats_floor": true
+    },
+    {
+      "id": "pg514_Little-Women.txt",
+      "ncd": 0.9938924327042693,
+      "ncd_rank": 24,
+      "mixture_real_share_pct": 1.003,
+      "mixture_ratio_vs_shuffled": 1.81,
+      "mixture_beats_floor": true
+    },
+    {
+      "id": "pg521_The-Life-and-Adventures-of-Robinson-Crusoe.txt",
+      "ncd": 0.9939056668695906,
+      "ncd_rank": 25,
+      "mixture_real_share_pct": 1.358,
+      "mixture_ratio_vs_shuffled": 2.09,
+      "mixture_beats_floor": true
+    },
+    {
+      "id": "pg1232_The-Prince.txt",
+      "ncd": 0.9939122839522512,
+      "ncd_rank": 26,
+      "mixture_real_share_pct": 2.145,
+      "mixture_ratio_vs_shuffled": 2.21,
+      "mixture_beats_floor": true
+    },
+    {
+      "id": "pg11_Alice_s_Adventures_in_Wonderland.txt",
+      "ncd": 0.9939453693655541,
+      "ncd_rank": 27,
+      "mixture_real_share_pct": 1.689,
+      "mixture_ratio_vs_shuffled": 1.61,
+      "mixture_beats_floor": true
+    },
+    {
+      "id": "pg161_Sense-and-Sensibility.txt",
+      "ncd": 0.9940181572748207,
+      "ncd_rank": 28,
+      "mixture_real_share_pct": 1.436,
+      "mixture_ratio_vs_shuffled": 2.24,
+      "mixture_beats_floor": true
+    },
+    {
+      "id": "pg12_Through_the_Looking_Glass.txt",
+      "ncd": 0.9941174135147296,
+      "ncd_rank": 29,
+      "mixture_real_share_pct": 1.455,
+      "mixture_ratio_vs_shuffled": 1.49,
+      "mixture_beats_floor": true
+    },
+    {
+      "id": "pg62168_The_Origin_of_Species_by_Darwin.txt",
+      "ncd": 0.9943159259945475,
+      "ncd_rank": 30,
+      "mixture_real_share_pct": 3.721,
+      "mixture_ratio_vs_shuffled": 1.57,
+      "mixture_beats_floor": true
+    },
+    {
+      "id": "pg1404_The-Federalist-Papers.txt",
+      "ncd": 0.9943579816093125,
+      "ncd_rank": 31,
+      "mixture_real_share_pct": 2.348,
+      "mixture_ratio_vs_shuffled": 2.72,
+      "mixture_beats_floor": true
+    },
+    {
+      "id": "pg147_Common-Sense.txt",
+      "ncd": 0.9944019480691353,
+      "ncd_rank": 32,
+      "mixture_real_share_pct": 3.818,
+      "mixture_ratio_vs_shuffled": 2.14,
+      "mixture_beats_floor": true
+    },
+    {
+      "id": "pg55201_The_Republic_by_Plato.txt",
+      "ncd": 0.9944911679746414,
+      "ncd_rank": 33,
+      "mixture_real_share_pct": 3.206,
+      "mixture_ratio_vs_shuffled": 3.22,
+      "mixture_beats_floor": true
+    },
+    {
+      "id": "pg5827_Meditations_by_Marcus_Aurelius.txt",
+      "ncd": 0.994686482623541,
+      "ncd_rank": 34,
+      "mixture_real_share_pct": 3.499,
+      "mixture_ratio_vs_shuffled": 2.54,
+      "mixture_beats_floor": true
+    },
+    {
+      "id": "pg100_Complete_Works_of_Shakespeare.txt",
+      "ncd": 0.9950504221698737,
+      "ncd_rank": 35,
+      "mixture_real_share_pct": 1.22,
+      "mixture_ratio_vs_shuffled": 2.08,
+      "mixture_beats_floor": true
+    },
+    {
+      "id": "pg2701_Moby_Dick.txt",
+      "ncd": 0.9951775137133753,
+      "ncd_rank": 36,
+      "mixture_real_share_pct": 1.542,
+      "mixture_ratio_vs_shuffled": 2.37,
+      "mixture_beats_floor": true
+    },
+    {
+      "id": "pg59129_Leviathan_by_Hobbes.txt",
+      "ncd": 0.9957981525105212,
+      "ncd_rank": 37,
+      "mixture_real_share_pct": 1.633,
+      "mixture_ratio_vs_shuffled": 2.29,
+      "mixture_beats_floor": true
+    },
+    {
+      "id": "pg32063_On_the_Electrodynamics_of_Moving_Bodies__Einstein_.txt",
+      "ncd": 0.9965789682644716,
+      "ncd_rank": 38,
+      "mixture_real_share_pct": 1.808,
+      "mixture_ratio_vs_shuffled": 2.38,
+      "mixture_beats_floor": true
+    }
+  ],
+  "recommended_priors": [
+    "pg768_The_Adventures_of_Sherlock_Holmes.txt",
+    "pg1661_The_Adventures_of_Tom_Sawyer.txt",
+    "pg768_Wuthering-Heights.txt",
+    "pg35_The-Time-Machine.txt",
+    "pg8394_Beyond_Good_and_Evil_by_Nietzsche.txt",
+    "pg829_Gulliver-s-Travels.txt",
+    "pg2554_Crime-and-Punishment.txt",
+    "pg84_Frankenstein.txt",
+    "pg345_Dracula.txt",
+    "pg2397_Leaves_of_Grass_by_Whitman.txt"
+  ],
+  "history": [
+    {
+      "date": "2026-08-19",
+      "event": "first measurement — both axes run against all 38 available English priors in live_priors, engine bug found and fixed in the legacy engine.1/scripts/imagine.mjs"
+    }
+  ],
+  "known_limitation": "This artifact is a declared RECIPE and a measured VERDICT, not a resumable model snapshot. belief.js's createLayer keeps its count tables as true closure-private state with no export/import hook, so 'bootstrapping from this' currently means re-running training from the same declared params and priors (deterministic, reproducible, single-digit minutes for the read layer + ~38 gifts) — not loading serialized weights. True incremental resume (observe() new material onto an already-loaded state without replaying history) would need new additive methods on createLayer's returned layer object — a real but small change to shared engine code, not made in this pass pending a separate decision."
+}

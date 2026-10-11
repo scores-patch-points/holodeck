@@ -1,0 +1,43 @@
+{
+  "schema": "RoleConfig@1",
+  "language": "lav",
+  "provenance": {
+    "builder": "eoreader7 native/scripts/build-role-config.mjs",
+    "source": "/private/tmp/claude-501/tb/lav/train.conllu",
+    "min_volume": 20,
+    "null_draws": 200,
+    "null_alpha": 0.05,
+    "null_seed": 1,
+    "note": "position stats and marker candidates are both derived mechanically from this treebank's own gold dependency annotations — never hand-typed or asserted from general linguistic knowledge. A marker candidate is admitted only when its real precision beats the (1-alpha) quantile of a within-sentence role-label shuffle (II.23), never a fixed ratio — and (S122) that quantile is the MAX-STATISTIC across every eligible closed-class candidate tried, not a per-candidate null, so the admitted marker is significant against the whole search, not merely against itself."
+  },
+  "object": {
+    "total": 17280,
+    "before": 5348,
+    "after": 11932,
+    "dominantSide": "after",
+    "reliability": 0.6905092592592592,
+    "usable": true,
+    "marker": {
+      "form": "savus",
+      "precision": 0.8035714285714286,
+      "nullCeiling": 0.28125,
+      "volume": 56,
+      "recall": 0.0026041666666666665
+    }
+  },
+  "subject": {
+    "total": 21735,
+    "before": 16266,
+    "after": 5469,
+    "dominantSide": "before",
+    "reliability": 0.7483781918564527,
+    "usable": true,
+    "marker": {
+      "form": "esi",
+      "hits": 26,
+      "total": 46,
+      "precision": 0.5652173913043478,
+      "nullCeiling": 0.3125
+    }
+  }
+}

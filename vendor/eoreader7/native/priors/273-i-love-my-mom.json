@@ -1,0 +1,61 @@
+{
+  "schema": "LaVarPrior@1",
+  "giver": "LaVar (Claude Sonnet 5, this session) — read the full file directly against source_path, 2026-09-09. First book read from the new 18-childrens-books/ pilot corpus.",
+  "read": {
+    "title": "273_I-Love-My-Mom.txt",
+    "source_path": "18-childrens-books/global-digital-library/en/273_I-Love-My-Mom.txt",
+    "sha256": "f7a73c8943fe814247286b580c884f8b40eb0886b8d4e672dcfb9e0a650a9c38",
+    "forms_total": 127
+  },
+  "known_limitation": "The source file itself was edited in place, 2026-09-09, after the corpus's own commit — this is a deliberate deviation from the schema's usual 'read what's on disk' posture, done because the raw fetch mixed the story with front matter (title/author/illustrator/translator byline) and back matter (StoryWeaver/Room to Read platform boilerplate, license text, per-page image attributions), and both were found to actively corrupt reading (see mistakes[] below) rather than merely inflate a word count. sha256/forms_total above are for the CLEANED file (623 bytes, 127 words, story text only); the original fetched file's sha256 was f3e9b9186f2cb4a4abee2d6bde720d13123e585dbf6b693394bae454b06490ea (820 words, 85% boilerplate) and is recoverable from git history (this repo's own convention — 'they'll be in git history so feel free to wipe', user direction, verbatim). Three other files sharing the same StoryWeaver platform boilerplate marker were cleaned the same way (15517_I-love-my-mom.txt, fr/10252_Je-Peux-M-039-habiller-Toute-Seule.txt, vi/8024_Hay-coi-chung-Ho-ang-o-ay.txt) — two of them (15517, 10252) turned out to have NO real story content ever fetched, only byline and boilerplate; that is a separate, disclosed fetch-quality gap in scripts/fetch-childrens-books.mjs, not fixed here.",
+  "sidecar": {
+    "path": "18-childrens-books/global-digital-library/en/273_I-Love-My-Mom.txt.eot.json",
+    "recipe_id": "see the sidecar's own recipe.id field — regenerated after the LP17 fix below",
+    "note": "The REAL, canonical sidecar (scripts/eot-sidecar.mjs, EOTReading@1 schema — this repo's own established format, not a bespoke one). admission.gate is \"empty\": 0 edges, 0 heard, 0 folded. This is now an HONEST empty, not a masked one (see mistakes[] — LP17 was masking every prior run's true admission count under gate:\"clean\"). eoreader7/native/eval/lavar/read-real.mjs (this session's earlier, parallel driver) is kept for its own worked value but is NOT the production sidecar path — this file is."
+  },
+  "rung": null,
+  "rung_note": "Not placed on LAVAR.md's own ladder (§4: McGuffey Primer→Sixth, then Aesop/Grimm/Andersen/Potter/Alice, then short stories, then novels). This corpus is a different thing: 38 auth-free-source picture books across 17 languages, most under the repo's own 600-word floor (exempted in this fetch's commit message on the grounds that a complete picture book can legitimately be short) and predominantly non-English (36 of 38 documents; §8 says start monolingual and treat every other language as its own ladder with its own giver). Rung left null rather than guessed — assigning one would misrepresent a real gap between what LAVAR.md's ladder specifies and what this corpus actually is. Flagged to the user; not resolved here.",
+  "priors": [
+    {
+      "kind": "composition_affordance",
+      "claim": "The story's body is one template repeated four times verbatim in structure: \"When [mom does X], I learn to [X] too.\" (cook/water the flowers/wash our clothes/dry our clothes), each instance a single sentence, each ending on the same clause shape. A reader that recognizes the template after the first or second instance can predict the syntactic shape (though not the content) of the third and fourth before reading them — a much stronger and more mechanical affordance than anything in the Alice worked example, consistent with this being deliberately easier material (the file's own back-matter calls it 'a Level 1 book for children who are eager to begin reading').",
+      "address": { "start": 84, "end": 310, "quote": "When my mom cooks, I learn to cook too. ... When she dries our clothes, I learn to dry our clothes too." },
+      "confidence": "high — directly read, four repetitions of the same pattern within one short text"
+    },
+    {
+      "kind": "relational_structure",
+      "claim": "The mother-child relation is never introduced as an event or asserted as a discrete fact — it is presupposed from the first token via the possessive \"My mom\" and never independently established (no sentence like \"Lee is my mother\"). Every one of the story's 11 sentences either names the relation via possessive (\"my mom\", \"my bicycle\", \"our clothes\") or elides the subject under it. A relation extractor built to find an explicit binding clause (as the LAVAR.md §1 specimen's 'missed relation' class describes for Crime and Punishment) will find zero explicit assertions of the mother-daughter relation in this text even though it is the single relation the whole story is about — the SAME failure mode as the specimen, but here the ground truth is that the relation is carried entirely by possessive determiners, not by a missing verb slot in one sentence.",
+      "address": { "start": 0, "end": 616, "quote": "My mom’s name is Lee. ... I love my mom so much!" },
+      "confidence": "high — directly read in full; this is a whole-text claim, not one passage"
+    },
+    {
+      "kind": "kind_parameter",
+      "claim": "The mother is individuated by a given name stated once, early and directly (\"My mom's name is Lee\"), then never referred to by that name again — every subsequent 15 mentions use \"my mom\"/\"she\". This is the opposite ordering from Alice's White Rabbit (kind_parameter in pg11-alice-...json), where the being is introduced anonymously and only becomes individuated by action. Early-reader material may name-then-relate where literary narration relates-then-names; one data point, not yet checked against the corpus's other English title (15517_I-love-my-mom.txt, a different translation of the same underlying story, but confirmed below to have no real story text of its own to compare against).",
+      "address": { "start": 0, "end": 50, "quote": "My mom’s name is Lee. She works hard all the time." },
+      "confidence": "medium — directly read, but the comparison to Alice's pattern is one book against one book, not a checked generalization"
+    }
+  ],
+  "mistakes": [
+    {
+      "class": "missed being",
+      "organ": "native/adapters/text/surfaces.js::surfacesFromEvidence / discoverReferents",
+      "detail": "Run through the real production reader, this text's entire cast is admitted as exactly two surfaces: \"Lee\" (the mother's given name, stated once, never repeated) and \"WHEEEEEEE\" (an onomatopoeic exclamation). The actual protagonist — referred to as \"my mom\"/\"she\"/\"her\" roughly ten times across eleven sentences — is never admitted, because \"mom\" is never capitalised (it's a common noun, not a proper name) and the narrator is only ever a pronoun. This is a THIRD shape of the capitalisation-only-signal defect READING-SPEC S86 measured and S87 partially fixed: S86 is signal LOST (case stripped from a text that had it); this is signal NEVER PRESENT (the source's own naming convention for its cast is kinship terms and pronouns, correctly capitalised throughout). Written up as READING-SPEC S88, which proposes but does not build a fourth being-signal (a common noun recurring under a possessive determiner — 'my mom', 'her mom') as the fix.",
+      "address": { "start": 106, "end": 156, "quote": "My mom’s name is Lee. She works hard all the time." },
+      "downstream_effect": "zero referent bindings, zero relation edges — every relation this story is about (mother teaches, mother makes, mother tells, mother sings, child learns, child loves) is silently absent from the sidecar, not because the text lacks structure but because the cast was never discovered."
+    }
+  ],
+  "history": [
+    {
+      "date": "2026-09-09",
+      "note": "scaffolded by lavar-prior-scaffold.mjs — sha256 and forms_total measured, nothing read yet"
+    },
+    {
+      "date": "2026-09-09",
+      "note": "LaVar read the full file (story + boilerplate) by hand: found and byte-verified the story/boilerplate split (known_limitation), added three grounded priors, and left rung unset rather than guessed — this book does not sit on LAVAR.md's §4 ladder, and that gap is reported to the user rather than papered over with an invented rung label."
+    },
+    {
+      "date": "2026-09-09",
+      "note": "Ran the REAL production reader (createRecursiveReader/createCausalTextPerceiver via eoreader7/native/eval/lavar/read-real.mjs), not a hand-authored proposition list — per user correction that LaVar's job is grading the real pipeline's real output, leveraging the actual holograph/hyperlexicon machinery, not writing prose that describes what a reader might find. First attempt (refreshEvery:25, the archived recipe's own default) produced a completely empty fold; traced to a real defect (the reader's vocabulary-update cycle never fires within a 14-sentence text at that batch size), fixed at the source (native/adapters/text/recursive.js's default changed to refreshEvery:1, written up in READING-POLICY.md A26 and CLAUDE.md, confirmed on 20 existing tests plus a real-book performance measurement — 2.4x slower, not O(n^2), and MORE accurate). Re-ran with the fix: still zero relation edges, but for a real, different, more specific reason — the entire cast is never admitted as a surface at all (see mistakes[0], READING-SPEC S88). Both findings are genuine engine-level results, not properties of this one book; recorded in the shared policy/spec docs, not only here."
+    }
+  ]
+}

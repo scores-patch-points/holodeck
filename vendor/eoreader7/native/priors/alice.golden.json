@@ -1,0 +1,400 @@
+{
+ "schema": "EOReadingGolden@1",
+ "specimen": "alice",
+ "path": "01-literature-books/gutenberg/pg11_Alice_s_Adventures_in_Wonderland.txt",
+ "rule": "goldens/reading/RULE.md",
+ "window": {
+  "start": 0,
+  "end": 1952,
+  "endText": "under the hedge.",
+  "coordinates": "normalized body (container-stripped, CRLF-normalized); spans in RAW file coordinates"
+ },
+ "notes": "Window includes title page and chapter TOC carrying no finite main clause. Three narrative paragraphs follow (S3 is the long multi-clause sentence).",
+ "revisions": [],
+ "rows": [
+  {
+   "subject": "Alice",
+   "relation": "was beginning to get",
+   "object": "very tired of sitting by her sister on the bank, and of having nothing to do",
+   "polarity": "+",
+   "phasepost": {
+    "op": "INS",
+    "grain": "Ground"
+   },
+   "because": "a condition (tiredness) comes into being, landing on her whole state — Generate·Existence at ground grain",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 651,
+    "end": 957
+   },
+   "anchor": "Alice was beginning to get very tired of sitting by her sister on the"
+  },
+  {
+   "subject": "Alice",
+   "relation": "had peeped into",
+   "object": "the book her sister was reading",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Figure"
+   },
+   "because": "brief attention to one figure's presence; \"her sister was reading\" is restrictive and folds into the NP (R1)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "\"she\" → Alice, sentence subject",
+   "alternate": null,
+   "span": {
+    "start": 651,
+    "end": 957
+   },
+   "anchor": "once or twice she had peeped into"
+  },
+  {
+   "subject": "the book",
+   "relation": "had",
+   "object": "pictures or conversations in it",
+   "polarity": "-",
+   "phasepost": {
+    "op": "CON",
+    "grain": "Pattern"
+   },
+   "because": "possession of kinds of content, negated — polarity carries the \"no\", never NUL (R6); kinds, not one picture — pattern grain",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "\"it\" → the book, prior clause's object",
+   "alternate": null,
+   "span": {
+    "start": 651,
+    "end": 957
+   },
+   "anchor": "but it had no pictures or"
+  },
+  {
+   "subject": "Alice",
+   "relation": "thought",
+   "object": "\"and what is the use of a book without pictures or conversations?\"",
+   "polarity": "+",
+   "phasepost": {
+    "op": "EVA",
+    "grain": "Figure"
+   },
+   "because": "a judgment held by its holder; quoted complement stays inside the object (A1)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 651,
+    "end": 957
+   },
+   "anchor": "thought Alice"
+  },
+  {
+   "subject": "Alice",
+   "relation": "was considering",
+   "object": "whether the pleasure of making a daisy-chain would be worth the trouble of getting up and picking the daisies",
+   "polarity": "+",
+   "phasepost": {
+    "op": "EVA",
+    "grain": "Figure"
+   },
+   "because": "weighing one question — Relate·Interpretation at figure grain; complement clause stays inside object (A1)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "\"she\" → Alice",
+   "alternate": null,
+   "span": {
+    "start": 961,
+    "end": 1254
+   },
+   "anchor": "So she was considering in her own mind"
+  },
+  {
+   "subject": "the hot day",
+   "relation": "made",
+   "object": "her feel very sleepy and stupid",
+   "polarity": "+",
+   "phasepost": {
+    "op": "INS",
+    "grain": "Ground"
+   },
+   "because": "parenthetical asserts a state produced in her — Generate·Existence at ground grain (a felt condition)",
+   "embedded": true,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 961,
+    "end": 1254
+   },
+   "anchor": "the\nhot day made her feel very sleepy and stupid"
+  },
+  {
+   "subject": "a White Rabbit with pink eyes",
+   "relation": "ran close by",
+   "object": "her",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Figure"
+   },
+   "because": "a figure arrives into presence beside her — translocation as presence-in-relation (A5), landing on the figure passed",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "\"her\" → Alice",
+   "alternate": null,
+   "span": {
+    "start": 961,
+    "end": 1254
+   },
+   "anchor": "suddenly a White Rabbit with pink eyes ran\nclose by her."
+  },
+  {
+   "subject": "nothing so very remarkable",
+   "relation": "was",
+   "object": "in that",
+   "polarity": "+",
+   "phasepost": {
+    "op": "NUL",
+    "grain": "Ground"
+   },
+   "because": "existential-negative subject: the absence IS the act (A4) — Differentiate·Existence over the situation as ground",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 1258,
+    "end": 2007
+   },
+   "anchor": "There was nothing so _very_ remarkable in that;"
+  },
+  {
+   "subject": "Alice",
+   "relation": "think",
+   "object": "it so very much out of the way to hear the Rabbit say to itself, \"Oh dear! Oh dear! I shall be late!\"",
+   "polarity": "-",
+   "phasepost": {
+    "op": "EVA",
+    "grain": "Figure"
+   },
+   "because": "negated judgment (\"nor did\"); the Rabbit's speech is inside the perception complement and stays in the object (A1)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 1258,
+    "end": 2007
+   },
+   "anchor": "nor did Alice think it\nso _very_ much out of the way to hear the Rabbit say to itself"
+  },
+  {
+   "subject": "that she ought to have wondered at this",
+   "relation": "occurred to",
+   "object": "her",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Figure"
+   },
+   "because": "parenthetical: a realization presents itself to her — a thought arriving into presence",
+   "embedded": true,
+   "unresolved": false,
+   "resolution": "\"her\"/\"she\" → Alice",
+   "alternate": null,
+   "span": {
+    "start": 1258,
+    "end": 2007
+   },
+   "anchor": "it occurred to her that she ought to have wondered at this"
+  },
+  {
+   "subject": "it all",
+   "relation": "seemed",
+   "object": "quite natural",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "because": "parenthetical: appearing-as over the whole situation — seeming is presence-in-relation at ground grain",
+   "embedded": true,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 1258,
+    "end": 2007
+   },
+   "anchor": "time it all seemed quite natural"
+  },
+  {
+   "subject": "the Rabbit",
+   "relation": "took out of",
+   "object": "a watch … its waistcoat-pocket",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SEG",
+    "grain": "Figure"
+   },
+   "because": "removal of one part from its container — Differentiate·Structure at figure grain",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 1258,
+    "end": 2007
+   },
+   "anchor": "the Rabbit actually _took a\nwatch out of its waistcoat-pocket_"
+  },
+  {
+   "subject": "the Rabbit",
+   "relation": "looked at",
+   "object": "it",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Figure"
+   },
+   "because": "attention to one figure (the watch)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "\"it\" → the watch, previous clause's object",
+   "alternate": null,
+   "span": {
+    "start": 1258,
+    "end": 2007
+   },
+   "anchor": "and looked at it, and then hurried\non"
+  },
+  {
+   "subject": "the Rabbit",
+   "relation": "hurried on",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "because": "motion continuing through the scene (A5); no complement — the golden records an intransitive with a null object rather than inventing one",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "shared subject of the coordinated VP chain (the Rabbit)",
+   "alternate": {
+    "op": "SEG",
+    "grain": "Figure",
+    "because": "readable as departure — separating from her vicinity"
+   },
+   "span": {
+    "start": 1258,
+    "end": 2007
+   },
+   "anchor": "then hurried\non, Alice started"
+  },
+  {
+   "subject": "Alice",
+   "relation": "started to",
+   "object": "her feet",
+   "polarity": "+",
+   "phasepost": {
+    "op": "INS",
+    "grain": "Figure"
+   },
+   "because": "a sudden new bodily state springs into being — Generate·Existence at figure grain",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 1258,
+    "end": 2007
+   },
+   "anchor": "Alice started to her feet"
+  },
+  {
+   "subject": "that she had never before seen a rabbit with either a waistcoat-pocket, or a watch to take out of it",
+   "relation": "flashed across",
+   "object": "her mind",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Figure"
+   },
+   "because": "a realization arrives; the that-clause is the arriving thing and its own content stays inside it (A1)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "\"her\"/\"she\" → Alice",
+   "alternate": null,
+   "span": {
+    "start": 1258,
+    "end": 2007
+   },
+   "anchor": "it flashed across her mind that she\nhad never before seen a rabbit"
+  },
+  {
+   "subject": "Alice",
+   "relation": "was burning with",
+   "object": "curiosity",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Figure"
+   },
+   "because": "free adjunct asserts a quality standing with her (copula rule 4 shape)",
+   "embedded": true,
+   "unresolved": false,
+   "resolution": "\"she\" → Alice",
+   "alternate": null,
+   "span": {
+    "start": 1258,
+    "end": 2007
+   },
+   "anchor": "burning with curiosity, she ran across the\nfield after it"
+  },
+  {
+   "subject": "Alice",
+   "relation": "ran across",
+   "object": "the field",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "because": "translocation over a ground (A5); \"after it\" is the pursuit adjunct (A2), noted not objectified",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "\"she\" → Alice; \"it\" → the Rabbit",
+   "alternate": null,
+   "span": {
+    "start": 1258,
+    "end": 2007
+   },
+   "anchor": "she ran across the\nfield after it, and fortunately"
+  },
+  {
+   "subject": "Alice",
+   "relation": "was just in time to see",
+   "object": "it pop down a large rabbit-hole under the hedge",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Figure"
+   },
+   "because": "perception of one event; the perceived event stays inside the object (A1)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "\"it\" → the Rabbit",
+   "alternate": null,
+   "span": {
+    "start": 1258,
+    "end": 2007
+   },
+   "anchor": "was just in time to see it pop down a\nlarge rabbit-hole under the hedge."
+  }
+ ]
+}

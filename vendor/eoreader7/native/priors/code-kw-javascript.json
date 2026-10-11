@@ -1,0 +1,415 @@
+{
+ "schema": "CodeKeywordPrior@1",
+ "language": "javascript",
+ "provenance": {
+  "giver": "tree-sitter grammar for javascript (tree-sitter-language-pack 1.21.0) for the word tokens, arbitrated by V8 undefined (node v24.10.0, compile probes that execute nothing) for which words are reserved; hard = (grammar word tokens U grammar dedicated literal terminals) INTERSECT engine-refused in the sloppy goal",
+  "giverNote": "Derived, never hand-typed (javascript_kw_giver.py): hard = (grammar word tokens U grammar dedicated literal terminals) INTERSECT the words V8's compiler refuses as var/function/assignment/parameter names in the sloppy goal (so refused in every goal); soft = the grammar words V8 does not refuse (incl. the strict-only let/static/yield and the module-only await); builtins = Object.getOwnPropertyNames(globalThis) of a fresh vm context. Hard words refuse BINDING names only: a property or method may be named by a reserved word. Semantics stay in the engine.",
+  "source": "/private/tmp/claude-501/coding-competence/javascript-priors/javascript-law-prior.json",
+  "builder": "eoreader7 native/scripts/build-code-keyword-prior.mjs",
+  "keywords_read": 35,
+  "soft_keywords_read": 14,
+  "builtins_read": 67,
+  "stdlib_modules_read": 0,
+  "stdlib_modules_projected": 0,
+  "note": "hard keywords refuse (cannot name a being); soft keywords and builtins are recorded but never refuse (legally declarable — shadowing is a fact about the material, not a parse failure)",
+  "grammar": {
+   "name": "tree-sitter-javascript (the `javascript` grammar of the language pack)",
+   "language": "javascript",
+   "package": "tree-sitter-language-pack",
+   "packageVersion": "1.21.0",
+   "packageLicense": "MIT",
+   "packageSource": "https://github.com/xberg-io/tree-sitter-language-pack",
+   "upstream": "https://github.com/tree-sitter/tree-sitter-javascript",
+   "upstreamLicense": "MIT",
+   "upstreamCommit": null,
+   "upstreamCommitNote": "not recorded by the installed pack (Language.semantic_version is None); typed gap, not guessed",
+   "abi": 14,
+   "nodeKindCount": 265,
+   "nodeKindFingerprintSha256": "f04fcceac1b90d6c06cf3256ee2eb325e5bf2549430351de9d35bb1c22c8b604",
+   "compiledLibrary": "libtree_sitter_javascript.dylib",
+   "compiledLibrarySha256": "ba2fc504e986cf72a955ab26b96df0a7d46936d03dba30bd7615bb95d1bef181",
+   "releaseBundle": "macos-arm64-cad37e5ebb7b818e5d1e106cbc54604ed3389cf69e08732a8f567f4d4e442195.tar.zst",
+   "releaseUrl": "https://github.com/xberg-io/tree-sitter-language-pack/releases/download/v1.21.0/parsers-macos-arm64.tar.zst",
+   "anonymousWordKinds": [
+    "as",
+    "async",
+    "await",
+    "break",
+    "case",
+    "catch",
+    "class",
+    "const",
+    "continue",
+    "debugger",
+    "default",
+    "delete",
+    "do",
+    "else",
+    "export",
+    "extends",
+    "finally",
+    "for",
+    "from",
+    "function",
+    "get",
+    "if",
+    "import",
+    "in",
+    "instanceof",
+    "let",
+    "meta",
+    "new",
+    "of",
+    "return",
+    "set",
+    "static",
+    "switch",
+    "target",
+    "throw",
+    "try",
+    "typeof",
+    "using",
+    "var",
+    "void",
+    "while",
+    "with",
+    "yield"
+   ],
+   "dedicatedLiteralTerminals": {
+    "false": "false",
+    "null": "null",
+    "super": "super",
+    "this": "this",
+    "true": "true",
+    "undefined": "undefined"
+   },
+   "rule": "anonymous visible node kinds matching /^[#@]?[A-Za-z][A-Za-z0-9_]*$/ (c0_grammar_keywords.py rule) + dedicated named terminal probe `x = <kind>;` for every named word-shaped kind"
+  },
+  "engine": {
+   "implementation": "v8",
+   "version": "13.6.233.10-node.28",
+   "node": "v24.10.0",
+   "mode": "node --experimental-vm-modules: vm.Script (sloppy, strict) and vm.SourceTextModule (module) compile probes; nothing executed"
+  },
+  "derivation": {
+   "script": "eval/coding-competence/javascript_kw_giver.py",
+   "projection": "scripts/build-code-keyword-prior.mjs (unmodified)",
+   "engineProbeForms": [
+    "var {w};",
+    "function {w}(){}",
+    "{w} = 0;",
+    "function f({w}){}"
+   ],
+   "engineGoals": [
+    "sloppy",
+    "strict",
+    "module"
+   ],
+   "engineModuleGoalProbed": true,
+   "contextualReservation": {
+    "strictOnly": [
+     "implements",
+     "interface",
+     "let",
+     "private",
+     "protected",
+     "public",
+     "static",
+     "yield"
+    ],
+    "moduleOnly": [
+     "await"
+    ],
+    "note": "reserved only in strict code / only in modules: legally declarable in a sloppy script, therefore soft (never refused)"
+   },
+   "softSources": {
+    "as": [
+     "grammar:anonymous-word-token",
+     "engine:accepted-as-binding-name-in-sloppy-script"
+    ],
+    "async": [
+     "grammar:anonymous-word-token",
+     "engine:accepted-as-binding-name-in-sloppy-script"
+    ],
+    "await": [
+     "grammar:anonymous-word-token",
+     "engine:reserved-only-in-modules",
+     "engine:accepted-as-binding-name-in-sloppy-script"
+    ],
+    "from": [
+     "grammar:anonymous-word-token",
+     "engine:accepted-as-binding-name-in-sloppy-script"
+    ],
+    "get": [
+     "grammar:anonymous-word-token",
+     "engine:accepted-as-binding-name-in-sloppy-script"
+    ],
+    "let": [
+     "grammar:anonymous-word-token",
+     "engine:reserved-only-in-strict-code",
+     "engine:accepted-as-binding-name-in-sloppy-script"
+    ],
+    "meta": [
+     "grammar:anonymous-word-token",
+     "engine:accepted-as-binding-name-in-sloppy-script"
+    ],
+    "of": [
+     "grammar:anonymous-word-token",
+     "engine:accepted-as-binding-name-in-sloppy-script"
+    ],
+    "set": [
+     "grammar:anonymous-word-token",
+     "engine:accepted-as-binding-name-in-sloppy-script"
+    ],
+    "static": [
+     "grammar:anonymous-word-token",
+     "engine:reserved-only-in-strict-code",
+     "engine:accepted-as-binding-name-in-sloppy-script"
+    ],
+    "target": [
+     "grammar:anonymous-word-token",
+     "engine:accepted-as-binding-name-in-sloppy-script"
+    ],
+    "undefined": [
+     "grammar:dedicated-terminal:undefined",
+     "engine:accepted-as-binding-name-in-sloppy-script"
+    ],
+    "using": [
+     "grammar:anonymous-word-token",
+     "engine:accepted-as-binding-name-in-sloppy-script"
+    ],
+    "yield": [
+     "grammar:anonymous-word-token",
+     "engine:reserved-only-in-strict-code",
+     "engine:accepted-as-binding-name-in-sloppy-script"
+    ]
+   },
+   "engineRefusedButNotGrammarToken": [
+    "enum"
+   ],
+   "strictReservedButNotGrammarToken": [
+    "implements",
+    "interface",
+    "private",
+    "protected",
+    "public"
+   ],
+   "grammarWordsEngineDoesNotRefuse": [
+    "as",
+    "async",
+    "await",
+    "from",
+    "get",
+    "let",
+    "meta",
+    "of",
+    "set",
+    "static",
+    "target",
+    "undefined",
+    "using",
+    "yield"
+   ],
+   "probeVocabulary": {
+    "size": 79,
+    "source": "javascript grammar words + dedicated terminals + the anonymous word kinds of the sibling typescript grammar (probe vocabulary only: a TypeScript-only word enters the prior never)",
+    "typescriptSiblingWords": 73
+   },
+   "hostGlobalsExcluded": 115,
+   "builtinsNote": "V8 fresh-context globals: the ECMAScript globals plus what V8 installs itself (console, WebAssembly, escape, unescape, SharedArrayBuffer...). Browser globals (window, document) and node host globals (process, Buffer, require) are absent by construction: a typed gap, harmless because builtins never refuse",
+   "stdlibModules": {
+    "status": "not_applicable",
+    "reason": "ECMA-262 defines no standard-library module namespace; node's builtinModules are host-specific and are not recorded (a fix for a name that failed to resolve is a host question, not a language one)"
+   },
+   "bindingOnly": "a reserved word cannot name a binding (variable, function, class, parameter, label) but can be a property or method name; the hard set is a refusal law for binding positions only",
+   "esprima": {
+    "version": "4.0.1",
+    "role": "independent cross-giver for K1"
+   },
+   "checks": {
+    "K1": "pass",
+    "K2": "pass",
+    "K3": "pass",
+    "K4": "pass",
+    "K5": "pass",
+    "K6": "pass"
+   }
+  },
+  "assembledBy": "eval/coding-competence/build-javascript-priors.mjs (adds the grammar, engine, derivation and TRAIN-witness provenance to the unmodified builder's output; the keyword lists are the builder's, untouched)",
+  "noCorpusRead": "the keyword set is derived from the grammar and the engine only; no corpus file is read to derive it",
+  "trainWitness": {
+   "split": "train",
+   "files": 240,
+   "repos": 4,
+   "tokens": 114528,
+   "hardKeywordsAttested": 31,
+   "hardKeywordsUnattested": [
+    "debugger",
+    "do",
+    "void",
+    "with"
+   ],
+   "keywordTokenCoverage": 1,
+   "hardKeywordsDeclaredAsBindingNames": 0,
+   "hardKeywordsUsedAsMemberNames": 2,
+   "hardTextAsPropertyTokens": 306,
+   "verdicts": {
+    "R1": "pass",
+    "R2": "pass",
+    "R3": "fail",
+    "R4a": "pass"
+   }
+  },
+  "polarity": "hard keywords refuse BINDING names only (a variable, function, class, parameter or label cannot be named by a reserved word; a property or method can: `p.catch(f)`, `class A { delete() {} }`); soft keywords (as, async, await, from, get, let, meta, of, set, static, target, undefined, using, yield: legally declarable in a sloppy script; let/static/yield are reserved only in strict code and await only in modules) and builtins are recorded and NEVER refuse",
+  "incumbent": {
+   "file": "priors/code-kw-js.json",
+   "hardOnlyThere": [
+    "as",
+    "async",
+    "await",
+    "from",
+    "get",
+    "let",
+    "meta",
+    "of",
+    "set",
+    "static",
+    "target",
+    "using",
+    "yield"
+   ],
+   "hardOnlyHere": [
+    "false",
+    "null",
+    "super",
+    "this",
+    "true"
+   ],
+   "note": "the incumbent refuses 13 words V8 accepts as binding names and lacks this, super, null, true, false; it is not held-out-relevant (a keyword set) but its refusals are measured in E1/R1 of the card"
+  },
+  "builtAt": "2026-10-06"
+ },
+ "keywords": [
+  "break",
+  "case",
+  "catch",
+  "class",
+  "const",
+  "continue",
+  "debugger",
+  "default",
+  "delete",
+  "do",
+  "else",
+  "export",
+  "extends",
+  "false",
+  "finally",
+  "for",
+  "function",
+  "if",
+  "import",
+  "in",
+  "instanceof",
+  "new",
+  "null",
+  "return",
+  "super",
+  "switch",
+  "this",
+  "throw",
+  "true",
+  "try",
+  "typeof",
+  "var",
+  "void",
+  "while",
+  "with"
+ ],
+ "softKeywords": [
+  "as",
+  "async",
+  "await",
+  "from",
+  "get",
+  "let",
+  "meta",
+  "of",
+  "set",
+  "static",
+  "target",
+  "undefined",
+  "using",
+  "yield"
+ ],
+ "builtins": [
+  "AggregateError",
+  "Array",
+  "ArrayBuffer",
+  "AsyncDisposableStack",
+  "Atomics",
+  "BigInt",
+  "BigInt64Array",
+  "BigUint64Array",
+  "Boolean",
+  "DataView",
+  "Date",
+  "DisposableStack",
+  "Error",
+  "EvalError",
+  "FinalizationRegistry",
+  "Float16Array",
+  "Float32Array",
+  "Float64Array",
+  "Function",
+  "Infinity",
+  "Int16Array",
+  "Int32Array",
+  "Int8Array",
+  "Intl",
+  "Iterator",
+  "JSON",
+  "Map",
+  "Math",
+  "NaN",
+  "Number",
+  "Object",
+  "Promise",
+  "Proxy",
+  "RangeError",
+  "ReferenceError",
+  "Reflect",
+  "RegExp",
+  "Set",
+  "SharedArrayBuffer",
+  "String",
+  "SuppressedError",
+  "Symbol",
+  "SyntaxError",
+  "TypeError",
+  "URIError",
+  "Uint16Array",
+  "Uint32Array",
+  "Uint8Array",
+  "Uint8ClampedArray",
+  "WeakMap",
+  "WeakRef",
+  "WeakSet",
+  "WebAssembly",
+  "console",
+  "decodeURI",
+  "decodeURIComponent",
+  "encodeURI",
+  "encodeURIComponent",
+  "escape",
+  "eval",
+  "globalThis",
+  "isFinite",
+  "isNaN",
+  "parseFloat",
+  "parseInt",
+  "undefined",
+  "unescape"
+ ],
+ "stdlibModules": []
+}

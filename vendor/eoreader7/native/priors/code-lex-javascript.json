@@ -1,0 +1,2336 @@
+{
+ "schema": "CodeLexPrior@1",
+ "language": "javascript",
+ "grammar": "javascript",
+ "provenance": {
+  "giver": "tree-sitter grammar `javascript` (tree-sitter-language-pack via eval/coding-competence/gold.py, gold-1), TRAIN repositories only",
+  "goldVersion": "gold-1",
+  "trainRepos": [
+   {
+    "repo": "ElemeFE/element",
+    "url": "https://github.com/ElemeFE/element",
+    "commit": "c345bb453bf11badb4831a6a3f600c9372b3a336",
+    "license": "mit",
+    "license_text_family": "mit"
+   },
+   {
+    "repo": "TanStack/query",
+    "url": "https://github.com/TanStack/query",
+    "commit": "d169ee87786c250ccc791f5b22c40141a489ec88",
+    "license": "mit",
+    "license_text_family": "mit"
+   },
+   {
+    "repo": "conductor-oss/conductor",
+    "url": "https://github.com/conductor-oss/conductor",
+    "commit": "ab2de6da6c7b5935e6c6d09da29953b8d4cfe291",
+    "license": "apache-2.0",
+    "license_text_family": "apache-2.0"
+   },
+   {
+    "repo": "sveltejs/svelte",
+    "url": "https://github.com/sveltejs/svelte",
+    "commit": "7c2fcdae6a29fb3b36855dc8e86eb7ce4c56b93a",
+    "license": "mit",
+    "license_text_family": "mit"
+   }
+  ],
+  "trainFiles": [
+   {
+    "rel": "test/unit/specs/radio.spec.js",
+    "repo": "ElemeFE/element",
+    "sha256": "073d3d5f1d2aa0234da03158509f111bac8cc452c0411cf8064afc51b366ed5d",
+    "bytes": 11767
+   },
+   {
+    "rel": "examples/lit/ssr/server/index.mjs",
+    "repo": "TanStack/query",
+    "sha256": "04778caba4600858590d0bba3584fbe76d6ad5a4ebbe77ef4efcc22c1e90dd66",
+    "bytes": 7519
+   },
+   {
+    "rel": "ui/src/components/icons/Plus.jsx",
+    "repo": "conductor-oss/conductor",
+    "sha256": "00bdc4a0a1ae8d7e551f4ed97f885e90199693283d1824160116a4b214e67e63",
+    "bytes": 531
+   },
+   {
+    "rel": "packages/svelte/tests/runtime-runes/samples/async-derived-module/_config.js",
+    "repo": "sveltejs/svelte",
+    "sha256": "01e6c7e701d75ee6f85dff36a0a9d2ec638932ccfad5ab8f883c06405882020e",
+    "bytes": 1441
+   },
+   {
+    "rel": "examples/entry.js",
+    "repo": "ElemeFE/element",
+    "sha256": "0745b1acf22294ac1e5dfa0223747af9d3d589eb6ae07a555c058604a3169777",
+    "bytes": 1862
+   },
+   {
+    "rel": "examples/svelte/basic/svelte.config.js",
+    "repo": "TanStack/query",
+    "sha256": "0cecf9dd94997a1862e1d1a206048833ddb72f90fb2f87fd71ffbf6c2927d728",
+    "bytes": 309
+   },
+   {
+    "rel": "ui/src/pages/definitions/Header.jsx",
+    "repo": "conductor-oss/conductor",
+    "sha256": "0c1493552516cefc1cbc4acf2cf51230431fae79b3845fa85b564e6814938bcc",
+    "bytes": 945
+   },
+   {
+    "rel": "packages/svelte/src/compiler/phases/3-transform/server/visitors/ExpressionStatement.js",
+    "repo": "sveltejs/svelte",
+    "sha256": "05ba91cdeef2b5225d1becb046a8d0ab7e5359019f993980f4b1a6090f0681b9",
+    "bytes": 537
+   },
+   {
+    "rel": "packages/infinite-scroll/src/main.js",
+    "repo": "ElemeFE/element",
+    "sha256": "13b5a58376085e319d9423528ffcf8c3dbc03b3df6486d112532f8deab7a7740",
+    "bytes": 3890
+   },
+   {
+    "rel": "examples/svelte/load-more-infinite-scroll/svelte.config.js",
+    "repo": "TanStack/query",
+    "sha256": "0cecf9dd94997a1862e1d1a206048833ddb72f90fb2f87fd71ffbf6c2927d728",
+    "bytes": 309
+   },
+   {
+    "rel": "ui-next/src/components/features/flow/components/shapes/TaskCard/JSONJQTransformTask.jsx",
+    "repo": "conductor-oss/conductor",
+    "sha256": "13b16a0f9e189dd20006179e8fe0e3b53543fc2f6e12826c1502ab16c314d0d6",
+    "bytes": 1045
+   },
+   {
+    "rel": "packages/svelte/tests/runtime-legacy/samples/event-handler-each-context-invalidation/_config.js",
+    "repo": "sveltejs/svelte",
+    "sha256": "0bba874080cbbdecd22cea7e4d090f6ddf9a7366765e1cb841fe5c07f45e7df1",
+    "bytes": 835
+   },
+   {
+    "rel": "test/unit/specs/tree.spec.js",
+    "repo": "ElemeFE/element",
+    "sha256": "16c0ac0b114431f881f100f7e37c2064e5af99d244ea7942538c84c8a45f5b98",
+    "bytes": 28295
+   },
+   {
+    "rel": "examples/svelte/optimistic-updates/svelte.config.js",
+    "repo": "TanStack/query",
+    "sha256": "0cecf9dd94997a1862e1d1a206048833ddb72f90fb2f87fd71ffbf6c2927d728",
+    "bytes": 309
+   },
+   {
+    "rel": "ui-next/src/components/features/flow/components/shapes/TaskCard/icons/Buildings.jsx",
+    "repo": "conductor-oss/conductor",
+    "sha256": "14b7c1840cc8dcf1673539e47e7c304c3257c3909385f6b2b21f03fa1d4d0464",
+    "bytes": 1631
+   },
+   {
+    "rel": "packages/svelte/tests/runtime-browser/samples/css-props-dynamic-component/_config.js",
+    "repo": "sveltejs/svelte",
+    "sha256": "0c9ccd8b1cabcbc120a8c7953c0e39f16ac661c643867b5959c5e9f5f183eddc",
+    "bytes": 503
+   },
+   {
+    "rel": "test/unit/specs/cascader.spec.js",
+    "repo": "ElemeFE/element",
+    "sha256": "1970b140d09cd76d4564dabd1694e5f6e8232d73c9804441762cb96a77619c9f",
+    "bytes": 11065
+   },
+   {
+    "rel": "examples/svelte/playground/svelte.config.js",
+    "repo": "TanStack/query",
+    "sha256": "0cecf9dd94997a1862e1d1a206048833ddb72f90fb2f87fd71ffbf6c2927d728",
+    "bytes": 309
+   },
+   {
+    "rel": "ui-next/src/components/features/flow/components/shapes/TaskCard/icons/WarningIcon.jsx",
+    "repo": "conductor-oss/conductor",
+    "sha256": "15e167d0741b5a29d103de7b9f996db1f75f3adabed2d043809a846aa4aa000d",
+    "bytes": 762
+   },
+   {
+    "rel": "packages/svelte/tests/runtime-runes/samples/async-reactivity-loss-for-await/_config.js",
+    "repo": "sveltejs/svelte",
+    "sha256": "101ef273253a5a3e7a0507b0092ca70c6c5df74079657a9ff8c4ebbb3e575633",
+    "bytes": 612
+   },
+   {
+    "rel": "examples/components/theme-configurator/utils/utils.js",
+    "repo": "ElemeFE/element",
+    "sha256": "1c6425505094c2caecc2f613f6e4ad8c792f0e29e99fe84ddf0824c43d87c729",
+    "bytes": 1924
+   },
+   {
+    "rel": "examples/svelte/ssr/svelte.config.js",
+    "repo": "TanStack/query",
+    "sha256": "0cecf9dd94997a1862e1d1a206048833ddb72f90fb2f87fd71ffbf6c2927d728",
+    "bytes": 309
+   },
+   {
+    "rel": "ui/src/components/DateRangePicker.jsx",
+    "repo": "conductor-oss/conductor",
+    "sha256": "18aa2d0a6b935e5a72c33d67e4a0e10024490d8b018f08980fe337d0cd2957d0",
+    "bytes": 973
+   },
+   {
+    "rel": "packages/svelte/src/store/shared/index.js",
+    "repo": "sveltejs/svelte",
+    "sha256": "193ee05b45c970870d171ffd4a978ffffe0571098d8d23278f28d68a53a9c9e1",
+    "bytes": 5227
+   },
+   {
+    "rel": "packages/menu/src/menu-mixin.js",
+    "repo": "ElemeFE/element",
+    "sha256": "1fc165bc5a0b917047e8dda88ca2d4f49555627530c77a08e14513deaef466f9",
+    "bytes": 1074
+   },
+   {
+    "rel": "examples/svelte/star-wars/svelte.config.js",
+    "repo": "TanStack/query",
+    "sha256": "0cecf9dd94997a1862e1d1a206048833ddb72f90fb2f87fd71ffbf6c2927d728",
+    "bytes": 309
+   },
+   {
+    "rel": "ui/src/components/diagram/ZoomControls.jsx",
+    "repo": "conductor-oss/conductor",
+    "sha256": "1ac058aa9d2192f7d0953a78ccdc6f006808b54142da51398f0b5121f8d21bbe",
+    "bytes": 2722
+   },
+   {
+    "rel": "packages/svelte/tests/runtime-legacy/samples/component-slot-context-props-each/_config.js",
+    "repo": "sveltejs/svelte",
+    "sha256": "23ab3fc93c6af551e7882d1f2894fe5a3b211b01fb68757db0faeeab74d9c5b4",
+    "bytes": 524
+   },
+   {
+    "rel": "src/locale/lang/is.js",
+    "repo": "ElemeFE/element",
+    "sha256": "246bf2a356bd95791026d9a52d2b5fa1c7a0fb4e34523910b27be0cd286e7757",
+    "bytes": 2759
+   },
+   {
+    "rel": "examples/lit/ssr/config/ports.js",
+    "repo": "TanStack/query",
+    "sha256": "0e0e52ef4c26ace35c49c0272f5edb8a1776997100ca0d3a1eb9a9d399b2d56d",
+    "bytes": 1550
+   },
+   {
+    "rel": "ui/src/pages/misc/TaskQueue.jsx",
+    "repo": "conductor-oss/conductor",
+    "sha256": "1f66536d86a3a150f975635032e0efef958a5c8dae90bdb22d218eeebc775b1c",
+    "bytes": 3371
+   },
+   {
+    "rel": "packages/svelte/tests/runtime-legacy/samples/each-block-keyed-dynamic-key/_config.js",
+    "repo": "sveltejs/svelte",
+    "sha256": "2abbc854e6f40d982b25b4c3b70450c7e4a3f5563d278456e603bbc0fd2b4154",
+    "bytes": 479
+   },
+   {
+    "rel": "test/unit/specs/calendar.spec.js",
+    "repo": "ElemeFE/element",
+    "sha256": "2511775b20e8fcb2f32b6fdf1c76865c477ff883406e31b2bc62f4ac0461eb33",
+    "bytes": 3639
+   },
+   {
+    "rel": "scripts/getTsdownConfig.js",
+    "repo": "TanStack/query",
+    "sha256": "15b7d4f123c0c4a303e8f92d93913774079796c5f2c14effb7714c75630aec7c",
+    "bytes": 1086
+   },
+   {
+    "rel": "ui-next/src/components/features/flow/nodes/mapper/switch.test.js",
+    "repo": "conductor-oss/conductor",
+    "sha256": "21353520bd5d2b10a91e0d555a7105deca695e767de9aedbf097c25fc415d11d",
+    "bytes": 35493
+   },
+   {
+    "rel": "packages/svelte/src/compiler/phases/3-transform/client/visitors/UpdateExpression.js",
+    "repo": "sveltejs/svelte",
+    "sha256": "2ae479065f7da0e24debc1189dfa3b73e39e319cffb2bcfbaaa76f807a4f2c8c",
+    "bytes": 1517
+   },
+   {
+    "rel": "src/locale/lang/hu.js",
+    "repo": "ElemeFE/element",
+    "sha256": "26692163096b01424f2a64dff94296b70e64f43436ad4db1dad27614611b4768",
+    "bytes": 2781
+   },
+   {
+    "rel": "packages/angular-query-persist-client/eslint.config.js",
+    "repo": "TanStack/query",
+    "sha256": "212a486bcbe2ab3c5ce88d84a70a4a7994719f2b32a1836d7afcc2d7722a6257",
+    "bytes": 340
+   },
+   {
+    "rel": "ui/src/pages/execution/TaskSummary.jsx",
+    "repo": "conductor-oss/conductor",
+    "sha256": "26544549fad208c57f6674efb9a482ea3c99391ce42efb5c0f4a772e22d7ce38",
+    "bytes": 3645
+   },
+   {
+    "rel": "packages/svelte/tests/runtime-legacy/samples/dynamic-component-nulled-out/_config.js",
+    "repo": "sveltejs/svelte",
+    "sha256": "2c0fd00ae59015945c8f38f1465736e97d6d334f8dfa824faf508db173a18211",
+    "bytes": 322
+   },
+   {
+    "rel": "src/locale/lang/ta.js",
+    "repo": "ElemeFE/element",
+    "sha256": "2b245c4fc6d26fe230912b96e3fe289a4b014271db9012c7d0e0eef501d9a255",
+    "bytes": 4602
+   },
+   {
+    "rel": "examples/lit/pagination/server/index.mjs",
+    "repo": "TanStack/query",
+    "sha256": "2765768853c591f9743cd31d05b5fa080e82cf4851cbef9083bafc9071680676",
+    "bytes": 7975
+   },
+   {
+    "rel": "ui/src/pages/errors/ErrorsInspector.jsx",
+    "repo": "conductor-oss/conductor",
+    "sha256": "305e0ac26bc217f121e2b017c89d4dd903b6c6f62b2034e2b107a532018abde8",
+    "bytes": 29003
+   },
+   {
+    "rel": "packages/svelte/tests/runtime-legacy/samples/each-block-keyed-html-b/_config.js",
+    "repo": "sveltejs/svelte",
+    "sha256": "2cb23b7413e8f69c8b295140a816c2a5a223a2b2dbe055d604b0326d26065c47",
+    "bytes": 370
+   },
+   {
+    "rel": "examples/components/theme/localstorage.js",
+    "repo": "ElemeFE/element",
+    "sha256": "2d6f1332b472e142e87c7b0833761ebc80f1fcd384e0bce126f022244ae7da3a",
+    "bytes": 881
+   },
+   {
+    "rel": "examples/lit/ssr/scripts/dev.mjs",
+    "repo": "TanStack/query",
+    "sha256": "30335f7687582e2647733ec42f5d22014cdeaf3d81ef665103147a4d87c1d2d8",
+    "bytes": 1207
+   },
+   {
+    "rel": "ui-next/src/components/features/flow/components/shapes/SwitchJoinPseudoTask.jsx",
+    "repo": "conductor-oss/conductor",
+    "sha256": "344e4864e4cc2b7e3594b60881462042ecbdab3f7469e72e578b175f31ef7611",
+    "bytes": 1228
+   },
+   {
+    "rel": "packages/svelte/src/compiler/phases/2-analyze/visitors/ExportSpecifier.js",
+    "repo": "sveltejs/svelte",
+    "sha256": "32dbb18495c24c2cfa34bbc98e64ab9e966658f731c5331cf36b7eabe0a0a70a",
+    "bytes": 873
+   },
+   {
+    "rel": "test/unit/specs/transfer.spec.js",
+    "repo": "ElemeFE/element",
+    "sha256": "31f7a546045b1fa93b0e4a481e6fc231b44cbe5e4237b1af945b813624630810",
+    "bytes": 5453
+   },
+   {
+    "rel": "packages/query-codemods/src/v5/remove-overloads/utils/unknown-usage-error.cjs",
+    "repo": "TanStack/query",
+    "sha256": "30b6ef86841a95093d6336f45d142646766b0c9f3083d514c116c67bf443a933",
+    "bytes": 789
+   },
+   {
+    "rel": "ui-next/src/components/features/flow/components/shapes/testDiagrams.js",
+    "repo": "conductor-oss/conductor",
+    "sha256": "4e9e26c6727a39de2ad824a7539fd383737341ea428860a756c1daa3aa6a140e",
+    "bytes": 19908
+   },
+   {
+    "rel": "packages/svelte/tests/runtime-legacy/samples/component-events/_config.js",
+    "repo": "sveltejs/svelte",
+    "sha256": "3a81a4baf0f75dfb677abaab618f7e6df18d6155bd19503e660ab6952d1df3c6",
+    "bytes": 476
+   },
+   {
+    "rel": "src/locale/lang/en.js",
+    "repo": "ElemeFE/element",
+    "sha256": "3368a57996d7ef3f958879e1abb4a6c23a9afa0d29ed7fe4b96f4e18294899af",
+    "bytes": 2734
+   },
+   {
+    "rel": "packages/query-codemods/src/v5/keep-previous-data/keep-previous-data.cjs",
+    "repo": "TanStack/query",
+    "sha256": "3ccd2fd627a31ef87b5c04da24c83dc2df3e59f48d34a3250783756651ea1626",
+    "bytes": 8728
+   },
+   {
+    "rel": "ui/src/pages/execution/TaskHumanForm.jsx",
+    "repo": "conductor-oss/conductor",
+    "sha256": "5018bcb93e259cda828dd7dd9f3645deecc517b6cda6c96b4a974227ca94aefc",
+    "bytes": 2838
+   },
+   {
+    "rel": "packages/svelte/tests/runtime-runes/samples/state-reuse/_config.js",
+    "repo": "sveltejs/svelte",
+    "sha256": "3cf4bdf3cab13047054fef439dac11d4e2bc849b65c0a556a3eb7e613ae0ffbb",
+    "bytes": 406
+   },
+   {
+    "rel": "test/unit/specs/button.spec.js",
+    "repo": "ElemeFE/element",
+    "sha256": "3625fee22a2a323e1ba697049c4db59cbfa32223054762aafcda9e69091173a6",
+    "bytes": 3171
+   },
+   {
+    "rel": "packages/query-codemods/src/utils/transformers/query-client-transformer.cjs",
+    "repo": "TanStack/query",
+    "sha256": "3fc4ac58eaeec94eb61402e98e5b555f9364119ce256ee5b1fddd829622194c4",
+    "bytes": 1665
+   },
+   {
+    "rel": "ui-next/src/pages/definition/progressicons.jsx",
+    "repo": "conductor-oss/conductor",
+    "sha256": "5138e55057ac795f1337695d3355e9179c515740268d22b252765d4384ec2de1",
+    "bytes": 463
+   },
+   {
+    "rel": "packages/svelte/tests/runtime-legacy/samples/reactive-values-implicit-destructured/_config.js",
+    "repo": "sveltejs/svelte",
+    "sha256": "3dc4745f2a958d5ea7eb87bc4a7cf8d21059b0fc315254218bdec21a31de49f2",
+    "bytes": 449
+   },
+   {
+    "rel": "src/mixins/migrating.js",
+    "repo": "ElemeFE/element",
+    "sha256": "3db2eeb2efb4259eff673199bde989cf1c5ff16a72af83aad8b937ac8ad57874",
+    "bytes": 1542
+   },
+   {
+    "rel": "packages/query-codemods/src/utils/transformers/use-query-like-transformer.cjs",
+    "repo": "TanStack/query",
+    "sha256": "41a1d50747792834840151a559b5d41d991a1d6160c02b7b4bac6258c7f42a3b",
+    "bytes": 944
+   },
+   {
+    "rel": "ui/src/schema/workflow.js",
+    "repo": "conductor-oss/conductor",
+    "sha256": "57378d3befd34aa33664fdae7abf6a31a6c31dde0e004732441bd8925083635a",
+    "bytes": 9346
+   },
+   {
+    "rel": "packages/svelte/tests/runtime-legacy/samples/event-handler-each-modifier/_config.js",
+    "repo": "sveltejs/svelte",
+    "sha256": "436c6d14e20b66cda19cceb448e1fba77907928207af411fc55c60676cf22514",
+    "bytes": 1104
+   },
+   {
+    "rel": "src/locale/lang/nb-NO.js",
+    "repo": "ElemeFE/element",
+    "sha256": "4299ff63601d4d4b7b9f2201b04686bc63da2c838ceef05fcd5528a905879eb7",
+    "bytes": 2694
+   },
+   {
+    "rel": "packages/react-query-devtools/eslint.config.js",
+    "repo": "TanStack/query",
+    "sha256": "4377e9dba2acf8add9524ec84253d16efaac3463079e3da92351714404741f74",
+    "bytes": 1257
+   },
+   {
+    "rel": "ui-next/src/components/features/flow/components/shapes/DoWhileTask.jsx",
+    "repo": "conductor-oss/conductor",
+    "sha256": "5a6a5471f9c63d2403114754ff6cfc03bf634f73a7d992b10720a3ece049f8b9",
+    "bytes": 5087
+   },
+   {
+    "rel": "packages/svelte/tests/runtime-runes/samples/block-dependency-sequence/_config.js",
+    "repo": "sveltejs/svelte",
+    "sha256": "43adb6f73bfe44bbf48c6283e7dc66f2f40d415775d5030d65f39971bcb427c1",
+    "bytes": 698
+   },
+   {
+    "rel": "packages/table/src/config.js",
+    "repo": "ElemeFE/element",
+    "sha256": "4760f8816c633caf358242c3ae14eb92c608a738b079708ee70f30711339183d",
+    "bytes": 3423
+   },
+   {
+    "rel": "packages/react-query-persist-client/eslint.config.js",
+    "repo": "TanStack/query",
+    "sha256": "4377e9dba2acf8add9524ec84253d16efaac3463079e3da92351714404741f74",
+    "bytes": 1257
+   },
+   {
+    "rel": "ui-next/src/components/features/flow/nodes/mapper/core.test.js",
+    "repo": "conductor-oss/conductor",
+    "sha256": "5acecaf67f296017d293234f89cfc6f2b144f253b0a2c27c2f31c2dbbb1052a6",
+    "bytes": 2303
+   },
+   {
+    "rel": "packages/svelte/tests/runtime-runes/samples/async-pending-batch/_config.js",
+    "repo": "sveltejs/svelte",
+    "sha256": "44e1421ef38b418691d6b3b30432c1e3e228dd731992cf7964232c3a92b7ef75",
+    "bytes": 535
+   },
+   {
+    "rel": "test/unit/specs/message.spec.js",
+    "repo": "ElemeFE/element",
+    "sha256": "495dcb96f147602461e2eeaf492855a8bbcbc36f7a7ce37b7f21f3f4be581beb",
+    "bytes": 2793
+   },
+   {
+    "rel": "packages/eslint-plugin-query/root.tsdown.config.js",
+    "repo": "TanStack/query",
+    "sha256": "4cba387fadf0dd85e6f0378e9d85947dbe45441d4a3ab9a21be429cd49309420",
+    "bytes": 1242
+   },
+   {
+    "rel": "ui/src/components/DataTable.jsx",
+    "repo": "conductor-oss/conductor",
+    "sha256": "5b61d8570f2389b062c03445eceb9c340fc8fd954d21ef4586297e12f03c75a1",
+    "bytes": 8871
+   },
+   {
+    "rel": "packages/svelte/tests/runtime-runes/samples/object-has-own-reactive/_config.js",
+    "repo": "sveltejs/svelte",
+    "sha256": "46e7f13c620ece7e9120e7ed6b3eacddac40e4722689e8050a1c854c24fd6526",
+    "bytes": 548
+   },
+   {
+    "rel": "test/unit/specs/carousel.spec.js",
+    "repo": "ElemeFE/element",
+    "sha256": "4d5ca5054877160643cf07fc9ef7004b8156597fcea39ff17fba21cbf79d8b7a",
+    "bytes": 7574
+   },
+   {
+    "rel": "packages/svelte-query/eslint.config.js",
+    "repo": "TanStack/query",
+    "sha256": "57d5fba240a4cc1ede00100be80537ba7a18543081522ffb714dbfde9e65749e",
+    "bytes": 894
+   },
+   {
+    "rel": "ui/src/pages/executions/WorkflowSearch.jsx",
+    "repo": "conductor-oss/conductor",
+    "sha256": "62ab342079193223d80c44d312e04ef77692c71e88606860900c4782b07c7ce6",
+    "bytes": 6246
+   },
+   {
+    "rel": "packages/svelte/tests/runtime-legacy/samples/select-one-way-bind-object/_config.js",
+    "repo": "sveltejs/svelte",
+    "sha256": "50e6c342dc185a9b7b61e859947ecce32bbff315a92c61b10c6fcd8202a6c172",
+    "bytes": 470
+   },
+   {
+    "rel": "test/unit/specs/pagination.spec.js",
+    "repo": "ElemeFE/element",
+    "sha256": "570643c35033796d2686896255fe3ca58ce41137c1dc1590d4547945f09dd74e",
+    "bytes": 12040
+   },
+   {
+    "rel": "packages/query-codemods/src/v5/remove-overloads/transformers/query-fn-aware-usage-transformer.cjs",
+    "repo": "TanStack/query",
+    "sha256": "5864e33f15cfe88582849d2a9cf08963c6806c1461b48e41f5098ae78e9098ab",
+    "bytes": 5204
+   },
+   {
+    "rel": "ui/src/pages/definitions/Workflow.jsx",
+    "repo": "conductor-oss/conductor",
+    "sha256": "664b74ec5dc601a42e03869988e8e1f12072e5f1e8f11da4df281bb44e7b3285",
+    "bytes": 4056
+   },
+   {
+    "rel": "packages/svelte/tests/runtime-runes/samples/svelte-component-switch-dev/_config.js",
+    "repo": "sveltejs/svelte",
+    "sha256": "5398004296595650ea982c1fddd7dfda46eb77163980f14b4fe064891d7c9c55",
+    "bytes": 389
+   },
+   {
+    "rel": "src/directives/mousewheel.js",
+    "repo": "ElemeFE/element",
+    "sha256": "58a7959087c4fbbb7dcf6773c9fee084958af1dd1c310ee93d45a2eae2dc277b",
+    "bytes": 553
+   },
+   {
+    "rel": "packages/query-codemods/src/v5/is-loading/is-loading.cjs",
+    "repo": "TanStack/query",
+    "sha256": "5fb52a4409da8688c6e4f877153739889d7c4d9ee9c979ad78ee252961a848a1",
+    "bytes": 6983
+   },
+   {
+    "rel": "ui/src/pages/execution/TaskList.jsx",
+    "repo": "conductor-oss/conductor",
+    "sha256": "687fc0500395d4f24acd384af5095cf8c0dc454a957fb0be5a03e8ccc392c31d",
+    "bytes": 1193
+   },
+   {
+    "rel": "packages/svelte/tests/snapshot/samples/each-string-template/_expected/client/index.svelte.js",
+    "repo": "sveltejs/svelte",
+    "sha256": "5b0a3647122dc93f6168c5c08f7fea136487047ad5b20ece1810435b87ec58b4",
+    "bytes": 498
+   },
+   {
+    "rel": "src/locale/lang/kz.js",
+    "repo": "ElemeFE/element",
+    "sha256": "58d6980b5a7b8d86a9155a3235408988ba56f18a86b87cb9b11698ba26a4e97f",
+    "bytes": 3482
+   },
+   {
+    "rel": "integrations/react-vite/src/App.jsx",
+    "repo": "TanStack/query",
+    "sha256": "6eb2b3b737aad70b8bac05dcdc918f15d60664c6031feff1ad8c9ed9927536cf",
+    "bytes": 453
+   },
+   {
+    "rel": "ui/src/pages/kitchensink/DiagramTest.jsx",
+    "repo": "conductor-oss/conductor",
+    "sha256": "73954b02407f3db2ae273d5a3fbb679850aa1672e865cf87f742636353409e82",
+    "bytes": 2698
+   },
+   {
+    "rel": "packages/svelte/tests/runtime-runes/samples/async-each-preserve-pending/_config.js",
+    "repo": "sveltejs/svelte",
+    "sha256": "5b6316cb52251b2523c169dfc59a544b5372b53d52e62ebef17819a36f97288b",
+    "bytes": 964
+   },
+   {
+    "rel": "test/unit/util.js",
+    "repo": "ElemeFE/element",
+    "sha256": "67c011a44e6bf34e2b62bf15f9019c17277e938958e9f93ff00abd3c413f949d",
+    "bytes": 2934
+   },
+   {
+    "rel": "integrations/react-webpack-4/src/App.js",
+    "repo": "TanStack/query",
+    "sha256": "6eb2b3b737aad70b8bac05dcdc918f15d60664c6031feff1ad8c9ed9927536cf",
+    "bytes": 453
+   },
+   {
+    "rel": "ui/src/pages/definition/TaskDefinition.jsx",
+    "repo": "conductor-oss/conductor",
+    "sha256": "764964e27c1f47c4bc97db0f7b236e80f58e439f8c719d3f28d7dcf204e1d001",
+    "bytes": 4341
+   },
+   {
+    "rel": "packages/svelte/src/internal/server/hydratable.js",
+    "repo": "sveltejs/svelte",
+    "sha256": "5bc3072d39a6cbae57ffc4a4e6bb6842099411e746edc0b50d690683d3bc5da0",
+    "bytes": 4036
+   },
+   {
+    "rel": "examples/components/theme/constant.js",
+    "repo": "ElemeFE/element",
+    "sha256": "6e0a1f213faf5ce1010d211a4090ce5c1c609227709c8ebc978a227060de6c34",
+    "bytes": 514
+   },
+   {
+    "rel": "integrations/react-webpack-5/src/App.js",
+    "repo": "TanStack/query",
+    "sha256": "6eb2b3b737aad70b8bac05dcdc918f15d60664c6031feff1ad8c9ed9927536cf",
+    "bytes": 453
+   },
+   {
+    "rel": "ui/src/utils/helperFunctions.js",
+    "repo": "conductor-oss/conductor",
+    "sha256": "76f74becc8901e964769ce98953c629a9c388651faf4ba7dcdaaa629bd5044ee",
+    "bytes": 1740
+   },
+   {
+    "rel": "packages/svelte/tests/runtime-legacy/samples/let-directive-and-const-tag-slotted/_config.js",
+    "repo": "sveltejs/svelte",
+    "sha256": "5d922cc6551fba42b06cf64117f8088a3be762ddf58366b4e03ada8a258d08cf",
+    "bytes": 444
+   },
+   {
+    "rel": "examples/util.js",
+    "repo": "ElemeFE/element",
+    "sha256": "708605d1cf9a6d14252e87f28321f290f9ba8348b473f504e1f7d2299c3c9f7d",
+    "bytes": 498
+   },
+   {
+    "rel": "packages/query-codemods/src/utils/index.cjs",
+    "repo": "TanStack/query",
+    "sha256": "6fb91b9655b003408a686661fff975e7320766417b242cd2ee9c70d8899bf7f6",
+    "bytes": 5627
+   },
+   {
+    "rel": "ui-next/src/components/features/flow/components/shapes/TaskCard/icons/PlusIcon.jsx",
+    "repo": "conductor-oss/conductor",
+    "sha256": "78b1fe38befa63d2c089d14d8a7fda6020b65c7cb8b7388604e4b94ca93740fd",
+    "bytes": 649
+   },
+   {
+    "rel": "packages/svelte/tests/runtime-runes/samples/proxy-not-shared/_config.js",
+    "repo": "sveltejs/svelte",
+    "sha256": "677696c651b4d4f3a0089e5bbe2755fadbd4e68c12ce3577d6d4944c6ed5b5b7",
+    "bytes": 545
+   },
+   {
+    "rel": "src/locale/lang/es.js",
+    "repo": "ElemeFE/element",
+    "sha256": "75a6c9689cff92478114d87f02cc9fed5acb90006c608aec8dba563daa847d46",
+    "bytes": 2778
+   },
+   {
+    "rel": "packages/query-codemods/src/v4/key-transformation.cjs",
+    "repo": "TanStack/query",
+    "sha256": "7b07825c69877b52c1571a8e10dce47a05c2047d9187280593b80052dd0ad3a3",
+    "bytes": 4202
+   },
+   {
+    "rel": "ui/src/index.js",
+    "repo": "conductor-oss/conductor",
+    "sha256": "7a1c69f5778aa8f32cd8f974b03b4765a425ae37fce96fd4f17bc8aceeebcb6a",
+    "bytes": 1269
+   },
+   {
+    "rel": "packages/svelte/tests/runtime-runes/samples/async-state-new-branch-fork-2/_config.js",
+    "repo": "sveltejs/svelte",
+    "sha256": "692e0a6e02f9b2b3e2bbc3d6b1d0a635f92215b238a67094ab60b5991a5d3489",
+    "bytes": 1188
+   },
+   {
+    "rel": "src/locale/lang/sw.js",
+    "repo": "ElemeFE/element",
+    "sha256": "8338cec10d289c4dd11862f45e55b5ddfa91302e8f3ef0cb3aeb32af3342bdd8",
+    "bytes": 2982
+   },
+   {
+    "rel": "packages/query-codemods/src/v5/rename-properties/rename-properties.cjs",
+    "repo": "TanStack/query",
+    "sha256": "88c56d40ece42bcbabb9cb52000c4d9dac0f6e9acab5cfa3429091856aa5e7a7",
+    "bytes": 1166
+   },
+   {
+    "rel": "ui/src/pages/execution/TaskLogs.jsx",
+    "repo": "conductor-oss/conductor",
+    "sha256": "84eab239e14e46acf6a02140b97bae9910fdfe10df73cc9e2e7994d0e24f73e2",
+    "bytes": 657
+   },
+   {
+    "rel": "packages/svelte/tests/runtime-legacy/samples/spread-component-dynamic-non-object-multiple-dependencies/_config.js",
+    "repo": "sveltejs/svelte",
+    "sha256": "6ccad26f3df868dc9f0e4e47092346dcc17bfe8ffe45d0082ea43dd042a36a17",
+    "bytes": 1212
+   },
+   {
+    "rel": "src/locale/lang/pt.js",
+    "repo": "ElemeFE/element",
+    "sha256": "84c5d433c58bcab769329dd3fb9c5b769e4b64c8798ab80f2e74a1433c28f01e",
+    "bytes": 3020
+   },
+   {
+    "rel": "packages/react-query/eslint.config.js",
+    "repo": "TanStack/query",
+    "sha256": "8952cf8786967536410d0ea5ded9601899a53509e4a5e6e172c53034c2b27d82",
+    "bytes": 1378
+   },
+   {
+    "rel": "ui/src/components/Dropdown.jsx",
+    "repo": "conductor-oss/conductor",
+    "sha256": "8d364850aaa53b89156ec01e039bbfa3ebbf6dba287b906cad31078ff1de8999",
+    "bytes": 1470
+   },
+   {
+    "rel": "packages/svelte/tests/css/samples/nested-css/_config.js",
+    "repo": "sveltejs/svelte",
+    "sha256": "6dc42478d7be7fd56e231f29f469d453c559d521c044d0e6c1eb93301abd1acb",
+    "bytes": 1572
+   },
+   {
+    "rel": "packages/upload/src/ajax.js",
+    "repo": "ElemeFE/element",
+    "sha256": "8998b70ceda2bfe0567d7809729b452466dcefa67d3e23ce40debaa5113c8e0e",
+    "bytes": 1779
+   },
+   {
+    "rel": "packages/query-codemods/src/v5/remove-overloads/remove-overloads.cjs",
+    "repo": "TanStack/query",
+    "sha256": "8c4dac7669445a93db3d8ebf311ec31d3f484d56a1326dcc20512a2a3d80de5c",
+    "bytes": 1515
+   },
+   {
+    "rel": "ui/src/pages/execution/ActionModule.jsx",
+    "repo": "conductor-oss/conductor",
+    "sha256": "92260265bf9d1304dd536a7214f06d93956e27448e5637999d053f58b02b1874",
+    "bytes": 4773
+   },
+   {
+    "rel": "packages/svelte/tests/runtime-runes/samples/async-attachment/_config.js",
+    "repo": "sveltejs/svelte",
+    "sha256": "6f2af1a2101b3f9eb9aaf794f552421a2e791c494877496f29e747bfc62f29bc",
+    "bytes": 515
+   },
+   {
+    "rel": "examples/components/theme-configurator/editor/color-picker/src/color.js",
+    "repo": "ElemeFE/element",
+    "sha256": "9110944562984962b51d394813c955928d8dd43ae2ca81b9cd6e0b2ce4d5b97d",
+    "bytes": 8827
+   },
+   {
+    "rel": "examples/lit/pagination/config/ports.js",
+    "repo": "TanStack/query",
+    "sha256": "93e253843120332f746228160b2c296c005ff2986a3afab35ff7143c7ed386f1",
+    "bytes": 620
+   },
+   {
+    "rel": "ui/src/data/workflow.js",
+    "repo": "conductor-oss/conductor",
+    "sha256": "924afdfe339ab97dfce9a8f50399a1b5a11f90f08af4d645fedf8026c3673ef5",
+    "bytes": 5106
+   },
+   {
+    "rel": "packages/svelte/tests/runtime-legacy/samples/await-then-destruct-array/_config.js",
+    "repo": "sveltejs/svelte",
+    "sha256": "739bd8f93ef28963152a4ac18b2a0a068b97808415204179140f592168d37d81",
+    "bytes": 938
+   },
+   {
+    "rel": "packages/color-picker/src/draggable.js",
+    "repo": "ElemeFE/element",
+    "sha256": "913f436b835aff03a627a036261e798a7a90abf88f301fa8f1ae8908edc845de",
+    "bytes": 915
+   },
+   {
+    "rel": "packages/query-codemods/src/v4/utils/replacers/key-replacer.cjs",
+    "repo": "TanStack/query",
+    "sha256": "9745a07f3ab9e32d3cdbd647252b9b8ca0dd15ab1c1043d7b4eeaf8ad3daf804",
+    "bytes": 5098
+   },
+   {
+    "rel": "ui-next/src/components/features/flow/components/shapes/TaskCard/StartWorkflowTask.jsx",
+    "repo": "conductor-oss/conductor",
+    "sha256": "97ab57b78c4a7ed12d6f875a3c2d51f69840d40760386cc14d8b6ad583f9cbdd",
+    "bytes": 1626
+   },
+   {
+    "rel": "packages/svelte/tests/runtime-runes/samples/bindable-prop-and-export/_config.js",
+    "repo": "sveltejs/svelte",
+    "sha256": "778eee6b9c0c16a774b00ccc5730856ddeda15251cc3cb75aef763c714da8cfd",
+    "bytes": 952
+   },
+   {
+    "rel": "src/locale/lang/da.js",
+    "repo": "ElemeFE/element",
+    "sha256": "9545fb9e0662ef9a9a84b3340d4403e52633b9cd531dd91446333dd8a09a9627",
+    "bytes": 2744
+   },
+   {
+    "rel": "packages/query-codemods/src/v5/keep-previous-data/utils/already-has-placeholder-data-property.cjs",
+    "repo": "TanStack/query",
+    "sha256": "9c5d91e8c40a32ac6cd15df5b344c0c4c8572376fba23bfc092e11c68b00e0de",
+    "bytes": 844
+   },
+   {
+    "rel": "ui-next/src/components/features/flow/components/graphs/CustomPort.jsx",
+    "repo": "conductor-oss/conductor",
+    "sha256": "9991dd25d983202d6a11c1f26df9d73f423b179eb4a1ec7e1b1a69387593e644",
+    "bytes": 1173
+   },
+   {
+    "rel": "packages/svelte/tests/runtime-runes/samples/inspect-new-property/_config.js",
+    "repo": "sveltejs/svelte",
+    "sha256": "7fa47690c60a8ac2cffe4fd3bae8becfaacf04e819206da793bbf4ddbc1f9a5d",
+    "bytes": 466
+   },
+   {
+    "rel": "packages/table/src/store/expand.js",
+    "repo": "ElemeFE/element",
+    "sha256": "9c00d1831d6e29c807cf094623e7875c16f0893985494f14536646837487597d",
+    "bytes": 1814
+   },
+   {
+    "rel": "packages/react-query-next-experimental/eslint.config.js",
+    "repo": "TanStack/query",
+    "sha256": "9c61a6e8cc6662c58a575ccff00b1a5cdcf3d799c91c77676fccd1a67157417c",
+    "bytes": 1320
+   },
+   {
+    "rel": "ui-next/src/components/features/flow/testUtils.js",
+    "repo": "conductor-oss/conductor",
+    "sha256": "a54b8c5ecf355f1c390985c073e6d6c717e385090d725577381addc791610ad5",
+    "bytes": 1611
+   },
+   {
+    "rel": "packages/svelte/tests/runtime-legacy/samples/component-slot-fallback-6/_config.js",
+    "repo": "sveltejs/svelte",
+    "sha256": "8253b9291c8c3382e33031c4a2c67f1552c107c255d2d23040fbfd528d8f3a6c",
+    "bytes": 504
+   },
+   {
+    "rel": "src/locale/lang/ko.js",
+    "repo": "ElemeFE/element",
+    "sha256": "a4d33a1d25e65430a7897002a8e56e731c46b4518eee9fbb9dbb782b95faf25a",
+    "bytes": 2914
+   },
+   {
+    "rel": "integrations/react-webpack-4/webpack.config.js",
+    "repo": "TanStack/query",
+    "sha256": "9e6735a143a12244caa6ddbd1ac7023dc3879f00ad2b50e9897fa1f35f7b7232",
+    "bytes": 501
+   },
+   {
+    "rel": "ui-next/src/components/features/flow/components/shapes/TaskCard/INLINETask.jsx",
+    "repo": "conductor-oss/conductor",
+    "sha256": "ac857c087823ce4c155b3828a2caf1f418e6f077581ecb08fc54996357894a2b",
+    "bytes": 931
+   },
+   {
+    "rel": "packages/svelte/tests/runtime-legacy/samples/textarea-content/_config.js",
+    "repo": "sveltejs/svelte",
+    "sha256": "8fe2086fbd463b1625a643126efda55bb3a30ded9233b89c4f99d93507196e77",
+    "bytes": 3311
+   },
+   {
+    "rel": "src/utils/after-leave.js",
+    "repo": "ElemeFE/element",
+    "sha256": "a6a7c292d52d125ccf4c9df42dce48baa83f574389208b932d71c25efc373c37",
+    "bytes": 894
+   },
+   {
+    "rel": "integrations/react-webpack-5/webpack.config.js",
+    "repo": "TanStack/query",
+    "sha256": "9e6735a143a12244caa6ddbd1ac7023dc3879f00ad2b50e9897fa1f35f7b7232",
+    "bytes": 501
+   },
+   {
+    "rel": "ui/src/pages/errors/components/Notification.jsx",
+    "repo": "conductor-oss/conductor",
+    "sha256": "ad1b9c44b6cd2518723bf1f211a2877f87daf4e04d17a00e8af93b2d22e22d82",
+    "bytes": 1259
+   },
+   {
+    "rel": "packages/svelte/tests/runtime-runes/samples/html-entity-line-feed/_config.js",
+    "repo": "sveltejs/svelte",
+    "sha256": "91d10bccae76cd6c9a99b7995708f4d44deba341ee93c2321b2f65752b2643a6",
+    "bytes": 611
+   },
+   {
+    "rel": "src/utils/aria-dialog.js",
+    "repo": "ElemeFE/element",
+    "sha256": "ab76606fae3932df4b9d9c7557c36355fbe13774eb2a1a4e4f12614c180e403a",
+    "bytes": 2595
+   },
+   {
+    "rel": "packages/query-codemods/src/v5/remove-overloads/utils/index.cjs",
+    "repo": "TanStack/query",
+    "sha256": "9fc818a2cb05fa99dac044e16368a32c35a5cf1687b40be7cc859e5b7b10c094",
+    "bytes": 3681
+   },
+   {
+    "rel": "ui-next/src/components/features/flow/components/shapes/StarShape.jsx",
+    "repo": "conductor-oss/conductor",
+    "sha256": "af19f15a98b3d068494f434c0ba18480c5baae39b5fec9ff5a0eec03224014e2",
+    "bytes": 1199
+   },
+   {
+    "rel": "packages/svelte/src/internal/client/dom/blocks/key.js",
+    "repo": "sveltejs/svelte",
+    "sha256": "9a76c14bf72d0412906b2fafaec99901171563b21a7f8dbdbe619ad4e2fdc1cb",
+    "bytes": 970
+   },
+   {
+    "rel": "test/unit/specs/tag.spec.js",
+    "repo": "ElemeFE/element",
+    "sha256": "ae7647f059b048760364027348db2cc24a54b3ee513cb8b54599679384d78b1f",
+    "bytes": 2824
+   },
+   {
+    "rel": "packages/angular-query-experimental/scripts/prepack.js",
+    "repo": "TanStack/query",
+    "sha256": "a7abfcb7acf29225b695ac30577c94b32c7dc062b7cf589f9734215ea7c3786e",
+    "bytes": 3026
+   },
+   {
+    "rel": "ui-next/src/components/features/flow/components/shapes/TaskCard/KAFKATask.jsx",
+    "repo": "conductor-oss/conductor",
+    "sha256": "af2626754c7027c38b269814552570480b772eb44bebf307187e713232b95347",
+    "bytes": 1832
+   },
+   {
+    "rel": "packages/svelte/src/internal/client/dev/tracing.js",
+    "repo": "sveltejs/svelte",
+    "sha256": "a13f87e8a893e7ad30f6185092a7cf7e211d10d9f15023c0ec49cb4fe1049310",
+    "bytes": 4014
+   },
+   {
+    "rel": "packages/table/src/table-column.js",
+    "repo": "ElemeFE/element",
+    "sha256": "bab21135dcd30b80696d9dbe4d83e86961ceda6f5294386c598e3848b3d310d1",
+    "bytes": 9145
+   },
+   {
+    "rel": "examples/react/eslint-plugin-demo/eslint.config.js",
+    "repo": "TanStack/query",
+    "sha256": "afa760ce7d8eae1265a7eb76f576e3d797e031cc497459bd35f457814f22222c",
+    "bytes": 476
+   },
+   {
+    "rel": "ui/src/pages/errors/components/WorkflowTypeChart.jsx",
+    "repo": "conductor-oss/conductor",
+    "sha256": "b046d27fba9bbb7f1d1a52ac4e4df8f1ed6405e52f9927fbef2a04bb1aa25dbc",
+    "bytes": 3989
+   },
+   {
+    "rel": "packages/svelte/tests/runtime-runes/samples/async-new-batch-during-initial-load/_config.js",
+    "repo": "sveltejs/svelte",
+    "sha256": "b0e97a72dcef01cddd99611ceb9cf57ad68ff476a07e6bead4dd5a1b64eb506d",
+    "bytes": 520
+   },
+   {
+    "rel": "test/unit/specs/checkbox.spec.js",
+    "repo": "ElemeFE/element",
+    "sha256": "c0961280512736c6bef236e14203a4d47d6a46ab347a9ae18a2f1217228f89f8",
+    "bytes": 14166
+   },
+   {
+    "rel": "packages/eslint-plugin-query/eslint.config.js",
+    "repo": "TanStack/query",
+    "sha256": "b1532c63764264cd3ed236ac50e09990e0a5947fc9f5c611a81090b502e42b04",
+    "bytes": 451
+   },
+   {
+    "rel": "ui/src/components/Tabs.jsx",
+    "repo": "conductor-oss/conductor",
+    "sha256": "b1596c0a19bd2c9a57e45510ff856fead839c2290cb6de01e6364b09e8cee422",
+    "bytes": 1574
+   },
+   {
+    "rel": "packages/svelte/tests/runtime-legacy/samples/component-slot-let-mutated/_config.js",
+    "repo": "sveltejs/svelte",
+    "sha256": "b14e93bf0a24cd63a86438147ed046cb1e3d9acedebe5218e2cabb444f2e6801",
+    "bytes": 395
+   },
+   {
+    "rel": "src/locale/lang/sl.js",
+    "repo": "ElemeFE/element",
+    "sha256": "ca3cdf3fc1f7d9a34ab3be1274492075bf9c9c8575f84adad8dac8e902b95632",
+    "bytes": 2754
+   },
+   {
+    "rel": "packages/preact-query-persist-client/eslint.config.js",
+    "repo": "TanStack/query",
+    "sha256": "b17761a4d213a9d8275dc093011c5903e9da27fc2638130e5bd955be2f06b1eb",
+    "bytes": 921
+   },
+   {
+    "rel": "ui/src/components/ScheduleNameInput.jsx",
+    "repo": "conductor-oss/conductor",
+    "sha256": "b41e8796db6ae3c72e1d61df6ae61c1567062dea393451b7ea58ccbbf6b4264e",
+    "bytes": 415
+   },
+   {
+    "rel": "packages/svelte/tests/runtime-legacy/samples/props-reactive-slot/_config.js",
+    "repo": "sveltejs/svelte",
+    "sha256": "b3069da45d0fe431c06b54a588e8093889b7f5bd0ee6cc7d38e67f7152fcafc1",
+    "bytes": 462
+   },
+   {
+    "rel": "src/utils/aria-utils.js",
+    "repo": "ElemeFE/element",
+    "sha256": "d073abb91d6d9be8abef2d16aa7e4fe1e14645792516c41d383d5b6d15b5fe6c",
+    "bytes": 2849
+   },
+   {
+    "rel": "packages/preact-query/eslint.config.js",
+    "repo": "TanStack/query",
+    "sha256": "b17761a4d213a9d8275dc093011c5903e9da27fc2638130e5bd955be2f06b1eb",
+    "bytes": 921
+   },
+   {
+    "rel": "ui-next/src/components/features/flow/components/shapes/TaskCard/icons/CheckIcon.jsx",
+    "repo": "conductor-oss/conductor",
+    "sha256": "c00800e81858ac82fc637b9ca96ef7f78fbd2dc54a1331bfe67e5d9d667d8a54",
+    "bytes": 450
+   },
+   {
+    "rel": "packages/svelte/src/compiler/phases/3-transform/shared/transform-async.js",
+    "repo": "sveltejs/svelte",
+    "sha256": "bb63ab6d04766f2580f77bc8d45d0759bf363c87dc0ef1e0b4e1e412df9e83f3",
+    "bytes": 4158
+   },
+   {
+    "rel": "packages/message/src/main.js",
+    "repo": "ElemeFE/element",
+    "sha256": "d2257939cc8592a8989ec2f4afd0814b19ecd7fbc1e253a64193ff4557ad7fc4",
+    "bytes": 2288
+   },
+   {
+    "rel": "scripts/create-github-release.mjs",
+    "repo": "TanStack/query",
+    "sha256": "b902a00c38fb6f1d1811e1c98cff4ab2dc0337dea9a53e6e19fb417bea380fe7",
+    "bytes": 8120
+   },
+   {
+    "rel": "ui/src/pages/errors/components/TimeSeriesChart.jsx",
+    "repo": "conductor-oss/conductor",
+    "sha256": "c5ba8e305f0c87e24470fe8c6b78e1c2588003198710757dacfbc6ed4b3793d6",
+    "bytes": 4468
+   },
+   {
+    "rel": "packages/svelte/tests/runtime-browser/samples/hydrate-large-text-node/_config.js",
+    "repo": "sveltejs/svelte",
+    "sha256": "bc5d60cf76ea8610d45e660c0b4f5ed9a47bd7c79a5c0d29650bb099cedd059b",
+    "bytes": 789
+   },
+   {
+    "rel": "test/unit/specs/result.spec.js",
+    "repo": "ElemeFE/element",
+    "sha256": "d33359a4b8a8f8121857a40b3be984fbc660c2a3a620ab33ee8fe861a03eba75",
+    "bytes": 3649
+   },
+   {
+    "rel": "packages/svelte-query-devtools/eslint.config.js",
+    "repo": "TanStack/query",
+    "sha256": "b91326eaad5961c5590b859085d84bc77daef61a9e9359d81dd4ae7f784062ec",
+    "bytes": 737
+   },
+   {
+    "rel": "ui-next/src/templates/JSONSchemaWorkflow.js",
+    "repo": "conductor-oss/conductor",
+    "sha256": "c771ec5b3334338b583e7aca6ed8b82269595b5b7383a8351b5e3cecfe4f6a3b",
+    "bytes": 9469
+   },
+   {
+    "rel": "packages/svelte/src/internal/server/dev.js",
+    "repo": "sveltejs/svelte",
+    "sha256": "bccc29673fba9d4ef26a63811d23f34cd91fad0a90e608b6cfb1d45cdaf0302b",
+    "bytes": 3133
+   },
+   {
+    "rel": "test/unit/specs/container.spec.js",
+    "repo": "ElemeFE/element",
+    "sha256": "d89a61ceec5cc5f918e31c6f0ddab18d867867358d175de8c5a1c71700b7284b",
+    "bytes": 2586
+   },
+   {
+    "rel": "packages/svelte-query-persist-client/eslint.config.js",
+    "repo": "TanStack/query",
+    "sha256": "b91326eaad5961c5590b859085d84bc77daef61a9e9359d81dd4ae7f784062ec",
+    "bytes": 737
+   },
+   {
+    "rel": "ui/src/components/LinearProgress.jsx",
+    "repo": "conductor-oss/conductor",
+    "sha256": "cae7d7f3c4f0ebc9c0c009b024a232fbc18e5aa89d6ed075ea2c288ce44aea1e",
+    "bytes": 460
+   },
+   {
+    "rel": "packages/svelte/tests/runtime-runes/samples/class-state-init-eager-3/_config.js",
+    "repo": "sveltejs/svelte",
+    "sha256": "c611b5fe6c03b5a991967b124ebe50f1cdbdd2092ee13b3d100e6ad112e4a974",
+    "bytes": 435
+   },
+   {
+    "rel": "test/unit/specs/divider.spec.js",
+    "repo": "ElemeFE/element",
+    "sha256": "da9f7c725244ee9197793f891c032fafeee2e7f199f3ae301a08b9258479f2f8",
+    "bytes": 882
+   },
+   {
+    "rel": "integrations/react-webpack-4/src/index.js",
+    "repo": "TanStack/query",
+    "sha256": "b9137b7cfec995e3f90f0bf22689f14b6670257b5719e941d89b6434a0f4ed1b",
+    "bytes": 514
+   },
+   {
+    "rel": "ui/src/components/formik/FormikSwitch.jsx",
+    "repo": "conductor-oss/conductor",
+    "sha256": "cfd63a815e2c6f3407c84b6d230b2df486de9a63908e6208b4e0f7ed7d10751e",
+    "bytes": 475
+   },
+   {
+    "rel": "packages/svelte/src/compiler/phases/3-transform/server/visitors/PropertyDefinition.js",
+    "repo": "sveltejs/svelte",
+    "sha256": "c768eba2a7fe29743b29f84a6d63b3f778e19f48d347af7cba26ddef7b15afcf",
+    "bytes": 1032
+   },
+   {
+    "rel": "test/unit/specs/row.spec.js",
+    "repo": "ElemeFE/element",
+    "sha256": "dce760610aafa4b77814fea990599fcb329b2a1552cef3db511a53f634e2786f",
+    "bytes": 1089
+   },
+   {
+    "rel": "integrations/react-webpack-5/src/index.js",
+    "repo": "TanStack/query",
+    "sha256": "b9137b7cfec995e3f90f0bf22689f14b6670257b5719e941d89b6434a0f4ed1b",
+    "bytes": 514
+   },
+   {
+    "rel": "ui/src/pages/workbench/ExecutionHistory.jsx",
+    "repo": "conductor-oss/conductor",
+    "sha256": "d6bd8f8c0a126c269b80f8985d47c3e246314f7866fb5703456cebd9e761393c",
+    "bytes": 2625
+   },
+   {
+    "rel": "packages/svelte/rollup.config.js",
+    "repo": "sveltejs/svelte",
+    "sha256": "c9a25cb6140d33d3f72715cb5f31894af2e6c2a4be806a88a9f85218320c47da",
+    "bytes": 474
+   },
+   {
+    "rel": "packages/notification/src/main.js",
+    "repo": "ElemeFE/element",
+    "sha256": "dd7cc1067b63aac3125d548883056b5f527bca39007494a4ad2ba0d9a856e2cd",
+    "bytes": 2518
+   },
+   {
+    "rel": "examples/lit/basic/config/port.js",
+    "repo": "TanStack/query",
+    "sha256": "b9297802cd066b909cb79c8e92d56b59b502e73a8ea5bf211174d13a807feae1",
+    "bytes": 492
+   },
+   {
+    "rel": "ui/src/theme/colorOverrides.js",
+    "repo": "conductor-oss/conductor",
+    "sha256": "dd11d13ae0b455aadba1bebcb3f133130a8168adc68b102a09ed4e4916382ab5",
+    "bytes": 948
+   },
+   {
+    "rel": "packages/svelte/tests/runtime-runes/samples/snippet-expressions/_config.js",
+    "repo": "sveltejs/svelte",
+    "sha256": "c9b8672a46d6c0ce52a932b76f7b1f587b3efb6ab898a2ef3c6caa9057701b9b",
+    "bytes": 684
+   },
+   {
+    "rel": "src/locale/lang/ar.js",
+    "repo": "ElemeFE/element",
+    "sha256": "dfae62d612be9c293b076111dd31ed73d7eae0d3b9b084157d063dcaefd8a555",
+    "bytes": 3297
+   },
+   {
+    "rel": "examples/lit/pagination/scripts/dev.mjs",
+    "repo": "TanStack/query",
+    "sha256": "c9233710197a57c325a47073ec86cb9683a06ee44bb0f8addd984d0e96dfa4b7",
+    "bytes": 1862
+   },
+   {
+    "rel": "ui/src/components/SchedulerDisabledBanner.jsx",
+    "repo": "conductor-oss/conductor",
+    "sha256": "e2a38715fa43bb6ca919ffa96846eaff289d916d8dc5947ee159ff0c51c52a37",
+    "bytes": 1079
+   },
+   {
+    "rel": "packages/svelte/tests/runtime-legacy/samples/binding-textarea/_config.js",
+    "repo": "sveltejs/svelte",
+    "sha256": "d0e73a925dac7f8041f2904a69bb3221cc6c64f391f9e5828e19ef8c10d6c434",
+    "bytes": 836
+   },
+   {
+    "rel": "test/unit/specs/menu.spec.js",
+    "repo": "ElemeFE/element",
+    "sha256": "e1064f5856bba6a59d35886593a3db0f19b4dc13cc9527e772213b3a596dd0d3",
+    "bytes": 15029
+   },
+   {
+    "rel": "integrations/solid-vite/src/App.jsx",
+    "repo": "TanStack/query",
+    "sha256": "d30a2e22f266daffbf87d047db2e0bae9db2b77c434dbc96c193d0b3e4380019",
+    "bytes": 526
+   },
+   {
+    "rel": "ui/src/pages/definition/SaveSchedulerDialog.jsx",
+    "repo": "conductor-oss/conductor",
+    "sha256": "e3f86fb8f59ade87d0588d129533c770cebff22e3352747898f00d087459629f",
+    "bytes": 3907
+   },
+   {
+    "rel": "packages/svelte/tests/runtime-legacy/samples/immutable-mutate-object/_config.js",
+    "repo": "sveltejs/svelte",
+    "sha256": "d639a83acf5f7b9feed69a8ce46f892934b9c814688560523580c284c97c6258",
+    "bytes": 489
+   },
+   {
+    "rel": "packages/message-box/src/main.js",
+    "repo": "ElemeFE/element",
+    "sha256": "e197e5f7900621fd18be0f05af48588b322381e10914c72c1e16230254bd1df1",
+    "bytes": 5098
+   },
+   {
+    "rel": "eslint.config.js",
+    "repo": "TanStack/query",
+    "sha256": "daee3fbd8f2f409eff3fccb5da86495bcbd3696ea042cc22f32ddc4ba5ee1d05",
+    "bytes": 7134
+   },
+   {
+    "rel": "ui-next/src/components/features/flow/components/shapes/TaskCard/SimpleTask.jsx",
+    "repo": "conductor-oss/conductor",
+    "sha256": "ea6a7c24b4594a47b1d28c2958271850b206c59f6c275b7b5c4ebf9b00244833",
+    "bytes": 690
+   },
+   {
+    "rel": "packages/svelte/tests/runtime-legacy/samples/each-block-component-no-props/_config.js",
+    "repo": "sveltejs/svelte",
+    "sha256": "dd9b53cda4d89a5228743b0d66e2308c7736e5f191455665f2e3fc185e296d02",
+    "bytes": 360
+   },
+   {
+    "rel": "packages/table/src/store/tree.js",
+    "repo": "ElemeFE/element",
+    "sha256": "ec0c8e0267747a9907790a720436c18b6e0366c0029bb2fdcac2905d7f133e88",
+    "bytes": 6909
+   },
+   {
+    "rel": "packages/query-codemods/src/v4/__tests__/key-transformation.test.cjs",
+    "repo": "TanStack/query",
+    "sha256": "db08fb165339fd5dd2ad2727cdc331fa190b2d8d02fd8ebe914d9189968cd8ad",
+    "bytes": 698
+   },
+   {
+    "rel": "ui-next/src/components/features/flow/nodes/mapper/join.test.js",
+    "repo": "conductor-oss/conductor",
+    "sha256": "ed5f76cb3353512e87f3b49269074625cdf17816b724f3bb7b1e4a1d5ed1f9cd",
+    "bytes": 6446
+   },
+   {
+    "rel": "packages/svelte/tests/runtime-legacy/samples/transition-js-dynamic-component/_config.js",
+    "repo": "sveltejs/svelte",
+    "sha256": "e0fd509e451c35158d474aff20dd109569f8d55ed1163e0e7b6379bb517b60e1",
+    "bytes": 631
+   },
+   {
+    "rel": "src/utils/menu/aria-submenu.js",
+    "repo": "ElemeFE/element",
+    "sha256": "f2d39ef9aee4a53971f461741e26942871caad6f2dd1217ff204a759d770e6fc",
+    "bytes": 1450
+   },
+   {
+    "rel": "packages/query-codemods/src/v5/remove-overloads/transformers/filter-aware-usage-transformer.cjs",
+    "repo": "TanStack/query",
+    "sha256": "e06d57b7fdea73739f455b2ceb002d0167acea33ec9b5930105d079eb86e03d3",
+    "bytes": 9164
+   },
+   {
+    "rel": "ui/src/components/index.js",
+    "repo": "conductor-oss/conductor",
+    "sha256": "f20be8c606ba854bbabd8176548b11eaad3d4e89b9352a7c9572a8109fb688d2",
+    "bytes": 1397
+   },
+   {
+    "rel": "packages/svelte/src/compiler/phases/3-transform/client/visitors/ConstTag.js",
+    "repo": "sveltejs/svelte",
+    "sha256": "e4412f55ce5a29ea04b0af692da515c5106fce3e703d4ec884ba0e1968594d25",
+    "bytes": 3481
+   },
+   {
+    "rel": "test/unit/specs/tabs.spec.js",
+    "repo": "ElemeFE/element",
+    "sha256": "f2d5d70fc9ccd2ade7cd3bf138ab89e9e120df286729a8277f22e9b8f5e0ab1f",
+    "bytes": 19054
+   },
+   {
+    "rel": "scripts/getViteAliases.js",
+    "repo": "TanStack/query",
+    "sha256": "e0743992a973fae173915695c58cc24ee053b4960bf2b7010c2849433dfff5ea",
+    "bytes": 478
+   },
+   {
+    "rel": "ui/src/pages/errors/errorsInspectorStyles.js",
+    "repo": "conductor-oss/conductor",
+    "sha256": "f3d69b9076b5a5cf473b3e6c74956aa57289b0b04f59fea2841e094a2936a392",
+    "bytes": 9623
+   },
+   {
+    "rel": "packages/svelte/tests/runtime-runes/samples/async-obsolete-branch-no-effect-runs/_config.js",
+    "repo": "sveltejs/svelte",
+    "sha256": "e53e90f33daa8048f178ee21cf889c196ad695d1921b7d9be6e9703009177f67",
+    "bytes": 566
+   },
+   {
+    "rel": "test/unit/specs/autocomplete.spec.js",
+    "repo": "ElemeFE/element",
+    "sha256": "f416400e387c556ca2f83e90ab3c5cd2f170a42bd37bd96d992eede5f2f436fe",
+    "bytes": 22830
+   },
+   {
+    "rel": "packages/query-codemods/src/v4/replace-import-specifier.cjs",
+    "repo": "TanStack/query",
+    "sha256": "e5ab7343391834b60d80c2b8ec15a89bfb64592ad5908066c86d433045b6a359",
+    "bytes": 605
+   },
+   {
+    "rel": "ui/src/data/bulkactions.js",
+    "repo": "conductor-oss/conductor",
+    "sha256": "f3f1e6baf03ef926dc6bd72d31ed3e1b768643fc1f44cf7c29505740a2d01209",
+    "bytes": 2007
+   },
+   {
+    "rel": "packages/svelte/tests/runtime-legacy/samples/raw-mustache-as-root/_config.js",
+    "repo": "sveltejs/svelte",
+    "sha256": "e6e7082333c338dffccf0bd1a3dd10f0c4d23fb233a245eeabbb06287c52a494",
+    "bytes": 767
+   },
+   {
+    "rel": "src/locale/lang/ja.js",
+    "repo": "ElemeFE/element",
+    "sha256": "f55bfd3a3a9c758863c6bdba7ffdb92c6d5017fff0c1bbb240c98950f1bb692d",
+    "bytes": 2941
+   },
+   {
+    "rel": "integrations/solid-vite/src/index.jsx",
+    "repo": "TanStack/query",
+    "sha256": "ef03d0ad94bed546e3a3c24538fcc93c5038815d387222c249cf99e05c0080a5",
+    "bytes": 461
+   },
+   {
+    "rel": "ui-next/src/pages/scheduler/ScheduleDiffEditor.jsx",
+    "repo": "conductor-oss/conductor",
+    "sha256": "f7eaaf60541eef6b7e70568f629abd28e950ee3d86fe8bcc3e5d5ab0161e06ff",
+    "bytes": 2593
+   },
+   {
+    "rel": "packages/svelte/tests/runtime-legacy/samples/binding-store-each/_config.js",
+    "repo": "sveltejs/svelte",
+    "sha256": "e7dad3d3d2202fdb40c91d3d52c5eec4589499ef734317d15fab9ca9d3a61561",
+    "bytes": 579
+   },
+   {
+    "rel": "src/locale/lang/ku.js",
+    "repo": "ElemeFE/element",
+    "sha256": "f65c0d5b4b1e3d87830a602e10947a48a139be9c24941cbe61c7e81c0fff5664",
+    "bytes": 2870
+   },
+   {
+    "rel": "packages/angular-query-experimental/eslint.config.js",
+    "repo": "TanStack/query",
+    "sha256": "f230f51ee7a6ff7f60f1e9d38befd41aba4f5945d954a5024498c456f72bb352",
+    "bytes": 546
+   },
+   {
+    "rel": "ui-next/src/pages/styles.js",
+    "repo": "conductor-oss/conductor",
+    "sha256": "f9ab104b39959a64689c85d1a42d0f338f5e83b792bdd5f6454cfc4dc5208d13",
+    "bytes": 3408
+   },
+   {
+    "rel": "packages/svelte/tests/runtime-runes/samples/async-each-sibling/_config.js",
+    "repo": "sveltejs/svelte",
+    "sha256": "e9775b2bed4a2cfb11bcc7cc55ca12feb91d7882dc9290824f3e3da691f833a0",
+    "bytes": 422
+   },
+   {
+    "rel": "examples/components/theme-configurator/utils/boxShadow.js",
+    "repo": "ElemeFE/element",
+    "sha256": "f7a114e2c926d40402c3b4aa795de0e64261e7be6499ea7578803ac5505cd409",
+    "bytes": 1354
+   },
+   {
+    "rel": "packages/query-codemods/eslint.config.js",
+    "repo": "TanStack/query",
+    "sha256": "f2962dbb14a3753ad59c12f4d9924c578bd67bf2ed9cab282b27f022a6b1b3bb",
+    "bytes": 631
+   },
+   {
+    "rel": "ui-next/public/context.js",
+    "repo": "conductor-oss/conductor",
+    "sha256": "f9d21a90429cdf2a4286e5c6904277ece24dec57357a8f5f70db3d69077a1db1",
+    "bytes": 1640
+   },
+   {
+    "rel": "packages/svelte/tests/runtime-legacy/samples/svg-child-component-declared-namespace-shorthand/_config.js",
+    "repo": "sveltejs/svelte",
+    "sha256": "ecd6de2ad97da7cf60e3eefac2fd890962cd8a61a34938bbe1e37221e07c5d27",
+    "bytes": 655
+   },
+   {
+    "rel": "packages/table/src/dropdown.js",
+    "repo": "ElemeFE/element",
+    "sha256": "f8ea09beea7b2a7f818ae475f6b17b4f36a3c40559152c3beeddf1887e428ac2",
+    "bytes": 650
+   },
+   {
+    "rel": "packages/query-codemods/src/v5/rename-hydrate/rename-hydrate.cjs",
+    "repo": "TanStack/query",
+    "sha256": "f61e044de3e57b33eee5ba91b89d284d5ca598d750cb8593ce82b24ce879bffa",
+    "bytes": 1613
+   },
+   {
+    "rel": "ui/src/data/actions.js",
+    "repo": "conductor-oss/conductor",
+    "sha256": "fa96f53c67b10db6359efea6804ee4dfedb3eaaa78dfc7a0263ae58a145a4664",
+    "bytes": 1786
+   },
+   {
+    "rel": "packages/svelte/tests/runtime-runes/samples/async-save-await-block-pending/_config.js",
+    "repo": "sveltejs/svelte",
+    "sha256": "f8c5b9eb514cdfc3f2342a9e3b45980ec9c34c8b6823cf13fe71e22a5638cd2e",
+    "bytes": 434
+   },
+   {
+    "rel": "packages/tooltip/src/main.js",
+    "repo": "ElemeFE/element",
+    "sha256": "fd5ea504d7780c1f7167172c26d237dddefa38f8cdfbd7db4c035588ffe8b47b",
+    "bytes": 5894
+   },
+   {
+    "rel": "integrations/react-vite/src/main.jsx",
+    "repo": "TanStack/query",
+    "sha256": "fa9599b87c3f042bf8b3a82cad36b4d7d5baecbf93c19902c29aa787ba7181f1",
+    "bytes": 518
+   },
+   {
+    "rel": "ui/src/components/ButtonGroup.jsx",
+    "repo": "conductor-oss/conductor",
+    "sha256": "fce1ffbd5b532598a65651cb2cff6f56fc088be5bff72bec674bd7d4a1ff6512",
+    "bytes": 571
+   },
+   {
+    "rel": "packages/svelte/tests/runtime-runes/samples/event-attribute-capture/_config.js",
+    "repo": "sveltejs/svelte",
+    "sha256": "fcaf2e8745b3d51ecbc60257f1a37f71260a23ff298a1312f07ba4f7a746e744",
+    "bytes": 435
+   }
+  ],
+  "trainTokens": 114528,
+  "builder": "eval/coding-competence/build-lex-prior.mjs",
+  "derive": {
+   "MIN_WORD_COUNT": 3,
+   "MIN_WORD_REPOS": 2,
+   "MIN_SYMBOL_COUNT": 1,
+   "MUNCH_PRECISION": 0.5,
+   "OPENER_MIN_COUNT": 5,
+   "OPENER1_PRECISION": 0.95,
+   "OPENER2_PRECISION": 0.99,
+   "LCP_SHARE": 0.99,
+   "STRING_MIN_COUNT": 5,
+   "STRING_OPEN_PRECISION": 0.95,
+   "MATCH_MIN": 0.9,
+   "EXTRA_MIN_COUNT": 20,
+   "EXTRA_PRECISION": 0.9,
+   "PREFIX_MIN_COUNT": 20,
+   "PREFIX_ATTACH": 0.5,
+   "SUFFIX_MIN_COUNT": 20,
+   "SUFFIX_ATTACH": 0.5,
+   "COND_MIN_COUNT": 5,
+   "COND_PRECISION": 0.95,
+   "INTERP_MIN_COUNT": 20,
+   "INTERP_MIN_SHARE": 0.02,
+   "STRPREFIX_MIN_COUNT": 3,
+   "SAMPLE": 400,
+   "IDENT_SAMPLE_MIN": 300
+  },
+  "note": "Derived from TRAIN gold only (split by repository). Every threshold is in provenance.derive. A prior nominates and refuses; it never admits an identity.",
+  "selection": {
+   "split": "train",
+   "maxFiles": 100000,
+   "maxBytes": 200000,
+   "goldErrTol": 0.02,
+   "eligible": 240,
+   "excluded": {
+    "restricted": 0,
+    "tooBig": 0
+   },
+   "gaps": [],
+   "builtAt": "2026-10-05"
+  }
+ },
+ "words": {
+  "keyword": [
+   "as",
+   "async",
+   "await",
+   "case",
+   "catch",
+   "const",
+   "default",
+   "else",
+   "export",
+   "extends",
+   "finally",
+   "for",
+   "from",
+   "function",
+   "if",
+   "import",
+   "in",
+   "let",
+   "meta",
+   "new",
+   "of",
+   "return",
+   "super",
+   "switch",
+   "this",
+   "throw",
+   "try",
+   "typeof",
+   "var",
+   "while"
+  ],
+  "literal": [
+   "false",
+   "null",
+   "true",
+   "undefined"
+  ],
+  "counts": {
+   "import": 595,
+   "from": 656,
+   "let": 194,
+   "return": 782,
+   "true": 578,
+   "this": 426,
+   "as": 44,
+   "const": 1484,
+   "meta": 5,
+   "false": 336,
+   "function": 217,
+   "new": 110,
+   "if": 587,
+   "undefined": 56,
+   "async": 86,
+   "await": 153,
+   "switch": 9,
+   "case": 33,
+   "default": 254,
+   "try": 27,
+   "catch": 32,
+   "typeof": 41,
+   "in": 12,
+   "throw": 24,
+   "export": 306,
+   "for": 45,
+   "null": 154,
+   "else": 85,
+   "of": 27,
+   "while": 7,
+   "extends": 5,
+   "super": 4,
+   "var": 60,
+   "finally": 3,
+   "vm": 882,
+   "expect": 641,
+   "to": 595,
+   "name": 405,
+   "data": 381,
+   "value": 368,
+   "$el": 358,
+   "node": 321,
+   "equal": 319,
+   "type": 300,
+   "it": 276,
+   "done": 260,
+   "length": 253,
+   "querySelector": 247,
+   "be": 230,
+   "jscodeshift": 218,
+   "label": 206,
+   "target": 191,
+   "id": 190,
+   "setTimeout": 181,
+   "click": 176,
+   "assert": 174,
+   "createVue": 162,
+   "test": 156,
+   "$refs": 152,
+   "template": 151,
+   "div": 150,
+   "style": 142,
+   "path": 127,
+   "title": 127,
+   "tree": 120,
+   "key": 119,
+   "options": 119,
+   "error": 111,
+   "classList": 109,
+   "taskReferenceName": 107,
+   "contains": 106,
+   "querySelectorAll": 96,
+   "document": 95,
+   "b": 91,
+   "color": 89,
+   "el": 86,
+   "message": 86,
+   "utils": 84,
+   "push": 82,
+   "width": 82,
+   "column": 81,
+   "val": 80,
+   "instance": 79,
+   "inputParameters": 77,
+   "innerHTML": 76,
+   "status": 76,
+   "root": 74,
+   "children": 73,
+   "index": 71,
+   "colors": 70,
+   "description": 69,
+   "htmlEqual": 69,
+   "i": 69,
+   "props": 69,
+   "component": 68,
+   "res": 65,
+   "property": 64,
+   "display": 63,
+   "decisionCases": 62,
+   "parent": 62,
+   "height": 61,
+   "task": 61,
+   "exist": 60,
+   "className": 57,
+   "input": 57,
+   "joinOn": 57,
+   "classes": 56,
+   "defaultCase": 56,
+   "methods": 56,
+   "map": 55,
+   "optional": 55,
+   "restaurants": 55,
+   "row": 55,
+   "startDelay": 55,
+   "asyncComplete": 54,
+   "resolve": 54,
+   "$nextTick": 53,
+   "disabled": 53,
+   "createTest": 52,
+   "forkTasks": 52,
+   "tick": 52,
+   "v": 52,
+   "config": 50,
+   "loopOver": 50,
+   "ok": 49,
+   "filter": 48,
+   "indexOf": 48,
+   "loading": 48,
+   "p": 48,
+   "queryString": 48,
+   "taskResult": 47,
+   "confirm": 46,
+   "entry": 46,
+   "result": 46,
+   "toBe": 46,
+   "workflow": 46,
+   "defaultExclusiveJoinTask": 45,
+   "elm": 45,
+   "noData": 45,
+   "noMatch": 45,
+   "results": 45,
+   "count": 44,
+   "match": 44,
+   "text": 44,
+   "console": 43,
+   "describe": 43,
+   "getTreeVm": 43,
+   "h": 43,
+   "nodeData": 43,
+   "waitImmediate": 43,
+   "context": 42,
+   "filePath": 42,
+   "payload": 42,
+   "$id": 41,
+   "body": 41,
+   "flushSync": 41,
+   "backgroundColor": 40,
+   "destroyVM": 40,
+   "get": 40,
+   "html": 39,
+   "item": 39,
+   "onSuccess": 39,
+   "transfer": 39,
+   "parts": 38,
+   "React": 37,
+   "a": 37,
+   "e": 37,
+   "element": 37,
+   "event": 37,
+   "examples": 37,
+   "expression": 37,
+   "items": 37,
+   "method": 37,
+   "padding": 37,
+   "state": 37,
+   "$children": 36,
+   "autocomplete": 36,
+   "filteredData": 36,
+   "option": 36,
+   "placeholder": 36,
+   "startTime": 36,
+   "useState": 36,
+   "Math": 35,
+   "find": 35,
+   "not": 35,
+   "r": 35,
+   "radio": 35,
+   "checkList": 34,
+   "Vue": 33,
+   "edges": 33,
+   "firstNode": 33,
+   "includes": 33,
+   "Object": 31,
+   "callee": 31,
+   "checked": 31,
+   "clear": 31,
+   "keys": 31,
+   "query": 31,
+   "start": 31,
+   "tabList": 31,
+   "total": 31,
+   "workflowId": 31,
+   "callback": 30,
+   "cancel": 30,
+   "defineConfig": 30,
+   "emptyText": 30,
+   "forEach": 30,
+   "innerText": 30,
+   "line": 30,
+   "mutableNode": 30,
+   "process": 30,
+   "properties": 30,
+   "tabs": 30,
+   "arguments": 29,
+   "log": 29,
+   "metrics": 29,
+   "nodes": 29,
+   "suggestions": 29,
+   "tasks": 29,
+   "Promise": 28,
+   "file": 28,
+   "identifier": 28,
+   "require": 28,
+   "store": 28,
+   "styles": 28,
+   "version": 28,
+   "window": 28,
+   "Button": 27,
+   "JSON": 27,
+   "binding": 27,
+   "endTime": 27,
+   "fontSize": 27,
+   "makeStyles": 27,
+   "onClick": 27,
+   "writeJson": 27,
+   "Array": 26,
+   "Date": 26,
+   "aria": 26,
+   "columns": 26,
+   "d": 26,
+   "exports": 26,
+   "prop": 26,
+   "rootConfig": 26,
+   "sat": 26,
+   "source": 26,
+   "ListItemText": 25,
+   "Number": 25,
+   "cb": 25,
+   "end": 25,
+   "hex": 25,
+   "lonleySwitchTask": 25,
+   "prev": 25,
+   "rules": 25,
+   "size": 25,
+   "span": 25,
+   "spy": 25,
+   "states": 25,
+   "PropTypes": 24,
+   "Utils": 24,
+   "action": 24,
+   "afterEach": 24,
+   "child": 24,
+   "col": 24,
+   "now": 24,
+   "objectExpression": 24,
+   "page": 24,
+   "useStyles": 24,
+   "borderRadius": 23,
+   "code": 23,
+   "fill": 23,
+   "instances": 23,
+   "module": 23,
+   "replacer": 23,
+   "s": 23,
+   "scope": 23,
+   "side": 23,
+   "content": 22,
+   "keyName": 22,
+   "original": 22,
+   "packageName": 22,
+   "switchTaskNode": 22,
+   "useMemo": 22,
+   "xhr": 22,
+   "callExpression": 21,
+   "evt": 21,
+   "g": 21,
+   "getCheckedNodes": 21,
+   "max": 21,
+   "position": 21,
+   "replace": 21,
+   "submenu": 21,
+   "toEqual": 21,
+   "Message": 20,
+   "NavLink": 20,
+   "Pagination": 20,
+   "String": 20,
+   "activeName": 20,
+   "delete": 20,
+   "init": 20,
+   "isEmpty": 20,
+   "opts": 20,
+   "rowKey": 20,
+   "table": 20,
+   "triggerEvent": 20,
+   "buttonElm": 19,
+   "continue": 19,
+   "dispatchEvent": 19,
+   "item1": 19,
+   "level": 19,
+   "n": 19,
+   "onChange": 19,
+   "renderer": 19,
+   "requestUrl": 19,
+   "selectedTimePeriod": 19,
+   "set": 19,
+   "transform": 19,
+   "workflowDef": 19,
+   "workflows": 19,
+   "App": 18,
+   "Boolean": 18,
+   "adapter": 18,
+   "alignItems": 18,
+   "call": 18,
+   "container": 18,
+   "createFilter": 18,
+   "expanded": 18,
+   "loadAll": 18,
+   "margin": 18,
+   "mounted": 18,
+   "paneList": 18,
+   "queryClient": 18,
+   "restaurant": 18,
+   "trim": 18,
+   "upload": 18
+  },
+  "identifierSample": [
+   "vm",
+   "expect",
+   "to",
+   "name",
+   "data",
+   "value",
+   "$el",
+   "node",
+   "equal",
+   "type",
+   "it",
+   "done",
+   "length",
+   "querySelector",
+   "be",
+   "jscodeshift",
+   "label",
+   "target",
+   "id",
+   "setTimeout",
+   "click",
+   "assert",
+   "createVue",
+   "test",
+   "$refs",
+   "template",
+   "div",
+   "style",
+   "path",
+   "title",
+   "tree",
+   "key",
+   "options",
+   "error",
+   "classList",
+   "taskReferenceName",
+   "contains",
+   "querySelectorAll",
+   "document",
+   "b",
+   "color",
+   "el",
+   "message",
+   "utils",
+   "push",
+   "width",
+   "column",
+   "val",
+   "instance",
+   "inputParameters",
+   "innerHTML",
+   "status",
+   "root",
+   "children",
+   "index",
+   "colors",
+   "description",
+   "htmlEqual",
+   "i",
+   "props",
+   "component",
+   "res",
+   "property",
+   "display",
+   "decisionCases",
+   "parent",
+   "height",
+   "task",
+   "exist",
+   "className",
+   "input",
+   "joinOn",
+   "classes",
+   "defaultCase",
+   "methods",
+   "map",
+   "optional",
+   "restaurants",
+   "row",
+   "startDelay",
+   "asyncComplete",
+   "resolve",
+   "$nextTick",
+   "disabled",
+   "createTest",
+   "forkTasks",
+   "tick",
+   "v",
+   "config",
+   "loopOver",
+   "ok",
+   "filter",
+   "indexOf",
+   "loading",
+   "p",
+   "queryString",
+   "taskResult",
+   "confirm",
+   "entry",
+   "result",
+   "toBe",
+   "workflow",
+   "defaultExclusiveJoinTask",
+   "elm",
+   "noData",
+   "noMatch",
+   "results",
+   "count",
+   "match",
+   "text",
+   "console",
+   "describe",
+   "getTreeVm",
+   "h",
+   "nodeData",
+   "waitImmediate",
+   "context",
+   "filePath",
+   "payload",
+   "$id",
+   "body",
+   "flushSync",
+   "backgroundColor",
+   "destroyVM",
+   "get",
+   "html",
+   "item",
+   "onSuccess",
+   "transfer",
+   "parts",
+   "React",
+   "a",
+   "e",
+   "element",
+   "event",
+   "examples",
+   "expression",
+   "items",
+   "method",
+   "padding",
+   "state",
+   "$children",
+   "autocomplete",
+   "filteredData",
+   "option",
+   "placeholder",
+   "startTime",
+   "useState",
+   "Math",
+   "find",
+   "not",
+   "r",
+   "radio",
+   "checkList",
+   "Vue",
+   "edges",
+   "firstNode",
+   "includes",
+   "Object",
+   "callee",
+   "checked",
+   "clear",
+   "keys",
+   "query",
+   "start",
+   "tabList",
+   "total",
+   "workflowId",
+   "callback",
+   "cancel",
+   "defineConfig",
+   "emptyText",
+   "forEach",
+   "innerText",
+   "line",
+   "mutableNode",
+   "process",
+   "properties",
+   "tabs",
+   "arguments",
+   "log",
+   "metrics",
+   "nodes",
+   "suggestions",
+   "tasks",
+   "Promise",
+   "file",
+   "identifier",
+   "require",
+   "store",
+   "styles",
+   "version",
+   "window",
+   "Button",
+   "JSON",
+   "binding",
+   "endTime",
+   "fontSize",
+   "makeStyles",
+   "onClick",
+   "writeJson",
+   "Array",
+   "Date",
+   "aria",
+   "columns",
+   "d",
+   "exports",
+   "prop",
+   "rootConfig",
+   "sat",
+   "source",
+   "ListItemText",
+   "Number",
+   "cb",
+   "end",
+   "hex",
+   "lonleySwitchTask",
+   "prev",
+   "rules",
+   "size",
+   "span",
+   "spy",
+   "states",
+   "PropTypes",
+   "Utils",
+   "action",
+   "afterEach",
+   "child",
+   "col",
+   "now",
+   "objectExpression",
+   "page",
+   "useStyles",
+   "borderRadius",
+   "code",
+   "fill",
+   "instances",
+   "module",
+   "replacer",
+   "s",
+   "scope",
+   "side",
+   "content",
+   "keyName",
+   "original",
+   "packageName",
+   "switchTaskNode",
+   "useMemo",
+   "xhr",
+   "callExpression",
+   "evt",
+   "g",
+   "getCheckedNodes",
+   "max",
+   "position",
+   "replace",
+   "submenu",
+   "toEqual",
+   "Message",
+   "NavLink",
+   "Pagination",
+   "String",
+   "activeName",
+   "delete",
+   "init",
+   "isEmpty",
+   "opts",
+   "rowKey",
+   "table",
+   "triggerEvent",
+   "buttonElm",
+   "continue",
+   "dispatchEvent",
+   "item1",
+   "level",
+   "n",
+   "onChange",
+   "renderer",
+   "requestUrl",
+   "selectedTimePeriod",
+   "set",
+   "transform",
+   "workflowDef",
+   "workflows",
+   "App",
+   "Boolean",
+   "adapter",
+   "alignItems",
+   "call",
+   "container",
+   "createFilter",
+   "expanded",
+   "loadAll",
+   "margin",
+   "mounted",
+   "paneList",
+   "queryClient",
+   "restaurant",
+   "trim",
+   "upload"
+  ]
+ },
+ "wordChars": {
+  "extra": [
+   "$"
+  ],
+  "prefixes": [],
+  "suffix": []
+ },
+ "shape": {
+  "number": "literal",
+  "unknownWord": "identifier",
+  "unknownSymbol": "operator"
+ },
+ "comments": [
+  {
+   "open": "/*",
+   "close": "*/",
+   "matchRate": 1,
+   "n": 204
+  },
+  {
+   "open": "//",
+   "close": null,
+   "matchRate": 0.9901,
+   "n": 557
+  }
+ ],
+ "strings": [
+  {
+   "open": "'",
+   "close": "'",
+   "escape": null,
+   "multiline": false,
+   "trailing": false,
+   "interp": [],
+   "interpQuotes": [],
+   "prefixes": [],
+   "class": "string",
+   "matchRate": 1,
+   "n": 4533
+  },
+  {
+   "open": "\"",
+   "close": "\"",
+   "escape": null,
+   "multiline": false,
+   "trailing": false,
+   "interp": [],
+   "interpQuotes": [],
+   "prefixes": [],
+   "class": "string",
+   "matchRate": 1,
+   "n": 2338
+  },
+  {
+   "open": "`",
+   "close": "`",
+   "escape": "\\",
+   "multiline": true,
+   "trailing": false,
+   "interp": [
+    "${"
+   ],
+   "interpQuotes": [
+    "'",
+    "\"",
+    "`"
+   ],
+   "prefixes": [],
+   "class": "string",
+   "matchRate": 1,
+   "n": 382
+  }
+ ],
+ "conditional": [],
+ "symbols": {
+  "table": {
+   "{": "punctuation",
+   ",": "punctuation",
+   "}": "punctuation",
+   ";": "punctuation",
+   "(": "punctuation",
+   ")": "punctuation",
+   "=>": "operator",
+   "=": "operator",
+   ":": "punctuation",
+   ".": "punctuation",
+   "===": "operator",
+   "+=": "operator",
+   "??": "operator",
+   "!": "operator",
+   "||": "operator",
+   "<": "operator",
+   ">": "operator",
+   "...": "punctuation",
+   "&&": "operator",
+   "[": "punctuation",
+   "]": "punctuation",
+   "!==": "operator",
+   "/>": "operator",
+   "</": "operator",
+   "+": "operator",
+   "*": "operator",
+   "?": "operator",
+   "-": "operator",
+   "<=": "operator",
+   "++": "operator",
+   "&=": "operator",
+   "~": "operator",
+   "<<": "operator",
+   "|=": "operator",
+   "==": "operator",
+   "/": "operator",
+   ">=": "operator",
+   "%": "operator",
+   "!=": "operator",
+   "--": "operator",
+   "??=": "operator",
+   "*=": "operator",
+   "/=": "operator",
+   "&": "operator",
+   "|": "operator",
+   "?.": "operator",
+   "×": "operator"
+  },
+  "maxLen": 3
+ },
+ "classShare": {
+  "keyword": 0.05427,
+  "punctuation": 0.518,
+  "identifier": 0.26856,
+  "string": 0.06372,
+  "operator": 0.06448,
+  "literal": 0.02433,
+  "comment": 0.00665
+ }
+}

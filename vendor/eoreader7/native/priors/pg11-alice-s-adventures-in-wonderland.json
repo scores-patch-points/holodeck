@@ -1,0 +1,43 @@
+{
+  "schema": "LaVarPrior@1",
+  "giver": "LaVar (Claude Sonnet 5, this session) — read the opening ~1,600 bytes directly against source_path, 2026-09-09. Prep pass ahead of the live_priors children's-book corpus arriving; the three priors below are a worked example of the schema, not a claim that this book has been read in full.",
+  "read": {
+    "title": "pg11_Alice_s_Adventures_in_Wonderland.txt",
+    "source_path": "01-literature-books/gutenberg/pg11_Alice_s_Adventures_in_Wonderland.txt",
+    "sha256": "65c5ebedfb6fe332d89574aae63286cf89f625a901be9f0ba31d7f981b020e53",
+    "forms_total": 26525
+  },
+  "sidecar": null,
+  "rung": "children-lit",
+  "priors": [
+    {
+      "kind": "composition_affordance",
+      "claim": "Interior speech is composed as narration + a quoted clause + a post-posed cognition-verb tag (\"X,\" thought Alice \"Y?\"), not the said-first order a reader might default to. The tag sits between two quoted fragments of the SAME uninterrupted thought, so a reader that only recognizes 'said Alice' / 'Alice said' as the speech-attribution shape will miss this attribution or mis-split the thought into two.",
+      "address": { "start": 806, "end": 883, "quote": "“and what is the use of a book,” thought Alice" },
+      "confidence": "high — directly read, single unambiguous instance"
+    },
+    {
+      "kind": "kind_parameter",
+      "claim": "\"White Rabbit\" is introduced as an ordinary animal (definite article absent, indefinite \"a White Rabbit\", lower-salience placement mid-sentence) and only becomes a named recurring being retroactively, once it performs a human-coded action (checking a pocket watch) that the narration explicitly marks as un-animal-like (\"she had never before seen a rabbit with either a waistcoat-pocket, or a watch\"). Kind parameter: an anthropomorphic-animal being's admission point is not its first mention but the first action that violates the reader's own species prior — the text does the surprise-marking itself, in narration, rather than leaving it for a reader to infer.",
+      "address": { "start": 1164, "end": 1599, "quote": "a White Rabbit with pink eyes ran close by her ... took a\nwatch out of its waistcoat-pocket" },
+      "confidence": "high — directly read; the surprise is stated by the narrator, not inferred"
+    },
+    {
+      "kind": "relational_structure",
+      "claim": "The chase-and-follow relation (Alice runs after the Rabbit, then follows it down the hole) is licensed entirely by the curiosity state named two sentences earlier (\"burning with curiosity\"), with no separate motive clause attached to the actions themselves. A relation extractor keyed to verb-adjacent motive markers (\"because\", \"so that\") will find zero edges here even though the causal link is explicit in the prose — it is carried by an affect-state noun phrase, not a subordinating conjunction.",
+      "address": { "start": 1801, "end": 1996, "quote": "and burning with curiosity, she ran across the\nfield after it ... In another moment down went Alice after it" },
+      "confidence": "high — directly read, single instance; not yet checked against other chase scenes in the book to see if the pattern repeats"
+    }
+  ],
+  "mistakes": [],
+  "history": [
+    {
+      "date": "2026-09-09",
+      "note": "scaffolded by lavar-prior-scaffold.mjs — sha256 and forms_total measured, nothing read yet"
+    },
+    {
+      "date": "2026-09-09",
+      "note": "LaVar read the opening ~1,600 bytes by hand and added three grounded priors (one per kind) as a worked example, prepping the pipeline ahead of the real children's-book corpus. No sidecar exists yet for this text, so the 'mistakes' array (which needs a sidecar to disagree with) is empty by construction, not by absence of error."
+    }
+  ]
+}

@@ -1,0 +1,823 @@
+{
+  "vetted_at": "2026-08-16T16:48:27.635Z",
+  "scope": "09-source-code/ (collected documents only; repo-authored README.md and VETTING.md excluded)",
+  "checks": {
+    "nul-bytes / utf8": "binary smuggling — FAIL",
+    "bidi-controls": "Unicode bidi control set per CVE-2021-42574 (Trojan Source) — FAIL",
+    "invisible-chars": "zero-width/invisible codepoints — WARN",
+    "credential tokens": "aws-access-key-id, github-token, gitlab-token, slack-token, google-api-key — FAIL unless provider example",
+    "private-key-material": "PEM marker followed by base64 body — FAIL; bare marker — WARN",
+    "pipe-to-shell": "download piped to shell in text — WARN",
+    "license presence": "each repo directory carries LICENSE/COPYING/PROVENANCE.md"
+  },
+  "summary": {
+    "files_scanned": 100,
+    "ok": 97,
+    "adjudicated": 3,
+    "warn": 0,
+    "fail": 0,
+    "license_gaps": [
+      "BurntSushi_ripgrep",
+      "denoland_deno",
+      "ggerganov_llama.cpp",
+      "ghc_ghc",
+      "godotengine_godot",
+      "golang_go",
+      "microsoft_TypeScript",
+      "pallets_flask",
+      "postgres_postgres",
+      "rails_rails",
+      "sharkdp_bat",
+      "sqlite_sqlite",
+      "tiangolo_fastapi",
+      "torvalds_linux",
+      "ziglang_zig"
+    ],
+    "manifest_integrity": {
+      "present": true,
+      "checked": 34,
+      "mismatches": []
+    }
+  },
+  "url_checks": [
+    {
+      "repo": "curl/curl",
+      "label": "Cure53 penetration test and source audit of curl, 2016",
+      "url": "https://cure53.de/pentest-report_curl.pdf",
+      "status": "ok"
+    },
+    {
+      "repo": "curl/curl",
+      "label": "Trail of Bits security review of curl, 2022 (OSTIF)",
+      "url": "https://github.com/trailofbits/publications",
+      "status": "ok"
+    },
+    {
+      "repo": "git/git",
+      "label": "X41 D-Sec source code audit of Git, 2023 (OSTIF/GitLab)",
+      "url": "https://x41-dsec.de/static/reports/X41-OSTIF-Gitlab-Git-Security-Audit-20230117-public.pdf",
+      "status": "ok"
+    },
+    {
+      "repo": "openssh/openssh-portable",
+      "label": "OpenBSD security process",
+      "url": "https://www.openbsd.org/security.html",
+      "status": "ok"
+    },
+    {
+      "repo": "WireGuard/wireguard-go",
+      "label": "WireGuard formal verification (Tamarin)",
+      "url": "https://www.wireguard.com/formal-verification/",
+      "status": "ok"
+    },
+    {
+      "repo": "WireGuard/wireguard-go",
+      "label": "WireGuard: Next Generation Kernel Network Tunnel, NDSS 2017",
+      "url": "https://www.wireguard.com/papers/wireguard.pdf",
+      "status": "ok"
+    },
+    {
+      "repo": "kubernetes/kubernetes",
+      "label": "Kubernetes third-party security audits (SIG Security)",
+      "url": "https://github.com/kubernetes/sig-security",
+      "status": "ok"
+    },
+    {
+      "repo": "aws/s2n-tls",
+      "label": "s2n-tls repository (proofs under tests/saw)",
+      "url": "https://github.com/aws/s2n-tls",
+      "status": "ok"
+    },
+    {
+      "repo": "signalapp/libsignal",
+      "label": "A Formal Security Analysis of the Signal Messaging Protocol (eprint 2016/1013)",
+      "url": "https://eprint.iacr.org/2016/1013",
+      "status": "ok"
+    }
+  ],
+  "files": [
+    {
+      "file": "09-source-code/apache_httpd/LICENSE",
+      "sha256": "47b8c2b6c3309282a99d4a3001575c790fead690cc14734628c4667d2bbffc43",
+      "bytes": 25479,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/apache_httpd/modules_http_http_request.c",
+      "sha256": "a7095295e2915727f0d0a23e05bebce21914c51b54ba4e08a039e1522b7a4363",
+      "bytes": 29720,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/apache_httpd/PROVENANCE.md",
+      "sha256": "39d846ecaa34860368d54d8717fc89ae922ff8d32b0e7260a5e1bf926cd38db0",
+      "bytes": 6014,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/apache_httpd/server_core.c",
+      "sha256": "41c37fefbdb39627bc4ddaee508ae7d9bae5aa056736f2732e247ee1e8ba83fb",
+      "bytes": 206331,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/apache_spark/core_src_main_scala_org_apache_spark_SparkContext.scala",
+      "sha256": "3590d898d6cc643e0e96224c419964567a1aae06a0634aaaace19d45a80e8b59",
+      "bytes": 148474,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/apache_spark/LICENSE",
+      "sha256": "b8ea0873b8410497804dbb19dac00ffa5017d2ab33582b9e7ce46692fa4a0da1",
+      "bytes": 13640,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/apache_spark/README.md",
+      "sha256": "4ff5e3a889c084a8eee12ffb4027b80978badeeb4d8c5d53f71d1bb66288b2eb",
+      "bytes": 20600,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/astral-sh_ruff/LICENSE",
+      "sha256": "2597d854122b77ddc71971564ca2350a37608575ce324adc5650a2b2051c8f18",
+      "bytes": 20731,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/astral-sh_ruff/README.md",
+      "sha256": "ddedd53777f62fb2ea4cf17b6c43a5db23281d60531030642cacdbeebb39aedc",
+      "bytes": 25219,
+      "findings": [
+        {
+          "check": "pipe-to-shell",
+          "severity": "ADJUDICATED",
+          "detail": "download-piped-to-shell text at line 149 — Installation one-liners quoted inside collected documentation. Nothing in this corpus is executed; the text is the document."
+        },
+        {
+          "check": "pipe-to-shell",
+          "severity": "ADJUDICATED",
+          "detail": "download-piped-to-shell text at line 155 — Installation one-liners quoted inside collected documentation. Nothing in this corpus is executed; the text is the document."
+        }
+      ],
+      "status": "ADJUDICATED"
+    },
+    {
+      "file": "09-source-code/aws_s2n-tls/api_s2n.h",
+      "sha256": "afc2dd1ccd9c53528707a0780c962b2f4bfa725d5fb884837aa1d4c9292a045a",
+      "bytes": 190712,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/aws_s2n-tls/LICENSE",
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "bytes": 11358,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/aws_s2n-tls/PROVENANCE.md",
+      "sha256": "bde031290af01d6ee5b1a26f3b9db939b8908e42c12a32e4001f079501cd584f",
+      "bytes": 1309,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/aws_s2n-tls/README.md",
+      "sha256": "8dc63513011b3cb7193250ebba1e93b17bffab9b0b81a8e3ea0a7d525d1c71e9",
+      "bytes": 11761,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/aws_s2n-tls/tls_s2n_handshake_io.c",
+      "sha256": "658b60edfc2c47bb81fd348baba943af6f608e2a456a6167820c458259c54a8c",
+      "bytes": 77995,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/bitcoin_bitcoin/doc_developer-notes.md",
+      "sha256": "89cd8efadc27eb20d8b0f1fb4d22edad0099a5192becbe3b5bfe98bc0d5d87ca",
+      "bytes": 65331,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/bitcoin_bitcoin/PROVENANCE.md",
+      "sha256": "82685ac81ad46171049e6460585e4a5e00d40ae02c23af82ca5aa916431de31a",
+      "bytes": 3691,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/bitcoin_bitcoin/src_script_interpreter.cpp",
+      "sha256": "57a6f328c7e6202f499e48366a86eb26e09c8ebb78e92eef7e839207230be333",
+      "bytes": 91396,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/bitcoin_bitcoin/src_validation.cpp",
+      "sha256": "f96522f7528393e09462faa1ac2e5c89f4f2a149ec554ff978a331a8edec852b",
+      "bytes": 313710,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/BurntSushi_ripgrep/CHANGELOG.md.txt",
+      "sha256": "028fe166d7ea9dcf79c1a122cfb3482c047ff499996b32cec0b3488673bad8cf",
+      "bytes": 90034,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/BurntSushi_ripgrep/FAQ.md.txt",
+      "sha256": "4359aaf42d65b787d70c94085108c3f4cf3d4169284b5fb60a98085caaa13c81",
+      "bytes": 42243,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/BurntSushi_ripgrep/GUIDE.md.txt",
+      "sha256": "156337b59d9813beadc8f7489e9e86da9eec2c09e755e6baa31ec2c40c7e77eb",
+      "bytes": 40895,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/BurntSushi_ripgrep/README.md",
+      "sha256": "945622d974f65e4e141ef9726c948c2640eebd222c5b101afb6445728283921e",
+      "bytes": 21599,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/curl_curl/docs_VULN-DISCLOSURE-POLICY.md",
+      "sha256": "f7828eb196fdb7c0dfd8baca222db6016fa535d54926c14b0c74b16343ca518b",
+      "bytes": 20400,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/curl_curl/lib_http.c",
+      "sha256": "83fbd4f749479bac89f01819c0506c4b3713522e1cec544b1bbfc9f90cedd3f6",
+      "bytes": 157659,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/curl_curl/lib_url.c",
+      "sha256": "af40462b7534d970b643300336e91251c922273858628c2d659faa148e67de22",
+      "bytes": 83773,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/curl_curl/PROVENANCE.md",
+      "sha256": "bc5e4795536cdc71546c7285bffdc6df18511433756c23246ede7356f9637e5a",
+      "bytes": 4423,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/denoland_deno/Releases.md.txt",
+      "sha256": "887303ba027558e0cce10c4136ef589f02d464addcabe82ed19e4393608c4297",
+      "bytes": 655476,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/ggerganov_llama.cpp/CONTRIBUTING.md.txt",
+      "sha256": "f1d5f9ae06528b260880c972fe0cbf07565ad84f4e88b360058cb4aca72759a0",
+      "bytes": 12725,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/ggerganov_llama.cpp/docs_build.md.txt",
+      "sha256": "14ed1bafeac10bf796ea9d74efa1cf2a881c82ab17639fbeaeafc038beff4943",
+      "bytes": 36611,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/ggerganov_llama.cpp/docs_development_HOWTO-add-model.md.txt",
+      "sha256": "0d8c08e5dbb3b0fd716b50d7db9d72393bd2c794379dde47b42e66448950fc94",
+      "bytes": 11330,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/ghc_ghc/README.md",
+      "sha256": "dfb3839b4d837c2e57882901abb9b0f0b0b54a51bbf68f18c2ecbcebf030e52e",
+      "bytes": 6210,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/ghc_ghc/README.md.txt",
+      "sha256": "dfb3839b4d837c2e57882901abb9b0f0b0b54a51bbf68f18c2ecbcebf030e52e",
+      "bytes": 6210,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/git_git/builtin_commit.c",
+      "sha256": "3404e51612fd63c284275c9d9a98b16dd4eeea80d650339643ae60b18207a121",
+      "bytes": 62317,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/git_git/COPYING",
+      "sha256": "5b2198d1645f767585e8a88ac0499b04472164c0d2da22e75ecf97ef443ab32e",
+      "bytes": 18765,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/git_git/Documentation_CodingGuidelines",
+      "sha256": "775a38e4d9152784db3eeafa377eab4d5d6d5eea1094c82fa697542b86935ee0",
+      "bytes": 36558,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/git_git/PROVENANCE.md",
+      "sha256": "ec49a744deba27f7e040c9bf28e63d041641ca85e0a2a8aebfb12457b088a7ea",
+      "bytes": 5272,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/git_git/refs.c",
+      "sha256": "c0e5406b2d198ff26a9da541c85363a48e39fa6c012bc7e82569c7f60298460b",
+      "bytes": 96066,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/godotengine_godot/AUTHORS.md.txt",
+      "sha256": "6ca51d335b9de108ea53c5621e820c187d98c6faf92e14c8413ddb946b5e56cf",
+      "bytes": 10948,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/godotengine_godot/CONTRIBUTING.md.txt",
+      "sha256": "b89c15a68682ab32d1d041c1f90b3e4ba483c6e11d2656075d5ab7d19a079e30",
+      "bytes": 11307,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/godotengine_godot/main_main.cpp",
+      "sha256": "c84424bf6cb3e95bb2f5a06588b2608f5150d2d0a9809c420c2e7de54c0d6bfc",
+      "bytes": 207335,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/golang_go/doc_asm.html.txt",
+      "sha256": "b9e2477834a9fdce6c7983b5e84649bfcff2d8daa70cb68a534efbdb21720055",
+      "bytes": 37346,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/golang_go/doc_go_mem.html.txt",
+      "sha256": "a7372b4f36c9525ecc7531bbdbb9e53746ae3f58367a25fe8084d5a35bb8ee7c",
+      "bytes": 27268,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/golang_go/src_runtime_proc.go",
+      "sha256": "b7edcc4e5195335e407954729eea5d66095d541f937a9efb4571c8033f35365f",
+      "bytes": 243265,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/jedisct1_libsodium/PROVENANCE.md",
+      "sha256": "e9fe2eda090f3419fa7dedfecd16414ff131ed975500a6af1a9eb0c1cb9ccefe",
+      "bytes": 6090,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/jedisct1_libsodium/src_libsodium_crypto_pwhash_argon2_argon2.c",
+      "sha256": "1e85bab3b4195fe16bdf5b37acae3e788b8bd3674b6a085673d4bbd0f5fb9852",
+      "bytes": 8659,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/jedisct1_libsodium/src_libsodium_sodium_utils.c",
+      "sha256": "a1c5d4bca5af3f7535c390ea41e0850d235817b4c2f624a9190b9b76993f6871",
+      "bytes": 21534,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/kubernetes_kubernetes/LICENSE",
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "bytes": 11358,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/kubernetes_kubernetes/pkg_kubelet_kubelet.go",
+      "sha256": "c29e8a38ccc588d881e77efd7520d20d07c6b21bdca5db3826bdc03e620a9b85",
+      "bytes": 155864,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/kubernetes_kubernetes/PROVENANCE.md",
+      "sha256": "ef5b9aa726fff1f9c1665625ff99847cf704f4c1e3d92b09b15d83e2ed4b1880",
+      "bytes": 6627,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/microsoft_TypeScript/CONTRIBUTING.md.txt",
+      "sha256": "6e518e7802d4e2d1c381f02dac0539da3b88ef2975b92ba5c2b2efd9b7215c8b",
+      "bytes": 19660,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/microsoft_TypeScript/src_compiler_scanner.ts",
+      "sha256": "edeb7827fbdf692c7c06a176425104be3a3d2b161752522901e7c32d74d9d553",
+      "bytes": 219164,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/openssh_openssh-portable/LICENCE",
+      "sha256": "5bb5b160726ef5756e4f32fe95b35249c294962419650f48d05134b486d27ccb",
+      "bytes": 21140,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/openssh_openssh-portable/PROTOCOL",
+      "sha256": "4a9e7f6d26d3f59deae825ab11ca34a4ffb260b47a19b5a174ddfd1ee009bca4",
+      "bytes": 25246,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/openssh_openssh-portable/PROVENANCE.md",
+      "sha256": "15956a277475c2c6cd853e38122992dfbae26babcf3ba1e1ef86c1c0108f5f95",
+      "bytes": 7191,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/openssh_openssh-portable/ssh.c",
+      "sha256": "bb830a224536e1b6797448f04da408bdf2c1c8d44413bdce5be0d7f7d3bbd1f9",
+      "bytes": 75501,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/openssh_openssh-portable/sshkey.c",
+      "sha256": "e80e13a6494ae19175f6598b9fe448fdb9ebca40b38da57cad45207074698efe",
+      "bytes": 92200,
+      "findings": [
+        {
+          "check": "private-key-marker",
+          "severity": "ADJUDICATED",
+          "detail": "PEM private-key marker (no body) at line 67 — sshkey.c defines the PEM armor marker constants its own parser recognizes; no key material follows the markers."
+        }
+      ],
+      "status": "ADJUDICATED"
+    },
+    {
+      "file": "09-source-code/openssl_openssl/crypto_evp_evp_enc.c",
+      "sha256": "8afacee7fae28f3d42c0b43a7616a8ede4d75c53a4d98f53dabb7b262a521a26",
+      "bytes": 47749,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/openssl_openssl/LICENSE.txt",
+      "sha256": "7d5450cb2d142651b8afa315b5f238efc805dad827d91ba367d8516bc9d49e7a",
+      "bytes": 10175,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/openssl_openssl/PROVENANCE.md",
+      "sha256": "1b7c90e12233eefd55e0c2cc9be4a9568c6c7dfc15431b01ea61d0071bad0057",
+      "bytes": 1320,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/openssl_openssl/README.md",
+      "sha256": "64464d90ab175816fb57d9241bd241d3c95f2f5229644854a3e98ae5dc888e9a",
+      "bytes": 8586,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/openssl_openssl/ssl_ssl_lib.c",
+      "sha256": "ed49d5e61d0d7b35f41fcc61229f1ab2e30aed8e7172bcdb5e54c64938b852c3",
+      "bytes": 227975,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/pallets_flask/CHANGES.rst.txt",
+      "sha256": "c850d97d088d7babdf93f4477617277d8ffad511631ecedf7868a26c559db0fd",
+      "bytes": 73507,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/pallets_flask/docs_quickstart.rst.txt",
+      "sha256": "c17e0dac53c25f5cca0c18fd00e4f9549038f16d6ac5569ec2c97c7178744629",
+      "bytes": 30055,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/pallets_flask/src_flask_app.py",
+      "sha256": "09a3a1a7b3d1f174a4d274da2c329f9377745bbf6f138b17c3187352f7466a15",
+      "bytes": 65423,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/postgres_postgres/src_backend_access_transam_README.txt",
+      "sha256": "137ff195933dddbf58cfa62fb42a56e713d20d41c226cdf6973b3567a7a881f5",
+      "bytes": 48795,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/postgres_postgres/src_backend_optimizer_README.txt",
+      "sha256": "c8494e90639bc35410af8fc42d3e047930712c17084eb73b701fc47dd3f8d3e0",
+      "bytes": 87263,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/postgres_postgres/src_backend_postmaster_postmaster.c",
+      "sha256": "bf4a47ca6e62e36e7f1720b96fab978c05f8663a6c11190ea084bed400e5201e",
+      "bytes": 138332,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/postgres_postgres/src_backend_storage_buffer_README.txt",
+      "sha256": "f0058977fadd7b8e8b9b180e56d41c467d5233645899f2679a03e67ae0a551d1",
+      "bytes": 15472,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/python_cpython/Doc_reference_datamodel.rst.txt",
+      "sha256": "e3beab320c04a74c1512eb8407e9320fd230a4ab76a5206dffb947f0e8e28a28",
+      "bytes": 157154,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/python_cpython/Doc_tutorial_classes.rst.txt",
+      "sha256": "e322d827e7778530afb1fe832eace5588d8025e12315f2be7e7228a04c85ac41",
+      "bytes": 37746,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/python_cpython/Doc_tutorial_datastructures.rst.txt",
+      "sha256": "033c0f8854d1b1ae90936a1bd7d754659353508e082092de799511603999b54c",
+      "bytes": 27597,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/python_cpython/Doc_tutorial_introduction.rst.txt",
+      "sha256": "cf1674daf9568abeb5fc22f62a991e17751fea4deb06f598362ce6e7de264808",
+      "bytes": 19188,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/python_cpython/Lib_typing.py",
+      "sha256": "f42137cf2a30fed3d739b7ba5fb90d6eaefa7511dc2c660d37d9ba5ed6e6496b",
+      "bytes": 138943,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/python_cpython/LICENSE",
+      "sha256": "b0e25a78cffb43f4d92de8b61ccfa1f1f98ecbc22330b54b5251e7b6ba010231",
+      "bytes": 13804,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/python_cpython/Python_ceval.c",
+      "sha256": "f2761601589133d5c5f381ace8554cf449d2839d0f50f81a5649ec71bd942ca0",
+      "bytes": 120470,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/python_cpython/README.rst",
+      "sha256": "14d60004348d7f63ecfadcc35366e51fb83fb0343a7cd117c1b1f02796d63c83",
+      "bytes": 8908,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/rails_rails/railties_lib_rails_application.rb",
+      "sha256": "4b846d0ceca1c06c86bdf17609afd71f6bdfac9bd0d799826c965eb8daff855f",
+      "bytes": 30694,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/rails_rails/README.md",
+      "sha256": "49381409f34ee342af506ef1bec6364ec69fb139f932484d19ead0a0d05ed7e4",
+      "bytes": 4798,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/sharkdp_bat/README.md",
+      "sha256": "9d34b90ebb25cb7eac0f99bbcc10bb7c6fbae8faf20407774e09920c5057dcb1",
+      "bytes": 33951,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/signalapp_libsignal/LICENSE",
+      "sha256": "0d96a4ff68ad6d4b6f1f30f713b18d5184912ba8dd389f86aa7710db079abcb0",
+      "bytes": 34523,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/signalapp_libsignal/PROVENANCE.md",
+      "sha256": "4c3b6beec7e558b463b811d9639370a29eeee0b25964f41c075f94531de4e4b1",
+      "bytes": 4962,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/signalapp_libsignal/README.md",
+      "sha256": "b750fb041f95e6733209a3b5bf233ce446e0ceb3771826712e7967707a6803d4",
+      "bytes": 12122,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/signalapp_libsignal/rust_protocol_src_session.rs",
+      "sha256": "d8dba05207b36dc49e6898d6e38a27d44ce31a8a1d32a64df80bb7e1b3697cbb",
+      "bytes": 9278,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/sqlite_sqlite/doc_lemon.html.txt",
+      "sha256": "b5523bd9d2bf459b48a05569c9b08293788313d78da809dc7a6a5c1c40990455",
+      "bytes": 51146,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/sqlite_sqlite/README.md",
+      "sha256": "6d593a9a8d89b86caec382ad0eea43b6aa7c31c8280849e4e10f40a2987d2e37",
+      "bytes": 21165,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/sqlite_sqlite/README.md.txt",
+      "sha256": "6d593a9a8d89b86caec382ad0eea43b6aa7c31c8280849e4e10f40a2987d2e37",
+      "bytes": 21165,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/tiangolo_fastapi/docs_en_docs_async.md.txt",
+      "sha256": "1d4397242a6b63f64dd5106e36999dff6deacdc79bb0bb157aae6cc36f8a2c44",
+      "bytes": 23978,
+      "findings": [
+        {
+          "check": "invisible-chars",
+          "severity": "ADJUDICATED",
+          "detail": "invisible codepoint U+200D at line 192 — U+200D is the joiner inside an emoji ZWJ sequence (the docs' cook emoji), verified by byte inspection — not a hidden-text vector in prose documentation."
+        }
+      ],
+      "status": "ADJUDICATED"
+    },
+    {
+      "file": "09-source-code/tiangolo_fastapi/docs_en_docs_tutorial_body.md.txt",
+      "sha256": "1a3e0f7b9220dcee9a7379c999d57b49e126ed07725dbbc5566ee1278d4ec670",
+      "bytes": 6611,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/tiangolo_fastapi/docs_en_docs_tutorial_first-steps.md.txt",
+      "sha256": "ecc419c9e4ccf1e996db0b196301aab93a8f43d52ddc59a180d4e88f8290c858",
+      "bytes": 14155,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/tiangolo_fastapi/fastapi_applications.py",
+      "sha256": "38dccb19b2a0b0b984c8d7541263842954a37c087cf96b4463aea17873c6183c",
+      "bytes": 183840,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/tiangolo_fastapi/README.md",
+      "sha256": "b765d1bb8a76106a5bff83fdae798a12150b03ef9cc99f37d68d1e5d8dc2938a",
+      "bytes": 23143,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/torvalds_linux/Documentation_process_coding-style.rst.txt",
+      "sha256": "332454d2ab9a0462dd9f292c52291cf3b5e1afcd638aa06df15f557c47a126f5",
+      "bytes": 45673,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/torvalds_linux/Documentation_process_submitting-patches.rst.txt",
+      "sha256": "d9c5f7c9c849751d49208b537da9766dd6e1527a4eab0fec3baaf087ce7f2f23",
+      "bytes": 42024,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/torvalds_linux/init_main.c",
+      "sha256": "e895a643df800a83857b88bebb6e990c17cd0890e485a48a7b972f5d2ae73516",
+      "bytes": 42540,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/torvalds_linux/kernel_sched_core.c",
+      "sha256": "957f657af1a2327c75dac495548eaa7bd1571a12a756c7f704e6f3195b156988",
+      "bytes": 301876,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/torvalds_linux/Makefile",
+      "sha256": "99fea917aaa015ff23879b8ac0fe369fffeb772296d4523fdc31d1646031c44f",
+      "bytes": 79213,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/WireGuard_wireguard-go/device_noise-protocol.go",
+      "sha256": "55e2b3e9034029922e3f12a637a553235acc76187507180e04c00f0190cfaeeb",
+      "bytes": 17919,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/WireGuard_wireguard-go/device_send.go",
+      "sha256": "9ba682734747200ac835fb9739f1197fd0ff2fb46677d00582627ffabd703e01",
+      "bytes": 14872,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/WireGuard_wireguard-go/PROVENANCE.md",
+      "sha256": "ae1eaf05209cddbc193b6b2f399f0f7072bea01fb9613915f94c1c7a2d0cf369",
+      "bytes": 6678,
+      "findings": [],
+      "status": "OK"
+    },
+    {
+      "file": "09-source-code/ziglang_zig/doc_langref.html.in.txt",
+      "sha256": "6a5520e69529dee8fb16f2e03ee987e7d502f4c929a02bf00639f0fc738bb543",
+      "bytes": 351215,
+      "findings": [],
+      "status": "OK"
+    }
+  ]
+}

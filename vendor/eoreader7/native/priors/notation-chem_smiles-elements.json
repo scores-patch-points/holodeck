@@ -1,0 +1,1144 @@
+{
+ "kind": "ChemElementPrior@1",
+ "family": "chem_smiles",
+ "givers": [
+  {
+   "name": "PubChem Periodic Table (atomic data of IUPAC / NIST)",
+   "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/periodictable/JSON",
+   "license": "public domain (NCBI/NLM)",
+   "fetched": "2026-10-06",
+   "raw": "raw/pubchem-periodictable.json"
+  }
+ ],
+ "refuses": "a bracket atom whose symbol is not in this table (and not '*' or an aromatic symbol of the grammar prior)",
+ "train_counts": {
+  "source": "TRAIN = ChEBI r255 + ChEMBL; atoms read by RDKit (Chem.MolFromSmiles sanitize=False) from the written SMILES",
+  "records_parsed": 6886,
+  "elements_attested": 59
+ },
+ "unattested_in_train": [
+  "Be",
+  "Ne",
+  "Ar",
+  "Sc",
+  "Ti",
+  "Ga",
+  "Ge",
+  "Kr",
+  "Rb",
+  "Sr",
+  "Nb",
+  "Pd",
+  "In",
+  "Xe",
+  "La",
+  "Pr",
+  "Nd",
+  "Pm",
+  "Sm",
+  "Tb",
+  "Dy",
+  "Ho",
+  "Er",
+  "Tm",
+  "Lu",
+  "Hf",
+  "Ta",
+  "Re",
+  "Os",
+  "Fr",
+  "Ra",
+  "Ac",
+  "Th",
+  "Pa",
+  "Np",
+  "Pu",
+  "Am",
+  "Cm",
+  "Bk",
+  "Cf",
+  "Es",
+  "Fm",
+  "Md",
+  "No",
+  "Lr",
+  "Rf",
+  "Db",
+  "Sg",
+  "Bh",
+  "Hs",
+  "Mt",
+  "Ds",
+  "Cn",
+  "Nh",
+  "Fl",
+  "Mc",
+  "Lv",
+  "Ts",
+  "Og"
+ ],
+ "symbols": {
+  "H": {
+   "z": 1,
+   "name": "Hydrogen",
+   "block": "Nonmetal",
+   "train": {
+    "records": 627,
+    "atoms": 1639
+   }
+  },
+  "He": {
+   "z": 2,
+   "name": "Helium",
+   "block": "Noble gas",
+   "train": {
+    "records": 1,
+    "atoms": 1
+   }
+  },
+  "Li": {
+   "z": 3,
+   "name": "Lithium",
+   "block": "Alkali metal",
+   "train": {
+    "records": 4,
+    "atoms": 6
+   }
+  },
+  "Be": {
+   "z": 4,
+   "name": "Beryllium",
+   "block": "Alkaline earth metal",
+   "train": {
+    "records": 0,
+    "atoms": 0
+   }
+  },
+  "B": {
+   "z": 5,
+   "name": "Boron",
+   "block": "Metalloid",
+   "train": {
+    "records": 23,
+    "atoms": 28
+   }
+  },
+  "C": {
+   "z": 6,
+   "name": "Carbon",
+   "block": "Nonmetal",
+   "train": {
+    "records": 6763,
+    "atoms": 153816
+   }
+  },
+  "N": {
+   "z": 7,
+   "name": "Nitrogen",
+   "block": "Nonmetal",
+   "train": {
+    "records": 5350,
+    "atoms": 21169
+   }
+  },
+  "O": {
+   "z": 8,
+   "name": "Oxygen",
+   "block": "Nonmetal",
+   "train": {
+    "records": 6347,
+    "atoms": 35319
+   }
+  },
+  "F": {
+   "z": 9,
+   "name": "Fluorine",
+   "block": "Halogen",
+   "train": {
+    "records": 1230,
+    "atoms": 2915
+   }
+  },
+  "Ne": {
+   "z": 10,
+   "name": "Neon",
+   "block": "Noble gas",
+   "train": {
+    "records": 0,
+    "atoms": 0
+   }
+  },
+  "Na": {
+   "z": 11,
+   "name": "Sodium",
+   "block": "Alkali metal",
+   "train": {
+    "records": 46,
+    "atoms": 69
+   }
+  },
+  "Mg": {
+   "z": 12,
+   "name": "Magnesium",
+   "block": "Alkaline earth metal",
+   "train": {
+    "records": 9,
+    "atoms": 9
+   }
+  },
+  "Al": {
+   "z": 13,
+   "name": "Aluminum",
+   "block": "Post-transition metal",
+   "train": {
+    "records": 8,
+    "atoms": 10
+   }
+  },
+  "Si": {
+   "z": 14,
+   "name": "Silicon",
+   "block": "Metalloid",
+   "train": {
+    "records": 14,
+    "atoms": 24
+   }
+  },
+  "P": {
+   "z": 15,
+   "name": "Phosphorus",
+   "block": "Nonmetal",
+   "train": {
+    "records": 483,
+    "atoms": 897
+   }
+  },
+  "S": {
+   "z": 16,
+   "name": "Sulfur",
+   "block": "Nonmetal",
+   "train": {
+    "records": 1586,
+    "atoms": 2041
+   }
+  },
+  "Cl": {
+   "z": 17,
+   "name": "Chlorine",
+   "block": "Halogen",
+   "train": {
+    "records": 919,
+    "atoms": 1368
+   }
+  },
+  "Ar": {
+   "z": 18,
+   "name": "Argon",
+   "block": "Noble gas",
+   "train": {
+    "records": 0,
+    "atoms": 0
+   }
+  },
+  "K": {
+   "z": 19,
+   "name": "Potassium",
+   "block": "Alkali metal",
+   "train": {
+    "records": 7,
+    "atoms": 9
+   }
+  },
+  "Ca": {
+   "z": 20,
+   "name": "Calcium",
+   "block": "Alkaline earth metal",
+   "train": {
+    "records": 5,
+    "atoms": 5
+   }
+  },
+  "Sc": {
+   "z": 21,
+   "name": "Scandium",
+   "block": "Transition metal",
+   "train": {
+    "records": 0,
+    "atoms": 0
+   }
+  },
+  "Ti": {
+   "z": 22,
+   "name": "Titanium",
+   "block": "Transition metal",
+   "train": {
+    "records": 0,
+    "atoms": 0
+   }
+  },
+  "V": {
+   "z": 23,
+   "name": "Vanadium",
+   "block": "Transition metal",
+   "train": {
+    "records": 3,
+    "atoms": 3
+   }
+  },
+  "Cr": {
+   "z": 24,
+   "name": "Chromium",
+   "block": "Transition metal",
+   "train": {
+    "records": 7,
+    "atoms": 7
+   }
+  },
+  "Mn": {
+   "z": 25,
+   "name": "Manganese",
+   "block": "Transition metal",
+   "train": {
+    "records": 2,
+    "atoms": 2
+   }
+  },
+  "Fe": {
+   "z": 26,
+   "name": "Iron",
+   "block": "Transition metal",
+   "train": {
+    "records": 9,
+    "atoms": 11
+   }
+  },
+  "Co": {
+   "z": 27,
+   "name": "Cobalt",
+   "block": "Transition metal",
+   "train": {
+    "records": 6,
+    "atoms": 6
+   }
+  },
+  "Ni": {
+   "z": 28,
+   "name": "Nickel",
+   "block": "Transition metal",
+   "train": {
+    "records": 4,
+    "atoms": 4
+   }
+  },
+  "Cu": {
+   "z": 29,
+   "name": "Copper",
+   "block": "Transition metal",
+   "train": {
+    "records": 1,
+    "atoms": 2
+   }
+  },
+  "Zn": {
+   "z": 30,
+   "name": "Zinc",
+   "block": "Transition metal",
+   "train": {
+    "records": 2,
+    "atoms": 2
+   }
+  },
+  "Ga": {
+   "z": 31,
+   "name": "Gallium",
+   "block": "Post-transition metal",
+   "train": {
+    "records": 0,
+    "atoms": 0
+   }
+  },
+  "Ge": {
+   "z": 32,
+   "name": "Germanium",
+   "block": "Metalloid",
+   "train": {
+    "records": 0,
+    "atoms": 0
+   }
+  },
+  "As": {
+   "z": 33,
+   "name": "Arsenic",
+   "block": "Metalloid",
+   "train": {
+    "records": 11,
+    "atoms": 16
+   }
+  },
+  "Se": {
+   "z": 34,
+   "name": "Selenium",
+   "block": "Nonmetal",
+   "train": {
+    "records": 6,
+    "atoms": 7
+   }
+  },
+  "Br": {
+   "z": 35,
+   "name": "Bromine",
+   "block": "Halogen",
+   "train": {
+    "records": 206,
+    "atoms": 260
+   }
+  },
+  "Kr": {
+   "z": 36,
+   "name": "Krypton",
+   "block": "Noble gas",
+   "train": {
+    "records": 0,
+    "atoms": 0
+   }
+  },
+  "Rb": {
+   "z": 37,
+   "name": "Rubidium",
+   "block": "Alkali metal",
+   "train": {
+    "records": 0,
+    "atoms": 0
+   }
+  },
+  "Sr": {
+   "z": 38,
+   "name": "Strontium",
+   "block": "Alkaline earth metal",
+   "train": {
+    "records": 0,
+    "atoms": 0
+   }
+  },
+  "Y": {
+   "z": 39,
+   "name": "Yttrium",
+   "block": "Transition metal",
+   "train": {
+    "records": 1,
+    "atoms": 1
+   }
+  },
+  "Zr": {
+   "z": 40,
+   "name": "Zirconium",
+   "block": "Transition metal",
+   "train": {
+    "records": 1,
+    "atoms": 1
+   }
+  },
+  "Nb": {
+   "z": 41,
+   "name": "Niobium",
+   "block": "Transition metal",
+   "train": {
+    "records": 0,
+    "atoms": 0
+   }
+  },
+  "Mo": {
+   "z": 42,
+   "name": "Molybdenum",
+   "block": "Transition metal",
+   "train": {
+    "records": 3,
+    "atoms": 4
+   }
+  },
+  "Tc": {
+   "z": 43,
+   "name": "Technetium",
+   "block": "Transition metal",
+   "train": {
+    "records": 1,
+    "atoms": 1
+   }
+  },
+  "Ru": {
+   "z": 44,
+   "name": "Ruthenium",
+   "block": "Transition metal",
+   "train": {
+    "records": 3,
+    "atoms": 3
+   }
+  },
+  "Rh": {
+   "z": 45,
+   "name": "Rhodium",
+   "block": "Transition metal",
+   "train": {
+    "records": 1,
+    "atoms": 2
+   }
+  },
+  "Pd": {
+   "z": 46,
+   "name": "Palladium",
+   "block": "Transition metal",
+   "train": {
+    "records": 0,
+    "atoms": 0
+   }
+  },
+  "Ag": {
+   "z": 47,
+   "name": "Silver",
+   "block": "Transition metal",
+   "train": {
+    "records": 1,
+    "atoms": 1
+   }
+  },
+  "Cd": {
+   "z": 48,
+   "name": "Cadmium",
+   "block": "Transition metal",
+   "train": {
+    "records": 1,
+    "atoms": 3
+   }
+  },
+  "In": {
+   "z": 49,
+   "name": "Indium",
+   "block": "Post-transition metal",
+   "train": {
+    "records": 0,
+    "atoms": 0
+   }
+  },
+  "Sn": {
+   "z": 50,
+   "name": "Tin",
+   "block": "Post-transition metal",
+   "train": {
+    "records": 6,
+    "atoms": 6
+   }
+  },
+  "Sb": {
+   "z": 51,
+   "name": "Antimony",
+   "block": "Metalloid",
+   "train": {
+    "records": 2,
+    "atoms": 2
+   }
+  },
+  "Te": {
+   "z": 52,
+   "name": "Tellurium",
+   "block": "Metalloid",
+   "train": {
+    "records": 3,
+    "atoms": 3
+   }
+  },
+  "I": {
+   "z": 53,
+   "name": "Iodine",
+   "block": "Halogen",
+   "train": {
+    "records": 55,
+    "atoms": 74
+   }
+  },
+  "Xe": {
+   "z": 54,
+   "name": "Xenon",
+   "block": "Noble gas",
+   "train": {
+    "records": 0,
+    "atoms": 0
+   }
+  },
+  "Cs": {
+   "z": 55,
+   "name": "Cesium",
+   "block": "Alkali metal",
+   "train": {
+    "records": 1,
+    "atoms": 1
+   }
+  },
+  "Ba": {
+   "z": 56,
+   "name": "Barium",
+   "block": "Alkaline earth metal",
+   "train": {
+    "records": 2,
+    "atoms": 2
+   }
+  },
+  "La": {
+   "z": 57,
+   "name": "Lanthanum",
+   "block": "Lanthanide",
+   "train": {
+    "records": 0,
+    "atoms": 0
+   }
+  },
+  "Ce": {
+   "z": 58,
+   "name": "Cerium",
+   "block": "Lanthanide",
+   "train": {
+    "records": 1,
+    "atoms": 1
+   }
+  },
+  "Pr": {
+   "z": 59,
+   "name": "Praseodymium",
+   "block": "Lanthanide",
+   "train": {
+    "records": 0,
+    "atoms": 0
+   }
+  },
+  "Nd": {
+   "z": 60,
+   "name": "Neodymium",
+   "block": "Lanthanide",
+   "train": {
+    "records": 0,
+    "atoms": 0
+   }
+  },
+  "Pm": {
+   "z": 61,
+   "name": "Promethium",
+   "block": "Lanthanide",
+   "train": {
+    "records": 0,
+    "atoms": 0
+   }
+  },
+  "Sm": {
+   "z": 62,
+   "name": "Samarium",
+   "block": "Lanthanide",
+   "train": {
+    "records": 0,
+    "atoms": 0
+   }
+  },
+  "Eu": {
+   "z": 63,
+   "name": "Europium",
+   "block": "Lanthanide",
+   "train": {
+    "records": 2,
+    "atoms": 2
+   }
+  },
+  "Gd": {
+   "z": 64,
+   "name": "Gadolinium",
+   "block": "Lanthanide",
+   "train": {
+    "records": 2,
+    "atoms": 2
+   }
+  },
+  "Tb": {
+   "z": 65,
+   "name": "Terbium",
+   "block": "Lanthanide",
+   "train": {
+    "records": 0,
+    "atoms": 0
+   }
+  },
+  "Dy": {
+   "z": 66,
+   "name": "Dysprosium",
+   "block": "Lanthanide",
+   "train": {
+    "records": 0,
+    "atoms": 0
+   }
+  },
+  "Ho": {
+   "z": 67,
+   "name": "Holmium",
+   "block": "Lanthanide",
+   "train": {
+    "records": 0,
+    "atoms": 0
+   }
+  },
+  "Er": {
+   "z": 68,
+   "name": "Erbium",
+   "block": "Lanthanide",
+   "train": {
+    "records": 0,
+    "atoms": 0
+   }
+  },
+  "Tm": {
+   "z": 69,
+   "name": "Thulium",
+   "block": "Lanthanide",
+   "train": {
+    "records": 0,
+    "atoms": 0
+   }
+  },
+  "Yb": {
+   "z": 70,
+   "name": "Ytterbium",
+   "block": "Lanthanide",
+   "train": {
+    "records": 1,
+    "atoms": 1
+   }
+  },
+  "Lu": {
+   "z": 71,
+   "name": "Lutetium",
+   "block": "Lanthanide",
+   "train": {
+    "records": 0,
+    "atoms": 0
+   }
+  },
+  "Hf": {
+   "z": 72,
+   "name": "Hafnium",
+   "block": "Transition metal",
+   "train": {
+    "records": 0,
+    "atoms": 0
+   }
+  },
+  "Ta": {
+   "z": 73,
+   "name": "Tantalum",
+   "block": "Transition metal",
+   "train": {
+    "records": 0,
+    "atoms": 0
+   }
+  },
+  "W": {
+   "z": 74,
+   "name": "Tungsten",
+   "block": "Transition metal",
+   "train": {
+    "records": 4,
+    "atoms": 4
+   }
+  },
+  "Re": {
+   "z": 75,
+   "name": "Rhenium",
+   "block": "Transition metal",
+   "train": {
+    "records": 0,
+    "atoms": 0
+   }
+  },
+  "Os": {
+   "z": 76,
+   "name": "Osmium",
+   "block": "Transition metal",
+   "train": {
+    "records": 0,
+    "atoms": 0
+   }
+  },
+  "Ir": {
+   "z": 77,
+   "name": "Iridium",
+   "block": "Transition metal",
+   "train": {
+    "records": 1,
+    "atoms": 2
+   }
+  },
+  "Pt": {
+   "z": 78,
+   "name": "Platinum",
+   "block": "Transition metal",
+   "train": {
+    "records": 4,
+    "atoms": 4
+   }
+  },
+  "Au": {
+   "z": 79,
+   "name": "Gold",
+   "block": "Transition metal",
+   "train": {
+    "records": 1,
+    "atoms": 1
+   }
+  },
+  "Hg": {
+   "z": 80,
+   "name": "Mercury",
+   "block": "Transition metal",
+   "train": {
+    "records": 3,
+    "atoms": 3
+   }
+  },
+  "Tl": {
+   "z": 81,
+   "name": "Thallium",
+   "block": "Post-transition metal",
+   "train": {
+    "records": 3,
+    "atoms": 4
+   }
+  },
+  "Pb": {
+   "z": 82,
+   "name": "Lead",
+   "block": "Post-transition metal",
+   "train": {
+    "records": 3,
+    "atoms": 3
+   }
+  },
+  "Bi": {
+   "z": 83,
+   "name": "Bismuth",
+   "block": "Post-transition metal",
+   "train": {
+    "records": 3,
+    "atoms": 4
+   }
+  },
+  "Po": {
+   "z": 84,
+   "name": "Polonium",
+   "block": "Metalloid",
+   "train": {
+    "records": 1,
+    "atoms": 1
+   }
+  },
+  "At": {
+   "z": 85,
+   "name": "Astatine",
+   "block": "Halogen",
+   "train": {
+    "records": 1,
+    "atoms": 2
+   }
+  },
+  "Rn": {
+   "z": 86,
+   "name": "Radon",
+   "block": "Noble gas",
+   "train": {
+    "records": 1,
+    "atoms": 1
+   }
+  },
+  "Fr": {
+   "z": 87,
+   "name": "Francium",
+   "block": "Alkali metal",
+   "train": {
+    "records": 0,
+    "atoms": 0
+   }
+  },
+  "Ra": {
+   "z": 88,
+   "name": "Radium",
+   "block": "Alkaline earth metal",
+   "train": {
+    "records": 0,
+    "atoms": 0
+   }
+  },
+  "Ac": {
+   "z": 89,
+   "name": "Actinium",
+   "block": "Actinide",
+   "train": {
+    "records": 0,
+    "atoms": 0
+   }
+  },
+  "Th": {
+   "z": 90,
+   "name": "Thorium",
+   "block": "Actinide",
+   "train": {
+    "records": 0,
+    "atoms": 0
+   }
+  },
+  "Pa": {
+   "z": 91,
+   "name": "Protactinium",
+   "block": "Actinide",
+   "train": {
+    "records": 0,
+    "atoms": 0
+   }
+  },
+  "U": {
+   "z": 92,
+   "name": "Uranium",
+   "block": "Actinide",
+   "train": {
+    "records": 1,
+    "atoms": 1
+   }
+  },
+  "Np": {
+   "z": 93,
+   "name": "Neptunium",
+   "block": "Actinide",
+   "train": {
+    "records": 0,
+    "atoms": 0
+   }
+  },
+  "Pu": {
+   "z": 94,
+   "name": "Plutonium",
+   "block": "Actinide",
+   "train": {
+    "records": 0,
+    "atoms": 0
+   }
+  },
+  "Am": {
+   "z": 95,
+   "name": "Americium",
+   "block": "Actinide",
+   "train": {
+    "records": 0,
+    "atoms": 0
+   }
+  },
+  "Cm": {
+   "z": 96,
+   "name": "Curium",
+   "block": "Actinide",
+   "train": {
+    "records": 0,
+    "atoms": 0
+   }
+  },
+  "Bk": {
+   "z": 97,
+   "name": "Berkelium",
+   "block": "Actinide",
+   "train": {
+    "records": 0,
+    "atoms": 0
+   }
+  },
+  "Cf": {
+   "z": 98,
+   "name": "Californium",
+   "block": "Actinide",
+   "train": {
+    "records": 0,
+    "atoms": 0
+   }
+  },
+  "Es": {
+   "z": 99,
+   "name": "Einsteinium",
+   "block": "Actinide",
+   "train": {
+    "records": 0,
+    "atoms": 0
+   }
+  },
+  "Fm": {
+   "z": 100,
+   "name": "Fermium",
+   "block": "Actinide",
+   "train": {
+    "records": 0,
+    "atoms": 0
+   }
+  },
+  "Md": {
+   "z": 101,
+   "name": "Mendelevium",
+   "block": "Actinide",
+   "train": {
+    "records": 0,
+    "atoms": 0
+   }
+  },
+  "No": {
+   "z": 102,
+   "name": "Nobelium",
+   "block": "Actinide",
+   "train": {
+    "records": 0,
+    "atoms": 0
+   }
+  },
+  "Lr": {
+   "z": 103,
+   "name": "Lawrencium",
+   "block": "Actinide",
+   "train": {
+    "records": 0,
+    "atoms": 0
+   }
+  },
+  "Rf": {
+   "z": 104,
+   "name": "Rutherfordium",
+   "block": "Transition metal",
+   "train": {
+    "records": 0,
+    "atoms": 0
+   }
+  },
+  "Db": {
+   "z": 105,
+   "name": "Dubnium",
+   "block": "Transition metal",
+   "train": {
+    "records": 0,
+    "atoms": 0
+   }
+  },
+  "Sg": {
+   "z": 106,
+   "name": "Seaborgium",
+   "block": "Transition metal",
+   "train": {
+    "records": 0,
+    "atoms": 0
+   }
+  },
+  "Bh": {
+   "z": 107,
+   "name": "Bohrium",
+   "block": "Transition metal",
+   "train": {
+    "records": 0,
+    "atoms": 0
+   }
+  },
+  "Hs": {
+   "z": 108,
+   "name": "Hassium",
+   "block": "Transition metal",
+   "train": {
+    "records": 0,
+    "atoms": 0
+   }
+  },
+  "Mt": {
+   "z": 109,
+   "name": "Meitnerium",
+   "block": "Transition metal",
+   "train": {
+    "records": 0,
+    "atoms": 0
+   }
+  },
+  "Ds": {
+   "z": 110,
+   "name": "Darmstadtium",
+   "block": "Transition metal",
+   "train": {
+    "records": 0,
+    "atoms": 0
+   }
+  },
+  "Rg": {
+   "z": 111,
+   "name": "Roentgenium",
+   "block": "Transition metal",
+   "train": {
+    "records": 1,
+    "atoms": 1
+   }
+  },
+  "Cn": {
+   "z": 112,
+   "name": "Copernicium",
+   "block": "Transition metal",
+   "train": {
+    "records": 0,
+    "atoms": 0
+   }
+  },
+  "Nh": {
+   "z": 113,
+   "name": "Nihonium",
+   "block": "Post-transition metal",
+   "train": {
+    "records": 0,
+    "atoms": 0
+   }
+  },
+  "Fl": {
+   "z": 114,
+   "name": "Flerovium",
+   "block": "Post-transition metal",
+   "train": {
+    "records": 0,
+    "atoms": 0
+   }
+  },
+  "Mc": {
+   "z": 115,
+   "name": "Moscovium",
+   "block": "Post-transition metal",
+   "train": {
+    "records": 0,
+    "atoms": 0
+   }
+  },
+  "Lv": {
+   "z": 116,
+   "name": "Livermorium",
+   "block": "Post-transition metal",
+   "train": {
+    "records": 0,
+    "atoms": 0
+   }
+  },
+  "Ts": {
+   "z": 117,
+   "name": "Tennessine",
+   "block": "Halogen",
+   "train": {
+    "records": 0,
+    "atoms": 0
+   }
+  },
+  "Og": {
+   "z": 118,
+   "name": "Oganesson",
+   "block": "Noble gas",
+   "train": {
+    "records": 0,
+    "atoms": 0
+   }
+  }
+ }
+}

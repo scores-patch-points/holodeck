@@ -1,0 +1,31 @@
+{
+  "schema": "RoleConfig@1",
+  "language": "hye",
+  "provenance": {
+    "builder": "eoreader7 native/scripts/build-role-config.mjs",
+    "source": "/private/tmp/claude-501/tb/hye/train.conllu",
+    "min_volume": 20,
+    "null_draws": 200,
+    "null_alpha": 0.05,
+    "null_seed": 1,
+    "note": "position stats and marker candidates are both derived mechanically from this treebank's own gold dependency annotations — never hand-typed or asserted from general linguistic knowledge. A marker candidate is admitted only when its real precision beats the (1-alpha) quantile of a within-sentence role-label shuffle (II.23), never a fixed ratio — and (S122) that quantile is the MAX-STATISTIC across every eligible closed-class candidate tried, not a per-candidate null, so the admitted marker is significant against the whole search, not merely against itself."
+  },
+  "object": {
+    "total": 3774,
+    "before": 2041,
+    "after": 1733,
+    "dominantSide": "before",
+    "reliability": 0.5408055113937467,
+    "usable": false,
+    "marker": null
+  },
+  "subject": {
+    "total": 5058,
+    "before": 3939,
+    "after": 1119,
+    "dominantSide": "before",
+    "reliability": 0.7787663107947805,
+    "usable": true,
+    "marker": null
+  }
+}

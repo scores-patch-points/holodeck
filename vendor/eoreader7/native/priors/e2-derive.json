@@ -1,0 +1,910 @@
+{
+ "meta": {
+  "ethosCommit": "1c510a6",
+  "WIN": 400,
+  "STOPsize": 76,
+  "corpus": {
+   "fr": {
+    "files": 24,
+    "windows": 3009,
+    "mode": "by-file"
+   },
+   "tr": {
+    "files": 2,
+    "windows": 14,
+    "mode": "positional-halves"
+   },
+   "el": {
+    "files": 71,
+    "windows": 3140,
+    "mode": "by-file"
+   },
+   "fa": {
+    "files": 1,
+    "windows": 9,
+    "mode": "positional-halves"
+   },
+   "ko": {
+    "files": 2,
+    "windows": 12,
+    "mode": "positional-halves"
+   },
+   "de": {
+    "files": 70,
+    "windows": 3032,
+    "mode": "by-file"
+   },
+   "en": {
+    "files": 150,
+    "windows": 8074,
+    "mode": "by-file"
+   },
+   "it": {
+    "files": 26,
+    "windows": 1472,
+    "mode": "by-file"
+   },
+   "es": {
+    "files": 79,
+    "windows": 2770,
+    "mode": "by-file"
+   },
+   "nl": {
+    "files": 24,
+    "windows": 865,
+    "mode": "by-file"
+   },
+   "fi": {
+    "files": 7,
+    "windows": 555,
+    "mode": "by-file"
+   },
+   "hu": {
+    "files": 2,
+    "windows": 330,
+    "mode": "positional-halves"
+   },
+   "ru": {
+    "files": 1,
+    "windows": 16,
+    "mode": "positional-halves"
+   },
+   "ja": {
+    "files": 6,
+    "windows": 1619,
+    "mode": "by-file"
+   },
+   "la": {
+    "files": 15,
+    "windows": 2204,
+    "mode": "by-file"
+   },
+   "sv": {
+    "files": 21,
+    "windows": 303,
+    "mode": "by-file"
+   },
+   "ar": {
+    "files": 10,
+    "windows": 1635,
+    "mode": "by-file"
+   },
+   "zh": {
+    "files": 7,
+    "windows": 2836,
+    "mode": "by-file"
+   },
+   "cs": {
+    "files": 20,
+    "windows": 281,
+    "mode": "by-file"
+   },
+   "lv": {
+    "files": 20,
+    "windows": 217,
+    "mode": "by-file"
+   },
+   "pl": {
+    "files": 19,
+    "windows": 146,
+    "mode": "by-file"
+   },
+   "pt": {
+    "files": 21,
+    "windows": 172,
+    "mode": "by-file"
+   },
+   "sk": {
+    "files": 20,
+    "windows": 130,
+    "mode": "by-file"
+   },
+   "no": {
+    "files": 3,
+    "windows": 154,
+    "mode": "positional-halves"
+   },
+   "ca": {
+    "files": 20,
+    "windows": 362,
+    "mode": "by-file"
+   },
+   "ro": {
+    "files": 1,
+    "windows": 192,
+    "mode": "positional-halves"
+   }
+  }
+ },
+ "grid": [
+  {
+   "theta": 0.5,
+   "f": 0,
+   "size": 34,
+   "P": 0.909,
+   "R": 0.495,
+   "F1": 0.641
+  },
+  {
+   "theta": 0.5,
+   "f": 0.5,
+   "size": 34,
+   "P": 0.909,
+   "R": 0.495,
+   "F1": 0.641
+  },
+  {
+   "theta": 0.5,
+   "f": 0.8,
+   "size": 30,
+   "P": 0.924,
+   "R": 0.458,
+   "F1": 0.612
+  },
+  {
+   "theta": 0.35,
+   "f": 0,
+   "size": 61,
+   "P": 0.857,
+   "R": 0.682,
+   "F1": 0.76
+  },
+  {
+   "theta": 0.35,
+   "f": 0.5,
+   "size": 59,
+   "P": 0.853,
+   "R": 0.664,
+   "F1": 0.747
+  },
+  {
+   "theta": 0.35,
+   "f": 0.8,
+   "size": 48,
+   "P": 0.86,
+   "R": 0.574,
+   "F1": 0.688
+  },
+  {
+   "theta": 0.25,
+   "f": 0,
+   "size": 96,
+   "P": 0.788,
+   "R": 0.812,
+   "F1": 0.8
+  },
+  {
+   "theta": 0.25,
+   "f": 0.5,
+   "size": 89,
+   "P": 0.789,
+   "R": 0.773,
+   "F1": 0.781
+  },
+  {
+   "theta": 0.25,
+   "f": 0.8,
+   "size": 58,
+   "P": 0.818,
+   "R": 0.601,
+   "F1": 0.693
+  },
+  {
+   "theta": 0.18,
+   "f": 0,
+   "size": 133,
+   "P": 0.726,
+   "R": 0.873,
+   "F1": 0.793
+  },
+  {
+   "theta": 0.18,
+   "f": 0.5,
+   "size": 116,
+   "P": 0.736,
+   "R": 0.814,
+   "F1": 0.773
+  },
+  {
+   "theta": 0.18,
+   "f": 0.8,
+   "size": 60,
+   "P": 0.808,
+   "R": 0.601,
+   "F1": 0.689
+  },
+  {
+   "theta": 0.12,
+   "f": 0,
+   "size": 199,
+   "P": 0.65,
+   "R": 0.924,
+   "F1": 0.763
+  },
+  {
+   "theta": 0.12,
+   "f": 0.5,
+   "size": 161,
+   "P": 0.676,
+   "R": 0.848,
+   "F1": 0.752
+  },
+  {
+   "theta": 0.12,
+   "f": 0.8,
+   "size": 65,
+   "P": 0.796,
+   "R": 0.605,
+   "F1": 0.687
+  },
+  {
+   "theta": 0.08,
+   "f": 0,
+   "size": 319,
+   "P": 0.568,
+   "R": 0.955,
+   "F1": 0.713
+  },
+  {
+   "theta": 0.08,
+   "f": 0.5,
+   "size": 225,
+   "P": 0.621,
+   "R": 0.864,
+   "F1": 0.722
+  },
+  {
+   "theta": 0.08,
+   "f": 0.8,
+   "size": 67,
+   "P": 0.791,
+   "R": 0.605,
+   "F1": 0.685
+  },
+  {
+   "theta": 0.05,
+   "f": 0,
+   "size": 534,
+   "P": 0.496,
+   "R": 0.977,
+   "F1": 0.658
+  },
+  {
+   "theta": 0.05,
+   "f": 0.5,
+   "size": 304,
+   "P": 0.579,
+   "R": 0.872,
+   "F1": 0.696
+  },
+  {
+   "theta": 0.05,
+   "f": 0.8,
+   "size": 68,
+   "P": 0.789,
+   "R": 0.605,
+   "F1": 0.685
+  },
+  {
+   "theta": 0.035,
+   "f": 0,
+   "size": 798,
+   "P": 0.447,
+   "R": 0.985,
+   "F1": 0.615
+  },
+  {
+   "theta": 0.035,
+   "f": 0.5,
+   "size": 358,
+   "P": 0.559,
+   "R": 0.872,
+   "F1": 0.682
+  },
+  {
+   "theta": 0.035,
+   "f": 0.8,
+   "size": 68,
+   "P": 0.789,
+   "R": 0.605,
+   "F1": 0.685
+  },
+  {
+   "theta": 0.025,
+   "f": 0,
+   "size": 1114,
+   "P": 0.414,
+   "R": 0.989,
+   "F1": 0.584
+  },
+  {
+   "theta": 0.025,
+   "f": 0.5,
+   "size": 373,
+   "P": 0.556,
+   "R": 0.873,
+   "F1": 0.68
+  },
+  {
+   "theta": 0.025,
+   "f": 0.8,
+   "size": 68,
+   "P": 0.789,
+   "R": 0.605,
+   "F1": 0.685
+  },
+  {
+   "theta": 0.018,
+   "f": 0,
+   "size": 1674,
+   "P": 0.379,
+   "R": 0.992,
+   "F1": 0.548
+  },
+  {
+   "theta": 0.018,
+   "f": 0.5,
+   "size": 383,
+   "P": 0.554,
+   "R": 0.873,
+   "F1": 0.678
+  },
+  {
+   "theta": 0.018,
+   "f": 0.8,
+   "size": 68,
+   "P": 0.789,
+   "R": 0.605,
+   "F1": 0.685
+  },
+  {
+   "theta": 0.012,
+   "f": 0,
+   "size": 2531,
+   "P": 0.35,
+   "R": 0.996,
+   "F1": 0.518
+  },
+  {
+   "theta": 0.012,
+   "f": 0.5,
+   "size": 383,
+   "P": 0.554,
+   "R": 0.873,
+   "F1": 0.678
+  },
+  {
+   "theta": 0.012,
+   "f": 0.8,
+   "size": 68,
+   "P": 0.789,
+   "R": 0.605,
+   "F1": 0.685
+  },
+  {
+   "theta": 0.008,
+   "f": 0,
+   "size": 3666,
+   "P": 0.33,
+   "R": 0.997,
+   "F1": 0.496
+  },
+  {
+   "theta": 0.008,
+   "f": 0.5,
+   "size": 383,
+   "P": 0.554,
+   "R": 0.873,
+   "F1": 0.678
+  },
+  {
+   "theta": 0.008,
+   "f": 0.8,
+   "size": 68,
+   "P": 0.789,
+   "R": 0.605,
+   "F1": 0.685
+  }
+ ],
+ "selected": {
+  "theta": 0.25,
+  "f": 0,
+  "selectedOn": "en dev tokens, max token-level F1 vs UD closed-class",
+  "setSize": 96,
+  "devF1": 0.8001215340829517
+ },
+ "enTest": [
+  {
+   "name": "derived R(theta,f) from en dev",
+   "P": 0.79,
+   "R": 0.812,
+   "F1": {
+    "est": 0.8005507287660827,
+    "lo": 0.796537706140758,
+    "hi": 0.8069135911192736,
+    "nClusters": 73,
+    "n": 73
+   },
+   "known": 542773,
+   "total": 723457
+  },
+  {
+   "name": "fold-chat-web contentTerms complement (len<4 or FUNCTION_WORDS)",
+   "P": 0.671,
+   "R": 0.798,
+   "F1": {
+    "est": 0.7288575732884703,
+    "lo": 0.7211082020925133,
+    "hi": 0.7356954639322951,
+    "nClusters": 73,
+    "n": 73
+   },
+   "known": 542773,
+   "total": 723457
+  },
+  {
+   "name": "STOP+len<4 (fork's substantive complement)",
+   "P": 0.664,
+   "R": 0.774,
+   "F1": {
+    "est": 0.7146512812614768,
+    "lo": 0.7070254256771861,
+    "hi": 0.7220683189194569,
+    "nClusters": 73,
+    "n": 73
+   },
+   "known": 542773,
+   "total": 723457
+  },
+  {
+   "name": "STOP only",
+   "P": 0.792,
+   "R": 0.669,
+   "F1": {
+    "est": 0.7256467248953866,
+    "lo": 0.7178077091371484,
+    "hi": 0.7390822567917805,
+    "nClusters": 73,
+    "n": 73
+   },
+   "known": 542773,
+   "total": 723457
+  },
+  {
+   "name": "len<4 only",
+   "P": 0.67,
+   "R": 0.571,
+   "F1": {
+    "est": 0.6166130088682652,
+    "lo": 0.6111581949674517,
+    "hi": 0.6237040574714738,
+    "nClusters": 73,
+    "n": 73
+   },
+   "known": 542773,
+   "total": 723457
+  },
+  {
+   "name": "no filter",
+   "P": 0,
+   "R": 0,
+   "F1": {
+    "est": 0,
+    "lo": 0,
+    "hi": 0,
+    "nClusters": 73,
+    "n": 73
+   },
+   "known": 542773,
+   "total": 723457
+  }
+ ],
+ "enTestTypeLevel": {
+  "nTypes": 8943,
+  "derived": {
+   "P": 0.719,
+   "R": 0.367,
+   "F1": 0.486
+  },
+  "fold-chat-web contentTerms complement (len<4 or FUNCTION_WORDS)": {
+   "P": 0.178,
+   "R": 0.495,
+   "F1": 0.262
+  },
+  "STOP+len<4 (fork's substantive complement)": {
+   "P": 0.175,
+   "R": 0.473,
+   "F1": 0.255
+  },
+  "STOP only": {
+   "P": 0.697,
+   "R": 0.282,
+   "F1": 0.402
+  },
+  "len<4 only": {
+   "P": 0.147,
+   "R": 0.372,
+   "F1": 0.211
+  },
+  "no filter": {
+   "P": 0,
+   "R": 0,
+   "F1": 0
+  }
+ },
+ "ruSelectedRefit": {
+  "theta": 0.25,
+  "f": 0,
+  "note": "ru has 1 file(s): positional-halves; f fixed 0 (file spread undefined)"
+ },
+ "ruTest": [
+  {
+   "name": "derived, en (theta,f) transferred",
+   "P": 0.63,
+   "R": 0.836,
+   "F1": {
+    "est": 0.7185877466251297,
+    "lo": 0.7185877466251297,
+    "hi": 0.7185877466251297,
+    "nClusters": 1,
+    "n": 1
+   },
+   "known": 1105,
+   "total": 2185
+  },
+  {
+   "name": "derived, refit on ru dev",
+   "P": 0.63,
+   "R": 0.836,
+   "F1": {
+    "est": 0.7185877466251297,
+    "lo": 0.7185877466251297,
+    "hi": 0.7185877466251297,
+    "nClusters": 1,
+    "n": 1
+   },
+   "known": 1105,
+   "total": 2185
+  },
+  {
+   "name": "fold-chat-web contentTerms complement (len<4 or FUNCTION_WORDS)",
+   "P": 0.759,
+   "R": 0.679,
+   "F1": {
+    "est": 0.7168367346938775,
+    "lo": 0.7168367346938775,
+    "hi": 0.7168367346938775,
+    "nClusters": 1,
+    "n": 1
+   },
+   "known": 1105,
+   "total": 2185
+  },
+  {
+   "name": "STOP+len<4 (fork's substantive complement)",
+   "P": 0.759,
+   "R": 0.679,
+   "F1": {
+    "est": 0.7168367346938775,
+    "lo": 0.7168367346938775,
+    "hi": 0.7168367346938775,
+    "nClusters": 1,
+    "n": 1
+   },
+   "known": 1105,
+   "total": 2185
+  },
+  {
+   "name": "STOP only",
+   "P": 0,
+   "R": 0,
+   "F1": {
+    "est": 0,
+    "lo": 0,
+    "hi": 0,
+    "nClusters": 1,
+    "n": 1
+   },
+   "known": 1105,
+   "total": 2185
+  },
+  {
+   "name": "len<4 only",
+   "P": 0.759,
+   "R": 0.679,
+   "F1": {
+    "est": 0.7168367346938775,
+    "lo": 0.7168367346938775,
+    "hi": 0.7168367346938775,
+    "nClusters": 1,
+    "n": 1
+   },
+   "known": 1105,
+   "total": 2185
+  },
+  {
+   "name": "no filter",
+   "P": 0,
+   "R": 0,
+   "F1": {
+    "est": 0,
+    "lo": 0,
+    "hi": 0,
+    "nClusters": 1,
+    "n": 1
+   },
+   "known": 1105,
+   "total": 2185
+  }
+ ],
+ "otherLanguages": {
+  "ar": {
+   "files": 10,
+   "windows": 1635,
+   "mode": "by-file",
+   "devSetSize": 119,
+   "testSetSize": 78,
+   "jaccardDevTest": 0.438,
+   "fullSetSize": 86
+  },
+  "ca": {
+   "files": 20,
+   "windows": 362,
+   "mode": "by-file",
+   "devSetSize": 108,
+   "testSetSize": 80,
+   "jaccardDevTest": 0.492,
+   "fullSetSize": 86
+  },
+  "cs": {
+   "files": 20,
+   "windows": 281,
+   "mode": "by-file",
+   "devSetSize": 124,
+   "testSetSize": 64,
+   "jaccardDevTest": 0.403,
+   "fullSetSize": 85
+  },
+  "de": {
+   "files": 70,
+   "windows": 3032,
+   "mode": "by-file",
+   "devSetSize": 73,
+   "testSetSize": 85,
+   "jaccardDevTest": 0.816,
+   "fullSetSize": 79
+  },
+  "el": {
+   "files": 71,
+   "windows": 3140,
+   "mode": "by-file",
+   "devSetSize": 105,
+   "testSetSize": 99,
+   "jaccardDevTest": 0.714,
+   "fullSetSize": 106
+  },
+  "en": {
+   "files": 150,
+   "windows": 8074,
+   "mode": "by-file",
+   "devSetSize": 96,
+   "testSetSize": 100,
+   "jaccardDevTest": 0.867,
+   "fullSetSize": 95
+  },
+  "es": {
+   "files": 79,
+   "windows": 2770,
+   "mode": "by-file",
+   "devSetSize": 57,
+   "testSetSize": 60,
+   "jaccardDevTest": 0.481,
+   "fullSetSize": 47
+  },
+  "fa": {
+   "files": 1,
+   "windows": 9,
+   "mode": "positional-halves",
+   "devSetSize": 175,
+   "testSetSize": 860,
+   "jaccardDevTest": 0.083,
+   "fullSetSize": 114
+  },
+  "fi": {
+   "files": 7,
+   "windows": 555,
+   "mode": "by-file",
+   "devSetSize": 86,
+   "testSetSize": 82,
+   "jaccardDevTest": 0.527,
+   "fullSetSize": 78
+  },
+  "fr": {
+   "files": 24,
+   "windows": 3009,
+   "mode": "by-file",
+   "devSetSize": 88,
+   "testSetSize": 73,
+   "jaccardDevTest": 0.66,
+   "fullSetSize": 75
+  },
+  "hu": {
+   "files": 2,
+   "windows": 330,
+   "mode": "positional-halves",
+   "devSetSize": 103,
+   "testSetSize": 108,
+   "jaccardDevTest": 0.803,
+   "fullSetSize": 104
+  },
+  "it": {
+   "files": 26,
+   "windows": 1472,
+   "mode": "by-file",
+   "devSetSize": 71,
+   "testSetSize": 68,
+   "jaccardDevTest": 0.675,
+   "fullSetSize": 72
+  },
+  "ja": {
+   "files": 6,
+   "windows": 1619,
+   "mode": "by-file",
+   "devSetSize": 164,
+   "testSetSize": 136,
+   "jaccardDevTest": 0.382,
+   "fullSetSize": 142
+  },
+  "ko": {
+   "files": 2,
+   "windows": 12,
+   "mode": "positional-halves",
+   "devSetSize": 218,
+   "testSetSize": 147,
+   "jaccardDevTest": 0.148,
+   "fullSetSize": 155
+  },
+  "la": {
+   "files": 15,
+   "windows": 2204,
+   "mode": "by-file",
+   "devSetSize": 87,
+   "testSetSize": 63,
+   "jaccardDevTest": 0.515,
+   "fullSetSize": 65
+  },
+  "lv": {
+   "files": 20,
+   "windows": 217,
+   "mode": "by-file",
+   "devSetSize": 44,
+   "testSetSize": 112,
+   "jaccardDevTest": 0.311,
+   "fullSetSize": 50
+  },
+  "nl": {
+   "files": 24,
+   "windows": 865,
+   "mode": "by-file",
+   "devSetSize": 113,
+   "testSetSize": 85,
+   "jaccardDevTest": 0.311,
+   "fullSetSize": 83
+  },
+  "no": {
+   "files": 3,
+   "windows": 154,
+   "mode": "positional-halves",
+   "devSetSize": 81,
+   "testSetSize": 78,
+   "jaccardDevTest": 0.574,
+   "fullSetSize": 81
+  },
+  "pl": {
+   "files": 19,
+   "windows": 146,
+   "mode": "by-file",
+   "devSetSize": 78,
+   "testSetSize": 110,
+   "jaccardDevTest": 0.414,
+   "fullSetSize": 78
+  },
+  "pt": {
+   "files": 21,
+   "windows": 172,
+   "mode": "by-file",
+   "devSetSize": 128,
+   "testSetSize": 133,
+   "jaccardDevTest": 0.491,
+   "fullSetSize": 126
+  },
+  "ro": {
+   "files": 1,
+   "windows": 192,
+   "mode": "positional-halves",
+   "devSetSize": 133,
+   "testSetSize": 149,
+   "jaccardDevTest": 0.516,
+   "fullSetSize": 138
+  },
+  "ru": {
+   "files": 1,
+   "windows": 16,
+   "mode": "positional-halves",
+   "devSetSize": 328,
+   "testSetSize": 318,
+   "jaccardDevTest": 0.332,
+   "fullSetSize": 223
+  },
+  "sk": {
+   "files": 20,
+   "windows": 130,
+   "mode": "by-file",
+   "devSetSize": 96,
+   "testSetSize": 85,
+   "jaccardDevTest": 0.382,
+   "fullSetSize": 70
+  },
+  "sv": {
+   "files": 21,
+   "windows": 303,
+   "mode": "by-file",
+   "devSetSize": 87,
+   "testSetSize": 106,
+   "jaccardDevTest": 0.331,
+   "fullSetSize": 72
+  },
+  "tr": {
+   "files": 2,
+   "windows": 14,
+   "mode": "positional-halves",
+   "devSetSize": 295,
+   "testSetSize": 220,
+   "jaccardDevTest": 0.2,
+   "fullSetSize": 131
+  },
+  "zh": {
+   "files": 7,
+   "windows": 2836,
+   "mode": "by-file",
+   "devSetSize": 139,
+   "testSetSize": 109,
+   "jaccardDevTest": 0.348,
+   "fullSetSize": 108
+  }
+ },
+ "spot": {
+  "fr": "de la à le et les en des dans un du que une qui pour au par ne est a pas sur il ce ou cette se tout son aux si plus sont avec être même peut sa ces fait",
+  "es": "a la de el en y los que del las por se no con para al su o artículo un lo una ley como sus caso cuando sin este podrá ser si esta sobre será general acuerdo e deberá podrán",
+  "de": "in die und der zu den an das von nicht mit dem so auf des ein eine als ist im es sich sie für nach auch wenn er aus was einer oder wie durch werden nur einen sind hat zur",
+  "it": "in a i di e per la il del che le con al non da si un o della cui nel come alla una delle gli dei lo ed se più ai ma è dal ad sono me mi ne",
+  "zh": "之 以 也 曰 者 其 而 有 人 不 於 故 與 大 子 下 則 皆 無 中 此 上 一 所 時 亦 為 是 言 矣 乃 今 入 爲 及 得 使 用 至 謂",
+  "ja": "て と の を に は し も か た な れ ら へ さ り き が ば で ま い や る もの お した 人 く 思 え ぬ ひ 見 せ け 御 から なる う",
+  "ar": "من في على أن إلى ما عن لا ذلك هذا كان الله له عليه قال لم ولا ثم فيه إلا الذي هو إذا أو وهو فقال إن بن به هذه أنه وقال حتى بين ابن منه قد أبي أبو بعد"
+ },
+ "artifact": {
+  "rawBytes": 22761,
+  "gzBytes": 9983,
+  "languages": 26
+ }
+}

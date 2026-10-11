@@ -1,0 +1,1896 @@
+{
+ "schema": "TypographyLooks@1",
+ "giver": "eoreader7:organs/tschichold.js — curated taxonomy, 2026-09-28",
+ "standing": "curated: a received map of what can be looked at, not a measurement. Competency per family is MEASURED by the bench (organs/tschichold.js competency()).",
+ "principle": "Carriers partitioned by the signal's own dimensions (symbols, plane, sound, plane-in-time, timed symbols, space, container); in every carrier the same three questions — ground (the medium and what of it is not content), figure (units and their roles), pattern (their arrangement). The CV parent LOOKS once; what it saw becomes a byte rule; the rule is falsified on similar-but-not-identical material; then the bytes are read without looking.",
+ "carriers": {
+  "C1": "a discrete stream of symbols — text, notation, code, records",
+  "C2": "a plane — a page image, a graphic",
+  "C3": "a continuous signal in time — sound",
+  "C4": "a plane in time — video, animation",
+  "C5": "discrete symbols in time — MIDI, captions, logs, motion",
+  "C6": "coordinates in space — geodata, models, drawings",
+  "C7": "a container of the above — PDF, web page, e-book, mail, package"
+ },
+ "looks": {
+  "renderText": "render the bytes as a reader sees them (organs/look.js renderTextToImage, or the source's own HTML in a browser) → tesseract TSV layout (block/line/word boxes) → layout facts; compare with the byte reading",
+  "page": "the page image itself (the-fold/pdf-read.js renderPdfPage; a scan) → tesseract TSV layout + OpenCV boxes/connectors (visual-rec.mjs detectVisualStructure) → layout facts; compare with pdftotext -layout / OCR bytes",
+  "graphic": "the image → OpenCV regions, connectors, text boxes (detectVisualStructure) + per-region OCR → labelled regions; compare with any caption/alt/metadata bytes",
+  "sound": "render a spectrogram / waveform image (adapters/audio: frames, chroma, moments) → bands, onsets, silences seen as regions; compare with the sample stream's own measures",
+  "video": "sample frames at shot boundaries (adapters/video frame differences) → look at keyframes as pages/graphics; compare with caption/subtitle bytes",
+  "timed": "render a timeline / piano roll of the events → look at the image; compare with the event bytes",
+  "space": "project to an image (map render / orthographic views) → look; compare with the coordinate bytes",
+  "container": "unpack; render the package the way its reader would (browser, PDF viewer, e-reader) → look at pages; compare with each member's bytes"
+ },
+ "families": [
+  {
+   "id": "C1.01",
+   "carrier": "C1",
+   "name": "encodings, scripts and directions",
+   "bytes": "code points",
+   "look": "render the bytes as a reader sees them (organs/look.js renderTextToImage, or the source's own HTML in a browser) → tesseract TSV layout (block/line/word boxes) → layout facts; compare with the byte reading",
+   "ground": [
+    "encoding and its failures (mojibake, legacy code pages, CRLF)",
+    "script and direction (LTR, RTL with bidi, vertical CJK)",
+    "romanisation of a script (IAST, Buckwalter, pinyin)",
+    "combining marks (niqqud, cantillation, harakat, polytonic accents)",
+    "invisible and special spaces (NBSP, ZWJ/ZWNJ, soft hyphen, thin space)"
+   ],
+   "figure": [
+    "word boundaries with and without spaces (CJK, Thai, Lao)",
+    "numerals of every script (Arabic-Indic, Devanagari, CJK, Roman, Greek alphabetic)"
+   ],
+   "pattern": [
+    "mixed-script lines and code-switching",
+    "a caption or note in another language bleeding into the body"
+   ],
+   "leaves": [
+    "Latin",
+    "Greek polytonic",
+    "Cyrillic",
+    "Arabic with harakat",
+    "Hebrew with niqqud and cantillation",
+    "Devanagari",
+    "IAST romanised Sanskrit",
+    "Literary Chinese",
+    "Japanese kana-kanji",
+    "Ethiopic",
+    "Lao",
+    "Braille patterns"
+   ],
+   "exemplars": [
+    {
+     "path": "live_priors/14-holy-texts/wlc-tanakh/2Chr.txt",
+     "exists": true,
+     "inLivePriors": true
+    },
+    {
+     "path": "live_priors/14-holy-texts/quran-suras/sura-076-Al-Insan.txt",
+     "exists": true,
+     "inLivePriors": true
+    },
+    {
+     "path": "live_priors/11-multi-language/sanskrit-originals/rigveda.txt",
+     "exists": true,
+     "inLivePriors": true
+    },
+    {
+     "path": "live_priors/11-multi-language/chinese-originals/shiji.txt",
+     "exists": true,
+     "inLivePriors": true
+    },
+    {
+     "path": "live_priors/11-multi-language/japanese-originals/murasaki-tale-of-genji.txt",
+     "exists": true,
+     "inLivePriors": true
+    },
+    {
+     "path": "live_priors/11-multi-language/greek-originals/homer-iliad.txt",
+     "exists": true,
+     "inLivePriors": true
+    }
+   ]
+  },
+  {
+   "id": "C1.02",
+   "carrier": "C1",
+   "name": "lines, wraps and breaks",
+   "bytes": "newlines and spaces",
+   "look": "render the bytes as a reader sees them (organs/look.js renderTextToImage, or the source's own HTML in a browser) → tesseract TSV layout (block/line/word boxes) → layout facts; compare with the byte reading",
+   "ground": [
+    "hard wrap at a column (Gutenberg ~70)",
+    "one paragraph per line (Wikisource, Wikipedia)",
+    "lost breaks (a flattened edition)",
+    "line-end hyphenation, real and typesetter's"
+   ],
+   "figure": [
+    "authored line (verse) vs typeset line (prose)",
+    "hanging indent continuation",
+    "blank line as paragraph vs as stanza vs as page"
+   ],
+   "pattern": [
+    "verse paragraph vs stanza vs prose paragraph across a work"
+   ],
+   "leaves": [
+    "hard-wrapped prose",
+    "unwrapped paragraphs",
+    "stichic verse",
+    "flattened sutra edition",
+    "hyphenated OCR lines"
+   ],
+   "exemplars": [
+    {
+     "path": "live_priors/01-literature-books/gutenberg/pg145_Middlemarch-George-Eliot.txt",
+     "exists": true,
+     "inLivePriors": true
+    },
+    {
+     "path": "live_priors/11-multi-language/italian-originals/pg1000_La-Divina-Commedia-di-Dante-Italian.txt",
+     "exists": true,
+     "inLivePriors": true
+    },
+    {
+     "path": "live_priors/11-multi-language/sanskrit-originals/panini-ashtadhyayi.txt",
+     "exists": true,
+     "inLivePriors": true
+    },
+    {
+     "path": "live_priors/11-multi-language/translations-en/adams-1849-the-genuine-works-of-hippocrates-volume-2.txt",
+     "exists": true,
+     "inLivePriors": true
+    }
+   ]
+  },
+  {
+   "id": "C1.03",
+   "carrier": "C1",
+   "name": "prose forms",
+   "bytes": "paragraphs and headings",
+   "look": "render the bytes as a reader sees them (organs/look.js renderTextToImage, or the source's own HTML in a browser) → tesseract TSV layout (block/line/word boxes) → layout facts; compare with the byte reading",
+   "ground": [
+    "chapter and book heads",
+    "epigraphs and dedications"
+   ],
+   "figure": [
+    "paragraph",
+    "reported speech and its quote marks by language (« » „ “ — dashes)",
+    "the author's aside (太史公曰)"
+   ],
+   "pattern": [
+    "narrative",
+    "treatise and argument",
+    "annals — dated entries (其明年，…)",
+    "letters and epistles",
+    "essay",
+    "oration",
+    "aphorism collection",
+    "sūtra collection",
+    "commentary on a root text"
+   ],
+   "leaves": [
+    "novel",
+    "treatise",
+    "annals",
+    "epistle",
+    "aphorisms",
+    "sūtras",
+    "commentary"
+   ],
+   "exemplars": [
+    {
+     "path": "live_priors/01-literature-books/gutenberg/pg5196_Don_Quixote__Spanish_.txt",
+     "exists": true,
+     "inLivePriors": true
+    },
+    {
+     "path": "live_priors/11-multi-language/chinese-originals/shiji.txt",
+     "exists": true,
+     "inLivePriors": true
+    },
+    {
+     "path": "live_priors/11-multi-language/french-originals/pascal-pensees.txt",
+     "exists": true,
+     "inLivePriors": true
+    },
+    {
+     "path": "live_priors/11-multi-language/greek-originals/hippocrates-aphorisms.txt",
+     "exists": true,
+     "inLivePriors": true
+    },
+    {
+     "path": "live_priors/11-multi-language/arabic-originals/ibn-khaldun-muqaddimah.txt",
+     "exists": true,
+     "inLivePriors": true
+    }
+   ]
+  },
+  {
+   "id": "C1.04",
+   "carrier": "C1",
+   "name": "verse forms",
+   "bytes": "authored lines",
+   "look": "render the bytes as a reader sees them (organs/look.js renderTextToImage, or the source's own HTML in a browser) → tesseract TSV layout (block/line/word boxes) → layout facts; compare with the byte reading",
+   "ground": [
+    "the editor's lineation (every fifth line)",
+    "strophe / antistrophe / epode labels"
+   ],
+   "figure": [
+    "line, half-line (pāda, hemistich)",
+    "caesura marks",
+    "rhyme and assonance by spelling",
+    "refrain"
+   ],
+   "pattern": [
+    "stichic (hexameter, blank verse)",
+    "stanzaic (tercet/terza rima, quatrain, ottava rima)",
+    "fixed forms (sonnet, ghazal, śloka, haiku, regulated verse, limerick)",
+    "alliterative (Eddic)",
+    "ode triads",
+    "prosimetrum (verse inside prose)",
+    "free verse"
+   ],
+   "leaves": [
+    "hexameter",
+    "terza rima",
+    "śloka",
+    "Eddic stanza",
+    "Pindaric triad",
+    "sonnet",
+    "free verse",
+    "prosimetrum"
+   ],
+   "exemplars": [
+    {
+     "path": "live_priors/11-multi-language/greek-originals/homer-odyssey.txt",
+     "exists": true,
+     "inLivePriors": true
+    },
+    {
+     "path": "live_priors/11-multi-language/greek-originals/pindar-pythian-odes.txt",
+     "exists": true,
+     "inLivePriors": true
+    },
+    {
+     "path": "live_priors/11-multi-language/old-norse-originals/eddukvaedi.txt",
+     "exists": true,
+     "inLivePriors": true
+    },
+    {
+     "path": "live_priors/11-multi-language/latin-originals/boethius-consolation.txt",
+     "exists": true,
+     "inLivePriors": true
+    },
+    {
+     "path": "live_priors/01-literature-books/gutenberg/pg2397_Leaves_of_Grass_by_Whitman.txt",
+     "exists": true,
+     "inLivePriors": true
+    },
+    {
+     "path": "live_priors/14-holy-texts/bhagavad-gita/bhagavad-gita.txt",
+     "exists": true,
+     "inLivePriors": true
+    }
+   ]
+  },
+  {
+   "id": "C1.05",
+   "carrier": "C1",
+   "name": "drama, dialogue and transcript",
+   "bytes": "speaker labels and turns",
+   "look": "render the bytes as a reader sees them (organs/look.js renderTextToImage, or the source's own HTML in a browser) → tesseract TSV layout (block/line/word boxes) → layout facts; compare with the byte reading",
+   "ground": [
+    "cast list (Dramatis Personae)",
+    "act and scene heads"
+   ],
+   "figure": [
+    "speaker label (ALL CAPS line, inline abbreviation, Greek abbreviation)",
+    "stage direction ([Exit], _Exeunt_, (Ab.))",
+    "shared part-line",
+    "speech tag in narrative (dijo:, قال:, kvað:)"
+   ],
+   "pattern": [
+    "verse/prose switching within a play",
+    "turn-taking and assent rhythm (elenchus)",
+    "catechism Q/A (問/曰)",
+    "screenplay (sluglines, parentheticals)",
+    "interview and oral-history transcript",
+    "chat log"
+   ],
+   "leaves": [
+    "folio drama",
+    "modern drama",
+    "Platonic dialogue",
+    "catechism",
+    "screenplay",
+    "interview transcript",
+    "chat log"
+   ],
+   "exemplars": [
+    {
+     "path": "live_priors/15-western-canon/first-folio/henry-iv-part-1.txt",
+     "exists": true,
+     "inLivePriors": true
+    },
+    {
+     "path": "live_priors/15-western-canon/marlowe/doctor-faustus-1604-quarto.txt",
+     "exists": true,
+     "inLivePriors": true
+    },
+    {
+     "path": "live_priors/01-literature-books/gutenberg/pg2636_Faust__German_.txt",
+     "exists": true,
+     "inLivePriors": true
+    },
+    {
+     "path": "live_priors/11-multi-language/greek-originals/plato-sophist.txt",
+     "exists": true,
+     "inLivePriors": true
+    },
+    {
+     "path": "live_priors/11-multi-language/chinese-originals/dai-zhen.txt",
+     "exists": true,
+     "inLivePriors": true
+    },
+    {
+     "path": "live_priors/11-multi-language/dialects-pidgins-creoles/coraal/dcb/DCB_se2_ag2_f_01.txt",
+     "exists": true,
+     "inLivePriors": true
+    }
+   ]
+  },
+  {
+   "id": "C1.06",
+   "carrier": "C1",
+   "name": "scripture and versified addressing",
+   "bytes": "verse references",
+   "look": "render the bytes as a reader sees them (organs/look.js renderTextToImage, or the source's own HTML in a browser) → tesseract TSV layout (block/line/word boxes) → layout facts; compare with the byte reading",
+   "ground": [
+    "book.chapter.verse prefixes",
+    "bracketed sura:ayah"
+   ],
+   "figure": [
+    "verse",
+    "interlinear line pairs (source / gloss)",
+    "apparatus sigla and variant readings"
+   ],
+   "pattern": [
+    "canon order",
+    "parallel columns",
+    "a verse text with no addresses at all (sefaria) vs one with them (wlc)"
+   ],
+   "leaves": [
+    "Tanakh",
+    "Greek NT with apparatus",
+    "Qur'an with transliteration and gloss",
+    "Pali interlinear",
+    "OSIS word-tokenised XML"
+   ],
+   "exemplars": [
+    {
+     "path": "live_priors/14-holy-texts/wlc-tanakh/2Chr.txt",
+     "exists": true,
+     "inLivePriors": true
+    },
+    {
+     "path": "live_priors/14-holy-texts/sefaria/I_Kings_he.txt",
+     "exists": true,
+     "inLivePriors": true
+    },
+    {
+     "path": "live_priors/14-holy-texts/sblgnt/Matt.txt",
+     "exists": true,
+     "inLivePriors": true
+    },
+    {
+     "path": "live_priors/14-holy-texts/pali-suttas/dn10.txt",
+     "exists": true,
+     "inLivePriors": true
+    },
+    {
+     "path": "live_priors/14-holy-texts/nestle1904/02-mark.xml",
+     "exists": true,
+     "inLivePriors": true
+    }
+   ]
+  },
+  {
+   "id": "C1.07",
+   "carrier": "C1",
+   "name": "reference works",
+   "bytes": "entries and fields",
+   "look": "render the bytes as a reader sees them (organs/look.js renderTextToImage, or the source's own HTML in a browser) → tesseract TSV layout (block/line/word boxes) → layout facts; compare with the byte reading",
+   "ground": [
+    "section heads by radical, letter or class"
+   ],
+   "figure": [
+    "headword",
+    "definition",
+    "field label (【釋名】【主治】)",
+    "cross-reference"
+   ],
+   "pattern": [
+    "dictionary / lexicon",
+    "encyclopedia article",
+    "catalogue and bibliography (Fihrist, collection records)",
+    "index and concordance",
+    "gazetteer",
+    "materia medica",
+    "glossary"
+   ],
+   "leaves": [
+    "character dictionary",
+    "encyclopedia",
+    "catalogue",
+    "gazetteer",
+    "materia medica"
+   ],
+   "exemplars": [
+    {
+     "path": "live_priors/11-multi-language/chinese-originals/shuowen-jiezi.txt",
+     "exists": true,
+     "inLivePriors": true
+    },
+    {
+     "path": "live_priors/11-multi-language/chinese-originals/bencao-gangmu.txt",
+     "exists": true,
+     "inLivePriors": true
+    },
+    {
+     "path": "live_priors/11-multi-language/arabic-originals/ibn-al-nadim-fihrist.txt",
+     "exists": true,
+     "inLivePriors": true
+    },
+    {
+     "path": "live_priors/02-encyclopedic/wikipedia/Mathematics.txt",
+     "exists": true,
+     "inLivePriors": true
+    },
+    {
+     "path": "live_priors/06-government-legal/world-factbook/africa_ag.txt",
+     "exists": true,
+     "inLivePriors": true
+    },
+    {
+     "path": "live_priors/07-images-media/nasa-catalog.txt",
+     "exists": true,
+     "inLivePriors": true
+    }
+   ]
+  },
+  {
+   "id": "C1.08",
+   "carrier": "C1",
+   "name": "legal and administrative",
+   "bytes": "numbered provisions",
+   "look": "render the bytes as a reader sees them (organs/look.js renderTextToImage, or the source's own HTML in a browser) → tesseract TSV layout (block/line/word boxes) → layout facts; compare with the byte reading",
+   "ground": [
+    "jurisdiction-specific front matter",
+    "the converted text is not the authentic instrument"
+   ],
+   "figure": [
+    "§ and Art. heads",
+    "(a)(1)(A) enumerations",
+    "citations inside provisions",
+    "motions and votes in minutes"
+   ],
+   "pattern": [
+    "statute / code",
+    "constitution",
+    "court opinion (headnotes, footnotes)",
+    "regulation",
+    "contract",
+    "minutes",
+    "form with blanks"
+   ],
+   "leaves": [
+    "US Code section",
+    "German Grundgesetz article",
+    "UDHR article",
+    "minutes"
+   ],
+   "exemplars": [
+    {
+     "path": "live_priors/06-government-legal/world-legislation/us/USC-T1-S1.md",
+     "exists": true,
+     "inLivePriors": true
+    },
+    {
+     "path": "live_priors/06-government-legal/world-legislation/de/GG.md",
+     "exists": true,
+     "inLivePriors": true
+    },
+    {
+     "path": "live_priors/06-government-legal/un-udhr/udhr-007.txt",
+     "exists": true,
+     "inLivePriors": true
+    }
+   ]
+  },
+  {
+   "id": "C1.09",
+   "carrier": "C1",
+   "name": "scholarly apparatus and other hands",
+   "bytes": "markers and bracketed matter",
+   "look": "render the bytes as a reader sees them (organs/look.js renderTextToImage, or the source's own HTML in a browser) → tesseract TSV layout (block/line/word boxes) → layout facts; compare with the byte reading",
+   "ground": [
+    "editorial brackets ⟨ ⟩ [ ]",
+    "transcriber's notes that declare their own markup"
+   ],
+   "figure": [
+    "footnote marker and note block",
+    "marginal references (Stephanus, Bekker)",
+    "lineation",
+    "page references",
+    "cross-references ([ر: 173])",
+    "a later commentator's label (【索隱述贊】)"
+   ],
+   "pattern": [
+    "root text with layered commentary",
+    "text with apparatus criticus"
+   ],
+   "leaves": [
+    "footnotes",
+    "Stephanus margins",
+    "cross-references",
+    "layered commentary",
+    "declared markup (gesperrt *…*)"
+   ],
+   "exemplars": [
+    {
+     "path": "live_priors/11-multi-language/greek-originals/plato-republic.txt",
+     "exists": true,
+     "inLivePriors": true
+    },
+    {
+     "path": "live_priors/11-multi-language/arabic-originals/sahih-al-bukhari.txt",
+     "exists": true,
+     "inLivePriors": true
+    },
+    {
+     "path": "live_priors/11-multi-language/gutenberg-non-en/de/pg60360_Der-Wille-zur-Macht-Nietzsche.txt",
+     "exists": true,
+     "inLivePriors": true
+    }
+   ]
+  },
+  {
+   "id": "C1.10",
+   "carrier": "C1",
+   "name": "lists, problems and procedures",
+   "bytes": "enumerators",
+   "look": "render the bytes as a reader sees them (organs/look.js renderTextToImage, or the source's own HTML in a browser) → tesseract TSV layout (block/line/word boxes) → layout facts; compare with the byte reading",
+   "ground": [
+    "enumerator systems (1. / I. / (a) / 一、)"
+   ],
+   "figure": [
+    "item",
+    "problem / answer / method (今有 … 荅曰 … 術曰)",
+    "rule stated and illustrated",
+    "ingredient and step"
+   ],
+   "pattern": [
+    "outline levels",
+    "problem sets",
+    "rule books",
+    "recipes"
+   ],
+   "leaves": [
+    "numbered rules",
+    "problem-answer-method",
+    "recipe"
+   ],
+   "exemplars": [
+    {
+     "path": "live_priors/01-literature-books/gutenberg/pg37134_The_Elements_of_Style.txt",
+     "exists": true,
+     "inLivePriors": true
+    },
+    {
+     "path": "live_priors/11-multi-language/chinese-originals/jiuzhang-suanshu.txt",
+     "exists": true,
+     "inLivePriors": true
+    },
+    {
+     "path": "live_priors/11-multi-language/french-originals/brillat-savarin-physiologie-du-gout.txt",
+     "exists": true,
+     "inLivePriors": true
+    }
+   ]
+  },
+  {
+   "id": "C1.11",
+   "carrier": "C1",
+   "name": "tables and records in text",
+   "bytes": "aligned whitespace, delimiters, key: value",
+   "look": "render the bytes as a reader sees them (organs/look.js renderTextToImage, or the source's own HTML in a browser) → tesseract TSV layout (block/line/word boxes) → layout facts; compare with the byte reading",
+   "ground": [
+    "delimiter (pipe, tab, comma, em-dash inside free text)"
+   ],
+   "figure": [
+    "cell, row, header",
+    "key: value record"
+   ],
+   "pattern": [
+    "whitespace-aligned columns",
+    "markdown/pipe tables",
+    "record catalogues (--- N. Title)"
+   ],
+   "leaves": [
+    "aligned table",
+    "pipe table",
+    "catalogue records",
+    "em-dash field lines"
+   ],
+   "exemplars": [
+    {
+     "path": "live_priors/10-audio-music/grateful-dead-catalog.txt",
+     "exists": true,
+     "inLivePriors": true
+    },
+    {
+     "path": "live_priors/16-wordplay/guardian-cryptics/guardian-cryptic-clues-1999-2020.txt",
+     "exists": true,
+     "inLivePriors": true
+    },
+    {
+     "path": "live_priors/11-multi-language/concepticon/concepticon.tsv",
+     "exists": true,
+     "inLivePriors": true
+    }
+   ]
+  },
+  {
+   "id": "C1.12",
+   "carrier": "C1",
+   "name": "markup and structured text",
+   "bytes": "markup tokens",
+   "look": "render the bytes as a reader sees them (organs/look.js renderTextToImage, or the source's own HTML in a browser) → tesseract TSV layout (block/line/word boxes) → layout facts; compare with the byte reading; for markup the rendered page is the look",
+   "ground": [
+    "wikitext, Markdown, HTML, XML (TEI, OSIS, USLM, JATS), LaTeX, RTF",
+    "front matter (YAML) and plain-header blocks"
+   ],
+   "figure": [
+    "heading, list, link, template, tag"
+   ],
+   "pattern": [
+    "document tree",
+    "rendered-vs-source drift (a fused link, an entity left raw)"
+   ],
+   "leaves": [
+    "wikitext",
+    "Markdown",
+    "HTML",
+    "TEI/OSIS XML",
+    "LaTeX"
+   ],
+   "exemplars": [
+    {
+     "path": "live_priors/14-holy-texts/nestle1904/02-mark.xml",
+     "exists": true,
+     "inLivePriors": true
+    },
+    {
+     "path": "live_priors/06-government-legal/world-legislation/de/GG.md",
+     "exists": true,
+     "inLivePriors": true
+    },
+    {
+     "path": "live_priors/05-academic-papers/open-access-books/d2l/builders-guide-model-construction.txt",
+     "exists": true,
+     "inLivePriors": true
+    }
+   ]
+  },
+  {
+   "id": "C1.13",
+   "carrier": "C1",
+   "name": "code",
+   "bytes": "source text",
+   "look": "render the bytes as a reader sees them (organs/look.js renderTextToImage, or the source's own HTML in a browser) → tesseract TSV layout (block/line/word boxes) → layout facts; compare with the byte reading",
+   "ground": [
+    "language and its whitespace law (indentation-significant vs braces)",
+    "licence headers",
+    "path-flattened file names"
+   ],
+   "figure": [
+    "declaration, block, comment, docstring, string"
+   ],
+   "pattern": [
+    "module structure",
+    "notebooks (cells)",
+    "diffs and patches",
+    "logs and stack traces",
+    "config files",
+    "shell sessions"
+   ],
+   "leaves": [
+    "C",
+    "Python",
+    "JavaScript/TypeScript",
+    "Go",
+    "notebook",
+    "diff",
+    "log"
+   ],
+   "exemplars": [
+    {
+     "path": "live_priors/09-source-code/jedisct1_libsodium/src_libsodium_crypto_pwhash_argon2_argon2.c",
+     "exists": true,
+     "inLivePriors": true
+    },
+    {
+     "path": "er7-redteam/harmbench/HarmBench/notebooks/analyze_results.ipynb",
+     "exists": true,
+     "inLivePriors": false
+    }
+   ]
+  },
+  {
+   "id": "C1.14",
+   "carrier": "C1",
+   "name": "data records",
+   "bytes": "delimited or nested records",
+   "look": "render the bytes as a reader sees them (organs/look.js renderTextToImage, or the source's own HTML in a browser) → tesseract TSV layout (block/line/word boxes) → layout facts; compare with the byte reading",
+   "ground": [
+    "schema line or header",
+    "encoding of empty values"
+   ],
+   "figure": [
+    "token row (CoNLL-U)",
+    "tag per token (BIO)",
+    "aligned pair (bitext)",
+    "entry (BibTeX)"
+   ],
+   "pattern": [
+    "sentence blocks",
+    "nested JSON",
+    "one record per line (JSONL)"
+   ],
+   "leaves": [
+    "CSV",
+    "TSV",
+    "JSON/JSONL",
+    "CoNLL-U",
+    "BIO",
+    "BibTeX",
+    "Archive.org metadata"
+   ],
+   "exemplars": [
+    {
+     "path": "live_priors/11-multi-language/dialects-pidgins-creoles/creoleval/pos_ud_naija_pcm/pcm_nsc-ud-train_sample.conllu",
+     "exists": true,
+     "inLivePriors": true
+    },
+    {
+     "path": "live_priors/11-multi-language/dialects-pidgins-creoles/creoleval/ner_wikiann/ht_sample.bio",
+     "exists": true,
+     "inLivePriors": true
+    },
+    {
+     "path": "live_priors/11-multi-language/dialects-pidgins-creoles/kreyol-mt/bitexts/crs-fra/crs-fra.tsv",
+     "exists": true,
+     "inLivePriors": true
+    },
+    {
+     "path": "live_priors/11-multi-language/dialects-pidgins-creoles/ewave/cldf/sources.bib",
+     "exists": true,
+     "inLivePriors": true
+    }
+   ]
+  },
+  {
+   "id": "C1.15",
+   "carrier": "C1",
+   "name": "formal notations",
+   "bytes": "notation tokens",
+   "look": "render the bytes as a reader sees them (organs/look.js renderTextToImage, or the source's own HTML in a browser) → tesseract TSV layout (block/line/word boxes) → layout facts; compare with the byte reading; a notation's own renderer (a score, a formula, a board) is the look",
+   "ground": [
+    "the notation's header fields (ABC X:/K:/M:)"
+   ],
+   "figure": [
+    "note, bar, chord (music)",
+    "operator and operand (math)",
+    "atom and bond (chemistry)",
+    "move (chess)",
+    "base (genetics)"
+   ],
+   "pattern": [
+    "score",
+    "proof",
+    "game",
+    "sequence"
+   ],
+   "leaves": [
+    "ABC",
+    "MusicXML",
+    "TeX/MathML",
+    "SMILES",
+    "PGN",
+    "FASTA",
+    "Braille"
+   ],
+   "acquire": "ABC: thesession.org / abcnotation.com; MusicXML: MuseScore/IMSLP public-domain scores; PGN: lichess database; FASTA: NCBI",
+   "exemplars": []
+  },
+  {
+   "id": "C1.16",
+   "carrier": "C1",
+   "name": "furniture, noise and damage",
+   "bytes": "anything that is not the work",
+   "look": "render the bytes as a reader sees them (organs/look.js renderTextToImage, or the source's own HTML in a browser) → tesseract TSV layout (block/line/word boxes) → layout facts; compare with the byte reading",
+   "ground": [
+    "page UI rendered as text (edit links, navigation, licence templates)",
+    "running heads and page numbers inside an extraction",
+    "OCR noise (ligatures, long s, letter-spaced caps)",
+    "fused links and raw entities",
+    "CSS/JS dumped as text",
+    "a doubled fetch",
+    "boilerplate licences",
+    "a file whose bytes are not the work its name claims"
+   ],
+   "figure": [
+    "a line that heads every part",
+    "a token inside every heading"
+   ],
+   "pattern": [
+    "furniture recurring once per part",
+    "duplication of long blocks"
+   ],
+   "leaves": [
+    "Wikisource edit links",
+    "licence boxes",
+    "page templates",
+    "doubled subpages",
+    "fused wikilinks",
+    "CSS dump",
+    "mislabeled file"
+   ],
+   "exemplars": [
+    {
+     "path": "live_priors/08-news-current/eu-commission/Wikinews_Shorts__November_13__2008.txt",
+     "exists": true,
+     "inLivePriors": true
+    },
+    {
+     "path": "live_priors/11-multi-language/greek-originals/marcus-aurelius-meditations.txt",
+     "exists": true,
+     "inLivePriors": true
+    },
+    {
+     "path": "live_priors/02-encyclopedic/wikipedia/Mathematics.txt",
+     "exists": true,
+     "inLivePriors": true
+    }
+   ]
+  },
+  {
+   "id": "C1.17",
+   "carrier": "C1",
+   "name": "wordplay and puzzles",
+   "bytes": "clue lines and letter patterns",
+   "look": "render the bytes as a reader sees them (organs/look.js renderTextToImage, or the source's own HTML in a browser) → tesseract TSV layout (block/line/word boxes) → layout facts; compare with the byte reading",
+   "ground": [],
+   "figure": [
+    "clue, answer, setter",
+    "enumeration (5,4)"
+   ],
+   "pattern": [
+    "acrostic (initial letters spell)",
+    "anagram",
+    "palindrome",
+    "concrete / shape poem"
+   ],
+   "leaves": [
+    "cryptic clue",
+    "acrostic",
+    "shape poem"
+   ],
+   "exemplars": [
+    {
+     "path": "live_priors/16-wordplay/guardian-cryptics/guardian-cryptic-clues-1999-2020.txt",
+     "exists": true,
+     "inLivePriors": true
+    }
+   ]
+  },
+  {
+   "id": "C1.18",
+   "carrier": "C1",
+   "name": "messages and correspondence",
+   "bytes": "headers, quotes and signatures",
+   "look": "render the bytes as a reader sees them (organs/look.js renderTextToImage, or the source's own HTML in a browser) → tesseract TSV layout (block/line/word boxes) → layout facts; compare with the byte reading",
+   "ground": [
+    "mail headers",
+    "quoted-reply marks (>)"
+   ],
+   "figure": [
+    "salutation, closing, signature",
+    "mention and hashtag"
+   ],
+   "pattern": [
+    "thread",
+    "digest"
+   ],
+   "leaves": [
+    "email",
+    "letter",
+    "chat",
+    "social post"
+   ],
+   "acquire": "public mailing-list archives (e.g. Apache, W3C lists as mbox); letters in 01-literature-books epistolary works",
+   "exemplars": []
+  },
+  {
+   "id": "C1.19",
+   "carrier": "C1",
+   "name": "news and periodicals",
+   "bytes": "headline, dateline, byline",
+   "look": "render the bytes as a reader sees them (organs/look.js renderTextToImage, or the source's own HTML in a browser) → tesseract TSV layout (block/line/word boxes) → layout facts; compare with the byte reading",
+   "ground": [
+    "archive notices and repeated boilerplate"
+   ],
+   "figure": [
+    "headline, dek, dateline, byline, lede, source list"
+   ],
+   "pattern": [
+    "briefs compilation",
+    "article",
+    "corrections"
+   ],
+   "leaves": [
+    "brief",
+    "article",
+    "wire item"
+   ],
+   "exemplars": [
+    {
+     "path": "live_priors/08-news-current/eu-commission/Wikinews_Shorts__November_13__2008.txt",
+     "exists": true,
+     "inLivePriors": true
+    }
+   ]
+  },
+  {
+   "id": "C1.20",
+   "carrier": "C1",
+   "name": "children's and picture-book text",
+   "bytes": "page markers and credits",
+   "look": "render the bytes as a reader sees them (organs/look.js renderTextToImage, or the source's own HTML in a browser) → tesseract TSV layout (block/line/word boxes) → layout facts; compare with the byte reading",
+   "ground": [
+    "credits block (text, illustration, translation, licence)"
+   ],
+   "figure": [
+    "page (## as a page break)",
+    "one sentence per page"
+   ],
+   "pattern": [
+    "page sequence"
+   ],
+   "leaves": [
+    "African Storybook page",
+    "GDL story"
+   ],
+   "exemplars": [
+    {
+     "path": "live_priors/18-childrens-books/african-storybook",
+     "exists": true,
+     "inLivePriors": true
+    },
+    {
+     "path": "live_priors/18-childrens-books/global-digital-library",
+     "exists": true,
+     "inLivePriors": true
+    }
+   ]
+  },
+  {
+   "id": "C2.01",
+   "carrier": "C2",
+   "name": "born-digital pages (PDF with a text layer)",
+   "bytes": "pdftotext -layout page text (form-feed separated)",
+   "look": "the page image itself (the-fold/pdf-read.js renderPdfPage; a scan) → tesseract TSV layout + OpenCV boxes/connectors (visual-rec.mjs detectVisualStructure) → layout facts; compare with pdftotext -layout / OCR bytes",
+   "ground": [
+    "page size, margins",
+    "running heads and feet",
+    "page numbers",
+    "the report-documentation form page"
+   ],
+   "figure": [
+    "title page",
+    "table of contents with dot leaders",
+    "footnote band",
+    "sidebar / box",
+    "caption"
+   ],
+   "pattern": [
+    "single vs multi-column reading order",
+    "front matter / body / back matter"
+   ],
+   "leaves": [
+    "technical report",
+    "journal article",
+    "book PDF",
+    "slides as PDF"
+   ],
+   "exemplars": [
+    {
+     "path": "live_priors/05-academic-papers/ntrs-white-papers/19830026406_computational-methods-for-ideal-compressible-flow.txt",
+     "exists": true,
+     "inLivePriors": true
+    },
+    {
+     "path": "live_priors/05-academic-papers/open-access-books/ashby/ashby-1956-an-introduction-to-cybernetics.txt",
+     "exists": true,
+     "inLivePriors": true
+    },
+    {
+     "path": "HallidayLangBased.pdf",
+     "exists": true,
+     "inLivePriors": false
+    }
+   ]
+  },
+  {
+   "id": "C2.02",
+   "carrier": "C2",
+   "name": "scanned print (image + OCR)",
+   "bytes": "OCR text (djvu, tesseract)",
+   "look": "the page image itself (the-fold/pdf-read.js renderPdfPage; a scan) → tesseract TSV layout + OpenCV boxes/connectors (visual-rec.mjs detectVisualStructure) → layout facts; compare with pdftotext -layout / OCR bytes",
+   "ground": [
+    "skew, curvature, bleed-through",
+    "blackletter/Fraktur, long s, ligatures",
+    "catchwords and signature marks"
+   ],
+   "figure": [
+    "running head",
+    "page number",
+    "marginal note",
+    "letter-spaced title"
+   ],
+   "pattern": [
+    "newspaper columns and jumps",
+    "book page sequence"
+   ],
+   "leaves": [
+    "19th-c. book scan",
+    "typewritten report",
+    "newspaper",
+    "Fraktur print"
+   ],
+   "exemplars": [
+    {
+     "path": "live_priors/11-multi-language/german-originals/ranke-geschichten-der-romanischen-und-germanischen-voelker-1824.txt",
+     "exists": true,
+     "inLivePriors": true
+    },
+    {
+     "path": "live_priors/11-multi-language/translations-en/ashworth-1887-ranke-history-of-the-latin-and-teutonic-nations.txt",
+     "exists": true,
+     "inLivePriors": true
+    }
+   ]
+  },
+  {
+   "id": "C2.03",
+   "carrier": "C2",
+   "name": "handwriting and manuscripts",
+   "bytes": "HTR/OCR text if any",
+   "look": "the page image itself (the-fold/pdf-read.js renderPdfPage; a scan) → tesseract TSV layout + OpenCV boxes/connectors (visual-rec.mjs detectVisualStructure) → layout facts; compare with pdftotext -layout / OCR bytes",
+   "ground": [
+    "ink, hand, ruling"
+   ],
+   "figure": [
+    "line, word, abbreviation, correction, gloss"
+   ],
+   "pattern": [
+    "codex page with interlinear and marginal glosses",
+    "letter",
+    "notebook",
+    "filled form"
+   ],
+   "leaves": [
+    "letter",
+    "codex",
+    "notebook",
+    "form filled by hand"
+   ],
+   "acquire": "e-codices (CH), Library of Congress manuscripts, Wikimedia Commons manuscript scans",
+   "exemplars": []
+  },
+  {
+   "id": "C2.04",
+   "carrier": "C2",
+   "name": "tables and forms as images",
+   "bytes": "OCR cells",
+   "look": "the page image itself (the-fold/pdf-read.js renderPdfPage; a scan) → tesseract TSV layout + OpenCV boxes/connectors (visual-rec.mjs detectVisualStructure) → layout facts; compare with pdftotext -layout / OCR bytes",
+   "ground": [
+    "ruling lines"
+   ],
+   "figure": [
+    "cell, header, merged cell, checkbox"
+   ],
+   "pattern": [
+    "grid",
+    "form"
+   ],
+   "leaves": [
+    "ruled table",
+    "form",
+    "receipt"
+   ],
+   "exemplars": [
+    {
+     "path": "live_priors/05-academic-papers/ntrs-white-papers",
+     "exists": true,
+     "inLivePriors": true
+    }
+   ]
+  },
+  {
+   "id": "C2.05",
+   "carrier": "C2",
+   "name": "mathematics and chemistry typeset",
+   "bytes": "the text layer's garbled symbols",
+   "look": "the page image itself (the-fold/pdf-read.js renderPdfPage; a scan) → tesseract TSV layout + OpenCV boxes/connectors (visual-rec.mjs detectVisualStructure) → layout facts; compare with pdftotext -layout / OCR bytes",
+   "ground": [
+    "math fonts"
+   ],
+   "figure": [
+    "displayed equation, inline math, matrix, structure diagram"
+   ],
+   "pattern": [
+    "numbered equations and references"
+   ],
+   "leaves": [
+    "displayed equations",
+    "matrices",
+    "chemical structures"
+   ],
+   "exemplars": [
+    {
+     "path": "live_priors/05-academic-papers/ntrs-white-papers/19930019979_radiative-interactions-in-molecular-gases-under-local-and-nonlocal-thermodynamic.txt",
+     "exists": true,
+     "inLivePriors": true
+    }
+   ]
+  },
+  {
+   "id": "C2.06",
+   "carrier": "C2",
+   "name": "charts and plots",
+   "bytes": "scattered axis labels in the text layer",
+   "look": "the image → OpenCV regions, connectors, text boxes (detectVisualStructure) + per-region OCR → labelled regions; compare with any caption/alt/metadata bytes",
+   "ground": [
+    "plot area"
+   ],
+   "figure": [
+    "axis, tick, legend, series, annotation"
+   ],
+   "pattern": [
+    "multi-panel figure"
+   ],
+   "leaves": [
+    "line chart",
+    "scatter",
+    "bar chart",
+    "multi-panel"
+   ],
+   "exemplars": [
+    {
+     "path": "live_priors/05-academic-papers/ntrs-white-papers/19660006294_naca-conference-on-aerodynamics-of-high-speed-aircraft-a-compilation-of-the-pape.cv.md",
+     "exists": true,
+     "inLivePriors": true
+    }
+   ]
+  },
+  {
+   "id": "C2.07",
+   "carrier": "C2",
+   "name": "diagrams",
+   "bytes": "box labels",
+   "look": "the image → OpenCV regions, connectors, text boxes (detectVisualStructure) + per-region OCR → labelled regions; compare with any caption/alt/metadata bytes",
+   "ground": [],
+   "figure": [
+    "box, arrow/connector, label"
+   ],
+   "pattern": [
+    "flowchart",
+    "block diagram",
+    "tree",
+    "circuit",
+    "timeline"
+   ],
+   "leaves": [
+    "flowchart",
+    "block diagram",
+    "tree",
+    "circuit"
+   ],
+   "acquire": "Wikimedia Commons diagrams; NTRS report figures",
+   "exemplars": []
+  },
+  {
+   "id": "C2.08",
+   "carrier": "C2",
+   "name": "maps and plans",
+   "bytes": "labels, legend, scale text",
+   "look": "the image → OpenCV regions, connectors, text boxes (detectVisualStructure) + per-region OCR → labelled regions; compare with any caption/alt/metadata bytes",
+   "ground": [
+    "projection, scale"
+   ],
+   "figure": [
+    "label, legend, symbol"
+   ],
+   "pattern": [
+    "map sheet",
+    "floor plan",
+    "technical drawing"
+   ],
+   "leaves": [
+    "satellite/aerial image",
+    "map",
+    "plan"
+   ],
+   "exemplars": [
+    {
+     "path": "MNPD-DFR/satellite/01_Madison_Park_Playground_-86.70184_36.26711.png",
+     "exists": true,
+     "inLivePriors": false
+    }
+   ]
+  },
+  {
+   "id": "C2.09",
+   "carrier": "C2",
+   "name": "photographs and art",
+   "bytes": "caption, alt text, catalogue record",
+   "look": "the image → OpenCV regions, connectors, text boxes (detectVisualStructure) + per-region OCR → labelled regions; compare with any caption/alt/metadata bytes",
+   "ground": [
+    "exposure, colour"
+   ],
+   "figure": [
+    "region, object, text in the scene"
+   ],
+   "pattern": [
+    "composition"
+   ],
+   "leaves": [
+    "photograph",
+    "painting",
+    "museum object",
+    "sign in the wild"
+   ],
+   "exemplars": [
+    {
+     "path": "live_priors/07-images-media/met-museum-catalog.txt",
+     "exists": true,
+     "inLivePriors": true
+    },
+    {
+     "path": "Screenshot 2026-09-27 at 12.37.23 AM.png",
+     "exists": true,
+     "inLivePriors": false
+    }
+   ]
+  },
+  {
+   "id": "C2.10",
+   "carrier": "C2",
+   "name": "composite layouts",
+   "bytes": "extracted text in arbitrary order",
+   "look": "the page image itself (the-fold/pdf-read.js renderPdfPage; a scan) → tesseract TSV layout + OpenCV boxes/connectors (visual-rec.mjs detectVisualStructure) → layout facts; compare with pdftotext -layout / OCR bytes",
+   "ground": [
+    "grid"
+   ],
+   "figure": [
+    "panel, balloon, headline, slide title, bullet"
+   ],
+   "pattern": [
+    "reading order across panels/columns"
+   ],
+   "leaves": [
+    "newspaper/magazine page",
+    "poster",
+    "slide",
+    "comic",
+    "web screenshot",
+    "UI screen"
+   ],
+   "acquire": "Chronicling America (LoC) newspaper pages; public-domain comics (Digital Comic Museum)",
+   "exemplars": []
+  },
+  {
+   "id": "C2.11",
+   "carrier": "C2",
+   "name": "special page systems",
+   "bytes": "the text layer, if any",
+   "look": "the page image itself (the-fold/pdf-read.js renderPdfPage; a scan) → tesseract TSV layout + OpenCV boxes/connectors (visual-rec.mjs detectVisualStructure) → layout facts; compare with pdftotext -layout / OCR bytes",
+   "ground": [
+    "vertical setting",
+    "right-to-left page order"
+   ],
+   "figure": [
+    "ruby/furigana",
+    "calligraphic line",
+    "staff notation",
+    "embossed Braille cell"
+   ],
+   "pattern": [
+    "Talmud page (commentary around the centre)",
+    "interlinear gloss page",
+    "inscription"
+   ],
+   "leaves": [
+    "vertical CJK",
+    "Talmud page",
+    "music score page",
+    "embossed Braille"
+   ],
+   "acquire": "Sefaria page images; IMSLP scores; NDL (Japan) digital collections",
+   "exemplars": []
+  },
+  {
+   "id": "C3.01",
+   "carrier": "C3",
+   "name": "speech",
+   "bytes": "PCM samples (+ any transcript)",
+   "look": "render a spectrogram / waveform image (adapters/audio: frames, chroma, moments) → bands, onsets, silences seen as regions; compare with the sample stream's own measures",
+   "ground": [
+    "rate, depth, channels, codec",
+    "silence and noise floor"
+   ],
+   "figure": [
+    "utterance, pause, turn",
+    "word onset"
+   ],
+   "pattern": [
+    "monologue",
+    "conversation with overlap",
+    "interview",
+    "lecture",
+    "read speech"
+   ],
+   "leaves": [
+    "meeting recording",
+    "interview",
+    "read word (TTS)"
+   ],
+   "exemplars": [
+    {
+     "path": "sept23-audit-committee.wav",
+     "exists": true,
+     "inLivePriors": false
+    },
+    {
+     "path": "vimeo-audio.wav",
+     "exists": true,
+     "inLivePriors": false
+    }
+   ]
+  },
+  {
+   "id": "C3.02",
+   "carrier": "C3",
+   "name": "music performance",
+   "bytes": "PCM samples",
+   "look": "render a spectrogram / waveform image (adapters/audio: frames, chroma, moments) → bands, onsets, silences seen as regions; compare with the sample stream's own measures",
+   "ground": [
+    "restoration artefacts (78 rpm surface noise)"
+   ],
+   "figure": [
+    "note, beat, bar, phrase"
+   ],
+   "pattern": [
+    "verse/chorus form",
+    "instrumental form"
+   ],
+   "leaves": [
+    "78 rpm song",
+    "live recording",
+    "classical performance"
+   ],
+   "exemplars": [
+    {
+     "path": "live_priors/10-audio-music/downloads/78rpm/josh-white-house-of-the-rising-sun/restored.mp3",
+     "exists": true,
+     "inLivePriors": true
+    }
+   ]
+  },
+  {
+   "id": "C3.03",
+   "carrier": "C3",
+   "name": "environmental and animal sound",
+   "bytes": "PCM samples",
+   "look": "render a spectrogram / waveform image (adapters/audio: frames, chroma, moments) → bands, onsets, silences seen as regions; compare with the sample stream's own measures",
+   "ground": [
+    "background noise"
+   ],
+   "figure": [
+    "call, click, burst"
+   ],
+   "pattern": [
+    "lek chorus (túngara)",
+    "echolocation train (Platanista)",
+    "alarm pattern"
+   ],
+   "leaves": [
+    "frog chorus",
+    "echolocation",
+    "alarm"
+   ],
+   "acquire": "Macaulay Library / xeno-canto recordings",
+   "exemplars": []
+  },
+  {
+   "id": "C4.01",
+   "carrier": "C4",
+   "name": "film and recorded video",
+   "bytes": "frames (+ caption track)",
+   "look": "sample frames at shot boundaries (adapters/video frame differences) → look at keyframes as pages/graphics; compare with caption/subtitle bytes",
+   "ground": [
+    "frame rate, resolution, letterbox"
+   ],
+   "figure": [
+    "shot, cut, title card, burned-in caption, lower third"
+   ],
+   "pattern": [
+    "scene",
+    "credits roll",
+    "montage"
+   ],
+   "leaves": [
+    "feature film",
+    "meeting video",
+    "motion test"
+   ],
+   "exemplars": [
+    {
+     "path": "Vimeo-vimeo.mp4",
+     "exists": true,
+     "inLivePriors": false
+    },
+    {
+     "path": "sept23-audit-committee.webm",
+     "exists": true,
+     "inLivePriors": false
+    }
+   ]
+  },
+  {
+   "id": "C4.02",
+   "carrier": "C4",
+   "name": "slides, screens and sign",
+   "bytes": "frames",
+   "look": "sample frames at shot boundaries (adapters/video frame differences) → look at keyframes as pages/graphics; compare with caption/subtitle bytes",
+   "ground": [],
+   "figure": [
+    "slide change",
+    "cursor",
+    "handshape"
+   ],
+   "pattern": [
+    "lecture with slides",
+    "screen recording",
+    "sign-language utterance"
+   ],
+   "leaves": [
+    "lecture video",
+    "screen recording",
+    "sign language"
+   ],
+   "acquire": "public lecture recordings; sign-language corpora with licences",
+   "exemplars": []
+  },
+  {
+   "id": "C4.03",
+   "carrier": "C4",
+   "name": "animation",
+   "bytes": "frames",
+   "look": "sample frames at shot boundaries (adapters/video frame differences) → look at keyframes as pages/graphics; compare with caption/subtitle bytes",
+   "ground": [
+    "palette, loop"
+   ],
+   "figure": [
+    "frame"
+   ],
+   "pattern": [
+    "loop cycle"
+   ],
+   "leaves": [
+    "GIF"
+   ],
+   "exemplars": [
+    {
+     "path": "eoreader7/native/eval/the-fold/fixtures/animation.gif",
+     "exists": true,
+     "inLivePriors": false
+    }
+   ]
+  },
+  {
+   "id": "C5.01",
+   "carrier": "C5",
+   "name": "MIDI",
+   "bytes": "SMF events",
+   "look": "render a timeline / piano roll of the events → look at the image; compare with the event bytes",
+   "ground": [
+    "tracks, channels, ticks per beat, tempo map"
+   ],
+   "figure": [
+    "note on/off, controller"
+   ],
+   "pattern": [
+    "voice, phrase, form"
+   ],
+   "leaves": [
+    "keyboard work",
+    "multi-track"
+   ],
+   "exemplars": [
+    {
+     "path": "eoreader7/native/eval/the-fold/fixtures/midi/bwv-988-aria.mid",
+     "exists": true,
+     "inLivePriors": false
+    },
+    {
+     "path": "eoreader7/native/eval/the-fold/fixtures/midi/wtk1-prelude1.mid",
+     "exists": true,
+     "inLivePriors": false
+    }
+   ]
+  },
+  {
+   "id": "C5.02",
+   "carrier": "C5",
+   "name": "captions and subtitles",
+   "bytes": "SRT/VTT cues",
+   "look": "render a timeline / piano roll of the events → look at the image; compare with the event bytes",
+   "ground": [
+    "cue numbering and time codes"
+   ],
+   "figure": [
+    "cue, speaker tag, sound description [music]"
+   ],
+   "pattern": [
+    "dialogue flow across cues"
+   ],
+   "leaves": [
+    "SRT",
+    "VTT"
+   ],
+   "exemplars": [
+    {
+     "path": "eoreader7/native/eval/the-fold/results/movies/detour-1945.srt",
+     "exists": true,
+     "inLivePriors": false
+    },
+    {
+     "path": "eoreader7/native/eval/the-fold/results/movies/his-girl-friday-1940.vtt",
+     "exists": true,
+     "inLivePriors": false
+    }
+   ]
+  },
+  {
+   "id": "C5.03",
+   "carrier": "C5",
+   "name": "timed transcripts and lyrics",
+   "bytes": "timestamped lines",
+   "look": "render a timeline / piano roll of the events → look at the image; compare with the event bytes",
+   "ground": [
+    "time code format"
+   ],
+   "figure": [
+    "segment, speaker, word timing"
+   ],
+   "pattern": [
+    "diarised conversation",
+    "timed lyrics (LRC)"
+   ],
+   "leaves": [
+    "diarised transcript",
+    "LRC"
+   ],
+   "acquire": "whisper output beside the meeting audio already on disk; LRC from public lyric archives of public-domain songs",
+   "exemplars": []
+  },
+  {
+   "id": "C5.04",
+   "carrier": "C5",
+   "name": "logs and time series",
+   "bytes": "timestamped records",
+   "look": "render a timeline / piano roll of the events → look at the image; compare with the event bytes",
+   "ground": [
+    "clock and zone"
+   ],
+   "figure": [
+    "event, level, value"
+   ],
+   "pattern": [
+    "session",
+    "trend",
+    "burst"
+   ],
+   "leaves": [
+    "server log",
+    "sensor series",
+    "chat with timestamps"
+   ],
+   "exemplars": [
+    {
+     "path": "eoreader7/heimdall-log.jsonl",
+     "exists": true,
+     "inLivePriors": false
+    }
+   ]
+  },
+  {
+   "id": "C5.05",
+   "carrier": "C5",
+   "name": "motion and gesture",
+   "bytes": "joint/marker frames",
+   "look": "render a timeline / piano roll of the events → look at the image; compare with the event bytes",
+   "ground": [
+    "skeleton definition"
+   ],
+   "figure": [
+    "joint, frame"
+   ],
+   "pattern": [
+    "gesture, gait, dance phrase"
+   ],
+   "leaves": [
+    "BVH motion capture"
+   ],
+   "acquire": "CMU Graphics Lab motion-capture database (BVH conversions)",
+   "exemplars": []
+  },
+  {
+   "id": "C6.01",
+   "carrier": "C6",
+   "name": "geospatial vectors",
+   "bytes": "coordinates and properties",
+   "look": "project to an image (map render / orthographic views) → look; compare with the coordinate bytes",
+   "ground": [
+    "coordinate reference system"
+   ],
+   "figure": [
+    "point, line, polygon, property"
+   ],
+   "pattern": [
+    "layer, feature collection"
+   ],
+   "leaves": [
+    "GeoJSON",
+    "KML",
+    "shapefile"
+   ],
+   "exemplars": [
+    {
+     "path": "municipal-db/btora/bb/bb_map_flags.geojson",
+     "exists": true,
+     "inLivePriors": false
+    }
+   ]
+  },
+  {
+   "id": "C6.02",
+   "carrier": "C6",
+   "name": "3-D models and point clouds",
+   "bytes": "vertices and faces",
+   "look": "project to an image (map render / orthographic views) → look; compare with the coordinate bytes",
+   "ground": [
+    "units, axes"
+   ],
+   "figure": [
+    "vertex, face, mesh"
+   ],
+   "pattern": [
+    "assembly"
+   ],
+   "leaves": [
+    "OBJ",
+    "STL",
+    "glTF",
+    "point cloud"
+   ],
+   "acquire": "Smithsonian 3D (open access models), NASA 3D resources",
+   "exemplars": []
+  },
+  {
+   "id": "C6.03",
+   "carrier": "C6",
+   "name": "technical drawings (vector)",
+   "bytes": "entities and layers",
+   "look": "project to an image (map render / orthographic views) → look; compare with the coordinate bytes",
+   "ground": [
+    "layers, units"
+   ],
+   "figure": [
+    "line, dimension, annotation"
+   ],
+   "pattern": [
+    "sheet, view"
+   ],
+   "leaves": [
+    "DXF",
+    "SVG drawing"
+   ],
+   "exemplars": [
+    {
+     "path": "commoncite/site-source/public/favicon.svg",
+     "exists": true,
+     "inLivePriors": false
+    }
+   ]
+  },
+  {
+   "id": "C7.01",
+   "carrier": "C7",
+   "name": "PDF as a container",
+   "bytes": "text layer + images + vector + fonts",
+   "look": "unpack; render the package the way its reader would (browser, PDF viewer, e-reader) → look at pages; compare with each member's bytes",
+   "ground": [
+    "text layer present or absent (born-digital vs scan)",
+    "embedded fonts and encodings"
+   ],
+   "figure": [
+    "page object, image, annotation"
+   ],
+   "pattern": [
+    "page tree, outline/bookmarks"
+   ],
+   "leaves": [
+    "born-digital PDF",
+    "scanned PDF",
+    "hybrid PDF"
+   ],
+   "exemplars": [
+    {
+     "path": "HallidayLangBased.pdf",
+     "exists": true,
+     "inLivePriors": false
+    },
+    {
+     "path": "Gmail - Fw_ CoC Ranking concerns and questions for moving forward.pdf",
+     "exists": true,
+     "inLivePriors": false
+    }
+   ]
+  },
+  {
+   "id": "C7.02",
+   "carrier": "C7",
+   "name": "web pages and wikis",
+   "bytes": "HTML + CSS + script, wikitext + templates",
+   "look": "unpack; render the package the way its reader would (browser, PDF viewer, e-reader) → look at pages; compare with each member's bytes",
+   "ground": [
+    "navigation, footer, cookie banners",
+    "templates and edit UI"
+   ],
+   "figure": [
+    "main content region, infobox, reference list"
+   ],
+   "pattern": [
+    "rendered vs source",
+    "a site's page template"
+   ],
+   "leaves": [
+    "article page",
+    "wiki page",
+    "catalogue page"
+   ],
+   "acquire": "fetch through the Fold's own sanctioned egress (web.js extractReadable) — the page and its rendering together",
+   "exemplars": []
+  },
+  {
+   "id": "C7.03",
+   "carrier": "C7",
+   "name": "e-books and office documents",
+   "bytes": "zipped XHTML/XML parts",
+   "look": "unpack; render the package the way its reader would (browser, PDF viewer, e-reader) → look at pages; compare with each member's bytes",
+   "ground": [
+    "package manifest, styles"
+   ],
+   "figure": [
+    "chapter file, paragraph style, slide, sheet"
+   ],
+   "pattern": [
+    "spine / reading order",
+    "slide order",
+    "sheet grid"
+   ],
+   "leaves": [
+    "EPUB",
+    "DOCX",
+    "PPTX",
+    "XLSX"
+   ],
+   "exemplars": [
+    {
+     "path": "live_priors/11-multi-language/dialects-pidgins-creoles/dialectbench/ajgt/AJGT.xlsx",
+     "exists": true,
+     "inLivePriors": true
+    }
+   ],
+   "acquire": "Standard Ebooks / Project Gutenberg EPUBs for the same works already held as .txt — the ideal byte comparison"
+  },
+  {
+   "id": "C7.04",
+   "carrier": "C7",
+   "name": "mail and messages",
+   "bytes": "MIME parts",
+   "look": "unpack; render the package the way its reader would (browser, PDF viewer, e-reader) → look at pages; compare with each member's bytes",
+   "ground": [
+    "headers, boundaries, encodings (quoted-printable, base64)"
+   ],
+   "figure": [
+    "part, attachment, alternative"
+   ],
+   "pattern": [
+    "thread"
+   ],
+   "leaves": [
+    "mbox",
+    "eml"
+   ],
+   "acquire": "public mailing-list mbox archives",
+   "exemplars": []
+  },
+  {
+   "id": "C7.05",
+   "carrier": "C7",
+   "name": "notebooks, archives and datasets",
+   "bytes": "members with their own carriers",
+   "look": "unpack; render the package the way its reader would (browser, PDF viewer, e-reader) → look at pages; compare with each member's bytes",
+   "ground": [
+    "README, LICENSE, manifest"
+   ],
+   "figure": [
+    "member file, cell, output"
+   ],
+   "pattern": [
+    "package layout"
+   ],
+   "leaves": [
+    "Jupyter notebook",
+    "dataset package",
+    "code repository"
+   ],
+   "exemplars": [
+    {
+     "path": "er7-redteam/harmbench/HarmBench/notebooks/analyze_results.ipynb",
+     "exists": true,
+     "inLivePriors": false
+    },
+    {
+     "path": "live_priors/11-multi-language/dialects-pidgins-creoles/ewave",
+     "exists": true,
+     "inLivePriors": true
+    }
+   ]
+  }
+ ],
+ "counts": {
+  "families": 50,
+  "leaves": 203,
+  "exemplars": 95,
+  "exemplarsMissing": 0,
+  "familiesWithoutExemplar": [
+   "C1.15",
+   "C1.18",
+   "C2.03",
+   "C2.07",
+   "C2.10",
+   "C2.11",
+   "C3.03",
+   "C4.02",
+   "C5.03",
+   "C5.05",
+   "C6.02",
+   "C7.02",
+   "C7.04"
+  ]
+ }
+}

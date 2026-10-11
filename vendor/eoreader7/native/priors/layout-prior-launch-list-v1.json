@@ -1,0 +1,173 @@
+{
+ "schema": "LayoutPrior@1",
+ "family": "launch-list",
+ "giver": "er7-comp-harvest 2026-10-01",
+ "recipe": "fetch HTML (UA er7-quake-test/launch-test), strip scripts/styles, read list-row structure by hand-verified markers; image-look NAMED GAP (no local vision model, no screenshot tooling)",
+ "gate": {
+  "module": "consensus-gate.mjs ConsensusGate@1",
+  "params": {
+   "alpha": 0.05,
+   "minN": 3,
+   "maxN": 12
+  },
+  "labels": [
+   "L",
+   "L",
+   "L",
+   "L",
+   "null",
+   "null"
+  ],
+  "verdict": "CALLABLE",
+  "detail": "unanimous 4/4, no rival mode"
+ },
+ "row_spec": {
+  "order": "when(countdown-or-datetime), mission, vehicle/provider, pad/site (soonest-first)",
+  "standing": "CALLABLE-unanimous \u2014 copycat risk disclosed",
+  "sub_mode": "live-ticking-countdown prominent in 3/4 witnesses; fine-grained labels [CD/T/M/V/S,T/M/V/S,T/M/V,CD/T/M/V/S] re-run gate to MORE (recorded)"
+ },
+ "provenance": [
+  {
+   "url": "https://spacelaunchschedule.com/",
+   "fetched": "2026-10-01",
+   "bytes": 288316,
+   "sha256": "a27cbeaf578af493a66e4d2c3154535f96ec75e29bbabc2a866d2e292f86f223",
+   "witness_label": "L",
+   "evidence": [
+    {
+     "marker": "countdowns",
+     "byte_offset": 87892,
+     "snip": "with the latest <strong>Space Launch Schedule</strong>, including launch dates, countdowns, mission details, live video feeds, and flight trajectories from spaceports around the world. Follow launches from <a href=\"/category/kennedy-space-center-rocket-launch-viewing/\">Kennedy Space Center</a>, <a h"
+    },
+    {
+     "marker": "mission details",
+     "byte_offset": 87904,
+     "snip": "est <strong>Space Launch Schedule</strong>, including launch dates, countdowns, mission details, live video feeds, and flight trajectories from spaceports around the world. Follow launches from <a href=\"/category/kennedy-space-center-rocket-launch-viewing/\">Kennedy Space Center</a>, <a href=\"/catego"
+    },
+    {
+     "marker": "Each launch pa",
+     "byte_offset": 88304,
+     "snip": "et-launch-viewing/\">SpaceX Starbase in Texas</a>, and other major launch sites. Each launch page provides available information about the rocket, payload, crew, launch provider, weather, and booster landing plans.</p> <p class=\"mb-5\">Want to see a launch in person? Explore our <a href=\"/news/watch-a"
+    }
+   ],
+   "raw_bytes_note": "full bytes hashed at fetch; file in experiment scratch (non-permanent)"
+  },
+  {
+   "url": "https://rocketlaunch.live/",
+   "fetched": "2026-10-01",
+   "bytes": 320412,
+   "sha256": "87ff509675546f4ffd9a35785070ca3487431f57aa7e757e0a7319b8d957d690",
+   "witness_label": "L",
+   "evidence": [
+    {
+     "marker": "Next Launch",
+     "byte_offset": 73144,
+     "snip": " \t\t\t\t\t\t<div class=\"row header\" style=\"text-align:center;\"> \t\t\t\t\t\t\t<h3> \t\t\t\t\t\t\t\t\tNext Launch \t\t\t\t\t\t\t</h3> \t\t\t\t\t\t</div> \t\t\t\t\t\t\t\t<div id=\"launch-5982\" data-sortDate=\"1790867406\" class=\"row launch launch-5982 vehicle-falcon-9 company-spacex location-cape-canaveral-sfs location-united-states location-flo"
+    },
+    {
+     "marker": "Crew-13",
+     "byte_offset": 13302,
+     "snip": "Item\",\"position\":1,\"url\":\"https://www.rocketlaunch.live/launch/crew-13\",\"name\":\"Crew-13 \u2014 Falcon 9 Launch\"},{\"@type\":\"ListItem\",\"position\":2,\"url\":\"https://www.rocketlaunch.live/launch/transporter-18\",\"name\":\"Transporter 18 \u2014 Falcon 9 Launch\"},{\"@type\":\"ListItem\",\"position\":3,\"url\":\"https://www.rock"
+    },
+    {
+     "marker": "SLC-40, Cape Canaveral",
+     "byte_offset": 74847,
+     "snip": "ef=\"/?filter=spacex\">SpaceX</a></div> \t\t\t\t<div class=\"rlt-location\"> \t\t\t\t\t\t\t\t\t\t\tSLC-40, Cape Canaveral SFS<br /> \t\t\t\t\t\t\t\t\t\t\t\t\t<a href=\"/?filter=florida\">Florida</a>, \t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<a href=\"/?filter=united-states\">United States</a>\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t</div> \t\t\t</div>  \t\t\t<div class=\"row\"> \t\t\t\t<div cl"
+    }
+   ],
+   "raw_bytes_note": "full bytes hashed at fetch; file in experiment scratch (non-permanent)"
+  },
+  {
+   "url": "https://spaceflightnow.com/launch-schedule/",
+   "fetched": "2026-10-01",
+   "bytes": 96493,
+   "sha256": "d1a65cc2ffc389faab318b660202367e9b0b4c07c97e6fa105b34984056879f8",
+   "witness_label": "L",
+   "evidence": [
+    {
+     "marker": "Launch Schedule",
+     "byte_offset": 221,
+     "snip": "initial-scale=1.0\"> <link rel=\"profile\" href=\"http://gmpg.org/xfn/11\" /> <title>Launch Schedule &#8211; Spaceflight Now</title> <meta name='robots' content='max-image-preview:large' /> <link rel='dns-prefetch' href='//js.stripe.com' /> <link rel='dns-prefetch' href='//fonts.googleapis.com' /> <link "
+    },
+    {
+     "marker": "Falcon 9",
+     "byte_offset": 52932,
+     "snip": "tegory menu-item-13107\"><a href=\"https://spaceflightnow.com/category/falcon-9/\">Falcon 9</a></li> \t<li id=\"menu-item-29391\" class=\"menu-item menu-item-type-taxonomy menu-item-object-category menu-item-29391\"><a href=\"https://spaceflightnow.com/category/falcon-heavy/\">Falcon Heavy</a></li> \t<li id=\"m"
+    }
+   ],
+   "raw_bytes_note": "full bytes hashed at fetch; file in experiment scratch (non-permanent)"
+  },
+  {
+   "url": "https://nextspaceflight.com/launches/",
+   "fetched": "2026-10-01",
+   "bytes": 175552,
+   "sha256": "f465c72f08f80ae3c3b11a7c05a47a933499d3ad58f2cf5b7a59acb6a5b227c2",
+   "witness_label": "L",
+   "evidence": [
+    {
+     "marker": "MINS",
+     "byte_offset": 111118,
+     "snip": "div><p class=\"text-xxs text-center text-white text-shadow-sm text-shadow-black\">MINS</p></div><div class=\"flex justify-center items-center gap-1 text-lg flex-col\"><div class=\"relative font-dseg7 bg-bg-primary/25 border border-label-secondary/25 backdrop-blur-md rounded-sm text-sm p-1.5\"><div class=\""
+    },
+    {
+     "marker": "SECS",
+     "byte_offset": 111590,
+     "snip": "div><p class=\"text-xxs text-center text-white text-shadow-sm text-shadow-black\">SECS</p></div></div></div><div class=\"flex flex-col gap-2 p-4 pb-4 mt-auto z-1 transition-all group-hover:pt-16 bg-gradient-to-b from-transparent to-[#161618] pt-4\"><div class=\"flex gap-1 flex-wrap-reverse\"><div class=\"f"
+    },
+    {
+     "marker": "Today, 15:10",
+     "byte_offset": 112038,
+     "snip": "ndary/50 p-2 text-sm font-medium\"><span class=\"flex items-center gap-1.5 w-fit\">Today, 15:10</span></div><div class=\"flex flex-col gap-2 p-1.5 4xl:p-2 rounded-sm z-10 text-xs 4xl:text-sm bg-black/25 text-white backdrop-blur-md h-fit w-max drop-shadow-none border border-label-secondary/50\"><span clas"
+    },
+    {
+     "marker": "Cape Canaveral SFS",
+     "byte_offset": 80878,
+     "snip": "01 @ Wenchang Space Launch Site, China\\\",\\\"value\\\":\\\"59\\\"},{\\\"label\\\":\\\"LC-12 @ Cape Canaveral SFS, Florida, USA\\\",\\\"value\\\":\\\"86\\\"},{\\\"label\\\":\\\"LC-13 @ Cape Canaveral SFS, Florida, USA\\\",\\\"value\\\":\\\"85\\\"},{\\\"label\\\":\\\"LC-14 @ Cape Canaveral SFS, Florida, USA\\\",\\\"value\\\":\\\"83\\\"},{\\\"label\\\":\\\"LC-15 "
+    }
+   ],
+   "raw_bytes_note": "full bytes hashed at fetch; file in experiment scratch (non-permanent)"
+  },
+  {
+   "url": "https://www.nasaspaceflight.com/schedule/",
+   "fetched": "2026-10-01",
+   "bytes": 453704,
+   "sha256": "07e9273e6c85bf56c918f08f4d353d41cf3effa90224666f11dd9abf4b019427",
+   "witness_label": "non-witness-news",
+   "evidence": [
+    {
+     "marker": "Upcoming Launches - NASASpaceFlight",
+     "byte_offset": 2602,
+     "snip": "t SEO plugin v28.0 - https://yoast.com/product/yoast-seo-wordpress/ --> \t<title>Upcoming Launches - NASASpaceFlight.com</title> \t<link rel=\"canonical\" href=\"https://www.nasaspaceflight.com/schedule/\" /> \t<meta property=\"og:locale\" content=\"en_US\" /> \t<meta property=\"og:type\" content=\"article\" /> \t<m"
+    }
+   ],
+   "raw_bytes_note": "full bytes hashed at fetch; file in experiment scratch (non-permanent)"
+  },
+  {
+   "url": "https://everydayastronaut.com/upcoming-launches/",
+   "fetched": "2026-10-01",
+   "bytes": 250278,
+   "sha256": "e38edb2b334d770f8ac28ae7dc5993acbd469e7361c675513207f09261b446a9",
+   "witness_label": "non-witness-previews",
+   "evidence": [
+    {
+     "marker": "Upcoming Launches",
+     "byte_offset": 485,
+     "snip": "yoast.com/product/yoast-seo-premium-wordpress/ --> \t<title>Everyday Astronaut | Upcoming Launches | Prelaunch Previews</title> \t<meta name=\"description\" content=\"Upcoming Launches - Here you can find a list of upcoming rocket launches and their missions. You&#039;ll find everything you need in our s"
+    },
+    {
+     "marker": "Prelaunch Preview",
+     "byte_offset": 505,
+     "snip": "ast-seo-premium-wordpress/ --> \t<title>Everyday Astronaut | Upcoming Launches | Prelaunch Previews</title> \t<meta name=\"description\" content=\"Upcoming Launches - Here you can find a list of upcoming rocket launches and their missions. You&#039;ll find everything you need in our so-called Prelaunch P"
+    }
+   ],
+   "raw_bytes_note": "full bytes hashed at fetch; file in experiment scratch (non-permanent)"
+  }
+ ],
+ "history": [
+  {
+   "date": "2026-10-01",
+   "event": "seeded from launch-exp harvest",
+   "gate": "CALLABLE-unanimous"
+  }
+ ]
+}

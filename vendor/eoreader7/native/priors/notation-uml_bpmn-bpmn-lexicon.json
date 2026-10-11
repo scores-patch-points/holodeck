@@ -1,0 +1,2130 @@
+{
+ "schema": "NotationLexiconPrior@1",
+ "family": "uml_bpmn",
+ "kind": "bpmn-lexicon",
+ "built": "2026-10-06",
+ "built_by": "eval/notation-competence/uml_bpmn-priors.mjs",
+ "givers": [
+  {
+   "name": "OMG Business Process Model and Notation 2.0.2 (formal/2013-12-09), as generated into bpmn-io/bpmn-moddle",
+   "url": "https://github.com/bpmn-io/bpmn-moddle",
+   "license": "MIT",
+   "files": [
+    "resources/bpmn/json/bpmn.json",
+    "resources/bpmn/json/bpmndi.json",
+    "resources/bpmn/json/dc.json",
+    "resources/bpmn/json/di.json"
+   ],
+   "commit": "f35959afc443444b706a4f39542530134233db07",
+   "note": "element classes and reference attributes are derived from the superClass graph and the isReference flags of this table; the OMG CMOF it is generated from is resources/bpmn/cmof (consulted, not copied)"
+  },
+  {
+   "name": "relation_rules: the BPMN 2.0.2 specification's reading of sequenceFlow/messageFlow/association (sourceRef -> targetRef), dataInput/OutputAssociation (child sourceRef/targetRef) and boundaryEvent (attachedToRef); hand-declared, checked against the table",
+   "rule_check_against_table": {
+    "sequenceFlow": true,
+    "messageFlow": true,
+    "association": true,
+    "dataInputAssociation": true,
+    "dataOutputAssociation": true,
+    "boundaryEvent": true
+   }
+  }
+ ],
+ "semantics": "NOMINATES the class of a BPMN element name and the role of its attributes; REFUSES beings to every element outside the standard's namespaces and to every name the table does not list. Casing is not a signal: names are matched exactly as written.",
+ "namespaces": {
+  "model": "http://www.omg.org/spec/BPMN/20100524/MODEL",
+  "di": [
+   "http://www.omg.org/spec/BPMN/20100524/DI",
+   "http://www.omg.org/spec/DD/20100524/DC",
+   "http://www.omg.org/spec/DD/20100524/DI"
+  ]
+ },
+ "classes": [
+  "flow_node",
+  "edge",
+  "swimlane",
+  "process",
+  "data",
+  "artifact",
+  "definitions",
+  "model_other",
+  "diagram",
+  "ext"
+ ],
+ "being_classes": [
+  "flow_node",
+  "swimlane",
+  "process",
+  "data",
+  "artifact"
+ ],
+ "elements": {
+  "interface": {
+   "cls": "model_other",
+   "attrs": {
+    "name": "label",
+    "id": "decl"
+   }
+  },
+  "operation": {
+   "cls": "model_other",
+   "attrs": {
+    "name": "label",
+    "id": "decl"
+   }
+  },
+  "endPoint": {
+   "cls": "model_other",
+   "attrs": {
+    "id": "decl"
+   }
+  },
+  "auditing": {
+   "cls": "model_other",
+   "attrs": {
+    "id": "decl"
+   }
+  },
+  "globalTask": {
+   "cls": "model_other",
+   "attrs": {
+    "name": "label",
+    "id": "decl"
+   }
+  },
+  "monitoring": {
+   "cls": "model_other",
+   "attrs": {
+    "id": "decl"
+   }
+  },
+  "performer": {
+   "cls": "model_other",
+   "attrs": {
+    "name": "label",
+    "id": "decl"
+   }
+  },
+  "process": {
+   "cls": "process",
+   "attrs": {
+    "definitionalCollaborationRef": "ref",
+    "name": "label",
+    "id": "decl"
+   }
+  },
+  "laneSet": {
+   "cls": "model_other",
+   "attrs": {
+    "name": "label",
+    "id": "decl"
+   }
+  },
+  "lane": {
+   "cls": "swimlane",
+   "attrs": {
+    "name": "label",
+    "partitionElementRef": "ref",
+    "id": "decl"
+   }
+  },
+  "globalManualTask": {
+   "cls": "model_other",
+   "attrs": {
+    "name": "label",
+    "id": "decl"
+   }
+  },
+  "manualTask": {
+   "cls": "flow_node",
+   "attrs": {
+    "default": "ref",
+    "name": "label",
+    "id": "decl"
+   }
+  },
+  "userTask": {
+   "cls": "flow_node",
+   "attrs": {
+    "default": "ref",
+    "name": "label",
+    "id": "decl"
+   }
+  },
+  "rendering": {
+   "cls": "model_other",
+   "attrs": {
+    "id": "decl"
+   }
+  },
+  "humanPerformer": {
+   "cls": "model_other",
+   "attrs": {
+    "name": "label",
+    "id": "decl"
+   }
+  },
+  "potentialOwner": {
+   "cls": "model_other",
+   "attrs": {
+    "name": "label",
+    "id": "decl"
+   }
+  },
+  "globalUserTask": {
+   "cls": "model_other",
+   "attrs": {
+    "name": "label",
+    "id": "decl"
+   }
+  },
+  "gateway": {
+   "cls": "flow_node",
+   "attrs": {
+    "name": "label",
+    "id": "decl"
+   }
+  },
+  "eventBasedGateway": {
+   "cls": "flow_node",
+   "attrs": {
+    "name": "label",
+    "id": "decl"
+   }
+  },
+  "complexGateway": {
+   "cls": "flow_node",
+   "attrs": {
+    "default": "ref",
+    "name": "label",
+    "id": "decl"
+   }
+  },
+  "exclusiveGateway": {
+   "cls": "flow_node",
+   "attrs": {
+    "default": "ref",
+    "name": "label",
+    "id": "decl"
+   }
+  },
+  "inclusiveGateway": {
+   "cls": "flow_node",
+   "attrs": {
+    "default": "ref",
+    "name": "label",
+    "id": "decl"
+   }
+  },
+  "parallelGateway": {
+   "cls": "flow_node",
+   "attrs": {
+    "name": "label",
+    "id": "decl"
+   }
+  },
+  "rootElement": {
+   "cls": "model_other",
+   "attrs": {
+    "id": "decl"
+   }
+  },
+  "relationship": {
+   "cls": "model_other",
+   "attrs": {
+    "id": "decl"
+   }
+  },
+  "baseElement": {
+   "cls": "model_other",
+   "attrs": {
+    "id": "decl"
+   }
+  },
+  "extension": {
+   "cls": "model_other",
+   "attrs": {
+    "definition": "ref"
+   }
+  },
+  "extensionDefinition": {
+   "cls": "model_other",
+   "attrs": {
+    "name": "label"
+   }
+  },
+  "extensionAttributeDefinition": {
+   "cls": "model_other",
+   "attrs": {
+    "name": "label",
+    "extensionDefinition": "ref"
+   }
+  },
+  "extensionElements": {
+   "cls": "model_other",
+   "attrs": {
+    "valueRef": "ref",
+    "extensionAttributeDefinition": "ref"
+   }
+  },
+  "documentation": {
+   "cls": "model_other",
+   "attrs": {
+    "id": "decl"
+   }
+  },
+  "event": {
+   "cls": "flow_node",
+   "attrs": {
+    "name": "label",
+    "id": "decl"
+   }
+  },
+  "intermediateCatchEvent": {
+   "cls": "flow_node",
+   "attrs": {
+    "name": "label",
+    "id": "decl"
+   }
+  },
+  "intermediateThrowEvent": {
+   "cls": "flow_node",
+   "attrs": {
+    "name": "label",
+    "id": "decl"
+   }
+  },
+  "endEvent": {
+   "cls": "flow_node",
+   "attrs": {
+    "name": "label",
+    "id": "decl"
+   }
+  },
+  "startEvent": {
+   "cls": "flow_node",
+   "attrs": {
+    "name": "label",
+    "id": "decl"
+   }
+  },
+  "throwEvent": {
+   "cls": "flow_node",
+   "attrs": {
+    "name": "label",
+    "id": "decl"
+   }
+  },
+  "catchEvent": {
+   "cls": "flow_node",
+   "attrs": {
+    "name": "label",
+    "id": "decl"
+   }
+  },
+  "boundaryEvent": {
+   "cls": "flow_node",
+   "attrs": {
+    "attachedToRef": "ref",
+    "name": "label",
+    "id": "decl"
+   }
+  },
+  "eventDefinition": {
+   "cls": "model_other",
+   "attrs": {
+    "id": "decl"
+   }
+  },
+  "cancelEventDefinition": {
+   "cls": "model_other",
+   "attrs": {
+    "id": "decl"
+   }
+  },
+  "errorEventDefinition": {
+   "cls": "model_other",
+   "attrs": {
+    "errorRef": "ref",
+    "id": "decl"
+   }
+  },
+  "terminateEventDefinition": {
+   "cls": "model_other",
+   "attrs": {
+    "id": "decl"
+   }
+  },
+  "escalationEventDefinition": {
+   "cls": "model_other",
+   "attrs": {
+    "escalationRef": "ref",
+    "id": "decl"
+   }
+  },
+  "escalation": {
+   "cls": "model_other",
+   "attrs": {
+    "structureRef": "ref",
+    "name": "label",
+    "id": "decl"
+   }
+  },
+  "compensateEventDefinition": {
+   "cls": "model_other",
+   "attrs": {
+    "activityRef": "ref",
+    "id": "decl"
+   }
+  },
+  "timerEventDefinition": {
+   "cls": "model_other",
+   "attrs": {
+    "id": "decl"
+   }
+  },
+  "linkEventDefinition": {
+   "cls": "model_other",
+   "attrs": {
+    "name": "label",
+    "id": "decl"
+   }
+  },
+  "messageEventDefinition": {
+   "cls": "model_other",
+   "attrs": {
+    "messageRef": "ref",
+    "id": "decl"
+   }
+  },
+  "conditionalEventDefinition": {
+   "cls": "model_other",
+   "attrs": {
+    "id": "decl"
+   }
+  },
+  "signalEventDefinition": {
+   "cls": "model_other",
+   "attrs": {
+    "signalRef": "ref",
+    "id": "decl"
+   }
+  },
+  "signal": {
+   "cls": "model_other",
+   "attrs": {
+    "structureRef": "ref",
+    "name": "label",
+    "id": "decl"
+   }
+  },
+  "implicitThrowEvent": {
+   "cls": "flow_node",
+   "attrs": {
+    "name": "label",
+    "id": "decl"
+   }
+  },
+  "dataState": {
+   "cls": "model_other",
+   "attrs": {
+    "name": "label",
+    "id": "decl"
+   }
+  },
+  "itemAwareElement": {
+   "cls": "model_other",
+   "attrs": {
+    "itemSubjectRef": "ref",
+    "id": "decl"
+   }
+  },
+  "dataAssociation": {
+   "cls": "edge",
+   "attrs": {
+    "id": "decl"
+   }
+  },
+  "dataInput": {
+   "cls": "data",
+   "attrs": {
+    "name": "label",
+    "itemSubjectRef": "ref",
+    "id": "decl"
+   }
+  },
+  "dataOutput": {
+   "cls": "data",
+   "attrs": {
+    "name": "label",
+    "itemSubjectRef": "ref",
+    "id": "decl"
+   }
+  },
+  "inputSet": {
+   "cls": "model_other",
+   "attrs": {
+    "name": "label",
+    "id": "decl"
+   }
+  },
+  "outputSet": {
+   "cls": "model_other",
+   "attrs": {
+    "name": "label",
+    "id": "decl"
+   }
+  },
+  "property": {
+   "cls": "data",
+   "attrs": {
+    "name": "label",
+    "itemSubjectRef": "ref",
+    "id": "decl"
+   }
+  },
+  "dataInputAssociation": {
+   "cls": "edge",
+   "attrs": {
+    "id": "decl"
+   }
+  },
+  "dataOutputAssociation": {
+   "cls": "edge",
+   "attrs": {
+    "id": "decl"
+   }
+  },
+  "inputOutputSpecification": {
+   "cls": "model_other",
+   "attrs": {
+    "id": "decl"
+   }
+  },
+  "dataObject": {
+   "cls": "data",
+   "attrs": {
+    "itemSubjectRef": "ref",
+    "id": "decl",
+    "name": "label"
+   }
+  },
+  "inputOutputBinding": {
+   "cls": "model_other",
+   "attrs": {
+    "inputDataRef": "ref",
+    "outputDataRef": "ref",
+    "operationRef": "ref"
+   }
+  },
+  "assignment": {
+   "cls": "model_other",
+   "attrs": {
+    "id": "decl"
+   }
+  },
+  "dataStore": {
+   "cls": "data",
+   "attrs": {
+    "name": "label",
+    "itemSubjectRef": "ref",
+    "id": "decl"
+   }
+  },
+  "dataStoreReference": {
+   "cls": "data",
+   "attrs": {
+    "dataStoreRef": "ref",
+    "name": "label",
+    "id": "decl",
+    "itemSubjectRef": "ref"
+   }
+  },
+  "dataObjectReference": {
+   "cls": "data",
+   "attrs": {
+    "dataObjectRef": "ref",
+    "name": "label",
+    "id": "decl",
+    "itemSubjectRef": "ref"
+   }
+  },
+  "conversationLink": {
+   "cls": "model_other",
+   "attrs": {
+    "sourceRef": "ref",
+    "targetRef": "ref",
+    "name": "label",
+    "id": "decl"
+   }
+  },
+  "conversationAssociation": {
+   "cls": "model_other",
+   "attrs": {
+    "innerConversationNodeRef": "ref",
+    "outerConversationNodeRef": "ref",
+    "id": "decl"
+   }
+  },
+  "callConversation": {
+   "cls": "model_other",
+   "attrs": {
+    "calledCollaborationRef": "ref",
+    "name": "label",
+    "id": "decl"
+   }
+  },
+  "conversation": {
+   "cls": "model_other",
+   "attrs": {
+    "name": "label",
+    "id": "decl"
+   }
+  },
+  "subConversation": {
+   "cls": "model_other",
+   "attrs": {
+    "name": "label",
+    "id": "decl"
+   }
+  },
+  "conversationNode": {
+   "cls": "model_other",
+   "attrs": {
+    "name": "label",
+    "id": "decl"
+   }
+  },
+  "globalConversation": {
+   "cls": "process",
+   "attrs": {
+    "name": "label",
+    "id": "decl"
+   }
+  },
+  "partnerEntity": {
+   "cls": "model_other",
+   "attrs": {
+    "name": "label",
+    "id": "decl"
+   }
+  },
+  "partnerRole": {
+   "cls": "model_other",
+   "attrs": {
+    "name": "label",
+    "id": "decl"
+   }
+  },
+  "correlationProperty": {
+   "cls": "model_other",
+   "attrs": {
+    "name": "label",
+    "type": "ref",
+    "id": "decl"
+   }
+  },
+  "error": {
+   "cls": "model_other",
+   "attrs": {
+    "structureRef": "ref",
+    "name": "label",
+    "id": "decl"
+   }
+  },
+  "correlationKey": {
+   "cls": "model_other",
+   "attrs": {
+    "name": "label",
+    "id": "decl"
+   }
+  },
+  "expression": {
+   "cls": "model_other",
+   "attrs": {
+    "id": "decl"
+   }
+  },
+  "formalExpression": {
+   "cls": "model_other",
+   "attrs": {
+    "evaluatesToTypeRef": "ref",
+    "id": "decl"
+   }
+  },
+  "message": {
+   "cls": "model_other",
+   "attrs": {
+    "name": "label",
+    "itemRef": "ref",
+    "id": "decl"
+   }
+  },
+  "itemDefinition": {
+   "cls": "model_other",
+   "attrs": {
+    "import": "ref",
+    "id": "decl"
+   }
+  },
+  "flowElement": {
+   "cls": "model_other",
+   "attrs": {
+    "name": "label",
+    "id": "decl"
+   }
+  },
+  "sequenceFlow": {
+   "cls": "edge",
+   "attrs": {
+    "sourceRef": "ref",
+    "targetRef": "ref",
+    "name": "label",
+    "id": "decl"
+   }
+  },
+  "flowElementsContainer": {
+   "cls": "model_other",
+   "attrs": {
+    "id": "decl"
+   }
+  },
+  "callableElement": {
+   "cls": "model_other",
+   "attrs": {
+    "name": "label",
+    "id": "decl"
+   }
+  },
+  "flowNode": {
+   "cls": "flow_node",
+   "attrs": {
+    "name": "label",
+    "id": "decl"
+   }
+  },
+  "correlationPropertyRetrievalExpression": {
+   "cls": "model_other",
+   "attrs": {
+    "messageRef": "ref",
+    "id": "decl"
+   }
+  },
+  "correlationPropertyBinding": {
+   "cls": "model_other",
+   "attrs": {
+    "correlationPropertyRef": "ref",
+    "id": "decl"
+   }
+  },
+  "resource": {
+   "cls": "model_other",
+   "attrs": {
+    "name": "label",
+    "id": "decl"
+   }
+  },
+  "resourceParameter": {
+   "cls": "model_other",
+   "attrs": {
+    "name": "label",
+    "type": "ref",
+    "id": "decl"
+   }
+  },
+  "correlationSubscription": {
+   "cls": "model_other",
+   "attrs": {
+    "correlationKeyRef": "ref",
+    "id": "decl"
+   }
+  },
+  "messageFlow": {
+   "cls": "edge",
+   "attrs": {
+    "name": "label",
+    "sourceRef": "ref",
+    "targetRef": "ref",
+    "messageRef": "ref",
+    "id": "decl"
+   }
+  },
+  "messageFlowAssociation": {
+   "cls": "model_other",
+   "attrs": {
+    "innerMessageFlowRef": "ref",
+    "outerMessageFlowRef": "ref",
+    "id": "decl"
+   }
+  },
+  "interactionNode": {
+   "cls": "model_other",
+   "attrs": {}
+  },
+  "participant": {
+   "cls": "swimlane",
+   "attrs": {
+    "name": "label",
+    "processRef": "ref",
+    "id": "decl"
+   }
+  },
+  "participantAssociation": {
+   "cls": "model_other",
+   "attrs": {
+    "innerParticipantRef": "ref",
+    "outerParticipantRef": "ref",
+    "id": "decl"
+   }
+  },
+  "participantMultiplicity": {
+   "cls": "model_other",
+   "attrs": {
+    "id": "decl"
+   }
+  },
+  "collaboration": {
+   "cls": "process",
+   "attrs": {
+    "name": "label",
+    "id": "decl"
+   }
+  },
+  "choreographyActivity": {
+   "cls": "flow_node",
+   "attrs": {
+    "initiatingParticipantRef": "ref",
+    "name": "label",
+    "id": "decl"
+   }
+  },
+  "callChoreography": {
+   "cls": "flow_node",
+   "attrs": {
+    "calledChoreographyRef": "ref",
+    "initiatingParticipantRef": "ref",
+    "name": "label",
+    "id": "decl"
+   }
+  },
+  "subChoreography": {
+   "cls": "flow_node",
+   "attrs": {
+    "id": "decl",
+    "initiatingParticipantRef": "ref",
+    "name": "label"
+   }
+  },
+  "choreographyTask": {
+   "cls": "flow_node",
+   "attrs": {
+    "initiatingParticipantRef": "ref",
+    "name": "label",
+    "id": "decl"
+   }
+  },
+  "choreography": {
+   "cls": "process",
+   "attrs": {
+    "id": "decl",
+    "name": "label"
+   }
+  },
+  "globalChoreographyTask": {
+   "cls": "process",
+   "attrs": {
+    "initiatingParticipantRef": "ref",
+    "id": "decl",
+    "name": "label"
+   }
+  },
+  "textAnnotation": {
+   "cls": "artifact",
+   "attrs": {
+    "id": "decl"
+   }
+  },
+  "group": {
+   "cls": "artifact",
+   "attrs": {
+    "categoryValueRef": "ref",
+    "id": "decl"
+   }
+  },
+  "association": {
+   "cls": "edge",
+   "attrs": {
+    "sourceRef": "ref",
+    "targetRef": "ref",
+    "id": "decl"
+   }
+  },
+  "category": {
+   "cls": "model_other",
+   "attrs": {
+    "name": "label",
+    "id": "decl"
+   }
+  },
+  "artifact": {
+   "cls": "artifact",
+   "attrs": {
+    "id": "decl"
+   }
+  },
+  "categoryValue": {
+   "cls": "model_other",
+   "attrs": {
+    "id": "decl"
+   }
+  },
+  "activity": {
+   "cls": "flow_node",
+   "attrs": {
+    "default": "ref",
+    "name": "label",
+    "id": "decl"
+   }
+  },
+  "serviceTask": {
+   "cls": "flow_node",
+   "attrs": {
+    "operationRef": "ref",
+    "default": "ref",
+    "name": "label",
+    "id": "decl"
+   }
+  },
+  "subProcess": {
+   "cls": "flow_node",
+   "attrs": {
+    "id": "decl",
+    "default": "ref",
+    "name": "label"
+   }
+  },
+  "loopCharacteristics": {
+   "cls": "model_other",
+   "attrs": {
+    "id": "decl"
+   }
+  },
+  "multiInstanceLoopCharacteristics": {
+   "cls": "model_other",
+   "attrs": {
+    "oneBehaviorEventRef": "ref",
+    "noneBehaviorEventRef": "ref",
+    "id": "decl"
+   }
+  },
+  "standardLoopCharacteristics": {
+   "cls": "model_other",
+   "attrs": {
+    "id": "decl"
+   }
+  },
+  "callActivity": {
+   "cls": "flow_node",
+   "attrs": {
+    "default": "ref",
+    "name": "label",
+    "id": "decl"
+   }
+  },
+  "task": {
+   "cls": "flow_node",
+   "attrs": {
+    "default": "ref",
+    "name": "label",
+    "id": "decl"
+   }
+  },
+  "sendTask": {
+   "cls": "flow_node",
+   "attrs": {
+    "operationRef": "ref",
+    "messageRef": "ref",
+    "default": "ref",
+    "name": "label",
+    "id": "decl"
+   }
+  },
+  "receiveTask": {
+   "cls": "flow_node",
+   "attrs": {
+    "operationRef": "ref",
+    "messageRef": "ref",
+    "default": "ref",
+    "name": "label",
+    "id": "decl"
+   }
+  },
+  "scriptTask": {
+   "cls": "flow_node",
+   "attrs": {
+    "default": "ref",
+    "name": "label",
+    "id": "decl"
+   }
+  },
+  "businessRuleTask": {
+   "cls": "flow_node",
+   "attrs": {
+    "default": "ref",
+    "name": "label",
+    "id": "decl"
+   }
+  },
+  "adHocSubProcess": {
+   "cls": "flow_node",
+   "attrs": {
+    "id": "decl",
+    "default": "ref",
+    "name": "label"
+   }
+  },
+  "transaction": {
+   "cls": "flow_node",
+   "attrs": {
+    "id": "decl",
+    "default": "ref",
+    "name": "label"
+   }
+  },
+  "globalScriptTask": {
+   "cls": "model_other",
+   "attrs": {
+    "name": "label",
+    "id": "decl"
+   }
+  },
+  "globalBusinessRuleTask": {
+   "cls": "model_other",
+   "attrs": {
+    "name": "label",
+    "id": "decl"
+   }
+  },
+  "complexBehaviorDefinition": {
+   "cls": "model_other",
+   "attrs": {
+    "id": "decl"
+   }
+  },
+  "resourceRole": {
+   "cls": "model_other",
+   "attrs": {
+    "name": "label",
+    "id": "decl"
+   }
+  },
+  "resourceParameterBinding": {
+   "cls": "model_other",
+   "attrs": {
+    "parameterRef": "ref",
+    "id": "decl"
+   }
+  },
+  "resourceAssignmentExpression": {
+   "cls": "model_other",
+   "attrs": {
+    "id": "decl"
+   }
+  },
+  "import": {
+   "cls": "model_other",
+   "attrs": {}
+  },
+  "definitions": {
+   "cls": "definitions",
+   "attrs": {
+    "name": "label",
+    "id": "decl"
+   }
+  },
+  "operations": {
+   "cls": "model_other",
+   "attrs": {
+    "name": "label",
+    "id": "decl"
+   },
+   "from": "property:Operation"
+  },
+  "inMessageRef": {
+   "cls": "model_other",
+   "attrs": {},
+   "from": "property"
+  },
+  "outMessageRef": {
+   "cls": "model_other",
+   "attrs": {},
+   "from": "property"
+  },
+  "errorRef": {
+   "cls": "model_other",
+   "attrs": {},
+   "from": "property"
+  },
+  "resources": {
+   "cls": "model_other",
+   "attrs": {
+    "name": "label",
+    "id": "decl"
+   },
+   "from": "property:ResourceRole"
+  },
+  "properties": {
+   "cls": "data",
+   "attrs": {
+    "name": "label",
+    "itemSubjectRef": "ref",
+    "id": "decl"
+   },
+   "from": "property:Property"
+  },
+  "laneSets": {
+   "cls": "model_other",
+   "attrs": {
+    "name": "label",
+    "id": "decl"
+   },
+   "from": "property:LaneSet"
+  },
+  "flowElements": {
+   "cls": "model_other",
+   "attrs": {
+    "name": "label",
+    "id": "decl"
+   },
+   "from": "property:FlowElement"
+  },
+  "artifacts": {
+   "cls": "artifact",
+   "attrs": {
+    "id": "decl"
+   },
+   "from": "property:Artifact"
+  },
+  "correlationSubscriptions": {
+   "cls": "model_other",
+   "attrs": {
+    "correlationKeyRef": "ref",
+    "id": "decl"
+   },
+   "from": "property:CorrelationSubscription"
+  },
+  "supports": {
+   "cls": "model_other",
+   "attrs": {},
+   "from": "property"
+  },
+  "lanes": {
+   "cls": "swimlane",
+   "attrs": {
+    "name": "label",
+    "partitionElementRef": "ref",
+    "id": "decl"
+   },
+   "from": "property:Lane"
+  },
+  "partitionElement": {
+   "cls": "model_other",
+   "attrs": {
+    "id": "decl"
+   },
+   "from": "property:BaseElement"
+  },
+  "flowNodeRef": {
+   "cls": "model_other",
+   "attrs": {},
+   "from": "property"
+  },
+  "childLaneSet": {
+   "cls": "model_other",
+   "attrs": {
+    "name": "label",
+    "id": "decl"
+   },
+   "from": "property:LaneSet"
+  },
+  "renderings": {
+   "cls": "model_other",
+   "attrs": {
+    "id": "decl"
+   },
+   "from": "property:Rendering"
+  },
+  "activationCondition": {
+   "cls": "model_other",
+   "attrs": {
+    "id": "decl"
+   },
+   "from": "property:Expression"
+  },
+  "source": {
+   "cls": "model_other",
+   "attrs": {},
+   "from": "property"
+  },
+  "target": {
+   "cls": "model_other",
+   "attrs": {},
+   "from": "property"
+  },
+  "extensionDefinitions": {
+   "cls": "model_other",
+   "attrs": {},
+   "from": "property"
+  },
+  "extensionAttributeDefinitions": {
+   "cls": "model_other",
+   "attrs": {
+    "name": "label",
+    "extensionDefinition": "ref"
+   },
+   "from": "property:ExtensionAttributeDefinition"
+  },
+  "values": {
+   "cls": "model_other",
+   "attrs": {},
+   "from": "property"
+  },
+  "text": {
+   "cls": "model_other",
+   "attrs": {},
+   "from": "property"
+  },
+  "dataInputs": {
+   "cls": "data",
+   "attrs": {
+    "name": "label",
+    "itemSubjectRef": "ref",
+    "id": "decl"
+   },
+   "from": "property:DataInput"
+  },
+  "dataInputAssociations": {
+   "cls": "edge",
+   "attrs": {
+    "id": "decl"
+   },
+   "from": "property:DataInputAssociation"
+  },
+  "eventDefinitions": {
+   "cls": "model_other",
+   "attrs": {
+    "id": "decl"
+   },
+   "from": "property:EventDefinition"
+  },
+  "eventDefinitionRef": {
+   "cls": "model_other",
+   "attrs": {},
+   "from": "property"
+  },
+  "dataOutputs": {
+   "cls": "data",
+   "attrs": {
+    "name": "label",
+    "itemSubjectRef": "ref",
+    "id": "decl"
+   },
+   "from": "property:DataOutput"
+  },
+  "dataOutputAssociations": {
+   "cls": "edge",
+   "attrs": {
+    "id": "decl"
+   },
+   "from": "property:DataOutputAssociation"
+  },
+  "timeDate": {
+   "cls": "model_other",
+   "attrs": {
+    "id": "decl"
+   },
+   "from": "property:Expression"
+  },
+  "timeCycle": {
+   "cls": "model_other",
+   "attrs": {
+    "id": "decl"
+   },
+   "from": "property:Expression"
+  },
+  "timeDuration": {
+   "cls": "model_other",
+   "attrs": {
+    "id": "decl"
+   },
+   "from": "property:Expression"
+  },
+  "operationRef": {
+   "cls": "model_other",
+   "attrs": {},
+   "from": "property"
+  },
+  "condition": {
+   "cls": "model_other",
+   "attrs": {
+    "id": "decl"
+   },
+   "from": "property:Expression"
+  },
+  "sourceRef": {
+   "cls": "model_other",
+   "attrs": {},
+   "from": "property"
+  },
+  "targetRef": {
+   "cls": "model_other",
+   "attrs": {},
+   "from": "property"
+  },
+  "transformation": {
+   "cls": "model_other",
+   "attrs": {
+    "evaluatesToTypeRef": "ref",
+    "id": "decl"
+   },
+   "from": "property:FormalExpression"
+  },
+  "inputSetRef": {
+   "cls": "model_other",
+   "attrs": {},
+   "from": "property"
+  },
+  "inputSetWithOptional": {
+   "cls": "model_other",
+   "attrs": {},
+   "from": "property"
+  },
+  "inputSetWithWhileExecuting": {
+   "cls": "model_other",
+   "attrs": {},
+   "from": "property"
+  },
+  "outputSetRef": {
+   "cls": "model_other",
+   "attrs": {},
+   "from": "property"
+  },
+  "outputSetWithOptional": {
+   "cls": "model_other",
+   "attrs": {},
+   "from": "property"
+  },
+  "outputSetWithWhileExecuting": {
+   "cls": "model_other",
+   "attrs": {},
+   "from": "property"
+  },
+  "dataInputRefs": {
+   "cls": "model_other",
+   "attrs": {},
+   "from": "property"
+  },
+  "optionalInputRefs": {
+   "cls": "model_other",
+   "attrs": {},
+   "from": "property"
+  },
+  "whileExecutingInputRefs": {
+   "cls": "model_other",
+   "attrs": {},
+   "from": "property"
+  },
+  "outputSetRefs": {
+   "cls": "model_other",
+   "attrs": {},
+   "from": "property"
+  },
+  "dataOutputRefs": {
+   "cls": "model_other",
+   "attrs": {},
+   "from": "property"
+  },
+  "inputSetRefs": {
+   "cls": "model_other",
+   "attrs": {},
+   "from": "property"
+  },
+  "optionalOutputRefs": {
+   "cls": "model_other",
+   "attrs": {},
+   "from": "property"
+  },
+  "whileExecutingOutputRefs": {
+   "cls": "model_other",
+   "attrs": {},
+   "from": "property"
+  },
+  "inputSets": {
+   "cls": "model_other",
+   "attrs": {
+    "name": "label",
+    "id": "decl"
+   },
+   "from": "property:InputSet"
+  },
+  "outputSets": {
+   "cls": "model_other",
+   "attrs": {
+    "name": "label",
+    "id": "decl"
+   },
+   "from": "property:OutputSet"
+  },
+  "from": {
+   "cls": "model_other",
+   "attrs": {
+    "id": "decl"
+   },
+   "from": "property:Expression"
+  },
+  "to": {
+   "cls": "model_other",
+   "attrs": {
+    "id": "decl"
+   },
+   "from": "property:Expression"
+  },
+  "participantAssociations": {
+   "cls": "model_other",
+   "attrs": {
+    "innerParticipantRef": "ref",
+    "outerParticipantRef": "ref",
+    "id": "decl"
+   },
+   "from": "property:ParticipantAssociation"
+  },
+  "conversationNodes": {
+   "cls": "model_other",
+   "attrs": {
+    "name": "label",
+    "id": "decl"
+   },
+   "from": "property:ConversationNode"
+  },
+  "participantRef": {
+   "cls": "model_other",
+   "attrs": {},
+   "from": "property"
+  },
+  "messageFlowRefs": {
+   "cls": "model_other",
+   "attrs": {},
+   "from": "property"
+  },
+  "correlationKeys": {
+   "cls": "model_other",
+   "attrs": {
+    "name": "label",
+    "id": "decl"
+   },
+   "from": "property:CorrelationKey"
+  },
+  "correlationPropertyRef": {
+   "cls": "model_other",
+   "attrs": {},
+   "from": "property"
+  },
+  "body": {
+   "cls": "model_other",
+   "attrs": {},
+   "from": "property"
+  },
+  "categoryValueRef": {
+   "cls": "model_other",
+   "attrs": {},
+   "from": "property"
+  },
+  "conditionExpression": {
+   "cls": "model_other",
+   "attrs": {
+    "id": "decl"
+   },
+   "from": "property:Expression"
+  },
+  "ioSpecification": {
+   "cls": "model_other",
+   "attrs": {
+    "id": "decl"
+   },
+   "from": "property:InputOutputSpecification"
+  },
+  "supportedInterfaceRef": {
+   "cls": "model_other",
+   "attrs": {},
+   "from": "property"
+  },
+  "ioBinding": {
+   "cls": "model_other",
+   "attrs": {
+    "inputDataRef": "ref",
+    "outputDataRef": "ref",
+    "operationRef": "ref"
+   },
+   "from": "property:InputOutputBinding"
+  },
+  "incoming": {
+   "cls": "model_other",
+   "attrs": {},
+   "from": "property"
+  },
+  "outgoing": {
+   "cls": "model_other",
+   "attrs": {},
+   "from": "property"
+  },
+  "messagePath": {
+   "cls": "model_other",
+   "attrs": {
+    "evaluatesToTypeRef": "ref",
+    "id": "decl"
+   },
+   "from": "property:FormalExpression"
+  },
+  "dataPath": {
+   "cls": "model_other",
+   "attrs": {
+    "evaluatesToTypeRef": "ref",
+    "id": "decl"
+   },
+   "from": "property:FormalExpression"
+  },
+  "resourceParameters": {
+   "cls": "model_other",
+   "attrs": {
+    "name": "label",
+    "type": "ref",
+    "id": "decl"
+   },
+   "from": "property:ResourceParameter"
+  },
+  "incomingConversationLinks": {
+   "cls": "model_other",
+   "attrs": {},
+   "from": "property"
+  },
+  "outgoingConversationLinks": {
+   "cls": "model_other",
+   "attrs": {},
+   "from": "property"
+  },
+  "interfaceRef": {
+   "cls": "model_other",
+   "attrs": {},
+   "from": "property"
+  },
+  "endPointRefs": {
+   "cls": "model_other",
+   "attrs": {},
+   "from": "property"
+  },
+  "participants": {
+   "cls": "swimlane",
+   "attrs": {
+    "name": "label",
+    "processRef": "ref",
+    "id": "decl"
+   },
+   "from": "property:Participant"
+  },
+  "messageFlows": {
+   "cls": "edge",
+   "attrs": {
+    "name": "label",
+    "sourceRef": "ref",
+    "targetRef": "ref",
+    "messageRef": "ref",
+    "id": "decl"
+   },
+   "from": "property:MessageFlow"
+  },
+  "conversations": {
+   "cls": "model_other",
+   "attrs": {
+    "name": "label",
+    "id": "decl"
+   },
+   "from": "property:ConversationNode"
+  },
+  "conversationAssociations": {
+   "cls": "model_other",
+   "attrs": {
+    "innerConversationNodeRef": "ref",
+    "outerConversationNodeRef": "ref",
+    "id": "decl"
+   },
+   "from": "property:ConversationAssociation"
+  },
+  "messageFlowAssociations": {
+   "cls": "model_other",
+   "attrs": {
+    "innerMessageFlowRef": "ref",
+    "outerMessageFlowRef": "ref",
+    "id": "decl"
+   },
+   "from": "property:MessageFlowAssociation"
+  },
+  "choreographyRef": {
+   "cls": "model_other",
+   "attrs": {},
+   "from": "property"
+  },
+  "conversationLinks": {
+   "cls": "model_other",
+   "attrs": {
+    "sourceRef": "ref",
+    "targetRef": "ref",
+    "name": "label",
+    "id": "decl"
+   },
+   "from": "property:ConversationLink"
+  },
+  "messageFlowRef": {
+   "cls": "model_other",
+   "attrs": {},
+   "from": "property"
+  },
+  "categorizedFlowElements": {
+   "cls": "model_other",
+   "attrs": {},
+   "from": "property"
+  },
+  "boundaryEventRefs": {
+   "cls": "model_other",
+   "attrs": {},
+   "from": "property"
+  },
+  "loopCardinality": {
+   "cls": "model_other",
+   "attrs": {
+    "id": "decl"
+   },
+   "from": "property:Expression"
+  },
+  "loopDataInputRef": {
+   "cls": "model_other",
+   "attrs": {},
+   "from": "property"
+  },
+  "loopDataOutputRef": {
+   "cls": "model_other",
+   "attrs": {},
+   "from": "property"
+  },
+  "inputDataItem": {
+   "cls": "data",
+   "attrs": {
+    "name": "label",
+    "itemSubjectRef": "ref",
+    "id": "decl"
+   },
+   "from": "property:DataInput"
+  },
+  "outputDataItem": {
+   "cls": "data",
+   "attrs": {
+    "name": "label",
+    "itemSubjectRef": "ref",
+    "id": "decl"
+   },
+   "from": "property:DataOutput"
+  },
+  "completionCondition": {
+   "cls": "model_other",
+   "attrs": {
+    "id": "decl"
+   },
+   "from": "property:Expression"
+  },
+  "loopCondition": {
+   "cls": "model_other",
+   "attrs": {
+    "id": "decl"
+   },
+   "from": "property:Expression"
+  },
+  "script": {
+   "cls": "model_other",
+   "attrs": {},
+   "from": "property"
+  },
+  "resourceRef": {
+   "cls": "model_other",
+   "attrs": {},
+   "from": "property"
+  },
+  "resourceParameterBindings": {
+   "cls": "model_other",
+   "attrs": {
+    "parameterRef": "ref",
+    "id": "decl"
+   },
+   "from": "property:ResourceParameterBinding"
+  },
+  "imports": {
+   "cls": "model_other",
+   "attrs": {},
+   "from": "property:Import"
+  },
+  "extensions": {
+   "cls": "model_other",
+   "attrs": {
+    "definition": "ref"
+   },
+   "from": "property:Extension"
+  },
+  "rootElements": {
+   "cls": "model_other",
+   "attrs": {
+    "id": "decl"
+   },
+   "from": "property:RootElement"
+  },
+  "diagrams": {
+   "cls": "model_other",
+   "attrs": {},
+   "from": "property"
+  },
+  "relationships": {
+   "cls": "model_other",
+   "attrs": {
+    "id": "decl"
+   },
+   "from": "property:Relationship"
+  }
+ },
+ "di_elements": {
+  "BPMNDiagram": {
+   "attrs": {}
+  },
+  "BPMNPlane": {
+   "attrs": {
+    "bpmnElement": "ref"
+   }
+  },
+  "BPMNShape": {
+   "attrs": {
+    "bpmnElement": "ref",
+    "choreographyActivityShape": "ref"
+   }
+  },
+  "BPMNEdge": {
+   "attrs": {
+    "bpmnElement": "ref",
+    "sourceElement": "ref",
+    "targetElement": "ref"
+   }
+  },
+  "BPMNLabel": {
+   "attrs": {
+    "labelStyle": "ref"
+   }
+  },
+  "BPMNLabelStyle": {
+   "attrs": {}
+  },
+  "Boolean": {
+   "attrs": {}
+  },
+  "Integer": {
+   "attrs": {}
+  },
+  "Real": {
+   "attrs": {}
+  },
+  "String": {
+   "attrs": {}
+  },
+  "Font": {
+   "attrs": {}
+  },
+  "Point": {
+   "attrs": {}
+  },
+  "Bounds": {
+   "attrs": {}
+  },
+  "DiagramElement": {
+   "attrs": {
+    "id": "decl"
+   }
+  },
+  "Node": {
+   "attrs": {}
+  },
+  "Edge": {
+   "attrs": {}
+  },
+  "Diagram": {
+   "attrs": {
+    "id": "decl"
+   }
+  },
+  "Shape": {
+   "attrs": {}
+  },
+  "Plane": {
+   "attrs": {}
+  },
+  "LabeledEdge": {
+   "attrs": {}
+  },
+  "LabeledShape": {
+   "attrs": {}
+  },
+  "Label": {
+   "attrs": {}
+  },
+  "Style": {
+   "attrs": {
+    "id": "decl"
+   }
+  },
+  "Extension": {
+   "attrs": {}
+  },
+  "waypoint": {
+   "attrs": {}
+  }
+ },
+ "ref_text_elements": [
+  "boundaryEventRefs",
+  "categorizedFlowElements",
+  "categoryValueRef",
+  "choreographyRef",
+  "correlationPropertyRef",
+  "dataInputRefs",
+  "dataOutputRefs",
+  "endPointRefs",
+  "errorRef",
+  "eventDefinitionRef",
+  "extensionDefinitions",
+  "flowNodeRef",
+  "inMessageRef",
+  "incoming",
+  "incomingConversationLinks",
+  "inputSetRef",
+  "inputSetRefs",
+  "inputSetWithOptional",
+  "inputSetWithWhileExecuting",
+  "interfaceRef",
+  "lanes",
+  "loopDataInputRef",
+  "loopDataOutputRef",
+  "messageFlowRef",
+  "messageFlowRefs",
+  "operationRef",
+  "optionalInputRefs",
+  "optionalOutputRefs",
+  "outMessageRef",
+  "outgoing",
+  "outgoingConversationLinks",
+  "outputSetRef",
+  "outputSetRefs",
+  "outputSetWithOptional",
+  "outputSetWithWhileExecuting",
+  "participantRef",
+  "resourceRef",
+  "source",
+  "sourceRef",
+  "supportedInterfaceRef",
+  "supports",
+  "target",
+  "targetRef",
+  "whileExecutingInputRefs",
+  "whileExecutingOutputRefs"
+ ],
+ "relation_rules": {
+  "sequenceFlow": {
+   "label": "sequence_flow",
+   "from": "sourceRef",
+   "to": "targetRef"
+  },
+  "messageFlow": {
+   "label": "message_flow",
+   "from": "sourceRef",
+   "to": "targetRef"
+  },
+  "association": {
+   "label": "association",
+   "from": "sourceRef",
+   "to": "targetRef"
+  },
+  "dataInputAssociation": {
+   "label": "data_association",
+   "fromChild": "sourceRef",
+   "toChild": "targetRef"
+  },
+  "dataOutputAssociation": {
+   "label": "data_association",
+   "fromChild": "sourceRef",
+   "toChild": "targetRef"
+  },
+  "boundaryEvent": {
+   "label": "attached_to",
+   "fromId": true,
+   "to": "attachedToRef"
+  }
+ },
+ "train": {
+  "marker": "COUNTS FROM TRAIN ONLY (flowable-engine + Activiti test models, lineage 'activiti'), from the TRAIN gold written by uml_bpmn-data.py",
+  "docs": 934,
+  "elements_counted": 27683,
+  "model_element_counts": {
+   "sequenceFlow": 4586,
+   "endEvent": 1466,
+   "startEvent": 1334,
+   "userTask": 1267,
+   "extensionElements": 1089,
+   "process": 983,
+   "definitions": 934,
+   "serviceTask": 399,
+   "outgoing": 369,
+   "incoming": 368,
+   "subProcess": 338,
+   "boundaryEvent": 282,
+   "parallelGateway": 235,
+   "conditionExpression": 211,
+   "multiInstanceLoopCharacteristics": 161,
+   "documentation": 158,
+   "timerEventDefinition": 146,
+   "errorEventDefinition": 139,
+   "loopCardinality": 126,
+   "exclusiveGateway": 118,
+   "scriptTask": 108,
+   "timeDuration": 106,
+   "script": 105,
+   "message": 103,
+   "callActivity": 99,
+   "messageEventDefinition": 95,
+   "signalEventDefinition": 89,
+   "receiveTask": 87,
+   "signal": 85,
+   "intermediateCatchEvent": 80,
+   "dataObject": 75,
+   "flowNodeRef": 69,
+   "association": 57,
+   "manualTask": 56,
+   "intermediateThrowEvent": 55,
+   "terminateEventDefinition": 51,
+   "error": 49,
+   "inclusiveGateway": 41,
+   "compensateEventDefinition": 41,
+   "task": 33,
+   "cancelEventDefinition": 31,
+   "timeCycle": 30,
+   "resourceAssignmentExpression": 27,
+   "formalExpression": 27,
+   "itemDefinition": 26,
+   "participant": 25,
+   "sendTask": 22,
+   "textAnnotation": 21,
+   "text": 21,
+   "variable": 20,
+   "completionCondition": 18,
+   "lane": 16,
+   "potentialOwner": 15,
+   "collaboration": 14,
+   "messageFlow": 12,
+   "interface": 12,
+   "operation": 12,
+   "inMessageRef": 12,
+   "eventBasedGateway": 11,
+   "targetRef": 11,
+   "humanPerformer": 10,
+   "loopDataOutputRef": 10,
+   "outMessageRef": 10,
+   "dataInputAssociation": 10,
+   "escalationEventDefinition": 10,
+   "import": 10,
+   "transaction": 9,
+   "laneSet": 9,
+   "linkEventDefinition": 8,
+   "sourceRef": 8,
+   "ioSpecification": 8,
+   "dataInput": 8,
+   "inputSet": 8,
+   "dataInputRefs": 8,
+   "outputSet": 8,
+   "assignment": 7,
+   "from": 7,
+   "to": 7,
+   "adHocSubProcess": 6,
+   "escalation": 5,
+   "conditionalEventDefinition": 5,
+   "condition": 5,
+   "timeDate": 3,
+   "outputDataItem": 3,
+   "dataStore": 3,
+   "dataStoreReference": 3,
+   "dataOutput": 3,
+   "dataOutputRefs": 3,
+   "dataOutputAssociation": 3,
+   "source": 2,
+   "loopDataInputRef": 2,
+   "inputDataItem": 2,
+   "resource": 2,
+   "resourceRef": 2,
+   "dataState": 2,
+   "businessRuleTask": 2,
+   "target": 2,
+   "transformation": 2,
+   "participantMultiplicity": 2,
+   "property": 1,
+   "invalid": 1,
+   "startEventThisIsNotRight": 1
+  },
+  "model_element_doc_freq": {
+   "definitions": 934,
+   "signal": 73,
+   "process": 934,
+   "startEvent": 932,
+   "sequenceFlow": 929,
+   "userTask": 628,
+   "subProcess": 226,
+   "exclusiveGateway": 89,
+   "conditionExpression": 103,
+   "endEvent": 902,
+   "intermediateThrowEvent": 49,
+   "signalEventDefinition": 69,
+   "task": 17,
+   "intermediateCatchEvent": 59,
+   "timerEventDefinition": 115,
+   "timeDuration": 91,
+   "eventBasedGateway": 11,
+   "multiInstanceLoopCharacteristics": 140,
+   "loopCardinality": 107,
+   "parallelGateway": 137,
+   "boundaryEvent": 218,
+   "serviceTask": 232,
+   "callActivity": 81,
+   "extensionElements": 343,
+   "terminateEventDefinition": 40,
+   "timeCycle": 21,
+   "adHocSubProcess": 6,
+   "manualTask": 23,
+   "dataObject": 18,
+   "outgoing": 87,
+   "incoming": 88,
+   "documentation": 80,
+   "humanPerformer": 10,
+   "resourceAssignmentExpression": 19,
+   "formalExpression": 19,
+   "scriptTask": 72,
+   "script": 71,
+   "inclusiveGateway": 26,
+   "errorEventDefinition": 83,
+   "compensateEventDefinition": 20,
+   "association": 36,
+   "collaboration": 14,
+   "participant": 14,
+   "linkEventDefinition": 4,
+   "source": 2,
+   "error": 37,
+   "receiveTask": 68,
+   "sendTask": 16,
+   "message": 80,
+   "messageEventDefinition": 67,
+   "completionCondition": 18,
+   "transaction": 8,
+   "cancelEventDefinition": 11,
+   "loopDataInputRef": 2,
+   "inputDataItem": 2,
+   "messageFlow": 7,
+   "potentialOwner": 10,
+   "textAnnotation": 14,
+   "text": 14,
+   "timeDate": 3,
+   "loopDataOutputRef": 5,
+   "outputDataItem": 3,
+   "resource": 1,
+   "resourceRef": 1,
+   "dataStore": 3,
+   "laneSet": 6,
+   "lane": 6,
+   "flowNodeRef": 6,
+   "dataState": 1,
+   "dataStoreReference": 3,
+   "property": 1,
+   "businessRuleTask": 2,
+   "target": 2,
+   "invalid": 1,
+   "startEventThisIsNotRight": 1,
+   "interface": 12,
+   "operation": 12,
+   "inMessageRef": 12,
+   "outMessageRef": 10,
+   "dataInputAssociation": 9,
+   "sourceRef": 6,
+   "escalation": 5,
+   "escalationEventDefinition": 6,
+   "import": 10,
+   "ioSpecification": 6,
+   "dataInput": 6,
+   "dataOutput": 2,
+   "inputSet": 6,
+   "dataInputRefs": 6,
+   "outputSet": 6,
+   "dataOutputRefs": 2,
+   "dataOutputAssociation": 3,
+   "targetRef": 8,
+   "transformation": 2,
+   "itemDefinition": 10,
+   "assignment": 5,
+   "from": 5,
+   "to": 5,
+   "variable": 6,
+   "conditionalEventDefinition": 5,
+   "condition": 5,
+   "participantMultiplicity": 1
+  },
+  "names_in_standard_ns_not_in_table": {
+   "invalid": 1,
+   "startEventThisIsNotRight": 1,
+   "variable": 20
+  },
+  "table_names_never_seen_in_train": 139,
+  "vendor_namespaces_attested": {
+   "http://activiti.org/bpmn": {
+    "elements": 622,
+    "docs": 153
+   },
+   "http://flowable.org/bpmn": {
+    "elements": 491,
+    "docs": 137
+   },
+   "http://flowable.org/design": {
+    "elements": 490,
+    "docs": 29
+   },
+   "http://activiti.com/modeler": {
+    "elements": 428,
+    "docs": 47
+   },
+   "http://www.signavio.com": {
+    "elements": 50,
+    "docs": 5
+   },
+   "http://yourco/bpmn": {
+    "elements": 12,
+    "docs": 2
+   },
+   "http://flowable.org/modeler": {
+    "elements": 9,
+    "docs": 2
+   },
+   "http://bpmn.sourceforge.net": {
+    "elements": 2,
+    "docs": 1
+   },
+   "http://custom.org/bpmn": {
+    "elements": 1,
+    "docs": 1
+   }
+  }
+ }
+}

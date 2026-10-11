@@ -1,0 +1,222 @@
+{
+  "source": "CreoleVal: Multilingual Multitask Benchmarks for Creoles",
+  "url": "https://github.com/hclent/CreoleVal",
+  "citation": "Lent, Heather et al. 2024. \"CreoleVal: Multilingual Multitask Benchmarks for Creoles.\" Transactions of the Association for Computational Linguistics 12: 950-978. https://doi.org/10.1162/tacl_a_00682",
+  "license": "COMPOSITE -- CreoleVal is an aggregator of pre-existing and newly-introduced benchmarks, each carrying its own license (CreoleVal's own top-level README states this explicitly and publishes a per-dataset license table). No single license covers the whole repository; see per-directory license fields below. Every license named below was independently re-verified against the actual upstream source (a real LICENSE file, dataset card, or README fetched live), not assumed from CreoleVal's table alone -- CreoleVal's own claim and the independently-fetched source agreed in every case checked.",
+  "fetched_at": "2026-08-19",
+  "fetch_method": "git clone --recursive https://github.com/hclent/CreoleVal.git (real clone, including the machamp and yanmtt submodules) for the data already vendored in-repo; curl of the exact upstream URLs named in CreoleVal's own download_*.sh scripts (masakhane-ner, afrisenti-semeval-2023, UD_Naija-NSC, Sing_Par, and the KreolMorisienMT HuggingFace dataset) for the data CreoleVal only references via a fetch script rather than vendoring directly.",
+  "coverage": "A representative slice, not an attempt at completeness. CreoleVal spans 28 creole/pidgin languages and 8 NLP task types; this pocket stages real data across 9 task-type directories (relation classification, machine comprehension, 2 NER sources, 2 POS sources, sentiment analysis, 2 machine-translation sources, and Tatoeba sentence-mining) and 12 distinct language/variety codes (bi/Bislama, cbk-zam/Chavacano de Zamboanga, jam/Jamaican Patois, tpi/Tok Pisin, hat/Haitian Creole, mfe/Mauritian Creole, pcm/Nigerian Pidgin, pap/Papiamento, sag or sg/Sango, gcf/Guadeloupean Creole French, pih/Norfuk-Pitcairn, and Singlish/Colloquial Singapore English -- the last is an English-lexified contact variety CreoleVal itself includes as a task language, not a canonical creole). Large upstream files (raw WikiAnn .bio files up to 60,713 lines; UD_Naija-NSC's 213,822-line train split; the MIT-Haiti monolingual corpus's 8,280 lines; KreolMorisienMT's 21,810-line train split) were bounded to representative samples (typically the first 400-3000 lines) rather than staged in full, per this repo's stated preference for bounded, verifiable samples over attempted completeness; official dev/test splits that were already modest in size were generally kept whole. Three datasets CreoleVal itself names were deliberately NOT staged (Bible/Religious MT -- explicitly copyrighted per the repo's own README and creolem2m/README.md; Oyewusi Nigerian-Pidgin sentiment and JamPatoisNLI -- both Twitter/web-sourced with no discoverable license), and the machamp/yanmtt training-toolkit submodules were skipped as out-of-scope code, not language data. See \"gated_or_skipped\" below for the full reasoning on each.",
+  "directory": "11-multi-language/dialects-pidgins-creoles/creoleval",
+  "totals": {
+    "total_files": 64,
+    "approx_total_size_bytes": 5550788,
+    "task_directories": 9,
+    "distinct_language_codes": 12
+  },
+  "task_directories": [
+    {
+      "dir": "relation_classification",
+      "task": "Relation Classification (RC)",
+      "languages": ["bi (Bislama)", "cbk-zam (Chavacano de Zamboanga)", "jam (Jamaican Patois)", "tpi (Tok Pisin)"],
+      "license": "CC0 (public domain dedication). Confirmed via CreoleVal's own top-level README benchmark table (\"CC0\", domain \"WikiDump\") and consistent with the data's own origin: sentences paired with Wikidata entity/property triples (Wikidata's own data is CC0), extracted from Creole-language Wikipedia dumps by CreoleVal's own data_generation pipeline (nlu/relation_classification/src/data_generation/).",
+      "coverage": "Staged in full -- all 4 language files CreoleVal vendors directly in-repo at nlu/relation_classification/data/relation_extraction/ (a 5th, pih, has only a properties/pih.json list with no matching sentence CSV in the repo, so it was not included here).",
+      "vendored_directly_in_creoleval_repo": true,
+      "files": [
+        {"path": "relation_classification/bi.csv", "bytes": 9052, "rows": 96},
+        {"path": "relation_classification/cbk-zam.csv", "bytes": 9461, "rows": 106},
+        {"path": "relation_classification/jam.csv", "bytes": 8842, "rows": 96},
+        {"path": "relation_classification/tpi.csv", "bytes": 8364, "rows": 97},
+        {"path": "relation_classification/SOURCE_README.md", "bytes": 7175, "note": "CreoleVal's own README.md for this task, copied verbatim for context (property list, data-generation pipeline description)."}
+      ]
+    },
+    {
+      "dir": "mctest",
+      "task": "Machine Comprehension / Reading Comprehension (MC)",
+      "languages": ["hat (Haitian Creole, two independent translations)", "mfe (Mauritian Creole)"],
+      "license": "Microsoft Research License Terms (MSR-LA) -- a real license, not a placeholder. Verified by fetching and reading the actual license PDF CreoleVal vendors at nlu/mctest/LICENSE.pdf (copied here as mctest/MSR-LA-LICENSE.pdf). Key terms: broad use/copy/modify/redistribute rights \"for any purposes\", conditioned on redistributing under the same MSR-LA terms, preserving copyright notices, and flagging any derivative works as changed. This is CreoleVal's own newly-introduced dataset (the original English MCTest is by Microsoft Research; CreoleVal's professional-translator Haitian and Mauritian versions are the new contribution, per its README).",
+      "coverage": "The 3 Creole-translated story sets are staged in full (30 stories x 4 questions = 120 questions each, per CreoleVal's own README): MCTestHat1 (direct translation), MCTestHat2 (localized translation, names/places adjusted for Haitian readers), MCTestMar (Mauritian Creole). The original English MCTest160/MCTest500 splits were NOT staged (out of scope -- not a creole language). The raw pre-JSON translator output (.txt) and its .tsv alignment are also included from CreoleVal's own CreoleTranslations/ folder for readability.",
+      "vendored_directly_in_creoleval_repo": true,
+      "files": [
+        {"path": "mctest/MCTestHat1/mc160.dev.json", "bytes": 193088, "note": "Haitian Creole, direct translation, 120 questions over 30 stories"},
+        {"path": "mctest/MCTestHat2/mc160.dev.json", "bytes": 197011, "note": "Haitian Creole, localized translation"},
+        {"path": "mctest/MCTestMar/mc160.dev.json", "bytes": 171709, "note": "Mauritian Creole (mfe)"},
+        {"path": "mctest/CreoleTranslations/mc160.dev.kreyol1.txt", "bytes": 57200},
+        {"path": "mctest/CreoleTranslations/mc160.dev.kreyol1.tsv", "bytes": 54530},
+        {"path": "mctest/CreoleTranslations/mc160.dev.kreyol2_localized.txt", "bytes": 57858},
+        {"path": "mctest/CreoleTranslations/mc160.dev.kreyol2_localized.tsv", "bytes": 55165},
+        {"path": "mctest/CreoleTranslations/mc160.dev.mauritian.txt", "bytes": 54636},
+        {"path": "mctest/CreoleTranslations/mc160.dev.mauritian.tsv", "bytes": 51943},
+        {"path": "mctest/MSR-LA-LICENSE.pdf", "bytes": 126378, "note": "The real Microsoft Research License Terms PDF, copied verbatim from the CreoleVal repo for attribution/compliance."},
+        {"path": "mctest/SOURCE_README.md", "bytes": 4114}
+      ]
+    },
+    {
+      "dir": "ner_wikiann",
+      "task": "Named Entity Recognition (NER) -- WikiAnn / PAN-X",
+      "languages": ["bi", "cbk_zam", "ht", "pap", "pih", "sg", "tpi"],
+      "license": "UNSPECIFIED -- staged as a bounded, clearly-tagged SAMPLE, not treated as an open license. CreoleVal's own README table lists this dataset's license as literally \"Unspecified\"; independently, the canonical HuggingFace mirror (unimelb-nlp/wikiann) was fetched and its own dataset card confirms \"license: unknown\" with a \"[More Information Needed]\" licensing section. The underlying text is Wikipedia-derived (Wikipedia's own prose is CC BY-SA 3.0/GFDL), and this is a long-standing, widely-redistributed academic NER benchmark, not scraped social media against a platform's ToS -- so per this repo's staging rules a bounded representative sample was staged (not the full files, not zero). Full detail in ner_wikiann/PROVENANCE.txt.",
+      "coverage": "First 400 lines of each language's .bio file (CreoleVal's own re-split of WikiAnn, vendored at nlu/ner/data/WikiAnn_data/<lang>/), out of 2,113-60,713 total lines per language in the CreoleVal-vendored files.",
+      "vendored_directly_in_creoleval_repo": true,
+      "files": [
+        {"path": "ner_wikiann/bi_sample.bio", "bytes": 6872, "lines": 400},
+        {"path": "ner_wikiann/cbk_zam_sample.bio", "bytes": 6197, "lines": 400},
+        {"path": "ner_wikiann/ht_sample.bio", "bytes": 8522, "lines": 400},
+        {"path": "ner_wikiann/pap_sample.bio", "bytes": 7198, "lines": 400},
+        {"path": "ner_wikiann/pih_sample.bio", "bytes": 6407, "lines": 400},
+        {"path": "ner_wikiann/sg_sample.bio", "bytes": 8054, "lines": 400},
+        {"path": "ner_wikiann/tpi_sample.bio", "bytes": 6595, "lines": 400},
+        {"path": "ner_wikiann/SOURCE_README.md", "bytes": 2642},
+        {"path": "ner_wikiann/PROVENANCE.txt", "bytes": 2207}
+      ]
+    },
+    {
+      "dir": "ner_masakhaner_pcm",
+      "task": "Named Entity Recognition (NER) -- MasakhaNER 2.0",
+      "languages": ["pcm (Nigerian Pidgin / Naija)"],
+      "license": "Apache License 2.0. Confirmed by fetching and reading https://raw.githubusercontent.com/masakhane-io/masakhane-ner/main/LICENSE directly (full Apache-2.0 text). CreoleVal's own README table independently lists this as \"Apache 2.0\" too.",
+      "coverage": "Fetched directly from the upstream masakhane-ner repo (CreoleVal only ships a download script, nlu/ner/download_masakhaner.sh, not the data itself). Full dev (22,693 lines) and test (43,373 lines) splits staged; train bounded to the first 500 of ~148,000+ lines.",
+      "vendored_directly_in_creoleval_repo": false,
+      "fetched_from": "https://github.com/masakhane-io/masakhane-ner (MasakhaNER2.0/data/pcm/)",
+      "files": [
+        {"path": "ner_masakhaner_pcm/train_sample.txt", "bytes": 3701, "lines": 500, "of_total_lines": "~148000+"},
+        {"path": "ner_masakhaner_pcm/dev.txt", "bytes": 164394, "lines": 22693, "note": "full official dev split"},
+        {"path": "ner_masakhaner_pcm/test.txt", "bytes": 310715, "lines": 43373, "note": "full official test split"},
+        {"path": "ner_masakhaner_pcm/PROVENANCE.txt", "bytes": 1089}
+      ]
+    },
+    {
+      "dir": "pos_ud_naija_pcm",
+      "task": "Universal POS Tagging (UDPoS) -- UD_Naija-NSC",
+      "languages": ["pcm (Nigerian Pidgin / Naija)"],
+      "license": "CC BY-SA 4.0. Confirmed by fetching and reading https://raw.githubusercontent.com/UniversalDependencies/UD_Naija-NSC/master/LICENSE.txt directly (\"The treebank is licensed under the Creative Commons License Attribution-ShareAlike 4.0 International\"). CreoleVal's own README table lists this as \"CC 4.0\" (a loose paraphrase of the more precise CC BY-SA 4.0 verified here).",
+      "coverage": "Fetched directly from the upstream UD_Naija-NSC repo (CreoleVal only ships a download script, nlu/pos/download_ud_naija.sh, not the data itself). Bounded samples of all 3 splits: first 2000 of 213,822 train lines, first 3000 of 28,432 dev lines, first 3000 of 27,959 test lines.",
+      "vendored_directly_in_creoleval_repo": false,
+      "fetched_from": "https://github.com/UniversalDependencies/UD_Naija-NSC",
+      "files": [
+        {"path": "pos_ud_naija_pcm/pcm_nsc-ud-train_sample.conllu", "bytes": 100050, "lines": 2000, "of_total_lines": 213822},
+        {"path": "pos_ud_naija_pcm/pcm_nsc-ud-dev_sample.conllu", "bytes": 184504, "lines": 3000, "of_total_lines": 28432},
+        {"path": "pos_ud_naija_pcm/pcm_nsc-ud-test_sample.conllu", "bytes": 178632, "lines": 3000, "of_total_lines": 27959},
+        {"path": "pos_ud_naija_pcm/PROVENANCE.txt", "bytes": 1280}
+      ]
+    },
+    {
+      "dir": "pos_singlish",
+      "task": "Universal POS Tagging (UDPoS) -- Singlish STB-ACL",
+      "languages": ["Singlish (Colloquial Singapore English -- an English-lexified contact variety, one of CreoleVal's own included task languages, not a canonical creole)"],
+      "license": "MIT License. Confirmed by fetching and reading https://raw.githubusercontent.com/wanghm92/Sing_Par/master/LICENSE directly (full MIT text, \"Copyright (c) 2017 Hongmin Wang\"). CreoleVal's own README table independently lists this as \"MIT\" too.",
+      "coverage": "Fetched directly from the upstream Sing_Par repo (CreoleVal only ships a download script, nlu/pos/download_singlish_upos.sh, not the data itself). Full dev (1534 lines) and test (1531 lines) splits staged; train bounded to the first 1500 of 9121 lines.",
+      "vendored_directly_in_creoleval_repo": false,
+      "fetched_from": "https://github.com/wanghm92/Sing_Par (ACL17_dataset/treebank/gold_pos/)",
+      "files": [
+        {"path": "pos_singlish/train_sample.conll", "bytes": 48131, "lines": 1500, "of_total_lines": 9121},
+        {"path": "pos_singlish/dev.conll", "bytes": 49654, "lines": 1534, "note": "full official dev split"},
+        {"path": "pos_singlish/test.conll", "bytes": 49426, "lines": 1531, "note": "full official test split"},
+        {"path": "pos_singlish/PROVENANCE.txt", "bytes": 1296}
+      ]
+    },
+    {
+      "dir": "sa_afrisenti_pcm",
+      "task": "Sentiment Analysis (SA) -- AfriSenti-SemEval",
+      "languages": ["pcm (Nigerian Pidgin / Naija)"],
+      "license": "CC BY 4.0. Confirmed by fetching and reading https://raw.githubusercontent.com/afrisenti-semeval/afrisent-semeval-2023/main/README.md directly (its own \"## License\" section states CC BY 4.0 with the standard badge). CreoleVal's own README table independently lists this as \"CC BY 4.0\" too. Domain is Twitter, but the license itself is clear, open, and attribution-only -- not the ambiguous/unclear case this repo's rules caution against.",
+      "coverage": "Fetched directly from the upstream afrisent-semeval-2023 repo (CreoleVal only ships a download script, nlu/sa/download_afrisenti.sh, not the data itself). Full dev (1282 lines) and test (4155 lines) splits staged; train bounded to the first 500 of 5122 lines.",
+      "vendored_directly_in_creoleval_repo": false,
+      "fetched_from": "https://github.com/afrisenti-semeval/afrisent-semeval-2023 (SubtaskA/)",
+      "files": [
+        {"path": "sa_afrisenti_pcm/pcm_train_sample.tsv", "bytes": 76900, "lines": 500, "of_total_lines": 5122},
+        {"path": "sa_afrisenti_pcm/pcm_dev.tsv", "bytes": 179429, "lines": 1282, "note": "full official dev split"},
+        {"path": "sa_afrisenti_pcm/pcm_test.tsv", "bytes": 479800, "lines": 4155, "note": "full official test split"},
+        {"path": "sa_afrisenti_pcm/PROVENANCE.txt", "bytes": 1385}
+      ]
+    },
+    {
+      "dir": "mt_mit_haiti",
+      "task": "Machine Translation (MT) + pretraining -- the MIT-Haiti Corpus",
+      "languages": ["hat (Haitian Creole) paired with en, es, fr"],
+      "license": "CC 4.0 (Creative Commons Attribution 4.0). Per CreoleVal's own README table and its own nlg/mit_haiti/README.md, made in collaboration with Platfom MIT-Ayiti (https://mit-ayiti.net/), who \"kindly allowed us to utilize their Haitian Creole educational materials\" for this corpus -- CreoleVal's own newly-introduced dataset for this pass.",
+      "coverage": "The parallel data is staged in full: ht-en (1559 sentence pairs), ht-es (102 pairs), ht-fr (1503 pairs). The monolingual corpus (8280 lines total, lesson plans and blog posts) is bounded to the first 1500 lines as a representative sample.",
+      "vendored_directly_in_creoleval_repo": true,
+      "files": [
+        {"path": "mt_mit_haiti/ht-en.src", "bytes": 90065, "lines": 1559, "note": "English source"},
+        {"path": "mt_mit_haiti/ht-en.trg", "bytes": 92523, "lines": 1559, "note": "Haitian Creole target"},
+        {"path": "mt_mit_haiti/ht-es.src", "bytes": 5503, "lines": 102, "note": "Spanish source"},
+        {"path": "mt_mit_haiti/ht-es.trg", "bytes": 5391, "lines": 102, "note": "Haitian Creole target"},
+        {"path": "mt_mit_haiti/ht-fr.src", "bytes": 107937, "lines": 1503, "note": "French source"},
+        {"path": "mt_mit_haiti/ht-fr.trg", "bytes": 92082, "lines": 1503, "note": "Haitian Creole target"},
+        {"path": "mt_mit_haiti/ht_monolingual_sample.txt", "bytes": 103854, "lines": 1500, "of_total_lines": 8280},
+        {"path": "mt_mit_haiti/SOURCE_README.md", "bytes": 1645}
+      ]
+    },
+    {
+      "dir": "mt_kreolmorisien",
+      "task": "Machine Translation (MT) -- KreolMorisienMT / MorisienMT",
+      "languages": ["mfe (Mauritian Creole) paired with en"],
+      "license": "MIT. Confirmed by fetching and reading the dataset's own HuggingFace card at https://huggingface.co/datasets/prajdabre/KreolMorisienMT/raw/main/README.md directly (YAML frontmatter: \"license: mit\"). CreoleVal's own README table independently lists \"KreolMorisienMT\" as \"MIT License\" too.",
+      "coverage": "Fetched directly from the HuggingFace dataset (CreoleVal only ships a download script, nlg/download_kreolmorisien_mt.sh, not the data itself). Only the en-cr (English-Creole) portion was fetched, not fr-cr or the cr monolingual corpus, to keep this dataset's footprint bounded. Full dev (500 lines) and test (1000 lines) splits staged; train bounded to the first 500 of 21,810 lines.",
+      "vendored_directly_in_creoleval_repo": false,
+      "fetched_from": "https://huggingface.co/datasets/prajdabre/KreolMorisienMT",
+      "files": [
+        {"path": "mt_kreolmorisien/en-cr_train_sample.jsonl", "bytes": 52845, "lines": 500, "of_total_lines": 21810},
+        {"path": "mt_kreolmorisien/en-cr_dev.jsonl", "bytes": 99266, "lines": 500, "note": "full official dev split"},
+        {"path": "mt_kreolmorisien/en-cr_test.jsonl", "bytes": 197133, "lines": 1000, "note": "full official test split"},
+        {"path": "mt_kreolmorisien/PROVENANCE.txt", "bytes": 1559}
+      ]
+    },
+    {
+      "dir": "tatoeba_sentence_mining",
+      "task": "Sentence Mining / cross-lingual retrieval (SM) -- Tatoeba Challenge",
+      "languages": ["cbk (Chavacano)", "gcf (Guadeloupean Creole French)", "hat (Haitian Creole)", "jam (Jamaican Patois)", "pap (Papiamento)", "sag (Sango)", "tpi (Tok Pisin)"],
+      "license": "CC-BY 2.0 FR (test/dev release license). Confirmed by fetching and reading https://raw.githubusercontent.com/Helsinki-NLP/Tatoeba-Challenge/master/README.md directly -- its own \"## License\" section states the test and development sets (which is what these CreoleVal-generated evaluation samples are drawn from) are released under CC-BY 2.0 FR; the much larger raw training corpus is separately CC-BY-NC-SA 4.0 and was not touched here. CreoleVal's own README table independently lists this as \"CC-BY 2.0\" too.",
+      "coverage": "CreoleVal generated these particular test-sample files itself (nlu/tatoeba_task/data/, vendored directly in-repo) from the Tatoeba Challenge; one representative sample file per language pair is staged here (where CreoleVal provides multiple numbered samples, sample1 was chosen).",
+      "vendored_directly_in_creoleval_repo": true,
+      "files": [
+        {"path": "tatoeba_sentence_mining/cbk-eng_sample1.tsv", "bytes": 96095, "lines": 1001},
+        {"path": "tatoeba_sentence_mining/cbk-spa.tsv", "bytes": 9965, "lines": 105},
+        {"path": "tatoeba_sentence_mining/gcf-eng.tsv", "bytes": 7470, "lines": 103},
+        {"path": "tatoeba_sentence_mining/gcf-fra.tsv", "bytes": 79246, "lines": 1001},
+        {"path": "tatoeba_sentence_mining/hat-eng_sample1.tsv", "bytes": 251117, "lines": 1001},
+        {"path": "tatoeba_sentence_mining/hat-fra_sample1.tsv", "bytes": 334637, "lines": 1001},
+        {"path": "tatoeba_sentence_mining/jam-eng.tsv", "bytes": 64418, "lines": 147},
+        {"path": "tatoeba_sentence_mining/pap-eng_sample1.tsv", "bytes": 293717, "lines": 1001},
+        {"path": "tatoeba_sentence_mining/sag-eng_sample1.tsv", "bytes": 308039, "lines": 1001},
+        {"path": "tatoeba_sentence_mining/tpi-eng_sample1.tsv", "bytes": 301445, "lines": 1001},
+        {"path": "tatoeba_sentence_mining/SOURCE_README.md", "bytes": 3230}
+      ]
+    }
+  ],
+  "gated_or_skipped": [
+    {
+      "dataset": "CreoleVal Religious MT (Bible corpus)",
+      "task": "Machine Translation",
+      "languages": "25 languages per CreoleVal's own README table (bzj, bis, cbk, gul, hat, hwc, jam, ktu, kri, mkn, mbf, mfe, djk, pcm, pap, pis, acf, icr, sag, srm, crs, srn, tdt, tpi, tcs) -- CreoleVal's single largest MT dataset by sentence count (64,394 sentences / 811,741 words per its own table)",
+      "status": "SKIPPED -- explicitly copyrighted",
+      "reason": "CreoleVal's own top-level README table lists this dataset's license as \"Copyrighted\", and its nlg/creolem2m/README.md states outright: \"We do not own this data, and it [is] highly confidential due to copy-right, and must not be shared publically.\" No raw Bible text was fetched or staged anywhere in this pocket; the creolem2m/tables/ directory that WAS checked (aggregate BLEU/CHRF scores only, no raw text) confirms no bible sentence text leaked into what CreoleVal itself vendors in-repo either."
+    },
+    {
+      "dataset": "Oyewusi Nigerian-Pidgin Sentiment",
+      "task": "Sentiment Analysis",
+      "languages": "pcm (Nigerian Pidgin)",
+      "status": "GATED -- not staged",
+      "reason": "CreoleVal's own README table lists this dataset's license as \"Unspecified\", sourced from Twitter (domain column: \"Twitter\"). CreoleVal does vendor this one directly in-repo (nlu/sa/data/Oyewusi/*.tsv, 14,003 lines total, inspected directly during this pocket's build -- content is plainly tweet-style text: emoji, hashtag-like fragments, football-commentary and current-events chatter). With no license statement discoverable anywhere (CreoleVal's README, the data files themselves, or the upstream Data Science Nigeria repo it cites) and a Twitter-scrape origin, this is exactly the \"genuinely ambiguous license + scraped social media against a platform's ToS\" case this repo's staging rules say must not be staged. No content from this dataset was copied into the pocket."
+    },
+    {
+      "dataset": "JamPatoisNLI",
+      "task": "Natural Language Inference",
+      "languages": "jam (Jamaican Patois)",
+      "status": "GATED -- not staged",
+      "reason": "CreoleVal's own README table lists this dataset's license as \"Unspecified\", domain \"Twitter, web\". Independently verified by fetching https://github.com/ruth-ann/jampatoisnli directly: no LICENSE file exists in that repository (404), and its README describes \"naturally-occurring premises\" with no license statement anywhere. This is not vendored in the CreoleVal repo itself (only a download script, nlu/nli/download_jampatois_nli.sh, exists), so nothing was fetched from the upstream repo either -- both the unclear license and the social-media-adjacent sourcing independently argue against staging this one."
+    },
+    {
+      "dataset": "machamp and yanmtt git submodules",
+      "task": "N/A -- training toolkit code, not creole-language data",
+      "languages": "N/A",
+      "status": "OUT OF SCOPE -- not staged",
+      "reason": "These are the two git submodules CreoleVal depends on for model training (MaChAmp: multi-task NLP training toolkit, MIT License; YANMTT: Yet Another Neural Machine Translation Toolkit, MIT License). Both were cloned successfully (git clone --recursive) and inspected; both contain only Python training/modeling code, no creole-language text or annotations. This repo (live_priors) collects source text for a text-analysis engine's priors, not training code, so these were left out as out-of-scope regardless of their (open) license."
+    }
+  ],
+  "verbatim_excerpt": {
+    "file": "11-multi-language/dialects-pidgins-creoles/creoleval/tatoeba_sentence_mining/jam-eng.tsv",
+    "language": "jam (Jamaican Patois) / eng",
+    "excerpt": "Gi mi da one deh.\tI love you.\t18\tGive me that one there.\t23"
+  }
+}

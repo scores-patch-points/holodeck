@@ -1,0 +1,39 @@
+{
+  "schema": "SovereigntyPrior@1",
+  "giver": {
+    "resource": "the human-rights instruments that ground data sovereignty (privacy of stored/communicated data)",
+    "instruments": [
+      { "id": "udhr-12", "name": "Universal Declaration of Human Rights, Article 12", "right": "privacy — no arbitrary interference with privacy, family, home, or correspondence", "text": "live_priors/06-government-legal/un-udhr/udhr-eng.txt" },
+      { "id": "iccp r-17", "name": "International Covenant on Civil and Political Rights, Article 17", "right": "privacy, in treaty form" },
+      { "id": "eu-charter-8", "name": "EU Charter of Fundamental Rights, Article 8", "right": "protection of personal data — processed fairly, on consent or a legitimate basis, with access and rectification" },
+      { "id": "convention-108", "name": "Council of Europe Convention 108+ (CETS 223)", "right": "the only binding multilateral treaty on automatic processing of personal data" },
+      { "id": "care", "name": "CARE Principles for Indigenous Data Governance (Global Indigenous Data Alliance)", "right": "Collective benefit, Authority to control, Responsibility, Ethics" },
+      { "id": "ocap", "name": "OCAP (First Nations Information Governance Centre)", "right": "Ownership, Control, Access, Possession" }
+    ]
+  },
+  "note": "A curated index over the named instruments (prose, not parseable data — disclosed as received, not derived, the same way the operator-precedence table is). Data sovereignty has no single UDHR-equivalent declaration; it is fragmented across a treaty, a charter article, a regulation, and an Indigenous framework. This prior assembles the common architectural shapes those instruments license, so a generator can GRAVITATE toward them rather than cite them.",
+  "principles": [
+    { "name": "end-to-end encryption", "grounding": ["udhr-12", "eu-charter-8"], "note": "the data is unreadable to any operator — privacy by construction, not by policy" },
+    { "name": "local-first", "grounding": ["ocap"], "note": "the person's data lives on their device and syncs peer-to-peer; the server is not the home" },
+    { "name": "zero-knowledge", "grounding": ["eu-charter-8"], "note": "the operator never holds plaintext or keys" },
+    { "name": "data minimization", "grounding": ["eu-charter-8", "convention-108"], "note": "collect and retain the least the task requires" },
+    { "name": "consent by default", "grounding": ["eu-charter-8", "care"], "note": "opt-in, granular, revocable" },
+    { "name": "deletion and portability", "grounding": ["eu-charter-8", "convention-108"], "note": "the person can delete their data and take it with them" },
+    { "name": "self-hosting and open protocol", "grounding": ["care", "ocap"], "note": "no single operator owns the layer — federation over centralization" }
+  ],
+  "signals": {
+    "protocols": ["matrix", "xmpp", "activitypub", "nostr", "ssb", "solid"],
+    "crypto": ["e2ee", "end-to-end encryption", "olm", "megolm", "double ratchet", "signal protocol", "zero-knowledge", "zk", "libsodium", "nacl"],
+    "architecture": ["local-first", "self-hosted", "federated", "decentralized", "peer-to-peer", "p2p", "crdt", "offline-first"],
+    "domain": ["messag", "chat", "mail", "email", "contact", "account", "identit", "auth", "login", "credential", "stor", "data", "database", "sync", "backup", "upload", "share", "publish", "social", "communit", "host", "server", "cloud", "file", "photo", "calendar", "note", "wallet", "payment", "profile", "record", "ledger"]
+  },
+  "counts": {
+    "instruments": 6,
+    "principles": 7,
+    "protocolSignals": 6,
+    "cryptoSignals": 11,
+    "architectureSignals": 9,
+    "domainSignals": 32
+  },
+  "builtAt": "2026-09-15T00:00:00.000Z"
+}

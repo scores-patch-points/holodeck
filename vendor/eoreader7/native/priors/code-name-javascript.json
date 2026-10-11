@@ -1,0 +1,3075 @@
+{
+ "schema": "CodeNamePrior@1",
+ "language": "javascript",
+ "provenance": {
+  "giver": "per-language TRAIN-only measurement of the CodeNamePrior@1: the manifest's javascript TRAIN split (a treebank-like corpus of 4 permissively licensed repositories); recipe identical to the family `js` recipe of scripts/build-code-name-prior-split.mjs and to the js recipes of adapters/text/code-structure.js; sum-checked entry for entry against the unmodified split builder run on the same files (409 (name, repo) attestations) and against an independent per-repository partition",
+  "split": "train",
+  "family": "js",
+  "manifest": "/private/tmp/claude-501/code-corpus/manifest.json",
+  "manifestGeneratedAt": "2026-10-05T20:16:47Z",
+  "splitRule": "BY REPOSITORY: sha256(lower(owner/repo)) mod 4 -> {0,1:train, 2:dev, 3:test}",
+  "trainRepos": [
+   "ElemeFE/element",
+   "TanStack/query",
+   "conductor-oss/conductor",
+   "sveltejs/svelte"
+  ],
+  "trainRepoFiles": {
+   "ElemeFE/element": 60,
+   "TanStack/query": 60,
+   "conductor-oss/conductor": 60,
+   "sveltejs/svelte": 60
+  },
+  "trainRepoDetails": [
+   {
+    "repo": "ElemeFE/element",
+    "url": "https://github.com/ElemeFE/element",
+    "commit": "c345bb453bf11badb4831a6a3f600c9372b3a336",
+    "license": "mit",
+    "fetched_at": "2026-10-05T19:27:48Z",
+    "files": 60
+   },
+   {
+    "repo": "TanStack/query",
+    "url": "https://github.com/TanStack/query",
+    "commit": "d169ee87786c250ccc791f5b22c40141a489ec88",
+    "license": "mit",
+    "fetched_at": "2026-10-05T19:27:50Z",
+    "files": 60
+   },
+   {
+    "repo": "conductor-oss/conductor",
+    "url": "https://github.com/conductor-oss/conductor",
+    "commit": "ab2de6da6c7b5935e6c6d09da29953b8d4cfe291",
+    "license": "apache-2.0",
+    "fetched_at": "2026-10-05T19:28:20Z",
+    "files": 60
+   },
+   {
+    "repo": "sveltejs/svelte",
+    "url": "https://github.com/sveltejs/svelte",
+    "commit": "7c2fcdae6a29fb3b36855dc8e86eb7ce4c56b93a",
+    "license": "mit",
+    "fetched_at": "2026-10-05T19:28:20Z",
+    "files": 60
+   }
+  ],
+  "trainFiles": 240,
+  "trainFilesDigestSha256": "718672a8199e894192adc26786206189aec4745fd9b89840d078b0aedd539688",
+  "recipeFiles": 223,
+  "filesNotInRecipeFamily": {
+   "ext": ".cjs",
+   "files": 17,
+   "note": "the family recipe's extension list (.ts .tsx .js .mjs .jsx) has no .cjs; these TRAIN files are not tallied"
+  },
+  "filesExcluded": {
+   "restricted_licence": []
+  },
+  "recipe": {
+   "patterns": [
+    {
+     "source": "^[ \\t]*(?:export\\s+)?(?:default\\s+)?(?:async\\s+)?function\\s*\\*?\\s+([A-Za-z_$][\\w$]*)",
+     "flags": "gm",
+     "kind": "function"
+    },
+    {
+     "source": "^[ \\t]*(?:export\\s+)?(?:default\\s+)?(?:abstract\\s+)?class\\s+([A-Za-z_$][\\w$]*)",
+     "flags": "gm",
+     "kind": "class"
+    },
+    {
+     "source": "^[ \\t]*(?:export\\s+)?const\\s+([A-Za-z_$][\\w$]*)\\s*=\\s*(?:async\\s*)?\\(?[^=]*?\\)?\\s*=>",
+     "flags": "gm",
+     "kind": "function"
+    }
+   ],
+   "exts": [
+    ".ts",
+    ".tsx",
+    ".js",
+    ".mjs",
+    ".jsx"
+   ],
+   "note": "ASCII identifiers only (the split builder's recipe); function and class declarations and const-arrow bindings; no methods, no var/let-bound function expressions, no object-literal members"
+  },
+  "builder": "eval/coding-competence/build-javascript-priors.mjs",
+  "builtOn": "2026-10-06",
+  "sumCheck": {
+   "reference": "scripts/build-code-name-prior-split.mjs (unmodified)",
+   "entryForEntryEqual": true,
+   "entries": 407,
+   "perRepoPartitionSum": 409,
+   "pooledAttestations": 409
+  },
+  "validity": {
+   "recipeVsGrammar": {
+    "precision": 0.6185819070904646,
+    "targetedRecall": 1,
+    "overallRecall": 0.6067146282973621,
+    "regexPairs": 409,
+    "goldPairs": 417,
+    "verdicts": {
+     "N3a": "fail",
+     "N3b": "pass"
+    }
+   },
+   "readerAgreement": "pass"
+  },
+  "genericityVsHeldOutRepo": {
+   "design": "leave-one-repository-out inside TRAIN; names declared in >=2 of the other repos vs exactly 1, hit = declared in the held-out repo",
+   "pooledLift": 0,
+   "rateG": 0,
+   "rateS": 0.003281378178835111,
+   "controlMedianLift": 0.8511904761904763,
+   "controlMaxLift": 1.5934974990380917,
+   "verdict": "unlicensed"
+  },
+  "gaps": [
+   {
+    "gap": "members-and-bound-expressions-not-tallied",
+    "note": "methods, object-literal members and var/let-bound function expressions are not read by the recipe (see validity.recipeVsGrammar.overallRecall)"
+   },
+   {
+    "gap": "cjs-not-tallied",
+    "files": 17,
+    "declarationsTheRecipeWouldFind": 95
+   },
+   {
+    "gap": "non-ascii-identifiers",
+    "nonAsciiDeclarations": 0,
+    "of": 510,
+    "note": "Unicode identifier names are not counted by the ASCII recipe"
+   },
+   {
+    "gap": "four-train-repos",
+    "note": "genericity at floor 2 rests on 4 repositories; a name is generic here only if it recurs in 2 of 4"
+   },
+   {
+    "gap": "no-typescript",
+    "note": "the js family also covers .ts/.tsx; this language's TRAIN split holds none, so this prior is javascript-only"
+   }
+  ],
+  "postHoc": {
+   "post_hoc": true,
+   "writtenAfter": "the first run's N3a fail, R3 fail and N4 unlicensed were seen",
+   "script": "eval/coding-competence/javascript-priors-posthoc.mjs",
+   "perPatternPrecision": [
+    {
+     "pattern": 0,
+     "kind": "function",
+     "source": "^[ \\t]*(?:export\\s+)?(?:default\\s+)?(?:async\\s+)?function\\s*\\*?\\s+([A-Za-z_$][\\w$]*)",
+     "pairs": 133,
+     "precision": 1,
+     "recall": 0.31894484412470026,
+     "targetedRecall": 0.9851851851851852
+    },
+    {
+     "pattern": 1,
+     "kind": "class",
+     "source": "^[ \\t]*(?:export\\s+)?(?:default\\s+)?(?:abstract\\s+)?class\\s+([A-Za-z_$][\\w$]*)",
+     "pairs": 2,
+     "precision": 1,
+     "recall": 0.004796163069544364,
+     "targetedRecall": 0.014814814814814815
+    },
+    {
+     "pattern": 2,
+     "kind": "function",
+     "source": "^[ \\t]*(?:export\\s+)?const\\s+([A-Za-z_$][\\w$]*)\\s*=\\s*(?:async\\s*)?\\(?[^=]*?\\)?\\s*=>",
+     "pairs": 274,
+     "precision": 0.4306569343065693,
+     "recall": 0.2829736211031175,
+     "targetedRecall": 0
+    }
+   ],
+   "proposedTightening": {
+    "pattern": "^[ \\t]*(?:export\\s+)?const\\s+([A-Za-z_$][\\w$]*)\\s*=\\s*(?:async\\s*)?(?:\\([^()]*\\)|[A-Za-z_$][\\w$]*)\\s*=>",
+    "applied": false,
+    "note": "PROPOSED, not applied: replace the third (const-arrow) pattern in adapters/text/code-structure.js and scripts/build-code-name-prior-split.mjs, then rebuild",
+    "current": {
+     "pairs": 409,
+     "precision": 0.6185819070904646,
+     "recall": 0.6067146282973621,
+     "targetedRecall": 1
+    },
+    "tightened": {
+     "pairs": 255,
+     "precision": 1,
+     "recall": 0.6115107913669064,
+     "targetedRecall": 1
+    }
+   },
+   "genericityOverGrammarCoreNames": {
+    "names": 479,
+    "atOrAboveFloor2": 10,
+    "pooledLift": 0,
+    "pooledG": 20,
+    "pooledHitG": 0,
+    "controlMedian": 0.8755102040816326,
+    "controlMax": 1.4829924242424244,
+    "verdictByN4Rule": "unlicensed"
+   }
+  },
+  "note": "genericity is a fact about this language's own codebases: repos counts only the TRAIN repositories attesting the name through this recipe. The prior counts what the READER declares (the reader applies the same recipe, N7), false positives included; it is therefore not a list of real functions (see validity.recipeVsGrammar). A name never attested is admitted (null from genericityOf), never refused. The older priors/code-name-js.json mixes ts/tsx/js from the ethos tree (2 repositories, some of which the manifest assigns to dev/test): it is not held-out safe; this file is."
+ },
+ "counts": {
+  "files": 223,
+  "repos": 4,
+  "totalBytes": 645063,
+  "distinctNames": 407,
+  "totalDeclarations": 510,
+  "namesAtOrAboveGenericFloor": 2
+ },
+ "names": {
+  "ALL_NODE_COUNT": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "AXIOM": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "ActionModule": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "App": {
+   "repos": 1,
+   "files": 4,
+   "kinds": [
+    "function"
+   ]
+  },
+  "Color": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "ColumnsSelector": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "ConstTag": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "CustomPort": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "DEFAULT_FILTER_OBJ": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "DELAY": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "DataTable": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "DateRangePicker": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "DiagramTest": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "DroppablePlace": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "Each_string_template": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "ErrorsInspector": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "ExecutionHistory": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "ExportSpecifier": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "ExpressionStatement": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "Filter": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "Header": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "INLINETask": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "Icon": {
+   "repos": 1,
+   "files": 4,
+   "kinds": [
+    "function"
+   ]
+  },
+  "JSONJQTransformTask": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "JSON_CONTENT_TYPE": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "KAFKATask": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "NAN": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "Notification": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "PlusIcon": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "ProgressIcon": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "PropertyDefinition": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "SaveSchedulerDialog": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "ScheduleDiffEditor": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "ScheduleNameInput": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "SchedulerDisabledBanner": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "SimpleTask": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "StarShape": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "StartWorkflowTask": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "SwitchJoin": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "Tab": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "Tabs": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "TaskDefinition": {
+   "repos": 1,
+   "files": 2,
+   "kinds": [
+    "function"
+   ]
+  },
+  "TaskHumanForm": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "TaskList": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "TaskLogs": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "TaskSummary": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "TimeSeriesChart": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "UpdateExpression": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "WorkflowDefinitions": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "WorkflowPanel": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "WorkflowTypeChart": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "ZoomControls": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "add_const_declaration": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "allAliases": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "allEdgesAreConnectedToNodes": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "anEventTask": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "auto": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "block": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "body": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "btn": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "btnNext": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "btnPrev": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "buildProjectsPage": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "buildQuery": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "buildQueryString": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "button": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "calculateMetrics": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "carousel": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "cell": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "changeValue": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "checkedKeys": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "checkedOption": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "child": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "client": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "closeBtn": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "col": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "column": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "columnKey": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "columns": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "compare": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "comparison": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "configObj": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "configureMonaco": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "consumeFailNextDataRequest": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "consumeNextDataDelay": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "createBrowserQueryClient": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "createSeedProjects": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "createTransfer": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "currentNodeLabel": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "cwd": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "dataTableColumns": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "date": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "decisionCase1Edge": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "decisionDefaultCaseEdge": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "decisionDefaultCaseEdgeInvalid": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "decisionDefaultCaseEdgeValid": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "decisionKeys": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "defaultCallback": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "defaultCaseNodeNames": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "defaultColumns": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "defaultRenderCell": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "derived": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "diffEditorDidMount": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "doReset": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "doSearch": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "domains": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "dynamicAliases": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "editorDidMount": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "effectiveWorkflowDefs": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "el": {
+   "repos": 1,
+   "files": 2,
+   "kinds": [
+    "function"
+   ]
+  },
+  "elm": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "emptyBranchDecsionIdx": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "encode": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "entries": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "extractNodeId": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "extractSubWorkflowNames": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "fakeNodeForSwitch": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "fetchContext": {
+   "repos": 1,
+   "files": 3,
+   "kinds": [
+    "function"
+   ]
+  },
+  "fetchForWorkflowDefinition": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "filterConfigType": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "filterGlobalValue": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "filterNonSwitch": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "filteredItems": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "firstNode": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "firstRow": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "formData": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "formDataToRunPayload": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "forwardOutput": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "fromHSV": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "get": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "getActionDisplayName": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "getBody": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "getClientHeight": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "getCloseButton": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "getColumnId": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "getColumnLabel": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "getColumnLabelById": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "getDisableTreeVm": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "getElementTop": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "getError": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "getExpanded": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "getHashCode": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "getLang": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "getMenus": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "getNameFromI18N": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "getOffsetHeight": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "getOptions": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "getPositionSize": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "getScrollOptions": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "getSizesMap": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "getStatusColor": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "getStatusData": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "getStyleComputedProperty": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "getStyleDisplayName": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "getStyleDisplayValue": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "getTestData": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "getTimeseriesData": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "getTreeVm": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "getVariableDisplayName": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "getWorkflowTypeData": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "get_type": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "get_user_code_location": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "globalArr": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "globalEle": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "grouped": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "groupedByStatus": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "groupedByType": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "handleChange": {
+   "repos": 1,
+   "files": 2,
+   "kinds": [
+    "function"
+   ]
+  },
+  "handleChangeTest": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "handleClick": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "handleClose": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "handleColumnChange": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "handleCompleteTask": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "handleEditorDidMount": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "handleEditorWillMount": {
+   "repos": 1,
+   "files": 2,
+   "kinds": [
+    "function"
+   ]
+  },
+  "handleFilterChange": {
+   "repos": 1,
+   "files": 2,
+   "kinds": [
+    "function"
+   ]
+  },
+  "handleLookback": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "handleOpenSave": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "handlePage": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "handleReasonForIncompletionClick": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "handleRefresh": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "handleRowsPerPage": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "handleSave": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "handleSaveSuccess": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "handleSort": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "handleStartFrom": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "handleStartTo": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "handleTimePeriodClick": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "handleValidate": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "handleValueChange": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "handleWorkflowTypeClick": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "hydratable": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "icon": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "initData": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "initInstance": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "initStatus": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "input": {
+   "repos": 2,
+   "files": 2,
+   "kinds": [
+    "function"
+   ]
+  },
+  "inputElm": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "instance": {
+   "repos": 1,
+   "files": 2,
+   "kinds": [
+    "function"
+   ]
+  },
+  "isLength": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "isNonSwitchPred": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "isSchedulerDisabled": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "is_promise": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "item": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "items": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "joinNode": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "key": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "label": {
+   "repos": 2,
+   "files": 3,
+   "kinds": [
+    "function"
+   ]
+  },
+  "lang": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "lastKey": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "lazyKeys": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "leafCheckbox": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "leftList": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "legacyConfig": {
+   "repos": 1,
+   "files": 2,
+   "kinds": [
+    "function"
+   ]
+  },
+  "loadFromLocal": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "loadPreviewFromLocal": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "loadUserThemeFromLocal": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "log_entry": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "maybeAddButton": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "maybeFailMutation": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "message": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "metrics": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "modernConfig": {
+   "repos": 1,
+   "files": 2,
+   "kinds": [
+    "function"
+   ]
+  },
+  "modified": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "newData": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "newForkTask": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "newTaskTemplate": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "newWorkflowTemplate": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "next": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "nextDataResponse": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "node": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "nodeCheckbox": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "nodeData": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "nodeMap": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "nodes": {
+   "repos": 1,
+   "files": 2,
+   "kinds": [
+    "function"
+   ]
+  },
+  "nodesName": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "nodesToMap": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "normalizeUrlHost": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "northPorts": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "nums": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "onSuccess": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "options": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "opts": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "outcome": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "p": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "pagers": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "paneList": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "parentNode": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "parse": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "parseNonNegativeDelayMs": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "parseNonNegativeInt": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "parsePositiveInt": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "parseValue": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "parts": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "path": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "pathRoot": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "pop_element": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "print_error": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "processExports": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "projectIndex": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "push_element": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "query": {
+   "repos": 1,
+   "files": 4,
+   "kinds": [
+    "function"
+   ]
+  },
+  "readJsonBody": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "readPortFromEnv": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "readTemplate": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "readable": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "readonly": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "refreshData": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "regexp": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "removePreviewFromLocal": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "renderPage": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "repeatTasks": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "replaceDist": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "res": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "reset": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "resetApiState": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "resetReasonForIncompletionFilter": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "resetState": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "resetTimePeriodFilter": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "resetWorkflowTypeFilter": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "resolveAuthorForPR": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "resolveConnectHost": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "resolvePort": {
+   "repos": 1,
+   "files": 2,
+   "kinds": [
+    "function"
+   ]
+  },
+  "resolvePublicOrigin": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "resolveUsername": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "result": {
+   "repos": 1,
+   "files": 2,
+   "kinds": [
+    "function"
+   ]
+  },
+  "resultsMap": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "root": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "router": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "rows": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "run": {
+   "repos": 1,
+   "files": 2,
+   "kinds": [
+    "function"
+   ]
+  },
+  "runBuild": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "savePreviewToLocal": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "saveToLocal": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "saveUserThemeToLocal": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "searchObj": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "secondNode": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "selectedOption": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "serialization_stack": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "serializeJsonForHtml": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "serveAsset": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "server": {
+   "repos": 1,
+   "files": 2,
+   "kinds": [
+    "function"
+   ]
+  },
+  "set": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "setTaskName": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "showNextMsg": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "shutdown": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "sleep": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "sortedTypes": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "source": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "spy": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "spyBlur": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "stack": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "start": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "statements": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "statusData": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "statusToColor": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "stop": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "stopServer": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "stressGraph": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "stringify": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "stringifyValue": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "stripScript": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "stripStyle": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "stripTemplate": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "styles": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "subWorkflowNames": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "subscribe": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "suggestionList": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "suggestions": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "switchTaskNode": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "switchTaskWithUnterminatedBranch": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "sync": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "tabList": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "tag": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "tag_proxy": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "tags": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "targetItems": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "taskDetailFields": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "taskJson": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "taskTypeSet": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "terminalClick": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "terminateEdge": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "textNodes": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "thunks": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "timeRangeOption": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "timer": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "timeseriesData": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "toNum": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "toPx": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "totalTime": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "trace": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "transfer": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "transform_async_node": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "transform_body": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "traverseTasks": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "tree": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "treeCellPrefix": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "typeIndex": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "undefinedNodeIdx": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "uniqueDefs": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "uniqueWorkflowDefs": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "unsubscribers": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "unterminatedTasks": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "update": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "upload": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "useBulkDeleteAction": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "useBulkPauseAction": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "useBulkRestartAction": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "useBulkRestartLatestAction": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "useBulkResumeAction": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "useBulkRetryAction": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "useBulkTerminateAction": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "useBulkTerminateWithReasonAction": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "useFetchForWorkflowDefinition": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "useInvalidateWorkflows": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "useLatestWorkflowDefs": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "usePauseAction": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "useRestartAction": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "useRestartLatestAction": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "useResumeAction": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "useRetryAction": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "useRetryResumeSubworkflowTasksAction": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "useSaveWorkflow": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "useStartWorkflow": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "useStyles": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "useTerminateAction": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "useWorkflow": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "useWorkflowDef": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "useWorkflowDefs": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "useWorkflowNames": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "useWorkflowNamesAndVersions": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "useWorkflowSearch": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "useWorkflowVersions": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "useWorkflowsByIds": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "validateOwner": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "validateProjectName": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "validate_snippet_args": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "value": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "vm": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "waitImmediate": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "workflowIds": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "workflowTypeData": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "workflows": {
+   "repos": 1,
+   "files": 2,
+   "kinds": [
+    "function"
+   ]
+  },
+  "writable": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "writeBuffer": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "writeHtml": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "writeJson": {
+   "repos": 1,
+   "files": 2,
+   "kinds": [
+    "function"
+   ]
+  }
+ },
+ "builtAt": "2026-10-06T06:02:47.964Z"
+}

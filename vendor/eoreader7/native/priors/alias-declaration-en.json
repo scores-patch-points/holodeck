@@ -1,0 +1,176 @@
+{
+ "schema": "AliasDeclarationPrior@1",
+ "language": "en",
+ "provenance": {
+  "source": "live_priors corpus: 02-encyclopedic, 06-government-legal, 15-western-canon, 05-academic-papers",
+  "license": "per-work; see SOURCES.md",
+  "built_by": "scripts/build-alias-prior.mjs",
+  "files_read": 900,
+  "bytes_read": 20772137,
+  "min_uses": 2,
+  "note": "Shapes are CANDIDATES TESTED against the corpus, never a list asserted to be right. A shape FIRES when it matches; it is CONFIRMED when the form it introduced is used at least min_uses times in the same document, the declaration counting as one. confirm_rate is confirmed/fires. A consumer applies its own floor: this prior measures, it does not decide. No rule here derives a name from another name — an initialism is admitted only where a document declares it, which is why acronyms need no rule of their own."
+ },
+ "min_uses": 2,
+ "shapes": {
+  "parenthetical": {
+   "connective": "( )",
+   "source": "((?:[A-Z][\\w'’-]*)(?:\\s+(?:of|the|and|for|de|van|von|[A-Z][\\w'’-]*))*)\\s*\\(\\s*([^()\\n]{1,60}?)\\s*\\)",
+   "full_group": 1,
+   "alias_group": 2,
+   "fires": 23375,
+   "confirmed": 11163,
+   "refused_not_a_name": 5797,
+   "refused_same_as_full": 10,
+   "confirm_rate": 0.4776,
+   "examples": [
+    {
+     "full": "Geometry",
+     "alias": "Axioms",
+     "uses": 4,
+     "file": "02-encyclopedic/1911-britannica/EB1911_Mathematics.txt"
+    },
+    {
+     "full": "Psychology",
+     "alias": "q.v.",
+     "uses": 6,
+     "file": "02-encyclopedic/1911-britannica/EB1911_Philosophy.txt"
+    },
+    {
+     "full": "Aesthetics",
+     "alias": "q.v.",
+     "uses": 6,
+     "file": "02-encyclopedic/1911-britannica/EB1911_Philosophy.txt"
+    },
+    {
+     "full": "Hobbes",
+     "alias": "Leviathan",
+     "uses": 2,
+     "file": "02-encyclopedic/1911-britannica/EB1911_Sociology.txt"
+    },
+    {
+     "full": "Locke",
+     "alias": "Two Treatises of Government",
+     "uses": 2,
+     "file": "02-encyclopedic/1911-britannica/EB1911_Sociology.txt"
+    }
+   ]
+  },
+  "also-known-as": {
+   "connective": "also known as",
+   "source": "((?:[A-Z][\\w'’-]*)(?:\\s+(?:of|the|and|for|de|van|von|[A-Z][\\w'’-]*))*)\\s*,?\\s+also known as\\s+([A-Z][\\w'’.&-]*(?:\\s+[\\w'’.&-]+){0,3})",
+   "full_group": 1,
+   "alias_group": 2,
+   "fires": 10,
+   "confirmed": 1,
+   "refused_not_a_name": 0,
+   "refused_same_as_full": 0,
+   "confirm_rate": 0.1,
+   "examples": [
+    {
+     "full": "History",
+     "alias": "Constantine the Great",
+     "uses": 2,
+     "file": "02-encyclopedic/wikipedia/Byzantine_Empire.txt"
+    }
+   ]
+  },
+  "known-as": {
+   "connective": "known as",
+   "source": "((?:[A-Z][\\w'’-]*)(?:\\s+(?:of|the|and|for|de|van|von|[A-Z][\\w'’-]*))*)\\s*,?\\s+known as\\s+([A-Z][\\w'’.&-]*(?:\\s+[\\w'’.&-]+){0,3})",
+   "full_group": 1,
+   "alias_group": 2,
+   "fires": 6,
+   "confirmed": 1,
+   "refused_not_a_name": 0,
+   "refused_same_as_full": 0,
+   "confirm_rate": 0.1667,
+   "examples": [
+    {
+     "full": "Dnipro",
+     "alias": "Ukraine's",
+     "uses": 7,
+     "file": "06-government-legal/world-factbook/europe_up.txt"
+    }
+   ]
+  },
+  "or": {
+   "connective": ", or",
+   "source": "((?:[A-Z][\\w'’-]*)(?:\\s+(?:of|the|and|for|de|van|von|[A-Z][\\w'’-]*))*)\\s*,\\s+or\\s+([A-Z][\\w'’.&-]*(?:\\s+[\\w'’.&-]+){0,3})\\s*,",
+   "full_group": 1,
+   "alias_group": 2,
+   "fires": 13,
+   "confirmed": 3,
+   "refused_not_a_name": 0,
+   "refused_same_as_full": 0,
+   "confirm_rate": 0.2308,
+   "examples": [
+    {
+     "full": "Shiva",
+     "alias": "Shakti",
+     "uses": 11,
+     "file": "02-encyclopedic/wikipedia/Hinduism.txt"
+    },
+    {
+     "full": "Jew",
+     "alias": "Christian",
+     "uses": 11,
+     "file": "02-encyclopedic/wikipedia/Islam.txt"
+    },
+    {
+     "full": "Mazdaism",
+     "alias": "Zoroastrianism",
+     "uses": 103,
+     "file": "02-encyclopedic/wikipedia/Zoroastrianism.txt"
+    }
+   ]
+  },
+  "abbreviated": {
+   "connective": "abbreviated",
+   "source": "((?:[A-Z][\\w'’-]*)(?:\\s+(?:of|the|and|for|de|van|von|[A-Z][\\w'’-]*))*)\\s*,?\\s+abbreviated\\s+([A-Z][\\w'’.&-]*(?:\\s+[\\w'’.&-]+){0,3})",
+   "full_group": 1,
+   "alias_group": 2,
+   "fires": 1,
+   "confirmed": 0,
+   "refused_not_a_name": 0,
+   "refused_same_as_full": 0,
+   "confirm_rate": 0,
+   "examples": []
+  },
+  "short-for": {
+   "connective": "short for",
+   "source": "([A-Z][\\w'’.&-]*(?:\\s+[\\w'’.&-]+){0,3})\\s*,\\s+short for\\s+((?:[A-Z][\\w'’-]*)(?:\\s+(?:of|the|and|for|de|van|von|[A-Z][\\w'’-]*))*)",
+   "full_group": 2,
+   "alias_group": 1,
+   "fires": 0,
+   "confirmed": 0,
+   "refused_not_a_name": 0,
+   "refused_same_as_full": 0,
+   "confirm_rate": null,
+   "examples": []
+  },
+  "dba": {
+   "connective": "doing business as",
+   "source": "((?:[A-Z][\\w'’-]*)(?:\\s+(?:of|the|and|for|de|van|von|[A-Z][\\w'’-]*))*)\\s*,?\\s+(?:d\\/b\\/a|doing business as)\\s+([A-Z][\\w'’.&-]*(?:\\s+[\\w'’.&-]+){0,3})",
+   "full_group": 1,
+   "alias_group": 2,
+   "fires": 0,
+   "confirmed": 0,
+   "refused_not_a_name": 0,
+   "refused_same_as_full": 0,
+   "confirm_rate": null,
+   "examples": []
+  },
+  "formerly": {
+   "connective": "formerly",
+   "source": "((?:[A-Z][\\w'’-]*)(?:\\s+(?:of|the|and|for|de|van|von|[A-Z][\\w'’-]*))*)\\s*,?\\s+formerly\\s+([A-Z][\\w'’.&-]*(?:\\s+[\\w'’.&-]+){0,3})",
+   "full_group": 1,
+   "alias_group": 2,
+   "fires": 3,
+   "confirmed": 0,
+   "refused_not_a_name": 0,
+   "refused_same_as_full": 0,
+   "confirm_rate": 0,
+   "examples": []
+  }
+ }
+}

@@ -1,0 +1,64 @@
+{
+ "name": "RisingSunChromaPrior@1",
+ "givers": [
+  "Josh White and his Guitar, House Of The Rising Sun, 1942 — Internet Archive 78rpm digitized by George Blood L.P. / Archive of Contemporary Music (live_priors/10-audio-music/downloads/78rpm/josh-white-house-of-the-rising-sun/restored-22050.wav; source item license unknown — heard as prior, never redistributed)",
+  "ears: eoreader7 wav.js decode → fft magnitudes → chroma12 @4096/1024 (reading.js field rate), Hann window; voiced = top-65% frame energy + chroma confidence ≥0.45; melody = argmax class run-compressed",
+  "method: same shape metrics as thea-bach-prior.json (turns/repeats per 12, class grain) — directly comparable grounds"
+ ],
+ "sampleRate": 22050,
+ "seconds": 182.2,
+ "frames": 3920,
+ "melodyClasses": 633,
+ "chromaProfile": {
+  "C": 0.3204,
+  "C#": 0.1662,
+  "D": 0.2384,
+  "D#": 0.2009,
+  "E": 0.1873,
+  "F": 0.2127,
+  "F#": 0.2536,
+  "G": 0.3209,
+  "G#": 0.1667,
+  "A": 0.1663,
+  "A#": 0.1794,
+  "B": 0.2242
+ },
+ "topClasses": [
+  [
+   "G",
+   0.3209
+  ],
+  [
+   "C",
+   0.3204
+  ],
+  [
+   "F#",
+   0.2536
+  ]
+ ],
+ "shape": {
+  "turnsPer12": {
+   "min": 4,
+   "median": 7,
+   "max": 10
+  },
+  "samesPer12": {
+   "min": 0,
+   "max": 0
+  },
+  "longestMonotoneRun": 6
+ },
+ "topBigrams": {
+  "11>0": 39,
+  "0>11": 28,
+  "6>5": 27,
+  "5>6": 25,
+  "2>3": 22,
+  "10>11": 21,
+  "11>10": 20,
+  "6>7": 18,
+  "3>2": 18,
+  "7>6": 16
+ }
+}

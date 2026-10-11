@@ -1,0 +1,2915 @@
+{
+ "schema": "SourceStructure@1",
+ "source": "05-academic-papers/ntrs-white-papers/20070032946_research-issues-in-image-registration-for-remote-sensing.txt",
+ "bytes": 48117,
+ "bodyOffset": 598,
+ "splitBasis": "362 sentence-punctuation splits",
+ "unsplit": false,
+ "unitCount": 363,
+ "units": [
+  {
+   "start": 598,
+   "end": 964,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 365",
+   "id": null,
+   "text": "Source of Acquisition\n                                                                                                        NASA Goddard Space Flight Center\n\n\n\n\n                    Research issues i"
+  },
+  {
+   "start": 964,
+   "end": 1055,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 456",
+   "id": null,
+   "text": "Eastman                           Jacqueline Le Moigne                           Nathan S."
+  },
+  {
+   "start": 1055,
+   "end": 1717,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 1118",
+   "id": null,
+   "text": "Netanyahu\n   Loyola College in Maryland                NASA Goddard Space Flight Center                     Bar-Ilan University\n      Baltimore, Maryland                          Greenbelt, Maryland  "
+  },
+  {
+   "start": 1717,
+   "end": 1865,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 1266",
+   "id": null,
+   "text": "Despite considerable investigation\nthejield has not settled on a dejinitive solution for most ap-\nplications and a number of questions remain open."
+  },
+  {
+   "start": 1865,
+   "end": 2166,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 1567",
+   "id": null,
+   "text": "This\narticle looks at selected research issues by surveying the ex-\nperience of operational satellite teams, application-specijic\nrequirementsfor Earth science, and our experiments in the\nevaluation o"
+  },
+  {
+   "start": 2166,
+   "end": 2366,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 1767",
+   "id": null,
+   "text": "We\nconclude that remote sensing applications put particular\ndemands on image registration algorithms to take into ac-\ncount domain-specijic knowledge of geometric transforma-\ntions and image content."
+  },
+  {
+   "start": 2366,
+   "end": 2443,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 1844",
+   "id": null,
+   "text": "Figure 1."
+  },
+  {
+   "start": 2443,
+   "end": 2500,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 1901",
+   "id": null,
+   "text": "Mulitsensor registration of ETM+ at 30m (surround) to\n1."
+  },
+  {
+   "start": 2500,
+   "end": 2805,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 2206",
+   "id": null,
+   "text": "Introduction                                                   IKONOS at Im (inset)\n\n    Image registration, the alignment of images and other\ndata for comparison and fusion, is an important element i"
+  },
+  {
+   "start": 2805,
+   "end": 3009,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 2410",
+   "id": null,
+   "text": "It finds many applica-          support of operational production of imagery products, can\ntions, including but not limited to the operational production      be quite automatic, efficient and effecti"
+  },
+  {
+   "start": 3009,
+   "end": 3595,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 2996",
+   "id": null,
+   "text": "However, many\nof satellite image products, validation and precision correc-    ,\n                                                                    end users still depend on labor-intensive manual se"
+  },
+  {
+   "start": 3595,
+   "end": 4317,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 3718",
+   "id": null,
+   "text": "This\ntion, atmospheric velocity computations, and land use anal-        article explores this disparity in the use of advanced tech-\nysis and planning.                                                 "
+  },
+  {
+   "start": 4317,
+   "end": 4343,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 3744",
+   "id": null,
+   "text": "Zitova and Flusser [35])."
+  },
+  {
+   "start": 4343,
+   "end": 4778,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 4179",
+   "id": null,
+   "text": "In an editorial on medical image            In this article we describe image registration as a process\nregistration Pluirn and Fitzpatrick 1221 note that since 1988      that aligns one Image lo anot"
+  },
+  {
+   "start": 4778,
+   "end": 5277,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 4678",
+   "id": null,
+   "text": "An image registration method can be defined\n\fby three main steps: (1) extraction of features to be used to       systematic correction, or directly by relating a new image\nmatch the imagery; (2) featu"
+  },
+  {
+   "start": 5277,
+   "end": 5332,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 4733",
+   "id": null,
+   "text": "From an early point in\na common coordinate system [5]."
+  },
+  {
+   "start": 5332,
+   "end": 5729,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 5130",
+   "id": null,
+   "text": "The transformations al-             sensor design they develop specifications that include im-\nlowed for alignment can vary, from translation only in x and        age registration reliability and accu"
+  },
+  {
+   "start": 5729,
+   "end": 5759,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 5160",
+   "id": null,
+   "text": "Many              quirements."
+  },
+  {
+   "start": 5759,
+   "end": 6223,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 5624",
+   "id": null,
+   "text": "Their knowledge of the satellite and sensor\ncurrent systems use two levels of transformation as they            enables them to model the radiometric and geometric trans-\nmatch CPs as small image regi"
+  },
+  {
+   "start": 6223,
+   "end": 6448,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 5849",
+   "id": null,
+   "text": "Some algorithms              Below we survey six representative operational systems to\nuse Digital Elevation Models (DEMs) to correct for parallax         look for characteristics and commonalities.\nc"
+  },
+  {
+   "start": 6448,
+   "end": 6653,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 6054",
+   "id": null,
+   "text": "ASTER is a 14-band multispectral imager launched in\n                                                                    1999 on the Terra (EOS-AMl) satellite."
+  },
+  {
+   "start": 6653,
+   "end": 6675,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 6076",
+   "id": null,
+   "text": "It has three sepa-\n2."
+  },
+  {
+   "start": 6675,
+   "end": 6890,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 6291",
+   "id": null,
+   "text": "Application requirements for image regis-                       rate image subsystems with individual telescopes that sam-\n   tration                                                         ple at 15m"
+  },
+  {
+   "start": 6890,
+   "end": 7029,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 6430",
+   "id": null,
+   "text": "Iwasaki and Fujisada 2005\n                                                                    [14] describe the image registration system."
+  },
+  {
+   "start": 7029,
+   "end": 7306,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 6707",
+   "id": null,
+   "text": "Image reg-\n    In part, the wide variation in image registration tech-         istration was intended to improve geolocation of imagery\nniques in remote sensing is a result of the wide variation in   "
+  },
+  {
+   "start": 7306,
+   "end": 7517,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 6918",
+   "id": null,
+   "text": "Fonseca and Manjunath 1121 noted this, pro-           position to within 0.2 pixels and adjust intertelescope posi-\nposed a rule-based system that would automatically select           tion to within 0"
+  },
+  {
+   "start": 7517,
+   "end": 7785,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 7186",
+   "id": null,
+   "text": "Registration is done to a database\nan appropriate method for an application and reviewed the           of about 300-600 CPs which were mapped on topographic\nliterature to characterize the available me"
+  },
+  {
+   "start": 7785,
+   "end": 7836,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 7237",
+   "id": null,
+   "text": "The similar-\nOur own work [16] supports this goal."
+  },
+  {
+   "start": 7836,
+   "end": 8014,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 7415",
+   "id": null,
+   "text": "In particular, we            ity measure is normalized correlation with transformation\nhave implemented a number of methods to evaluate them in           limited to translation."
+  },
+  {
+   "start": 8014,
+   "end": 8206,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 7607",
+   "id": null,
+   "text": "Subpixel estimation is calculated by\na consistent framework and to develop an online toolbox of          fitting a second-order polynomial to the correlation values.\ntechniques for end users."
+  },
+  {
+   "start": 8206,
+   "end": 8394,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 7795",
+   "id": null,
+   "text": "Matches are rejected for correlation less than 0.7 or when\n    This program also requires understanding application           clouds are detected."
+  },
+  {
+   "start": 8394,
+   "end": 8598,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 7999",
+   "id": null,
+   "text": "Validation of satellite performance was\nneeds to get an end-to-end view of how image registration          done in a retrospective study and the authors cite accuracies\nfits into overall data processi"
+  },
+  {
+   "start": 8598,
+   "end": 8679,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 8080",
+   "id": null,
+   "text": "The literature on image         of 50m, 0.2 pixels and 0.1 pixels, respectively."
+  },
+  {
+   "start": 8679,
+   "end": 8987,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 8388",
+   "id": null,
+   "text": "Problems\nregistration is dominated by articles advancing or propos-         were noted with parallax errors in high-elevation areas due\ning a new technique, with far fewer articles that document      "
+  },
+  {
+   "start": 8987,
+   "end": 9685,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 9086",
+   "id": null,
+   "text": "In this section      due to satellite jitter, failures by the cloud detection algo-\nwe look at issues in user requirements, dividing users into        rithm, and cross-band matching in scenes with con"
+  },
+  {
+   "start": 9685,
+   "end": 9733,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 9134",
+   "id": null,
+   "text": "Madani, Carr and Shoser 2004 [20] describe\n2.1."
+  },
+  {
+   "start": 9733,
+   "end": 9843,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 9244",
+   "id": null,
+   "text": "Operationalsystem requirements and practices                  the AutoLandmark system for image registration."
+  },
+  {
+   "start": 9843,
+   "end": 10079,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 9480",
+   "id": null,
+   "text": "GOES\n   Operational satellite science teams that support remote         geolocation requirements vary from night to day, from 4km\nsensing sensors rely on image registration for a number of         to "
+  },
+  {
+   "start": 10079,
+   "end": 10647,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 10048",
+   "id": null,
+   "text": "Registration is\npurposes, including updating a geometric model that relates        done to a database of coastlines represented in vector for-\na sensor to the navigation data (position and orientation"
+  },
+  {
+   "start": 10647,
+   "end": 11056,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 10457",
+   "id": null,
+   "text": "Geolocat-          This is matched to a binary image rasterized from the coast-\ning a satellite image relative to a ground coordinate system       line vector database, with a correlation measure of t"
+  },
+  {
+   "start": 11056,
+   "end": 11084,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 10485",
+   "id": null,
+   "text": "Cloud areas are masked out."
+  },
+  {
+   "start": 11084,
+   "end": 11203,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 10604",
+   "id": null,
+   "text": "Bisection search is used\ncorrection through registration of image features to previ-        to find subpixel maximums."
+  },
+  {
+   "start": 11203,
+   "end": 11262,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 10663",
+   "id": null,
+   "text": "Matches are rejected when a\nously located ground features."
+  },
+  {
+   "start": 11262,
+   "end": 11429,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 10830",
+   "id": null,
+   "text": "Precision cor~ectioncan be          fuzzy logic quality metric (QM) falls below a threshold of\ndone indirectly, by updating the camera models used for            0.9."
+  },
+  {
+   "start": 11429,
+   "end": 11750,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 11151",
+   "id": null,
+   "text": "The QM takes into account the quality of the edge cor-\n\f    ETM+               Landsat-7      15-60m           Correlation to arid region CPs*               Fit to correlation surface*\n    VEGETATION "
+  },
+  {
+   "start": 11750,
+   "end": 12033,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 11434",
+   "id": null,
+   "text": "Operational Image Registration Systems. * ETM+ information in table refers to band-to-bandregistration\n\n\nrelation, the fraction of cloud contamination, and the con-             HRS, or High Resolution"
+  },
+  {
+   "start": 12033,
+   "end": 12184,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 11585",
+   "id": null,
+   "text": "In the           2.5m, is an instrument on the SPOT 5 satellite launched in\ninfrared bands the daily warming/cooling cycle means land            2002."
+  },
+  {
+   "start": 12184,
+   "end": 12435,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 11836",
+   "id": null,
+   "text": "Baillarin et al. 2005 [3] describe the ANDORRE\nand water can reverse in radiation, causing coastal edges to         system with the TARIFA core for image fusion and recti-\ninvert, migrate and even dis"
+  },
+  {
+   "start": 12435,
+   "end": 12537,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 11938",
+   "id": null,
+   "text": "HRS requirements are 90% of points within 16m\n    MISR is a second instrument on the Terra satellite."
+  },
+  {
+   "start": 12537,
+   "end": 12596,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 11997",
+   "id": null,
+   "text": "Jo-          circular accuracy and 10m elevation accuracy."
+  },
+  {
+   "start": 12596,
+   "end": 12741,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 12142",
+   "id": null,
+   "text": "ANDORRE\nvanovic et al. 2002 [15] describe the geometric correction           uses an extensive database of orthoimagery tiles integrated\nsystem."
+  },
+  {
+   "start": 12741,
+   "end": 12949,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 12350",
+   "id": null,
+   "text": "It has 9 pushbroom cameras with four bands each,             with DEM data to generate, using ray tracing, a simulated\n                                                                     image for ma"
+  },
+  {
+   "start": 12949,
+   "end": 13093,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 12494",
+   "id": null,
+   "text": "Matching is done using multresolution\nall sampling at 275m, intended to image atmospheric ele-\nments from multiple angles for climate analysis."
+  },
+  {
+   "start": 13093,
+   "end": 13259,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 12660",
+   "id": null,
+   "text": "This repre-         search with the number of levels set to keep a 5x5 pixel size\nsents a particular challenge for geolocation of the multiple         search window."
+  },
+  {
+   "start": 13259,
+   "end": 13422,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 12823",
+   "id": null,
+   "text": "CPs are automatically found, matched by\ncameras with the objective of achieving better than 140m             correlation and used to calibrate a parametric model."
+  },
+  {
+   "start": 13422,
+   "end": 13564,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 12965",
+   "id": null,
+   "text": "Ge-\nuncertainty in absolute geolocation at nadir and between             ometric outliers and CPs with correlation coefficient below\ncameras."
+  },
+  {
+   "start": 13564,
+   "end": 13643,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 13044",
+   "id": null,
+   "text": "Registration has been done to a database of 120             0.80 are rejected."
+  },
+  {
+   "start": 13643,
+   "end": 14070,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 13471",
+   "id": null,
+   "text": "In the case of an inadequate number of tie\nground CPs, each a collection of 9 co-located 64x64 image            points the correlation threshold is lowered to 0.70 and the\nchips from Landsat Thematic "
+  },
+  {
+   "start": 14070,
+   "end": 14118,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 13519",
+   "id": null,
+   "text": "The\nidentifiable ground feature located to 30m."
+  },
+  {
+   "start": 14118,
+   "end": 14295,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 13696",
+   "id": null,
+   "text": "Each CP was\nselected for seasonally invariant features and then mapped           authors cite a final circular error of 2m for 88% of the points\ninto terrain-corrected imagery."
+  },
+  {
+   "start": 14295,
+   "end": 14352,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 13753",
+   "id": null,
+   "text": "A ray-casting algorithm is           in 100 test images."
+  },
+  {
+   "start": 14352,
+   "end": 14533,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 13934",
+   "id": null,
+   "text": "Problems occur due to seasonal changes,\nused to warp each chip to the appropriate geometry for the           low intensity images and homogenous subscenes.\nappropriate MISR camera."
+  },
+  {
+   "start": 14533,
+   "end": 14832,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 14233",
+   "id": null,
+   "text": "Chip matching is done to sub-\n                                                                         ETM+ is an instrument on the Landsat-7 satellite\npixel accuracy in translation, potentially to 11"
+  },
+  {
+   "start": 14832,
+   "end": 14907,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 14308",
+   "id": null,
+   "text": "Lee et al. [I91 describe the extensive on-\nleast squares optimization [l]."
+  },
+  {
+   "start": 14907,
+   "end": 15200,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 14601",
+   "id": null,
+   "text": "Cloud masking is used and\n                                                                     going set of assessment and calibration activities for ETM+\noutliers are rejected.\n                      "
+  },
+  {
+   "start": 15200,
+   "end": 15476,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 14877",
+   "id": null,
+   "text": "ETM+ re-\n    MODIS is a third instrument on the Terra satellite.              quirements are for 250m absolute geodetic accuracy, 0.28\nWolfe et al. 2002 [I81 describe the geolocaton system (see       "
+  },
+  {
+   "start": 15476,
+   "end": 15543,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 14944",
+   "id": null,
+   "text": "MODIS has 36 spectral bands that sample at              istration."
+  },
+  {
+   "start": 15543,
+   "end": 15710,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 15111",
+   "id": null,
+   "text": "The three requirements lead to multiple registra-\n Ikm, 500m and 250m The MODIS Land Science Team                      tion approaches for calibration and assessment."
+  },
+  {
+   "start": 15710,
+   "end": 16020,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 15421",
+   "id": null,
+   "text": "Geodetic\nset a requirement of geolocation of 150m with an opera-              accuracy is updated by correlating systematically corrected\ntional goal of 50m Registration is done to a database of      "
+  },
+  {
+   "start": 16020,
+   "end": 16208,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 15609",
+   "id": null,
+   "text": "For each             chips extracted from USGS digital orthophoto quadrangles\nCP, 24km2 chips of 30m sampling were constructed from               with vertical information from USGS DEMs."
+  },
+  {
+   "start": 16208,
+   "end": 16333,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 15734",
+   "id": null,
+   "text": "About 75-\nLandsat TM bands 3 and 4 taken from cloud-free images                100 CP chips are used for.assessing accuracy."
+  },
+  {
+   "start": 16333,
+   "end": 16392,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 15793",
+   "id": null,
+   "text": "Band-to-band\npredominately along coastlines and waterways."
+  },
+  {
+   "start": 16392,
+   "end": 16760,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 16161",
+   "id": null,
+   "text": "The higher-           registration is used to update a parameter file with corrected\nresolution TM chips are resampled to MODIS resolution us-           off-sets, so selected images in arid regions wi"
+  },
+  {
+   "start": 16760,
+   "end": 16836,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 16237",
+   "id": null,
+   "text": "Area-based correlation is used for            prove cross-band correlation."
+  },
+  {
+   "start": 16836,
+   "end": 16982,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 16383",
+   "id": null,
+   "text": "Subpixel registration is done\nrnatch~ng,with a 25m sampling interval to get subpixel ac-          by second-order fit to the correlation surface."
+  },
+  {
+   "start": 16982,
+   "end": 17027,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 16428",
+   "id": null,
+   "text": "Temporal res-\ncuracy and a threshold of 0.6."
+  },
+  {
+   "start": 17027,
+   "end": 17328,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 16729",
+   "id": null,
+   "text": "Matches are used to update a         olution is assessed by conelating a reference image wit11\ncamera geometric model that accounts for internal and ex-           a precision and terrain conected panc"
+  },
+  {
+   "start": 17328,
+   "end": 17659,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 17060",
+   "id": null,
+   "text": "Success is reporied for absolute geodetic accu-\n\fracy as 99.9% of test CPs within 250x1 and a 54m RMS             changes in temperature or vegetation or homogenous terrain\nerror, while for band-to-ba"
+  },
+  {
+   "start": 17659,
+   "end": 17832,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 17233",
+   "id": null,
+   "text": "Problems have been seen in       tions.\ndecay of satellite attitude data due to aging gyros, and band-\nto-band calibration due to post-launch and seasonal operat-      2.2."
+  },
+  {
+   "start": 17832,
+   "end": 17884,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 17285",
+   "id": null,
+   "text": "End user application requirements\ning temperatures."
+  },
+  {
+   "start": 17884,
+   "end": 18594,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 17995",
+   "id": null,
+   "text": "Band-to-band correlation of band 6 (in-\n                                                                      In contrast to the operational teams, end users do not al-\nfrared) has been problematic du"
+  },
+  {
+   "start": 18594,
+   "end": 18718,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 18119",
+   "id": null,
+   "text": "Sylander          CPs, access to navigation modeling and other correction\net al. 2000 [24] describe the geolocation system."
+  },
+  {
+   "start": 18718,
+   "end": 18784,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 18185",
+   "id": null,
+   "text": "The re-         data, or statistical models of geolocation error."
+  },
+  {
+   "start": 18784,
+   "end": 19152,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 18553",
+   "id": null,
+   "text": "In addition,\nquirements are Ikm in absolute location, 500m in multi-           they may need to register heterogeneous data sources such\ntemporal registration with an operational objective of 300     "
+  },
+  {
+   "start": 19152,
+   "end": 19526,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 18927",
+   "id": null,
+   "text": "But, they do bring\ndicated that existing coastline databases were not accurate       to image registration tasks knowledge of their application\nenough, and reliance on systematic correction was not ad"
+  },
+  {
+   "start": 19526,
+   "end": 19668,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 19069",
+   "id": null,
+   "text": "Each CP has four image chips                  Accuracy needs of image registration for change detec-\nfrom different seasons and orientations."
+  },
+  {
+   "start": 19668,
+   "end": 19828,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 19229",
+   "id": null,
+   "text": "Matching using           tion has been one of the most studied application needs [27,\ncorrelation is done under the control of human operators          28, 61."
+  },
+  {
+   "start": 19828,
+   "end": 20038,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 19439",
+   "id": null,
+   "text": "Townshend et al. 1992 [27] found that for four re-\nwho insure there are 10 matched points per orbit to com-          gions studied in Landsat TM imagery, to keep NDVI (Nor-\npute satellite position cor"
+  },
+  {
+   "start": 20038,
+   "end": 20339,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 19740",
+   "id": null,
+   "text": "Absolute location was        malized Difference Vegetation Index) pixel-based change\nmeasured to 300m RMS, multitemporal to 325m in RMS,               estimations down to an error of 10% required subp"
+  },
+  {
+   "start": 20339,
+   "end": 20415,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 19816",
+   "id": null,
+   "text": "However, for three more homoge-\ntime was slightly outside the requirements."
+  },
+  {
+   "start": 20415,
+   "end": 20602,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 20003",
+   "id": null,
+   "text": "Problems occur        nous, arid regions they found that registrations of 0.5 to 1.0\ndue to seasonal changes, images with inadequate distribu-         pixels were adequate for 10% error."
+  },
+  {
+   "start": 20602,
+   "end": 21092,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 20493",
+   "id": null,
+   "text": "Dai and Khorram 1998\ntion of CPs, rejection of images such as islands where CPs        [lo] report similar results with about 0.2 pixels registration\ncannot be uniformly distributed, and CPs that may "
+  },
+  {
+   "start": 21092,
+   "end": 21139,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 20540",
+   "id": null,
+   "text": "Other confounding issues considered\nand needs."
+  },
+  {
+   "start": 21139,
+   "end": 21735,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 21136",
+   "id": null,
+   "text": "The systems all share the use of pre-constructed       for misregistration impact on change detection has been the\ndatabases, either of CPs or vector coastlines; the use of nor-    number of classes a"
+  },
+  {
+   "start": 21735,
+   "end": 22003,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 21404",
+   "id": null,
+   "text": "Authors have\nglobally; the use of translation since it dominates in small     also considered how to adapt to misregistration errors by\nregions; cloud masking or thresholds to eliminate cloudy re-    "
+  },
+  {
+   "start": 22003,
+   "end": 22106,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 21507",
+   "id": null,
+   "text": "Most systems use subpixel estimation but vary in the      tion [28, 30, 61.\nmethod used to compute it."
+  },
+  {
+   "start": 22106,
+   "end": 22317,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 21718",
+   "id": null,
+   "text": "The systems also vary in how              Knowledge and use of appropriate transformation mod-\nlocal matches are used in precision correction - whether         els can assist in improving registration"
+  },
+  {
+   "start": 22317,
+   "end": 22554,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 21955",
+   "id": null,
+   "text": "Toutin\nthey are combined to estimate a global image transforma-         2004 [26] extensively reviews transformation models used\ntion or an update to the geometric camera model for sys-         for sa"
+  },
+  {
+   "start": 22554,
+   "end": 22588,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 21989",
+   "id": null,
+   "text": "Physical mod-\ntematic correction."
+  },
+  {
+   "start": 22588,
+   "end": 22965,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 22366",
+   "id": null,
+   "text": "High-resolution sensors, on the order        els that take into account satellite geometry and the sen-\nof 1 m, face specific challenges in accounting for terrain       sor imaging model, such as thos"
+  },
+  {
+   "start": 22965,
+   "end": 23009,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 22410",
+   "id": null,
+   "text": "The problems reported by the          able."
+  },
+  {
+   "start": 23009,
+   "end": 23385,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 22786",
+   "id": null,
+   "text": "Empirical models, such low order affine or RST,\ngroups show some differences but add up to the follow-           higher order polynomial, or piecewise transformations, do\ning picture of current regist"
+  },
+  {
+   "start": 23385,
+   "end": 23882,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 23283",
+   "id": null,
+   "text": "Three-dimensional rational functions\nto thermal changes in satellite geometry and minor prob-         (RFs), ratios of polynomials, can approach the accuracy\nlems in orbit data; uniform distribution o"
+  },
+  {
+   "start": 23882,
+   "end": 24064,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 23465",
+   "id": null,
+   "text": "There are good studies that give extensive analyses of         in selecting appropriate techniques for a remote sensing ap-\nend user image registration experience and accuracy."
+  },
+  {
+   "start": 24064,
+   "end": 24214,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 23615",
+   "id": null,
+   "text": "Wang          plication based on accuracy and suitability for that applica-\n and Ellis 2005 [29] give such a detailed description and           tion."
+  },
+  {
+   "start": 24214,
+   "end": 24760,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 24161",
+   "id": null,
+   "text": "We carry this out by surveying, designing and devel-\nanaIysis for the registration by manual CPs of IKONOS and          oping different components of the registration process so\nhistorical aerial phot"
+  },
+  {
+   "start": 24760,
+   "end": 24931,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 24332",
+   "id": null,
+   "text": "Following\nvariation and number of CPs, and using independent check           these goals, we performed several sets of experiments, and\npoints (ICPs) to measure accuracy."
+  },
+  {
+   "start": 24931,
+   "end": 25541,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 24942",
+   "id": null,
+   "text": "Arrnston et al. 2002 121         according to the observations described in the previous sec-\ngives a similar analysis of geometric correction of Landsat        tions, the challenges that were address"
+  },
+  {
+   "start": 25541,
+   "end": 25879,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 25280",
+   "id": null,
+   "text": "They give the rules used for selection of            Assessing an image registration algorithm for subpixel\nCPs, which included syntactic properties (choose high con-          accuracy on remote sensi"
+  },
+  {
+   "start": 25879,
+   "end": 26241,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 25642",
+   "id": null,
+   "text": "Interleaving two im-\nsemantic properties (avoid cleared land and bodies of water        ages for visual assessment can detect gross mismatches and\nand choose bare ground among vegetation.)            "
+  },
+  {
+   "start": 26241,
+   "end": 26683,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 26084",
+   "id": null,
+   "text": "Manual registration can be used to cal-\nCP selection is often judged by precision rather than for-         culate the unknown transformation but it is uncertain if it\nmally by accuracy, as measures li"
+  },
+  {
+   "start": 26683,
+   "end": 26897,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 26298",
+   "id": null,
+   "text": "This is often done with the residual under   matching one image against a transformed and resampled\nthe computed transformation to a separate set of indepen-          version of itself with or without"
+  },
+  {
+   "start": 26897,
+   "end": 27317,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 26718",
+   "id": null,
+   "text": "To avoid some\ndent check points using holdout validation, or with leave-         resampling issues this can be done by using high resolution\none-out cross-validation (LOOCV) which recomputes the      "
+  },
+  {
+   "start": 27317,
+   "end": 27364,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 26765",
+   "id": null,
+   "text": "Spatial and orientation distribu-      a pair."
+  },
+  {
+   "start": 27364,
+   "end": 27590,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 26991",
+   "id": null,
+   "text": "However, while useful this approach is limited in re-\ntions of residuals have also been considered (Armston et al.        alistically modeling noise, temporal scene changes or.cross-\n2002 [2], Buiten "
+  },
+  {
+   "start": 27590,
+   "end": 27629,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 27030",
+   "id": null,
+   "text": "In general, accu-       sensor issues."
+  },
+  {
+   "start": 27629,
+   "end": 27892,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 27293",
+   "id": null,
+   "text": "A third approach is to use circular registration\nracy increases with the number of CPs up to a diminishing          results on natural imagery when three or more overlapping\nreturn [26, 291.          "
+  },
+  {
+   "start": 27892,
+   "end": 28208,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 27609",
+   "id": null,
+   "text": "In this case the transformations should\n    From this brief survey of end user requirements for reg-       compose to yield the identity- for three images registered\nistration there can be seen connec"
+  },
+  {
+   "start": 28208,
+   "end": 28778,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 28179",
+   "id": null,
+   "text": "Homogenous regions that cause           should be close to the identity transformation [34].\nproblems for image registration correlation may have com-              In all our experiments, we assume th"
+  },
+  {
+   "start": 28778,
+   "end": 29135,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 28536",
+   "id": null,
+   "text": "Our precision-correction algo-\nquirements and the images to be processed, will specify up-        rithms utilize selected image features or CPs to refine this\ndated and realistic accuracy requirements"
+  },
+  {
+   "start": 29135,
+   "end": 29188,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 28589",
+   "id": null,
+   "text": "We first performed preliminary experiments summa-\n3."
+  },
+  {
+   "start": 29188,
+   "end": 29932,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 29333",
+   "id": null,
+   "text": "Studies for evaluation of image registration                    rized in 1161 looking at different components individually\n    Work of the NASA image registration group has empha-           [23, 331 a"
+  },
+  {
+   "start": 29932,
+   "end": 30292,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 29693",
+   "id": null,
+   "text": "Despite the           different features with exhaustive correlation search: gray\nwide variety of algorithms available for image registration,       levels, edges, orthonormalfo~hogonal wavelets (such"
+  },
+  {
+   "start": 30292,
+   "end": 30368,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 29769",
+   "id": null,
+   "text": "Our objective is to carry       (such as the Simoncelli steerable pyramid)."
+  },
+  {
+   "start": 30368,
+   "end": 30673,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 30074",
+   "id": null,
+   "text": "The results\nout systematic studies to support image registration users         showed that, as expected, edge or edge-like features (such\n\f  as wavelets) were more robust to noise and local intensity "
+  },
+  {
+   "start": 30673,
+   "end": 31473,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 30874",
+   "id": null,
+   "text": "In comparing edges              Pass features, similarity metrics can be either cross-\n  and wavelets, a full exhaustive search using edge features             correlation, the L2 Norm, Mutual Informa"
+  },
+  {
+   "start": 31473,
+   "end": 31917,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 31318",
+   "id": null,
+   "text": "It is            proach [25] or a stocchastic gradient approach [9], and\n  well-known that wavelet representations are not translation-           a Robust Feature Matching approach [21].\n invariant si"
+  },
+  {
+   "start": 31917,
+   "end": 32012,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 31413",
+   "id": null,
+   "text": "Within these restrictions we quantita-\n tively assessed the usefulness of orthogonal wavelets."
+  },
+  {
+   "start": 32012,
+   "end": 32442,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 31843",
+   "id": null,
+   "text": "The          0   Fast Fourier correlation is very fast but limited to trans-\n main result was that the normalized correlation coefficients            formations with scaIes close to I (in the range r0"
+  },
+  {
+   "start": 32442,
+   "end": 32761,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 32162",
+   "id": null,
+   "text": "The third-level low-pass subbands pro-\n                                                                     e   When using a Marquart-Levenberg approach, features\n duce a correlation peak that varies "
+  },
+  {
+   "start": 32761,
+   "end": 32946,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 32347",
+   "id": null,
+   "text": "On the other hand, high-                 more robust to noise, with errors in the range of [0.032,\n pass subbands are more sensitive to translation, although               0.251 pixel."
+  },
+  {
+   "start": 32946,
+   "end": 33449,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 32850",
+   "id": null,
+   "text": "At the same time, Simoncelli-Low Pass\n this sensitivity is limited.                                            features are less sensitive to the initial guess than\n      A follow-on series of experim"
+  },
+  {
+   "start": 33449,
+   "end": 33781,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 33182",
+   "id": null,
+   "text": "Us-            a Mutual Information metrics is overall the most robust\n ing an optimization-based scheme, Daubechies orthogonal                 to initial conditions and the most accurate with errors\n"
+  },
+  {
+   "start": 33781,
+   "end": 34169,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 33570",
+   "id": null,
+   "text": "We found that the band-pass wavelets\n obtained from the Steerable Pyramid due to Simoncelli per-           Figure 2 illustrates the types of results we obtained in\n form best in terms of accuracy and "
+  },
+  {
+   "start": 34169,
+   "end": 34248,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 33649",
+   "id": null,
+   "text": "In this experiment compo-\n best results in terms of the radius of convergence."
+  },
+  {
+   "start": 34248,
+   "end": 34655,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 34056",
+   "id": null,
+   "text": "Although     nents of the framework were tested using synthetic data as\n not as reliable, spline wavelets show the best accuracy when     well as Landsat multi-temporal data and IKONOS, Land-\n converg"
+  },
+  {
+   "start": 34655,
+   "end": 34848,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 34249",
+   "id": null,
+   "text": "Synthetic images were created\ntions of the major image registration components: features,       using a controlled process [33] designed to emulate real\nsimilarity metrics and search strategy."
+  },
+  {
+   "start": 34848,
+   "end": 34880,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 34281",
+   "id": null,
+   "text": "We built a framework      data."
+  },
+  {
+   "start": 34880,
+   "end": 35196,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 34597",
+   "id": null,
+   "text": "Starting from a given source image, three types of\nto selectively combine the components in order to reach op-       modifications are applied in various combinations to pro-\ntimum registration on a g"
+  },
+  {
+   "start": 35196,
+   "end": 35292,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 34693",
+   "id": null,
+   "text": "Another use of the framework is to test each       metric variations and (3) addition of noise."
+  },
+  {
+   "start": 35292,
+   "end": 35911,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 35312",
+   "id": null,
+   "text": "Figure 2 shows\nelement of registration independently (so we know the edge        the results of the Marquart-Levenberg optimization strat-\ndetection implementation, for example, is the same in all    "
+  },
+  {
+   "start": 35911,
+   "end": 36162,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 35563",
+   "id": null,
+   "text": "Shifts are varied from\nponent compared to other known ones, and (3) serve as a           0 to 8 pixels, rotations are varied from 0 to 8 degrees and\nregistration tool where a user can select component"
+  },
+  {
+   "start": 36162,
+   "end": 36884,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 36285",
+   "id": null,
+   "text": "The white areas depict\nfunction of the application at hand, the available computa-       the regions of convergence of the algorithms with an error\ntiorla1 resources and the required accuracy.        "
+  },
+  {
+   "start": 36884,
+   "end": 37020,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 36421",
+   "id": null,
+   "text": "Sensitivity of TRU Algorithms to Initial Guess\n\n                                            Figure 2."
+  },
+  {
+   "start": 37020,
+   "end": 37059,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 36460",
+   "id": null,
+   "text": "Sensitivity to initial conditions\n\n\n4."
+  },
+  {
+   "start": 37059,
+   "end": 37213,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 36614",
+   "id": null,
+   "text": "Conclusion                                                        References\n                                                                      [I] F."
+  },
+  {
+   "start": 37213,
+   "end": 37223,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 36624",
+   "id": null,
+   "text": "Ackerman."
+  },
+  {
+   "start": 37223,
+   "end": 37381,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 36782",
+   "id": null,
+   "text": "Digital image correlation: Performance and\n                                                                          potential application in photogrammetry."
+  },
+  {
+   "start": 37381,
+   "end": 37701,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 37102",
+   "id": null,
+   "text": "Photogrammetric\n    In order to better understand requirements for the devel-\n                                                                          Record, 11(64):429-439, 1984.\nopment and evaluat"
+  },
+  {
+   "start": 37701,
+   "end": 37704,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 37105",
+   "id": null,
+   "text": "D."
+  },
+  {
+   "start": 37704,
+   "end": 37715,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 37116",
+   "id": null,
+   "text": "Amston, T."
+  },
+  {
+   "start": 37715,
+   "end": 37718,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 37119",
+   "id": null,
+   "text": "J."
+  },
+  {
+   "start": 37718,
+   "end": 37730,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 37131",
+   "id": null,
+   "text": "Danaher, B."
+  },
+  {
+   "start": 37730,
+   "end": 37733,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 37134",
+   "id": null,
+   "text": "M."
+  },
+  {
+   "start": 37733,
+   "end": 37752,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 37153",
+   "id": null,
+   "text": "Goulevitch, and M."
+  },
+  {
+   "start": 37752,
+   "end": 37755,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 37156",
+   "id": null,
+   "text": "I."
+  },
+  {
+   "start": 37755,
+   "end": 37835,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 37236",
+   "id": null,
+   "text": "Byme."
+  },
+  {
+   "start": 37835,
+   "end": 38175,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 37576",
+   "id": null,
+   "text": "Geometric correction of landsat mss, tm, and etm+\nthe experience of operational satellite teams, application-\n                                                                          imagery for mapp"
+  },
+  {
+   "start": 38175,
+   "end": 38347,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 37748",
+   "id": null,
+   "text": "In Proceedings of the 11th Aus-\nand experiments in the evaluation of image registratioh al-               tralasian Remote Sensing and Photogrammetry Conference,\ngorithms."
+  },
+  {
+   "start": 38347,
+   "end": 38527,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 37928",
+   "id": null,
+   "text": "From the experience and current practice of oper-               pages 1-23, Brisbane, Australia, 2002.\national groups, as well as documented requirements for end            [3] S."
+  },
+  {
+   "start": 38527,
+   "end": 38541,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 37942",
+   "id": null,
+   "text": "Baillarin, A."
+  },
+  {
+   "start": 38541,
+   "end": 38554,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 37955",
+   "id": null,
+   "text": "Bouillon, M."
+  },
+  {
+   "start": 38554,
+   "end": 38569,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 37970",
+   "id": null,
+   "text": "Bemard, and M."
+  },
+  {
+   "start": 38569,
+   "end": 38577,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 37978",
+   "id": null,
+   "text": "Chikhi."
+  },
+  {
+   "start": 38577,
+   "end": 38823,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 38224",
+   "id": null,
+   "text": "Using\nuser applications, we can see the importance of subpixel                  a three dimensional spatial database to orthorectify automat-\nregistration for image subregions with increasing need to "
+  },
+  {
+   "start": 38823,
+   "end": 39109,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 38510",
+   "id": null,
+   "text": "In Proceedings of the ISPRS\nperform it robustly between sensors, particularly with the                Hangzhou 2005 Workshop, pages 89-94, Hangzhou, China,\nadvent of very high resolution and hyperspec"
+  },
+  {
+   "start": 39109,
+   "end": 39136,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 38537",
+   "id": null,
+   "text": "We                  [4] M."
+  },
+  {
+   "start": 39136,
+   "end": 39139,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 38540",
+   "id": null,
+   "text": "A."
+  },
+  {
+   "start": 39139,
+   "end": 39152,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 38553",
+   "id": null,
+   "text": "Brovelli, M."
+  },
+  {
+   "start": 39152,
+   "end": 39163,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 38564",
+   "id": null,
+   "text": "Crespi, F."
+  },
+  {
+   "start": 39163,
+   "end": 39181,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 38582",
+   "id": null,
+   "text": "Fratarcangeli, F."
+  },
+  {
+   "start": 39181,
+   "end": 39272,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 38673",
+   "id": null,
+   "text": "Giannone,\nalso see the need for image registration techniques that are              and E."
+  },
+  {
+   "start": 39272,
+   "end": 39280,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 38681",
+   "id": null,
+   "text": "Realin."
+  },
+  {
+   "start": 39280,
+   "end": 39438,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 38839",
+   "id": null,
+   "text": "Accuracy assessment of high resolution satel-\ntailored to the needs of remote sensing applications with                 lite imagery by leave-one-out method."
+  },
+  {
+   "start": 39438,
+   "end": 39795,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 39196",
+   "id": null,
+   "text": "In 7th International\nspecific attention to sensor-related geometric transforma-                Symposium on Spatial Accuracy Assessment in Natural Re-\ntions and knowledge of accuracy requirements and "
+  },
+  {
+   "start": 39795,
+   "end": 39798,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 39199",
+   "id": null,
+   "text": "G."
+  },
+  {
+   "start": 39798,
+   "end": 39805,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 39206",
+   "id": null,
+   "text": "Brown."
+  },
+  {
+   "start": 39805,
+   "end": 39848,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 39249",
+   "id": null,
+   "text": "A survey of image registration techniques."
+  },
+  {
+   "start": 39848,
+   "end": 40044,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 39445",
+   "id": null,
+   "text": "ACM Computing Surveys, 24(24):325-376, 1992.\n                                                                      [6] L."
+  },
+  {
+   "start": 40044,
+   "end": 40060,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 39461",
+   "id": null,
+   "text": "Bruzzone and R."
+  },
+  {
+   "start": 40060,
+   "end": 40067,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 39468",
+   "id": null,
+   "text": "Cossu."
+  },
+  {
+   "start": 40067,
+   "end": 40313,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 39714",
+   "id": null,
+   "text": "An adaptive approach to reduc-\n                                                                          ing registration noise effects in unsupervised change detec-\n   Acknowledgments                "
+  },
+  {
+   "start": 40313,
+   "end": 40539,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 39940",
+   "id": null,
+   "text": "IEEE Transactions on Geoscience and Remote Sensing,\n                                                                          41(11):2455-2465,2003.\n                                                   "
+  },
+  {
+   "start": 40539,
+   "end": 40542,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 39943",
+   "id": null,
+   "text": "J."
+  },
+  {
+   "start": 40542,
+   "end": 40559,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 39960",
+   "id": null,
+   "text": "Buiten and B. v."
+  },
+  {
+   "start": 40559,
+   "end": 40567,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 39968",
+   "id": null,
+   "text": "Putten."
+  },
+  {
+   "start": 40567,
+   "end": 40822,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 40223",
+   "id": null,
+   "text": "Quality assessment of remote\n   We would like to acknowledge the invaluable contri-                    sensing image registration - analysis and testing of control\nbutions of collaborators with the NA"
+  },
+  {
+   "start": 40822,
+   "end": 40972,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 40373",
+   "id": null,
+   "text": "ISPRS Journal of Photograitlinetry and Re-\ntion group over the years: Arlene Cole-Rhodes and Kisha                   mote Sensing, 52(2):57-73, 1997."
+  },
+  {
+   "start": 40972,
+   "end": 41049,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 40450",
+   "id": null,
+   "text": "Johnson of Morgan State University, Tarek El-Ghazawi of               181 D."
+  },
+  {
+   "start": 41049,
+   "end": 41060,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 40461",
+   "id": null,
+   "text": "Canion, M."
+  },
+  {
+   "start": 41060,
+   "end": 41079,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 40480",
+   "id": null,
+   "text": "Gianinetto, and M."
+  },
+  {
+   "start": 41079,
+   "end": 41088,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 40489",
+   "id": null,
+   "text": "Scaioni."
+  },
+  {
+   "start": 41088,
+   "end": 41337,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 40738",
+   "id": null,
+   "text": "Georef: a soft-\nGeorge Washington University, Peyush Jain, Amlee Joshua,                  ware for improving the use of remote sensing images in envi-\nJeffrey Masek, Jeffery Morsisette, Nargess Memars"
+  },
+  {
+   "start": 41337,
+   "end": 41553,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 40954",
+   "id": null,
+   "text": "In Proceedings of the First Biennial\nand Ezinne Uko-Ozoro of WASAIGSFC, and David Mount                        Meering of the International Environme~ztalModellirig and\nof the University of Maryland a"
+  },
+  {
+   "start": 41553,
+   "end": 41643,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 41044",
+   "id": null,
+   "text": "Sojware Society, pages 360-365,2002.\n\f  [9] A, Cole-Rhodes, K."
+  },
+  {
+   "start": 41643,
+   "end": 41659,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 41060",
+   "id": null,
+   "text": "Johnson, and J."
+  },
+  {
+   "start": 41659,
+   "end": 41670,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 41071",
+   "id": null,
+   "text": "Le Moigne."
+  },
+  {
+   "start": 41670,
+   "end": 41699,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 41100",
+   "id": null,
+   "text": "Mul-                 1231 H."
+  },
+  {
+   "start": 41699,
+   "end": 41702,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 41103",
+   "id": null,
+   "text": "S."
+  },
+  {
+   "start": 41702,
+   "end": 41712,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 41113",
+   "id": null,
+   "text": "Stone, J."
+  },
+  {
+   "start": 41712,
+   "end": 41730,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 41131",
+   "id": null,
+   "text": "Le Moigne, and M."
+  },
+  {
+   "start": 41730,
+   "end": 41739,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 41140",
+   "id": null,
+   "text": "McGuire."
+  },
+  {
+   "start": 41739,
+   "end": 42192,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 41593",
+   "id": null,
+   "text": "Image regis-\n         tiresolution registration of remote sensing imagery by opti-         tration using wavelet techniques. 1EEE Transacfiorzson Pat-\n         mization of mutual information using a s"
+  },
+  {
+   "start": 42192,
+   "end": 42216,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 41617",
+   "id": null,
+   "text": "Sylvander, P, Henry, C."
+  },
+  {
+   "start": 42216,
+   "end": 42234,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 41635",
+   "id": null,
+   "text": "Bastien-Thiry, F."
+  },
+  {
+   "start": 42234,
+   "end": 42255,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 41656",
+   "id": null,
+   "text": "Meunier, and\n[lo] X."
+  },
+  {
+   "start": 42255,
+   "end": 42266,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 41667",
+   "id": null,
+   "text": "Dai and S."
+  },
+  {
+   "start": 42266,
+   "end": 42275,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 41676",
+   "id": null,
+   "text": "Khorram."
+  },
+  {
+   "start": 42275,
+   "end": 42328,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 41729",
+   "id": null,
+   "text": "The effects of image misregis-                    D."
+  },
+  {
+   "start": 42328,
+   "end": 42336,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 41737",
+   "id": null,
+   "text": "Fuster."
+  },
+  {
+   "start": 42336,
+   "end": 42374,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 41775",
+   "id": null,
+   "text": "Vegetation geometrical image quality."
+  },
+  {
+   "start": 42374,
+   "end": 42530,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 41931",
+   "id": null,
+   "text": "In Pro-\n         tration on the accuracy of remotely sensed change detec-             ceedings of the VEGETATION 2000 Conference, Balgirate,\n         tion."
+  },
+  {
+   "start": 42530,
+   "end": 42687,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 42088",
+   "id": null,
+   "text": "IEEE Transactions on Geoscience and Remote Sensing,            Italy, 2000.\n         36(5): 1566-1577, 1998.                                         [25] P."
+  },
+  {
+   "start": 42687,
+   "end": 42700,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 42101",
+   "id": null,
+   "text": "ThBvenaz, U."
+  },
+  {
+   "start": 42700,
+   "end": 42717,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 42118",
+   "id": null,
+   "text": "Ruttiman, and M."
+  },
+  {
+   "start": 42717,
+   "end": 42724,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 42125",
+   "id": null,
+   "text": "Unser."
+  },
+  {
+   "start": 42724,
+   "end": 42749,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 42150",
+   "id": null,
+   "text": "A pyramid ap-\n[ l l ] R."
+  },
+  {
+   "start": 42749,
+   "end": 42752,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 42153",
+   "id": null,
+   "text": "D."
+  },
+  {
+   "start": 42752,
+   "end": 42767,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 42168",
+   "id": null,
+   "text": "Eastman and J."
+  },
+  {
+   "start": 42767,
+   "end": 42778,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 42179",
+   "id": null,
+   "text": "Le Moigne."
+  },
+  {
+   "start": 42778,
+   "end": 42869,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 42270",
+   "id": null,
+   "text": "Gradient-descent tech-                proach to sub-pixel registration based on intensity."
+  },
+  {
+   "start": 42869,
+   "end": 43045,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 42446",
+   "id": null,
+   "text": "IEEE\n         niques for multi-temporal and multi-sensor image registra-           Transactions on Image Processing, 7(1):2741, 1998.\n         tion of remotely sensed imagery."
+  },
+  {
+   "start": 43045,
+   "end": 43084,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 42485",
+   "id": null,
+   "text": "In Fourth International        [26] T."
+  },
+  {
+   "start": 43084,
+   "end": 43092,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 42493",
+   "id": null,
+   "text": "Toutin."
+  },
+  {
+   "start": 43092,
+   "end": 43265,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 42666",
+   "id": null,
+   "text": "Review article: Geometric processing of remote\n         Conference on Information Fusion, Montreal, Canada, 2001.            sensing images: models, algorithms and methods."
+  },
+  {
+   "start": 43265,
+   "end": 43282,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 42683",
+   "id": null,
+   "text": "Interna-\n[I21 L."
+  },
+  {
+   "start": 43282,
+   "end": 43285,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 42686",
+   "id": null,
+   "text": "M."
+  },
+  {
+   "start": 43285,
+   "end": 43288,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 42689",
+   "id": null,
+   "text": "G."
+  },
+  {
+   "start": 43288,
+   "end": 43303,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 42704",
+   "id": null,
+   "text": "Fonseca and B."
+  },
+  {
+   "start": 43303,
+   "end": 43306,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 42707",
+   "id": null,
+   "text": "S."
+  },
+  {
+   "start": 43306,
+   "end": 43317,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 42718",
+   "id": null,
+   "text": "Manjunath."
+  },
+  {
+   "start": 43317,
+   "end": 43466,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 42867",
+   "id": null,
+   "text": "Registration tech-                 tional Journal of Remote Sensing, 25(10): 1893-1924,2004.\n        niques for multisensor remotely sensed imagery."
+  },
+  {
+   "start": 43466,
+   "end": 43491,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 42892",
+   "id": null,
+   "text": "Photogram-       [27] J."
+  },
+  {
+   "start": 43491,
+   "end": 43494,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 42895",
+   "id": null,
+   "text": "R."
+  },
+  {
+   "start": 43494,
+   "end": 43497,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 42898",
+   "id": null,
+   "text": "G."
+  },
+  {
+   "start": 43497,
+   "end": 43514,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 42915",
+   "id": null,
+   "text": "Townshend, C. 0."
+  },
+  {
+   "start": 43514,
+   "end": 43526,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 42927",
+   "id": null,
+   "text": "Justice, C."
+  },
+  {
+   "start": 43526,
+   "end": 43541,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 42942",
+   "id": null,
+   "text": "Gurney, and J."
+  },
+  {
+   "start": 43541,
+   "end": 43630,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 43031",
+   "id": null,
+   "text": "Mc-\n        metric Engineering and Remote Sensing, 62(9):1049-1056,               Manus."
+  },
+  {
+   "start": 43630,
+   "end": 43761,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 43162",
+   "id": null,
+   "text": "The impact of misregistration on change detec-\n         1996.                                                                tion."
+  },
+  {
+   "start": 43761,
+   "end": 43821,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 43222",
+   "id": null,
+   "text": "IEEE Transactions on Geoscience and Remote Sensing,\n[I31 A."
+  },
+  {
+   "start": 43821,
+   "end": 43834,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 43235",
+   "id": null,
+   "text": "Ganas and E."
+  },
+  {
+   "start": 43834,
+   "end": 43847,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 43248",
+   "id": null,
+   "text": "Athanassiou."
+  },
+  {
+   "start": 43847,
+   "end": 43995,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 43396",
+   "id": null,
+   "text": "A comparative study on the                  30(5):1054-1060, 1992.\n        production of satellite orthoimagery for geological remote       [28] D."
+  },
+  {
+   "start": 43995,
+   "end": 43998,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 43399",
+   "id": null,
+   "text": "L."
+  },
+  {
+   "start": 43998,
+   "end": 44013,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 43414",
+   "id": null,
+   "text": "Verbyla and S."
+  },
+  {
+   "start": 44013,
+   "end": 44016,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 43417",
+   "id": null,
+   "text": "H."
+  },
+  {
+   "start": 44016,
+   "end": 44023,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 43424",
+   "id": null,
+   "text": "Boles."
+  },
+  {
+   "start": 44023,
+   "end": 44067,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 43468",
+   "id": null,
+   "text": "Bias in land cover change\n         sensing."
+  },
+  {
+   "start": 44067,
+   "end": 44161,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 43562",
+   "id": null,
+   "text": "Geocarto International, 1451-59,2000.                       estimates due to misregistration."
+  },
+  {
+   "start": 44161,
+   "end": 44194,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 43595",
+   "id": null,
+   "text": "International Journal of\n[14] A."
+  },
+  {
+   "start": 44194,
+   "end": 44209,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 43610",
+   "id": null,
+   "text": "Iwasaki and H."
+  },
+  {
+   "start": 44209,
+   "end": 44219,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 43620",
+   "id": null,
+   "text": "Fujisada."
+  },
+  {
+   "start": 44219,
+   "end": 44248,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 43649",
+   "id": null,
+   "text": "Aster geometric performance."
+  },
+  {
+   "start": 44248,
+   "end": 44304,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 43705",
+   "id": null,
+   "text": "Remote Sensing, 2 1(18):3553-3560,2000."
+  },
+  {
+   "start": 44304,
+   "end": 44385,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 43786",
+   "id": null,
+   "text": "IEEE Transactions on Geoscience and Reinote Sensing,             [29] H."
+  },
+  {
+   "start": 44385,
+   "end": 44397,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 43798",
+   "id": null,
+   "text": "Wang and E."
+  },
+  {
+   "start": 44397,
+   "end": 44400,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 43801",
+   "id": null,
+   "text": "C."
+  },
+  {
+   "start": 44400,
+   "end": 44407,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 43808",
+   "id": null,
+   "text": "Ellis."
+  },
+  {
+   "start": 44407,
+   "end": 44537,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 43938",
+   "id": null,
+   "text": "Image misregistration error in\n        43(12):2700-2706,2005.                                                change measurements."
+  },
+  {
+   "start": 44537,
+   "end": 44577,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 43978",
+   "id": null,
+   "text": "Photogrammetric Engineering and\n[15] V."
+  },
+  {
+   "start": 44577,
+   "end": 44580,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 43981",
+   "id": null,
+   "text": "M."
+  },
+  {
+   "start": 44580,
+   "end": 44594,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 43995",
+   "id": null,
+   "text": "Jovanovic, M."
+  },
+  {
+   "start": 44594,
+   "end": 44597,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 43998",
+   "id": null,
+   "text": "A."
+  },
+  {
+   "start": 44597,
+   "end": 44606,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 44007",
+   "id": null,
+   "text": "Bull, M."
+  },
+  {
+   "start": 44606,
+   "end": 44609,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 44010",
+   "id": null,
+   "text": "M."
+  },
+  {
+   "start": 44609,
+   "end": 44623,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 44024",
+   "id": null,
+   "text": "Smyth, and J."
+  },
+  {
+   "start": 44623,
+   "end": 44629,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 44030",
+   "id": null,
+   "text": "Zong."
+  },
+  {
+   "start": 44629,
+   "end": 44687,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 44088",
+   "id": null,
+   "text": "Remote Sensing, 7 l(9): 1037-1044,2005."
+  },
+  {
+   "start": 44687,
+   "end": 44768,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 44169",
+   "id": null,
+   "text": "MISR in-flight camera geometric model calibration and geo-       [30] H."
+  },
+  {
+   "start": 44768,
+   "end": 44780,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 44181",
+   "id": null,
+   "text": "Wang and E."
+  },
+  {
+   "start": 44780,
+   "end": 44783,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 44184",
+   "id": null,
+   "text": "C."
+  },
+  {
+   "start": 44783,
+   "end": 44790,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 44191",
+   "id": null,
+   "text": "Ellis."
+  },
+  {
+   "start": 44790,
+   "end": 44857,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 44258",
+   "id": null,
+   "text": "Spatial accuracy of orthorecti-\n        rectification performance."
+  },
+  {
+   "start": 44857,
+   "end": 45060,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 44461",
+   "id": null,
+   "text": "IEEE Transactions on Geoscience            fied ikonos imagery and historical aerial photographs across\n        and Remote Sensing, 40(7): 1512-1 5 19,2002.                          five sites in chin"
+  },
+  {
+   "start": 45060,
+   "end": 45109,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 44510",
+   "id": null,
+   "text": "International Journal of Remote Sensing,\n[16] J."
+  },
+  {
+   "start": 45109,
+   "end": 45123,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 44524",
+   "id": null,
+   "text": "Le Moigne, A."
+  },
+  {
+   "start": 45123,
+   "end": 45139,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 44540",
+   "id": null,
+   "text": "Cole-Rhodes, R."
+  },
+  {
+   "start": 45139,
+   "end": 45151,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 44552",
+   "id": null,
+   "text": "Eastman, P."
+  },
+  {
+   "start": 45151,
+   "end": 45201,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 44602",
+   "id": null,
+   "text": "Jain,                       26(9):1893-1911,2005."
+  },
+  {
+   "start": 45201,
+   "end": 45212,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 44613",
+   "id": null,
+   "text": "A."
+  },
+  {
+   "start": 45212,
+   "end": 45223,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 44624",
+   "id": null,
+   "text": "Joshua, N."
+  },
+  {
+   "start": 45223,
+   "end": 45240,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 44641",
+   "id": null,
+   "text": "Memarsadeghi, D."
+  },
+  {
+   "start": 45240,
+   "end": 45250,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 44651",
+   "id": null,
+   "text": "Mount, N."
+  },
+  {
+   "start": 45250,
+   "end": 45253,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 44654",
+   "id": null,
+   "text": "S."
+  },
+  {
+   "start": 45253,
+   "end": 45282,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 44683",
+   "id": null,
+   "text": "Netanyahu,           [31] X."
+  },
+  {
+   "start": 45282,
+   "end": 45292,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 44693",
+   "id": null,
+   "text": "Xiong, N."
+  },
+  {
+   "start": 45292,
+   "end": 45304,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 44705",
+   "id": null,
+   "text": "Che, and W."
+  },
+  {
+   "start": 45304,
+   "end": 45312,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 44713",
+   "id": null,
+   "text": "Barnes."
+  },
+  {
+   "start": 45312,
+   "end": 45349,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 44750",
+   "id": null,
+   "text": "Terra modis on-orbit spa-\n        J."
+  },
+  {
+   "start": 45349,
+   "end": 45368,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 44769",
+   "id": null,
+   "text": "Morsisette, and E."
+  },
+  {
+   "start": 45368,
+   "end": 45379,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 44780",
+   "id": null,
+   "text": "Uko-Ozoro."
+  },
+  {
+   "start": 45379,
+   "end": 45454,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 44855",
+   "id": null,
+   "text": "Image registration and               tial characterizationand performance."
+  },
+  {
+   "start": 45454,
+   "end": 45622,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 45023",
+   "id": null,
+   "text": "IEEE Transactions on\n        fusion studies for the integration of multiple remote sens-           Geoscience and Remote Sensing, 43(2):355-365,2005.\n        ing data."
+  },
+  {
+   "start": 45622,
+   "end": 45685,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 45086",
+   "id": null,
+   "text": "In International Conference on Acoustics, Speech       [32] L."
+  },
+  {
+   "start": 45685,
+   "end": 45702,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 45103",
+   "id": null,
+   "text": "Zagorchev and A."
+  },
+  {
+   "start": 45702,
+   "end": 45713,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 45114",
+   "id": null,
+   "text": "Goshtasby."
+  },
+  {
+   "start": 45713,
+   "end": 45872,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 45273",
+   "id": null,
+   "text": "A comparative study\n        and Signal Processing (ICASSP),pages 100-1 05, Toulouse,              of transformation functions for nonrigid image registration."
+  },
+  {
+   "start": 45872,
+   "end": 46012,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 45413",
+   "id": null,
+   "text": "France, 2006.                                                         lEEE Transactions on Image Processing, 15(3):529-538,\n[17] J."
+  },
+  {
+   "start": 46012,
+   "end": 46026,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 45427",
+   "id": null,
+   "text": "Le Moigne, H."
+  },
+  {
+   "start": 46026,
+   "end": 46029,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 45430",
+   "id": null,
+   "text": "S."
+  },
+  {
+   "start": 46029,
+   "end": 46039,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 45440",
+   "id": null,
+   "text": "Stone, A."
+  },
+  {
+   "start": 46039,
+   "end": 46055,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 45456",
+   "id": null,
+   "text": "Cole-Rhodes, R."
+  },
+  {
+   "start": 46055,
+   "end": 46058,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 45459",
+   "id": null,
+   "text": "D."
+  },
+  {
+   "start": 46058,
+   "end": 46088,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 45489",
+   "id": null,
+   "text": "Eastman,                2006."
+  },
+  {
+   "start": 46088,
+   "end": 46099,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 45500",
+   "id": null,
+   "text": "P."
+  },
+  {
+   "start": 46099,
+   "end": 46108,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 45509",
+   "id": null,
+   "text": "Jain, K."
+  },
+  {
+   "start": 46108,
+   "end": 46120,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 45521",
+   "id": null,
+   "text": "Johnson, J."
+  },
+  {
+   "start": 46120,
+   "end": 46123,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 45524",
+   "id": null,
+   "text": "T."
+  },
+  {
+   "start": 46123,
+   "end": 46141,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 45542",
+   "id": null,
+   "text": "Morisette, and N."
+  },
+  {
+   "start": 46141,
+   "end": 46144,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 45545",
+   "id": null,
+   "text": "S."
+  },
+  {
+   "start": 46144,
+   "end": 46169,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 45570",
+   "id": null,
+   "text": "Netanyahu.       [33] 1."
+  },
+  {
+   "start": 46169,
+   "end": 46184,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 45585",
+   "id": null,
+   "text": "Zavorin and J."
+  },
+  {
+   "start": 46184,
+   "end": 46195,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 45596",
+   "id": null,
+   "text": "Le Moigne."
+  },
+  {
+   "start": 46195,
+   "end": 46278,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 45679",
+   "id": null,
+   "text": "Use of multiresolution\n        Registration of multiple sensor earth science data."
+  },
+  {
+   "start": 46278,
+   "end": 46452,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 45853",
+   "id": null,
+   "text": "In NASA           wavelet feature pyramids for automatic registration of mul-\n        Earth Science Technology Conference (ESTC), pages 100-                tisensor imagery."
+  },
+  {
+   "start": 46452,
+   "end": 46597,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 45998",
+   "id": null,
+   "text": "IEEE Transactions on Image Processing,\n         105, Palo Alto, CA, 2004.                                            14(6):770-782,2005.\n[18] D."
+  },
+  {
+   "start": 46597,
+   "end": 46600,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 46001",
+   "id": null,
+   "text": "S."
+  },
+  {
+   "start": 46600,
+   "end": 46608,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 46009",
+   "id": null,
+   "text": "Lee, J."
+  },
+  {
+   "start": 46608,
+   "end": 46611,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 46012",
+   "id": null,
+   "text": "C."
+  },
+  {
+   "start": 46611,
+   "end": 46622,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 46023",
+   "id": null,
+   "text": "Storey, M."
+  },
+  {
+   "start": 46622,
+   "end": 46625,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 46026",
+   "id": null,
+   "text": "J."
+  },
+  {
+   "start": 46625,
+   "end": 46640,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 46041",
+   "id": null,
+   "text": "Choate, and R."
+  },
+  {
+   "start": 46640,
+   "end": 46643,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 46044",
+   "id": null,
+   "text": "W."
+  },
+  {
+   "start": 46643,
+   "end": 46670,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 46071",
+   "id": null,
+   "text": "Hayes.             [34] I."
+  },
+  {
+   "start": 46670,
+   "end": 46682,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 46083",
+   "id": null,
+   "text": "Zavorin, H."
+  },
+  {
+   "start": 46682,
+   "end": 46685,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 46086",
+   "id": null,
+   "text": "S."
+  },
+  {
+   "start": 46685,
+   "end": 46699,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 46100",
+   "id": null,
+   "text": "Stone, and J."
+  },
+  {
+   "start": 46699,
+   "end": 46710,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 46111",
+   "id": null,
+   "text": "Le Moigne."
+  },
+  {
+   "start": 46710,
+   "end": 46894,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 46295",
+   "id": null,
+   "text": "Evaluating perfor-\n        Achieving sub-pixel geolocation accuracy in support of                mance of automatic techniques for subpixel registration of\n        modis land science."
+  },
+  {
+   "start": 46894,
+   "end": 46969,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 46370",
+   "id": null,
+   "text": "Remote Sensing of Environment, 83(1-              remotely sensed imagery."
+  },
+  {
+   "start": 46969,
+   "end": 47143,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 46544",
+   "id": null,
+   "text": "In Proceedings of SPIE - Volume\n        2):31-49,2002.                                                        5014 I~nageProcessing: Algorithms and Systems 11, pages\n[I91 D."
+  },
+  {
+   "start": 47143,
+   "end": 47146,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 46547",
+   "id": null,
+   "text": "S."
+  },
+  {
+   "start": 47146,
+   "end": 47154,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 46555",
+   "id": null,
+   "text": "Lee, J."
+  },
+  {
+   "start": 47154,
+   "end": 47157,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 46558",
+   "id": null,
+   "text": "C."
+  },
+  {
+   "start": 47157,
+   "end": 47168,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 46569",
+   "id": null,
+   "text": "Storey, M."
+  },
+  {
+   "start": 47168,
+   "end": 47171,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 46572",
+   "id": null,
+   "text": "J."
+  },
+  {
+   "start": 47171,
+   "end": 47186,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 46587",
+   "id": null,
+   "text": "Choate, and R."
+  },
+  {
+   "start": 47186,
+   "end": 47189,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 46590",
+   "id": null,
+   "text": "W."
+  },
+  {
+   "start": 47189,
+   "end": 47196,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 46597",
+   "id": null,
+   "text": "Hayes."
+  },
+  {
+   "start": 47196,
+   "end": 47308,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 46709",
+   "id": null,
+   "text": "Four             306-316,2003.\n        years of landsat-7 on-orbit geometric calibration and perfor-    [35] B."
+  },
+  {
+   "start": 47308,
+   "end": 47322,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 46723",
+   "id": null,
+   "text": "Zitova and J."
+  },
+  {
+   "start": 47322,
+   "end": 47331,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 46732",
+   "id": null,
+   "text": "Flusser."
+  },
+  {
+   "start": 47331,
+   "end": 47381,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 46782",
+   "id": null,
+   "text": "Image registration methods: a sur-\n        mance."
+  },
+  {
+   "start": 47381,
+   "end": 47544,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 46945",
+   "id": null,
+   "text": "IEEE Transactions on Geoscience and Remote Sens-               vey. lmage and Vision Computing, 21(11):977-1000, 2003.\n        ing, 42(12):2786-2795,2004.\n[20] H."
+  },
+  {
+   "start": 47544,
+   "end": 47555,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 46956",
+   "id": null,
+   "text": "Madani, J."
+  },
+  {
+   "start": 47555,
+   "end": 47558,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 46959",
+   "id": null,
+   "text": "L."
+  },
+  {
+   "start": 47558,
+   "end": 47570,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 46971",
+   "id": null,
+   "text": "Can, and C."
+  },
+  {
+   "start": 47570,
+   "end": 47580,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 46981",
+   "id": null,
+   "text": "Schoeser."
+  },
+  {
+   "start": 47580,
+   "end": 47627,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 47028",
+   "id": null,
+   "text": "Image registration\n        using autolandmark."
+  },
+  {
+   "start": 47627,
+   "end": 47731,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 47132",
+   "id": null,
+   "text": "In Proceedings of Fusion of Earth Data,\n        pages 234-778, Sophia-Antipolis,France, 2004.\n[21] N.S."
+  },
+  {
+   "start": 47731,
+   "end": 47745,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 47146",
+   "id": null,
+   "text": "Netanyahu, J."
+  },
+  {
+   "start": 47745,
+   "end": 47763,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 47164",
+   "id": null,
+   "text": "Le Moigne, and J."
+  },
+  {
+   "start": 47763,
+   "end": 47766,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 47167",
+   "id": null,
+   "text": "G."
+  },
+  {
+   "start": 47766,
+   "end": 47773,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 47174",
+   "id": null,
+   "text": "Masek."
+  },
+  {
+   "start": 47773,
+   "end": 47875,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 47276",
+   "id": null,
+   "text": "Georeg-\n        istration of Landsat data via robust matching of rnultiresolu-\n        Lion features."
+  },
+  {
+   "start": 47875,
+   "end": 47967,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 47368",
+   "id": null,
+   "text": "IEEE Transnctions on Geoscience and Remote\n        Sensing, 42(7): 1586-1600, 2004.\n[22] J."
+  },
+  {
+   "start": 47967,
+   "end": 47970,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 47371",
+   "id": null,
+   "text": "P."
+  },
+  {
+   "start": 47970,
+   "end": 47973,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 47374",
+   "id": null,
+   "text": "W."
+  },
+  {
+   "start": 47973,
+   "end": 47986,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 47387",
+   "id": null,
+   "text": "Pluim and J."
+  },
+  {
+   "start": 47986,
+   "end": 47989,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 47390",
+   "id": null,
+   "text": "M."
+  },
+  {
+   "start": 47989,
+   "end": 48044,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 47445",
+   "id": null,
+   "text": "Fitzpatrick, Image registra-\n        tion (editorial)."
+  },
+  {
+   "start": 48044,
+   "end": 48117,
+   "type": "sentence",
+   "basis": "trailing text",
+   "id": null,
+   "text": "IEEE Transactions on Medical Dnaging,\n        22(11): 1341-1343,2005."
+  }
+ ]
+}

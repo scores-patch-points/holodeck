@@ -1,0 +1,43 @@
+{
+  "schema": "RoleConfig@1",
+  "language": "hin",
+  "provenance": {
+    "builder": "eoreader7 native/scripts/build-role-config.mjs",
+    "source": "/private/tmp/claude-501/tb/hin/train.conllu",
+    "min_volume": 20,
+    "null_draws": 200,
+    "null_alpha": 0.05,
+    "null_seed": 1,
+    "note": "position stats and marker candidates are both derived mechanically from this treebank's own gold dependency annotations — never hand-typed or asserted from general linguistic knowledge. A marker candidate is admitted only when its real precision beats the (1-alpha) quantile of a within-sentence role-label shuffle (II.23), never a fixed ratio — and (S122) that quantile is the MAX-STATISTIC across every eligible closed-class candidate tried, not a per-candidate null, so the admitted marker is significant against the whole search, not merely against itself."
+  },
+  "object": {
+    "total": 14998,
+    "before": 12159,
+    "after": 2839,
+    "dominantSide": "before",
+    "reliability": 0.8107080944125884,
+    "usable": true,
+    "marker": {
+      "form": "को",
+      "precision": 0.6581751581751581,
+      "nullCeiling": 0.24390243902439024,
+      "volume": 6006,
+      "recall": 0.2635684757967729
+    }
+  },
+  "subject": {
+    "total": 17402,
+    "before": 17145,
+    "after": 257,
+    "dominantSide": "before",
+    "reliability": 0.9852315825767153,
+    "usable": true,
+    "marker": {
+      "form": "ने",
+      "hits": 4694,
+      "total": 4889,
+      "precision": 0.9601145428512988,
+      "nullCeiling": 0.25
+    }
+  }
+}

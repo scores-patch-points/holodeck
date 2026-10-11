@@ -1,0 +1,97 @@
+{
+ "schema": "EOReadingGolden@1",
+ "specimen": "quran-5-3",
+ "path": "14-holy-texts/tanzil-quran/quran_quran-uthmani.txt",
+ "rule": "goldens/reading/RULE.md",
+ "window": {
+  "start": 126158,
+  "startText": "ٱلْيَوْمَ أَكْمَلْتُ",
+  "end": 126269,
+  "endText": "دِينًۭا ۚ",
+  "coordinates": "normalized body (container-stripped, CRLF-normalized); spans in RAW file coordinates"
+ },
+ "notes": "Quran 5:3, the ikmāl sentence (mid-verse window — windowStartText scopes past the verse's earlier forbidden-foods and despairing-disbelievers material; R8's completeness is per window): the dīn perfected — SYN·Pattern in Arabic (a whole WAY brought to completed wholeness), closing that cell's English-only frontier; with the favor completed (SYN·Figure, the Πεπλήρωται family at figure scale) and Islam approved AS dīn (EVA·Pattern). The 1sg divine speaker is the sura's own voice, resolved on every row. Field strings derived mechanically from the file's bytes.",
+ "revisions": [],
+ "rows": [
+  {
+   "subject": "ٱللَّهُ",
+   "relation": "أَكْمَلْتُ",
+   "object": "دِينَكُمْ",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SYN",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "quran:din-perfected",
+   "ground": "quran-5.3.1",
+   "role": "declared",
+   "because": "أَكْمَلْتُ (I have perfected/completed) — a whole WAY brought to completed wholeness: Generate·Structure at PATTERN grain (the دِين is a paradigm binding a community, not one artifact — the kind-level whole); ٱلْيَوْمَ (this day) temporal, لَكُمْ recipient, both folded (A2)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "the 1sg subject is the sura's divine speaker → ٱللَّهُ",
+   "alternate": {
+    "op": "SYN",
+    "grain": "Ground",
+    "because": "readable as the whole field of the religion completed rather than the paradigm"
+   },
+   "span": {
+    "start": 124969,
+    "end": 126469
+   },
+   "anchor": "ٱلْيَوْمَ أَكْمَلْتُ لَكُمْ دِينَكُمْ"
+  },
+  {
+   "subject": "ٱللَّهُ",
+   "relation": "وَأَتْمَمْتُ",
+   "object": "نِعْمَتِى",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SYN",
+    "grain": "Figure"
+   },
+   "clause": "coordinate",
+   "prop": "quran:favor-completed",
+   "ground": "quran-5.3.2",
+   "role": "declared",
+   "because": "أَتْمَمْتُ (I have brought to fullness) — ONE bestowal (نِعْمَتِى, My favor) completed: Generate·Structure at figure grain, the mark-1-15 Πεπλήρωται family at figure scale; عَلَيْكُمْ recipient folded (A2)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "the 1sg subject → ٱللَّهُ (the same speaker)",
+   "alternate": null,
+   "span": {
+    "start": 124969,
+    "end": 126469
+   },
+   "anchor": "وَأَتْمَمْتُ عَلَيْكُمْ نِعْمَتِى"
+  },
+  {
+   "subject": "ٱللَّهُ",
+   "relation": "وَرَضِيتُ",
+   "object": "دِينًۭا ۚ",
+   "polarity": "+",
+   "phasepost": {
+    "op": "EVA",
+    "grain": "Pattern"
+   },
+   "clause": "coordinate",
+   "prop": "quran:islam-approved-din",
+   "ground": "quran-5.3.3",
+   "role": "declared",
+   "because": "رَضِيتُ (I have approved / am pleased with) — approval HELD toward Islam AS the way (دِينًا, the as-classification borne by the تمييز): Relate·Interpretation at PATTERN grain (approved as the kind-of-way for the community); لَكُمُ recipient folded (A2)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "the 1sg subject → ٱللَّهُ (the same speaker)",
+   "alternate": {
+    "op": "DEF",
+    "grain": "Pattern",
+    "because": "the as-assignment readable as bounding a standing (the proclaims-as family) rather than approval held"
+   },
+   "span": {
+    "start": 124969,
+    "end": 126469
+   },
+   "anchor": "وَرَضِيتُ لَكُمُ ٱلْإِسْلَٰمَ دِينًۭا ۚ"
+  }
+ ]
+}

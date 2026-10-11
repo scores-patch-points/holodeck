@@ -1,0 +1,37 @@
+{
+  "schema": "RoleConfig@1",
+  "language": "ell",
+  "provenance": {
+    "builder": "eoreader7 native/scripts/build-role-config.mjs",
+    "source": "/private/tmp/claude-501/tb/ell/train.conllu",
+    "min_volume": 20,
+    "null_draws": 200,
+    "null_alpha": 0.05,
+    "null_seed": 1,
+    "note": "position stats and marker candidates are both derived mechanically from this treebank's own gold dependency annotations — never hand-typed or asserted from general linguistic knowledge. A marker candidate is admitted only when its real precision beats the (1-alpha) quantile of a within-sentence role-label shuffle (II.23), never a fixed ratio — and (S122) that quantile is the MAX-STATISTIC across every eligible closed-class candidate tried, not a per-candidate null, so the admitted marker is significant against the whole search, not merely against itself."
+  },
+  "object": {
+    "total": 1700,
+    "before": 321,
+    "after": 1379,
+    "dominantSide": "after",
+    "reliability": 0.8111764705882353,
+    "usable": true,
+    "marker": null
+  },
+  "subject": {
+    "total": 2358,
+    "before": 1719,
+    "after": 639,
+    "dominantSide": "before",
+    "reliability": 0.7290076335877863,
+    "usable": true,
+    "marker": {
+      "form": "είχαν",
+      "hits": 8,
+      "total": 24,
+      "precision": 0.3333333333333333,
+      "nullCeiling": 0.2
+    }
+  }
+}

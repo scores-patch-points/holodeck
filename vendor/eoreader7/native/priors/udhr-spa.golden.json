@@ -1,0 +1,3280 @@
+{
+ "schema": "EOReadingGolden@1",
+ "specimen": "udhr-spa",
+ "path": "06-government-legal/un-udhr/udhr-spa.txt",
+ "rule": "goldens/reading/RULE.md",
+ "window": {
+  "start": 0,
+  "end": 13055,
+  "endText": "proclamados en esta Declaración.",
+  "coordinates": "normalized body (container-stripped, CRLF-normalized); spans in RAW file coordinates"
+ },
+ "notes": "Whole document: Preamble + Articles 1-30 (R8-R12). Spanish verbs the operative purpose twice ('promuevan', 'aseguren') where English wraps both under one 'shall strive' — visible in the matrix as Spanish carrying both udhr:promote-respect and udhr:secure-recognition. Preamble+Article 1 re-adjudicated 2026-08-31 verb-first; Articles 2-30 added the same day.",
+ "revisions": [],
+ "rows": [
+  {
+   "subject": null,
+   "relation": "Preámbulo",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-preamble",
+   "ground": "preamble",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens — Relate·Existence at Ground grain",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 266,
+    "end": 281
+   },
+   "anchor": "Preámbulo"
+  },
+  {
+   "subject": "la libertad, la justicia y la paz en el mundo",
+   "relation": "tienen por base",
+   "object": "el reconocimiento de la dignidad intrínseca y de los derechos iguales e inalienables de todos los miembros de la familia humana",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Figure"
+   },
+   "clause": "main",
+   "prop": "udhr:recognition-foundation",
+   "ground": "preamble.1.1",
+   "role": "premise",
+   "because": "'tener por' is a light-verb copular construction and the predicate noun 'base' a unique role — copula rule 3's own trigger; Spanish states the relation with subject and object swapped relative to English, which changes the argument order, not the act",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "CON",
+    "grain": "Figure",
+    "because": "'tienen' read as a full lexical verb asserting a structural grounding relation"
+   },
+   "span": {
+    "start": 283,
+    "end": 496
+   },
+   "anchor": "tienen por base el reconocimiento de la dignidad intrínseca"
+  },
+  {
+   "subject": "el desconocimiento y el menosprecio de los derechos humanos",
+   "relation": "han originado",
+   "object": "actos de barbarie ultrajantes para la conciencia de la humanidad",
+   "polarity": "+",
+   "phasepost": {
+    "op": "INS",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:disregard-acts",
+   "ground": "preamble.2.1",
+   "role": "premise",
+   "because": "causation brings a class of acts into being — Generate·Existence at pattern grain; object kept whole per R4",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 498,
+    "end": 885
+   },
+   "anchor": "han originado actos de barbarie ultrajantes para la conciencia de la humanidad"
+  },
+  {
+   "subject": "actos de barbarie",
+   "relation": "ultrajantes para",
+   "object": "la conciencia de la humanidad",
+   "polarity": "+",
+   "phasepost": {
+    "op": "DEF",
+    "grain": "Figure"
+   },
+   "clause": "participial-modifier",
+   "prop": "udhr:acts-outrage-conscience",
+   "ground": "preamble.2.1.1",
+   "role": "premise",
+   "because": "affronting a moral standing — Differentiate·Interpretation; Spanish encodes it as a deverbal ADJECTIVE where English uses a finite relative — same proposition, different syntax, recorded by `clause`",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "the participial adjective agrees with 'actos de barbarie', the head it modifies",
+   "alternate": {
+    "op": "SEG",
+    "grain": "Figure",
+    "because": "readable as marring an arrangement rather than a meaning"
+   },
+   "span": {
+    "start": 498,
+    "end": 885
+   },
+   "anchor": "actos de barbarie ultrajantes para la conciencia de la humanidad"
+  },
+  {
+   "subject": "el advenimiento de un mundo en que los seres humanos, liberados del temor y de la miseria, disfruten de la libertad de palabra y de la libertad de creencias",
+   "relation": "se ha proclamado como",
+   "object": "la aspiración más elevada del hombre",
+   "polarity": "+",
+   "phasepost": {
+    "op": "DEF",
+    "grain": "Figure"
+   },
+   "clause": "main",
+   "prop": "udhr:advent-aspiration",
+   "ground": "preamble.2.2",
+   "role": "premise",
+   "because": "proclaiming-as assigns a bounded standing to one identified thing — Differentiate·Interpretation at figure grain",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 498,
+    "end": 885
+   },
+   "anchor": "se ha proclamado, como la aspiración más elevada del hombre, el advenimiento de un mundo"
+  },
+  {
+   "subject": "los seres humanos",
+   "relation": "disfruten de",
+   "object": "la libertad de palabra y de la libertad de creencias",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "relative",
+   "prop": "udhr:enjoy-freedoms",
+   "ground": "preamble.2.2.1",
+   "role": "premise",
+   "because": "RE-TYPED 2026-08-31 (was CON·Pattern, assigned by bucket): the object names a CONDITION present to the kind, the verbal form of a property predication — Relate·Existence at pattern grain. Contrast 'dotados de razón' (constituent faculty → CON)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "CON",
+    "grain": "Pattern",
+    "because": "the prior reading: possession as arrangement"
+   },
+   "span": {
+    "start": 498,
+    "end": 885
+   },
+   "anchor": "disfruten de la libertad de palabra y de la libertad de creencias"
+  },
+  {
+   "subject": "los seres humanos",
+   "relation": "liberados",
+   "object": "del temor y de la miseria",
+   "polarity": "+",
+   "phasepost": {
+    "op": "NUL",
+    "grain": "Pattern"
+   },
+   "clause": "participial-modifier",
+   "prop": "udhr:freed-from-want",
+   "ground": "preamble.2.2.1.1",
+   "role": "premise",
+   "because": "freed FROM something is an absence brought about — Differentiate·Existence; A4's rule, the absence IS the act, polarity stays +",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "the participle agrees with 'los seres humanos', the relative clause's subject",
+   "alternate": null,
+   "span": {
+    "start": 498,
+    "end": 885
+   },
+   "anchor": "liberados del temor y de la miseria"
+  },
+  {
+   "subject": "que los derechos humanos sean protegidos por un régimen de Derecho",
+   "relation": "[es] esencial",
+   "object": "esencial",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Figure"
+   },
+   "clause": "main",
+   "prop": "udhr:legal-protection-essential",
+   "ground": "preamble.3.1",
+   "role": "premise",
+   "because": "extraposed subject clause + property adjective (copula rule 4); copula 'es' elided under 'Considerando…esencial que'",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 887,
+    "end": 1092
+   },
+   "anchor": "esencial que los derechos humanos sean protegidos por un régimen de Derecho"
+  },
+  {
+   "subject": "los derechos humanos",
+   "relation": "sean protegidos",
+   "object": "por un régimen de Derecho",
+   "polarity": "+",
+   "phasepost": {
+    "op": "CON",
+    "grain": "Pattern"
+   },
+   "clause": "complement",
+   "prop": "udhr:law-protects-rights",
+   "ground": "preamble.3.1.1",
+   "role": "premise",
+   "because": "protection is a standing guard-arrangement of the legal order over the rights — Relate·Structure at pattern grain",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 887,
+    "end": 1092
+   },
+   "anchor": "los derechos humanos sean protegidos por un régimen de Derecho"
+  },
+  {
+   "subject": "el hombre",
+   "relation": "no se vea compelido",
+   "object": "al supremo recurso de la rebelión contra la tiranía y la opresión",
+   "polarity": "-",
+   "phasepost": {
+    "op": "INS",
+    "grain": "Pattern"
+   },
+   "clause": "purpose-adjunct",
+   "prop": "udhr:compelled-to-rebellion",
+   "ground": "preamble.3.1.2",
+   "role": "premise",
+   "because": "RE-TYPED 2026-08-31 (was CON·Pattern, justified circularly). 'verse compelido a' is causative — unnegated, man driven to the last recourse of rebellion, the same causation shape as 'han originado actos de barbarie': Generate·Existence at pattern grain. Negated: polarity − per R6; Spanish frames it as purpose ('a fin de que') where English uses a conditional",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "CON",
+    "grain": "Pattern",
+    "because": "the prior reading: a binding force-relation"
+   },
+   "span": {
+    "start": 887,
+    "end": 1092
+   },
+   "anchor": "a fin de que el hombre no se vea compelido al supremo recurso de la rebelión"
+  },
+  {
+   "subject": "promover el desarrollo de relaciones amistosas entre las naciones",
+   "relation": "[es] esencial",
+   "object": "esencial",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Figure"
+   },
+   "clause": "main",
+   "prop": "udhr:friendly-relations-essential",
+   "ground": "preamble.4.1",
+   "role": "premise",
+   "because": "extraposed infinitival subject + property adjective (copula rule 4)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 1094,
+    "end": 1196
+   },
+   "anchor": "Considerando también esencial promover el desarrollo de relaciones amistosas entre las naciones"
+  },
+  {
+   "subject": "los pueblos de las Naciones Unidas",
+   "relation": "han reafirmado",
+   "object": "su fe en los derechos fundamentales del hombre, en la dignidad y el valor de la persona humana y en la igualdad de derechos de hombres y mujeres",
+   "polarity": "+",
+   "phasepost": {
+    "op": "EVA",
+    "grain": "Figure"
+   },
+   "clause": "main",
+   "prop": "udhr:faith-reaffirmed",
+   "ground": "preamble.5.1",
+   "role": "premise",
+   "because": "a held commitment restated ('su fe'), not a frame replaced — Relate·Interpretation at figure grain; REC is the re-zero and concedes a prior ground, which reaffirmation does not. 'en la Carta' is adjunct (A2)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "REC",
+    "grain": "Figure",
+    "because": "the prior reading, kept disclosed"
+   },
+   "span": {
+    "start": 1198,
+    "end": 1564
+   },
+   "anchor": "han reafirmado en la Carta su fe en los derechos fundamentales del hombre"
+  },
+  {
+   "subject": "los pueblos de las Naciones Unidas",
+   "relation": "se han declarado resueltos a",
+   "object": "promover el progreso social y a elevar el nivel de vida dentro de un concepto más amplio de la libertad",
+   "polarity": "+",
+   "phasepost": {
+    "op": "DEF",
+    "grain": "Figure"
+   },
+   "clause": "main",
+   "prop": "udhr:progress-determined",
+   "ground": "preamble.5.2",
+   "role": "premise",
+   "because": "declararse resuelto a bounds a course of action, cutting off the others — Differentiate·Interpretation on one resolve; complement stays inside the object (A1)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "coordinated predicate shares 'los pueblos de las Naciones Unidas'",
+   "alternate": {
+    "op": "REC",
+    "grain": "Figure",
+    "because": "readable as generating a new commitment"
+   },
+   "span": {
+    "start": 1198,
+    "end": 1564
+   },
+   "anchor": "se han declarado resueltos a promover el progreso social"
+  },
+  {
+   "subject": "los Estados Miembros",
+   "relation": "se han comprometido a asegurar",
+   "object": "el respeto universal y efectivo a los derechos y libertades fundamentales del hombre",
+   "polarity": "+",
+   "phasepost": {
+    "op": "CON",
+    "grain": "Figure"
+   },
+   "clause": "main",
+   "prop": "udhr:states-pledged",
+   "ground": "preamble.6.1",
+   "role": "premise",
+   "because": "a commitment places the pledger and an undertaking into one standing link — Relate·Structure at figure grain (one specific commitment); 'en cooperación con la Organización de las Naciones Unidas' is adjunct (A2)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 1566,
+    "end": 1788
+   },
+   "anchor": "los Estados Miembros se han comprometido a asegurar"
+  },
+  {
+   "subject": "una concepción común de estos derechos y libertades",
+   "relation": "es",
+   "object": "de la mayor importancia para el pleno cumplimiento de dicho compromiso",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Figure"
+   },
+   "clause": "main",
+   "prop": "udhr:understanding-importance",
+   "ground": "preamble.7.1",
+   "role": "premise",
+   "because": "copula ('es') + property predicate (copula rule 4)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 1790,
+    "end": 1939
+   },
+   "anchor": "una concepción común de estos derechos y libertades es de la mayor importancia"
+  },
+  {
+   "subject": "La Asamblea General",
+   "relation": "Proclama",
+   "object": "la presente Declaración Universal de los Derechos Humanos como ideal común",
+   "polarity": "+",
+   "phasepost": {
+    "op": "DEF",
+    "grain": "Figure"
+   },
+   "clause": "main",
+   "prop": "udhr:assembly-proclaims",
+   "ground": "preamble.10.1",
+   "role": "operative",
+   "because": "declaring the Declaration's standing — a bounded public act of definition, the operative act the premises support; addressed at paragraph 10, where the predicate lives — paragraphs 8-9 ('Ahora, por tanto,' / 'La Asamblea General,') are this one predication split by layout",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "subject stands in its own preceding one-line paragraph ('La Asamblea General,') — the Preamble's own layout, not a pronoun",
+   "alternate": null,
+   "span": {
+    "start": 1994,
+    "end": 2571
+   },
+   "anchor": "Proclama la presente Declaración Universal de los Derechos Humanos como ideal común"
+  },
+  {
+   "subject": "todos los pueblos y naciones",
+   "relation": "deben esforzarse",
+   "object": "ideal común",
+   "polarity": "+",
+   "phasepost": {
+    "op": "INS",
+    "grain": "Pattern"
+   },
+   "clause": "relative",
+   "prop": "udhr:standard-to-strive",
+   "ground": "preamble.10.1.1",
+   "role": "operative",
+   "because": "RE-TYPED 2026-08-31 (was CON·Pattern, typed off the deontic wrapper against A3). 'esforzarse por' the ideal — labouring to REALIZE it: the product is a state of affairs in which the ideal is actual, Generate·Existence at pattern grain; deontic 'deben' noted, not typed (A3)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "'por el que' → el ideal común, the head it restricts",
+   "alternate": {
+    "op": "CON",
+    "grain": "Pattern",
+    "because": "the prior reading: prescribed standing conduct"
+   },
+   "span": {
+    "start": 1994,
+    "end": 2571
+   },
+   "anchor": "por el que todos los pueblos y naciones deben esforzarse"
+  },
+  {
+   "subject": "tanto los individuos como las instituciones",
+   "relation": "promuevan",
+   "object": "el respeto a estos derechos y libertades",
+   "polarity": "+",
+   "phasepost": {
+    "op": "REC",
+    "grain": "Pattern"
+   },
+   "clause": "purpose-adjunct",
+   "prop": "udhr:promote-respect",
+   "ground": "preamble.10.1.2",
+   "role": "operative",
+   "because": "RE-TYPED 2026-08-31 (was CON·Pattern, typed off the deontic frame). Verb-first: to PROMOTE respect, by teaching and education, is to foster a valuation in others — an interpretive product, not an arrangement: Generate·Interpretation at pattern grain. Typed from the verb; re-occupying an empty cell is a consequence, not a reason",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "CON",
+    "grain": "Pattern",
+    "because": "the prior reading: prescribed standing conduct"
+   },
+   "span": {
+    "start": 1994,
+    "end": 2571
+   },
+   "anchor": "promuevan, mediante la enseñanza y la educación, el respeto a estos derechos y libertades"
+  },
+  {
+   "subject": "tanto los individuos como las instituciones",
+   "relation": "aseguren",
+   "object": "su reconocimiento y aplicación universales y efectivos",
+   "polarity": "+",
+   "phasepost": {
+    "op": "REC",
+    "grain": "Pattern"
+   },
+   "clause": "purpose-adjunct",
+   "prop": "udhr:secure-recognition",
+   "ground": "preamble.10.1.3",
+   "role": "operative",
+   "because": "RE-TYPED 2026-08-31 (was CON·Pattern). Securing universal RECOGNITION generates an interpretive standing (acknowledgment) across the kind — Generate·Interpretation at pattern grain; the coordinated 'aplicación' (application/observance) leans structural, disclosed in the alternate. Spanish verbs this finitely where English folds it under 'shall strive' (A1) — a real syntactic divergence the prop matrix records",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "coordinated subjunctive shares 'tanto los individuos como las instituciones'",
+   "alternate": {
+    "op": "INS",
+    "grain": "Pattern",
+    "because": "the observance half read as a state of affairs brought into being"
+   },
+   "span": {
+    "start": 1994,
+    "end": 2571
+   },
+   "anchor": "aseguren, por medidas progresivas de carácter nacional e internacional, su reconocimiento y aplicación universales y efectivos"
+  },
+  {
+   "subject": "tanto los individuos como las instituciones",
+   "relation": "inspirándose",
+   "object": "constantemente en ella",
+   "polarity": "+",
+   "phasepost": {
+    "op": "EVA",
+    "grain": "Pattern"
+   },
+   "clause": "participial-adjunct",
+   "prop": "udhr:keep-in-mind",
+   "ground": "preamble.10.1.2.1",
+   "role": "operative",
+   "because": "a content held by a holder — Relate·Interpretation; 'constantemente' makes it habitual, hence Pattern",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "gerund shares the purpose clause's subject; 'ella' → la Declaración",
+   "alternate": null,
+   "span": {
+    "start": 1994,
+    "end": 2571
+   },
+   "anchor": "inspirándose constantemente en ella"
+  },
+  {
+   "subject": null,
+   "relation": "Artículo 1",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-1",
+   "ground": "article-1",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens — Relate·Existence at Ground grain",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 2576,
+    "end": 2592
+   },
+   "anchor": "Artículo 1"
+  },
+  {
+   "subject": "Todos los seres humanos",
+   "relation": "nacen",
+   "object": "libres e iguales en dignidad y derechos",
+   "polarity": "+",
+   "phasepost": {
+    "op": "INS",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:born-free",
+   "ground": "article-1.1.1",
+   "role": "declared",
+   "because": "birth stated as a law over the whole kind — Generate·Existence at pattern grain",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 2594,
+    "end": 2771
+   },
+   "anchor": "Todos los seres humanos nacen libres e iguales en dignidad y derechos"
+  },
+  {
+   "subject": "Todos los seres humanos",
+   "relation": "están dotados",
+   "object": "de razón y conciencia",
+   "polarity": "+",
+   "phasepost": {
+    "op": "CON",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:endowed-reason",
+   "ground": "article-1.1.2",
+   "role": "declared",
+   "because": "reason and conscience are constituent faculties — a part-whole arrangement stated as a law of the kind: Relate·Structure at pattern grain; parenthetical participial clause carrying its own predication",
+   "embedded": true,
+   "unresolved": false,
+   "resolution": "implicit subject shared with the main clause → Todos los seres humanos",
+   "alternate": null,
+   "span": {
+    "start": 2594,
+    "end": 2771
+   },
+   "anchor": "dotados como están de razón y conciencia"
+  },
+  {
+   "subject": "Todos los seres humanos",
+   "relation": "deben comportarse fraternalmente",
+   "object": "los unos con los otros",
+   "polarity": "+",
+   "phasepost": {
+    "op": "CON",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:act-brotherhood",
+   "ground": "article-1.1.3",
+   "role": "declared",
+   "because": "a standing mutual relation among members of the kind ('los unos con los otros') — Relate·Structure at pattern grain; deontic 'deben' noted (A3)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "shared subject 'Todos los seres humanos'",
+   "alternate": null,
+   "span": {
+    "start": 2594,
+    "end": 2771
+   },
+   "anchor": "deben comportarse fraternalmente los unos con los otros."
+  },
+  {
+   "subject": null,
+   "relation": "Artículo 2",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-2",
+   "ground": "article-2",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 2776,
+    "end": 2792
+   },
+   "anchor": "Artículo 2"
+  },
+  {
+   "subject": "Toda persona",
+   "relation": "tiene",
+   "object": "todos los derechos y libertades proclamados en esta Declaración",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:entitled-to-rights",
+   "ground": "article-2.1.1",
+   "role": "declared",
+   "because": "'tiene' with a normative-standing object: rights held as a CONDITION of the kind, not a constituent part — the same standing-holding shape as enjoy-freedoms, Relate·Existence at pattern grain; 'sin distinción alguna de…' is a verbless adjunct (A2)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "CON",
+    "grain": "Pattern",
+    "because": "'tener' read as full possession, an arrangement"
+   },
+   "span": {
+    "start": 2794,
+    "end": 3075
+   },
+   "anchor": "Toda persona tiene todos los derechos y libertades proclamados en esta Declaración"
+  },
+  {
+   "subject": "distinción alguna fundada en la condición política, jurídica o internacional del país o territorio",
+   "relation": "no se hará",
+   "object": null,
+   "polarity": "-",
+   "phasepost": {
+    "op": "SEG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:no-distinction-status",
+   "ground": "article-2.2.1",
+   "role": "declared",
+   "because": "distinguishing-by-status CUTS the kind into classes — Differentiate·Structure at pattern grain, negated impersonal ('no se hará'): polarity − per R6; the 'tanto si se trata de…' tail is a concessive alternative-list (folded, noted)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "NUL",
+    "grain": "Pattern",
+    "because": "A4's absence-as-act reading, polarity + — Arabic's own construction for this prop"
+   },
+   "span": {
+    "start": 3077,
+    "end": 3405
+   },
+   "anchor": "no se hará distinción alguna fundada en la condición política"
+  },
+  {
+   "subject": "una persona",
+   "relation": "dependa",
+   "object": "de cuya jurisdicción",
+   "polarity": "+",
+   "phasepost": {
+    "op": "CON",
+    "grain": "Pattern"
+   },
+   "clause": "restrictive-relative",
+   "prop": "udhr:person-belongs-territory",
+   "ground": "article-2.2.1.1",
+   "role": "declared",
+   "because": "jurisdictional dependence is a standing membership arrangement between a person and a polity — Relate·Structure at pattern grain; Spanish words it as dependence where English words it as belonging, same tie",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "'cuya' → del país o territorio, the head the relative restricts",
+   "alternate": null,
+   "span": {
+    "start": 3077,
+    "end": 3405
+   },
+   "anchor": "de cuya jurisdicción dependa una persona"
+  },
+  {
+   "subject": null,
+   "relation": "Artículo 3",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-3",
+   "ground": "article-3",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 3410,
+    "end": 3426
+   },
+   "anchor": "Artículo 3"
+  },
+  {
+   "subject": "Todo individuo",
+   "relation": "tiene derecho a",
+   "object": "la vida, a la libertad y a la seguridad de su persona",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:life-liberty-security",
+   "ground": "article-3.1.1",
+   "role": "declared",
+   "because": "the right-holding frame (see udhr:entitled-to-rights): a normative standing held by the kind — Relate·Existence at pattern grain; three coordinated right-objects under one verb (R4)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 3428,
+    "end": 3519
+   },
+   "anchor": "Todo individuo tiene derecho a la vida, a la libertad y a la seguridad de su persona."
+  },
+  {
+   "subject": null,
+   "relation": "Artículo 4",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-4",
+   "ground": "article-4",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 3524,
+    "end": 3540
+   },
+   "anchor": "Artículo 4"
+  },
+  {
+   "subject": "Nadie",
+   "relation": "estará sometido a",
+   "object": "esclavitud ni a servidumbre",
+   "polarity": "-",
+   "phasepost": {
+    "op": "CON",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:no-slavery",
+   "ground": "article-4.1.1",
+   "role": "declared",
+   "because": "'sometido a' — subjection, standing under another's hold: Relate·Structure at pattern grain, universally negated ('Nadie'): polarity − per R6 (the en/ar/es holding-subjection family; zh/sw verb the MAKING of a slave instead)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 3542,
+    "end": 3675
+   },
+   "anchor": "Nadie estará sometido a esclavitud ni a servidumbre"
+  },
+  {
+   "subject": "la esclavitud y la trata de esclavos",
+   "relation": "están prohibidas",
+   "object": "en todas sus formas",
+   "polarity": "+",
+   "phasepost": {
+    "op": "DEF",
+    "grain": "Pattern"
+   },
+   "clause": "coordinate",
+   "prop": "udhr:slavery-prohibited",
+   "ground": "article-4.1.2",
+   "role": "declared",
+   "because": "prohibition DRAWS AN EXCLUSION BOUNDARY around the practice-kind — Differentiate·Interpretation at pattern grain; Spanish states it copularly ('están prohibidas', the prohibited-standing held) like Swahili's 'ni marufuku', where English/Arabic/Mandarin verb the prohibiting — same cell, construction noted; the prohibition is asserted: polarity +",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 3542,
+    "end": 3675
+   },
+   "anchor": "la esclavitud y la trata de esclavos están prohibidas en todas sus formas"
+  },
+  {
+   "subject": null,
+   "relation": "Artículo 5",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-5",
+   "ground": "article-5",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 3680,
+    "end": 3696
+   },
+   "anchor": "Artículo 5"
+  },
+  {
+   "subject": "Nadie",
+   "relation": "será sometido a",
+   "object": "torturas ni a penas o tratos crueles, inhumanos o degradantes",
+   "polarity": "-",
+   "phasepost": {
+    "op": "CON",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:no-torture",
+   "ground": "article-5.1.1",
+   "role": "declared",
+   "because": "subjection — standing UNDER an infliction: Relate·Structure at pattern grain, universally negated: polarity − per R6",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 3698,
+    "end": 3788
+   },
+   "anchor": "Nadie será sometido a torturas ni a penas o tratos crueles, inhumanos o degradantes."
+  },
+  {
+   "subject": null,
+   "relation": "Artículo 6",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-6",
+   "ground": "article-6",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 3793,
+    "end": 3809
+   },
+   "anchor": "Artículo 6"
+  },
+  {
+   "subject": "Todo ser humano",
+   "relation": "tiene derecho al",
+   "object": "reconocimiento de su personalidad jurídica",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:recognition-before-law",
+   "ground": "article-6.1.1",
+   "role": "declared",
+   "because": "the right-holding frame; 'en todas partes' is a verbless parenthetical (A2, folded); the recognition stays inside the right-object (A1)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 3811,
+    "end": 3911
+   },
+   "anchor": "Todo ser humano tiene derecho, en todas partes, al reconocimiento de su personalidad jurídica."
+  },
+  {
+   "subject": null,
+   "relation": "Artículo 7",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-7",
+   "ground": "article-7",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 3916,
+    "end": 3932
+   },
+   "anchor": "Artículo 7"
+  },
+  {
+   "subject": "Todos",
+   "relation": "son",
+   "object": "iguales ante la ley",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:equal-before-law",
+   "ground": "article-7.1.1",
+   "role": "declared",
+   "because": "copula + property over the whole kind (rule 4) — a condition held: Relate·Existence at pattern grain",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 3934,
+    "end": 4178
+   },
+   "anchor": "Todos son iguales ante la ley"
+  },
+  {
+   "subject": "Todos",
+   "relation": "tienen derecho a",
+   "object": "igual protección de la ley",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "coordinate",
+   "prop": "udhr:equal-protection",
+   "ground": "article-7.1.2",
+   "role": "declared",
+   "because": "the right-holding frame; 'sin distinción' is a verbless parenthetical (A2)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "coordinated predicate shares 'Todos'",
+   "alternate": null,
+   "span": {
+    "start": 3934,
+    "end": 4178
+   },
+   "anchor": "tienen, sin distinción, derecho a igual protección de la ley"
+  },
+  {
+   "subject": "Todos",
+   "relation": "tienen derecho a",
+   "object": "igual protección contra toda discriminación que infrinja esta Declaración y contra toda provocación a tal discriminación",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:protection-against-discrimination",
+   "ground": "article-7.1.3",
+   "role": "declared",
+   "because": "the right-holding frame; 'que infrinja' is SUBJUNCTIVE — a characterizing relative inside the right-object, folded by the mood rule (R11)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 3934,
+    "end": 4178
+   },
+   "anchor": "Todos tienen derecho a igual protección contra toda discriminación que infrinja esta Declaración"
+  },
+  {
+   "subject": null,
+   "relation": "Artículo 8",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-8",
+   "ground": "article-8",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 4183,
+    "end": 4199
+   },
+   "anchor": "Artículo 8"
+  },
+  {
+   "subject": "Toda persona",
+   "relation": "tiene derecho a",
+   "object": "un recurso efectivo ante los tribunales nacionales competentes, que la ampare contra actos que violen sus derechos fundamentales",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:effective-remedy",
+   "ground": "article-8.1.1",
+   "role": "declared",
+   "because": "the right-holding frame; 'que la ampare' and 'que violen' are SUBJUNCTIVE relatives — irrealis mood marks them as characterizing the sought remedy, not asserting protection or violation occurs: they fold by the mood rule (R11), the rule's flagship case",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 4201,
+    "end": 4410
+   },
+   "anchor": "Toda persona tiene derecho a un recurso efectivo ante los tribunales nacionales competentes"
+  },
+  {
+   "subject": null,
+   "relation": "Artículo 9",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-9",
+   "ground": "article-9",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 4415,
+    "end": 4431
+   },
+   "anchor": "Artículo 9"
+  },
+  {
+   "subject": "Nadie",
+   "relation": "podrá ser arbitrariamente detenido",
+   "object": "preso ni desterrado",
+   "polarity": "-",
+   "phasepost": {
+    "op": "CON",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:no-arbitrary-arrest",
+   "ground": "article-9.1.1",
+   "role": "declared",
+   "because": "detention, imprisonment and banishment are takings-into-custody — the coverage-arrangement family: Relate·Structure at pattern grain, universally negated: polarity − per R6; three coordinated participles under one auxiliary, the remainder riding in the object slot",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 4433,
+    "end": 4501
+   },
+   "anchor": "Nadie podrá ser arbitrariamente detenido, preso ni desterrado."
+  },
+  {
+   "subject": null,
+   "relation": "Artículo 10",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-10",
+   "ground": "article-10",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 4506,
+    "end": 4523
+   },
+   "anchor": "Artículo 10"
+  },
+  {
+   "subject": "Toda persona",
+   "relation": "tiene derecho a",
+   "object": "ser oída públicamente y con justicia por un tribunal independiente e imparcial",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:fair-hearing",
+   "ground": "article-10.1.1",
+   "role": "declared",
+   "because": "the right-holding frame; 'en condiciones de plena igualdad' is a verbless parenthetical (A2); the hearing stays inside the right-object (A1)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 4525,
+    "end": 4797
+   },
+   "anchor": "Toda persona tiene derecho, en condiciones de plena igualdad, a ser oída públicamente y con justicia"
+  },
+  {
+   "subject": null,
+   "relation": "Artículo 11",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-11",
+   "ground": "article-11",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 4802,
+    "end": 4819
+   },
+   "anchor": "Artículo 11"
+  },
+  {
+   "subject": "Toda persona acusada de delito",
+   "relation": "tiene derecho a",
+   "object": "que se presuma su inocencia mientras no se pruebe su culpabilidad",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:presumed-innocent",
+   "ground": "article-11.1.1",
+   "role": "declared",
+   "because": "the right-holding frame; the presumption and the while-not-proven boundary stay inside the right-object (A1), and the trial-guarantees relative ('en el que se le hayan asegurado…', subjunctive) folds by the mood rule (R11)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 4823,
+    "end": 5064
+   },
+   "anchor": "Toda persona acusada de delito tiene derecho a que se presuma su inocencia"
+  },
+  {
+   "subject": "Nadie",
+   "relation": "será condenado por",
+   "object": "actos u omisiones que en el momento de cometerse no fueron delictivos según el Derecho nacional o internacional",
+   "polarity": "-",
+   "phasepost": {
+    "op": "EVA",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:no-retroactive-guilt",
+   "ground": "article-11.2.1",
+   "role": "declared",
+   "because": "'condenado' — a judgment rendered over a person: Relate·Interpretation at pattern grain, universally negated: polarity − per R6; the acts' own relative has its own row (R8)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 5068,
+    "end": 5308
+   },
+   "anchor": "Nadie será condenado por actos u omisiones"
+  },
+  {
+   "subject": "actos u omisiones",
+   "relation": "no fueron",
+   "object": "delictivos",
+   "polarity": "-",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "restrictive-relative",
+   "prop": "udhr:act-not-offence-then",
+   "ground": "article-11.2.1.1",
+   "role": "declared",
+   "because": "copula + property, negated — and INDICATIVE ('fueron', a real past fact), which is why this relative gets a row while this file's subjunctive relatives fold (R11): Spanish sides with English and Mandarin (class/property construal) in the four-way nullum crimen split the en row maps; 'en el momento de cometerse' is the temporal boundary, folded (A2)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "relative 'que' → actos u omisiones, the head it restricts",
+   "alternate": null,
+   "span": {
+    "start": 5068,
+    "end": 5308
+   },
+   "anchor": "que en el momento de cometerse no fueron delictivos"
+  },
+  {
+   "subject": "pena más grave",
+   "relation": "Tampoco se impondrá",
+   "object": "que la aplicable en el momento de la comisión del delito",
+   "polarity": "-",
+   "phasepost": {
+    "op": "INS",
+    "grain": "Pattern"
+   },
+   "clause": "coordinate",
+   "prop": "udhr:no-heavier-penalty",
+   "ground": "article-11.2.2",
+   "role": "declared",
+   "because": "'impondrá' — imposing brings the penalty into force: Generate·Existence at pattern grain, negated ('Tampoco'): polarity −; the comparative standard folds (R1)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "CON",
+    "grain": "Pattern",
+    "because": "readable as the penalty laid onto the person as an arrangement"
+   },
+   "span": {
+    "start": 5068,
+    "end": 5308
+   },
+   "anchor": "Tampoco se impondrá pena más grave que la aplicable en el momento de la comisión del delito."
+  },
+  {
+   "subject": null,
+   "relation": "Artículo 12",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-12",
+   "ground": "article-12",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 5315,
+    "end": 5332
+   },
+   "anchor": "Artículo 12"
+  },
+  {
+   "subject": "Nadie",
+   "relation": "será objeto de",
+   "object": "injerencias arbitrarias en su vida privada, su familia, su domicilio o su correspondencia, ni de ataques a su honra o a su reputación",
+   "polarity": "-",
+   "phasepost": {
+    "op": "CON",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:no-arbitrary-interference",
+   "ground": "article-12.1.1",
+   "role": "declared",
+   "because": "'ser objeto de' — subjection (being made the object of): the coverage-arrangement family, negated: polarity −; like English and Arabic, one verb folds the attacks-on-honour content into its coordinated object — prop udhr:no-attacks-honour absent here by fold",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 5334,
+    "end": 5584
+   },
+   "anchor": "Nadie será objeto de injerencias arbitrarias en su vida privada"
+  },
+  {
+   "subject": "Toda persona",
+   "relation": "tiene derecho a",
+   "object": "la protección de la ley contra tales injerencias o ataques",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:protection-of-law",
+   "ground": "article-12.1.2",
+   "role": "declared",
+   "because": "the right-holding frame; the protection arrangement stays inside the right-object (A1)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 5334,
+    "end": 5584
+   },
+   "anchor": "Toda persona tiene derecho a la protección de la ley contra tales injerencias o ataques."
+  },
+  {
+   "subject": null,
+   "relation": "Artículo 13",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-13",
+   "ground": "article-13",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 5589,
+    "end": 5606
+   },
+   "anchor": "Artículo 13"
+  },
+  {
+   "subject": "Toda persona",
+   "relation": "tiene derecho a",
+   "object": "circular libremente y a elegir su residencia en el territorio de un Estado",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:freedom-of-movement",
+   "ground": "article-13.1.1",
+   "role": "declared",
+   "because": "the right-holding frame; two coordinated act-infinitives under one verb (R4)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 5610,
+    "end": 5724
+   },
+   "anchor": "Toda persona tiene derecho a circular libremente y a elegir su residencia en el territorio de un Estado."
+  },
+  {
+   "subject": "Toda persona",
+   "relation": "tiene derecho a",
+   "object": "salir de cualquier país, incluso del propio, y a regresar a su país",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:leave-and-return",
+   "ground": "article-13.2.1",
+   "role": "declared",
+   "because": "the right-holding frame; ONE verb over the leave/return pair, like English (Arabic, Mandarin and Swahili each repeat the right-verb — two rows on this prop there)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 5728,
+    "end": 5835
+   },
+   "anchor": "Toda persona tiene derecho a salir de cualquier país, incluso del propio, y a regresar a su país."
+  },
+  {
+   "subject": null,
+   "relation": "Artículo 14",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-14",
+   "ground": "article-14",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 5842,
+    "end": 5859
+   },
+   "anchor": "Artículo 14"
+  },
+  {
+   "subject": "toda persona",
+   "relation": "tiene derecho a",
+   "object": "buscar asilo, y a disfrutar de él, en cualquier país",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:seek-asylum",
+   "ground": "article-14.1.1",
+   "role": "declared",
+   "because": "the right-holding frame; 'En caso de persecución' is a conditional adjunct (A2); two coordinated act-infinitives (R4)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 5863,
+    "end": 5979
+   },
+   "anchor": "En caso de persecución, toda persona tiene derecho a buscar asilo, y a disfrutar de él, en cualquier país."
+  },
+  {
+   "subject": "Este derecho",
+   "relation": "no podrá ser invocado",
+   "object": "contra una acción judicial realmente originada por delitos comunes o por actos opuestos a los propósitos y principios de las Naciones Unidas",
+   "polarity": "-",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:asylum-not-invoked",
+   "ground": "article-14.2.1",
+   "role": "declared",
+   "because": "invoking a right APPEALS TO the standing — Relate·Existence at pattern grain, negated for the named case-class: polarity − per R6; 'realmente originada por…' is a participial modifier, folded (R1)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "'Este derecho' → the asylum right (article-14.1.1)",
+   "alternate": {
+    "op": "DEF",
+    "grain": "Pattern",
+    "because": "readable by effect: the right's scope bounded to exclude the case-class"
+   },
+   "span": {
+    "start": 5983,
+    "end": 6169
+   },
+   "anchor": "Este derecho no podrá ser invocado contra una acción judicial"
+  },
+  {
+   "subject": null,
+   "relation": "Artículo 15",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-15",
+   "ground": "article-15",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 6176,
+    "end": 6193
+   },
+   "anchor": "Artículo 15"
+  },
+  {
+   "subject": "Toda persona",
+   "relation": "tiene derecho a",
+   "object": "una nacionalidad",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:right-to-nationality",
+   "ground": "article-15.1.1",
+   "role": "declared",
+   "because": "the right-holding frame",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 6197,
+    "end": 6253
+   },
+   "anchor": "Toda persona tiene derecho a una nacionalidad."
+  },
+  {
+   "subject": "A nadie",
+   "relation": "se privará",
+   "object": "de su nacionalidad ni del derecho a cambiar de nacionalidad",
+   "polarity": "-",
+   "phasepost": {
+    "op": "SEG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:no-deprive-nationality",
+   "ground": "article-15.2.1",
+   "role": "declared",
+   "because": "'privar de' SEVERS the person-nationality tie — Differentiate·Structure at pattern grain, universally negated: polarity −. Spanish alone folds the denial-of-change under this ONE deprivation verb ('ni del derecho a cambiar') — prop udhr:no-deny-change-nationality absent here by fold, its content in this object",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 6257,
+    "end": 6362
+   },
+   "anchor": "A nadie se privará arbitrariamente de su nacionalidad ni del derecho a cambiar de nacionalidad."
+  },
+  {
+   "subject": null,
+   "relation": "Artículo 16",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-16",
+   "ground": "article-16",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 6369,
+    "end": 6386
+   },
+   "anchor": "Artículo 16"
+  },
+  {
+   "subject": "Los hombres y las mujeres",
+   "relation": "tienen derecho a",
+   "object": "casarse y fundar una familia",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:marry-found-family",
+   "ground": "article-16.1.1",
+   "role": "declared",
+   "because": "the right-holding frame; 'a partir de la edad núbil' and 'sin restricción alguna…' are verbless parentheticals (A2, folded)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 6390,
+    "end": 6691
+   },
+   "anchor": "Los hombres y las mujeres, a partir de la edad núbil, tienen derecho, sin restricción alguna por motivos de raza, nacionalidad o religión, a casarse y fundar una familia"
+  },
+  {
+   "subject": "Los hombres y las mujeres",
+   "relation": "disfrutarán de",
+   "object": "iguales derechos en cuanto al matrimonio, durante el matrimonio y en caso de disolución del matrimonio",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "coordinate",
+   "prop": "udhr:equal-rights-marriage",
+   "ground": "article-16.1.2",
+   "role": "declared",
+   "because": "'disfrutarán' — the enjoy-frame: the equal rights held as a condition, Relate·Existence at pattern grain (English words this one as entitlement — same family)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "coordinated predicate shares 'Los hombres y las mujeres'",
+   "alternate": null,
+   "span": {
+    "start": 6390,
+    "end": 6691
+   },
+   "anchor": "disfrutarán de iguales derechos en cuanto al matrimonio"
+  },
+  {
+   "subject": "el matrimonio",
+   "relation": "podrá contraerse",
+   "object": "Sólo mediante libre y pleno consentimiento de los futuros esposos",
+   "polarity": "+",
+   "phasepost": {
+    "op": "CON",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:marriage-consent",
+   "ground": "article-16.2.1",
+   "role": "declared",
+   "because": "'contraerse' (be contracted) JOINS the parties into the arrangement — Relate·Structure at pattern grain; 'Sólo mediante' is a fronted restrictor, not a negation: polarity + (Arabic words the same restriction as لا…إلا and carries −)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "INS",
+    "grain": "Pattern",
+    "because": "readable as the marriage brought into being"
+   },
+   "span": {
+    "start": 6695,
+    "end": 6802
+   },
+   "anchor": "Sólo mediante libre y pleno consentimiento de los futuros esposos podrá contraerse el matrimonio."
+  },
+  {
+   "subject": "La familia",
+   "relation": "es",
+   "object": "el elemento natural y fundamental de la sociedad",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Figure"
+   },
+   "clause": "main",
+   "prop": "udhr:family-unit-society",
+   "ground": "article-16.3.1",
+   "role": "declared",
+   "because": "copula rule 3: definite unique role (EL elemento natural y fundamental) — the identificational shape, with the article doing the work as in English and Arabic; Spanish's role-noun is 'elemento' where English has 'group unit', noted",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "CON",
+    "grain": "Pattern",
+    "because": "the mereological reading: constituent element OF society"
+   },
+   "span": {
+    "start": 6806,
+    "end": 6939
+   },
+   "anchor": "La familia es el elemento natural y fundamental de la sociedad"
+  },
+  {
+   "subject": "La familia",
+   "relation": "tiene derecho a",
+   "object": "la protección de la sociedad y del Estado",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "coordinate",
+   "prop": "udhr:family-protected",
+   "ground": "article-16.3.2",
+   "role": "declared",
+   "because": "the right-holding frame over the kind 'family'",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "coordinated predicate shares 'La familia'",
+   "alternate": null,
+   "span": {
+    "start": 6806,
+    "end": 6939
+   },
+   "anchor": "tiene derecho a la protección de la sociedad y del Estado"
+  },
+  {
+   "subject": null,
+   "relation": "Artículo 17",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-17",
+   "ground": "article-17",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 6946,
+    "end": 6963
+   },
+   "anchor": "Artículo 17"
+  },
+  {
+   "subject": "Toda persona",
+   "relation": "tiene derecho a",
+   "object": "la propiedad, individual y colectivamente",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:own-property",
+   "ground": "article-17.1.1",
+   "role": "declared",
+   "because": "the right-holding frame; Spanish words the alone-or-in-association mode adverbially ('individual y colectivamente') — folded (A2)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 6967,
+    "end": 7048
+   },
+   "anchor": "Toda persona tiene derecho a la propiedad, individual y colectivamente."
+  },
+  {
+   "subject": "Nadie",
+   "relation": "será privado arbitrariamente de",
+   "object": "su propiedad",
+   "polarity": "-",
+   "phasepost": {
+    "op": "SEG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:no-deprive-property",
+   "ground": "article-17.2.1",
+   "role": "declared",
+   "because": "the deprivation frame: the person-property tie severed — Differentiate·Structure at pattern grain, negated: polarity −",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 7052,
+    "end": 7113
+   },
+   "anchor": "Nadie será privado arbitrariamente de su propiedad."
+  },
+  {
+   "subject": null,
+   "relation": "Artículo 18",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-18",
+   "ground": "article-18",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 7120,
+    "end": 7137
+   },
+   "anchor": "Artículo 18"
+  },
+  {
+   "subject": "Toda persona",
+   "relation": "tiene derecho a",
+   "object": "la libertad de pensamiento, de conciencia y de religión",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:freedom-of-thought",
+   "ground": "article-18.1.1",
+   "role": "declared",
+   "because": "the right-holding frame",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 7139,
+    "end": 7484
+   },
+   "anchor": "Toda persona tiene derecho a la libertad de pensamiento, de conciencia y de religión"
+  },
+  {
+   "subject": "este derecho",
+   "relation": "incluye",
+   "object": "la libertad de cambiar de religión o de creencia, así como la libertad de manifestar su religión o su creencia, individual y colectivamente, tanto en público como en privado, por la enseñanza, la práctica, el culto y la observancia",
+   "polarity": "+",
+   "phasepost": {
+    "op": "CON",
+    "grain": "Pattern"
+   },
+   "clause": "coordinate",
+   "prop": "udhr:thought-right-includes",
+   "ground": "article-18.1.2",
+   "role": "declared",
+   "because": "'incluye' is CONTAINMENT — the right holds these freedoms as parts: Relate·Structure at pattern grain; the manner parentheticals fold (A2)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "'este derecho' → the right to freedom of thought, conscience and religion (article-18.1.1)",
+   "alternate": null,
+   "span": {
+    "start": 7139,
+    "end": 7484
+   },
+   "anchor": "este derecho incluye la libertad de cambiar de religión o de creencia"
+  },
+  {
+   "subject": null,
+   "relation": "Artículo 19",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-19",
+   "ground": "article-19",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 7489,
+    "end": 7506
+   },
+   "anchor": "Artículo 19"
+  },
+  {
+   "subject": "Todo individuo",
+   "relation": "tiene derecho a",
+   "object": "la libertad de opinión y de expresión",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:freedom-of-opinion",
+   "ground": "article-19.1.1",
+   "role": "declared",
+   "because": "the right-holding frame",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 7508,
+    "end": 7791
+   },
+   "anchor": "Todo individuo tiene derecho a la libertad de opinión y de expresión"
+  },
+  {
+   "subject": "este derecho",
+   "relation": "incluye",
+   "object": "el de no ser molestado a causa de sus opiniones, el de investigar y recibir informaciones y opiniones, y el de difundirlas, sin limitación de fronteras, por cualquier medio de expresión",
+   "polarity": "+",
+   "phasepost": {
+    "op": "CON",
+    "grain": "Pattern"
+   },
+   "clause": "coordinate",
+   "prop": "udhr:opinion-right-includes",
+   "ground": "article-19.1.2",
+   "role": "declared",
+   "because": "the inclusion frame: containment — Relate·Structure at pattern grain; the included not-being-bothered content stays inside the include-object (A1 — its negation belongs to the mentioned freedom, not to this assertion)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "'este derecho' → the right to freedom of opinion and expression (article-19.1.1)",
+   "alternate": null,
+   "span": {
+    "start": 7508,
+    "end": 7791
+   },
+   "anchor": "este derecho incluye el de no ser molestado a causa de sus opiniones"
+  },
+  {
+   "subject": null,
+   "relation": "Artículo 20",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-20",
+   "ground": "article-20",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 7796,
+    "end": 7813
+   },
+   "anchor": "Artículo 20"
+  },
+  {
+   "subject": "Toda persona",
+   "relation": "tiene derecho a",
+   "object": "la libertad de reunión y de asociación pacíficas",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:freedom-of-assembly",
+   "ground": "article-20.1.1",
+   "role": "declared",
+   "because": "the right-holding frame",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 7817,
+    "end": 7905
+   },
+   "anchor": "Toda persona tiene derecho a la libertad de reunión y de asociación pacíficas."
+  },
+  {
+   "subject": "Nadie",
+   "relation": "podrá ser obligado a",
+   "object": "pertenecer a una asociación",
+   "polarity": "-",
+   "phasepost": {
+    "op": "INS",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:no-compelled-association",
+   "ground": "article-20.2.1",
+   "role": "declared",
+   "because": "'obligado' — the compulsion frame: causative, forcing the membership into being, Generate·Existence at pattern grain, negated: polarity −; part of the matrix's five-way compulsion alignment",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "CON",
+    "grain": "Pattern",
+    "because": "readable as the forced-membership arrangement negated"
+   },
+   "span": {
+    "start": 7909,
+    "end": 7974
+   },
+   "anchor": "Nadie podrá ser obligado a pertenecer a una asociación."
+  },
+  {
+   "subject": null,
+   "relation": "Artículo 21",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-21",
+   "ground": "article-21",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 7981,
+    "end": 7998
+   },
+   "anchor": "Artículo 21"
+  },
+  {
+   "subject": "Toda persona",
+   "relation": "tiene derecho a",
+   "object": "participar en el gobierno de su país, directamente o por medio de representantes libremente escogidos",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:take-part-government",
+   "ground": "article-21.1.1",
+   "role": "declared",
+   "because": "the right-holding frame; 'directamente o por medio de…' is a verbless manner alternative (A2, folded)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 8002,
+    "end": 8143
+   },
+   "anchor": "Toda persona tiene derecho a participar en el gobierno de su país"
+  },
+  {
+   "subject": "Toda persona",
+   "relation": "tiene el derecho de",
+   "object": "acceso, en condiciones de igualdad, a las funciones públicas de su país",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:equal-access-service",
+   "ground": "article-21.2.1",
+   "role": "declared",
+   "because": "the right-holding frame; 'en condiciones de igualdad' is a verbless parenthetical (A2)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 8147,
+    "end": 8262
+   },
+   "anchor": "Toda persona tiene el derecho de acceso, en condiciones de igualdad, a las funciones públicas de su país."
+  },
+  {
+   "subject": "La voluntad del pueblo",
+   "relation": "es",
+   "object": "la base de la autoridad del poder público",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Figure"
+   },
+   "clause": "main",
+   "prop": "udhr:will-basis-authority",
+   "ground": "article-21.3.1",
+   "role": "declared",
+   "because": "copula rule 3: definite unique role (LA base) — the identificational shape, article-marked as in English and Arabic",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "CON",
+    "grain": "Pattern",
+    "because": "basis-of readable as structural support"
+   },
+   "span": {
+    "start": 8266,
+    "end": 8562
+   },
+   "anchor": "La voluntad del pueblo es la base de la autoridad del poder público"
+  },
+  {
+   "subject": "esta voluntad",
+   "relation": "se expresará mediante",
+   "object": "elecciones auténticas",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "coordinate",
+   "prop": "udhr:will-expressed-elections",
+   "ground": "article-21.3.2",
+   "role": "declared",
+   "because": "expression MAKES the will present as a sign in the elections — Relate·Existence at pattern grain",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "'esta voluntad' → La voluntad del pueblo (article-21.3.1)",
+   "alternate": null,
+   "span": {
+    "start": 8266,
+    "end": 8562
+   },
+   "anchor": "esta voluntad se expresará mediante elecciones auténticas"
+  },
+  {
+   "subject": "elecciones auténticas",
+   "relation": "habrán de celebrarse",
+   "object": "periódicamente, por sufragio universal e igual y por voto secreto u otro procedimiento equivalente",
+   "polarity": "+",
+   "phasepost": {
+    "op": "INS",
+    "grain": "Pattern"
+   },
+   "clause": "restrictive-relative",
+   "prop": "udhr:elections-secret-vote",
+   "ground": "article-21.3.2.1",
+   "role": "declared",
+   "because": "'celebrarse' (be held) brings the event about — Generate·Existence at pattern grain; ONE conduct verb covers periodicity, suffrage and secret ballot, so prop udhr:elections-suffrage is folded here (English gives suffrage its own copula); 'que garantice la libertad del voto' is SUBJUNCTIVE and folds by the mood rule (R11)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "relative 'que' → elecciones auténticas, the head it restricts",
+   "alternate": null,
+   "span": {
+    "start": 8266,
+    "end": 8562
+   },
+   "anchor": "que habrán de celebrarse periódicamente, por sufragio universal e igual y por voto secreto"
+  },
+  {
+   "subject": null,
+   "relation": "Artículo 22",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-22",
+   "ground": "article-22",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 8569,
+    "end": 8586
+   },
+   "anchor": "Artículo 22"
+  },
+  {
+   "subject": "Toda persona",
+   "relation": "tiene derecho a",
+   "object": "la seguridad social, y a obtener, mediante el esfuerzo nacional y la cooperación internacional, habida cuenta de la organización y los recursos de cada Estado, la satisfacción de los derechos económicos, sociales y culturales, indispensables a su dignidad y al libre desarrollo de su personalidad",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:right-social-security",
+   "ground": "article-22.1.1",
+   "role": "declared",
+   "because": "the right-holding frame; like Arabic, ONE right-verb spans both the security and the obtaining-satisfaction complements — prop udhr:entitled-realization folded here (English gives it its own verb); 'como miembro de la sociedad' is an appositive parenthetical (A2, presupposed not asserted)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 8588,
+    "end": 8950
+   },
+   "anchor": "Toda persona, como miembro de la sociedad, tiene derecho a la seguridad social"
+  },
+  {
+   "subject": null,
+   "relation": "Artículo 23",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-23",
+   "ground": "article-23",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 8955,
+    "end": 8972
+   },
+   "anchor": "Artículo 23"
+  },
+  {
+   "subject": "Toda persona",
+   "relation": "tiene derecho al",
+   "object": "trabajo, a la libre elección de su trabajo, a condiciones equitativas y satisfactorias de trabajo y a la protección contra el desempleo",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:right-to-work",
+   "ground": "article-23.1.1",
+   "role": "declared",
+   "because": "the right-holding frame; FOUR coordinated right-objects under one verb (R4), like English",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 8976,
+    "end": 9152
+   },
+   "anchor": "Toda persona tiene derecho al trabajo, a la libre elección de su trabajo"
+  },
+  {
+   "subject": "Toda persona",
+   "relation": "tiene derecho a",
+   "object": "igual salario por trabajo igual",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:equal-pay",
+   "ground": "article-23.2.1",
+   "role": "declared",
+   "because": "the right-holding frame; 'sin discriminación alguna' is a verbless parenthetical (A2)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 9156,
+    "end": 9255
+   },
+   "anchor": "Toda persona tiene derecho, sin discriminación alguna, a igual salario por trabajo igual."
+  },
+  {
+   "subject": "Toda persona que trabaja",
+   "relation": "tiene derecho a",
+   "object": "una remuneración equitativa y satisfactoria, que le asegure, así como a su familia, una existencia conforme a la dignidad humana",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:just-remuneration",
+   "ground": "article-23.3.1",
+   "role": "declared",
+   "because": "the right-holding frame; 'que le asegure' is SUBJUNCTIVE — characterizing the sought remuneration, folded by the mood rule (R11) — while the INDICATIVE 'que será completada' is asserted and has its own row; the subject's relative ('que trabaja') stays inside the subject NP (R4)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 9259,
+    "end": 9532
+   },
+   "anchor": "Toda persona que trabaja tiene derecho a una remuneración equitativa y satisfactoria"
+  },
+  {
+   "subject": "una remuneración equitativa y satisfactoria",
+   "relation": "será completada",
+   "object": "por cualesquiera otros medios de protección social",
+   "polarity": "+",
+   "phasepost": {
+    "op": "INS",
+    "grain": "Pattern"
+   },
+   "clause": "restrictive-relative",
+   "prop": "udhr:just-remuneration",
+   "ground": "article-23.3.1.1",
+   "role": "declared",
+   "because": "'será completada' (shall be supplemented) — the supplement brought into being: Generate·Existence at pattern grain — and INDICATIVE where its sibling relative is subjunctive: mood decides the row (R11); 'en caso necesario' is a conditional adjunct (A2). A second row on this prop (R9): Spanish and Swahili verb the supplement the others fold",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "relative 'que' → una remuneración equitativa y satisfactoria, the head it restricts",
+   "alternate": null,
+   "span": {
+    "start": 9259,
+    "end": 9532
+   },
+   "anchor": "que será completada, en caso necesario, por cualesquiera otros medios de protección social"
+  },
+  {
+   "subject": "Toda persona",
+   "relation": "tiene derecho a",
+   "object": "fundar sindicatos y a sindicarse para la defensa de sus intereses",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:form-join-unions",
+   "ground": "article-23.4.1",
+   "role": "declared",
+   "because": "the right-holding frame; two coordinated act-infinitives (R4); the purpose PP folds (A2)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 9536,
+    "end": 9641
+   },
+   "anchor": "Toda persona tiene derecho a fundar sindicatos y a sindicarse para la defensa de sus intereses."
+  },
+  {
+   "subject": null,
+   "relation": "Artículo 24",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-24",
+   "ground": "article-24",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 9648,
+    "end": 9665
+   },
+   "anchor": "Artículo 24"
+  },
+  {
+   "subject": "Toda persona",
+   "relation": "tiene derecho al",
+   "object": "descanso, al disfrute del tiempo libre, a una limitación razonable de la duración del trabajo y a vacaciones periódicas pagadas",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:rest-leisure",
+   "ground": "article-24.1.1",
+   "role": "declared",
+   "because": "the right-holding frame; four coordinated right-objects under one verb (R4)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 9667,
+    "end": 9831
+   },
+   "anchor": "Toda persona tiene derecho al descanso, al disfrute del tiempo libre"
+  },
+  {
+   "subject": null,
+   "relation": "Artículo 25",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-25",
+   "ground": "article-25",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 9836,
+    "end": 9853
+   },
+   "anchor": "Artículo 25"
+  },
+  {
+   "subject": "Toda persona",
+   "relation": "tiene derecho a",
+   "object": "un nivel de vida adecuado que le asegure, así como a su familia, la salud y el bienestar, y en especial la alimentación, el vestido, la vivienda, la asistencia médica y los servicios sociales necesarios",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:standard-of-living",
+   "ground": "article-25.1.1",
+   "role": "declared",
+   "because": "the right-holding frame; 'que le asegure' is SUBJUNCTIVE — characterizing the sought standard, folded by the mood rule (R11); the in-particular list elaborates inside the object (A2)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 9857,
+    "end": 10300
+   },
+   "anchor": "Toda persona tiene derecho a un nivel de vida adecuado"
+  },
+  {
+   "subject": "Toda persona",
+   "relation": "tiene asimismo derecho a",
+   "object": "los seguros en caso de desempleo, enfermedad, invalidez, viudez, vejez u otros casos de pérdida de sus medios de subsistencia",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "coordinate",
+   "prop": "udhr:security-in-adversity",
+   "ground": "article-25.1.2",
+   "role": "declared",
+   "because": "the right-holding frame with its own verb — Spanish joins Arabic, Mandarin and Swahili in verbing the security right separately (English folds it into article 25's first object)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "coordinated predicate shares 'Toda persona'",
+   "alternate": null,
+   "span": {
+    "start": 9857,
+    "end": 10300
+   },
+   "anchor": "tiene asimismo derecho a los seguros en caso de desempleo"
+  },
+  {
+   "subject": "La maternidad y la infancia",
+   "relation": "tienen derecho a",
+   "object": "cuidados y asistencia especiales",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:motherhood-childhood-care",
+   "ground": "article-25.2.1",
+   "role": "declared",
+   "because": "the right-holding frame over abstract kinds (maternidad, infancia — like English and Arabic)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 10304,
+    "end": 10496
+   },
+   "anchor": "La maternidad y la infancia tienen derecho a cuidados y asistencia especiales."
+  },
+  {
+   "subject": "Todos los niños",
+   "relation": "tienen derecho a",
+   "object": "igual protección social",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:children-protection",
+   "ground": "article-25.2.2",
+   "role": "declared",
+   "because": "the right-holding frame — Spanish words this as a RIGHT where English/Arabic/Mandarin use the enjoy-frame (same cell either way: a standing held); 'nacidos de matrimonio o fuera de matrimonio' is a concessive parenthetical, folded (A2)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 10304,
+    "end": 10496
+   },
+   "anchor": "Todos los niños, nacidos de matrimonio o fuera de matrimonio, tienen derecho a igual protección social."
+  },
+  {
+   "subject": null,
+   "relation": "Artículo 26",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-26",
+   "ground": "article-26",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 10503,
+    "end": 10520
+   },
+   "anchor": "Artículo 26"
+  },
+  {
+   "subject": "Toda persona",
+   "relation": "tiene derecho a",
+   "object": "la educación",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:right-to-education",
+   "ground": "article-26.1.1",
+   "role": "declared",
+   "because": "the right-holding frame",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 10524,
+    "end": 10883
+   },
+   "anchor": "Toda persona tiene derecho a la educación."
+  },
+  {
+   "subject": "La educación",
+   "relation": "debe ser",
+   "object": "gratuita, al menos en lo concerniente a la instrucción elemental y fundamental",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:education-free",
+   "ground": "article-26.1.2",
+   "role": "declared",
+   "because": "copula + property of the kind (rule 4); the at-least restriction is an adjunct (A2); deontic 'debe' noted (A3)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 10524,
+    "end": 10883
+   },
+   "anchor": "La educación debe ser gratuita, al menos en lo concerniente a la instrucción elemental y fundamental."
+  },
+  {
+   "subject": "La instrucción elemental",
+   "relation": "será",
+   "object": "obligatoria",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:elementary-compulsory",
+   "ground": "article-26.1.3",
+   "role": "declared",
+   "because": "copula + property of the kind (rule 4)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 10524,
+    "end": 10883
+   },
+   "anchor": "La instrucción elemental será obligatoria."
+  },
+  {
+   "subject": "La instrucción técnica y profesional",
+   "relation": "habrá de ser generalizada",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "INS",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:technical-available",
+   "ground": "article-26.1.4",
+   "role": "declared",
+   "because": "'generalizada' — a make-verb participle (be made general): the availability GENERATED, Generate·Existence at pattern grain, with English's 'made available', Arabic's يعمم and Mandarin's 设立",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SIG",
+    "grain": "Pattern",
+    "because": "readable as the availability-condition itself"
+   },
+   "span": {
+    "start": 10524,
+    "end": 10883
+   },
+   "anchor": "La instrucción técnica y profesional habrá de ser generalizada"
+  },
+  {
+   "subject": "el acceso a los estudios superiores",
+   "relation": "será",
+   "object": "igual para todos, en función de los méritos respectivos",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "coordinate",
+   "prop": "udhr:higher-accessible",
+   "ground": "article-26.1.5",
+   "role": "declared",
+   "because": "copula + property (rule 4) — Spanish predicates equality of the ACCESS itself where English predicates accessibility of the education, noted; 'en función de los méritos' is an adjunct (A2)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 10524,
+    "end": 10883
+   },
+   "anchor": "el acceso a los estudios superiores será igual para todos"
+  },
+  {
+   "subject": "La educación",
+   "relation": "tendrá por objeto",
+   "object": "el pleno desarrollo de la personalidad humana y el fortalecimiento del respeto a los derechos humanos y a las libertades fundamentales",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:education-directed",
+   "ground": "article-26.2.1",
+   "role": "declared",
+   "because": "'tener por objeto' — the light-verb aim idiom (have-as-object): the practice ORIENTED toward its ends, the pointing relation, Relate·Existence at pattern grain (the same light-verb family as 'tienen por base', here aiming rather than identifying)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "REC",
+    "grain": "Pattern",
+    "because": "readable as setting the practice's interpretive frame — its telos"
+   },
+   "span": {
+    "start": 10887,
+    "end": 11284
+   },
+   "anchor": "La educación tendrá por objeto el pleno desarrollo de la personalidad humana"
+  },
+  {
+   "subject": "La educación",
+   "relation": "favorecerá",
+   "object": "la comprensión, la tolerancia y la amistad entre todas las naciones y todos los grupos étnicos o religiosos",
+   "polarity": "+",
+   "phasepost": {
+    "op": "REC",
+    "grain": "Pattern"
+   },
+   "clause": "coordinate",
+   "prop": "udhr:promote-understanding",
+   "ground": "article-26.2.2",
+   "role": "declared",
+   "because": "'favorecerá' — the promote-frame: fostering interpretive stances (comprehension, tolerance, friendship) across the kind, Generate·Interpretation at pattern grain",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "coordinated predicate shares 'La educación'",
+   "alternate": null,
+   "span": {
+    "start": 10887,
+    "end": 11284
+   },
+   "anchor": "favorecerá la comprensión, la tolerancia y la amistad entre todas las naciones"
+  },
+  {
+   "subject": "La educación",
+   "relation": "promoverá",
+   "object": "el desarrollo de las actividades de las Naciones Unidas para el mantenimiento de la paz",
+   "polarity": "+",
+   "phasepost": {
+    "op": "INS",
+    "grain": "Pattern"
+   },
+   "clause": "coordinate",
+   "prop": "udhr:further-un-activities",
+   "ground": "article-26.2.3",
+   "role": "declared",
+   "because": "'promoverá el desarrollo de las actividades' — the object is the ACTIVITIES' development, not a stance: their progress generated, Generate·Existence at pattern grain (the same verb lands REC one clause back where its objects are interpretive — the object decides the domain, the verb the mode)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "coordinated predicate shares 'La educación'",
+   "alternate": null,
+   "span": {
+    "start": 10887,
+    "end": 11284
+   },
+   "anchor": "promoverá el desarrollo de las actividades de las Naciones Unidas"
+  },
+  {
+   "subject": "Los padres",
+   "relation": "tendrán derecho preferente a",
+   "object": "escoger el tipo de educación que habrá de darse a sus hijos",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:parents-prior-right",
+   "ground": "article-26.3.1",
+   "role": "declared",
+   "because": "the right-holding frame; the choosing and the education-type's relative stay inside the right-object (A1/R1, folded)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 11288,
+    "end": 11398
+   },
+   "anchor": "Los padres tendrán derecho preferente a escoger el tipo de educación"
+  },
+  {
+   "subject": null,
+   "relation": "Artículo 27",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-27",
+   "ground": "article-27",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 11405,
+    "end": 11422
+   },
+   "anchor": "Artículo 27"
+  },
+  {
+   "subject": "Toda persona",
+   "relation": "tiene derecho a",
+   "object": "tomar parte libremente en la vida cultural de la comunidad, a gozar de las artes y a participar en el progreso científico y en los beneficios que de él resulten",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:participate-cultural-life",
+   "ground": "article-27.1.1",
+   "role": "declared",
+   "because": "the right-holding frame; three coordinated act-infinitives (R4); 'que de él resulten' is SUBJUNCTIVE and folds by the mood rule (R11)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 11426,
+    "end": 11626
+   },
+   "anchor": "Toda persona tiene derecho a tomar parte libremente en la vida cultural de la comunidad"
+  },
+  {
+   "subject": "Toda persona",
+   "relation": "tiene derecho a",
+   "object": "la protección de los intereses morales y materiales que le correspondan por razón de las producciones científicas, literarias o artísticas de que sea autora",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:protection-author-interests",
+   "ground": "article-27.2.1",
+   "role": "declared",
+   "because": "the right-holding frame; 'que le correspondan' and 'de que sea autora' are SUBJUNCTIVE relatives — characterizing, folded by the mood rule (R11)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 11630,
+    "end": 11826
+   },
+   "anchor": "Toda persona tiene derecho a la protección de los intereses morales y materiales"
+  },
+  {
+   "subject": null,
+   "relation": "Artículo 28",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-28",
+   "ground": "article-28",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 11833,
+    "end": 11850
+   },
+   "anchor": "Artículo 28"
+  },
+  {
+   "subject": "Toda persona",
+   "relation": "tiene derecho a",
+   "object": "que se establezca un orden social e internacional en el que los derechos y libertades proclamados en esta Declaración se hagan plenamente efectivos",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:entitled-to-order",
+   "ground": "article-28.1.1",
+   "role": "declared",
+   "because": "the right-holding frame. Spanish marks the WHOLE order-complement subjunctive ('que se establezca…se hagan') — the order is sought, not asserted to exist — which is the evidence behind folding this article's realization-relative in every language (A1 + the mood rule, R11); only Mandarin asserts the realization at clause level",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 11852,
+    "end": 12035
+   },
+   "anchor": "Toda persona tiene derecho a que se establezca un orden social e internacional"
+  },
+  {
+   "subject": null,
+   "relation": "Artículo 29",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-29",
+   "ground": "article-29",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 12040,
+    "end": 12057
+   },
+   "anchor": "Artículo 29"
+  },
+  {
+   "subject": "Toda persona",
+   "relation": "tiene deberes respecto a",
+   "object": "la comunidad",
+   "polarity": "+",
+   "phasepost": {
+    "op": "CON",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:duties-to-community",
+   "ground": "article-29.1.1",
+   "role": "declared",
+   "because": "a duty is a standing bond DIRECTED AT another party — Relate·Structure at pattern grain",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 12061,
+    "end": 12200
+   },
+   "anchor": "Toda persona tiene deberes respecto a la comunidad"
+  },
+  {
+   "subject": "Toda persona",
+   "relation": "puede desarrollar",
+   "object": "libre y plenamente su personalidad",
+   "polarity": "+",
+   "phasepost": {
+    "op": "INS",
+    "grain": "Pattern"
+   },
+   "clause": "reason-adjunct",
+   "prop": "udhr:development-in-community",
+   "ground": "article-29.1.1.1",
+   "role": "declared",
+   "because": "Spanish alone verbs the development ACTIVELY — 'desarrollar su personalidad', the personality's growth brought forth: Generate·Existence at pattern grain, modality 'puede' noted not typed (A3); en/ar/sw state availability/possibility instead (SIG), a real source-verb divergence the matrix records; 'sólo en ella' binds it to the communal ground, and the REASON clause ('puesto que') is what shows this content asserted, not characterizing",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "the implicit subject of 'puede desarrollar' → Toda persona, the main clause's subject",
+   "alternate": {
+    "op": "SIG",
+    "grain": "Pattern",
+    "because": "read as the siblings' availability-condition instead"
+   },
+   "span": {
+    "start": 12061,
+    "end": 12200
+   },
+   "anchor": "puesto que sólo en ella puede desarrollar libre y plenamente su personalidad"
+  },
+  {
+   "subject": "toda persona",
+   "relation": "estará solamente sujeta a",
+   "object": "las limitaciones establecidas por la ley",
+   "polarity": "+",
+   "phasepost": {
+    "op": "CON",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:subject-to-limitations",
+   "ground": "article-29.2.1",
+   "role": "declared",
+   "because": "standing UNDER a constraint — the coverage-arrangement family, Relate·Structure at pattern grain; 'En el ejercicio de sus derechos…' is a temporal adjunct (A2)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 12204,
+    "end": 12586
+   },
+   "anchor": "toda persona estará solamente sujeta a las limitaciones establecidas por la ley"
+  },
+  {
+   "subject": "las limitaciones",
+   "relation": "establecidas por",
+   "object": "la ley",
+   "polarity": "+",
+   "phasepost": {
+    "op": "DEF",
+    "grain": "Pattern"
+   },
+   "clause": "participial-modifier",
+   "prop": "udhr:limitations-by-law",
+   "ground": "article-29.2.1.1",
+   "role": "declared",
+   "because": "'establecidas por la ley' — the law fixes the bounds of the admissible class, Differentiate·Interpretation at pattern grain; Spanish encodes it as a participle where en/ar/sw use finite relatives, `clause` records the difference",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "the participle agrees with 'las limitaciones', the head it modifies",
+   "alternate": {
+    "op": "INS",
+    "grain": "Pattern",
+    "because": "readable as the limitations brought into being by statute"
+   },
+   "span": {
+    "start": 12204,
+    "end": 12586
+   },
+   "anchor": "establecidas por la ley"
+  },
+  {
+   "subject": "las limitaciones establecidas por la ley",
+   "relation": "asegurar",
+   "object": "el reconocimiento y el respeto de los derechos y libertades de los demás",
+   "polarity": "+",
+   "phasepost": {
+    "op": "REC",
+    "grain": "Pattern"
+   },
+   "clause": "purpose-adjunct",
+   "prop": "udhr:limitation-purpose",
+   "ground": "article-29.2.1.2",
+   "role": "declared",
+   "because": "securing recognition and respect generates an interpretive standing across the kind — Generate·Interpretation at pattern grain; the coordinated 'y de satisfacer las justas exigencias…' second purpose is folded into this one (noted)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "the purpose belongs to the limitations, the matrix clause's own object",
+   "alternate": {
+    "op": "CON",
+    "grain": "Pattern",
+    "because": "the satisfying-requirements half read as standing-in-accord"
+   },
+   "span": {
+    "start": 12204,
+    "end": 12586
+   },
+   "anchor": "con el único fin de asegurar el reconocimiento y el respeto de los derechos y libertades de los demás"
+  },
+  {
+   "subject": "Estos derechos y libertades",
+   "relation": "no podrán ser ejercidos",
+   "object": "en oposición a los propósitos y principios de las Naciones Unidas",
+   "polarity": "-",
+   "phasepost": {
+    "op": "CON",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:no-contrary-exercise",
+   "ground": "article-29.3.1",
+   "role": "declared",
+   "because": "exercising-in-opposition-to is conduct STANDING AGAINST — Relate·Structure at pattern grain, universally negated ('en ningún caso'): polarity − per R6",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 12590,
+    "end": 12735
+   },
+   "anchor": "no podrán, en ningún caso, ser ejercidos en oposición a los propósitos y principios de las Naciones Unidas"
+  },
+  {
+   "subject": null,
+   "relation": "Artículo 30",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-30",
+   "ground": "article-30",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 12742,
+    "end": 12759
+   },
+   "anchor": "Artículo 30"
+  },
+  {
+   "subject": "Nada en esta Declaración",
+   "relation": "podrá interpretarse",
+   "object": "en el sentido de que confiere derecho alguno al Estado, a un grupo o a una persona, para emprender y desarrollar actividades o realizar actos tendientes a la supresión de cualquiera de los derechos y libertades",
+   "polarity": "-",
+   "phasepost": {
+    "op": "DEF",
+    "grain": "Ground"
+   },
+   "clause": "main",
+   "prop": "udhr:no-destructive-interpretation",
+   "ground": "article-30.1.1",
+   "role": "declared",
+   "because": "bounding the DOCUMENT'S OWN INTERPRETIVE FIELD by excluding a whole class of readings — Differentiate·Interpretation at GROUND grain ('Nada en esta Declaración', the whole meaning-space), universal negation: polarity − per R6; the conferred-right content stays inside the intensional object (A1)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "NUL",
+    "grain": "Ground",
+    "because": "A4's absence-as-act reading of the existential-negative subject, polarity + — Arabic's and Swahili's own construction here"
+   },
+   "span": {
+    "start": 12761,
+    "end": 13055
+   },
+   "anchor": "Nada en esta Declaración podrá interpretarse"
+  }
+ ]
+}

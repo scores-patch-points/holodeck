@@ -1,0 +1,43 @@
+{
+  "schema": "RoleConfig@1",
+  "language": "cat",
+  "provenance": {
+    "builder": "eoreader7 native/scripts/build-role-config.mjs",
+    "source": "/private/tmp/claude-501/tb/cat/train.conllu",
+    "min_volume": 20,
+    "null_draws": 200,
+    "null_alpha": 0.05,
+    "null_seed": 1,
+    "note": "position stats and marker candidates are both derived mechanically from this treebank's own gold dependency annotations — never hand-typed or asserted from general linguistic knowledge. A marker candidate is admitted only when its real precision beats the (1-alpha) quantile of a within-sentence role-label shuffle (II.23), never a fixed ratio — and (S122) that quantile is the MAX-STATISTIC across every eligible closed-class candidate tried, not a per-candidate null, so the admitted marker is significant against the whole search, not merely against itself."
+  },
+  "object": {
+    "total": 21294,
+    "before": 6409,
+    "after": 14885,
+    "dominantSide": "after",
+    "reliability": 0.699023199023199,
+    "usable": true,
+    "marker": {
+      "form": "molta",
+      "precision": 0.42857142857142855,
+      "nullCeiling": 0.22580645161290322,
+      "volume": 28,
+      "recall": 0.0005635390250774866
+    }
+  },
+  "subject": {
+    "total": 21781,
+    "before": 18088,
+    "after": 3693,
+    "dominantSide": "before",
+    "reliability": 0.830448556080988,
+    "usable": true,
+    "marker": {
+      "form": "estarà",
+      "hits": 12,
+      "total": 33,
+      "precision": 0.36363636363636365,
+      "nullCeiling": 0.22727272727272727
+    }
+  }
+}

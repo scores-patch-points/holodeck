@@ -1,0 +1,1427 @@
+{
+ "schema": "SourceStructure@1",
+ "source": "05-academic-papers/ntrs-white-papers/20205002914_impacts-of-hybrid-parallelism-and-vectorization-on-the-performance-of-newton-kry.txt",
+ "bytes": 18129,
+ "bodyOffset": 659,
+ "splitBasis": "177 line-delimited rows",
+ "unsplit": false,
+ "unitCount": 177,
+ "units": [
+  {
+   "start": 660,
+   "end": 719,
+   "type": "verse",
+   "basis": "verse row at byte 1",
+   "id": null,
+   "text": "Impacts of Hybrid Parallelism and Vectorization on the"
+  },
+  {
+   "start": 720,
+   "end": 777,
+   "type": "verse",
+   "basis": "verse row at byte 61",
+   "id": null,
+   "text": "Performance of Newton-Krylov Methods in Computational"
+  },
+  {
+   "start": 778,
+   "end": 814,
+   "type": "verse",
+   "basis": "verse row at byte 119",
+   "id": null,
+   "text": "Aerodynamics"
+  },
+  {
+   "start": 816,
+   "end": 916,
+   "type": "verse",
+   "basis": "verse row at byte 157",
+   "id": null,
+   "text": "Stephen L. Wood,∗ , W. Kyle Anderson† , Kevin E. Jacobson‡ , and William T. Jones§"
+  },
+  {
+   "start": 917,
+   "end": 999,
+   "type": "verse",
+   "basis": "verse row at byte 258",
+   "id": null,
+   "text": "NASA Langley Research Center, Hampton, VA 23681, USA"
+  },
+  {
+   "start": 1001,
+   "end": 1099,
+   "type": "verse",
+   "basis": "verse row at byte 342",
+   "id": null,
+   "text": "Finding the numerical solution of moderate and high-fidelity aerodynamics problems on"
+  },
+  {
+   "start": 1100,
+   "end": 1198,
+   "type": "verse",
+   "basis": "verse row at byte 441",
+   "id": null,
+   "text": "modern computer architectures involves, 1) decomposing the domain into smaller regions of"
+  },
+  {
+   "start": 1199,
+   "end": 1304,
+   "type": "verse",
+   "basis": "verse row at byte 540",
+   "id": null,
+   "text": "nearly equal size, and 2) allocating computational resources for calculations on each domain and"
+  },
+  {
+   "start": 1305,
+   "end": 1399,
+   "type": "verse",
+   "basis": "verse row at byte 646",
+   "id": null,
+   "text": "communication between domains. Modern computer clusters are composed from hierarchies"
+  },
+  {
+   "start": 1400,
+   "end": 1500,
+   "type": "verse",
+   "basis": "verse row at byte 741",
+   "id": null,
+   "text": "of processing, memory, and communication resources with varying capabilities and latencies."
+  },
+  {
+   "start": 1501,
+   "end": 1596,
+   "type": "verse",
+   "basis": "verse row at byte 842",
+   "id": null,
+   "text": "This paper focuses on the combination of domain decomposition provided by ParMETIS [1]"
+  },
+  {
+   "start": 1597,
+   "end": 1693,
+   "type": "verse",
+   "basis": "verse row at byte 938",
+   "id": null,
+   "text": "and Newton-Krylov Methods [2–5] for the solution of Computational Aerodynamics problems"
+  },
+  {
+   "start": 1694,
+   "end": 1792,
+   "type": "verse",
+   "basis": "verse row at byte 1035",
+   "id": null,
+   "text": "of interest to NASA. Herein, trade-offs encountered when mapping aerodynamics problems to"
+  },
+  {
+   "start": 1793,
+   "end": 1894,
+   "type": "verse",
+   "basis": "verse row at byte 1134",
+   "id": null,
+   "text": "modern computer architectures are explored through examples and discussions of trade-offs in"
+  },
+  {
+   "start": 1895,
+   "end": 1996,
+   "type": "verse",
+   "basis": "verse row at byte 1236",
+   "id": null,
+   "text": "parallelism from MPI [6], OpenMP [7], and vectorization as partition sizes and computational"
+  },
+  {
+   "start": 1997,
+   "end": 2093,
+   "type": "verse",
+   "basis": "verse row at byte 1338",
+   "id": null,
+   "text": "resources are varied. An example of the impact that domain decomposition and MPI+OpenMP"
+  },
+  {
+   "start": 2094,
+   "end": 2197,
+   "type": "verse",
+   "basis": "verse row at byte 1435",
+   "id": null,
+   "text": "resource allocation can have on an adjoint calculation is presented in this abstract. The full"
+  },
+  {
+   "start": 2198,
+   "end": 2302,
+   "type": "verse",
+   "basis": "verse row at byte 1539",
+   "id": null,
+   "text": "paper will include more detailed examples, discussions of difficulties and potential methods to"
+  },
+  {
+   "start": 2303,
+   "end": 2366,
+   "type": "verse",
+   "basis": "verse row at byte 1644",
+   "id": null,
+   "text": "overcome them, and topics identified for future study."
+  },
+  {
+   "start": 2369,
+   "end": 2440,
+   "type": "verse",
+   "basis": "verse row at byte 1710",
+   "id": null,
+   "text": "I. Introduction"
+  },
+  {
+   "start": 2441,
+   "end": 2555,
+   "type": "verse",
+   "basis": "verse row at byte 1782",
+   "id": null,
+   "text": "Domain decomposition (DD) was proposed to solve partial differential equations (PDEs) by Schwarz [8] more than"
+  },
+  {
+   "start": 2556,
+   "end": 2669,
+   "type": "verse",
+   "basis": "verse row at byte 1897",
+   "id": null,
+   "text": "one hundred years ago. Essentially, the DD approach splits a large complicated problem into smaller, simpler sub-"
+  },
+  {
+   "start": 2670,
+   "end": 2789,
+   "type": "verse",
+   "basis": "verse row at byte 2011",
+   "id": null,
+   "text": "problems, solves and recombines their solutions to provide a global solution [9]. As modern computer architectures have"
+  },
+  {
+   "start": 2790,
+   "end": 2907,
+   "type": "verse",
+   "basis": "verse row at byte 2131",
+   "id": null,
+   "text": "developed capabilities for concurrent calculations, DD methods have steadily flourished as an important computational"
+  },
+  {
+   "start": 2908,
+   "end": 3024,
+   "type": "verse",
+   "basis": "verse row at byte 2249",
+   "id": null,
+   "text": "approach to simulate fluid flows [10, 11]. This paper will focus on the combination of domain decomposition provided"
+  },
+  {
+   "start": 3025,
+   "end": 3131,
+   "type": "verse",
+   "basis": "verse row at byte 2366",
+   "id": null,
+   "text": "by ParMETIS [1] and Newton-Krylov Methods [2–5] for the solution of Computational Aerodynamics problems of"
+  },
+  {
+   "start": 3132,
+   "end": 3149,
+   "type": "verse",
+   "basis": "verse row at byte 2473",
+   "id": null,
+   "text": "interest to NASA."
+  },
+  {
+   "start": 3150,
+   "end": 3264,
+   "type": "verse",
+   "basis": "verse row at byte 2491",
+   "id": null,
+   "text": "Forming and solving linear subproblems within Newton-Krylov methods can account for more than 50% of wall-time"
+  },
+  {
+   "start": 3265,
+   "end": 3386,
+   "type": "verse",
+   "basis": "verse row at byte 2606",
+   "id": null,
+   "text": "to solution when utilizing traditional domain decomposition and only MPI for parallelization [5]. Existing linear algebra"
+  },
+  {
+   "start": 3387,
+   "end": 3500,
+   "type": "verse",
+   "basis": "verse row at byte 2728",
+   "id": null,
+   "text": "packages and vendor libraries strive to be general purpose and are not focused on the antisymmetric sparse linear"
+  },
+  {
+   "start": 3501,
+   "end": 3607,
+   "type": "verse",
+   "basis": "verse row at byte 2842",
+   "id": null,
+   "text": "systems that arise in Computational Fluid Dynamics, Aeroelasticity, or Aeroacoustics. SPARSKIT [12], MAGMA"
+  },
+  {
+   "start": 3608,
+   "end": 3720,
+   "type": "verse",
+   "basis": "verse row at byte 2949",
+   "id": null,
+   "text": "[13, 14], PETSc [15], MKL 2019 [16], and CUDA10.2.89 [17], are well regarded numerical packages and their sparse"
+  },
+  {
+   "start": 3721,
+   "end": 3839,
+   "type": "verse",
+   "basis": "verse row at byte 3062",
+   "id": null,
+   "text": "linear algebra capabilities are widely used in scientific applications. However, these packages each target one or two"
+  },
+  {
+   "start": 3840,
+   "end": 3955,
+   "type": "verse",
+   "basis": "verse row at byte 3181",
+   "id": null,
+   "text": "computer architectures, do not have compatible software interfaces, and do not provide algorithms capable of hybrid"
+  },
+  {
+   "start": 3956,
+   "end": 4072,
+   "type": "verse",
+   "basis": "verse row at byte 3297",
+   "id": null,
+   "text": "parallelism. The Sparse Linear Algebra Toolkit [5] (SLAT) has been developed with hybrid-parallel algorithms to meet"
+  },
+  {
+   "start": 4073,
+   "end": 4186,
+   "type": "verse",
+   "basis": "verse row at byte 3414",
+   "id": null,
+   "text": "the needs of Computational Aerodynamics software developers their end users. In this study, the algorithms within"
+  },
+  {
+   "start": 4187,
+   "end": 4305,
+   "type": "verse",
+   "basis": "verse row at byte 3528",
+   "id": null,
+   "text": "SLAT are used to explore the trade-offs of hybrid parallelism and vectorization on modern computational architectures."
+  },
+  {
+   "start": 4308,
+   "end": 4379,
+   "type": "verse",
+   "basis": "verse row at byte 3649",
+   "id": null,
+   "text": "II. Numerical Methods"
+  },
+  {
+   "start": 4381,
+   "end": 4393,
+   "type": "verse",
+   "basis": "verse row at byte 3722",
+   "id": null,
+   "text": "A. FUN3D+SFE"
+  },
+  {
+   "start": 4394,
+   "end": 4511,
+   "type": "verse",
+   "basis": "verse row at byte 3735",
+   "id": null,
+   "text": "FUN3D+SFE is a continuous finite-element discretization within FUN3D [3, 18]. The discretization is a stabilized"
+  },
+  {
+   "start": 4512,
+   "end": 4628,
+   "type": "verse",
+   "basis": "verse row at byte 3853",
+   "id": null,
+   "text": "finite-element approach based on the Streamlined Upwind Petrov-Galerkin (SUPG) scheme [19, 20]. For turbulent flows,"
+  },
+  {
+   "start": 4629,
+   "end": 4734,
+   "type": "verse",
+   "basis": "verse row at byte 3970",
+   "id": null,
+   "text": "∗ Research Scientist, Computational AeroSciences Branch, MS 128, AIAA Member, stephen.l.wood@nasa.gov."
+  },
+  {
+   "start": 4735,
+   "end": 4832,
+   "type": "verse",
+   "basis": "verse row at byte 4076",
+   "id": null,
+   "text": "† Senior Research Scientist, Computational AeroSciences Branch, MS 128, AIAA Associate Fellow."
+  },
+  {
+   "start": 4833,
+   "end": 4910,
+   "type": "verse",
+   "basis": "verse row at byte 4174",
+   "id": null,
+   "text": "‡ Research Aerospace Engineer, Aeroelasticity Branch, MS 340, AIAA Member."
+  },
+  {
+   "start": 4911,
+   "end": 5000,
+   "type": "verse",
+   "basis": "verse row at byte 4252",
+   "id": null,
+   "text": "§ Computer Engineer, Computational AeroSciences Branch, MS 128, AIAA Associate Fellow."
+  },
+  {
+   "start": 5005,
+   "end": 5073,
+   "type": "verse",
+   "basis": "verse row at byte 4346",
+   "id": null,
+   "text": "1"
+  },
+  {
+   "start": 5074,
+   "end": 5189,
+   "type": "verse",
+   "basis": "verse row at byte 4415",
+   "id": null,
+   "text": "the SA-neg-QCR2000 [21, 22] is tightly coupled with the mean flow equations, yielding a nonlinear algebraic system"
+  },
+  {
+   "start": 5190,
+   "end": 5309,
+   "type": "verse",
+   "basis": "verse row at byte 4531",
+   "id": null,
+   "text": "of equations with six variables at each grid point. A linear nodal basis is used in this study, which is designed to be"
+  },
+  {
+   "start": 5310,
+   "end": 5430,
+   "type": "verse",
+   "basis": "verse row at byte 4651",
+   "id": null,
+   "text": "second-order accurate in space. The current implementation includes capabilities for computing on tetrahedra, hexahedra,"
+  },
+  {
+   "start": 5431,
+   "end": 5546,
+   "type": "verse",
+   "basis": "verse row at byte 4772",
+   "id": null,
+   "text": "pyramids, and prisms. FUN3D+SFE is used to perform forward CFD analysis as well as adjoint analysis [23, 24], which"
+  },
+  {
+   "start": 5547,
+   "end": 5665,
+   "type": "verse",
+   "basis": "verse row at byte 4888",
+   "id": null,
+   "text": "is required for goal-oriented adaptation. Forward CFD analysis and adjoint analysis use real-values in double (64 bit)"
+  },
+  {
+   "start": 5666,
+   "end": 5739,
+   "type": "verse",
+   "basis": "verse row at byte 5007",
+   "id": null,
+   "text": "precision, to represent the domain, initial conditions, and solution [3]."
+  },
+  {
+   "start": 5740,
+   "end": 5856,
+   "type": "verse",
+   "basis": "verse row at byte 5081",
+   "id": null,
+   "text": "To advance the solution toward a steady state, the density, velocities, temperature, and the turbulence working"
+  },
+  {
+   "start": 5857,
+   "end": 5974,
+   "type": "verse",
+   "basis": "verse row at byte 5198",
+   "id": null,
+   "text": "variable are updated in a tightly-coupled Newton-Krylov-type solver described in Ref. [3]. Here, an initial update to"
+  },
+  {
+   "start": 5975,
+   "end": 6089,
+   "type": "verse",
+   "basis": "verse row at byte 5316",
+   "id": null,
+   "text": "the flow variables is computed using a locally varying pseudotime-step parameter that is multiplied by the current"
+  },
+  {
+   "start": 6090,
+   "end": 6204,
+   "type": "verse",
+   "basis": "verse row at byte 5431",
+   "id": null,
+   "text": "Courant–Friedrichs–Lewy (CFL) number, which is adjusted during the iterative process. During each iteration of the"
+  },
+  {
+   "start": 6205,
+   "end": 6314,
+   "type": "verse",
+   "basis": "verse row at byte 5546",
+   "id": null,
+   "text": "nonlinear solver, SLAT is used to solve the linear system using a Generalized Minimal Residual (GMRES) method"
+  },
+  {
+   "start": 6315,
+   "end": 6430,
+   "type": "verse",
+   "basis": "verse row at byte 5656",
+   "id": null,
+   "text": "right-preconditioned with an Incomplete Lower-Upper approximate solve [25]. The steady-state RANS solutions in this"
+  },
+  {
+   "start": 6431,
+   "end": 6547,
+   "type": "verse",
+   "basis": "verse row at byte 5772",
+   "id": null,
+   "text": "study have been obtained by reducing the mean flow and turbulence-model residuals at least nine orders of magnitude,"
+  },
+  {
+   "start": 6548,
+   "end": 6620,
+   "type": "verse",
+   "basis": "verse row at byte 5889",
+   "id": null,
+   "text": "thereby ensuring that the magnitude of all residual is below 5 × 10−10 ."
+  },
+  {
+   "start": 6621,
+   "end": 6742,
+   "type": "verse",
+   "basis": "verse row at byte 5962",
+   "id": null,
+   "text": "The adjoint solution, λ, for a particular output functional I, is obtained by solving the linear system of equations"
+  },
+  {
+   "start": 6743,
+   "end": 6827,
+   "type": "verse",
+   "basis": "verse row at byte 6084",
+   "id": null,
+   "text": "\u0015T                   \u0013T"
+  },
+  {
+   "start": 6828,
+   "end": 6906,
+   "type": "verse",
+   "basis": "verse row at byte 6169",
+   "id": null,
+   "text": "∂Rh                  ∂I"
+  },
+  {
+   "start": 6907,
+   "end": 6980,
+   "type": "verse",
+   "basis": "verse row at byte 6248",
+   "id": null,
+   "text": "\u0014                    \u0012"
+  },
+  {
+   "start": 6981,
+   "end": 7107,
+   "type": "verse",
+   "basis": "verse row at byte 6322",
+   "id": null,
+   "text": "λ=−                                                      (1)"
+  },
+  {
+   "start": 7108,
+   "end": 7187,
+   "type": "verse",
+   "basis": "verse row at byte 6449",
+   "id": null,
+   "text": "∂qh                  ∂qh"
+  },
+  {
+   "start": 7189,
+   "end": 7313,
+   "type": "verse",
+   "basis": "verse row at byte 6530",
+   "id": null,
+   "text": "where qh is the set of solution state variables, and Rh is the discrete residual of the partial differential equations under"
+  },
+  {
+   "start": 7314,
+   "end": 7432,
+   "type": "verse",
+   "basis": "verse row at byte 6655",
+   "id": null,
+   "text": "consideration. The linear solver and preconditioner operations are stress-tested by the numerical stiffness of adjoint"
+  },
+  {
+   "start": 7433,
+   "end": 7554,
+   "type": "verse",
+   "basis": "verse row at byte 6774",
+   "id": null,
+   "text": "systems. These adjoint systems are exceptionally stiff due to an effectively infinite CFL number, which negates the boost"
+  },
+  {
+   "start": 7555,
+   "end": 7609,
+   "type": "verse",
+   "basis": "verse row at byte 6896",
+   "id": null,
+   "text": "to diagonal dominance provided by the pseudotime term."
+  },
+  {
+   "start": 7612,
+   "end": 7681,
+   "type": "verse",
+   "basis": "verse row at byte 6953",
+   "id": null,
+   "text": "III. Results"
+  },
+  {
+   "start": 7682,
+   "end": 7798,
+   "type": "verse",
+   "basis": "verse row at byte 7023",
+   "id": null,
+   "text": "For goal-oriented adaptation of the NASA Juncture Flow (JF) model [26–28], the approach reported by Loseille et"
+  },
+  {
+   "start": 7799,
+   "end": 7919,
+   "type": "verse",
+   "basis": "verse row at byte 7140",
+   "id": null,
+   "text": "al. [29] is utilized [30]. This goal-oriented metric only targets the inviscid contributions of estimated error, but has"
+  },
+  {
+   "start": 7920,
+   "end": 8035,
+   "type": "verse",
+   "basis": "verse row at byte 7261",
+   "id": null,
+   "text": "been used successfully on viscous cases [31]. The inviscid goal-oriented approach involves the optimization of an a"
+  },
+  {
+   "start": 8036,
+   "end": 8154,
+   "type": "verse",
+   "basis": "verse row at byte 7377",
+   "id": null,
+   "text": "priori error estimate of output functionals for the Euler equations in the continuous grid framework using calculus of"
+  },
+  {
+   "start": 8155,
+   "end": 8282,
+   "type": "verse",
+   "basis": "verse row at byte 7496",
+   "id": null,
+   "text": "variations, resulting in an analytical formulation for the metric field. The resulting metric field essentially consists of the"
+  },
+  {
+   "start": 8283,
+   "end": 8402,
+   "type": "verse",
+   "basis": "verse row at byte 7624",
+   "id": null,
+   "text": "sum of Hessians of the Euler fluxes, weighted by the gradient components of the adjoint fields [24]. The adjoint fields"
+  },
+  {
+   "start": 8403,
+   "end": 8526,
+   "type": "verse",
+   "basis": "verse row at byte 7744",
+   "id": null,
+   "text": "used in the present work were calculated for the drag coefficient output functional as described in Ref. [5]. The resulting"
+  },
+  {
+   "start": 8527,
+   "end": 8647,
+   "type": "verse",
+   "basis": "verse row at byte 7868",
+   "id": null,
+   "text": "adjoint linear systems were converged at least 13 orders of magnitude to produce costate variable fields used in forming"
+  },
+  {
+   "start": 8648,
+   "end": 8675,
+   "type": "verse",
+   "basis": "verse row at byte 7989",
+   "id": null,
+   "text": "an Euler adaptation metric."
+  },
+  {
+   "start": 8676,
+   "end": 8797,
+   "type": "verse",
+   "basis": "verse row at byte 8017",
+   "id": null,
+   "text": "Figure 1a shows the relative residual convergence of the drag adjoint linear system for the JF shown in Fig. 1b. Two"
+  },
+  {
+   "start": 8798,
+   "end": 8909,
+   "type": "verse",
+   "basis": "verse row at byte 8139",
+   "id": null,
+   "text": "decompositions of the 1,720,689 grid point domain over 400 Intel Skylake [32] CPU cores (arranged in 10 compute"
+  },
+  {
+   "start": 8910,
+   "end": 9021,
+   "type": "verse",
+   "basis": "verse row at byte 8251",
+   "id": null,
+   "text": "nodes) are shown, 1) 400 MPI partitions, and 2) 20 MPI partitions each using 20 OpenMP threads. The traditional"
+  },
+  {
+   "start": 9022,
+   "end": 9139,
+   "type": "verse",
+   "basis": "verse row at byte 8363",
+   "id": null,
+   "text": "approach of assigning one MPI partition per CPU core does not facilitate significant reduction in the residual of the"
+  },
+  {
+   "start": 9140,
+   "end": 9255,
+   "type": "verse",
+   "basis": "verse row at byte 8481",
+   "id": null,
+   "text": "adjoint system. The benefit of decomposing the domain into fewer, larger partitions, using the same total number of"
+  },
+  {
+   "start": 9256,
+   "end": 9371,
+   "type": "verse",
+   "basis": "verse row at byte 8597",
+   "id": null,
+   "text": "CPU cores is clear. Additional details of the Incomplete LU preconditioners and matrix orderings used to study this"
+  },
+  {
+   "start": 9372,
+   "end": 9413,
+   "type": "verse",
+   "basis": "verse row at byte 8713",
+   "id": null,
+   "text": "case will be presented in the full paper."
+  },
+  {
+   "start": 9416,
+   "end": 9483,
+   "type": "verse",
+   "basis": "verse row at byte 8757",
+   "id": null,
+   "text": "IV. Summary"
+  },
+  {
+   "start": 9484,
+   "end": 9593,
+   "type": "verse",
+   "basis": "verse row at byte 8825",
+   "id": null,
+   "text": "The decisions made early in a numerical solution process, to decompose domains and allocate computational"
+  },
+  {
+   "start": 9594,
+   "end": 9715,
+   "type": "verse",
+   "basis": "verse row at byte 8935",
+   "id": null,
+   "text": "resources, have significant impact on the cost and accuracy of resulting solutions. The Stabilized Finite Element library"
+  },
+  {
+   "start": 9716,
+   "end": 9826,
+   "type": "verse",
+   "basis": "verse row at byte 9057",
+   "id": null,
+   "text": "within FUN3D and the Sparse Linear Algebra Toolkit are used to examine trade-offs between domain decomposition"
+  },
+  {
+   "start": 9827,
+   "end": 9943,
+   "type": "verse",
+   "basis": "verse row at byte 9168",
+   "id": null,
+   "text": "and resource allocation approaches. The full paper will include examples and discussion of trade-offs in parallelism"
+  },
+  {
+   "start": 9944,
+   "end": 10038,
+   "type": "verse",
+   "basis": "verse row at byte 9285",
+   "id": null,
+   "text": "from MPI, OpenMP, and vectorization as partition sizes and computational resources are varied."
+  },
+  {
+   "start": 10043,
+   "end": 10111,
+   "type": "verse",
+   "basis": "verse row at byte 9384",
+   "id": null,
+   "text": "2"
+  },
+  {
+   "start": 10112,
+   "end": 10241,
+   "type": "verse",
+   "basis": "verse row at byte 9453",
+   "id": null,
+   "text": "(a) Relative residual convergence                    (b) Continuity costate isosurface over CP colored surface and"
+  },
+  {
+   "start": 10242,
+   "end": 10323,
+   "type": "verse",
+   "basis": "verse row at byte 9583",
+   "id": null,
+   "text": "symmetry plane"
+  },
+  {
+   "start": 10325,
+   "end": 10435,
+   "type": "verse",
+   "basis": "verse row at byte 9666",
+   "id": null,
+   "text": "Fig. 1    Convergence and visualization of adjoint linear system for the drag cost function of the JF model."
+  },
+  {
+   "start": 10438,
+   "end": 10504,
+   "type": "verse",
+   "basis": "verse row at byte 9779",
+   "id": null,
+   "text": "Acknowledgments"
+  },
+  {
+   "start": 10505,
+   "end": 10617,
+   "type": "verse",
+   "basis": "verse row at byte 9846",
+   "id": null,
+   "text": "This research was sponsored by the NASA Revolutionary Computational Aerosciences (RCA) Transformational Tools"
+  },
+  {
+   "start": 10618,
+   "end": 10730,
+   "type": "verse",
+   "basis": "verse row at byte 9959",
+   "id": null,
+   "text": "and Technologies (TTT) Project of the Transformative Aeronautics Concepts Program under the Aeronautics Research"
+  },
+  {
+   "start": 10731,
+   "end": 10842,
+   "type": "verse",
+   "basis": "verse row at byte 10072",
+   "id": null,
+   "text": "Mission Directorate. This work was partially supported by the NASA High Performance Computing Incubator (HPCI)."
+  },
+  {
+   "start": 10845,
+   "end": 10912,
+   "type": "verse",
+   "basis": "verse row at byte 10186",
+   "id": null,
+   "text": "References"
+  },
+  {
+   "start": 10913,
+   "end": 11034,
+   "type": "verse",
+   "basis": "verse row at byte 10254",
+   "id": null,
+   "text": "[1] Karypis, G., and Kumar, V., “MeTis: Unstructured Graph Partitioning and Sparse Matrix Ordering System, Version 4.0,”"
+  },
+  {
+   "start": 11035,
+   "end": 11075,
+   "type": "verse",
+   "basis": "verse row at byte 10376",
+   "id": null,
+   "text": "http://www.cs.umn.edu/~metis, 2009."
+  },
+  {
+   "start": 11077,
+   "end": 11204,
+   "type": "verse",
+   "basis": "verse row at byte 10418",
+   "id": null,
+   "text": "[2] Saad, Y., “Preconditioned Krylov subspace methods for CFD applications,” Solution Techniques for Large-Scale CFD Problems,"
+  },
+  {
+   "start": 11205,
+   "end": 11228,
+   "type": "verse",
+   "basis": "verse row at byte 10546",
+   "id": null,
+   "text": "1995, pp. 139–158."
+  },
+  {
+   "start": 11230,
+   "end": 11354,
+   "type": "verse",
+   "basis": "verse row at byte 10571",
+   "id": null,
+   "text": "[3] Anderson, W. K., Newman, J. C., and Karman, S. L., “Stabilized Finite Elements in FUN3D,” Journal of Aircraft, Vol. 55,"
+  },
+  {
+   "start": 11355,
+   "end": 11408,
+   "type": "verse",
+   "basis": "verse row at byte 10696",
+   "id": null,
+   "text": "No. 2, 2018, pp. 696–714. doi:10.2514/1.C034482."
+  },
+  {
+   "start": 11410,
+   "end": 11532,
+   "type": "verse",
+   "basis": "verse row at byte 10751",
+   "id": null,
+   "text": "[4] Zhang, J., “Preconditioned Krylov Subspace Methods for Solving Nonsymmetric Matrices from CFD Applications,” Computer"
+  },
+  {
+   "start": 11533,
+   "end": 11619,
+   "type": "verse",
+   "basis": "verse row at byte 10874",
+   "id": null,
+   "text": "methods in applied mechanics and engineering, Vol. 189, No. 3, 2000, pp. 825–840."
+  },
+  {
+   "start": 11621,
+   "end": 11751,
+   "type": "verse",
+   "basis": "verse row at byte 10962",
+   "id": null,
+   "text": "[5] Wood, S. L., Jacobson, K., Jones, W. T., and Anderson, W. K., “Sparse Linear Algebra Toolkit for Computational Aerodynamics,”"
+  },
+  {
+   "start": 11752,
+   "end": 11861,
+   "type": "verse",
+   "basis": "verse row at byte 11093",
+   "id": null,
+   "text": "AIAA Scitech Forum, 2020. doi:10.2514/6.2020-0317, URL https://arc.aiaa.org/doi/abs/10.2514/6.2020-0317."
+  },
+  {
+   "start": 11863,
+   "end": 11933,
+   "type": "verse",
+   "basis": "verse row at byte 11204",
+   "id": null,
+   "text": "[6] “MPI Documents,” , Jun 2015. URL https://www.mpi-forum.org/docs/."
+  },
+  {
+   "start": 11935,
+   "end": 12045,
+   "type": "verse",
+   "basis": "verse row at byte 11276",
+   "id": null,
+   "text": "[7] “OpenMP Application Programming Interface,” , 2020. URL https://www.openmp.org/wp-content/uploads/openmp-"
+  },
+  {
+   "start": 12046,
+   "end": 12059,
+   "type": "verse",
+   "basis": "verse row at byte 11387",
+   "id": null,
+   "text": "4.5.pdf."
+  },
+  {
+   "start": 12061,
+   "end": 12181,
+   "type": "verse",
+   "basis": "verse row at byte 11402",
+   "id": null,
+   "text": "[8] Schwarz, H., “Ueber einige Abbildungsaufgaben.” Journal für die reine und angewandte Mathematik, Vol. 70, 1869, pp."
+  },
+  {
+   "start": 12182,
+   "end": 12228,
+   "type": "verse",
+   "basis": "verse row at byte 11523",
+   "id": null,
+   "text": "105–120. URL http://eudml.org/doc/148076."
+  },
+  {
+   "start": 12230,
+   "end": 12353,
+   "type": "verse",
+   "basis": "verse row at byte 11571",
+   "id": null,
+   "text": "[9] Tang, H. S., Haynes, R. D., and Houzeaux, G., “A Review of Domain Decomposition Methods for Simulation of Fluid Flows:"
+  },
+  {
+   "start": 12354,
+   "end": 12455,
+   "type": "verse",
+   "basis": "verse row at byte 11695",
+   "id": null,
+   "text": "Concepts, Algorithms, and Applications,” Archives of Computational Methods in Engineering, 2020."
+  },
+  {
+   "start": 12457,
+   "end": 12583,
+   "type": "verse",
+   "basis": "verse row at byte 11798",
+   "id": null,
+   "text": "[10] Shang, Z., “Impact of Mesh Partitioning Methods in CFD for Large Scale Parallel Computing,” Computers & Fluids, Vol. 103,"
+  },
+  {
+   "start": 12584,
+   "end": 12700,
+   "type": "verse",
+   "basis": "verse row at byte 11925",
+   "id": null,
+   "text": "2014, pp. 1 – 5. doi:https://doi.org/10.1016/j.compfluid.2014.07.016, URL http://www.sciencedirect.com/science/"
+  },
+  {
+   "start": 12701,
+   "end": 12736,
+   "type": "verse",
+   "basis": "verse row at byte 12042",
+   "id": null,
+   "text": "article/pii/S0045793014003016."
+  },
+  {
+   "start": 12739,
+   "end": 12803,
+   "type": "verse",
+   "basis": "verse row at byte 12080",
+   "id": null,
+   "text": "3"
+  },
+  {
+   "start": 12804,
+   "end": 12931,
+   "type": "verse",
+   "basis": "verse row at byte 12145",
+   "id": null,
+   "text": "[11] Kogge, P., and Shalf, J., “Exascale Computing Trends: Adjusting to the \"New Normal\" for Computer Architecture,” Computing"
+  },
+  {
+   "start": 12932,
+   "end": 12995,
+   "type": "verse",
+   "basis": "verse row at byte 12273",
+   "id": null,
+   "text": "in Science & Engineering, Vol. 15, No. 6, 2013, pp. 16–26."
+  },
+  {
+   "start": 12997,
+   "end": 13084,
+   "type": "verse",
+   "basis": "verse row at byte 12338",
+   "id": null,
+   "text": "[12] “SPARKSIT,” , Nov 2019. URL https://www-users.cs.umn.edu/~saad/software/SPARSKIT/."
+  },
+  {
+   "start": 13086,
+   "end": 13208,
+   "type": "verse",
+   "basis": "verse row at byte 12427",
+   "id": null,
+   "text": "[13] Anzt, H., Sawyer, W., Tomov, S., Luszczek, P., Yamazaki, I., and Dongarra, J., “Optimizing Krylov Subspace Solvers on"
+  },
+  {
+   "start": 13209,
+   "end": 13330,
+   "type": "verse",
+   "basis": "verse row at byte 12550",
+   "id": null,
+   "text": "Graphics Processing Units,” Fourth International Workshop on Accelerators and Hybrid Exascale Systems (AsHES), IPDPS"
+  },
+  {
+   "start": 13331,
+   "end": 13372,
+   "type": "verse",
+   "basis": "verse row at byte 12672",
+   "id": null,
+   "text": "2014, IEEE, IEEE, Phoenix, AZ, 2014."
+  },
+  {
+   "start": 13374,
+   "end": 13497,
+   "type": "verse",
+   "basis": "verse row at byte 12715",
+   "id": null,
+   "text": "[14] Yamazaki, I., Anzt, H., Tomov, S., Hoemmen, M., and Dongarra, J., “Improving the performance of CA-GMRES on multicores"
+  },
+  {
+   "start": 13498,
+   "end": 13560,
+   "type": "verse",
+   "basis": "verse row at byte 12839",
+   "id": null,
+   "text": "with multiple GPUs,” IPDPS 2014, IEEE, Phoenix, AZ, 2014."
+  },
+  {
+   "start": 13562,
+   "end": 13688,
+   "type": "verse",
+   "basis": "verse row at byte 12903",
+   "id": null,
+   "text": "[15] Balay, S., Abhyankar, S., Adams, M. F., Brown, J., Brune, P., Buschelman, K., Dalcin, L., Dener, A., Eijkhout, V., Gropp,"
+  },
+  {
+   "start": 13689,
+   "end": 13818,
+   "type": "verse",
+   "basis": "verse row at byte 13030",
+   "id": null,
+   "text": "W. D., Karpeyev, D., Kaushik, D., Knepley, M. G., May, D. A., McInnes, L. C., Mills, R. T., Munson, T., Rupp, K., Sanan, P.,"
+  },
+  {
+   "start": 13819,
+   "end": 13935,
+   "type": "verse",
+   "basis": "verse row at byte 13160",
+   "id": null,
+   "text": "Smith, B. F., Zampini, S., Zhang, H., and Zhang, H., “PETSc Web page,” https://www.mcs.anl.gov/petsc, 2019. URL"
+  },
+  {
+   "start": 13936,
+   "end": 13971,
+   "type": "verse",
+   "basis": "verse row at byte 13277",
+   "id": null,
+   "text": "https://www.mcs.anl.gov/petsc."
+  },
+  {
+   "start": 13973,
+   "end": 14092,
+   "type": "verse",
+   "basis": "verse row at byte 13314",
+   "id": null,
+   "text": "[16] Intel®, “Developer Reference for Intel® Math Kernel Library 2019 - C,” , Nov 2019. URL https://software.intel.com/"
+  },
+  {
+   "start": 14093,
+   "end": 14130,
+   "type": "verse",
+   "basis": "verse row at byte 13434",
+   "id": null,
+   "text": "en-us/mkl-developer-reference-c."
+  },
+  {
+   "start": 14132,
+   "end": 14233,
+   "type": "verse",
+   "basis": "verse row at byte 13473",
+   "id": null,
+   "text": "[17] “CUDA Toolkit Documentation v10.2.89,” , Nov 2019. URL https://docs.nvidia.com/cuda/index.html#."
+  },
+  {
+   "start": 14235,
+   "end": 14327,
+   "type": "verse",
+   "basis": "verse row at byte 13576",
+   "id": null,
+   "text": "[18] “FUN3D Fully Unstructured Navier-Stokes,” , Nov 2019. URL https://fun3d.larc.nasa.gov/."
+  },
+  {
+   "start": 14329,
+   "end": 14453,
+   "type": "verse",
+   "basis": "verse row at byte 13670",
+   "id": null,
+   "text": "[19] Brooks, A. N., and Hughes, T. J. R., “Streamline Upwind/Petrov-Galerkin Formulation for Convection Dominated Flows with"
+  },
+  {
+   "start": 14454,
+   "end": 14577,
+   "type": "verse",
+   "basis": "verse row at byte 13795",
+   "id": null,
+   "text": "Particular Emphasis on Incompressible Navier-Stokes Equations,” Computer Methods in Applied Mechanics and Engineering,"
+  },
+  {
+   "start": 14578,
+   "end": 14653,
+   "type": "verse",
+   "basis": "verse row at byte 13919",
+   "id": null,
+   "text": "Vol. 32, No. 1–3, 1982, pp. 199–259. doi:10.1016/0045-7825(82)90071-8."
+  },
+  {
+   "start": 14655,
+   "end": 14779,
+   "type": "verse",
+   "basis": "verse row at byte 13996",
+   "id": null,
+   "text": "[20] Shakib, F., Hughes, T. J. R., and Johan, Z., “A New Finite-Element Formulation for Computational Fluid Dynamics: X. The"
+  },
+  {
+   "start": 14780,
+   "end": 14901,
+   "type": "verse",
+   "basis": "verse row at byte 14121",
+   "id": null,
+   "text": "Compressible Euler and Navier-Stokes Equations,” Computer Methods in Applied Mechanics and Engineering, Vol. 89, No."
+  },
+  {
+   "start": 14902,
+   "end": 14964,
+   "type": "verse",
+   "basis": "verse row at byte 14243",
+   "id": null,
+   "text": "1–3, 1991, pp. 141–219. doi:10.1016/0045-7825(91)90041-4."
+  },
+  {
+   "start": 14966,
+   "end": 15096,
+   "type": "verse",
+   "basis": "verse row at byte 14307",
+   "id": null,
+   "text": "[21] Allmaras, S. R., Johnson, F. T., and Spalart, P. R., “Modifications and Clarifications for the Implementation of the Spalart-"
+  },
+  {
+   "start": 15097,
+   "end": 15210,
+   "type": "verse",
+   "basis": "verse row at byte 14438",
+   "id": null,
+   "text": "Allmaras Turbulence Model,” Seventh International Conference on Computational Fluid Dynamics (ICCFD7), 2012."
+  },
+  {
+   "start": 15212,
+   "end": 15338,
+   "type": "verse",
+   "basis": "verse row at byte 14553",
+   "id": null,
+   "text": "[22] Spalart, P., “Strategies for Turbulence Modeling and Simulations,” International Journal of Heat and Fluid Flow, Vol. 21,"
+  },
+  {
+   "start": 15339,
+   "end": 15456,
+   "type": "verse",
+   "basis": "verse row at byte 14680",
+   "id": null,
+   "text": "No. 3, 2000, pp. 252 – 263. doi:https://doi.org/10.1016/S0142-727X(00)00007-2, URL http://www.sciencedirect.com/"
+  },
+  {
+   "start": 15457,
+   "end": 15500,
+   "type": "verse",
+   "basis": "verse row at byte 14798",
+   "id": null,
+   "text": "science/article/pii/S0142727X00000072."
+  },
+  {
+   "start": 15502,
+   "end": 15626,
+   "type": "verse",
+   "basis": "verse row at byte 14843",
+   "id": null,
+   "text": "[23] Balan, A., Park, M. A., and Anderson, W. K., “Adjoint-based Anisotropic Mesh Adaptation for a Stabilized Finite-Element"
+  },
+  {
+   "start": 15627,
+   "end": 15673,
+   "type": "verse",
+   "basis": "verse row at byte 14968",
+   "id": null,
+   "text": "Flow Solver,” AIAA Paper 2019–2949, 2019."
+  },
+  {
+   "start": 15675,
+   "end": 15801,
+   "type": "verse",
+   "basis": "verse row at byte 15016",
+   "id": null,
+   "text": "[24] Balan, A., Park, M. A., Wood, S., and Anderson, W. K., “Verification of Anisotropic Mesh Adaptation for Complex Aerospace"
+  },
+  {
+   "start": 15802,
+   "end": 15916,
+   "type": "verse",
+   "basis": "verse row at byte 15143",
+   "id": null,
+   "text": "Applications,” AIAA Scitech Forum, 2020. doi:10.2514/6.2020-0675, URL https://arc.aiaa.org/doi/abs/10.2514/6."
+  },
+  {
+   "start": 15917,
+   "end": 15932,
+   "type": "verse",
+   "basis": "verse row at byte 15258",
+   "id": null,
+   "text": "2020-0675."
+  },
+  {
+   "start": 15934,
+   "end": 16064,
+   "type": "verse",
+   "basis": "verse row at byte 15275",
+   "id": null,
+   "text": "[25] Saad, Y., Iterative Methods for Sparse Linear Systems, 2nd Ed., Society for Industrial and Applied Mathematics, Philadelphia,"
+  },
+  {
+   "start": 16065,
+   "end": 16084,
+   "type": "verse",
+   "basis": "verse row at byte 15406",
+   "id": null,
+   "text": "PA, USA, 2003."
+  },
+  {
+   "start": 16086,
+   "end": 16213,
+   "type": "verse",
+   "basis": "verse row at byte 15427",
+   "id": null,
+   "text": "[26] Rumsey, C. L., “The NASA Juncture Flow Test as a Model for Effective CFD/Experimental Collaboration,” Applied Aerodynamics"
+  },
+  {
+   "start": 16214,
+   "end": 16315,
+   "type": "verse",
+   "basis": "verse row at byte 15555",
+   "id": null,
+   "text": "Conference, 2018. doi:10.2514/6.2018-3319, URL https://arc.aiaa.org/doi/abs/10.2514/6.2018-3319."
+  },
+  {
+   "start": 16317,
+   "end": 16441,
+   "type": "verse",
+   "basis": "verse row at byte 15658",
+   "id": null,
+   "text": "[27] Kegerise, M. A., Neuhart, D., Hannon, J., and Rumsey, C. L., “An Experimental Investigation of a Wing-Fuselage Junction"
+  },
+  {
+   "start": 16442,
+   "end": 16561,
+   "type": "verse",
+   "basis": "verse row at byte 15783",
+   "id": null,
+   "text": "Model in the NASA Langley 14- by 22-Foot Subsonic Wind Tunnel,” AIAA Scitech Forum, 2019. doi:10.2514/6.2019-0077,"
+  },
+  {
+   "start": 16562,
+   "end": 16620,
+   "type": "verse",
+   "basis": "verse row at byte 15903",
+   "id": null,
+   "text": "URL https://arc.aiaa.org/doi/abs/10.2514/6.2019-0077."
+  },
+  {
+   "start": 16622,
+   "end": 16748,
+   "type": "verse",
+   "basis": "verse row at byte 15963",
+   "id": null,
+   "text": "[28] Kegerise, M. A., and Neuhart, D. H., “An Experimental Investigation of a Wing-Fuselage Junction Model in the NASA Langley"
+  },
+  {
+   "start": 16749,
+   "end": 16832,
+   "type": "verse",
+   "basis": "verse row at byte 16090",
+   "id": null,
+   "text": "14- by 22-Foot Subsonic Tunnel,” Technical Memorandum 2019-27403, 2019-6 2019."
+  },
+  {
+   "start": 16834,
+   "end": 16964,
+   "type": "verse",
+   "basis": "verse row at byte 16175",
+   "id": null,
+   "text": "[29] Loseille, A., Dervieux, A., and Alauzet, F., “Fully Anisotropic Goal-Oriented Mesh Adaptation for 3D Steady Euler Equations,”"
+  },
+  {
+   "start": 16965,
+   "end": 17094,
+   "type": "verse",
+   "basis": "verse row at byte 16306",
+   "id": null,
+   "text": "Journal of Computational Physics, Vol. 229, No. 8, 2010, pp. 2866 – 2897. doi:https://doi.org/10.1016/j.jcp.2009.12.021, URL"
+  },
+  {
+   "start": 17095,
+   "end": 17167,
+   "type": "verse",
+   "basis": "verse row at byte 16436",
+   "id": null,
+   "text": "http://www.sciencedirect.com/science/article/pii/S0021999109007001."
+  },
+  {
+   "start": 17172,
+   "end": 17237,
+   "type": "verse",
+   "basis": "verse row at byte 16513",
+   "id": null,
+   "text": "4"
+  },
+  {
+   "start": 17238,
+   "end": 17363,
+   "type": "verse",
+   "basis": "verse row at byte 16579",
+   "id": null,
+   "text": "[30] Wood, S. L., Anderson, W. K., Park, M. A., Balan, A., Karman, S., and Jacobson, K. E., “Reynolds-Averaged Navier-Stokes"
+  },
+  {
+   "start": 17364,
+   "end": 17484,
+   "type": "verse",
+   "basis": "verse row at byte 16705",
+   "id": null,
+   "text": "Computations of the NASA Juncture Flow Model Using Expert-Crafted and Adapted Grids,” AIAA Scitech Forum, 2020-2751"
+  },
+  {
+   "start": 17485,
+   "end": 17578,
+   "type": "verse",
+   "basis": "verse row at byte 16826",
+   "id": null,
+   "text": "in Press. doi:10.2514/6.2020-2751, URL https://arc.aiaa.org/doi/abs/10.2514/6.2020-2751."
+  },
+  {
+   "start": 17580,
+   "end": 17697,
+   "type": "verse",
+   "basis": "verse row at byte 16921",
+   "id": null,
+   "text": "[31] Belme, A., Alauzet, F., and Dervieux, A., “An a priori Anisotropic Goal-Oriented Error Estimate for Viscous Com-"
+  },
+  {
+   "start": 17698,
+   "end": 17819,
+   "type": "verse",
+   "basis": "verse row at byte 17039",
+   "id": null,
+   "text": "pressible Flow and Application to Mesh Adaptation,” Journal of Computational Physics, Vol. 376, 2019, pp. 1051–1088."
+  },
+  {
+   "start": 17820,
+   "end": 17902,
+   "type": "verse",
+   "basis": "verse row at byte 17161",
+   "id": null,
+   "text": "doi:10.1016/j.jcp.2018.08.048, URL https://doi.org/10.1016/j.jcp.2018.08.048."
+  },
+  {
+   "start": 17904,
+   "end": 18007,
+   "type": "verse",
+   "basis": "verse row at byte 17245",
+   "id": null,
+   "text": "[32] “Intel® Xeon® Processor E3-1240 v6,” , 2017. URL https://www.intel.com/content/www/us/en/products/"
+  },
+  {
+   "start": 18008,
+   "end": 18059,
+   "type": "verse",
+   "basis": "verse row at byte 17349",
+   "id": null,
+   "text": "processors/xeon/e3-processors/e3-1240-v6.html."
+  },
+  {
+   "start": 18064,
+   "end": 18126,
+   "type": "verse",
+   "basis": "verse row at byte 17405",
+   "id": null,
+   "text": "5"
+  }
+ ]
+}

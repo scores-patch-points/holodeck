@@ -1,0 +1,18 @@
+{
+ "schema": "RefusalFloor@1",
+ "language": "ita",
+ "alpha": 0.05,
+ "floor": 0.1639344262295082,
+ "provenance": {
+  "giver": "Universal Dependencies treebank (train split), human-annotated gold",
+  "builder": "khora native/scripts/build-refusal-floor.mjs",
+  "basis": "K=5 contiguous folds; per fold a POS prior and a frame prior built from the other folds; every in-scope held-out word the prior had not met is read by classAt; floor = the naming mass below which only ALPHA of the true naming occurrences fall (cap 0.5)",
+  "folds": 5,
+  "pseudo_unseen_naming": 14129,
+  "pseudo_unseen_non_naming": 9921,
+  "lost_share": 0.04968504494302498,
+  "caught_share": 0.5349259147263381,
+  "uncapped_floor": 0.1639344262295082,
+  "note": "the floor is a refusal bound, not a classifier: a word below it is refused, a word at or above it is kept and flagged class_unsettled when its frame does not settle it"
+ }
+}

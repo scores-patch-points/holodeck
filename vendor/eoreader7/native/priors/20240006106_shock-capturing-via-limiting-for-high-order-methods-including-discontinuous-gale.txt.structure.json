@@ -1,0 +1,7467 @@
+{
+ "schema": "SourceStructure@1",
+ "source": "05-academic-papers/ntrs-white-papers/20240006106_shock-capturing-via-limiting-for-high-order-methods-including-discontinuous-gale.txt",
+ "bytes": 82242,
+ "bodyOffset": 662,
+ "splitBasis": "932 line-delimited rows",
+ "unsplit": false,
+ "unitCount": 932,
+ "units": [
+  {
+   "start": 663,
+   "end": 716,
+   "type": "verse",
+   "basis": "verse row at byte 1",
+   "id": null,
+   "text": "1"
+  },
+  {
+   "start": 721,
+   "end": 778,
+   "type": "verse",
+   "basis": "verse row at byte 59",
+   "id": null,
+   "text": "Shock Capturing via Limiting for High-Order Methods"
+  },
+  {
+   "start": 779,
+   "end": 826,
+   "type": "verse",
+   "basis": "verse row at byte 117",
+   "id": null,
+   "text": "including Discontinuous Galerkin"
+  },
+  {
+   "start": 828,
+   "end": 883,
+   "type": "verse",
+   "basis": "verse row at byte 166",
+   "id": null,
+   "text": "H. T. Huynh"
+  },
+  {
+   "start": 884,
+   "end": 946,
+   "type": "verse",
+   "basis": "verse row at byte 222",
+   "id": null,
+   "text": "NASA Glenn Research Center"
+  },
+  {
+   "start": 947,
+   "end": 1008,
+   "type": "verse",
+   "basis": "verse row at byte 285",
+   "id": null,
+   "text": "Cleveland, OH 44135, USA"
+  },
+  {
+   "start": 1009,
+   "end": 1067,
+   "type": "verse",
+   "basis": "verse row at byte 347",
+   "id": null,
+   "text": "huynh@grc.nasa.gov"
+  },
+  {
+   "start": 1070,
+   "end": 1078,
+   "type": "verse",
+   "basis": "verse row at byte 408",
+   "id": null,
+   "text": "Abstract"
+  },
+  {
+   "start": 1079,
+   "end": 1179,
+   "type": "verse",
+   "basis": "verse row at byte 417",
+   "id": null,
+   "text": "High-order methods, such as discontinuous Galerkin (DG), spectral, and flux reconstruction (FR),"
+  },
+  {
+   "start": 1180,
+   "end": 1280,
+   "type": "verse",
+   "basis": "verse row at byte 518",
+   "id": null,
+   "text": "are prone to generating unwanted oscillations near shocks and discontinuities. Conventional limiting"
+  },
+  {
+   "start": 1281,
+   "end": 1380,
+   "type": "verse",
+   "basis": "verse row at byte 619",
+   "id": null,
+   "text": "techniques, while effective in suppressing oscillations near shocks, often compromise accuracy near"
+  },
+  {
+   "start": 1381,
+   "end": 1487,
+   "type": "verse",
+   "basis": "verse row at byte 719",
+   "id": null,
+   "text": "extrema, where the solution is only first-order accurate. This paper introduces a novel limiting technique"
+  },
+  {
+   "start": 1488,
+   "end": 1585,
+   "type": "verse",
+   "basis": "verse row at byte 826",
+   "id": null,
+   "text": "for these high-order schemes, aimed at effectively managing shocks while preserving accuracy. The"
+  },
+  {
+   "start": 1586,
+   "end": 1688,
+   "type": "verse",
+   "basis": "verse row at byte 924",
+   "id": null,
+   "text": "key idea is to expand the standard monotonicity limits to provide “room” near smooth extrema, ensuring"
+  },
+  {
+   "start": 1689,
+   "end": 1790,
+   "type": "verse",
+   "basis": "verse row at byte 1027",
+   "id": null,
+   "text": "that limiting has no effect and thus preserving accuracy. Near a discontinuity, these expanded limits"
+  },
+  {
+   "start": 1791,
+   "end": 1894,
+   "type": "verse",
+   "basis": "verse row at byte 1129",
+   "id": null,
+   "text": "effectively reduce to the original monotonicity limits, suppressing oscillations. Additional motivation"
+  },
+  {
+   "start": 1895,
+   "end": 1989,
+   "type": "verse",
+   "basis": "verse row at byte 1233",
+   "id": null,
+   "text": "is drawn from a formula for the derivative of Radau polynomials, which depicts the behavior of"
+  },
+  {
+   "start": 1990,
+   "end": 2097,
+   "type": "verse",
+   "basis": "verse row at byte 1328",
+   "id": null,
+   "text": "oscillations resulting from discontinuities. This behavior leads to a simplification by applying the limits"
+  },
+  {
+   "start": 2098,
+   "end": 2200,
+   "type": "verse",
+   "basis": "verse row at byte 1436",
+   "id": null,
+   "text": "to the sum of magnitudes of all modes, linear and higher degree. Unlike typical approaches, which rely"
+  },
+  {
+   "start": 2201,
+   "end": 2300,
+   "type": "verse",
+   "basis": "verse row at byte 1539",
+   "id": null,
+   "text": "on successful detection to activate limiting, our limiter depends continuously on the data, thereby"
+  },
+  {
+   "start": 2301,
+   "end": 2405,
+   "type": "verse",
+   "basis": "verse row at byte 1639",
+   "id": null,
+   "text": "avoiding potential issues if detection fails. To reduce computing time, efficient criteria for detecting"
+  },
+  {
+   "start": 2406,
+   "end": 2505,
+   "type": "verse",
+   "basis": "verse row at byte 1744",
+   "id": null,
+   "text": "smooth regions where limiting is unnecessary are presented. Combined with detection, the continuous"
+  },
+  {
+   "start": 2506,
+   "end": 2611,
+   "type": "verse",
+   "basis": "verse row at byte 1844",
+   "id": null,
+   "text": "dependence on the data is lost, but the method is more economical. A notable characteristic of the entire"
+  },
+  {
+   "start": 2612,
+   "end": 2713,
+   "type": "verse",
+   "basis": "verse row at byte 1950",
+   "id": null,
+   "text": "process is its simplicity in both concept and implementation. Numerical tests for advection and Euler"
+  },
+  {
+   "start": 2714,
+   "end": 2794,
+   "type": "verse",
+   "basis": "verse row at byte 2052",
+   "id": null,
+   "text": "equations are conducted to demonstrate the effectiveness of the proposed method."
+  },
+  {
+   "start": 2797,
+   "end": 2814,
+   "type": "verse",
+   "basis": "verse row at byte 2135",
+   "id": null,
+   "text": "1    Introduction"
+  },
+  {
+   "start": 2815,
+   "end": 2913,
+   "type": "verse",
+   "basis": "verse row at byte 2153",
+   "id": null,
+   "text": "As is well-known, popular high-order methods such as discontinuous Galerkin (DG), spectral, and"
+  },
+  {
+   "start": 2914,
+   "end": 3020,
+   "type": "verse",
+   "basis": "verse row at byte 2252",
+   "id": null,
+   "text": "flux reconstruction (FR), tend to produce oscillations near shocks and discontinuities. These oscillations"
+  },
+  {
+   "start": 3021,
+   "end": 3125,
+   "type": "verse",
+   "basis": "verse row at byte 2359",
+   "id": null,
+   "text": "cause a loss of accuracy and can result in negative pressure and/or density, leading to code break down."
+  },
+  {
+   "start": 3126,
+   "end": 3224,
+   "type": "verse",
+   "basis": "verse row at byte 2464",
+   "id": null,
+   "text": "To mitigate these oscillations, nonlinear stabilization techniques, often referred to as shock-"
+  },
+  {
+   "start": 3225,
+   "end": 3321,
+   "type": "verse",
+   "basis": "verse row at byte 2563",
+   "id": null,
+   "text": "capturing methods, have been developed. They can be broadly categorized into one of four groups:"
+  },
+  {
+   "start": 3322,
+   "end": 3413,
+   "type": "verse",
+   "basis": "verse row at byte 2660",
+   "id": null,
+   "text": "limiting (Van Leer 1977, Cockburn et al. 1990, Hoteit et al. 2004, Krivodonova et al. 2004,"
+  },
+  {
+   "start": 3414,
+   "end": 3511,
+   "type": "verse",
+   "basis": "verse row at byte 2752",
+   "id": null,
+   "text": "Krivodonova 2007, Yang and Wang 2009, Park et al. 2010, Park and Kim 2012, 2014, 2016, Moe et al."
+  },
+  {
+   "start": 3512,
+   "end": 3608,
+   "type": "verse",
+   "basis": "verse row at byte 2850",
+   "id": null,
+   "text": "2015, You and Kim 2018, Lu et al. 2019), filtering (Hesthaven and Warburton 2008, Asthana et al."
+  },
+  {
+   "start": 3609,
+   "end": 3705,
+   "type": "verse",
+   "basis": "verse row at byte 2947",
+   "id": null,
+   "text": "2015), artificial viscosity (Persson and Peraire 2006, Park et al. 2014), or method modification"
+  },
+  {
+   "start": 3706,
+   "end": 3807,
+   "type": "verse",
+   "basis": "verse row at byte 3044",
+   "id": null,
+   "text": "(Dumbser et al. 2015), each with a substantial body of literature (see the references given therein)."
+  },
+  {
+   "start": 3808,
+   "end": 3911,
+   "type": "verse",
+   "basis": "verse row at byte 3146",
+   "id": null,
+   "text": "These approaches differ in accuracy, robustness, computational cost, and difficulty of extensions. More"
+  },
+  {
+   "start": 3912,
+   "end": 4012,
+   "type": "verse",
+   "basis": "verse row at byte 3250",
+   "id": null,
+   "text": "recent works with promising results include (Dzanica et al. 2022, You et al. 2023, Kim et al. 2024)."
+  },
+  {
+   "start": 4013,
+   "end": 4111,
+   "type": "verse",
+   "basis": "verse row at byte 3351",
+   "id": null,
+   "text": "Among shock capturing methods, we narrow our focus to limiting type, which is arguably the most"
+  },
+  {
+   "start": 4112,
+   "end": 4208,
+   "type": "verse",
+   "basis": "verse row at byte 3450",
+   "id": null,
+   "text": "popular. For standard piecewise linear schemes, the limiting approach imposes constraints on the"
+  },
+  {
+   "start": 4209,
+   "end": 4307,
+   "type": "verse",
+   "basis": "verse row at byte 3547",
+   "id": null,
+   "text": "calculated slopes to prevent excessive steepness, based on Van Leer’s (1977) concept of preserving"
+  },
+  {
+   "start": 4308,
+   "end": 4404,
+   "type": "verse",
+   "basis": "verse row at byte 3646",
+   "id": null,
+   "text": "monotonicity: when the data are monotone, the limited slopes yield a monotone solution. The main"
+  },
+  {
+   "start": 4405,
+   "end": 4504,
+   "type": "verse",
+   "basis": "verse row at byte 3743",
+   "id": null,
+   "text": "drawback of limiting is that it causes a loss of accuracy near smooth extrema where the solution is"
+  },
+  {
+   "start": 4505,
+   "end": 4559,
+   "type": "verse",
+   "basis": "verse row at byte 3843",
+   "id": null,
+   "text": "2"
+  },
+  {
+   "start": 4561,
+   "end": 4663,
+   "type": "verse",
+   "basis": "verse row at byte 3899",
+   "id": null,
+   "text": "somewhat flattened and only first-order accurate. Such a reduction in accuracy undermines the inherent"
+  },
+  {
+   "start": 4664,
+   "end": 4711,
+   "type": "verse",
+   "basis": "verse row at byte 4002",
+   "id": null,
+   "text": "high-order nature of the methods employed here."
+  },
+  {
+   "start": 4712,
+   "end": 4815,
+   "type": "verse",
+   "basis": "verse row at byte 4050",
+   "id": null,
+   "text": "Concerning higher order (quadratic and higher) methods, the key idea for limiting is the following."
+  },
+  {
+   "start": 4816,
+   "end": 4916,
+   "type": "verse",
+   "basis": "verse row at byte 4154",
+   "id": null,
+   "text": "First, a solution is obtained using the base scheme. Next, a detection method is employed, marking a"
+  },
+  {
+   "start": 4917,
+   "end": 5020,
+   "type": "verse",
+   "basis": "verse row at byte 4255",
+   "id": null,
+   "text": "cell as “troubled” if, for example, high frequency or high modal components are significant, indicating"
+  },
+  {
+   "start": 5021,
+   "end": 5125,
+   "type": "verse",
+   "basis": "verse row at byte 4359",
+   "id": null,
+   "text": "the presence of oscillations and the necessity for limiting. For such cells, a constraint or a nonlinear"
+  },
+  {
+   "start": 5126,
+   "end": 5229,
+   "type": "verse",
+   "basis": "verse row at byte 4464",
+   "id": null,
+   "text": "reconstruction is applied to reduce steepness and suppress oscillations in the solution. Conversely, if"
+  },
+  {
+   "start": 5230,
+   "end": 5318,
+   "type": "verse",
+   "basis": "verse row at byte 4568",
+   "id": null,
+   "text": "the cell is deemed “good”—that is, not “troubled”—then the base solution is not altered."
+  },
+  {
+   "start": 5319,
+   "end": 5423,
+   "type": "verse",
+   "basis": "verse row at byte 4657",
+   "id": null,
+   "text": "Such DG-type limiters rely heavily on the detection technique, and detection can fail: occasionally,"
+  },
+  {
+   "start": 5424,
+   "end": 5528,
+   "type": "verse",
+   "basis": "verse row at byte 4762",
+   "id": null,
+   "text": "a good cell can be marked troubled, and vice versa. If a good cell in smooth regions is marked troubled,"
+  },
+  {
+   "start": 5529,
+   "end": 5635,
+   "type": "verse",
+   "basis": "verse row at byte 4867",
+   "id": null,
+   "text": "limiting may cause a loss of accuracy, and if a troubled cell is marked good, oscillations may take place."
+  },
+  {
+   "start": 5636,
+   "end": 5735,
+   "type": "verse",
+   "basis": "verse row at byte 4974",
+   "id": null,
+   "text": "The detection methods must also balance between either marking too many cells as troubled resulting"
+  },
+  {
+   "start": 5736,
+   "end": 5836,
+   "type": "verse",
+   "basis": "verse row at byte 5074",
+   "id": null,
+   "text": "in more computing time or marking too few resulting in oscillations. Some of these methods also rely"
+  },
+  {
+   "start": 5837,
+   "end": 5912,
+   "type": "verse",
+   "basis": "verse row at byte 5175",
+   "id": null,
+   "text": "on user specified parameters which must be recalibrated for different data."
+  },
+  {
+   "start": 5913,
+   "end": 6017,
+   "type": "verse",
+   "basis": "verse row at byte 5251",
+   "id": null,
+   "text": "In this paper, we introduce a limiting technique designed to mitigate oscillations near shocks while"
+  },
+  {
+   "start": 6018,
+   "end": 6118,
+   "type": "verse",
+   "basis": "verse row at byte 5356",
+   "id": null,
+   "text": "maintaining accuracy for high-order methods such as DG, spectral, and FR. This technique extends the"
+  },
+  {
+   "start": 6119,
+   "end": 6213,
+   "type": "verse",
+   "basis": "verse row at byte 5457",
+   "id": null,
+   "text": "method proposed in (Huynh 1995) and (Suresh and Huynh 1997) for traditional interpolation-type"
+  },
+  {
+   "start": 6214,
+   "end": 6312,
+   "type": "verse",
+   "basis": "verse row at byte 5552",
+   "id": null,
+   "text": "schemes. The key idea is to expand the standard monotonicity limits to provide “room” so that near"
+  },
+  {
+   "start": 6313,
+   "end": 6416,
+   "type": "verse",
+   "basis": "verse row at byte 5651",
+   "id": null,
+   "text": "smooth extrema, limiting has no effect, thereby preserving accuracy. Near a discontinuity, the expanded"
+  },
+  {
+   "start": 6417,
+   "end": 6517,
+   "type": "verse",
+   "basis": "verse row at byte 5755",
+   "id": null,
+   "text": "limits effectively reduce to the original monotonicity limits, suppressing oscillations. Our limiter"
+  },
+  {
+   "start": 6518,
+   "end": 6618,
+   "type": "verse",
+   "basis": "verse row at byte 5856",
+   "id": null,
+   "text": "depends continuously on the data, in contrast to typical limiting methods, which rely heavily on the"
+  },
+  {
+   "start": 6619,
+   "end": 6718,
+   "type": "verse",
+   "basis": "verse row at byte 5957",
+   "id": null,
+   "text": "success of detection to activate or deactivate limiting. The algorithm is further simplified by two"
+  },
+  {
+   "start": 6719,
+   "end": 6820,
+   "type": "verse",
+   "basis": "verse row at byte 6057",
+   "id": null,
+   "text": "observations: (a) near a discontinuity, the magnitudes of the high order modes in the solution become"
+  },
+  {
+   "start": 6821,
+   "end": 6927,
+   "type": "verse",
+   "basis": "verse row at byte 6159",
+   "id": null,
+   "text": "excessively large, but their signs are consistent with the direction of the jump, thus limiting only needs"
+  },
+  {
+   "start": 6928,
+   "end": 7030,
+   "type": "verse",
+   "basis": "verse row at byte 6266",
+   "id": null,
+   "text": "to reduce their magnitudes; and (b) the limiting bounds can be applied to the sum of magnitudes of all"
+  },
+  {
+   "start": 7031,
+   "end": 7129,
+   "type": "verse",
+   "basis": "verse row at byte 6369",
+   "id": null,
+   "text": "modes, linear and higher order. Thus, our limiting shares the reduction of higher-order modes with"
+  },
+  {
+   "start": 7130,
+   "end": 7230,
+   "type": "verse",
+   "basis": "verse row at byte 6468",
+   "id": null,
+   "text": "filtering techniques. The key difference is that our approach can reduce even the linear mode and/or"
+  },
+  {
+   "start": 7231,
+   "end": 7335,
+   "type": "verse",
+   "basis": "verse row at byte 6569",
+   "id": null,
+   "text": "nullify all higher-order modes. These large reductions, however, occur only near a discontinuity, unlike"
+  },
+  {
+   "start": 7336,
+   "end": 7408,
+   "type": "verse",
+   "basis": "verse row at byte 6674",
+   "id": null,
+   "text": "in standard filtering, where a moderate reduction is applied everywhere."
+  },
+  {
+   "start": 7409,
+   "end": 7510,
+   "type": "verse",
+   "basis": "verse row at byte 6747",
+   "id": null,
+   "text": "To reduce computing time, we also present efficient criteria for identifying smooth regions where"
+  },
+  {
+   "start": 7511,
+   "end": 7612,
+   "type": "verse",
+   "basis": "verse row at byte 6849",
+   "id": null,
+   "text": "limiting is unnecessary. The main criterion among the three for our detection relies on comparing the"
+  },
+  {
+   "start": 7613,
+   "end": 7718,
+   "type": "verse",
+   "basis": "verse row at byte 6951",
+   "id": null,
+   "text": "jumps at the interfaces to the quadratic content within the cell. The resulting algorithm typically marks"
+  },
+  {
+   "start": 7719,
+   "end": 7826,
+   "type": "verse",
+   "basis": "verse row at byte 7057",
+   "id": null,
+   "text": "one to three cells near a shock as troubled. For a contact discontinuity, after it is dissipated over a few"
+  },
+  {
+   "start": 7827,
+   "end": 7934,
+   "type": "verse",
+   "basis": "verse row at byte 7165",
+   "id": null,
+   "text": "cells, the detection can result in no troubled cells, indicating that the data is sufficiently smooth to be"
+  },
+  {
+   "start": 7935,
+   "end": 8034,
+   "type": "verse",
+   "basis": "verse row at byte 7273",
+   "id": null,
+   "text": "managed by the base method with no limiting. Together with detection, the combined method no longer"
+  },
+  {
+   "start": 8035,
+   "end": 8134,
+   "type": "verse",
+   "basis": "verse row at byte 7373",
+   "id": null,
+   "text": "depends continuously on the data, but it is more economical. A notable characteristic of the entire"
+  },
+  {
+   "start": 8135,
+   "end": 8196,
+   "type": "verse",
+   "basis": "verse row at byte 7473",
+   "id": null,
+   "text": "process is its simplicity in both concept and implementation."
+  },
+  {
+   "start": 8197,
+   "end": 8299,
+   "type": "verse",
+   "basis": "verse row at byte 7535",
+   "id": null,
+   "text": "Our approach, along with its motivations and associated discussions, is strongly influenced by the"
+  },
+  {
+   "start": 8300,
+   "end": 8402,
+   "type": "verse",
+   "basis": "verse row at byte 7638",
+   "id": null,
+   "text": "behavior of the DG method at a discontinuity. To illustrate this behavior, we need to formulate the DG"
+  },
+  {
+   "start": 8403,
+   "end": 8504,
+   "type": "verse",
+   "basis": "verse row at byte 7741",
+   "id": null,
+   "text": "method for advection from an interpolation viewpoint using the FR approach. In essence, projection in"
+  },
+  {
+   "start": 8505,
+   "end": 8608,
+   "type": "verse",
+   "basis": "verse row at byte 7843",
+   "id": null,
+   "text": "the DG formulation is equivalent to interpolation at the Radau points. Here, the oscillations resulting"
+  },
+  {
+   "start": 8609,
+   "end": 8710,
+   "type": "verse",
+   "basis": "verse row at byte 7947",
+   "id": null,
+   "text": "from a discontinuity are given by the derivative of the Radau polynomial. While Radau quadratures are"
+  },
+  {
+   "start": 8711,
+   "end": 8806,
+   "type": "verse",
+   "basis": "verse row at byte 8049",
+   "id": null,
+   "text": "well known, Radau polynomials are not widely recognized. These polynomials, which approximate a"
+  },
+  {
+   "start": 8807,
+   "end": 8907,
+   "type": "verse",
+   "basis": "verse row at byte 8145",
+   "id": null,
+   "text": "unit jump at a cell interface, are defined by averaging the Legendre polynomials. Hence, providing a"
+  },
+  {
+   "start": 8908,
+   "end": 9007,
+   "type": "verse",
+   "basis": "verse row at byte 8246",
+   "id": null,
+   "text": "description of DG in the FR framework, along with discussions on Radau polynomials and DG solutions"
+  },
+  {
+   "start": 9008,
+   "end": 9068,
+   "type": "verse",
+   "basis": "verse row at byte 8346",
+   "id": null,
+   "text": "at a discontinuity, becomes necessary and is detailed below."
+  },
+  {
+   "start": 9069,
+   "end": 9175,
+   "type": "verse",
+   "basis": "verse row at byte 8407",
+   "id": null,
+   "text": "The paper is essentially self-contained and organized as follows. Section 2 presents the preliminaries"
+  },
+  {
+   "start": 9176,
+   "end": 9274,
+   "type": "verse",
+   "basis": "verse row at byte 8514",
+   "id": null,
+   "text": "including the Radau polynomials and their derivatives. Section 3 describes the DG method in the FR"
+  },
+  {
+   "start": 9275,
+   "end": 9373,
+   "type": "verse",
+   "basis": "verse row at byte 8613",
+   "id": null,
+   "text": "framework for advection. Section 4 shows the behavior of the DG solution for a jump discontinuity."
+  },
+  {
+   "start": 9374,
+   "end": 9471,
+   "type": "verse",
+   "basis": "verse row at byte 8712",
+   "id": null,
+   "text": "Our limiting and detection methods are presented in Section 5. Numerical examples are provided in"
+  },
+  {
+   "start": 9472,
+   "end": 9546,
+   "type": "verse",
+   "basis": "verse row at byte 8810",
+   "id": null,
+   "text": "Section 6. Finally, conclusions and discussions can be found in Section 7."
+  },
+  {
+   "start": 9547,
+   "end": 9603,
+   "type": "verse",
+   "basis": "verse row at byte 8885",
+   "id": null,
+   "text": "3"
+  },
+  {
+   "start": 9606,
+   "end": 9625,
+   "type": "verse",
+   "basis": "verse row at byte 8944",
+   "id": null,
+   "text": "2     Preliminaries"
+  },
+  {
+   "start": 9626,
+   "end": 9720,
+   "type": "verse",
+   "basis": "verse row at byte 8964",
+   "id": null,
+   "text": "For any nonnegative integer 𝑚, let 𝑷𝑚 be the space of polynomials of degree 𝑚 or less."
+  },
+  {
+   "start": 9721,
+   "end": 9805,
+   "type": "verse",
+   "basis": "verse row at byte 9059",
+   "id": null,
+   "text": "1"
+  },
+  {
+   "start": 9806,
+   "end": 9913,
+   "type": "verse",
+   "basis": "verse row at byte 9144",
+   "id": null,
+   "text": "For any two functions 𝑣 and 𝑤 on 𝐼 = [−1, 1], denote (𝑣, 𝑤) = (𝑣, 𝑤)𝐼 = ∫−1 𝑣(𝜉)𝑤(𝜉) 𝑑𝜉 ."
+  },
+  {
+   "start": 9914,
+   "end": 10010,
+   "type": "verse",
+   "basis": "verse row at byte 9252",
+   "id": null,
+   "text": "We need the Legendre polynomials to define the Radau polynomials. Let the Legendre polynomial"
+  },
+  {
+   "start": 10011,
+   "end": 10121,
+   "type": "verse",
+   "basis": "verse row at byte 9349",
+   "id": null,
+   "text": "𝐿𝑘 on 𝐼 be defined as the unique polynomial of degree 𝑘 that satisfies 𝐿𝑘 (1) = 1 and 𝐿𝑘 is orthogonal"
+  },
+  {
+   "start": 10122,
+   "end": 10169,
+   "type": "verse",
+   "basis": "verse row at byte 9460",
+   "id": null,
+   "text": "1"
+  },
+  {
+   "start": 10170,
+   "end": 10294,
+   "type": "verse",
+   "basis": "verse row at byte 9508",
+   "id": null,
+   "text": "to 𝑷𝑘−1 (or 𝐿𝑘 ⏊ 𝑷𝑘−1 ), i.e., (𝐿𝑘 , 𝜉 𝑚 ) = ∫−1 𝐿𝑘 (𝜉)𝜉 𝑚 𝑑𝜉 = 0, for 𝑚 = 0, 1, … , 𝑘 − 1. The first few"
+  },
+  {
+   "start": 10295,
+   "end": 10319,
+   "type": "verse",
+   "basis": "verse row at byte 9633",
+   "id": null,
+   "text": "Legendre polynomials are"
+  },
+  {
+   "start": 10320,
+   "end": 10415,
+   "type": "verse",
+   "basis": "verse row at byte 9658",
+   "id": null,
+   "text": "3𝜉 2 − 1         5𝜉 3 − 3𝜉              35𝜉 4 − 30𝜉 2 + 3"
+  },
+  {
+   "start": 10416,
+   "end": 10523,
+   "type": "verse",
+   "basis": "verse row at byte 9754",
+   "id": null,
+   "text": "𝐿0 = 1,    𝐿1 = 𝜉,       𝐿2 =     , 𝐿3 =            , and 𝐿4 =                     .    (2.1)"
+  },
+  {
+   "start": 10524,
+   "end": 10606,
+   "type": "verse",
+   "basis": "verse row at byte 9862",
+   "id": null,
+   "text": "2                 2                         8"
+  },
+  {
+   "start": 10607,
+   "end": 10649,
+   "type": "verse",
+   "basis": "verse row at byte 9945",
+   "id": null,
+   "text": "The zeros of 𝐿𝑘 are the 𝑘 Gauss points."
+  },
+  {
+   "start": 10650,
+   "end": 10752,
+   "type": "verse",
+   "basis": "verse row at byte 9988",
+   "id": null,
+   "text": "Fig. 2.1(a) shows the graphs of the above Legendre polynomials; the dots, which represent the zeros"
+  },
+  {
+   "start": 10753,
+   "end": 10785,
+   "type": "verse",
+   "basis": "verse row at byte 10091",
+   "id": null,
+   "text": "of 𝐿4 , are the 4 Gauss points."
+  },
+  {
+   "start": 10790,
+   "end": 10884,
+   "type": "verse",
+   "basis": "verse row at byte 10128",
+   "id": null,
+   "text": "(a) Legendre polynomials                             (b) Left Radau polynomials"
+  },
+  {
+   "start": 10885,
+   "end": 10993,
+   "type": "verse",
+   "basis": "verse row at byte 10223",
+   "id": null,
+   "text": "Fig. 2.1: (a) The graphs of the Legendre polynomials 𝐿𝑘 , 𝑘 = 0, … , 4; the dots represent the 4 Gauss"
+  },
+  {
+   "start": 10994,
+   "end": 11102,
+   "type": "verse",
+   "basis": "verse row at byte 10332",
+   "id": null,
+   "text": "points. (b) The graphs of the left Radau polynomials 𝑅𝐿, 𝑘 , 𝑘 = 1, … , 4; the dots represent the 4 left"
+  },
+  {
+   "start": 11103,
+   "end": 11195,
+   "type": "verse",
+   "basis": "verse row at byte 10441",
+   "id": null,
+   "text": "Radau points. The left Radau polynomials approximate a unit jump (up) at the right boundary."
+  },
+  {
+   "start": 11197,
+   "end": 11297,
+   "type": "verse",
+   "basis": "verse row at byte 10535",
+   "id": null,
+   "text": "The Radau quadrature formulas are well-known, but the Radau polynomials are not. For any 𝑘 ≥ 1,"
+  },
+  {
+   "start": 11298,
+   "end": 11378,
+   "type": "verse",
+   "basis": "verse row at byte 10636",
+   "id": null,
+   "text": "let the left and right Radau polynomials of degree 𝑘 be defined respectively by"
+  },
+  {
+   "start": 11379,
+   "end": 11448,
+   "type": "verse",
+   "basis": "verse row at byte 10717",
+   "id": null,
+   "text": "1                                  (−1)𝑘"
+  },
+  {
+   "start": 11449,
+   "end": 11568,
+   "type": "verse",
+   "basis": "verse row at byte 10787",
+   "id": null,
+   "text": "𝑅𝐿, 𝑘 = (𝐿𝑘 + 𝐿𝑘−1 ), and 𝑅𝑅, 𝑘 =                  (𝐿𝑘 − 𝐿𝑘−1 ).              (2.2a,b)"
+  },
+  {
+   "start": 11569,
+   "end": 11636,
+   "type": "verse",
+   "basis": "verse row at byte 10907",
+   "id": null,
+   "text": "2                                     2"
+  },
+  {
+   "start": 11637,
+   "end": 11758,
+   "type": "verse",
+   "basis": "verse row at byte 10975",
+   "id": null,
+   "text": "Note that 𝑅𝐿, 𝑘 and 𝑅𝑅, 𝑘 are reflections of each other: 𝑅𝑅, 𝑘 (𝜉) = 𝑅𝐿, 𝑘 (−𝜉). At the two boundaries, for"
+  },
+  {
+   "start": 11759,
+   "end": 11785,
+   "type": "verse",
+   "basis": "verse row at byte 11097",
+   "id": null,
+   "text": "the left Radau polynomial,"
+  },
+  {
+   "start": 11788,
+   "end": 11899,
+   "type": "verse",
+   "basis": "verse row at byte 11126",
+   "id": null,
+   "text": "𝑅𝐿, 𝑘 (−1) = 0,   and   𝑅𝐿, 𝑘 (1) = 1.                       (2.3a,b)"
+  },
+  {
+   "start": 11900,
+   "end": 11931,
+   "type": "verse",
+   "basis": "verse row at byte 11238",
+   "id": null,
+   "text": "For the right Radau polynomial,"
+  },
+  {
+   "start": 11932,
+   "end": 12043,
+   "type": "verse",
+   "basis": "verse row at byte 11270",
+   "id": null,
+   "text": "𝑅𝑅, 𝑘 (−1) = 1,   and   𝑅𝑅, 𝑘 (1) = 0.                       (2.4a,b)"
+  },
+  {
+   "start": 12044,
+   "end": 12077,
+   "type": "verse",
+   "basis": "verse row at byte 11382",
+   "id": null,
+   "text": "The first few 𝑅𝐿, 𝑘 ’s are"
+  },
+  {
+   "start": 12078,
+   "end": 12161,
+   "type": "verse",
+   "basis": "verse row at byte 11416",
+   "id": null,
+   "text": "𝑅𝐿, 1 = (1 + 𝜉)/2, 𝑅𝐿, 2 = (−1 + 2𝜉 + 3𝜉 2 )/4,"
+  },
+  {
+   "start": 12162,
+   "end": 12273,
+   "type": "verse",
+   "basis": "verse row at byte 11500",
+   "id": null,
+   "text": "𝑅𝐿, 3 = (−1 − 3𝜉 + 3𝜉 2 + 5𝜉 3 )/4,       and    𝑅𝐿, 4 = (3 − 12𝜉 − 30𝜉 2 + 20𝜉 3 + 35𝜉 4 )/16."
+  },
+  {
+   "start": 12274,
+   "end": 12374,
+   "type": "verse",
+   "basis": "verse row at byte 11612",
+   "id": null,
+   "text": "Fig. 2.1(b) shows the graphs of these left Radau polynomials. The dots corresponding to the zeros"
+  },
+  {
+   "start": 12375,
+   "end": 12443,
+   "type": "verse",
+   "basis": "verse row at byte 11713",
+   "id": null,
+   "text": "of 𝑅𝐿, 4 represent the 4 left Radau points, which include 𝜉 = −1."
+  },
+  {
+   "start": 12444,
+   "end": 12503,
+   "type": "verse",
+   "basis": "verse row at byte 11782",
+   "id": null,
+   "text": "4"
+  },
+  {
+   "start": 12506,
+   "end": 12593,
+   "type": "verse",
+   "basis": "verse row at byte 11844",
+   "id": null,
+   "text": "The corresponding 𝑅𝑅, 𝑘 can easily be obtained by 𝑅𝑅, 𝑘 (𝜉) = 𝑅𝐿, 𝑘 (−𝜉)."
+  },
+  {
+   "start": 12594,
+   "end": 12697,
+   "type": "verse",
+   "basis": "verse row at byte 11932",
+   "id": null,
+   "text": "Since both 𝐿𝑘 and 𝐿𝑘−1 are orthogonal to 𝑷𝑘−2, both Radau polynomials also have this property:"
+  },
+  {
+   "start": 12698,
+   "end": 12816,
+   "type": "verse",
+   "basis": "verse row at byte 12036",
+   "id": null,
+   "text": "𝑅𝐿, 𝑘 ⏊ 𝑷𝑘−2 , and 𝑅𝑅, 𝑘 ⏊ 𝑷𝑘−2 .                               (2.5a,b)"
+  },
+  {
+   "start": 12817,
+   "end": 12910,
+   "type": "verse",
+   "basis": "verse row at byte 12155",
+   "id": null,
+   "text": "Let the step-down function 𝑆𝐷 and step-up function 𝑆𝑈 on 𝐼 be defined respectively by"
+  },
+  {
+   "start": 12911,
+   "end": 12992,
+   "type": "verse",
+   "basis": "verse row at byte 12249",
+   "id": null,
+   "text": "1 for    𝜉 = −1                  0 for − 1 ≤ 𝜉 < 1"
+  },
+  {
+   "start": 12993,
+   "end": 13107,
+   "type": "verse",
+   "basis": "verse row at byte 12331",
+   "id": null,
+   "text": "𝑆𝐷 (𝜉) = {                     and 𝑆𝑈 (𝜉) = {                                       (2.6a,b)"
+  },
+  {
+   "start": 13108,
+   "end": 13184,
+   "type": "verse",
+   "basis": "verse row at byte 12446",
+   "id": null,
+   "text": "0 for − 1 < 𝜉 ≤ 1                1 for 𝜉 = 1."
+  },
+  {
+   "start": 13185,
+   "end": 13286,
+   "type": "verse",
+   "basis": "verse row at byte 12523",
+   "id": null,
+   "text": "On 𝐼, 𝑆𝐷 represents a unit jump (down) at 𝜉 = −1, and 𝑆𝑈 represents a unit jump (up) at 𝜉 = 1."
+  },
+  {
+   "start": 13287,
+   "end": 13389,
+   "type": "verse",
+   "basis": "verse row at byte 12625",
+   "id": null,
+   "text": "The right Radau polynomial 𝑅𝑅, 𝑘 can be considered as an approximation to the step-down function"
+  },
+  {
+   "start": 13390,
+   "end": 13494,
+   "type": "verse",
+   "basis": "verse row at byte 12728",
+   "id": null,
+   "text": "𝑆𝐷 since 𝑅𝑅, 𝑘 (−1) = 1, 𝑅𝑅, 𝑘 (1) = 0, and 𝑅𝑅, 𝑘 approximates 0 on (−1, 1] in the sense that"
+  },
+  {
+   "start": 13495,
+   "end": 13617,
+   "type": "verse",
+   "basis": "verse row at byte 12833",
+   "id": null,
+   "text": "𝑅𝑅, 𝑘 ⏊ 𝑷𝑘−2 , i.e., (𝑅𝑅, 𝑘 , 𝜉 𝑚 ) = 0 for 𝑚 = 0, 1, … , 𝑘 − 2. In other words, except for the two conditions"
+  },
+  {
+   "start": 13618,
+   "end": 13718,
+   "type": "verse",
+   "basis": "verse row at byte 12956",
+   "id": null,
+   "text": "at the boundaries, namely (2.4a,b), 𝑅𝑅, 𝑘 utilizes the rest of the conditions (𝑘 − 1 of them) to"
+  },
+  {
+   "start": 13719,
+   "end": 13797,
+   "type": "verse",
+   "basis": "verse row at byte 13057",
+   "id": null,
+   "text": "approximate 0 in the sense of orthogonality or projection: 𝑅𝑅, 𝑘 ⏊ 𝑷𝑘−2 ."
+  },
+  {
+   "start": 13798,
+   "end": 13866,
+   "type": "verse",
+   "basis": "verse row at byte 13136",
+   "id": null,
+   "text": "Similarly, the left Radau polynomial 𝑅𝐿, 𝑘 approximates 𝑆𝑈 ."
+  },
+  {
+   "start": 13867,
+   "end": 13959,
+   "type": "verse",
+   "basis": "verse row at byte 13205",
+   "id": null,
+   "text": "The above discussion implies that the left and right Radau polynomials can be employed to"
+  },
+  {
+   "start": 13960,
+   "end": 14050,
+   "type": "verse",
+   "basis": "verse row at byte 13298",
+   "id": null,
+   "text": "approximate the jumps at the cell interfaces for the DG method as will be discussed below."
+  },
+  {
+   "start": 14051,
+   "end": 14162,
+   "type": "verse",
+   "basis": "verse row at byte 13389",
+   "id": null,
+   "text": "The zeros of 𝑅𝐿, 𝑘 are the 𝑘 left Radau points, and the zeros of 𝑅𝑅, 𝑘 are the 𝑘 right Radau points."
+  },
+  {
+   "start": 14163,
+   "end": 14271,
+   "type": "verse",
+   "basis": "verse row at byte 13501",
+   "id": null,
+   "text": "Next, we present simple formulas for 𝑅𝐿, 𝑘+1 ′ and 𝑅𝑅, 𝑘+1 ′, which approximate the derivative of a"
+  },
+  {
+   "start": 14272,
+   "end": 14356,
+   "type": "verse",
+   "basis": "verse row at byte 13610",
+   "id": null,
+   "text": "jump at the boundaries, and show the behavior of the DG solution at a discontinuity:"
+  },
+  {
+   "start": 14357,
+   "end": 14388,
+   "type": "verse",
+   "basis": "verse row at byte 13695",
+   "id": null,
+   "text": "𝑘"
+  },
+  {
+   "start": 14389,
+   "end": 14424,
+   "type": "verse",
+   "basis": "verse row at byte 13727",
+   "id": null,
+   "text": "′1              1"
+  },
+  {
+   "start": 14425,
+   "end": 14546,
+   "type": "verse",
+   "basis": "verse row at byte 13763",
+   "id": null,
+   "text": "𝑅𝐿, 𝑘+1 = ∑ (2𝑚 + 1)𝐿𝑚 = {𝐿0 + 3𝐿1 + 5𝐿2 + 7𝐿3 + ⋯ + (2𝑘 + 1)𝐿𝑘 },                          (2.7a)"
+  },
+  {
+   "start": 14547,
+   "end": 14582,
+   "type": "verse",
+   "basis": "verse row at byte 13885",
+   "id": null,
+   "text": "2              2"
+  },
+  {
+   "start": 14583,
+   "end": 14615,
+   "type": "verse",
+   "basis": "verse row at byte 13921",
+   "id": null,
+   "text": "𝑚=0"
+  },
+  {
+   "start": 14616,
+   "end": 14619,
+   "type": "verse",
+   "basis": "verse row at byte 13954",
+   "id": null,
+   "text": "and"
+  },
+  {
+   "start": 14620,
+   "end": 14645,
+   "type": "verse",
+   "basis": "verse row at byte 13958",
+   "id": null,
+   "text": "𝑘"
+  },
+  {
+   "start": 14646,
+   "end": 14685,
+   "type": "verse",
+   "basis": "verse row at byte 13984",
+   "id": null,
+   "text": "′  1                      1"
+  },
+  {
+   "start": 14686,
+   "end": 14783,
+   "type": "verse",
+   "basis": "verse row at byte 14024",
+   "id": null,
+   "text": "𝑅𝑅, 𝑘+1 = ∑ (−1)𝑚+1 (2𝑚 + 1)𝐿𝑚 = {−𝐿0 + 3𝐿1 + ⋯ + (−1)𝑘+1 (2𝑘 + 1)𝐿𝑘 }. (2.7b)"
+  },
+  {
+   "start": 14784,
+   "end": 14823,
+   "type": "verse",
+   "basis": "verse row at byte 14122",
+   "id": null,
+   "text": "2                      2"
+  },
+  {
+   "start": 14824,
+   "end": 14850,
+   "type": "verse",
+   "basis": "verse row at byte 14162",
+   "id": null,
+   "text": "𝑚=0"
+  },
+  {
+   "start": 14852,
+   "end": 14946,
+   "type": "verse",
+   "basis": "verse row at byte 14190",
+   "id": null,
+   "text": "Note the pattern 1, 3, 5, … , 2𝑘 + 1. For the proof of (2.7), see Appendix A. The above imply"
+  },
+  {
+   "start": 14947,
+   "end": 15029,
+   "type": "verse",
+   "basis": "verse row at byte 14285",
+   "id": null,
+   "text": "2𝑘 + 1                                         2𝑘 + 1"
+  },
+  {
+   "start": 15030,
+   "end": 15155,
+   "type": "verse",
+   "basis": "verse row at byte 14368",
+   "id": null,
+   "text": "𝑅𝐿, 𝑘+1 ′ = 𝑅𝐿, 𝑘 ′ +    𝐿𝑘 , and 𝑅𝑅, 𝑘+1 ′ = 𝑅𝑅, 𝑘 ′ + (−1)𝑘+1        𝐿𝑘 .               (2.8a,b)"
+  },
+  {
+   "start": 15156,
+   "end": 15233,
+   "type": "verse",
+   "basis": "verse row at byte 14494",
+   "id": null,
+   "text": "2                                            2"
+  },
+  {
+   "start": 15234,
+   "end": 15305,
+   "type": "verse",
+   "basis": "verse row at byte 14572",
+   "id": null,
+   "text": "The values at the boundaries, employed later, are also straightforward:"
+  },
+  {
+   "start": 15306,
+   "end": 15394,
+   "type": "verse",
+   "basis": "verse row at byte 14644",
+   "id": null,
+   "text": "1                              (𝑘 + 1)2"
+  },
+  {
+   "start": 15395,
+   "end": 15510,
+   "type": "verse",
+   "basis": "verse row at byte 14733",
+   "id": null,
+   "text": "𝑅𝐿, 𝑘+1 ′ (1) = −𝑅𝑅, 𝑘+1 ′ (−1) =      {1 + 3 + 5 − ⋯ + (2𝑘 + 1)} =          ,              (2.9)"
+  },
+  {
+   "start": 15511,
+   "end": 15594,
+   "type": "verse",
+   "basis": "verse row at byte 14849",
+   "id": null,
+   "text": "2                                 2"
+  },
+  {
+   "start": 15595,
+   "end": 15598,
+   "type": "verse",
+   "basis": "verse row at byte 14933",
+   "id": null,
+   "text": "and"
+  },
+  {
+   "start": 15599,
+   "end": 15693,
+   "type": "verse",
+   "basis": "verse row at byte 14937",
+   "id": null,
+   "text": "1                                                 𝑘+1"
+  },
+  {
+   "start": 15694,
+   "end": 15806,
+   "type": "verse",
+   "basis": "verse row at byte 15032",
+   "id": null,
+   "text": "𝑅𝐿, 𝑘+1 ′ (−1) = −𝑅𝑅, 𝑘+1 ′ (1) =   {1 − 3 + 5 + ⋯ + (−1)𝑘 (2𝑘 + 1)} = (−1)𝑘             . (2.10)"
+  },
+  {
+   "start": 15807,
+   "end": 15900,
+   "type": "verse",
+   "basis": "verse row at byte 15145",
+   "id": null,
+   "text": "2                                                   2"
+  },
+  {
+   "start": 15901,
+   "end": 16008,
+   "type": "verse",
+   "basis": "verse row at byte 15239",
+   "id": null,
+   "text": "Fig. 2.2 shows the plots of (a) the first few right Radau polynomials and (b) their derivatives. In (b),"
+  },
+  {
+   "start": 16009,
+   "end": 16117,
+   "type": "verse",
+   "basis": "verse row at byte 15347",
+   "id": null,
+   "text": "consistent with (2.9), the values 𝑅𝑅, 𝑘+1 ′ (−1), for 𝑘 = 0, … , 3, respectively, are: −1/2, −4/2, −9/2,"
+  },
+  {
+   "start": 16118,
+   "end": 16210,
+   "type": "verse",
+   "basis": "verse row at byte 15456",
+   "id": null,
+   "text": "and −16/2; and consistent with (2.10), the values 𝑅𝑅, 𝑘+1 ′ (1) are −1/2, 1, −3/2, and 2."
+  },
+  {
+   "start": 16211,
+   "end": 16324,
+   "type": "verse",
+   "basis": "verse row at byte 15549",
+   "id": null,
+   "text": "Denote the 𝑘 + 1 left and right Radau points in increasing order by 𝜉𝐿, 𝑚 and 𝜉𝑅, 𝑚 respectively, 𝑚 ="
+  },
+  {
+   "start": 16325,
+   "end": 16433,
+   "type": "verse",
+   "basis": "verse row at byte 15663",
+   "id": null,
+   "text": "1, … , 𝑘 + 1. Then, while 𝑅𝑅, 𝑘+1 vanishes at the 𝑘 + 1 right Radau points, its derivative 𝑅𝑅, 𝑘+1 ′"
+  },
+  {
+   "start": 16434,
+   "end": 16525,
+   "type": "verse",
+   "basis": "verse row at byte 15772",
+   "id": null,
+   "text": "vanishes at the 𝑘 interior points of the 𝑘 + 1 left Radau points: for 𝑙 = 2, … , 𝑘 + 1,"
+  },
+  {
+   "start": 16526,
+   "end": 16640,
+   "type": "verse",
+   "basis": "verse row at byte 15864",
+   "id": null,
+   "text": "𝑅𝑅, 𝑘+1 ′ (𝜉𝐿,𝑙 ) = 0.                                 (2.11)"
+  },
+  {
+   "start": 16641,
+   "end": 16746,
+   "type": "verse",
+   "basis": "verse row at byte 15979",
+   "id": null,
+   "text": "The exception is at the left boundary 𝜉 = −1 where 𝑅𝑅, 𝑘+1 ′ (−1) = −(𝑘 + 1)2 /2 by (2.9). The proof"
+  },
+  {
+   "start": 16747,
+   "end": 16784,
+   "type": "verse",
+   "basis": "verse row at byte 16085",
+   "id": null,
+   "text": "of (2.11) can be found in Appendix B."
+  },
+  {
+   "start": 16785,
+   "end": 16870,
+   "type": "verse",
+   "basis": "verse row at byte 16123",
+   "id": null,
+   "text": "A similar statement holds for the left Radau polynomial with appropriate changes."
+  },
+  {
+   "start": 16871,
+   "end": 16929,
+   "type": "verse",
+   "basis": "verse row at byte 16209",
+   "id": null,
+   "text": "5"
+  },
+  {
+   "start": 16934,
+   "end": 17036,
+   "type": "verse",
+   "basis": "verse row at byte 16272",
+   "id": null,
+   "text": "(a) Right Radau polynomials                    (b) Derivatives of Right Radau polynomials"
+  },
+  {
+   "start": 17037,
+   "end": 17147,
+   "type": "verse",
+   "basis": "verse row at byte 16375",
+   "id": null,
+   "text": "Fig. 2.2: (a) Graphs of the right Radau polynomials 𝑅𝑅, 𝑘 , 𝑘 = 1, … , 4, alongside dots corresponding"
+  },
+  {
+   "start": 17148,
+   "end": 17263,
+   "type": "verse",
+   "basis": "verse row at byte 16486",
+   "id": null,
+   "text": "to the zeros of 𝑅𝑅, 4 representing the 4 right Radau points; (b) graphs of 𝑅𝑅, 𝑘 ′, note the different scales."
+  },
+  {
+   "start": 17264,
+   "end": 17376,
+   "type": "verse",
+   "basis": "verse row at byte 16602",
+   "id": null,
+   "text": "Consistent with (2.11), for each 𝑘, the 𝑘 − 1 zeros of 𝑅𝑅, 𝑘 ′ together with 𝜉 = −1 form the 𝑘 left Radau"
+  },
+  {
+   "start": 17377,
+   "end": 17426,
+   "type": "verse",
+   "basis": "verse row at byte 16715",
+   "id": null,
+   "text": "points represented by the dots in (b) for 𝑘 = 4."
+  },
+  {
+   "start": 17429,
+   "end": 17493,
+   "type": "verse",
+   "basis": "verse row at byte 16767",
+   "id": null,
+   "text": "3. Discontinuous Galerkin method for advection via interpolation"
+  },
+  {
+   "start": 17494,
+   "end": 17595,
+   "type": "verse",
+   "basis": "verse row at byte 16832",
+   "id": null,
+   "text": "For advection, by casting the DG method in the flux reconstruction (FR) framework, projection, the"
+  },
+  {
+   "start": 17596,
+   "end": 17692,
+   "type": "verse",
+   "basis": "verse row at byte 16934",
+   "id": null,
+   "text": "key idea in the DG formulation, turns out to be equivalent to interpolation at the Radau points."
+  },
+  {
+   "start": 17693,
+   "end": 17727,
+   "type": "verse",
+   "basis": "verse row at byte 17031",
+   "id": null,
+   "text": "Consider the advection equation"
+  },
+  {
+   "start": 17728,
+   "end": 17841,
+   "type": "verse",
+   "basis": "verse row at byte 17066",
+   "id": null,
+   "text": "𝑢𝑡 + 𝑎𝑢𝑥 = 0                                            (3.1)"
+  },
+  {
+   "start": 17842,
+   "end": 17864,
+   "type": "verse",
+   "basis": "verse row at byte 17180",
+   "id": null,
+   "text": "with initial condition"
+  },
+  {
+   "start": 17865,
+   "end": 17977,
+   "type": "verse",
+   "basis": "verse row at byte 17203",
+   "id": null,
+   "text": "𝑢(𝑥, 0) = 𝑢0 (𝑥)                                          (3.2)"
+  },
+  {
+   "start": 17978,
+   "end": 18086,
+   "type": "verse",
+   "basis": "verse row at byte 17316",
+   "id": null,
+   "text": "where 𝑡 is time, 𝑥 space, and 𝑎 the advection speed, a positive constant (we can set 𝑎 = 1). By assuming"
+  },
+  {
+   "start": 18087,
+   "end": 18191,
+   "type": "verse",
+   "basis": "verse row at byte 17425",
+   "id": null,
+   "text": "that 𝑢0 is periodic, boundary conditions are trivial and thus omitted. The exact solution at time 𝑡 is"
+  },
+  {
+   "start": 18192,
+   "end": 18293,
+   "type": "verse",
+   "basis": "verse row at byte 17530",
+   "id": null,
+   "text": "obtained by shifting the data curve to the right a distance 𝑎𝑡: 𝑢exact (𝑥, 𝑡) = 𝑢0 (𝑥 − 𝑎𝑡)."
+  },
+  {
+   "start": 18294,
+   "end": 18400,
+   "type": "verse",
+   "basis": "verse row at byte 17632",
+   "id": null,
+   "text": "Let the domain of calculation Ω be divided into (possibly non-uniform) cells 𝐸𝑗 , 𝑗 = 1, 2, … Denote"
+  },
+  {
+   "start": 18401,
+   "end": 18514,
+   "type": "verse",
+   "basis": "verse row at byte 17739",
+   "id": null,
+   "text": "the center of 𝐸𝑗 by 𝑥𝑗 and its width by ℎ𝑗 . Set ℎ = max(ℎ𝑗 ), 𝑗 = 1, 2, … Using the reference frame, with"
+  },
+  {
+   "start": 18515,
+   "end": 18619,
+   "type": "verse",
+   "basis": "verse row at byte 17853",
+   "id": null,
+   "text": "𝜉 varying on 𝐼 = [−1, 1] and 𝑥 on 𝐸𝑗 , the linear function mapping 𝐼 onto 𝐸𝑗 and its inverse are"
+  },
+  {
+   "start": 18620,
+   "end": 18682,
+   "type": "verse",
+   "basis": "verse row at byte 17958",
+   "id": null,
+   "text": "ℎ𝑗             2"
+  },
+  {
+   "start": 18683,
+   "end": 18801,
+   "type": "verse",
+   "basis": "verse row at byte 18021",
+   "id": null,
+   "text": "𝑥(𝜉) = 𝑥𝑗 + 𝜉      , and 𝜉(𝑥) = (𝑥 − 𝑥𝑗 ).                                (3.3)"
+  },
+  {
+   "start": 18802,
+   "end": 18865,
+   "type": "verse",
+   "basis": "verse row at byte 18140",
+   "id": null,
+   "text": "2              ℎ𝑗"
+  },
+  {
+   "start": 18866,
+   "end": 18977,
+   "type": "verse",
+   "basis": "verse row at byte 18204",
+   "id": null,
+   "text": "Thus, 𝑑𝑥 = ℎ𝑗 𝑑𝜉/2. A function 𝑟𝑗 (𝑥) on 𝐸𝑗 results in a function on 𝐼 denoted by, for simplicity of"
+  },
+  {
+   "start": 18978,
+   "end": 19087,
+   "type": "verse",
+   "basis": "verse row at byte 18316",
+   "id": null,
+   "text": "notation, 𝑟𝑗 (𝜉) with 𝑟𝑗 (𝜉) = 𝑟𝑗 (𝑥(𝜉)). By the chain rule, 𝑑𝑟𝑗 /𝑑𝑥 = (2/ℎ𝑗 )(𝑑𝑟𝑗 /𝑑𝜉)."
+  },
+  {
+   "start": 19088,
+   "end": 19198,
+   "type": "verse",
+   "basis": "verse row at byte 18426",
+   "id": null,
+   "text": "Let 𝑝 be a nonnegative integer. At time 𝑡, let the solution 𝑢(𝑥, 𝑡) be approximated on each cell 𝐸𝑗"
+  },
+  {
+   "start": 19199,
+   "end": 19312,
+   "type": "verse",
+   "basis": "verse row at byte 18537",
+   "id": null,
+   "text": "by a polynomial of degree 𝑝 in 𝑥 denoted by 𝑢𝑗 (𝑥, 𝑡). For each fixed 𝑡, the collection of all polynomials"
+  },
+  {
+   "start": 19313,
+   "end": 19420,
+   "type": "verse",
+   "basis": "verse row at byte 18651",
+   "id": null,
+   "text": "{𝑢𝑗 (. , 𝑡)} as 𝑗 varies forms a function denoted by 𝑢ℎ , which is generally discontinuous across cell"
+  },
+  {
+   "start": 19421,
+   "end": 19533,
+   "type": "verse",
+   "basis": "verse row at byte 18759",
+   "id": null,
+   "text": "interfaces. In the reference description for 𝐸𝑗 , the solution 𝑢𝑗 (𝜉, 𝑡) can be expressed in modal form as"
+  },
+  {
+   "start": 19534,
+   "end": 19588,
+   "type": "verse",
+   "basis": "verse row at byte 18872",
+   "id": null,
+   "text": "𝑝"
+  },
+  {
+   "start": 19590,
+   "end": 19709,
+   "type": "verse",
+   "basis": "verse row at byte 18928",
+   "id": null,
+   "text": "𝑢𝑗 (𝜉, 𝑡) = ∑ 𝑢𝑗, 𝑘 (𝑡) 𝐿𝑘 (𝜉).                                 (3.4)"
+  },
+  {
+   "start": 19710,
+   "end": 19764,
+   "type": "verse",
+   "basis": "verse row at byte 19048",
+   "id": null,
+   "text": "𝑘=0"
+  },
+  {
+   "start": 19766,
+   "end": 19881,
+   "type": "verse",
+   "basis": "verse row at byte 19104",
+   "id": null,
+   "text": "For each 𝑘, 0 ≤ 𝑘 ≤ 𝑝, the value 𝑢𝑗, 𝑘 is called the 𝑘-th mode (or 𝑘-th moment) of the solution in cell 𝑗,"
+  },
+  {
+   "start": 19882,
+   "end": 19948,
+   "type": "verse",
+   "basis": "verse row at byte 19220",
+   "id": null,
+   "text": "and 𝑢𝑗 of degree 𝑝 is determined by the 𝑝 + 1 modes 𝑢𝑗, 𝑘 ."
+  },
+  {
+   "start": 19949,
+   "end": 20007,
+   "type": "verse",
+   "basis": "verse row at byte 19287",
+   "id": null,
+   "text": "6"
+  },
+  {
+   "start": 20010,
+   "end": 20120,
+   "type": "verse",
+   "basis": "verse row at byte 19348",
+   "id": null,
+   "text": "Assume that the data 𝑢𝑗, 𝑘 (𝑡 𝑛 ) = 𝑢𝑗, 𝑘 are known for all cells. We wish to calculate (𝑢ℎ )𝑥 or"
+  },
+  {
+   "start": 20121,
+   "end": 20228,
+   "type": "verse",
+   "basis": "verse row at byte 19459",
+   "id": null,
+   "text": "equivalently (𝑢ℎ )𝜉 . The initial condition 𝑢0 (𝑥) can be discretized by using the values at the 𝑝 + 1"
+  },
+  {
+   "start": 20229,
+   "end": 20329,
+   "type": "verse",
+   "basis": "verse row at byte 19567",
+   "id": null,
+   "text": "Gauss points in each cell. The resulting nodal data can easily be transformed into modal form (3.4)."
+  },
+  {
+   "start": 20330,
+   "end": 20434,
+   "type": "verse",
+   "basis": "verse row at byte 19668",
+   "id": null,
+   "text": "As is routine, to involve data interaction among cells, at each interface 𝑗 + 1/2, we define a value"
+  },
+  {
+   "start": 20435,
+   "end": 20523,
+   "type": "verse",
+   "basis": "verse row at byte 19773",
+   "id": null,
+   "text": "common for the two adjacent cells 𝑗 and 𝑗 + 1 by upwinding: using the reference frame,"
+  },
+  {
+   "start": 20524,
+   "end": 20577,
+   "type": "verse",
+   "basis": "verse row at byte 19862",
+   "id": null,
+   "text": "upw"
+  },
+  {
+   "start": 20578,
+   "end": 20689,
+   "type": "verse",
+   "basis": "verse row at byte 19916",
+   "id": null,
+   "text": "𝑢𝑗+1/2 = 𝑢𝑗 (1).                                       (3.5)"
+  },
+  {
+   "start": 20690,
+   "end": 20794,
+   "type": "verse",
+   "basis": "verse row at byte 20028",
+   "id": null,
+   "text": "The DG method can be cast as follows (for the proof, see Appendix C). In each cell 𝑗, we reconstruct"
+  },
+  {
+   "start": 20795,
+   "end": 20901,
+   "type": "verse",
+   "basis": "verse row at byte 20133",
+   "id": null,
+   "text": "the solution by a polynomial of degree 𝑝 + 1, one degree higher than that of 𝑢𝑗 , denoted by 𝑈𝑗 , and"
+  },
+  {
+   "start": 20902,
+   "end": 20996,
+   "type": "verse",
+   "basis": "verse row at byte 20240",
+   "id": null,
+   "text": "defined by 𝑝 + 2 conditions. At the two interfaces, 𝑈𝑗 takes on the common (upwind) values,"
+  },
+  {
+   "start": 20997,
+   "end": 21072,
+   "type": "verse",
+   "basis": "verse row at byte 20335",
+   "id": null,
+   "text": "upw                                   upw"
+  },
+  {
+   "start": 21073,
+   "end": 21192,
+   "type": "verse",
+   "basis": "verse row at byte 20411",
+   "id": null,
+   "text": "𝑈𝑗 (−1) = 𝑢𝑗−1/2 = 𝑢𝑗−1 (1) and 𝑈𝑗 (1) = 𝑢𝑗+1/2 = 𝑢𝑗 (1).                     (3.6a,b)"
+  },
+  {
+   "start": 21194,
+   "end": 21306,
+   "type": "verse",
+   "basis": "verse row at byte 20532",
+   "id": null,
+   "text": "For the remaining 𝑝 conditions, we require that 𝑈𝑗 (𝜉) approximates 𝑢𝑗 (𝜉) as closely as possible through"
+  },
+  {
+   "start": 21307,
+   "end": 21318,
+   "type": "verse",
+   "basis": "verse row at byte 20645",
+   "id": null,
+   "text": "projection:"
+  },
+  {
+   "start": 21319,
+   "end": 21432,
+   "type": "verse",
+   "basis": "verse row at byte 20657",
+   "id": null,
+   "text": "(𝑈𝑗 − 𝑢𝑗 )⏊ 𝑷𝑝−1 .                                        (3.7)"
+  },
+  {
+   "start": 21434,
+   "end": 21547,
+   "type": "verse",
+   "basis": "verse row at byte 20772",
+   "id": null,
+   "text": "The degree 𝑝 + 1 for 𝑈𝑗 serves the purpose that (𝑈𝑗 ) , which yields (𝑢ℎ )𝜉 , matches the degree of 𝑢𝑗 ."
+  },
+  {
+   "start": 21548,
+   "end": 21610,
+   "type": "verse",
+   "basis": "verse row at byte 20886",
+   "id": null,
+   "text": "𝜉"
+  },
+  {
+   "start": 21611,
+   "end": 21703,
+   "type": "verse",
+   "basis": "verse row at byte 20949",
+   "id": null,
+   "text": "Focussing on cell 𝑗, at the left interface, we have the following jump denoted by 𝐽𝐿 :"
+  },
+  {
+   "start": 21704,
+   "end": 21751,
+   "type": "verse",
+   "basis": "verse row at byte 21042",
+   "id": null,
+   "text": "upw"
+  },
+  {
+   "start": 21752,
+   "end": 21873,
+   "type": "verse",
+   "basis": "verse row at byte 21090",
+   "id": null,
+   "text": "𝑈𝑗 (−1) − 𝑢𝑗 (−1) = 𝑢𝑗−1/2 − 𝑢𝑗 (−1) = 𝑢𝑗−1 (1) − 𝑢𝑗 (−1) = 𝐽𝐿 .                  (3.8)"
+  },
+  {
+   "start": 21875,
+   "end": 21973,
+   "type": "verse",
+   "basis": "verse row at byte 21213",
+   "id": null,
+   "text": "(A more complete notation would be 𝐽𝑗,𝐿 .) On the other hand, at the right interface, 𝐽𝑅 = 0,"
+  },
+  {
+   "start": 21974,
+   "end": 22028,
+   "type": "verse",
+   "basis": "verse row at byte 21312",
+   "id": null,
+   "text": "upw"
+  },
+  {
+   "start": 22029,
+   "end": 22146,
+   "type": "verse",
+   "basis": "verse row at byte 21367",
+   "id": null,
+   "text": "𝑈𝑗 (1) − 𝑢𝑗 (1) = 𝑢𝑗+1/2 − 𝑢𝑗 (1) = 𝐽𝑅 = 0.                            (3.9)"
+  },
+  {
+   "start": 22148,
+   "end": 22258,
+   "type": "verse",
+   "basis": "verse row at byte 21486",
+   "id": null,
+   "text": "Eqs. (3.7)–(3.9) provide 𝑝 + 2 conditions defining 𝑈𝑗 − 𝑢𝑗 . The 𝑝 + 1 conditions of (3.7) and (3.9) for"
+  },
+  {
+   "start": 22259,
+   "end": 22363,
+   "type": "verse",
+   "basis": "verse row at byte 21597",
+   "id": null,
+   "text": "𝑈𝑗 − 𝑢𝑗 are identical to those for 𝑅𝑅, 𝑝+1 , namely, (2.5b) and (2.4b) with 𝑘 = 𝑝 + 1. Thus, by"
+  },
+  {
+   "start": 22364,
+   "end": 22471,
+   "type": "verse",
+   "basis": "verse row at byte 21702",
+   "id": null,
+   "text": "multiplying 𝑅𝑅, 𝑝+1 by the constant 𝐽𝐿 , we can also match condition (3.8) at the left boundary, i.e.,"
+  },
+  {
+   "start": 22473,
+   "end": 22589,
+   "type": "verse",
+   "basis": "verse row at byte 21811",
+   "id": null,
+   "text": "𝑈𝑗 − 𝑢𝑗 = 𝐽𝐿 𝑅𝑅, 𝑝+1 .                                    (3.10)"
+  },
+  {
+   "start": 22590,
+   "end": 22603,
+   "type": "verse",
+   "basis": "verse row at byte 21928",
+   "id": null,
+   "text": "Equivalently,"
+  },
+  {
+   "start": 22604,
+   "end": 22720,
+   "type": "verse",
+   "basis": "verse row at byte 21942",
+   "id": null,
+   "text": "𝑈𝑗 = 𝑢𝑗 + 𝐽𝐿 𝑅𝑅, 𝑝+1 .                                    (3.11)"
+  },
+  {
+   "start": 22722,
+   "end": 22834,
+   "type": "verse",
+   "basis": "verse row at byte 22060",
+   "id": null,
+   "text": "Hence, by adding the “correction” 𝐽𝐿 𝑅𝑅, 𝑝+1 to 𝑢𝑗 , we obtain 𝑈𝑗 that matches the common values at the"
+  },
+  {
+   "start": 22835,
+   "end": 22892,
+   "type": "verse",
+   "basis": "verse row at byte 22173",
+   "id": null,
+   "text": "upw                    upw"
+  },
+  {
+   "start": 22893,
+   "end": 23003,
+   "type": "verse",
+   "basis": "verse row at byte 22231",
+   "id": null,
+   "text": "interfaces, namely, 𝑈𝑗 (−1) = 𝑢𝑗−1/2 and 𝑈𝑗 (1) = 𝑢𝑗+1/2 , and (𝑈𝑗 )𝜉 yields the desired (𝑢ℎ )𝜉 ."
+  },
+  {
+   "start": 23004,
+   "end": 23105,
+   "type": "verse",
+   "basis": "verse row at byte 22342",
+   "id": null,
+   "text": "In short, (𝑈𝑗 )𝜉 yields the desired (𝑢ℎ )𝜉 by the DG method for the following reasons. The DG"
+  },
+  {
+   "start": 23106,
+   "end": 23205,
+   "type": "verse",
+   "basis": "verse row at byte 22444",
+   "id": null,
+   "text": "solution is of degree 𝑝, therefore, 𝑈𝑗 needs to be of degree 𝑝 + 1. The DG formulation involves"
+  },
+  {
+   "start": 23206,
+   "end": 23270,
+   "type": "verse",
+   "basis": "verse row at byte 22544",
+   "id": null,
+   "text": "upw        upw"
+  },
+  {
+   "start": 23271,
+   "end": 23380,
+   "type": "verse",
+   "basis": "verse row at byte 22609",
+   "id": null,
+   "text": "integration by parts to enforce the upwind value 𝑢𝑗−1/2 and 𝑢𝑗+1/2 at the two interfaces, consistent with"
+  },
+  {
+   "start": 23381,
+   "end": 23488,
+   "type": "verse",
+   "basis": "verse row at byte 22719",
+   "id": null,
+   "text": "𝑈𝑗 matching these values by (3.8) and (3.9). To define 𝑈𝑗 , we need 𝑝 additional conditions. These are"
+  },
+  {
+   "start": 23489,
+   "end": 23587,
+   "type": "verse",
+   "basis": "verse row at byte 22827",
+   "id": null,
+   "text": "provided by—using the key DG idea—requiring that 𝑈𝑗 approximates 𝑢𝑗 as closely as possible via"
+  },
+  {
+   "start": 23588,
+   "end": 23635,
+   "type": "verse",
+   "basis": "verse row at byte 22926",
+   "id": null,
+   "text": "projection: (𝑈𝑗 − 𝑢𝑗 )⏊ 𝑷𝑝−1 as in (3.7)."
+  },
+  {
+   "start": 23636,
+   "end": 23743,
+   "type": "verse",
+   "basis": "verse row at byte 22974",
+   "id": null,
+   "text": "The polynomial 𝑢𝑗 of degree 𝑝 can be defined by its values at the 𝑝 + 1 right Radau points, and 𝑈𝑗"
+  },
+  {
+   "start": 23744,
+   "end": 23844,
+   "type": "verse",
+   "basis": "verse row at byte 23082",
+   "id": null,
+   "text": "upw"
+  },
+  {
+   "start": 23845,
+   "end": 23956,
+   "type": "verse",
+   "basis": "verse row at byte 23183",
+   "id": null,
+   "text": "can defined by the 𝑝 + 2 conditions that it interpolates 𝑢𝑗 at these Radau points and 𝑈𝑗 (−1) = 𝑢𝑗−1/2 ."
+  },
+  {
+   "start": 23957,
+   "end": 24060,
+   "type": "verse",
+   "basis": "verse row at byte 23295",
+   "id": null,
+   "text": "Fig. 3.1 depict (a) piecewise quadratic data, and (b) the cubic polynomials 𝑈𝑗 and 𝑈𝑗+1 , which"
+  },
+  {
+   "start": 24061,
+   "end": 24177,
+   "type": "verse",
+   "basis": "verse row at byte 23399",
+   "id": null,
+   "text": "interpolate 𝑢𝑗 and 𝑢𝑗+1 , respectively, at the 3 right Radau points; (𝑈𝑗 )𝜉 yields the DG spatial derivative."
+  },
+  {
+   "start": 24178,
+   "end": 24280,
+   "type": "verse",
+   "basis": "verse row at byte 23516",
+   "id": null,
+   "text": "Thus, for advection, loosely put, projection in the DG method is equivalent to interpolation at the"
+  },
+  {
+   "start": 24281,
+   "end": 24325,
+   "type": "verse",
+   "basis": "verse row at byte 23619",
+   "id": null,
+   "text": "right Radau points (between 𝑈𝑗 and 𝑢𝑗 )."
+  },
+  {
+   "start": 24326,
+   "end": 24383,
+   "type": "verse",
+   "basis": "verse row at byte 23664",
+   "id": null,
+   "text": "7"
+  },
+  {
+   "start": 24386,
+   "end": 24489,
+   "type": "verse",
+   "basis": "verse row at byte 23724",
+   "id": null,
+   "text": "On the other hand, the left Radau points play an important role in the interpolation between (𝑈𝑗 )"
+  },
+  {
+   "start": 24490,
+   "end": 24604,
+   "type": "verse",
+   "basis": "verse row at byte 23828",
+   "id": null,
+   "text": "𝜉"
+  },
+  {
+   "start": 24605,
+   "end": 24650,
+   "type": "verse",
+   "basis": "verse row at byte 23943",
+   "id": null,
+   "text": "and (𝑢𝑗 )𝜉 . At the left boundary 𝜉 = −1,"
+  },
+  {
+   "start": 24652,
+   "end": 24728,
+   "type": "verse",
+   "basis": "verse row at byte 23990",
+   "id": null,
+   "text": "(𝑘 + 1)2"
+  },
+  {
+   "start": 24729,
+   "end": 24814,
+   "type": "verse",
+   "basis": "verse row at byte 24067",
+   "id": null,
+   "text": "(𝑈𝑗 )𝜉 (−1) = (𝑢𝑗 )𝜉 (−1) − 𝐽𝐿              ."
+  },
+  {
+   "start": 24815,
+   "end": 24886,
+   "type": "verse",
+   "basis": "verse row at byte 24153",
+   "id": null,
+   "text": "2"
+  },
+  {
+   "start": 24887,
+   "end": 25003,
+   "type": "verse",
+   "basis": "verse row at byte 24225",
+   "id": null,
+   "text": "However, at the 𝑝 interior points of the 𝑝 + 1 left Radau points, by (2.11), (𝑈𝑗 )𝜉 equals (𝑢𝑗 )𝜉 . Thus, at"
+  },
+  {
+   "start": 25004,
+   "end": 25119,
+   "type": "verse",
+   "basis": "verse row at byte 24342",
+   "id": null,
+   "text": "the left Radau points, the “correction” to (𝑢𝑗 )𝜉 , in the form (𝑈𝑗 )𝜉 , is lumped to the left boundary. This"
+  },
+  {
+   "start": 25120,
+   "end": 25228,
+   "type": "verse",
+   "basis": "verse row at byte 24458",
+   "id": null,
+   "text": "fact also relates to the sign changes of the oscillations across the left Radau points in Fig. 4.1(b) later."
+  },
+  {
+   "start": 25231,
+   "end": 25320,
+   "type": "verse",
+   "basis": "verse row at byte 24569",
+   "id": null,
+   "text": "𝑈𝑗 (𝑥)"
+  },
+  {
+   "start": 25321,
+   "end": 25353,
+   "type": "verse",
+   "basis": "verse row at byte 24659",
+   "id": null,
+   "text": "𝑢𝑗 (𝑥)"
+  },
+  {
+   "start": 25355,
+   "end": 25458,
+   "type": "verse",
+   "basis": "verse row at byte 24693",
+   "id": null,
+   "text": "upw                                                      𝑈𝑗+1 (𝑥)"
+  },
+  {
+   "start": 25459,
+   "end": 25503,
+   "type": "verse",
+   "basis": "verse row at byte 24797",
+   "id": null,
+   "text": "𝐽𝐿                     𝑢𝑗+1/2"
+  },
+  {
+   "start": 25505,
+   "end": 25530,
+   "type": "verse",
+   "basis": "verse row at byte 24843",
+   "id": null,
+   "text": "upw"
+  },
+  {
+   "start": 25531,
+   "end": 25581,
+   "type": "verse",
+   "basis": "verse row at byte 24869",
+   "id": null,
+   "text": "𝑢𝑗−1 (𝑥)     𝑢𝑗−1/2       𝑢𝑗+1 (𝑥)"
+  },
+  {
+   "start": 25585,
+   "end": 25688,
+   "type": "verse",
+   "basis": "verse row at byte 24923",
+   "id": null,
+   "text": "(a) Piecewise quadratic data                            (b) Cubic polynomials 𝑈𝑗 and 𝑈𝑗+1"
+  },
+  {
+   "start": 25689,
+   "end": 25781,
+   "type": "verse",
+   "basis": "verse row at byte 25027",
+   "id": null,
+   "text": "Fig. 3.1: Piecewise quadratic DG method in the FR framework for advection: (a) piecewise"
+  },
+  {
+   "start": 25782,
+   "end": 25886,
+   "type": "verse",
+   "basis": "verse row at byte 25120",
+   "id": null,
+   "text": "quadratic data; (b) cubic polynomial 𝑈𝑗 (𝑥), which matches the upwind value at the left interface and"
+  },
+  {
+   "start": 25887,
+   "end": 25976,
+   "type": "verse",
+   "basis": "verse row at byte 25225",
+   "id": null,
+   "text": "interpolates 𝑢𝑗 at the 3 right Radau points; (𝑈𝑗 ) yields (𝑢ℎ )𝑥 for the DG method."
+  },
+  {
+   "start": 25977,
+   "end": 26030,
+   "type": "verse",
+   "basis": "verse row at byte 25315",
+   "id": null,
+   "text": "𝑥"
+  },
+  {
+   "start": 26033,
+   "end": 26141,
+   "type": "verse",
+   "basis": "verse row at byte 25371",
+   "id": null,
+   "text": "In passing, if there is also a jump at the right boundary of cell 𝑗, (e.g., the speed 𝑎 changes sign in"
+  },
+  {
+   "start": 26142,
+   "end": 26245,
+   "type": "verse",
+   "basis": "verse row at byte 25480",
+   "id": null,
+   "text": "the cell, or the centered common value is used instead of the upwind value in (3.5)), then to match the"
+  },
+  {
+   "start": 26246,
+   "end": 26356,
+   "type": "verse",
+   "basis": "verse row at byte 25584",
+   "id": null,
+   "text": "common values at both boundaries, (3.11) must be modified to 𝑈𝑗 = 𝑢𝑗 + 𝐽𝐿 𝑅𝑅, 𝑝+1 + 𝐽𝑅 𝑅𝐿, 𝑝+1 ."
+  },
+  {
+   "start": 26357,
+   "end": 26452,
+   "type": "verse",
+   "basis": "verse row at byte 25695",
+   "id": null,
+   "text": "With 𝑈𝑗 by (3.11), the advection equation can then be discretized in semi-discrete form as"
+  },
+  {
+   "start": 26453,
+   "end": 26512,
+   "type": "verse",
+   "basis": "verse row at byte 25791",
+   "id": null,
+   "text": "𝜕               2"
+  },
+  {
+   "start": 26513,
+   "end": 26630,
+   "type": "verse",
+   "basis": "verse row at byte 25851",
+   "id": null,
+   "text": "𝑢𝑗 (𝜉, 𝑡) = − 𝑎(𝑈𝑗 )𝜉 .                                    (3.12)"
+  },
+  {
+   "start": 26631,
+   "end": 26693,
+   "type": "verse",
+   "basis": "verse row at byte 25969",
+   "id": null,
+   "text": "𝜕𝑡              ℎ𝑗"
+  },
+  {
+   "start": 26695,
+   "end": 26763,
+   "type": "verse",
+   "basis": "verse row at byte 26033",
+   "id": null,
+   "text": "This completes the description of the DG method in the FR framework."
+  },
+  {
+   "start": 26764,
+   "end": 26862,
+   "type": "verse",
+   "basis": "verse row at byte 26102",
+   "id": null,
+   "text": "For convenience, the DG method of degree 𝑝 is abbreviated to DGp. We also denote 𝑢𝜉 by 𝑢′ ."
+  },
+  {
+   "start": 26863,
+   "end": 26965,
+   "type": "verse",
+   "basis": "verse row at byte 26201",
+   "id": null,
+   "text": "The time stepping discussed below corresponds to an Euler forward method of size Δ𝜏 (by one stage"
+  },
+  {
+   "start": 26966,
+   "end": 27070,
+   "type": "verse",
+   "basis": "verse row at byte 26304",
+   "id": null,
+   "text": "of the Runge-Kutta method) with a CFL number of 𝜎 = 𝑎Δ𝜏/ℎ𝑗 . For convenience, it is referred to as a"
+  },
+  {
+   "start": 27071,
+   "end": 27176,
+   "type": "verse",
+   "basis": "verse row at byte 26409",
+   "id": null,
+   "text": "time step corresponding to 𝜎. The DG solution 𝑢̃𝑗 under such a time step is given by, using the above,"
+  },
+  {
+   "start": 27178,
+   "end": 27294,
+   "type": "verse",
+   "basis": "verse row at byte 26516",
+   "id": null,
+   "text": "𝑢̃𝑗 = 𝑢𝑗 − 2𝜎𝑈𝑗′ .                                        (3.13)"
+  },
+  {
+   "start": 27296,
+   "end": 27381,
+   "type": "verse",
+   "basis": "verse row at byte 26634",
+   "id": null,
+   "text": "(The wave travels a distance 2𝜎 in the reference frame.) Hence, with 𝑈𝑗 by (3.11),"
+  },
+  {
+   "start": 27383,
+   "end": 27505,
+   "type": "verse",
+   "basis": "verse row at byte 26721",
+   "id": null,
+   "text": "𝑢̃𝑗 = 𝑢𝑗 − 2𝜎𝑢𝑗′ −2𝜎𝐽𝐿 𝑅𝑅, 𝑝+1 ′ .                                 (3.14)"
+  },
+  {
+   "start": 27506,
+   "end": 27547,
+   "type": "verse",
+   "basis": "verse row at byte 26844",
+   "id": null,
+   "text": "Therefore, by (2.7b), the DGp solution is"
+  },
+  {
+   "start": 27548,
+   "end": 27674,
+   "type": "verse",
+   "basis": "verse row at byte 26886",
+   "id": null,
+   "text": "𝑢̃𝑗 = 𝑢𝑗 − 2𝜎𝑢𝑗′ + 𝜎𝐽𝐿 [𝐿0 − 3𝐿1 + 5𝐿2 + ⋯ + (−1)𝑝 (2𝑝 + 1)𝐿𝑝 ].                       (3.15)"
+  },
+  {
+   "start": 27675,
+   "end": 27777,
+   "type": "verse",
+   "basis": "verse row at byte 27013",
+   "id": null,
+   "text": "In (3.14) and the above, 𝑢𝑗 − 2𝜎𝑢𝑗′ represents the advection of 𝑢𝑗 with no interaction, while"
+  },
+  {
+   "start": 27778,
+   "end": 27890,
+   "type": "verse",
+   "basis": "verse row at byte 27116",
+   "id": null,
+   "text": "−2𝜎𝐽𝐿 𝑅𝑅, 𝑝+1 ′ and 𝜎𝐽𝐿 [… ] represent the effect of the interaction among cells due to the jump 𝐽𝐿 ."
+  },
+  {
+   "start": 27891,
+   "end": 27947,
+   "type": "verse",
+   "basis": "verse row at byte 27229",
+   "id": null,
+   "text": "8"
+  },
+  {
+   "start": 27950,
+   "end": 28056,
+   "type": "verse",
+   "basis": "verse row at byte 27288",
+   "id": null,
+   "text": "The next discussion on accuracy is essential for the limiting procedure. At 𝜉 = 1, since 𝐿𝑘 (1) = 1,"
+  },
+  {
+   "start": 28057,
+   "end": 28106,
+   "type": "verse",
+   "basis": "verse row at byte 27395",
+   "id": null,
+   "text": "𝑝"
+  },
+  {
+   "start": 28108,
+   "end": 28226,
+   "type": "verse",
+   "basis": "verse row at byte 27446",
+   "id": null,
+   "text": "𝑢𝑗 (1) = ∑ 𝑢𝑗, 𝑘 = 𝑢𝑗, 0 + ⋯ + 𝑢𝑗, 𝑝 .                            (3.16)"
+  },
+  {
+   "start": 28227,
+   "end": 28276,
+   "type": "verse",
+   "basis": "verse row at byte 27565",
+   "id": null,
+   "text": "𝑘=0"
+  },
+  {
+   "start": 28278,
+   "end": 28390,
+   "type": "verse",
+   "basis": "verse row at byte 27616",
+   "id": null,
+   "text": "At smooth regions, the 𝑘-th mode 𝑢𝑗, 𝑘 is of size 𝑂(ℎ𝑘 ), decreasing like ℎ𝑘 for small ℎ. Each successive"
+  },
+  {
+   "start": 28391,
+   "end": 28515,
+   "type": "verse",
+   "basis": "verse row at byte 27729",
+   "id": null,
+   "text": "𝑢𝑗, 𝑘 contributes to an estimate ∑𝑘𝑚=0 𝑢𝑗, 𝑚 for 𝑢(𝑥𝑗+1/2 ) accurate to order 𝑘, i.e., with an error 𝑂(ℎ𝑘+1 )."
+  },
+  {
+   "start": 28516,
+   "end": 28629,
+   "type": "verse",
+   "basis": "verse row at byte 27854",
+   "id": null,
+   "text": "In particular, the 𝑝-th mode 𝑢𝑗, 𝑝 is 𝑂(ℎ𝑝 ), and 𝑢𝑗 (1) above approximates 𝑢(𝑥𝑗+1/2 ) with an error"
+  },
+  {
+   "start": 28630,
+   "end": 28730,
+   "type": "verse",
+   "basis": "verse row at byte 27968",
+   "id": null,
+   "text": "𝑂(ℎ𝑝+1 ). A similar statement holds for 𝑢𝑗 (−1). Therefore, at all interfaces in smooth regions,"
+  },
+  {
+   "start": 28732,
+   "end": 28846,
+   "type": "verse",
+   "basis": "verse row at byte 28070",
+   "id": null,
+   "text": "|𝑢𝑗+1 (−1) − 𝑢𝑗 (1)| = 𝑂(ℎ𝑝+1 ).                              (3.17)"
+  },
+  {
+   "start": 28848,
+   "end": 28953,
+   "type": "verse",
+   "basis": "verse row at byte 28186",
+   "id": null,
+   "text": "Thus, if cell 𝑗 is in a smooth region, both 𝐽𝐿 and 𝐽𝑅 are 𝑂(ℎ𝑝+1 ), and (3.15) results in small"
+  },
+  {
+   "start": 28954,
+   "end": 28996,
+   "type": "verse",
+   "basis": "verse row at byte 28292",
+   "id": null,
+   "text": "corrections for all modes in the solution."
+  },
+  {
+   "start": 28997,
+   "end": 29106,
+   "type": "verse",
+   "basis": "verse row at byte 28335",
+   "id": null,
+   "text": "At a discontinuity, however, the jump 𝐽𝐿 is 𝑂(1), and the term −2𝜎𝐽𝐿 𝑅𝑅, 𝑝+1 ′ in (3.15) leads to"
+  },
+  {
+   "start": 29107,
+   "end": 29181,
+   "type": "verse",
+   "basis": "verse row at byte 28445",
+   "id": null,
+   "text": "higher modes of successively larger magnitudes, resulting in oscillations."
+  },
+  {
+   "start": 29184,
+   "end": 29227,
+   "type": "verse",
+   "basis": "verse row at byte 28522",
+   "id": null,
+   "text": "4. Behavior of solutions at a discontinuity"
+  },
+  {
+   "start": 29228,
+   "end": 29270,
+   "type": "verse",
+   "basis": "verse row at byte 28566",
+   "id": null,
+   "text": "Oscillatory DG solutions for step data."
+  },
+  {
+   "start": 29271,
+   "end": 29371,
+   "type": "verse",
+   "basis": "verse row at byte 28609",
+   "id": null,
+   "text": "The following example demonstrates the nature of the oscillations generated by the DG method at a"
+  },
+  {
+   "start": 29372,
+   "end": 29479,
+   "type": "verse",
+   "basis": "verse row at byte 28710",
+   "id": null,
+   "text": "discontinuity. Let the domain Ω = [0, 1] be divided into 3 uniform cells denoted by 𝑗 − 1, 𝑗, and 𝑗 + 1."
+  },
+  {
+   "start": 29480,
+   "end": 29590,
+   "type": "verse",
+   "basis": "verse row at byte 28818",
+   "id": null,
+   "text": "With 𝜉 on 𝐼, consider the case of a step-down data where 𝑢𝑗−1 (𝜉) = 1, and 𝑢𝑗 (𝜉) = 𝑢𝑗+1 (𝜉) = 0 as"
+  },
+  {
+   "start": 29591,
+   "end": 29689,
+   "type": "verse",
+   "basis": "verse row at byte 28929",
+   "id": null,
+   "text": "shown in Fig. 4.1(a). Thus, the data are monotonically decreasing. Under a time step corresponding"
+  },
+  {
+   "start": 29690,
+   "end": 29737,
+   "type": "verse",
+   "basis": "verse row at byte 29028",
+   "id": null,
+   "text": "to 𝜎, since 𝑢𝑗 = 0, and 𝐽𝐿 = 1, by (3.14),"
+  },
+  {
+   "start": 29739,
+   "end": 29853,
+   "type": "verse",
+   "basis": "verse row at byte 29077",
+   "id": null,
+   "text": "𝑢̃𝑗 = −2𝜎𝑅𝑅, 𝑝+1 ′ .                                       (4.1)"
+  },
+  {
+   "start": 29854,
+   "end": 29868,
+   "type": "verse",
+   "basis": "verse row at byte 29192",
+   "id": null,
+   "text": "Or, by (2.7b),"
+  },
+  {
+   "start": 29869,
+   "end": 29987,
+   "type": "verse",
+   "basis": "verse row at byte 29207",
+   "id": null,
+   "text": "𝑢̃𝑗 = 𝜎[𝐿0 − 3𝐿1 + 5𝐿2 + ⋯ + (−1)𝑝 (2𝑝 + 1)𝐿𝑝 ].                            (4.2)"
+  },
+  {
+   "start": 29989,
+   "end": 30079,
+   "type": "verse",
+   "basis": "verse row at byte 29327",
+   "id": null,
+   "text": "Note that the magnitude of the mode increases like 2𝑘 + 1 as the mode order 𝑘 increases."
+  },
+  {
+   "start": 30080,
+   "end": 30178,
+   "type": "verse",
+   "basis": "verse row at byte 29418",
+   "id": null,
+   "text": "Since 𝐿𝑘 (−1) = (−1)𝑘 , the above yields the following solution value at the left interface:"
+  },
+  {
+   "start": 30180,
+   "end": 30294,
+   "type": "verse",
+   "basis": "verse row at byte 29518",
+   "id": null,
+   "text": "𝑢̃𝑗 (−1) = 𝜎{1 + 3 + 5 + ⋯ + (2𝑝 + 1)} = 𝜎(𝑝 + 1)2 .                         (4.3)"
+  },
+  {
+   "start": 30296,
+   "end": 30319,
+   "type": "verse",
+   "basis": "verse row at byte 29634",
+   "id": null,
+   "text": "At the right interface,"
+  },
+  {
+   "start": 30320,
+   "end": 30436,
+   "type": "verse",
+   "basis": "verse row at byte 29658",
+   "id": null,
+   "text": "𝑢̃𝑗 (1) = 𝜎{1 − 3 + 5 + ⋯ + (−1)𝑝 (2𝑝 + 1)} = 𝜎(−1)𝑝 (𝑝 + 1).                       (4.4)"
+  },
+  {
+   "start": 30437,
+   "end": 30548,
+   "type": "verse",
+   "basis": "verse row at byte 29775",
+   "id": null,
+   "text": "Thus, for the step-down data, as 𝑝 increases, at the left interface, 𝑢̃𝑗 (−1) increases as 𝜎(𝑝 + 1)2 , and"
+  },
+  {
+   "start": 30549,
+   "end": 30647,
+   "type": "verse",
+   "basis": "verse row at byte 29887",
+   "id": null,
+   "text": "at the right interface, 𝑢̃𝑗 (1) has alternating signs and its magnitude increases as 𝜎(𝑝 + 1)."
+  },
+  {
+   "start": 30648,
+   "end": 30758,
+   "type": "verse",
+   "basis": "verse row at byte 29986",
+   "id": null,
+   "text": "Denote the DG solution of degree 𝑝 under a time step corresponding to 𝜎 by [𝑢̃𝑗 ](𝑝) . It follows from"
+  },
+  {
+   "start": 30759,
+   "end": 30845,
+   "type": "verse",
+   "basis": "verse row at byte 30097",
+   "id": null,
+   "text": "(4.2) for our step-down example that the DGp solutions satisfy the recurrence relation"
+  },
+  {
+   "start": 30846,
+   "end": 30965,
+   "type": "verse",
+   "basis": "verse row at byte 30184",
+   "id": null,
+   "text": "[𝑢̃𝑗 ](𝑝) = [𝑢̃𝑗 ](𝑝−1) + 𝜎(−1)𝑝 (2𝑝 + 1)𝐿𝑝 .                              (4.5)"
+  },
+  {
+   "start": 30966,
+   "end": 31066,
+   "type": "verse",
+   "basis": "verse row at byte 30304",
+   "id": null,
+   "text": "Fig. 4.1 shows (a) the step data and (b) the cubic DG solution (red curve) under a time step with"
+  },
+  {
+   "start": 31067,
+   "end": 31178,
+   "type": "verse",
+   "basis": "verse row at byte 30405",
+   "id": null,
+   "text": "𝜎 = 0.05. The cubic solution equals ∑3𝑚=0 𝑢𝑗, 𝑚 𝐿𝑚 where, for 𝑚 = 0, … , 3, respectively, the modes are"
+  },
+  {
+   "start": 31179,
+   "end": 31290,
+   "type": "verse",
+   "basis": "verse row at byte 30517",
+   "id": null,
+   "text": "𝑢𝑗,𝑚 = 𝜎, −3𝜎, 5𝜎, and −7𝜎. For 0 ≤ 𝑘 ≤ 2, each ∑𝑘𝑚=0 𝑢𝑗, 𝑚 𝐿𝑚 is identical to the DGk solution,"
+  },
+  {
+   "start": 31291,
+   "end": 31400,
+   "type": "verse",
+   "basis": "verse row at byte 30629",
+   "id": null,
+   "text": "whose plots are also shown. For 𝑚 = 0, … , 3, the modal values 𝑢𝑗, 𝑚 𝐿𝑚 (−1), are 𝜎, 3𝜎, 5𝜎, and 7𝜎"
+  },
+  {
+   "start": 31401,
+   "end": 31513,
+   "type": "verse",
+   "basis": "verse row at byte 30739",
+   "id": null,
+   "text": "respectively; they result in solution values [𝑢̃𝑗 ](𝑚) (−1) of 𝜎, 4𝜎, 9𝜎, and 16𝜎 represented by the dots"
+  },
+  {
+   "start": 31514,
+   "end": 31626,
+   "type": "verse",
+   "basis": "verse row at byte 30852",
+   "id": null,
+   "text": "on the vertical line 𝑥 = 1/3. Thus, the modes 𝑢𝑗, 𝑚 ’s have the “correct” sign in the sense that they result"
+  },
+  {
+   "start": 31627,
+   "end": 31681,
+   "type": "verse",
+   "basis": "verse row at byte 30965",
+   "id": null,
+   "text": "9"
+  },
+  {
+   "start": 31683,
+   "end": 31788,
+   "type": "verse",
+   "basis": "verse row at byte 31021",
+   "id": null,
+   "text": "in solution values increasing toward 1 at the interface corresponding to the jump (this observation holds"
+  },
+  {
+   "start": 31789,
+   "end": 31901,
+   "type": "verse",
+   "basis": "verse row at byte 31127",
+   "id": null,
+   "text": "for small 𝜎; a large 𝜎 can result in values larger than 1). At the right boundary, [𝑢̃𝑗 ](𝑚) (1) equals 𝜎,"
+  },
+  {
+   "start": 31902,
+   "end": 32011,
+   "type": "verse",
+   "basis": "verse row at byte 31240",
+   "id": null,
+   "text": "−2𝜎, 3𝜎, and −4𝜎. Consistent with (2.11) for 𝑅𝑅, 𝑝+1 ′ , the DG solutions also cross the 𝑥-axis at the"
+  },
+  {
+   "start": 32012,
+   "end": 32053,
+   "type": "verse",
+   "basis": "verse row at byte 31350",
+   "id": null,
+   "text": "corresponding interior left Radau points."
+  },
+  {
+   "start": 32058,
+   "end": 32078,
+   "type": "verse",
+   "basis": "verse row at byte 31396",
+   "id": null,
+   "text": "𝑢𝑗−1 (𝑥)"
+  },
+  {
+   "start": 32080,
+   "end": 32167,
+   "type": "verse",
+   "basis": "verse row at byte 31418",
+   "id": null,
+   "text": "Cell 𝑗                                                  Cell 𝑗"
+  },
+  {
+   "start": 32170,
+   "end": 32221,
+   "type": "verse",
+   "basis": "verse row at byte 31508",
+   "id": null,
+   "text": "𝑢𝑗 (𝑥)       𝑢𝑗+1 (𝑥)"
+  },
+  {
+   "start": 32225,
+   "end": 32322,
+   "type": "verse",
+   "basis": "verse row at byte 31563",
+   "id": null,
+   "text": "(a) Step-down data                             (b) Corresponding cubic DG solution"
+  },
+  {
+   "start": 32323,
+   "end": 32425,
+   "type": "verse",
+   "basis": "verse row at byte 31661",
+   "id": null,
+   "text": "Fig. 4.1: (a) Step data and (b) cubic DG solution under a time step with 𝜎 = 0.05 (red curve). The"
+  },
+  {
+   "start": 32426,
+   "end": 32536,
+   "type": "verse",
+   "basis": "verse row at byte 31764",
+   "id": null,
+   "text": "cubic solution equals ∑3𝑚=0 𝑢𝑗, 𝑚 𝐿𝑚 where 𝑢𝑗,𝑚 = 𝜎, −3𝜎, 5𝜎, −7𝜎 for 𝑚 = 0, … , 3, or 𝑢𝑗,𝑚 ="
+  },
+  {
+   "start": 32537,
+   "end": 32631,
+   "type": "verse",
+   "basis": "verse row at byte 31875",
+   "id": null,
+   "text": "(−1)𝑚 (2𝑚 + 1)𝜎. Each ∑𝑘𝑚=0 𝑢𝑗, 𝑚 𝐿𝑚 , 0 ≤ 𝑘 ≤ 2, is identical to the DGk solution."
+  },
+  {
+   "start": 32633,
+   "end": 32740,
+   "type": "verse",
+   "basis": "verse row at byte 31971",
+   "id": null,
+   "text": "For our step-down example, at the left interface, by (4.3), all solution modes contribute to increasing"
+  },
+  {
+   "start": 32741,
+   "end": 32843,
+   "type": "verse",
+   "basis": "verse row at byte 32079",
+   "id": null,
+   "text": "the value toward 1. That is, they exhibit the “correct” sign (a wrong sign would lead to a decrease in"
+  },
+  {
+   "start": 32844,
+   "end": 32934,
+   "type": "verse",
+   "basis": "verse row at byte 32182",
+   "id": null,
+   "text": "value). Thus, for each mode, we can limit only its magnitude and leave its sign unchanged."
+  },
+  {
+   "start": 32935,
+   "end": 33042,
+   "type": "verse",
+   "basis": "verse row at byte 32273",
+   "id": null,
+   "text": "At the right interface, however, by (4.4), 𝑢̃𝑗 (1) has alternating signs with magnitude increasing as"
+  },
+  {
+   "start": 33043,
+   "end": 33149,
+   "type": "verse",
+   "basis": "verse row at byte 32381",
+   "id": null,
+   "text": "𝜎(𝑝 + 1). Thus, near a discontinuity, to assure that the solution lies within the range [0,1], for modes"
+  },
+  {
+   "start": 33150,
+   "end": 33208,
+   "type": "verse",
+   "basis": "verse row at byte 32488",
+   "id": null,
+   "text": "𝑢𝑗,2 and above, zeroing them out is a reasonable option."
+  },
+  {
+   "start": 33209,
+   "end": 33303,
+   "type": "verse",
+   "basis": "verse row at byte 32547",
+   "id": null,
+   "text": "The filtering approach suppresses oscillations by reducing the magnitudes of the high modes"
+  },
+  {
+   "start": 33304,
+   "end": 33400,
+   "type": "verse",
+   "basis": "verse row at byte 32642",
+   "id": null,
+   "text": "everywhere. Various functions have been devised for this purpose (Hesthaven and Warburton 2008)."
+  },
+  {
+   "start": 33401,
+   "end": 33497,
+   "type": "verse",
+   "basis": "verse row at byte 32739",
+   "id": null,
+   "text": "However, determining an appropriate reduction for each mode remains challenging. Additionally, a"
+  },
+  {
+   "start": 33498,
+   "end": 33591,
+   "type": "verse",
+   "basis": "verse row at byte 32836",
+   "id": null,
+   "text": "significant drawback is that reducing mode sizes at smooth regions causes a loss of accuracy."
+  },
+  {
+   "start": 33592,
+   "end": 33692,
+   "type": "verse",
+   "basis": "verse row at byte 32930",
+   "id": null,
+   "text": "Our approach is different from standard filtering: for the above example, our limiting amounts to"
+  },
+  {
+   "start": 33693,
+   "end": 33796,
+   "type": "verse",
+   "basis": "verse row at byte 33031",
+   "id": null,
+   "text": "reducing even the linear mode and zeroing out all higher modes. Since our limiting has effect only at a"
+  },
+  {
+   "start": 33797,
+   "end": 33896,
+   "type": "verse",
+   "basis": "verse row at byte 33135",
+   "id": null,
+   "text": "few cells near discontinuities and has nonexistent or negligible effect at smooth regions, accuracy"
+  },
+  {
+   "start": 33897,
+   "end": 33946,
+   "type": "verse",
+   "basis": "verse row at byte 33235",
+   "id": null,
+   "text": "remains intact while oscillations are suppressed."
+  },
+  {
+   "start": 33947,
+   "end": 34047,
+   "type": "verse",
+   "basis": "verse row at byte 33285",
+   "id": null,
+   "text": "Given the oscillatory DG solutions, the question is what should the solution be for the step-down"
+  },
+  {
+   "start": 34048,
+   "end": 34147,
+   "type": "verse",
+   "basis": "verse row at byte 33386",
+   "id": null,
+   "text": "example above? Since the step data exhibits two essential properties—monotonicity and values within"
+  },
+  {
+   "start": 34148,
+   "end": 34239,
+   "type": "verse",
+   "basis": "verse row at byte 33486",
+   "id": null,
+   "text": "the range [0, 1]—it is reasonable to require the solution to also possess these properties."
+  },
+  {
+   "start": 34241,
+   "end": 34278,
+   "type": "verse",
+   "basis": "verse row at byte 33579",
+   "id": null,
+   "text": "Monotone solutions for step data."
+  },
+  {
+   "start": 34279,
+   "end": 34377,
+   "type": "verse",
+   "basis": "verse row at byte 33617",
+   "id": null,
+   "text": "The following is the FR generalization (Huynh 2007, 2009, Huynh et al. 2014) of the DG method:"
+  },
+  {
+   "start": 34378,
+   "end": 34396,
+   "type": "verse",
+   "basis": "verse row at byte 33716",
+   "id": null,
+   "text": "for advection, set"
+  },
+  {
+   "start": 34397,
+   "end": 34509,
+   "type": "verse",
+   "basis": "verse row at byte 33735",
+   "id": null,
+   "text": "𝑈𝑗 = 𝑢𝑗 + 𝐽𝐿 𝑔                                         (4.6)"
+  },
+  {
+   "start": 34510,
+   "end": 34616,
+   "type": "verse",
+   "basis": "verse row at byte 33848",
+   "id": null,
+   "text": "where 𝑔, called a “correction function”, is of degree 𝑝 + 1 and determined by 𝑝 + 2 conditions. It must"
+  },
+  {
+   "start": 34617,
+   "end": 34715,
+   "type": "verse",
+   "basis": "verse row at byte 33955",
+   "id": null,
+   "text": "approximate the step-down function in some sense. At the two boundaries, 𝑔 is required to satisfy"
+  },
+  {
+   "start": 34716,
+   "end": 34823,
+   "type": "verse",
+   "basis": "verse row at byte 34054",
+   "id": null,
+   "text": "𝑔(−1) = 1, 𝑔(1) = 0,                                        (4.7)"
+  },
+  {
+   "start": 34824,
+   "end": 34925,
+   "type": "verse",
+   "basis": "verse row at byte 34162",
+   "id": null,
+   "text": "with 𝑝 additional conditions to be prescribed. Here, condition 𝑔(−1) = 1 serves to match the upwind"
+  },
+  {
+   "start": 34926,
+   "end": 35025,
+   "type": "verse",
+   "basis": "verse row at byte 34264",
+   "id": null,
+   "text": "value at the left boundary, while condition 𝑔(1) = 0 serves to leave the value 𝑢𝑗 (1) unchanged."
+  },
+  {
+   "start": 35026,
+   "end": 35080,
+   "type": "verse",
+   "basis": "verse row at byte 34364",
+   "id": null,
+   "text": "10"
+  },
+  {
+   "start": 35083,
+   "end": 35192,
+   "type": "verse",
+   "basis": "verse row at byte 34421",
+   "id": null,
+   "text": "If 𝑔 = 𝑅𝑅, 𝑝+1 in (4.6), the result is the DGp method. The 𝑝 + 1 zeros of this 𝑔 are the right Radau"
+  },
+  {
+   "start": 35193,
+   "end": 35299,
+   "type": "verse",
+   "basis": "verse row at byte 34531",
+   "id": null,
+   "text": "points. To obtain a monotone 𝑔, we can push all the zeros to 𝜉 = 1 by requiring that 𝜉 = 1 is a zero of"
+  },
+  {
+   "start": 35300,
+   "end": 35410,
+   "type": "verse",
+   "basis": "verse row at byte 34638",
+   "id": null,
+   "text": "multiplicity 𝑝 + 1. Equivalently, for 1 ≤ 𝑘 ≤ 𝑝, all derivatives to degree 𝑘 vanish: 𝑔(𝑘) (1) = 0. Thus,"
+  },
+  {
+   "start": 35411,
+   "end": 35468,
+   "type": "verse",
+   "basis": "verse row at byte 34749",
+   "id": null,
+   "text": "1 − 𝜉 𝑝+1"
+  },
+  {
+   "start": 35469,
+   "end": 35574,
+   "type": "verse",
+   "basis": "verse row at byte 34807",
+   "id": null,
+   "text": "𝑔=(     ) .                                             (4.8)"
+  },
+  {
+   "start": 35575,
+   "end": 35624,
+   "type": "verse",
+   "basis": "verse row at byte 34913",
+   "id": null,
+   "text": "2"
+  },
+  {
+   "start": 35625,
+   "end": 35638,
+   "type": "verse",
+   "basis": "verse row at byte 34963",
+   "id": null,
+   "text": "Consequently,"
+  },
+  {
+   "start": 35639,
+   "end": 35700,
+   "type": "verse",
+   "basis": "verse row at byte 34977",
+   "id": null,
+   "text": "1         1−𝜉 𝑝"
+  },
+  {
+   "start": 35701,
+   "end": 35807,
+   "type": "verse",
+   "basis": "verse row at byte 35039",
+   "id": null,
+   "text": "𝑔′ = − (𝑝 + 1) (   ) .                                       (4.9)"
+  },
+  {
+   "start": 35808,
+   "end": 35864,
+   "type": "verse",
+   "basis": "verse row at byte 35146",
+   "id": null,
+   "text": "2          2"
+  },
+  {
+   "start": 35865,
+   "end": 35969,
+   "type": "verse",
+   "basis": "verse row at byte 35203",
+   "id": null,
+   "text": "With 𝑈𝑗 by (4.6) and 𝑔 by (4.8), the FR solution after a time step corresponding to 𝜎 is given by"
+  },
+  {
+   "start": 35970,
+   "end": 36038,
+   "type": "verse",
+   "basis": "verse row at byte 35308",
+   "id": null,
+   "text": "1−𝜉 𝑝"
+  },
+  {
+   "start": 36039,
+   "end": 36154,
+   "type": "verse",
+   "basis": "verse row at byte 35377",
+   "id": null,
+   "text": "𝑢̃𝑗 = 𝑢𝑗 − 2𝜎𝑢𝑗′ + 𝜎𝐽𝐿 [(𝑝 + 1) (   ) ].                              (4.10)"
+  },
+  {
+   "start": 36155,
+   "end": 36218,
+   "type": "verse",
+   "basis": "verse row at byte 35493",
+   "id": null,
+   "text": "2"
+  },
+  {
+   "start": 36219,
+   "end": 36263,
+   "type": "verse",
+   "basis": "verse row at byte 35557",
+   "id": null,
+   "text": "Hence, for our example of step-down data,"
+  },
+  {
+   "start": 36264,
+   "end": 36326,
+   "type": "verse",
+   "basis": "verse row at byte 35602",
+   "id": null,
+   "text": "1−𝜉 𝑝"
+  },
+  {
+   "start": 36327,
+   "end": 36435,
+   "type": "verse",
+   "basis": "verse row at byte 35665",
+   "id": null,
+   "text": "𝑢̃𝑗 = 𝜎(𝑝 + 1) (   ) .                                     (4.11)"
+  },
+  {
+   "start": 36436,
+   "end": 36493,
+   "type": "verse",
+   "basis": "verse row at byte 35774",
+   "id": null,
+   "text": "2"
+  },
+  {
+   "start": 36494,
+   "end": 36605,
+   "type": "verse",
+   "basis": "verse row at byte 35832",
+   "id": null,
+   "text": "For 𝑝 = 0, 𝑢̃𝑗 = 𝜎, a constant function. For 𝑝 = 0, 1, 2, …, at the left boundary, the solution values are"
+  },
+  {
+   "start": 36606,
+   "end": 36715,
+   "type": "verse",
+   "basis": "verse row at byte 35944",
+   "id": null,
+   "text": "𝜎, 2𝜎, 3𝜎, … as opposed to 𝜎, 4𝜎, 9𝜎, … of the DG methods, i.e., 𝜎(𝑝 + 1) as opposed to 𝜎(𝑝 + 1)2 ."
+  },
+  {
+   "start": 36716,
+   "end": 36797,
+   "type": "verse",
+   "basis": "verse row at byte 36054",
+   "id": null,
+   "text": "(𝑘)"
+  },
+  {
+   "start": 36798,
+   "end": 36891,
+   "type": "verse",
+   "basis": "verse row at byte 36136",
+   "id": null,
+   "text": "At the right boundary, for all 𝑝 ≥ 1, 𝑢̃𝑗 (1) = 0 and, for 1 ≤ 𝑘 ≤ 𝑝 − 1, 𝑢̃𝑗 (1) = 0."
+  },
+  {
+   "start": 36892,
+   "end": 36992,
+   "type": "verse",
+   "basis": "verse row at byte 36230",
+   "id": null,
+   "text": "Fig. 4.2 shows (a) the graphs of monotone correction functions (4.8) of degree 𝑘 = 𝑝 + 1, where"
+  },
+  {
+   "start": 36993,
+   "end": 37087,
+   "type": "verse",
+   "basis": "verse row at byte 36331",
+   "id": null,
+   "text": "𝑝 = 0, … , 3, and (b) the corresponding FR solutions (4.11) for the step-down data, which are"
+  },
+  {
+   "start": 37088,
+   "end": 37125,
+   "type": "verse",
+   "basis": "verse row at byte 36426",
+   "id": null,
+   "text": "monotonically decreasing in the cell."
+  },
+  {
+   "start": 37130,
+   "end": 37215,
+   "type": "verse",
+   "basis": "verse row at byte 36468",
+   "id": null,
+   "text": "Cell 𝑗"
+  },
+  {
+   "start": 37220,
+   "end": 37317,
+   "type": "verse",
+   "basis": "verse row at byte 36558",
+   "id": null,
+   "text": "(a) Monotone correction functions                  (b) Corresponding monotone FR solutions"
+  },
+  {
+   "start": 37318,
+   "end": 37423,
+   "type": "verse",
+   "basis": "verse row at byte 36656",
+   "id": null,
+   "text": "Fig. 4.2: (a) Graphs of monotone correction functions (4.8) of degree 𝑘 = 𝑝 + 1 where 𝑝 = 0, … , 3,"
+  },
+  {
+   "start": 37424,
+   "end": 37523,
+   "type": "verse",
+   "basis": "verse row at byte 36762",
+   "id": null,
+   "text": "and (b) the corresponding monotone FR solutions (curves) of degree up to 3 with time step 𝜎 = 0.2."
+  },
+  {
+   "start": 37525,
+   "end": 37625,
+   "type": "verse",
+   "basis": "verse row at byte 36863",
+   "id": null,
+   "text": "Regarding the monotone correction function 𝑔 of (4.8), it can be shown via Fourier analysis that"
+  },
+  {
+   "start": 37626,
+   "end": 37727,
+   "type": "verse",
+   "basis": "verse row at byte 36964",
+   "id": null,
+   "text": "with 𝑝 = 1, the resulting linear FR scheme is stable. However, for 𝑝 > 1, the schemes are unstable."
+  },
+  {
+   "start": 37728,
+   "end": 37828,
+   "type": "verse",
+   "basis": "verse row at byte 37066",
+   "id": null,
+   "text": "It appears reasonable to set the goal that for the step-down example above, limiting converts the"
+  },
+  {
+   "start": 37829,
+   "end": 37929,
+   "type": "verse",
+   "basis": "verse row at byte 37167",
+   "id": null,
+   "text": "oscillatory DGp solution in Fig. 4.1(b) into the monotone solution (4.11) shown in Fig. 4.2(b). Such"
+  },
+  {
+   "start": 37930,
+   "end": 37960,
+   "type": "verse",
+   "basis": "verse row at byte 37268",
+   "id": null,
+   "text": "methods remain to be explored."
+  },
+  {
+   "start": 37961,
+   "end": 38062,
+   "type": "verse",
+   "basis": "verse row at byte 37299",
+   "id": null,
+   "text": "Here, we focus on limiting methods associated with the linear case 𝑝 = 1 in (4.11) and apply them"
+  },
+  {
+   "start": 38063,
+   "end": 38166,
+   "type": "verse",
+   "basis": "verse row at byte 37401",
+   "id": null,
+   "text": "to higher-order modes. The main reason is that even with linear functions, a discontinuity can still be"
+  },
+  {
+   "start": 38167,
+   "end": 38263,
+   "type": "verse",
+   "basis": "verse row at byte 37505",
+   "id": null,
+   "text": "sharply resolved (in 2 to 4 cells). Additionally, our focus is on simple methods for the moment."
+  },
+  {
+   "start": 38264,
+   "end": 38321,
+   "type": "verse",
+   "basis": "verse row at byte 37602",
+   "id": null,
+   "text": "11"
+  },
+  {
+   "start": 38324,
+   "end": 38335,
+   "type": "verse",
+   "basis": "verse row at byte 37662",
+   "id": null,
+   "text": "5. Limiting"
+  },
+  {
+   "start": 38336,
+   "end": 38436,
+   "type": "verse",
+   "basis": "verse row at byte 37674",
+   "id": null,
+   "text": "As is well-known and discussed above, second and higher-order methods generate oscillations near"
+  },
+  {
+   "start": 38437,
+   "end": 38542,
+   "type": "verse",
+   "basis": "verse row at byte 37775",
+   "id": null,
+   "text": "discontinuities. One way to mitigate these oscillations is to limit the data so that it is not too steep."
+  },
+  {
+   "start": 38543,
+   "end": 38641,
+   "type": "verse",
+   "basis": "verse row at byte 37881",
+   "id": null,
+   "text": "However, limiting can lead to a loss of accuracy near smooth extrema. Below, we present a limiting"
+  },
+  {
+   "start": 38642,
+   "end": 38745,
+   "type": "verse",
+   "basis": "verse row at byte 37980",
+   "id": null,
+   "text": "method capable of suppressing oscillations near discontinuities while preserving accuracy near extrema."
+  },
+  {
+   "start": 38746,
+   "end": 38847,
+   "type": "verse",
+   "basis": "verse row at byte 38084",
+   "id": null,
+   "text": "Our limiting procedure can be viewed as an extension of the techniques introduced in (Huynh 1995)"
+  },
+  {
+   "start": 38848,
+   "end": 38949,
+   "type": "verse",
+   "basis": "verse row at byte 38186",
+   "id": null,
+   "text": "for piecewise linear and (Suresh and Huynh 1997) for higher order methods. It turns out that with DG-"
+  },
+  {
+   "start": 38950,
+   "end": 39052,
+   "type": "verse",
+   "basis": "verse row at byte 38288",
+   "id": null,
+   "text": "type methods of degree 𝑝 ≥ 1, we can differentiate a discontinuity from a smooth extremum by a three-"
+  },
+  {
+   "start": 39053,
+   "end": 39158,
+   "type": "verse",
+   "basis": "verse row at byte 38391",
+   "id": null,
+   "text": "cell stencil, as opposed to the five-cell stencil required in finite-difference or finite-volume schemes."
+  },
+  {
+   "start": 39159,
+   "end": 39257,
+   "type": "verse",
+   "basis": "verse row at byte 38497",
+   "id": null,
+   "text": "Hence, the limiting procedure here utilizes a three-cell stencil, like typical limiting processes."
+  },
+  {
+   "start": 39258,
+   "end": 39355,
+   "type": "verse",
+   "basis": "verse row at byte 38596",
+   "id": null,
+   "text": "We employ the standard 3-stage Runge-Kutta (RK) time-stepping method. The solution after each"
+  },
+  {
+   "start": 39356,
+   "end": 39481,
+   "type": "verse",
+   "basis": "verse row at byte 38694",
+   "id": null,
+   "text": "stage is given by (3.13): 𝑢̃𝑗 = 𝑢𝑗 − 2𝜎𝑈𝑗′ . Using the ODE notation 𝑘𝑖 for stage 𝑖, 𝑢̃𝑗 = 𝑢𝑗 + 𝜎(𝑘𝑖 )𝑗 . In"
+  },
+  {
+   "start": 39482,
+   "end": 39590,
+   "type": "verse",
+   "basis": "verse row at byte 38820",
+   "id": null,
+   "text": "the presence of discontinuities, the solution 𝑢̃𝑗 might be oscillatory. To suppress oscillations, we apply"
+  },
+  {
+   "start": 39591,
+   "end": 39704,
+   "type": "verse",
+   "basis": "verse row at byte 38929",
+   "id": null,
+   "text": "the limiting process below to 𝑢̃𝑗 resulting in the limited solution 𝑢̃𝑗LTD . Then, since 𝑘𝑖 will be used in"
+  },
+  {
+   "start": 39705,
+   "end": 39775,
+   "type": "verse",
+   "basis": "verse row at byte 39043",
+   "id": null,
+   "text": "later stages, it must be updated by (𝑘𝑖 )𝑗 = (𝑢̃𝑗LTD − 𝑢𝑗 )/𝜎."
+  },
+  {
+   "start": 39776,
+   "end": 39874,
+   "type": "verse",
+   "basis": "verse row at byte 39114",
+   "id": null,
+   "text": "As is routine, we limit the 𝑘-th mode, 1 ≤ 𝑘 ≤ 𝑝, but not the zero-th mode. The cell average"
+  },
+  {
+   "start": 39875,
+   "end": 39972,
+   "type": "verse",
+   "basis": "verse row at byte 39213",
+   "id": null,
+   "text": "quantities 𝑢𝑗,0 ’s are fundamental for the scheme to be conservative and should not be altered."
+  },
+  {
+   "start": 39973,
+   "end": 40087,
+   "type": "verse",
+   "basis": "verse row at byte 39311",
+   "id": null,
+   "text": "Limiting methods in the literature often constrain 𝑢𝑗, 𝑘 for 𝑘 = 𝑝, … , 1 in that order, i.e., the highest"
+  },
+  {
+   "start": 40088,
+   "end": 40197,
+   "type": "verse",
+   "basis": "verse row at byte 39426",
+   "id": null,
+   "text": "mode is constrained first. Here, we employ a reverse order, namely, 𝑘 = 1, … , 𝑝, i.e., we limit the linear"
+  },
+  {
+   "start": 40198,
+   "end": 40305,
+   "type": "verse",
+   "basis": "verse row at byte 39536",
+   "id": null,
+   "text": "mode 𝑢𝑗,1 first. The reason is that in smooth regions, limiting has nonexistent or minimal effect, so the"
+  },
+  {
+   "start": 40306,
+   "end": 40402,
+   "type": "verse",
+   "basis": "verse row at byte 39644",
+   "id": null,
+   "text": "mode order is irrelevant. Near a discontinuity, as shown in Fig. 4.1(b), high modes amplify with"
+  },
+  {
+   "start": 40403,
+   "end": 40504,
+   "type": "verse",
+   "basis": "verse row at byte 39741",
+   "id": null,
+   "text": "increasing mode order. If limiting already effects the linear mode, then the large higher-order modes"
+  },
+  {
+   "start": 40505,
+   "end": 40566,
+   "type": "verse",
+   "basis": "verse row at byte 39843",
+   "id": null,
+   "text": "are all suspects, and even zeroing them out seems reasonable."
+  },
+  {
+   "start": 40567,
+   "end": 40667,
+   "type": "verse",
+   "basis": "verse row at byte 39905",
+   "id": null,
+   "text": "To prepare, for any real numbers 𝑥 and 𝑦, let minmod(𝑥, 𝑦) be the median of 𝑥, 𝑦, and 0, or"
+  },
+  {
+   "start": 40668,
+   "end": 40711,
+   "type": "verse",
+   "basis": "verse row at byte 40006",
+   "id": null,
+   "text": "1"
+  },
+  {
+   "start": 40712,
+   "end": 40820,
+   "type": "verse",
+   "basis": "verse row at byte 40050",
+   "id": null,
+   "text": "minmod(𝑥, 𝑦) = [sign(𝑥) + sign(𝑦)] min(|𝑥|, |𝑦|).                         (5.1)"
+  },
+  {
+   "start": 40821,
+   "end": 40864,
+   "type": "verse",
+   "basis": "verse row at byte 40159",
+   "id": null,
+   "text": "2"
+  },
+  {
+   "start": 40865,
+   "end": 40965,
+   "type": "verse",
+   "basis": "verse row at byte 40203",
+   "id": null,
+   "text": "That is, minmod(𝑥, 𝑦) equals 0 if 𝑥 and 𝑦 are of opposite sign and equals the value with smaller"
+  },
+  {
+   "start": 40966,
+   "end": 41073,
+   "type": "verse",
+   "basis": "verse row at byte 40304",
+   "id": null,
+   "text": "modulus if 𝑥 and 𝑦 are of the same sign. Denote the smallest interval containing numbers 𝑥1 , …, 𝑥𝑚 by"
+  },
+  {
+   "start": 41074,
+   "end": 41168,
+   "type": "verse",
+   "basis": "verse row at byte 40412",
+   "id": null,
+   "text": "𝐼[𝑥1 , … , 𝑥𝑚 ] = [min(𝑥1 , … , 𝑥𝑚 ) , max(𝑥1 , … , 𝑥𝑚 )]."
+  },
+  {
+   "start": 41169,
+   "end": 41274,
+   "type": "verse",
+   "basis": "verse row at byte 40507",
+   "id": null,
+   "text": "For any numbers 𝛼, 𝛽, and 𝑦, the constraint that 𝑦 lies in the interval 𝐼[𝛼, 𝛽] can be enforced by"
+  },
+  {
+   "start": 41276,
+   "end": 41340,
+   "type": "verse",
+   "basis": "verse row at byte 40614",
+   "id": null,
+   "text": "median(𝑦, 𝛼, 𝛽)."
+  },
+  {
+   "start": 41341,
+   "end": 41406,
+   "type": "verse",
+   "basis": "verse row at byte 40679",
+   "id": null,
+   "text": "We can express the above in minmod form, e.g., using 𝛼 as pivot,"
+  },
+  {
+   "start": 41408,
+   "end": 41529,
+   "type": "verse",
+   "basis": "verse row at byte 40746",
+   "id": null,
+   "text": "median(𝑦, 𝛼, 𝛽) = 𝛼 + median(𝑦 − 𝛼, 0, 𝛽 − 𝛼) = 𝛼 + minmod(𝑦 − 𝛼, 𝛽 − 𝛼).                      (5.2)"
+  },
+  {
+   "start": 41532,
+   "end": 41554,
+   "type": "verse",
+   "basis": "verse row at byte 40870",
+   "id": null,
+   "text": "Monotonicity bounds"
+  },
+  {
+   "start": 41555,
+   "end": 41665,
+   "type": "verse",
+   "basis": "verse row at byte 40893",
+   "id": null,
+   "text": "Consider first the linear case. Focusing on cell 𝑗, using the average value 𝑢𝑗,0 as a pivot, to preserve"
+  },
+  {
+   "start": 41666,
+   "end": 41773,
+   "type": "verse",
+   "basis": "verse row at byte 41004",
+   "id": null,
+   "text": "monotonicity, at interface 𝑥𝑗+1/2, we require 𝑢𝑗,1 to lie between 0 and 𝑢𝑗+1,0 − 𝑢𝑗,0 , or 𝑢𝑗,1 ∈"
+  },
+  {
+   "start": 41774,
+   "end": 41897,
+   "type": "verse",
+   "basis": "verse row at byte 41112",
+   "id": null,
+   "text": "𝐼[0, 𝑢𝑗+1,0 − 𝑢𝑗,0 ]. Similarly, at interface 𝑥𝑗−1/2, we require −𝑢𝑗,1 to lie between 0 and 𝑢𝑗−1,0 − 𝑢𝑗,0 , or"
+  },
+  {
+   "start": 41898,
+   "end": 41994,
+   "type": "verse",
+   "basis": "verse row at byte 41236",
+   "id": null,
+   "text": "equivalently, 𝑢𝑗,1 ∈ 𝐼[0, 𝑢𝑗,0 − 𝑢𝑗−1,0 ]; see Fig. 5.1. To combine these conditions, set"
+  },
+  {
+   "start": 41996,
+   "end": 42113,
+   "type": "verse",
+   "basis": "verse row at byte 41334",
+   "id": null,
+   "text": "𝑢mm = minmod[𝑢𝑗+1,0 − 𝑢𝑗,0 , 𝑢𝑗,0 − 𝑢𝑗−1,0 ].                           (5.3a)"
+  },
+  {
+   "start": 42115,
+   "end": 42209,
+   "type": "verse",
+   "basis": "verse row at byte 41453",
+   "id": null,
+   "text": "The constraint that 𝑢𝑗,1 must be between 0 and 𝑢mm yields MUSCL (Monotone Upstream-Centered"
+  },
+  {
+   "start": 42210,
+   "end": 42284,
+   "type": "verse",
+   "basis": "verse row at byte 41548",
+   "id": null,
+   "text": "Schemes for Conservation Laws) limiting (Van Leer 1977). It is enforced by"
+  },
+  {
+   "start": 42285,
+   "end": 42398,
+   "type": "verse",
+   "basis": "verse row at byte 41623",
+   "id": null,
+   "text": "𝑢𝑗,1 ← minmod[𝑢𝑗,1 , 𝑢mm ].                                    (5.3b)"
+  },
+  {
+   "start": 42399,
+   "end": 42455,
+   "type": "verse",
+   "basis": "verse row at byte 41737",
+   "id": null,
+   "text": "12"
+  },
+  {
+   "start": 42457,
+   "end": 42559,
+   "type": "verse",
+   "basis": "verse row at byte 41795",
+   "id": null,
+   "text": "In smooth regions of the solution with a nonzero slope, the above constraint provides ample “room”"
+  },
+  {
+   "start": 42560,
+   "end": 42672,
+   "type": "verse",
+   "basis": "verse row at byte 41898",
+   "id": null,
+   "text": "so that the limited 𝑢𝑗,1 resulting from (5.3b) remains identical to the original 𝑢𝑗,1 , meaning limiting has"
+  },
+  {
+   "start": 42673,
+   "end": 42768,
+   "type": "verse",
+   "basis": "verse row at byte 42011",
+   "id": null,
+   "text": "no effect; see Fig. 5.1(b). However, a significant drawback arises near extrema, where 𝑢mm can"
+  },
+  {
+   "start": 42769,
+   "end": 42876,
+   "type": "verse",
+   "basis": "verse row at byte 42107",
+   "id": null,
+   "text": "become 0 or very small, leading to 𝑢𝑗,1 = 0 or very small after limiting, thus reducing accuracy to first"
+  },
+  {
+   "start": 42877,
+   "end": 42984,
+   "type": "verse",
+   "basis": "verse row at byte 42215",
+   "id": null,
+   "text": "order. We will discuss methods to expand the range 𝐼[0, 𝑢𝑗+1,0 − 𝑢𝑗,0 ] to alleviate this issue later."
+  },
+  {
+   "start": 42985,
+   "end": 43076,
+   "type": "verse",
+   "basis": "verse row at byte 42323",
+   "id": null,
+   "text": "Eqs. (5.3a,b) represent Van Leer’s MUSCL constraint (1977): “… in order to preserve the"
+  },
+  {
+   "start": 43077,
+   "end": 43179,
+   "type": "verse",
+   "basis": "verse row at byte 42415",
+   "id": null,
+   "text": "monotonicity of a sequence of mesh averages, the linear function (12) must not take values outside the"
+  },
+  {
+   "start": 43180,
+   "end": 43278,
+   "type": "verse",
+   "basis": "verse row at byte 42518",
+   "id": null,
+   "text": "range spanned by the neighboring mesh averages.” Here, “the linear function (12)” corresponds to a"
+  },
+  {
+   "start": 43279,
+   "end": 43382,
+   "type": "verse",
+   "basis": "verse row at byte 42617",
+   "id": null,
+   "text": "linear solution in cell 𝑗. An error in the DG literature misidentifies (5.3a,b) as the total variation"
+  },
+  {
+   "start": 43383,
+   "end": 43484,
+   "type": "verse",
+   "basis": "verse row at byte 42721",
+   "id": null,
+   "text": "diminishing (TVD) constraint and erroneously assigns essentially the minmod slope (5.3a) as the final"
+  },
+  {
+   "start": 43485,
+   "end": 43589,
+   "type": "verse",
+   "basis": "verse row at byte 42823",
+   "id": null,
+   "text": "MUSCL slope or final 2𝑢𝑗,1 , resulting in an overly dissipative MUSCL outcome (e.g., p. 150, Hesthaven"
+  },
+  {
+   "start": 43590,
+   "end": 43610,
+   "type": "verse",
+   "basis": "verse row at byte 42928",
+   "id": null,
+   "text": "and Warburton 2008)."
+  },
+  {
+   "start": 43611,
+   "end": 43713,
+   "type": "verse",
+   "basis": "verse row at byte 42949",
+   "id": null,
+   "text": "As depicted in Fig. 4.1(b), the modes exhibit the “correct” signs. Thus, we can simplify the above"
+  },
+  {
+   "start": 43714,
+   "end": 43816,
+   "type": "verse",
+   "basis": "verse row at byte 43052",
+   "id": null,
+   "text": "constraint by limiting only the magnitudes, which also facilitates the limiting of higher-order modes."
+  },
+  {
+   "start": 43817,
+   "end": 43919,
+   "type": "verse",
+   "basis": "verse row at byte 43155",
+   "id": null,
+   "text": "Note that reducing the modal magnitude is also employed in the filtering approach; however, the extent"
+  },
+  {
+   "start": 43920,
+   "end": 44009,
+   "type": "verse",
+   "basis": "verse row at byte 43258",
+   "id": null,
+   "text": "of reduction and the underlying reasons differ completely between limiting and filtering."
+  },
+  {
+   "start": 44010,
+   "end": 44116,
+   "type": "verse",
+   "basis": "verse row at byte 43348",
+   "id": null,
+   "text": "For simplicity of notation, we sometimes drop the subscript 𝑗, e.g., we use the notation 𝑢𝐿Lim where"
+  },
+  {
+   "start": 44117,
+   "end": 44217,
+   "type": "verse",
+   "basis": "verse row at byte 43455",
+   "id": null,
+   "text": "the superscript “Lim” stands for “Limit”, subscript “L” for “left”, and subscript 𝑗 is implied. All"
+  },
+  {
+   "start": 44218,
+   "end": 44275,
+   "type": "verse",
+   "basis": "verse row at byte 43556",
+   "id": null,
+   "text": "quantities defined in (5.4)–(5.7) are positive (≥ 0). Set"
+  },
+  {
+   "start": 44276,
+   "end": 44395,
+   "type": "verse",
+   "basis": "verse row at byte 43614",
+   "id": null,
+   "text": "𝑢𝐿Lim = |𝑢𝑗−1,0 − 𝑢𝑗,0 |, 𝑢𝑅Lim = |𝑢𝑗+1,0 − 𝑢𝑗,0 |.                       (5.4)"
+  },
+  {
+   "start": 44396,
+   "end": 44399,
+   "type": "verse",
+   "basis": "verse row at byte 43734",
+   "id": null,
+   "text": "and"
+  },
+  {
+   "start": 44400,
+   "end": 44512,
+   "type": "verse",
+   "basis": "verse row at byte 43738",
+   "id": null,
+   "text": "𝑢Lim = min(𝑢𝐿Lim , 𝑢𝑅Lim ).                                   (5.5)"
+  },
+  {
+   "start": 44514,
+   "end": 44622,
+   "type": "verse",
+   "basis": "verse row at byte 43852",
+   "id": null,
+   "text": "Denote 𝑢Lim by 𝑢1Lim where the subscript 1 represents “linear” (𝑢𝑘Lim will be defined later). We require"
+  },
+  {
+   "start": 44624,
+   "end": 44734,
+   "type": "verse",
+   "basis": "verse row at byte 43962",
+   "id": null,
+   "text": "|𝑢𝑗,1 | ≤ 𝑢1Lim .                                       (5.6)"
+  },
+  {
+   "start": 44735,
+   "end": 44814,
+   "type": "verse",
+   "basis": "verse row at byte 44073",
+   "id": null,
+   "text": "Ltd"
+  },
+  {
+   "start": 44815,
+   "end": 44900,
+   "type": "verse",
+   "basis": "verse row at byte 44153",
+   "id": null,
+   "text": "The above constraint is enforced by replacing 𝑢𝑗,1 by the limited quantity 𝑢𝑗,1 ,"
+  },
+  {
+   "start": 44901,
+   "end": 44939,
+   "type": "verse",
+   "basis": "verse row at byte 44239",
+   "id": null,
+   "text": "Ltd"
+  },
+  {
+   "start": 44940,
+   "end": 45054,
+   "type": "verse",
+   "basis": "verse row at byte 44278",
+   "id": null,
+   "text": "𝑢𝑗,1 = sign(𝑢𝑗,1 ) min(|𝑢𝑗,1 |, 𝑢1Lim ).                            (5.7)"
+  },
+  {
+   "start": 45056,
+   "end": 45173,
+   "type": "verse",
+   "basis": "verse row at byte 44394",
+   "id": null,
+   "text": "Fig. 5.1(a) shows 𝑢𝐿Lim , 𝑢𝑅Lim , 𝑢Lim = 𝑢1Lim = 𝑢𝑅Lim, the original linear data (thin blue line), and the"
+  },
+  {
+   "start": 45174,
+   "end": 45215,
+   "type": "verse",
+   "basis": "verse row at byte 44512",
+   "id": null,
+   "text": "Ltd"
+  },
+  {
+   "start": 45216,
+   "end": 45321,
+   "type": "verse",
+   "basis": "verse row at byte 44554",
+   "id": null,
+   "text": "limited slope corresponding to 𝑢𝑗,1       (thick purple line). Here, for ease of observation, 𝜎 = 0.2."
+  },
+  {
+   "start": 45322,
+   "end": 45414,
+   "type": "verse",
+   "basis": "verse row at byte 44660",
+   "id": null,
+   "text": "Fig. 5.1(b) shows the ample “room” provided by 𝑢Lim at smooth regions with a nonzero slope."
+  },
+  {
+   "start": 45415,
+   "end": 45519,
+   "type": "verse",
+   "basis": "verse row at byte 44753",
+   "id": null,
+   "text": "Constraints like (5.6) and (5.7) are typically employed to limit slope quantities. Higher-order modes"
+  },
+  {
+   "start": 45520,
+   "end": 45601,
+   "type": "verse",
+   "basis": "verse row at byte 44858",
+   "id": null,
+   "text": "are then limited by employing neighboring higher-order modes in a similar manner."
+  },
+  {
+   "start": 45602,
+   "end": 45694,
+   "type": "verse",
+   "basis": "verse row at byte 44940",
+   "id": null,
+   "text": "Our approach is different: we use 𝑢Lim = 𝑢1Lim to constrain all modes by requiring that"
+  },
+  {
+   "start": 45695,
+   "end": 45743,
+   "type": "verse",
+   "basis": "verse row at byte 45033",
+   "id": null,
+   "text": "𝑝"
+  },
+  {
+   "start": 45745,
+   "end": 45856,
+   "type": "verse",
+   "basis": "verse row at byte 45083",
+   "id": null,
+   "text": "∑|𝑢𝑗,𝑘 | ≤ 𝑢Lim .                                        (5.8)"
+  },
+  {
+   "start": 45857,
+   "end": 45905,
+   "type": "verse",
+   "basis": "verse row at byte 45195",
+   "id": null,
+   "text": "𝑘=1"
+  },
+  {
+   "start": 45906,
+   "end": 45988,
+   "type": "verse",
+   "basis": "verse row at byte 45244",
+   "id": null,
+   "text": "Ltd                                          Ltd"
+  },
+  {
+   "start": 45989,
+   "end": 46105,
+   "type": "verse",
+   "basis": "verse row at byte 45327",
+   "id": null,
+   "text": "With 𝑢1Lim = 𝑢Lim by (5.5) and 𝑢𝑗,1   by (5.7), we define 𝑢2Lim = 𝑢1Lim − |𝑢𝑗,1    |, which is, loosely put,"
+  },
+  {
+   "start": 46106,
+   "end": 46164,
+   "type": "verse",
+   "basis": "verse row at byte 45444",
+   "id": null,
+   "text": "Lim"
+  },
+  {
+   "start": 46165,
+   "end": 46272,
+   "type": "verse",
+   "basis": "verse row at byte 45503",
+   "id": null,
+   "text": "the remainder of the limit. We then require |𝑢𝑗,2 | ≤ 𝑢2 , and the process continues. In other words, to"
+  },
+  {
+   "start": 46273,
+   "end": 46339,
+   "type": "verse",
+   "basis": "verse row at byte 45611",
+   "id": null,
+   "text": "Ltd"
+  },
+  {
+   "start": 46340,
+   "end": 46449,
+   "type": "verse",
+   "basis": "verse row at byte 45678",
+   "id": null,
+   "text": "limit the 𝑘-th mode for 2 ≤ 𝑘 ≤ 𝑝, with the limited quantity 𝑢𝑗,𝑘−1 , let the remainder of the limit be"
+  },
+  {
+   "start": 46450,
+   "end": 46511,
+   "type": "verse",
+   "basis": "verse row at byte 45788",
+   "id": null,
+   "text": "Ltd"
+  },
+  {
+   "start": 46512,
+   "end": 46569,
+   "type": "verse",
+   "basis": "verse row at byte 45850",
+   "id": null,
+   "text": "𝑢𝑘Lim = 𝑢𝑘−1"
+  },
+  {
+   "start": 46570,
+   "end": 46623,
+   "type": "verse",
+   "basis": "verse row at byte 45908",
+   "id": null,
+   "text": "Lim"
+  },
+  {
+   "start": 46624,
+   "end": 46734,
+   "type": "verse",
+   "basis": "verse row at byte 45962",
+   "id": null,
+   "text": "− |𝑢𝑗,𝑘−1 |.                                    (5.9)"
+  },
+  {
+   "start": 46735,
+   "end": 46745,
+   "type": "verse",
+   "basis": "verse row at byte 46073",
+   "id": null,
+   "text": "We require"
+  },
+  {
+   "start": 46746,
+   "end": 46858,
+   "type": "verse",
+   "basis": "verse row at byte 46084",
+   "id": null,
+   "text": "|𝑢𝑗,𝑘 | ≤ 𝑢𝑘Lim .                                      (5.10)"
+  },
+  {
+   "start": 46859,
+   "end": 46916,
+   "type": "verse",
+   "basis": "verse row at byte 46197",
+   "id": null,
+   "text": "13"
+  },
+  {
+   "start": 46918,
+   "end": 46998,
+   "type": "verse",
+   "basis": "verse row at byte 46256",
+   "id": null,
+   "text": "Ltd"
+  },
+  {
+   "start": 46999,
+   "end": 47087,
+   "type": "verse",
+   "basis": "verse row at byte 46337",
+   "id": null,
+   "text": "The above constraint is satisfied by replacing 𝑢𝑗,𝑘 by the limited quantity 𝑢𝑗,𝑘 :"
+  },
+  {
+   "start": 47088,
+   "end": 47128,
+   "type": "verse",
+   "basis": "verse row at byte 46426",
+   "id": null,
+   "text": "Ltd"
+  },
+  {
+   "start": 47129,
+   "end": 47248,
+   "type": "verse",
+   "basis": "verse row at byte 46467",
+   "id": null,
+   "text": "𝑢𝑗,𝑘 = sign(𝑢𝑗,𝑘 ) min(|𝑢𝑗,𝑘 |, 𝑢𝑘Lim ).                          (5.11)"
+  },
+  {
+   "start": 47250,
+   "end": 47353,
+   "type": "verse",
+   "basis": "verse row at byte 46588",
+   "id": null,
+   "text": "This completes the limiting procedure except that we still need to enlarge 𝑢Lim to provide “room” near"
+  },
+  {
+   "start": 47354,
+   "end": 47389,
+   "type": "verse",
+   "basis": "verse row at byte 46692",
+   "id": null,
+   "text": "extrema as will be discussed below."
+  },
+  {
+   "start": 47390,
+   "end": 47450,
+   "type": "verse",
+   "basis": "verse row at byte 46728",
+   "id": null,
+   "text": "Ltd"
+  },
+  {
+   "start": 47451,
+   "end": 47565,
+   "type": "verse",
+   "basis": "verse row at byte 46789",
+   "id": null,
+   "text": "Note that for any 𝑘 ≥ 1, if |𝑢𝑗,𝑘 | ≥ 𝑢𝑘Lim , then |𝑢𝑗,𝑘  | = 𝑢𝑘Lim , and the remaining limit 𝑢𝑘+1"
+  },
+  {
+   "start": 47566,
+   "end": 47667,
+   "type": "verse",
+   "basis": "verse row at byte 46904",
+   "id": null,
+   "text": "Lim"
+  },
+  {
+   "start": 47668,
+   "end": 47771,
+   "type": "verse",
+   "basis": "verse row at byte 47006",
+   "id": null,
+   "text": "="
+  },
+  {
+   "start": 47772,
+   "end": 47784,
+   "type": "verse",
+   "basis": "verse row at byte 47110",
+   "id": null,
+   "text": "Lim     Ltd"
+  },
+  {
+   "start": 47785,
+   "end": 47885,
+   "type": "verse",
+   "basis": "verse row at byte 47123",
+   "id": null,
+   "text": "𝑢𝑘 − |𝑢𝑗,𝑘 | is zero, resulting in the vanishing of all 𝑘 + 1 and higher modes after limiting."
+  },
+  {
+   "start": 47890,
+   "end": 47993,
+   "type": "verse",
+   "basis": "verse row at byte 47228",
+   "id": null,
+   "text": "𝑢𝑗−1,0          Original linear data                                                𝑢𝑗+1,0"
+  },
+  {
+   "start": 47995,
+   "end": 48081,
+   "type": "verse",
+   "basis": "verse row at byte 47333",
+   "id": null,
+   "text": "Limited slope                                   𝑢𝑗,0"
+  },
+  {
+   "start": 48082,
+   "end": 48185,
+   "type": "verse",
+   "basis": "verse row at byte 47420",
+   "id": null,
+   "text": "𝑢𝐿Lim                                                  𝑢𝐿Lim                      𝑢Lim"
+  },
+  {
+   "start": 48186,
+   "end": 48217,
+   "type": "verse",
+   "basis": "verse row at byte 47524",
+   "id": null,
+   "text": "𝑢𝑗,0"
+  },
+  {
+   "start": 48218,
+   "end": 48296,
+   "type": "verse",
+   "basis": "verse row at byte 47556",
+   "id": null,
+   "text": "𝑢𝑅Lim = 𝑢1Lim                 𝑢𝑗−1,0"
+  },
+  {
+   "start": 48298,
+   "end": 48345,
+   "type": "verse",
+   "basis": "verse row at byte 47636",
+   "id": null,
+   "text": "Cell 𝑗          𝑢𝑗+1,0"
+  },
+  {
+   "start": 48347,
+   "end": 48447,
+   "type": "verse",
+   "basis": "verse row at byte 47685",
+   "id": null,
+   "text": "(a) Limiting alters 𝑢𝑗,1                           (b) Limiting provides ample “room”"
+  },
+  {
+   "start": 48448,
+   "end": 48564,
+   "type": "verse",
+   "basis": "verse row at byte 47786",
+   "id": null,
+   "text": "Fig. 5.1: (a) Quantities 𝑢𝐿Lim (dashed red vertical line), 𝑢𝑅Lim (thick red vertical line), 𝑢1Lim = 𝑢𝑅Lim,"
+  },
+  {
+   "start": 48565,
+   "end": 48672,
+   "type": "verse",
+   "basis": "verse row at byte 47903",
+   "id": null,
+   "text": "the original linear data (thin blue line), and the limited linear data (thick purple line); (b) at a smooth"
+  },
+  {
+   "start": 48673,
+   "end": 48776,
+   "type": "verse",
+   "basis": "verse row at byte 48011",
+   "id": null,
+   "text": "region with a nonzero slope, 𝑢Lim (red thick vertical line) provides ample “room” so that limiting has"
+  },
+  {
+   "start": 48777,
+   "end": 48787,
+   "type": "verse",
+   "basis": "verse row at byte 48115",
+   "id": null,
+   "text": "no effect."
+  },
+  {
+   "start": 48789,
+   "end": 48895,
+   "type": "verse",
+   "basis": "verse row at byte 48127",
+   "id": null,
+   "text": "For the step-down example in Fig. 4.1(b), the limiting process reduces the cubic solution to a limited"
+  },
+  {
+   "start": 48896,
+   "end": 49003,
+   "type": "verse",
+   "basis": "verse row at byte 48234",
+   "id": null,
+   "text": "linear solution: all modes of order 𝑘 ≥ 2 vanish after limiting. At first glance, the lack of higher-order"
+  },
+  {
+   "start": 49004,
+   "end": 49110,
+   "type": "verse",
+   "basis": "verse row at byte 48342",
+   "id": null,
+   "text": "modes might suggest that condition (5.8) dissipates a discontinuity. However, as illustrated later in Fig."
+  },
+  {
+   "start": 49111,
+   "end": 49212,
+   "type": "verse",
+   "basis": "verse row at byte 48449",
+   "id": null,
+   "text": "6.2, this limit yields a relatively sharp transition at a discontinuity (spanning from 2 to 4 cells)."
+  },
+  {
+   "start": 49213,
+   "end": 49314,
+   "type": "verse",
+   "basis": "verse row at byte 48551",
+   "id": null,
+   "text": "At smooth regions with a nonzero slope (away from extrema), for a uniform mesh, up to an error of"
+  },
+  {
+   "start": 49315,
+   "end": 49434,
+   "type": "verse",
+   "basis": "verse row at byte 48653",
+   "id": null,
+   "text": "𝑂(ℎ2 ), we have (𝑢𝑗,0 − 𝑢𝑗−1,0 ) ≈ (𝑢𝑗+1,0 − 𝑢𝑗,0 ) ≈ 2𝑢𝑗,1 . Therefore, the limit 𝑢1Lim ≈ 2𝑢𝑗,1 provides"
+  },
+  {
+   "start": 49435,
+   "end": 49541,
+   "type": "verse",
+   "basis": "verse row at byte 48773",
+   "id": null,
+   "text": "ample “room” so that limiting has no effect on all 𝑢𝑗,𝑘 , 𝑘 ≥ 1. This fact is depicted in Fig. 5.1(b)."
+  },
+  {
+   "start": 49542,
+   "end": 49634,
+   "type": "verse",
+   "basis": "verse row at byte 48880",
+   "id": null,
+   "text": "At a smooth extremum, however, 𝑢Lim can become 0, causing a loss of accuracy as shown in"
+  },
+  {
+   "start": 49635,
+   "end": 49647,
+   "type": "verse",
+   "basis": "verse row at byte 48973",
+   "id": null,
+   "text": "Fig. 5.2(a)."
+  },
+  {
+   "start": 49649,
+   "end": 49680,
+   "type": "verse",
+   "basis": "verse row at byte 48987",
+   "id": null,
+   "text": "Limiting near smooth extrema"
+  },
+  {
+   "start": 49681,
+   "end": 49777,
+   "type": "verse",
+   "basis": "verse row at byte 49019",
+   "id": null,
+   "text": "To address this loss of accuracy, we enlarge 𝑢Lim in a manner that allows more “room” near a"
+  },
+  {
+   "start": 49778,
+   "end": 49882,
+   "type": "verse",
+   "basis": "verse row at byte 49116",
+   "id": null,
+   "text": "smooth extremum so that limiting has no effect, and thus, accuracy is preserved. At a discontinuity, the"
+  },
+  {
+   "start": 49883,
+   "end": 49990,
+   "type": "verse",
+   "basis": "verse row at byte 49221",
+   "id": null,
+   "text": "enlarged limit essentially reduces to the original limit 𝑢Lim in (5.5). In fact, for the case of the step-"
+  },
+  {
+   "start": 49991,
+   "end": 50077,
+   "type": "verse",
+   "basis": "verse row at byte 49329",
+   "id": null,
+   "text": "down data in Fig. 4.1(b) above, the enlarged limit is identical to the original limit."
+  },
+  {
+   "start": 50078,
+   "end": 50183,
+   "type": "verse",
+   "basis": "verse row at byte 49416",
+   "id": null,
+   "text": "We deal with real numbers below. For cell 𝑗, consider the quadratic defined by the first three modes:"
+  },
+  {
+   "start": 50184,
+   "end": 50295,
+   "type": "verse",
+   "basis": "verse row at byte 49522",
+   "id": null,
+   "text": "𝑞𝑗 (𝜉) = 𝑢𝑗,0 + 𝑢𝑗,1 𝐿1 (𝜉) + 𝑢𝑗,2 𝐿2 (𝜉) = 𝑢𝑗,0 + 𝑢𝑗,1 𝜉 + 𝑢𝑗,2 (3𝜉 2 − 1)/2,"
+  },
+  {
+   "start": 50297,
+   "end": 50365,
+   "type": "verse",
+   "basis": "verse row at byte 49635",
+   "id": null,
+   "text": "where the expressions for 𝐿1 and 𝐿2 are given in (2.1). Therefore,"
+  },
+  {
+   "start": 50366,
+   "end": 50496,
+   "type": "verse",
+   "basis": "verse row at byte 49704",
+   "id": null,
+   "text": "𝑞𝑗 (−1) = 𝑢𝑗,0 − 𝑢𝑗,1 + 𝑢𝑗,2 , 𝑞𝑗 (0) = 𝑢𝑗,0 − 𝑢𝑗,2 /2, and 𝑞𝑗 (1) = 𝑢𝑗,0 + 𝑢𝑗,1 + 𝑢𝑗,2 .        (5.12)"
+  },
+  {
+   "start": 50498,
+   "end": 50604,
+   "type": "verse",
+   "basis": "verse row at byte 49836",
+   "id": null,
+   "text": "We can now enlarge 𝑢𝑅Lim for cell 𝑗. At interface 𝑥𝑗+1/2, using the neighboring cell averages, set"
+  },
+  {
+   "start": 50605,
+   "end": 50656,
+   "type": "verse",
+   "basis": "verse row at byte 49943",
+   "id": null,
+   "text": "1"
+  },
+  {
+   "start": 50657,
+   "end": 50770,
+   "type": "verse",
+   "basis": "verse row at byte 49995",
+   "id": null,
+   "text": "𝑣11 = 2 (𝑢𝑗,0 + 𝑢𝑗+1,0 ).                                   (5.13)"
+  },
+  {
+   "start": 50771,
+   "end": 50830,
+   "type": "verse",
+   "basis": "verse row at byte 50109",
+   "id": null,
+   "text": "14"
+  },
+  {
+   "start": 50833,
+   "end": 50943,
+   "type": "verse",
+   "basis": "verse row at byte 50171",
+   "id": null,
+   "text": "For cell 𝑗, consider the quadratic 𝑞𝑗 in the local frame 𝐼 = [−1, 1]. The line joining (−1, 𝑞𝑗 (−1)) and"
+  },
+  {
+   "start": 50944,
+   "end": 51038,
+   "type": "verse",
+   "basis": "verse row at byte 50282",
+   "id": null,
+   "text": "(0, 𝑞𝑗 (0)) intersects the right boundary 𝜉 = 1 at 𝑣12 = 2𝑞𝑗 (0) − 𝑞𝑗 (−1). By (5.12),"
+  },
+  {
+   "start": 51040,
+   "end": 51159,
+   "type": "verse",
+   "basis": "verse row at byte 50378",
+   "id": null,
+   "text": "𝑣12 = 𝑢𝑗,0 + 𝑢𝑗,1 − 2𝑢𝑗,2 .                                    (5.14)"
+  },
+  {
+   "start": 51161,
+   "end": 51271,
+   "type": "verse",
+   "basis": "verse row at byte 50499",
+   "id": null,
+   "text": "Note that whereas 𝑞𝑗 (1) in (5.12) has the term 𝑢𝑗,2 , the above contains the term −2𝑢𝑗,2 , which serves"
+  },
+  {
+   "start": 51272,
+   "end": 51376,
+   "type": "verse",
+   "basis": "verse row at byte 50610",
+   "id": null,
+   "text": "to provide the extra room so that limiting has minimal effect in smooth regions. By reflection, for cell"
+  },
+  {
+   "start": 51377,
+   "end": 51485,
+   "type": "verse",
+   "basis": "verse row at byte 50715",
+   "id": null,
+   "text": "𝑗 + 1, the line joining (1, 𝑞𝑗+1 (1)) and (0, 𝑞𝑗+1 (0) intersects the line 𝜉 = −1, i.e., the left cell"
+  },
+  {
+   "start": 51486,
+   "end": 51583,
+   "type": "verse",
+   "basis": "verse row at byte 50824",
+   "id": null,
+   "text": "boundary, at 𝑣13 = 2𝑞𝑗+1 (0) − 𝑞𝑗+1 (1). By using (5.12) with appropriate change in indices,"
+  },
+  {
+   "start": 51585,
+   "end": 51704,
+   "type": "verse",
+   "basis": "verse row at byte 50923",
+   "id": null,
+   "text": "𝑣13 = 𝑢𝑗+1,0 − 𝑢𝑗+1,1 − 2𝑢𝑗+1,2 .                                  (5.15)"
+  },
+  {
+   "start": 51706,
+   "end": 51782,
+   "type": "verse",
+   "basis": "verse row at byte 51044",
+   "id": null,
+   "text": "At interface 𝑗 + 1/2, denote by 𝑣14 the median of 𝑣11 , 𝑣12 , and 𝑣13 :"
+  },
+  {
+   "start": 51783,
+   "end": 51901,
+   "type": "verse",
+   "basis": "verse row at byte 51121",
+   "id": null,
+   "text": "𝑣14 = 𝑣11 + minmod(𝑣12 − 𝑣11 , 𝑣13 − 𝑣11 ).                                (5.16)"
+  },
+  {
+   "start": 51902,
+   "end": 52029,
+   "type": "verse",
+   "basis": "verse row at byte 51240",
+   "id": null,
+   "text": "To the right of cell 𝑗, we enlarge the range 𝐼[𝑢𝑗,0 , 𝑢𝑗+1,0 ] to 𝐼[𝑢𝑗,0 , 𝑢𝑗+1,0 , 𝑣14 ]. To simplify the process,"
+  },
+  {
+   "start": 52030,
+   "end": 52125,
+   "type": "verse",
+   "basis": "verse row at byte 51368",
+   "id": null,
+   "text": "we replace 𝑢𝑅Lim by the extended limit 𝑢𝑅XLim where, using 𝑢𝑗,0 as the pivot for cell 𝑗,"
+  },
+  {
+   "start": 52127,
+   "end": 52248,
+   "type": "verse",
+   "basis": "verse row at byte 51465",
+   "id": null,
+   "text": "𝑢𝑅XLim = Max(|𝑢𝑗+1,0 − 𝑢𝑗,0 |, |𝑣14 − 𝑢𝑗,0 |).                                 (5.17)"
+  },
+  {
+   "start": 52250,
+   "end": 52353,
+   "type": "verse",
+   "basis": "verse row at byte 51588",
+   "id": null,
+   "text": "Note that near a smooth extremum with a nonzero curvature, i.e., 𝑢𝑗,2 ≠ 0, the quantities 𝑣12 and"
+  },
+  {
+   "start": 52354,
+   "end": 52457,
+   "type": "verse",
+   "basis": "verse row at byte 51692",
+   "id": null,
+   "text": "𝑣13 are close to each other and the median 𝑣14 used in 𝑢𝑅XLim provides room so that limiting has no"
+  },
+  {
+   "start": 52458,
+   "end": 52562,
+   "type": "verse",
+   "basis": "verse row at byte 51796",
+   "id": null,
+   "text": "effect as can be seen in Fig. 5.2(b). The use of minmod function for 𝑣14 also assures that for the case"
+  },
+  {
+   "start": 52563,
+   "end": 52666,
+   "type": "verse",
+   "basis": "verse row at byte 51901",
+   "id": null,
+   "text": "of a step-down data in Fig. 4.1(b), the extended limit 𝑢𝑅XLim reduces to the original limit 𝑢𝑅Lim ."
+  },
+  {
+   "start": 52670,
+   "end": 52771,
+   "type": "verse",
+   "basis": "verse row at byte 52008",
+   "id": null,
+   "text": "𝑣12                    𝑣13"
+  },
+  {
+   "start": 52772,
+   "end": 52874,
+   "type": "verse",
+   "basis": "verse row at byte 52110",
+   "id": null,
+   "text": "𝑢𝑅XLim"
+  },
+  {
+   "start": 52875,
+   "end": 52895,
+   "type": "verse",
+   "basis": "verse row at byte 52213",
+   "id": null,
+   "text": "𝑢𝐿Lim"
+  },
+  {
+   "start": 52896,
+   "end": 52944,
+   "type": "verse",
+   "basis": "verse row at byte 52234",
+   "id": null,
+   "text": "𝑢𝑅Lim = 0"
+  },
+  {
+   "start": 52945,
+   "end": 53026,
+   "type": "verse",
+   "basis": "verse row at byte 52283",
+   "id": null,
+   "text": "Cell 𝑗                                            𝑣11"
+  },
+  {
+   "start": 53027,
+   "end": 53128,
+   "type": "verse",
+   "basis": "verse row at byte 52365",
+   "id": null,
+   "text": "Cell 𝑗         Cell 𝑗 + 1"
+  },
+  {
+   "start": 53131,
+   "end": 53237,
+   "type": "verse",
+   "basis": "verse row at byte 52469",
+   "id": null,
+   "text": "(a) Monotonicity limit 𝑢𝑅Lim near a maximum                  (b) Extended limit 𝑢𝑅XLim near a maximum"
+  },
+  {
+   "start": 53238,
+   "end": 53342,
+   "type": "verse",
+   "basis": "verse row at byte 52576",
+   "id": null,
+   "text": "Fig. 5.2: (a) 𝑢𝑅Lim reduces to 0, and limiting causes a loss of accuracy; (b) near a smooth maximum"
+  },
+  {
+   "start": 53343,
+   "end": 53443,
+   "type": "verse",
+   "basis": "verse row at byte 52681",
+   "id": null,
+   "text": "with a nonzero curvature, the extended limit 𝑢𝑅XLim provides ample room so limiting has no effect."
+  },
+  {
+   "start": 53445,
+   "end": 53526,
+   "type": "verse",
+   "basis": "verse row at byte 52783",
+   "id": null,
+   "text": "The extension for the left limit is similar. At the interface 𝑥𝑗−1/2, set"
+  },
+  {
+   "start": 53527,
+   "end": 53579,
+   "type": "verse",
+   "basis": "verse row at byte 52865",
+   "id": null,
+   "text": "1"
+  },
+  {
+   "start": 53580,
+   "end": 53697,
+   "type": "verse",
+   "basis": "verse row at byte 52918",
+   "id": null,
+   "text": "𝑣21 = 2 (𝑢𝑗,0 + 𝑢𝑗−1,0 ).                                     (5.18)"
+  },
+  {
+   "start": 53699,
+   "end": 53815,
+   "type": "verse",
+   "basis": "verse row at byte 53037",
+   "id": null,
+   "text": "The line joining (1, 𝑞𝑗 (1)) and (0, 𝑞𝑗 (0)) intersects the left boundary at 2𝑞𝑗 (0) − 𝑞𝑗 (1) = 𝑣22 , where"
+  },
+  {
+   "start": 53817,
+   "end": 53936,
+   "type": "verse",
+   "basis": "verse row at byte 53155",
+   "id": null,
+   "text": "𝑣22 = 𝑢𝑗,0 − 𝑢𝑗,1 − 2𝑢𝑗,2 .                                    (5.19)"
+  },
+  {
+   "start": 53938,
+   "end": 54051,
+   "type": "verse",
+   "basis": "verse row at byte 53276",
+   "id": null,
+   "text": "For cell 𝑗 − 1, the line joining (−1, 𝑞𝑗−1 (−1)) and (0, 𝑞𝑗−1 (0)) intersects the right boundary 𝑥𝑗−1/2 at"
+  },
+  {
+   "start": 54052,
+   "end": 54092,
+   "type": "verse",
+   "basis": "verse row at byte 53390",
+   "id": null,
+   "text": "2𝑞𝑗−1 (0) − 𝑞𝑗−1 (−1) = 𝑣23 , where"
+  },
+  {
+   "start": 54094,
+   "end": 54213,
+   "type": "verse",
+   "basis": "verse row at byte 53432",
+   "id": null,
+   "text": "𝑣23 = 𝑢𝑗−1,0 + 𝑢𝑗−1,1 − 2𝑢𝑗−1,2.                                   (5.20)"
+  },
+  {
+   "start": 54214,
+   "end": 54217,
+   "type": "verse",
+   "basis": "verse row at byte 53552",
+   "id": null,
+   "text": "Set"
+  },
+  {
+   "start": 54218,
+   "end": 54275,
+   "type": "verse",
+   "basis": "verse row at byte 53556",
+   "id": null,
+   "text": "15"
+  },
+  {
+   "start": 54278,
+   "end": 54392,
+   "type": "verse",
+   "basis": "verse row at byte 53616",
+   "id": null,
+   "text": "𝑣24 = 𝑣21 + minmod(𝑣22 − 𝑣21 , 𝑣23 − 𝑣21 ).                              (5.21)"
+  },
+  {
+   "start": 54393,
+   "end": 54438,
+   "type": "verse",
+   "basis": "verse row at byte 53731",
+   "id": null,
+   "text": "Thus, the extended limit 𝑢𝐿XLim is given by"
+  },
+  {
+   "start": 54439,
+   "end": 54556,
+   "type": "verse",
+   "basis": "verse row at byte 53777",
+   "id": null,
+   "text": "𝑢𝐿XLim = Max(|𝑢𝑗−1,0 − 𝑢𝑗,0 |, |𝑣24 − 𝑢𝑗,0 |).                         (5.22)"
+  },
+  {
+   "start": 54557,
+   "end": 54612,
+   "type": "verse",
+   "basis": "verse row at byte 53895",
+   "id": null,
+   "text": "Combining both sides, like (5.5), the extended limit is"
+  },
+  {
+   "start": 54613,
+   "end": 54726,
+   "type": "verse",
+   "basis": "verse row at byte 53951",
+   "id": null,
+   "text": "𝑢XLim = min(𝑢𝐿XLim , 𝑢𝑅XLim ).                                  (5.23)"
+  },
+  {
+   "start": 54728,
+   "end": 54833,
+   "type": "verse",
+   "basis": "verse row at byte 54066",
+   "id": null,
+   "text": "The rest of the algorithm for all modes is identical to (5.5)–(5.11) with 𝑢Lim replaced by 𝑢XLim . This"
+  },
+  {
+   "start": 54834,
+   "end": 54865,
+   "type": "verse",
+   "basis": "verse row at byte 54172",
+   "id": null,
+   "text": "completes the limiting process."
+  },
+  {
+   "start": 54866,
+   "end": 54912,
+   "type": "verse",
+   "basis": "verse row at byte 54204",
+   "id": null,
+   "text": "We summarize the limiting algorithm below."
+  },
+  {
+   "start": 54913,
+   "end": 55014,
+   "type": "verse",
+   "basis": "verse row at byte 54251",
+   "id": null,
+   "text": "Let the solution after one stage of Runge-Kutta (i.e., after an Euler forward step) be denoted by"
+  },
+  {
+   "start": 55015,
+   "end": 55133,
+   "type": "verse",
+   "basis": "verse row at byte 54353",
+   "id": null,
+   "text": "{𝑢𝑗, 𝑘 }, which might be oscillatory. For each index (or at cell) 𝑗, set 𝑣11 , … , 𝑣14 , and 𝑢𝑅XLim by (5.13)–"
+  },
+  {
+   "start": 55134,
+   "end": 55247,
+   "type": "verse",
+   "basis": "verse row at byte 54472",
+   "id": null,
+   "text": "(5.17), and set 𝑣21 , … , 𝑣24, and 𝑢𝐿XLim by (5.18)–(5.22). Set 𝑢XLim by (5.23). Then with 𝑢1Lim = 𝑢XLim ,"
+  },
+  {
+   "start": 55248,
+   "end": 55272,
+   "type": "verse",
+   "basis": "verse row at byte 54586",
+   "id": null,
+   "text": "for 𝑘 from 1 to 𝑝, set"
+  },
+  {
+   "start": 55273,
+   "end": 55311,
+   "type": "verse",
+   "basis": "verse row at byte 54611",
+   "id": null,
+   "text": "Ltd"
+  },
+  {
+   "start": 55312,
+   "end": 55431,
+   "type": "verse",
+   "basis": "verse row at byte 54650",
+   "id": null,
+   "text": "𝑢𝑗,𝑘 = sign(𝑢𝑗,𝑘 ) min(|𝑢𝑗,𝑘 |, 𝑢𝑘Lim ).                            (5.24)"
+  },
+  {
+   "start": 55432,
+   "end": 55435,
+   "type": "verse",
+   "basis": "verse row at byte 54770",
+   "id": null,
+   "text": "and"
+  },
+  {
+   "start": 55436,
+   "end": 55498,
+   "type": "verse",
+   "basis": "verse row at byte 54774",
+   "id": null,
+   "text": "Lim             Ltd"
+  },
+  {
+   "start": 55499,
+   "end": 55614,
+   "type": "verse",
+   "basis": "verse row at byte 54837",
+   "id": null,
+   "text": "𝑢𝑘+1 = 𝑢𝑘Lim − |𝑢𝑗,𝑘 |.                                     (5.25)"
+  },
+  {
+   "start": 55615,
+   "end": 55726,
+   "type": "verse",
+   "basis": "verse row at byte 54953",
+   "id": null,
+   "text": "Finally, for the standard 3-stage RK method, with the ODE notation 𝑘𝑖 for stage 𝑖, and with 𝑢𝑗,𝑘 replaced"
+  },
+  {
+   "start": 55727,
+   "end": 55734,
+   "type": "verse",
+   "basis": "verse row at byte 55065",
+   "id": null,
+   "text": "Ltd"
+  },
+  {
+   "start": 55735,
+   "end": 55810,
+   "type": "verse",
+   "basis": "verse row at byte 55073",
+   "id": null,
+   "text": "by 𝑢𝑗,𝑘 , we update (𝑘𝑖 )𝑗 accordingly. This completes the algorithm."
+  },
+  {
+   "start": 55811,
+   "end": 55903,
+   "type": "verse",
+   "basis": "verse row at byte 55149",
+   "id": null,
+   "text": "The above limiting algorithm contains no “if” or “max” statements; furthermore, “sign” is"
+  },
+  {
+   "start": 55904,
+   "end": 56002,
+   "type": "verse",
+   "basis": "verse row at byte 55242",
+   "id": null,
+   "text": "exclusively combined with “min” statements. Clearly, its outcome depends continuously on the data."
+  },
+  {
+   "start": 56003,
+   "end": 56102,
+   "type": "verse",
+   "basis": "verse row at byte 55341",
+   "id": null,
+   "text": "For coding purpose, the algorithm can be shortened, e.g., (5.13)–(5.16) can be combined into the"
+  },
+  {
+   "start": 56103,
+   "end": 56149,
+   "type": "verse",
+   "basis": "verse row at byte 55441",
+   "id": null,
+   "text": "quantity 𝑣14 − 𝑢𝑗,0 in (5.17), resulting in"
+  },
+  {
+   "start": 56150,
+   "end": 56230,
+   "type": "verse",
+   "basis": "verse row at byte 55488",
+   "id": null,
+   "text": "𝑣14 − 𝑢𝑗,0 = 0.5(𝑢𝑗+1,0 − 𝑢𝑗,0 ) + 𝑣15"
+  },
+  {
+   "start": 56231,
+   "end": 56236,
+   "type": "verse",
+   "basis": "verse row at byte 55569",
+   "id": null,
+   "text": "where"
+  },
+  {
+   "start": 56237,
+   "end": 56352,
+   "type": "verse",
+   "basis": "verse row at byte 55575",
+   "id": null,
+   "text": "𝑣15 = minmod(𝑢𝑗,1 − 2𝑢𝑗,2 + 0.5𝑢𝑗,0 − 0.5𝑢𝑗+1,0 , −𝑢𝑗+1,1 − 2𝑢𝑗+1,2 + 0.5𝑢𝑗+1,0 − 0.5𝑢𝑗,0 )."
+  },
+  {
+   "start": 56353,
+   "end": 56458,
+   "type": "verse",
+   "basis": "verse row at byte 55691",
+   "id": null,
+   "text": "Note that from a filtering point of view, our limiting technique corresponds to occasionally filtering"
+  },
+  {
+   "start": 56459,
+   "end": 56563,
+   "type": "verse",
+   "basis": "verse row at byte 55797",
+   "id": null,
+   "text": "even the first mode 𝑢𝑗,1 and nullifying all higher modes (near a discontinuity). The technique has the"
+  },
+  {
+   "start": 56564,
+   "end": 56667,
+   "type": "verse",
+   "basis": "verse row at byte 55902",
+   "id": null,
+   "text": "advantage of providing ample room so that limiting has nonexistent or minimal effect at smooth regions,"
+  },
+  {
+   "start": 56668,
+   "end": 56729,
+   "type": "verse",
+   "basis": "verse row at byte 56006",
+   "id": null,
+   "text": "and it only takes effect at a few cells near a discontinuity."
+  },
+  {
+   "start": 56731,
+   "end": 56804,
+   "type": "verse",
+   "basis": "verse row at byte 56069",
+   "id": null,
+   "text": "Detecting “good” cells at smooth regions where limiting has no effect"
+  },
+  {
+   "start": 56805,
+   "end": 56909,
+   "type": "verse",
+   "basis": "verse row at byte 56143",
+   "id": null,
+   "text": "While the above algorithm is relatively straightforward, for fluid flow equations, the costs add up."
+  },
+  {
+   "start": 56910,
+   "end": 57017,
+   "type": "verse",
+   "basis": "verse row at byte 56248",
+   "id": null,
+   "text": "Therefore, as is commonly practiced in the literature albeit for different reasons, it is prudent to detect"
+  },
+  {
+   "start": 57018,
+   "end": 57119,
+   "type": "verse",
+   "basis": "verse row at byte 56356",
+   "id": null,
+   "text": "“good” cells at smooth regions where limiting does not alter the data and therefore is not needed. We"
+  },
+  {
+   "start": 57120,
+   "end": 57226,
+   "type": "verse",
+   "basis": "verse row at byte 56458",
+   "id": null,
+   "text": "present here a detection method with three criteria. For each cell, if any one of the criteria is met, the"
+  },
+  {
+   "start": 57227,
+   "end": 57335,
+   "type": "verse",
+   "basis": "verse row at byte 56565",
+   "id": null,
+   "text": "cell is flagged as good, and no limiting is required. The criteria are effective, as only a few cells near a"
+  },
+  {
+   "start": 57336,
+   "end": 57437,
+   "type": "verse",
+   "basis": "verse row at byte 56674",
+   "id": null,
+   "text": "discontinuity are flagged “troubled”, indicating the need for limiting. However, even at those cells,"
+  },
+  {
+   "start": 57438,
+   "end": 57546,
+   "type": "verse",
+   "basis": "verse row at byte 56776",
+   "id": null,
+   "text": "limiting may still leave the data unaltered. Typically, each discontinuity has four or fewer troubled cells."
+  },
+  {
+   "start": 57547,
+   "end": 57653,
+   "type": "verse",
+   "basis": "verse row at byte 56885",
+   "id": null,
+   "text": "The first criterion relates to the jumps or gaps at the two interfaces of the cell. At smooth regions,"
+  },
+  {
+   "start": 57654,
+   "end": 57758,
+   "type": "verse",
+   "basis": "verse row at byte 56992",
+   "id": null,
+   "text": "by (3.17), this gap is a small quantity of order 𝑂(ℎ𝑝+1 ). Denote the quadratic content for cell 𝑗 by"
+  },
+  {
+   "start": 57759,
+   "end": 57874,
+   "type": "verse",
+   "basis": "verse row at byte 57097",
+   "id": null,
+   "text": "𝑐𝑗𝑄 = |𝑢𝑗,1 | + |𝑢𝑗,2 |.                                  (5.26)"
+  },
+  {
+   "start": 57875,
+   "end": 57935,
+   "type": "verse",
+   "basis": "verse row at byte 57213",
+   "id": null,
+   "text": "16"
+  },
+  {
+   "start": 57937,
+   "end": 58033,
+   "type": "verse",
+   "basis": "verse row at byte 57275",
+   "id": null,
+   "text": "We do not include higher modes because at a discontinuity, these modes can be very large and may"
+  },
+  {
+   "start": 58034,
+   "end": 58136,
+   "type": "verse",
+   "basis": "verse row at byte 57372",
+   "id": null,
+   "text": "result in false detection in (5.27) below. The cell 𝑗 is considered to be good if the gaps at the two"
+  },
+  {
+   "start": 58137,
+   "end": 58180,
+   "type": "verse",
+   "basis": "verse row at byte 57475",
+   "id": null,
+   "text": "interfaces are both smaller than 𝑐𝑗𝑄 /5:"
+  },
+  {
+   "start": 58181,
+   "end": 58262,
+   "type": "verse",
+   "basis": "verse row at byte 57519",
+   "id": null,
+   "text": "1 𝑄"
+  },
+  {
+   "start": 58263,
+   "end": 58382,
+   "type": "verse",
+   "basis": "verse row at byte 57601",
+   "id": null,
+   "text": "Max[ |𝑢𝑗−1 (1) − 𝑢𝑗 (−1)|, |𝑢𝑗+1 (−1) − 𝑢𝑗 (1)| ] ≤        𝑐 + 10−3 .                (5.27)"
+  },
+  {
+   "start": 58383,
+   "end": 58464,
+   "type": "verse",
+   "basis": "verse row at byte 57721",
+   "id": null,
+   "text": "5 𝑗"
+  },
+  {
+   "start": 58465,
+   "end": 58565,
+   "type": "verse",
+   "basis": "verse row at byte 57803",
+   "id": null,
+   "text": "Here, we allow a noise of level 10−3. The factor 1/5 works well in the numerical examples below. For"
+  },
+  {
+   "start": 58566,
+   "end": 58664,
+   "type": "verse",
+   "basis": "verse row at byte 57904",
+   "id": null,
+   "text": "fluid flow equations, we apply detection only to density and not to momentum or energy. Therefore,"
+  },
+  {
+   "start": 58665,
+   "end": 58741,
+   "type": "verse",
+   "basis": "verse row at byte 58003",
+   "id": null,
+   "text": "when prudence is required, this factor can be reduced, for example, to 1/10."
+  },
+  {
+   "start": 58742,
+   "end": 58854,
+   "type": "verse",
+   "basis": "verse row at byte 58080",
+   "id": null,
+   "text": "Note that if the gaps are small, then the correction to the solution, namely −2𝜎𝐽𝐿 𝑅𝑅, 𝑝+1 ′ in (3.14)"
+  },
+  {
+   "start": 58855,
+   "end": 58920,
+   "type": "verse",
+   "basis": "verse row at byte 58193",
+   "id": null,
+   "text": "or (3.15), is relatively small compared to the quadratic content."
+  },
+  {
+   "start": 58921,
+   "end": 59025,
+   "type": "verse",
+   "basis": "verse row at byte 58259",
+   "id": null,
+   "text": "The second criterion relates to the second modes, or equivalently, the curvature terms (Huynh 1995),"
+  },
+  {
+   "start": 59026,
+   "end": 59122,
+   "type": "verse",
+   "basis": "verse row at byte 58364",
+   "id": null,
+   "text": "at the cell and its two neighbors being close to each other. Cell 𝑗 is considered to be good if"
+  },
+  {
+   "start": 59123,
+   "end": 59199,
+   "type": "verse",
+   "basis": "verse row at byte 58461",
+   "id": null,
+   "text": "4 𝑢𝑗−1,2 5                     4 𝑢𝑗+1,2 5"
+  },
+  {
+   "start": 59200,
+   "end": 59310,
+   "type": "verse",
+   "basis": "verse row at byte 58538",
+   "id": null,
+   "text": "≤      ≤               and     ≤      ≤ .                              (5.28)"
+  },
+  {
+   "start": 59311,
+   "end": 59388,
+   "type": "verse",
+   "basis": "verse row at byte 58649",
+   "id": null,
+   "text": "5   𝑢𝑗,2   4                   5   𝑢𝑗,2  4"
+  },
+  {
+   "start": 59389,
+   "end": 59498,
+   "type": "verse",
+   "basis": "verse row at byte 58727",
+   "id": null,
+   "text": "For coding, denote 𝑐 = 4/5. (Here, 𝑐 < 1, and the closer 𝑐 is to 1, the more stringent the criterion.) The"
+  },
+  {
+   "start": 59499,
+   "end": 59611,
+   "type": "verse",
+   "basis": "verse row at byte 58837",
+   "id": null,
+   "text": "left expression above can be stated as 𝑢𝑗−1,2 lies between 𝑐𝑢𝑗,2 and 𝑐 −1 𝑢𝑗,2 , which can be written as"
+  },
+  {
+   "start": 59613,
+   "end": 59733,
+   "type": "verse",
+   "basis": "verse row at byte 58951",
+   "id": null,
+   "text": "(𝑢𝑗−1,2 − 𝑐𝑢𝑗,2 )(𝑢𝑗−1,2 − 𝑐 −1 𝑢𝑗,2 ) ≤ 0.                            (5.29)"
+  },
+  {
+   "start": 59735,
+   "end": 59823,
+   "type": "verse",
+   "basis": "verse row at byte 59073",
+   "id": null,
+   "text": "Thus, (5.28) can be expressed as, with a noise level of 10−5 (due to the product terms),"
+  },
+  {
+   "start": 59824,
+   "end": 59954,
+   "type": "verse",
+   "basis": "verse row at byte 59162",
+   "id": null,
+   "text": "Max[(𝑢𝑗−1,2 − 𝑐𝑢𝑗,2 )(𝑢𝑗−1,2 − 𝑐 −1 𝑢𝑗,2 ), (𝑢𝑗+1,2 − 𝑐𝑢𝑗,2 )(𝑢𝑗+1,2 − 𝑐 −1 𝑢𝑗,2 ) ] ≤ 10−5 .       (5.30)"
+  },
+  {
+   "start": 59956,
+   "end": 60073,
+   "type": "verse",
+   "basis": "verse row at byte 59294",
+   "id": null,
+   "text": "Finally, the third criterion relates to the slopes. Cell 𝑗 is considered good if |𝑢𝑗,1 | is well within 𝑢Lim :"
+  },
+  {
+   "start": 60074,
+   "end": 60130,
+   "type": "verse",
+   "basis": "verse row at byte 59412",
+   "id": null,
+   "text": "3 Lim"
+  },
+  {
+   "start": 60131,
+   "end": 60242,
+   "type": "verse",
+   "basis": "verse row at byte 59469",
+   "id": null,
+   "text": "|𝑢𝑗,1 | ≤  𝑢    + 10−4 .                                  (5.31)"
+  },
+  {
+   "start": 60243,
+   "end": 60295,
+   "type": "verse",
+   "basis": "verse row at byte 59581",
+   "id": null,
+   "text": "4"
+  },
+  {
+   "start": 60296,
+   "end": 60407,
+   "type": "verse",
+   "basis": "verse row at byte 59634",
+   "id": null,
+   "text": "If any of the criteria (5.27), (5.30), or (5.31) is met, the cell is flagged as good; otherwise, the cell is"
+  },
+  {
+   "start": 60408,
+   "end": 60484,
+   "type": "verse",
+   "basis": "verse row at byte 59746",
+   "id": null,
+   "text": "troubled, and limiting is necessary. This completes the detection algorithm."
+  },
+  {
+   "start": 60485,
+   "end": 60589,
+   "type": "verse",
+   "basis": "verse row at byte 59823",
+   "id": null,
+   "text": "Typically, at each discontinuity, the detection method above yields four or fewer troubled cells, and"
+  },
+  {
+   "start": 60590,
+   "end": 60664,
+   "type": "verse",
+   "basis": "verse row at byte 59928",
+   "id": null,
+   "text": "sometimes even zero troubled cells after the discontinuity has dissipated."
+  },
+  {
+   "start": 60665,
+   "end": 60750,
+   "type": "verse",
+   "basis": "verse row at byte 60003",
+   "id": null,
+   "text": "Concerning noise levels, a tighter (smaller) level results in more troubled cells."
+  },
+  {
+   "start": 60753,
+   "end": 60773,
+   "type": "verse",
+   "basis": "verse row at byte 60091",
+   "id": null,
+   "text": "6. Numerical Results"
+  },
+  {
+   "start": 60774,
+   "end": 60863,
+   "type": "verse",
+   "basis": "verse row at byte 60112",
+   "id": null,
+   "text": "The following numerical tests demonstrate the effectiveness of our limiting technique."
+  },
+  {
+   "start": 60864,
+   "end": 60971,
+   "type": "verse",
+   "basis": "verse row at byte 60202",
+   "id": null,
+   "text": "In all figures, the dots represent the cell average solutions, the blue curves the polynomial solutions,"
+  },
+  {
+   "start": 60972,
+   "end": 61073,
+   "type": "verse",
+   "basis": "verse row at byte 60310",
+   "id": null,
+   "text": "and the red curves the initial or exact solution. The standard 3-stage RK method is employed for time"
+  },
+  {
+   "start": 61074,
+   "end": 61175,
+   "type": "verse",
+   "basis": "verse row at byte 60412",
+   "id": null,
+   "text": "stepping; for solutions of degree 𝑝 = 2, 3, 4, the corresponding CFL limits are approximately 0.209,"
+  },
+  {
+   "start": 61176,
+   "end": 61265,
+   "type": "verse",
+   "basis": "verse row at byte 60514",
+   "id": null,
+   "text": "0.130, and 0.089, respectively. The CFL number 𝜎 is generally chosen close to the limit."
+  },
+  {
+   "start": 61267,
+   "end": 61279,
+   "type": "verse",
+   "basis": "verse row at byte 60605",
+   "id": null,
+   "text": "Advection"
+  },
+  {
+   "start": 61280,
+   "end": 61374,
+   "type": "verse",
+   "basis": "verse row at byte 60618",
+   "id": null,
+   "text": "The first test involves advection on the domain [0, 1] with 100 cells and periodic boundary"
+  },
+  {
+   "start": 61375,
+   "end": 61478,
+   "type": "verse",
+   "basis": "verse row at byte 60713",
+   "id": null,
+   "text": "conditions. The initial condition 𝑢0 (𝑥) consists of three waves, each of half width 0.1, including a"
+  },
+  {
+   "start": 61479,
+   "end": 61528,
+   "type": "verse",
+   "basis": "verse row at byte 60817",
+   "id": null,
+   "text": "Gaussian, a rectangular, and a semi-ellipse wave:"
+  },
+  {
+   "start": 61529,
+   "end": 61581,
+   "type": "verse",
+   "basis": "verse row at byte 60867",
+   "id": null,
+   "text": "𝑥−0.1 2"
+  },
+  {
+   "start": 61582,
+   "end": 61632,
+   "type": "verse",
+   "basis": "verse row at byte 60920",
+   "id": null,
+   "text": "−10(        )"
+  },
+  {
+   "start": 61633,
+   "end": 61723,
+   "type": "verse",
+   "basis": "verse row at byte 60971",
+   "id": null,
+   "text": "𝑒         0.1    ,                        0 ≤ 𝑥 ≤ 0.2"
+  },
+  {
+   "start": 61724,
+   "end": 61815,
+   "type": "verse",
+   "basis": "verse row at byte 61062",
+   "id": null,
+   "text": "1,                                        0.3 ≤ 𝑥 ≤ 0.5"
+  },
+  {
+   "start": 61816,
+   "end": 61862,
+   "type": "verse",
+   "basis": "verse row at byte 61154",
+   "id": null,
+   "text": "𝑢0 (𝑥) =        𝑥 − 0.8 2"
+  },
+  {
+   "start": 61863,
+   "end": 61954,
+   "type": "verse",
+   "basis": "verse row at byte 61201",
+   "id": null,
+   "text": "1−(        ) ,                                 0.7 ≤ 𝑥 ≤ 0.9"
+  },
+  {
+   "start": 61955,
+   "end": 61994,
+   "type": "verse",
+   "basis": "verse row at byte 61293",
+   "id": null,
+   "text": "0.1"
+  },
+  {
+   "start": 61995,
+   "end": 62082,
+   "type": "verse",
+   "basis": "verse row at byte 61333",
+   "id": null,
+   "text": "{ 0,                                            otherwise."
+  },
+  {
+   "start": 62083,
+   "end": 62138,
+   "type": "verse",
+   "basis": "verse row at byte 61421",
+   "id": null,
+   "text": "17"
+  },
+  {
+   "start": 62141,
+   "end": 62243,
+   "type": "verse",
+   "basis": "verse row at byte 61479",
+   "id": null,
+   "text": "Fig. 6.1 shows the DG2 solutions with no limiting and 𝜎 = 0.2. In Fig 6.1(a), the solution after 5"
+  },
+  {
+   "start": 62244,
+   "end": 62350,
+   "type": "verse",
+   "basis": "verse row at byte 61582",
+   "id": null,
+   "text": "time steps (the wave travels a distance 1 cell width) is noisy at the rectangular wave, and a little noise"
+  },
+  {
+   "start": 62351,
+   "end": 62458,
+   "type": "verse",
+   "basis": "verse row at byte 61689",
+   "id": null,
+   "text": "appears for the semi-ellipse wave. In Fig 6.1(b), after 10 time steps (2 cell widths), some of the noise is"
+  },
+  {
+   "start": 62459,
+   "end": 62556,
+   "type": "verse",
+   "basis": "verse row at byte 61797",
+   "id": null,
+   "text": "dissipated due to the numerical dissipation of the DG method. In Fig 6.1(c), after 500 time steps"
+  },
+  {
+   "start": 62557,
+   "end": 62621,
+   "type": "verse",
+   "basis": "verse row at byte 61895",
+   "id": null,
+   "text": "(1 period), the solution reaches a steady level of oscillations."
+  },
+  {
+   "start": 62626,
+   "end": 62705,
+   "type": "verse",
+   "basis": "verse row at byte 61964",
+   "id": null,
+   "text": "(a) 5 time steps (distance travelled: 1 cell width)"
+  },
+  {
+   "start": 62710,
+   "end": 62790,
+   "type": "verse",
+   "basis": "verse row at byte 62048",
+   "id": null,
+   "text": "(b) 10 time steps (distance travelled: 2 cell widths)"
+  },
+  {
+   "start": 62795,
+   "end": 62872,
+   "type": "verse",
+   "basis": "verse row at byte 62133",
+   "id": null,
+   "text": "(c) 500 time steps (distance travelled: 1 period)"
+  },
+  {
+   "start": 62873,
+   "end": 62974,
+   "type": "verse",
+   "basis": "verse row at byte 62211",
+   "id": null,
+   "text": "Fig. 6.1. DG2 solutions with no limiting and CFL number 𝜎 = 0.2. The blue dots represent the cell"
+  },
+  {
+   "start": 62975,
+   "end": 63074,
+   "type": "verse",
+   "basis": "verse row at byte 62313",
+   "id": null,
+   "text": "average solutions, the blue curves the polynomial solutions, and the red curves the exact solution."
+  },
+  {
+   "start": 63076,
+   "end": 63181,
+   "type": "verse",
+   "basis": "verse row at byte 62414",
+   "id": null,
+   "text": "Fig. 6.2 shows the DGp solutions with limiting for 𝑝 = 2, 3, 4. Fig. 6.2(a) depicts the DG2 solution"
+  },
+  {
+   "start": 63182,
+   "end": 63290,
+   "type": "verse",
+   "basis": "verse row at byte 62520",
+   "id": null,
+   "text": "for 𝜎 = 0.2 after 5 time steps (1 cell width); similar to the unlimited case in Fig. 6.1(a), a little noise"
+  },
+  {
+   "start": 63291,
+   "end": 63395,
+   "type": "verse",
+   "basis": "verse row at byte 62629",
+   "id": null,
+   "text": "appears for the semi-ellipse wave. Fig. 6.2(b) shows the DG2 solution with 𝜎 = 0.2 after 500 time steps"
+  },
+  {
+   "start": 63396,
+   "end": 63499,
+   "type": "verse",
+   "basis": "verse row at byte 62734",
+   "id": null,
+   "text": "(1 period). Fig. 6.2(c) represents the DG3 solution for 𝜎 = 0.125 after 800 time steps (1 period); for"
+  },
+  {
+   "start": 63500,
+   "end": 63595,
+   "type": "verse",
+   "basis": "verse row at byte 62838",
+   "id": null,
+   "text": "this case, each jump is resolved by only 2 cells. Note the improvement over the DG2 solution in"
+  },
+  {
+   "start": 63596,
+   "end": 63700,
+   "type": "verse",
+   "basis": "verse row at byte 62934",
+   "id": null,
+   "text": "Fig. 6.2(b). Fig. 6.2(d) depicts the DG4 solution with 𝜎 = 1/12 after 1200 time steps (1 period); here,"
+  },
+  {
+   "start": 63701,
+   "end": 63798,
+   "type": "verse",
+   "basis": "verse row at byte 63039",
+   "id": null,
+   "text": "the solution is very similar to the DG3 solution in Fig. 6.2(c). Note the Gaussian, including its"
+  },
+  {
+   "start": 63799,
+   "end": 63889,
+   "type": "verse",
+   "basis": "verse row at byte 63137",
+   "id": null,
+   "text": "maximum, is well resolved in all cases demonstrating that our limiting preserves accuracy."
+  },
+  {
+   "start": 63890,
+   "end": 63943,
+   "type": "verse",
+   "basis": "verse row at byte 63228",
+   "id": null,
+   "text": "18"
+  },
+  {
+   "start": 63948,
+   "end": 64049,
+   "type": "verse",
+   "basis": "verse row at byte 63286",
+   "id": null,
+   "text": "(a) DG2 solution with limiting and 𝜎 = 0.2 after 5 time steps (distance travelled: 1 cell width)"
+  },
+  {
+   "start": 64054,
+   "end": 64153,
+   "type": "verse",
+   "basis": "verse row at byte 63392",
+   "id": null,
+   "text": "(b) DG2 solution with limiting and 𝜎 = 0.2 after 500 time steps (distance travelled: 1 period)"
+  },
+  {
+   "start": 64158,
+   "end": 64258,
+   "type": "verse",
+   "basis": "verse row at byte 63496",
+   "id": null,
+   "text": "(c) DG3 solution with limiting and 𝜎 = 0.125 after 800 time steps (distance travelled: 1 period)"
+  },
+  {
+   "start": 64263,
+   "end": 64298,
+   "type": "verse",
+   "basis": "verse row at byte 63601",
+   "id": null,
+   "text": "1"
+  },
+  {
+   "start": 64299,
+   "end": 64399,
+   "type": "verse",
+   "basis": "verse row at byte 63637",
+   "id": null,
+   "text": "(d) DG4 with limiting and 𝜎 =      ≈ 0.08333 after 1200 time steps (distance travelled: 1 period)"
+  },
+  {
+   "start": 64400,
+   "end": 64436,
+   "type": "verse",
+   "basis": "verse row at byte 63738",
+   "id": null,
+   "text": "12"
+  },
+  {
+   "start": 64437,
+   "end": 64540,
+   "type": "verse",
+   "basis": "verse row at byte 63775",
+   "id": null,
+   "text": "Fig. 6.2. DGp solutions with limiting for 𝑝 = 2, 3, and 4. The blue dots represent the cell average"
+  },
+  {
+   "start": 64541,
+   "end": 64644,
+   "type": "verse",
+   "basis": "verse row at byte 63879",
+   "id": null,
+   "text": "solutions, the blue curves the polynomial solutions, and the red curves the exact solution. The magenta"
+  },
+  {
+   "start": 64645,
+   "end": 64731,
+   "type": "verse",
+   "basis": "verse row at byte 63983",
+   "id": null,
+   "text": "dots with a value greater than 0.1 identify troubled cells where limiting is required."
+  },
+  {
+   "start": 64732,
+   "end": 64791,
+   "type": "verse",
+   "basis": "verse row at byte 64070",
+   "id": null,
+   "text": "19"
+  },
+  {
+   "start": 64796,
+   "end": 64896,
+   "type": "verse",
+   "basis": "verse row at byte 64134",
+   "id": null,
+   "text": "Concerning the detection method, the (magenta) dots at level 𝑢 = 0.1 represent good cells where"
+  },
+  {
+   "start": 64897,
+   "end": 65004,
+   "type": "verse",
+   "basis": "verse row at byte 64235",
+   "id": null,
+   "text": "limiting is not needed, and the dots at level 𝑢 > 0.1 represent troubled cells where limiting is required."
+  },
+  {
+   "start": 65005,
+   "end": 65114,
+   "type": "verse",
+   "basis": "verse row at byte 64343",
+   "id": null,
+   "text": "In the case of troubled cells, a dot at level 𝑢 = 0.15, as in Fig. 6.2(c), means limiting has no effect even"
+  },
+  {
+   "start": 65115,
+   "end": 65222,
+   "type": "verse",
+   "basis": "verse row at byte 64453",
+   "id": null,
+   "text": "though the cell was marked as troubled. For Fig. 6.2(a), it appears that the cell just to the right of 𝑥 ="
+  },
+  {
+   "start": 65223,
+   "end": 65326,
+   "type": "verse",
+   "basis": "verse row at byte 64561",
+   "id": null,
+   "text": "0.7 should be flagged as troubled due to the infinite slope at the foot of the wave. However, since the"
+  },
+  {
+   "start": 65327,
+   "end": 65431,
+   "type": "verse",
+   "basis": "verse row at byte 64665",
+   "id": null,
+   "text": "second modes 𝑢𝑗,2 at the cell and its two neighbors are small, this cell is flagged as good due to the"
+  },
+  {
+   "start": 65432,
+   "end": 65537,
+   "type": "verse",
+   "basis": "verse row at byte 64770",
+   "id": null,
+   "text": "noise level of 10−5 allowed in criterion (5.29) for detection. If we use a noise level of 10−6, this cell"
+  },
+  {
+   "start": 65538,
+   "end": 65645,
+   "type": "verse",
+   "basis": "verse row at byte 64876",
+   "id": null,
+   "text": "would be flagged as troubled. Also note that there are no troubled cells in Fig. 6.2(d); here, the data has"
+  },
+  {
+   "start": 65646,
+   "end": 65741,
+   "type": "verse",
+   "basis": "verse row at byte 64984",
+   "id": null,
+   "text": "become smooth enough and the polynomial solution is of a high enough order that the gaps at the"
+  },
+  {
+   "start": 65742,
+   "end": 65787,
+   "type": "verse",
+   "basis": "verse row at byte 65080",
+   "id": null,
+   "text": "interfaces are small, and all cells are good."
+  },
+  {
+   "start": 65788,
+   "end": 65896,
+   "type": "verse",
+   "basis": "verse row at byte 65126",
+   "id": null,
+   "text": "Unlike the linear case of advection where it is possible to have no troubled cells near a discontinuity,"
+  },
+  {
+   "start": 65897,
+   "end": 66006,
+   "type": "verse",
+   "basis": "verse row at byte 65235",
+   "id": null,
+   "text": "for the nonlinear case of a shock, the presence of troubled cells is nearly certain; this is due to the self-"
+  },
+  {
+   "start": 66007,
+   "end": 66099,
+   "type": "verse",
+   "basis": "verse row at byte 65345",
+   "id": null,
+   "text": "sharpening mechanism at shocks resulting from the converging characteristics (for advection,"
+  },
+  {
+   "start": 66100,
+   "end": 66130,
+   "type": "verse",
+   "basis": "verse row at byte 65438",
+   "id": null,
+   "text": "characteristics are parallel)."
+  },
+  {
+   "start": 66131,
+   "end": 66229,
+   "type": "verse",
+   "basis": "verse row at byte 65469",
+   "id": null,
+   "text": "To illustrate that our detection method works well even with coarse meshes, we apply it to the"
+  },
+  {
+   "start": 66230,
+   "end": 66335,
+   "type": "verse",
+   "basis": "verse row at byte 65568",
+   "id": null,
+   "text": "sin 2𝜋𝑥 periodic initial data on the domain [0, 1]. The first case employs DG2 with 3 cells, 𝜎 = 0.15,"
+  },
+  {
+   "start": 66336,
+   "end": 66443,
+   "type": "verse",
+   "basis": "verse row at byte 65674",
+   "id": null,
+   "text": "and 20 time steps, i.e., the wave travels 1 period. With such a coarse mesh, the detection still results in"
+  },
+  {
+   "start": 66444,
+   "end": 66555,
+   "type": "verse",
+   "basis": "verse row at byte 65782",
+   "id": null,
+   "text": "no troubled cells, and limiting or no limiting yield identical solutions. If we use just 2 cells, then limiting"
+  },
+  {
+   "start": 66556,
+   "end": 66658,
+   "type": "verse",
+   "basis": "verse row at byte 65894",
+   "id": null,
+   "text": "takes effect, and the solution is damped to essentially zero; the method considered this data as noise"
+  },
+  {
+   "start": 66659,
+   "end": 66752,
+   "type": "verse",
+   "basis": "verse row at byte 65997",
+   "id": null,
+   "text": "and damps it out. The second case employs DG3 with only 2 cells, 𝜎 = 0.1, and 20 time steps,"
+  },
+  {
+   "start": 66753,
+   "end": 66848,
+   "type": "verse",
+   "basis": "verse row at byte 66091",
+   "id": null,
+   "text": "or 1 period. For this case, the detection yields no troubled cells, and limiting has no effect."
+  },
+  {
+   "start": 66850,
+   "end": 66893,
+   "type": "verse",
+   "basis": "verse row at byte 66188",
+   "id": null,
+   "text": "Euler Equations in One-Spatial Dimension"
+  },
+  {
+   "start": 66894,
+   "end": 67001,
+   "type": "verse",
+   "basis": "verse row at byte 66232",
+   "id": null,
+   "text": "The next set of tests deals with the Euler equations in one-spatial dimension (1D). Here, as is typical,"
+  },
+  {
+   "start": 67002,
+   "end": 67087,
+   "type": "verse",
+   "basis": "verse row at byte 66340",
+   "id": null,
+   "text": "limiting is applied to the (conservative) characteristic variables of troubled cells."
+  },
+  {
+   "start": 67088,
+   "end": 67170,
+   "type": "verse",
+   "basis": "verse row at byte 66426",
+   "id": null,
+   "text": "The next test, used by Sod (1978), is the Riemann problem with the initial data"
+  },
+  {
+   "start": 67171,
+   "end": 67277,
+   "type": "verse",
+   "basis": "verse row at byte 66509",
+   "id": null,
+   "text": "(𝜌𝐿 , 𝑢𝐿 , 𝑝𝐿 ) = (1, 0, 1)   and        (𝜌𝑅 , 𝑢𝑅 , 𝑝𝑅 ) = (0.125, 0, 0.1)"
+  },
+  {
+   "start": 67278,
+   "end": 67381,
+   "type": "verse",
+   "basis": "verse row at byte 66616",
+   "id": null,
+   "text": "where the subscript 𝐿 represents the condition for 0 ≤ 𝑥 ≤ 0.5, and 𝑅 for 0.5 < 𝑥 ≤ 1. The 1D Euler"
+  },
+  {
+   "start": 67382,
+   "end": 67486,
+   "type": "verse",
+   "basis": "verse row at byte 66720",
+   "id": null,
+   "text": "equations are solved on the domain [0, 1] with 100 cells. The final time is 0.2. Boundary conditions are"
+  },
+  {
+   "start": 67487,
+   "end": 67529,
+   "type": "verse",
+   "basis": "verse row at byte 66825",
+   "id": null,
+   "text": "by simple extrapolation from the interior."
+  },
+  {
+   "start": 67530,
+   "end": 67636,
+   "type": "verse",
+   "basis": "verse row at byte 66868",
+   "id": null,
+   "text": "Fig. 6.3 shows the DG solutions with limiting for (a) 𝑝 = 2 after 200 time steps, each of size 0.001,"
+  },
+  {
+   "start": 67637,
+   "end": 67737,
+   "type": "verse",
+   "basis": "verse row at byte 66975",
+   "id": null,
+   "text": "and (b) 𝑝 = 3 after 320 time steps, each of size 0.000625. Note that there are no oscillations, and"
+  },
+  {
+   "start": 67738,
+   "end": 67772,
+   "type": "verse",
+   "basis": "verse row at byte 67076",
+   "id": null,
+   "text": "discontinuities are well resolved."
+  },
+  {
+   "start": 67773,
+   "end": 67878,
+   "type": "verse",
+   "basis": "verse row at byte 67111",
+   "id": null,
+   "text": "The third test, due to Shu and Osher (1989), has several extrema in the smooth regions. It is used to"
+  },
+  {
+   "start": 67879,
+   "end": 67981,
+   "type": "verse",
+   "basis": "verse row at byte 67217",
+   "id": null,
+   "text": "test accuracy of methods near extrema in the presence of a shock. On the interval −5 ≤ 𝑥 ≤ 5, a shock"
+  },
+  {
+   "start": 67982,
+   "end": 68079,
+   "type": "verse",
+   "basis": "verse row at byte 67320",
+   "id": null,
+   "text": "propagating at Mach 3 interacts with sine waves in density as described by the initial condition:"
+  },
+  {
+   "start": 68080,
+   "end": 68156,
+   "type": "verse",
+   "basis": "verse row at byte 67418",
+   "id": null,
+   "text": "(3.857, 2.629, 10.333), − 5 ≤ 𝑥 ≤ −4"
+  },
+  {
+   "start": 68157,
+   "end": 68198,
+   "type": "verse",
+   "basis": "verse row at byte 67495",
+   "id": null,
+   "text": "(𝜌, 𝑢, 𝑝) = {"
+  },
+  {
+   "start": 68199,
+   "end": 68280,
+   "type": "verse",
+   "basis": "verse row at byte 67537",
+   "id": null,
+   "text": "(1 + 0.2 sin 5𝑥 , 0,1),        otherwise."
+  },
+  {
+   "start": 68281,
+   "end": 68382,
+   "type": "verse",
+   "basis": "verse row at byte 67619",
+   "id": null,
+   "text": "Fig. 6.4 shows the solution with 200 cells for 𝑝 = 2 with a time step size of 0.002093 after 860"
+  },
+  {
+   "start": 68383,
+   "end": 68486,
+   "type": "verse",
+   "basis": "verse row at byte 67721",
+   "id": null,
+   "text": "time steps. Figure 6.4(a) portrays the solution across the entire domain. At each discontinuity, only 2"
+  },
+  {
+   "start": 68487,
+   "end": 68589,
+   "type": "verse",
+   "basis": "verse row at byte 67825",
+   "id": null,
+   "text": "or 1 cell is flagged as troubled. Figure 6.4(b) provides a close-up view of the solution on the domain"
+  },
+  {
+   "start": 68590,
+   "end": 68693,
+   "type": "verse",
+   "basis": "verse row at byte 67928",
+   "id": null,
+   "text": "[0, 2.4]. For comparison, the standard second-order solution using the Van Albada limiter with the same"
+  },
+  {
+   "start": 68694,
+   "end": 68791,
+   "type": "verse",
+   "basis": "verse row at byte 68032",
+   "id": null,
+   "text": "number of degrees of freedom, meaning 600 cells, are shown as red dots. Note that on this domain,"
+  },
+  {
+   "start": 68792,
+   "end": 68895,
+   "type": "verse",
+   "basis": "verse row at byte 68130",
+   "id": null,
+   "text": "there are no troubled cells, and the extrema are well resolved by the DG2 solution even after the shock"
+  },
+  {
+   "start": 68896,
+   "end": 68911,
+   "type": "verse",
+   "basis": "verse row at byte 68234",
+   "id": null,
+   "text": "passes through."
+  },
+  {
+   "start": 68912,
+   "end": 68967,
+   "type": "verse",
+   "basis": "verse row at byte 68250",
+   "id": null,
+   "text": "20"
+  },
+  {
+   "start": 68972,
+   "end": 69081,
+   "type": "verse",
+   "basis": "verse row at byte 68310",
+   "id": null,
+   "text": "𝑥                                                     𝑥"
+  },
+  {
+   "start": 69082,
+   "end": 69170,
+   "type": "verse",
+   "basis": "verse row at byte 68420",
+   "id": null,
+   "text": "(a) DG2 solution                                     (b) DG3 solution"
+  },
+  {
+   "start": 69171,
+   "end": 69274,
+   "type": "verse",
+   "basis": "verse row at byte 68509",
+   "id": null,
+   "text": "Fig. 6.3: Solution densities. (a) DG2 solution after 200 time steps, each of size 0.001; there are 2"
+  },
+  {
+   "start": 69275,
+   "end": 69379,
+   "type": "verse",
+   "basis": "verse row at byte 68613",
+   "id": null,
+   "text": "troubled cells at the shock and zero troubled cells at the contact discontinuity. (b) DG3 solution after"
+  },
+  {
+   "start": 69380,
+   "end": 69485,
+   "type": "verse",
+   "basis": "verse row at byte 68718",
+   "id": null,
+   "text": "320 time steps, each of size 0.000625; there are 3 troubled cells at the shock and zero troubled cells at"
+  },
+  {
+   "start": 69486,
+   "end": 69584,
+   "type": "verse",
+   "basis": "verse row at byte 68824",
+   "id": null,
+   "text": "the contact discontinuity. The blue dots represent the cell average solutions, the blue curves the"
+  },
+  {
+   "start": 69585,
+   "end": 69688,
+   "type": "verse",
+   "basis": "verse row at byte 68923",
+   "id": null,
+   "text": "polynomial solutions, and the red curves the exact solution. The magenta dots with a value greater than"
+  },
+  {
+   "start": 69689,
+   "end": 69746,
+   "type": "verse",
+   "basis": "verse row at byte 69027",
+   "id": null,
+   "text": "0.04 represent troubled cells where limiting is required."
+  },
+  {
+   "start": 69751,
+   "end": 69854,
+   "type": "verse",
+   "basis": "verse row at byte 69089",
+   "id": null,
+   "text": "(a) DG2 solution on whole domain                  (b) DG2 solution (in blue) on domain [0, 2.4]"
+  },
+  {
+   "start": 69855,
+   "end": 69957,
+   "type": "verse",
+   "basis": "verse row at byte 69193",
+   "id": null,
+   "text": "Fig. 6.4: Solution densities with 200 cells, 𝑝 = 2, time step size of 0.002093, after 860 time steps."
+  },
+  {
+   "start": 69958,
+   "end": 70054,
+   "type": "verse",
+   "basis": "verse row at byte 69296",
+   "id": null,
+   "text": "(a) Solution on the whole domain; only 2 or 1 troubled cells are detected at each discontinuity."
+  },
+  {
+   "start": 70055,
+   "end": 70150,
+   "type": "verse",
+   "basis": "verse row at byte 69393",
+   "id": null,
+   "text": "(b) Close-up view of solution on the domain [0, 2.4]; for comparison, the standard second-order"
+  },
+  {
+   "start": 70151,
+   "end": 70232,
+   "type": "verse",
+   "basis": "verse row at byte 69489",
+   "id": null,
+   "text": "solution using the Van Albada limiter with 600 cells are represented by red dots."
+  },
+  {
+   "start": 70235,
+   "end": 70264,
+   "type": "verse",
+   "basis": "verse row at byte 69573",
+   "id": null,
+   "text": "7. Conclusions and Discussion"
+  },
+  {
+   "start": 70265,
+   "end": 70365,
+   "type": "verse",
+   "basis": "verse row at byte 69603",
+   "id": null,
+   "text": "In conclusion, we introduced a new high-order limiting technique capable of managing shocks while"
+  },
+  {
+   "start": 70366,
+   "end": 70467,
+   "type": "verse",
+   "basis": "verse row at byte 69704",
+   "id": null,
+   "text": "preserving accuracy in smooth regions without relying critically on a detection method. Initially, we"
+  },
+  {
+   "start": 70468,
+   "end": 70567,
+   "type": "verse",
+   "basis": "verse row at byte 69806",
+   "id": null,
+   "text": "described the DG method within the FR framework, where the solution is formulated via interpolation"
+  },
+  {
+   "start": 70568,
+   "end": 70673,
+   "type": "verse",
+   "basis": "verse row at byte 69906",
+   "id": null,
+   "text": "rather than standard projection, with the Radau polynomials and their derivatives playing a crucial role."
+  },
+  {
+   "start": 70674,
+   "end": 70775,
+   "type": "verse",
+   "basis": "verse row at byte 70012",
+   "id": null,
+   "text": "We illustrated the behavior of the DG solution at jump discontinuities, which partially motivates our"
+  },
+  {
+   "start": 70776,
+   "end": 70869,
+   "type": "verse",
+   "basis": "verse row at byte 70114",
+   "id": null,
+   "text": "approach. Subsequently, we presented our limiting technique, where the key innovation lies in"
+  },
+  {
+   "start": 70870,
+   "end": 70966,
+   "type": "verse",
+   "basis": "verse row at byte 70208",
+   "id": null,
+   "text": "expanding the standard monotonicity limits to provide ample “room” near smooth extrema, ensuring"
+  },
+  {
+   "start": 70967,
+   "end": 71074,
+   "type": "verse",
+   "basis": "verse row at byte 70305",
+   "id": null,
+   "text": "that limiting has no effect. Near a discontinuity, these expanded limits essentially reduce to the original"
+  },
+  {
+   "start": 71075,
+   "end": 71132,
+   "type": "verse",
+   "basis": "verse row at byte 70413",
+   "id": null,
+   "text": "21"
+  },
+  {
+   "start": 71134,
+   "end": 71238,
+   "type": "verse",
+   "basis": "verse row at byte 70472",
+   "id": null,
+   "text": "limits, suppressing oscillations. The algorithm is simplified by applying the limiting bounds to the sum"
+  },
+  {
+   "start": 71239,
+   "end": 71342,
+   "type": "verse",
+   "basis": "verse row at byte 70577",
+   "id": null,
+   "text": "of magnitudes of all modes, linear and higher order, successively. We also presented a detection method"
+  },
+  {
+   "start": 71343,
+   "end": 71442,
+   "type": "verse",
+   "basis": "verse row at byte 70681",
+   "id": null,
+   "text": "identifying regions where limiting is unnecessary to reduce computing time. Numerical examples were"
+  },
+  {
+   "start": 71443,
+   "end": 71504,
+   "type": "verse",
+   "basis": "verse row at byte 70781",
+   "id": null,
+   "text": "provided to demonstrate the effectiveness of the new limiter."
+  },
+  {
+   "start": 71505,
+   "end": 71604,
+   "type": "verse",
+   "basis": "verse row at byte 70843",
+   "id": null,
+   "text": "Additional tests, as well as 2D and 3D applications, particularly the extension to unstructured"
+  },
+  {
+   "start": 71605,
+   "end": 71648,
+   "type": "verse",
+   "basis": "verse row at byte 70943",
+   "id": null,
+   "text": "(triangular) meshes, remain to be explored."
+  },
+  {
+   "start": 71651,
+   "end": 71666,
+   "type": "verse",
+   "basis": "verse row at byte 70989",
+   "id": null,
+   "text": "Acknowledgments"
+  },
+  {
+   "start": 71667,
+   "end": 71761,
+   "type": "verse",
+   "basis": "verse row at byte 71005",
+   "id": null,
+   "text": "This research was sponsored by NASA’s Transformational Tools and Technologies (TTT) Project"
+  },
+  {
+   "start": 71762,
+   "end": 71851,
+   "type": "verse",
+   "basis": "verse row at byte 71100",
+   "id": null,
+   "text": "of the Transformative Aeronautics Concepts Program under the Aeronautics Research Mission"
+  },
+  {
+   "start": 71852,
+   "end": 71864,
+   "type": "verse",
+   "basis": "verse row at byte 71190",
+   "id": null,
+   "text": "Directorate."
+  },
+  {
+   "start": 71867,
+   "end": 71877,
+   "type": "verse",
+   "basis": "verse row at byte 71205",
+   "id": null,
+   "text": "Appendices"
+  },
+  {
+   "start": 71878,
+   "end": 71952,
+   "type": "verse",
+   "basis": "verse row at byte 71216",
+   "id": null,
+   "text": "A. Proof of formulas (2.7a,b) for the derivatives of Radau polynomials."
+  },
+  {
+   "start": 71953,
+   "end": 72033,
+   "type": "verse",
+   "basis": "verse row at byte 71291",
+   "id": null,
+   "text": "The derivative of the Legendre polynomial is given by (see, e.g., Wikipedia):"
+  },
+  {
+   "start": 72034,
+   "end": 72124,
+   "type": "verse",
+   "basis": "verse row at byte 71372",
+   "id": null,
+   "text": "𝐿𝑘 ′ = (2(𝑘 − 1) + 1)𝐿𝑘−1 + (2(𝑘 − 3) + 1)𝐿𝑘−3 + (2(𝑘 − 5) + 1)𝐿𝑘−5 + ⋯"
+  },
+  {
+   "start": 72125,
+   "end": 72226,
+   "type": "verse",
+   "basis": "verse row at byte 71463",
+   "id": null,
+   "text": "where the last term is 𝐿0 if 𝑘 is odd and 3𝐿1 if 𝑘 is even. That is, for odd 𝑘, or 𝑘 = 2𝑚 + 1,"
+  },
+  {
+   "start": 72227,
+   "end": 72304,
+   "type": "verse",
+   "basis": "verse row at byte 71565",
+   "id": null,
+   "text": "𝐿2𝑚+1 ′ = 𝐿0 + 5𝐿2 + 9𝐿4 … + (2(2𝑚) + 1)𝐿2𝑚 ."
+  },
+  {
+   "start": 72305,
+   "end": 72330,
+   "type": "verse",
+   "basis": "verse row at byte 71643",
+   "id": null,
+   "text": "For even 𝑘, or 𝑘 = 2𝑚,"
+  },
+  {
+   "start": 72331,
+   "end": 72410,
+   "type": "verse",
+   "basis": "verse row at byte 71669",
+   "id": null,
+   "text": "𝐿2𝑚 ′ = 3𝐿1 + 7𝐿3 + 11𝐿5 … + (2(2𝑚 − 1) + 1)𝐿2𝑚−1 ."
+  },
+  {
+   "start": 72411,
+   "end": 72478,
+   "type": "verse",
+   "basis": "verse row at byte 71749",
+   "id": null,
+   "text": "The above two equations imply (2.7a, b), thus completing the proof."
+  },
+  {
+   "start": 72480,
+   "end": 72590,
+   "type": "verse",
+   "basis": "verse row at byte 71818",
+   "id": null,
+   "text": "B. Proof of formula (2.11): the derivative of the right Radau polynomial, 𝑅𝑅, 𝑘+1 ′, vanishes at the 𝑘"
+  },
+  {
+   "start": 72591,
+   "end": 72639,
+   "type": "verse",
+   "basis": "verse row at byte 71929",
+   "id": null,
+   "text": "interior points of the 𝑘 + 1 left Radau points."
+  },
+  {
+   "start": 72640,
+   "end": 72754,
+   "type": "verse",
+   "basis": "verse row at byte 71978",
+   "id": null,
+   "text": "Indeed, denote the 𝑘 + 1 left Radau points by 𝜉𝐿, 𝑚 , 𝑚 = 1, … , 𝑘 + 1, where 𝜉𝐿, 1 = −1. For each 𝑚,"
+  },
+  {
+   "start": 72755,
+   "end": 72864,
+   "type": "verse",
+   "basis": "verse row at byte 72093",
+   "id": null,
+   "text": "let 𝜙𝐿, 𝑚 be the corresponding Lagrange polynomial (degree 𝑘) that takes on value 1 at 𝜉𝐿, 𝑚 and value"
+  },
+  {
+   "start": 72865,
+   "end": 72980,
+   "type": "verse",
+   "basis": "verse row at byte 72203",
+   "id": null,
+   "text": "0 at all other 𝜉𝐿, 𝑙 ’s. Then for 𝑚 ≥ 2, 𝜙𝐿, 𝑚 (−1) = 0. Thus, again for 𝑚 ≥ 2, using integration by parts,"
+  },
+  {
+   "start": 72981,
+   "end": 73061,
+   "type": "verse",
+   "basis": "verse row at byte 72319",
+   "id": null,
+   "text": "since the boundary terms vanish due to 𝑅𝑅, 𝑘+1 (1) = 0 and 𝜙𝐿, 𝑚 (−1) = 0,"
+  },
+  {
+   "start": 73062,
+   "end": 73149,
+   "type": "verse",
+   "basis": "verse row at byte 72400",
+   "id": null,
+   "text": "(𝑅𝑅, 𝑘+1 ′ , 𝜙𝐿, 𝑚 ) = −(𝑅𝑅, 𝑘+1 , 𝜙𝐿, 𝑚 ′ )."
+  },
+  {
+   "start": 73150,
+   "end": 73263,
+   "type": "verse",
+   "basis": "verse row at byte 72488",
+   "id": null,
+   "text": "Note that 𝜙𝐿, 𝑚 ′ is of degree 𝑘 − 1. Recall that by (2.5b) with 𝑘 replaced by 𝑘 + 1, 𝑅𝑅, 𝑘+1 ⏊ 𝑷𝑘−1 ."
+  },
+  {
+   "start": 73264,
+   "end": 73379,
+   "type": "verse",
+   "basis": "verse row at byte 72602",
+   "id": null,
+   "text": "Therefore, (𝑅𝑅, 𝑘+1 , 𝜙𝐿, 𝑚 ′ ) = 0. Thus, for 𝑚 ≥ 2, by the above, (𝑅𝑅, 𝑘+1 ′ , 𝜙𝐿, 𝑚 ) = 0. Next, by"
+  },
+  {
+   "start": 73380,
+   "end": 73500,
+   "type": "verse",
+   "basis": "verse row at byte 72718",
+   "id": null,
+   "text": "applying the left Radau quadrature to (𝑅𝑅, 𝑘+1 ′ , 𝜙𝐿, 𝑚 ), and since 𝜙𝐿, 𝑚 (𝜉𝐿, 𝑙 ) = 0 for all 𝑙 ≠ 𝑚, we"
+  },
+  {
+   "start": 73501,
+   "end": 73520,
+   "type": "verse",
+   "basis": "verse row at byte 72839",
+   "id": null,
+   "text": "obtain, for 𝑚 ≥ 2,"
+  },
+  {
+   "start": 73521,
+   "end": 73622,
+   "type": "verse",
+   "basis": "verse row at byte 72859",
+   "id": null,
+   "text": "𝑅𝑅, 𝑘+1 ′ (𝜉𝐿, 𝑚 )𝜙𝐿, 𝑚 (𝜉𝐿, 𝑚 ) = 𝑅𝑅, 𝑘+1 ′ (𝜉𝐿, 𝑚 ) = 0."
+  },
+  {
+   "start": 73623,
+   "end": 73648,
+   "type": "verse",
+   "basis": "verse row at byte 72961",
+   "id": null,
+   "text": "This completes the proof."
+  },
+  {
+   "start": 73650,
+   "end": 73737,
+   "type": "verse",
+   "basis": "verse row at byte 72988",
+   "id": null,
+   "text": "C. Proof that for advection, the DG method can be cast in interpolation form (3.11)."
+  },
+  {
+   "start": 73738,
+   "end": 73849,
+   "type": "verse",
+   "basis": "verse row at byte 73076",
+   "id": null,
+   "text": "Indeed, focusing on cell 𝐸 = 𝐸𝑗 , let 𝜙 be a test function, i.e., a polynomial of degree 𝑝 (independent"
+  },
+  {
+   "start": 73850,
+   "end": 73931,
+   "type": "verse",
+   "basis": "verse row at byte 73188",
+   "id": null,
+   "text": "of 𝑡). The advection equation leads to the following requirement via projection,"
+  },
+  {
+   "start": 73932,
+   "end": 73969,
+   "type": "verse",
+   "basis": "verse row at byte 73270",
+   "id": null,
+   "text": "𝜕"
+  },
+  {
+   "start": 73970,
+   "end": 74043,
+   "type": "verse",
+   "basis": "verse row at byte 73308",
+   "id": null,
+   "text": "(𝑢 , 𝜙)𝐸 + ((𝑢ℎ )𝑥 , 𝜙)𝐸 = 0."
+  },
+  {
+   "start": 74044,
+   "end": 74085,
+   "type": "verse",
+   "basis": "verse row at byte 73382",
+   "id": null,
+   "text": "𝜕𝑡 ℎ"
+  },
+  {
+   "start": 74086,
+   "end": 74189,
+   "type": "verse",
+   "basis": "verse row at byte 73424",
+   "id": null,
+   "text": "The above involves no interaction among cells. To account for interaction, we use integration by parts,"
+  },
+  {
+   "start": 74190,
+   "end": 74245,
+   "type": "verse",
+   "basis": "verse row at byte 73528",
+   "id": null,
+   "text": "22"
+  },
+  {
+   "start": 74248,
+   "end": 74283,
+   "type": "verse",
+   "basis": "verse row at byte 73586",
+   "id": null,
+   "text": "𝜕"
+  },
+  {
+   "start": 74284,
+   "end": 74368,
+   "type": "verse",
+   "basis": "verse row at byte 73622",
+   "id": null,
+   "text": "(𝑢 , 𝜙)𝐸 + (𝑢ℎ 𝜙)𝜕𝐸 − (𝑢ℎ , 𝜙𝑥 )𝐸 = 0."
+  },
+  {
+   "start": 74369,
+   "end": 74408,
+   "type": "verse",
+   "basis": "verse row at byte 73707",
+   "id": null,
+   "text": "𝜕𝑡 ℎ"
+  },
+  {
+   "start": 74409,
+   "end": 74506,
+   "type": "verse",
+   "basis": "verse row at byte 73747",
+   "id": null,
+   "text": "upw            upw"
+  },
+  {
+   "start": 74507,
+   "end": 74608,
+   "type": "verse",
+   "basis": "verse row at byte 73845",
+   "id": null,
+   "text": "For 𝑢ℎ in the boundary term (𝑢ℎ 𝜙)𝜕𝐸 , we employ the common values 𝑢𝑗+1/2 and 𝑢𝑗−1/2 defined"
+  },
+  {
+   "start": 74609,
+   "end": 74720,
+   "type": "verse",
+   "basis": "verse row at byte 73947",
+   "id": null,
+   "text": "in (3.5). Thus, on cell 𝑗, the DG solution 𝑢ℎ = 𝑢𝑗 is required to satisfy, for any degree 𝑝 polynomial 𝜙,"
+  },
+  {
+   "start": 74721,
+   "end": 74779,
+   "type": "verse",
+   "basis": "verse row at byte 74059",
+   "id": null,
+   "text": "𝜕                upw             upw"
+  },
+  {
+   "start": 74780,
+   "end": 74899,
+   "type": "verse",
+   "basis": "verse row at byte 74118",
+   "id": null,
+   "text": "(𝑢 , 𝜙)𝐸 + 𝑢𝑗+1/2   𝜙(1) − 𝑢𝑗−1/2 𝜙(−1) − (𝑢ℎ , 𝜙𝑥 )𝐸 = 0.                   (A.1)"
+  },
+  {
+   "start": 74900,
+   "end": 74927,
+   "type": "verse",
+   "basis": "verse row at byte 74238",
+   "id": null,
+   "text": "𝜕𝑡 ℎ"
+  },
+  {
+   "start": 74928,
+   "end": 75027,
+   "type": "verse",
+   "basis": "verse row at byte 74266",
+   "id": null,
+   "text": "Integrate by parts again, but this time, use the values just inside cell 𝑗 for the boundary terms,"
+  },
+  {
+   "start": 75028,
+   "end": 75092,
+   "type": "verse",
+   "basis": "verse row at byte 74366",
+   "id": null,
+   "text": "𝜕                              upw                     upw"
+  },
+  {
+   "start": 75093,
+   "end": 75196,
+   "type": "verse",
+   "basis": "verse row at byte 74431",
+   "id": null,
+   "text": "(𝑢 , 𝜙)𝐸 + ((𝑢ℎ )𝑥 , 𝜙)𝐸 + (𝑢𝑗+1/2 − 𝑢𝑗 (1))𝜙(1) − (𝑢𝑗−1/2 − 𝑢𝑗 (−1))𝜙(−1) = 0."
+  },
+  {
+   "start": 75197,
+   "end": 75208,
+   "type": "verse",
+   "basis": "verse row at byte 74535",
+   "id": null,
+   "text": "𝜕𝑡 ℎ"
+  },
+  {
+   "start": 75209,
+   "end": 75271,
+   "type": "verse",
+   "basis": "verse row at byte 74547",
+   "id": null,
+   "text": "upw                             upw"
+  },
+  {
+   "start": 75272,
+   "end": 75381,
+   "type": "verse",
+   "basis": "verse row at byte 74610",
+   "id": null,
+   "text": "For advection, by (3.5), 𝑢𝑗+1/2 = 𝑢𝑗 (1), and by (3.8), (𝑢𝑗−1/2 − 𝑢𝑗 (−1)) = 𝐽𝐿 . The above implies"
+  },
+  {
+   "start": 75382,
+   "end": 75412,
+   "type": "verse",
+   "basis": "verse row at byte 74720",
+   "id": null,
+   "text": "𝜕"
+  },
+  {
+   "start": 75413,
+   "end": 75526,
+   "type": "verse",
+   "basis": "verse row at byte 74751",
+   "id": null,
+   "text": "(𝑢 , 𝜙)𝐸 + ((𝑢ℎ )𝑥 , 𝜙)𝐸 − 𝐽𝐿 𝜙(−1) = 0.                           (A.2)"
+  },
+  {
+   "start": 75527,
+   "end": 75560,
+   "type": "verse",
+   "basis": "verse row at byte 74865",
+   "id": null,
+   "text": "𝜕𝑡 ℎ"
+  },
+  {
+   "start": 75561,
+   "end": 75643,
+   "type": "verse",
+   "basis": "verse row at byte 74899",
+   "id": null,
+   "text": "Here, the term −𝐽𝐿 𝜙(−1) accounts for data interaction among neighboring cells."
+  },
+  {
+   "start": 75644,
+   "end": 75746,
+   "type": "verse",
+   "basis": "verse row at byte 74982",
+   "id": null,
+   "text": "Next, we wish to eliminate 𝜙, i.e., we wish to express 𝜙(−1) in the form (𝛾, 𝜙) for some 𝛾 of"
+  },
+  {
+   "start": 75747,
+   "end": 75852,
+   "type": "verse",
+   "basis": "verse row at byte 75085",
+   "id": null,
+   "text": "degree 𝑝. To this end, let ℝ be the real line. The mapping 𝐵 from 𝑷𝑝 to ℝ defined by, 𝐵(𝜙) = 𝜙(−1)"
+  },
+  {
+   "start": 75853,
+   "end": 75969,
+   "type": "verse",
+   "basis": "verse row at byte 75191",
+   "id": null,
+   "text": "for any 𝜙 of degree 𝑝, is a linear functional on 𝑷𝑝 . Thus, there exists 𝛾 in 𝑷𝑝 such that 𝐵(𝜙) = (𝛾, 𝜙)."
+  },
+  {
+   "start": 75970,
+   "end": 75978,
+   "type": "verse",
+   "basis": "verse row at byte 75308",
+   "id": null,
+   "text": "That is,"
+  },
+  {
+   "start": 75979,
+   "end": 76043,
+   "type": "verse",
+   "basis": "verse row at byte 75317",
+   "id": null,
+   "text": "(𝛾, 𝜙) = 𝜙(−1)."
+  },
+  {
+   "start": 76044,
+   "end": 76115,
+   "type": "verse",
+   "basis": "verse row at byte 75382",
+   "id": null,
+   "text": "In fact, 𝛾 = −𝑅𝑅, 𝑝+1 ′. To prove this, using integration by parts,"
+  },
+  {
+   "start": 76116,
+   "end": 76223,
+   "type": "verse",
+   "basis": "verse row at byte 75454",
+   "id": null,
+   "text": "(𝑅𝑅, 𝑝+1 ′ , 𝜙) = 𝑅𝑅, 𝑝+1 (1)𝜙(1) − 𝑅𝑅, 𝑝+1 (−1)𝜙(−1) − (𝑅𝑅, 𝑝+1 , 𝜙 ′ )."
+  },
+  {
+   "start": 76224,
+   "end": 76338,
+   "type": "verse",
+   "basis": "verse row at byte 75562",
+   "id": null,
+   "text": "Next, we use (2.5b), namely, 𝑅𝑅, 𝑝+1 ⏊ 𝑷𝑝−1 . Since 𝜙 ′ is of degree 𝑝 − 1, (𝑅𝑅, 𝑝+1 , 𝜙 ′ ) = 0. Next,"
+  },
+  {
+   "start": 76339,
+   "end": 76411,
+   "type": "verse",
+   "basis": "verse row at byte 75677",
+   "id": null,
+   "text": "𝑅𝑅, 𝑝+1 (1) = 0 and 𝑅𝑅, 𝑝+1 (−1) = 1. Therefore, the above implies"
+  },
+  {
+   "start": 76412,
+   "end": 76484,
+   "type": "verse",
+   "basis": "verse row at byte 75750",
+   "id": null,
+   "text": "(𝑅𝑅, 𝑝+1 ′ , 𝜙) = −𝜙(−1),"
+  },
+  {
+   "start": 76485,
+   "end": 76518,
+   "type": "verse",
+   "basis": "verse row at byte 75823",
+   "id": null,
+   "text": "Thus, by the above, (A.2) implies"
+  },
+  {
+   "start": 76519,
+   "end": 76545,
+   "type": "verse",
+   "basis": "verse row at byte 75857",
+   "id": null,
+   "text": "𝜕"
+  },
+  {
+   "start": 76546,
+   "end": 76635,
+   "type": "verse",
+   "basis": "verse row at byte 75884",
+   "id": null,
+   "text": "(𝑢 , 𝜙)𝐸 + ((𝑢ℎ )𝑥 , 𝜙)𝐸 + 𝐽𝐿 (𝑅𝑅, 𝑝+1 ′ , 𝜙) = 0."
+  },
+  {
+   "start": 76636,
+   "end": 76666,
+   "type": "verse",
+   "basis": "verse row at byte 75974",
+   "id": null,
+   "text": "𝜕𝑡 ℎ"
+  },
+  {
+   "start": 76667,
+   "end": 76675,
+   "type": "verse",
+   "basis": "verse row at byte 76005",
+   "id": null,
+   "text": "That is,"
+  },
+  {
+   "start": 76676,
+   "end": 76705,
+   "type": "verse",
+   "basis": "verse row at byte 76014",
+   "id": null,
+   "text": "𝜕"
+  },
+  {
+   "start": 76706,
+   "end": 76787,
+   "type": "verse",
+   "basis": "verse row at byte 76044",
+   "id": null,
+   "text": "(𝑢 , 𝜙)𝐸 + ((𝑢ℎ + 𝐽𝐿 𝑅𝑅, 𝑝+1 )𝑥 , 𝜙) = 0."
+  },
+  {
+   "start": 76788,
+   "end": 76857,
+   "type": "verse",
+   "basis": "verse row at byte 76126",
+   "id": null,
+   "text": "𝜕𝑡 ℎ                                  𝐸"
+  },
+  {
+   "start": 76859,
+   "end": 76978,
+   "type": "verse",
+   "basis": "verse row at byte 76197",
+   "id": null,
+   "text": "Therefore, with 𝑈𝑗 = 𝑢𝑗 + 𝐽𝐿 𝑅𝑅, 𝑝+1 , the DG method leads to (𝑢ℎ )𝑥 = (𝑈𝑗 )𝑥 . This completes the proof."
+  },
+  {
+   "start": 76981,
+   "end": 76991,
+   "type": "verse",
+   "basis": "verse row at byte 76319",
+   "id": null,
+   "text": "References"
+  },
+  {
+   "start": 76992,
+   "end": 77089,
+   "type": "verse",
+   "basis": "verse row at byte 76330",
+   "id": null,
+   "text": "[1] K. Asthana, M.R. López-Morales, and A. Jameson, “Non-linear stabilization of high-order Flux"
+  },
+  {
+   "start": 77090,
+   "end": 77187,
+   "type": "verse",
+   "basis": "verse row at byte 76428",
+   "id": null,
+   "text": "Reconstruction schemes via Fourier-spectral filtering,” J. Comput. Phys., 303, pp. 269–294,"
+  },
+  {
+   "start": 77188,
+   "end": 77199,
+   "type": "verse",
+   "basis": "verse row at byte 76526",
+   "id": null,
+   "text": "2015."
+  },
+  {
+   "start": 77200,
+   "end": 77297,
+   "type": "verse",
+   "basis": "verse row at byte 76538",
+   "id": null,
+   "text": "[2] B. Cockburn, S. Hou, and C.-W. Shu, “The Runge-Kutta local projection discontinuous Galerkin"
+  },
+  {
+   "start": 77298,
+   "end": 77395,
+   "type": "verse",
+   "basis": "verse row at byte 76636",
+   "id": null,
+   "text": "finite element method for conservation laws. IV. The multidimensional case,” Mathematics of"
+  },
+  {
+   "start": 77396,
+   "end": 77451,
+   "type": "verse",
+   "basis": "verse row at byte 76734",
+   "id": null,
+   "text": "Computation, vol. 54, no. 190, pp. 545–581, 1990."
+  },
+  {
+   "start": 77452,
+   "end": 77554,
+   "type": "verse",
+   "basis": "verse row at byte 76790",
+   "id": null,
+   "text": "[3] T. Dzanica , W. Trojak, and F. D. Witherden, “Utilizing time-reversibility for shock capturing in"
+  },
+  {
+   "start": 77555,
+   "end": 77643,
+   "type": "verse",
+   "basis": "verse row at byte 76893",
+   "id": null,
+   "text": "nonlinear hyperbolic conservation laws,” arXiv:2110.03653v2 [math.NA] 18 Apr 2022."
+  },
+  {
+   "start": 77644,
+   "end": 77735,
+   "type": "verse",
+   "basis": "verse row at byte 76982",
+   "id": null,
+   "text": "[4] M. Dumbser, O. Zanotti, R. Loubère, and S. Diot, “A posteriori subcell limiting of the"
+  },
+  {
+   "start": 77736,
+   "end": 77832,
+   "type": "verse",
+   "basis": "verse row at byte 77074",
+   "id": null,
+   "text": "discontinuous Galerkin finite element method for hyperbolic conservation laws,” J. Comput."
+  },
+  {
+   "start": 77833,
+   "end": 77870,
+   "type": "verse",
+   "basis": "verse row at byte 77171",
+   "id": null,
+   "text": "Phys., 278, 1, pp. 47-75, 2014."
+  },
+  {
+   "start": 77871,
+   "end": 77922,
+   "type": "verse",
+   "basis": "verse row at byte 77209",
+   "id": null,
+   "text": "23"
+  },
+  {
+   "start": 77924,
+   "end": 78023,
+   "type": "verse",
+   "basis": "verse row at byte 77262",
+   "id": null,
+   "text": "[5] H. Hoteit, P. Ackerer, R. Mos´e, J. Erhel, and B. Philippe, “New two-dimensional slope limiters"
+  },
+  {
+   "start": 78024,
+   "end": 78121,
+   "type": "verse",
+   "basis": "verse row at byte 77362",
+   "id": null,
+   "text": "for discontinuous Galerkin methods on arbitrary meshes,” International Journal for Numerical"
+  },
+  {
+   "start": 78122,
+   "end": 78188,
+   "type": "verse",
+   "basis": "verse row at byte 77460",
+   "id": null,
+   "text": "Methods in Engineering, vol. 61, no. 14, pp. 2566–2593, 2004."
+  },
+  {
+   "start": 78189,
+   "end": 78287,
+   "type": "verse",
+   "basis": "verse row at byte 77527",
+   "id": null,
+   "text": "[6] J. S. Hesthaven and T. Warburton, “Nodal discontinuous Galerkin methods: algorithms, analysis,"
+  },
+  {
+   "start": 78288,
+   "end": 78375,
+   "type": "verse",
+   "basis": "verse row at byte 77626",
+   "id": null,
+   "text": "and applications,” Vol. 54, Texts in Applied Mathematics, Springer New York, 2008."
+  },
+  {
+   "start": 78376,
+   "end": 78468,
+   "type": "verse",
+   "basis": "verse row at byte 77714",
+   "id": null,
+   "text": "[7] H. T. Huynh, “Accurate upwind methods for the Euler equations,” SIAM J. Numer. Anal. 32,"
+  },
+  {
+   "start": 78469,
+   "end": 78485,
+   "type": "verse",
+   "basis": "verse row at byte 77807",
+   "id": null,
+   "text": "1565, 1995."
+  },
+  {
+   "start": 78486,
+   "end": 78580,
+   "type": "verse",
+   "basis": "verse row at byte 77824",
+   "id": null,
+   "text": "[8] H. T. Huynh, “A flux reconstruction approach to high-order schemes including discontinuous"
+  },
+  {
+   "start": 78581,
+   "end": 78626,
+   "type": "verse",
+   "basis": "verse row at byte 77919",
+   "id": null,
+   "text": "Galerkin methods,” AIAA Paper 2007-4079."
+  },
+  {
+   "start": 78627,
+   "end": 78724,
+   "type": "verse",
+   "basis": "verse row at byte 77965",
+   "id": null,
+   "text": "[9] H.T. Huynh, “A reconstruction approach to high-order schemes including discontinuous Galerkin"
+  },
+  {
+   "start": 78725,
+   "end": 78766,
+   "type": "verse",
+   "basis": "verse row at byte 78063",
+   "id": null,
+   "text": "for diffusion,” AIAA Paper 2009-403."
+  },
+  {
+   "start": 78767,
+   "end": 78856,
+   "type": "verse",
+   "basis": "verse row at byte 78105",
+   "id": null,
+   "text": "[10] H.T. Huynh, Z.J. Wang, and P.E. Vincent, “High-order methods for computational fluid"
+  },
+  {
+   "start": 78857,
+   "end": 78957,
+   "type": "verse",
+   "basis": "verse row at byte 78195",
+   "id": null,
+   "text": "dynamics: A brief review of compact differential formulations on unstructured grids,” Computers"
+  },
+  {
+   "start": 78958,
+   "end": 79001,
+   "type": "verse",
+   "basis": "verse row at byte 78296",
+   "id": null,
+   "text": "and Fluids, Vol 98, pp. 209-220, 2014."
+  },
+  {
+   "start": 79002,
+   "end": 79098,
+   "type": "verse",
+   "basis": "verse row at byte 78340",
+   "id": null,
+   "text": "[11] L. Krivodonova, “Limiters for high-order discontinuous Galerkin methods,” J. Comput. Phys.,"
+  },
+  {
+   "start": 79099,
+   "end": 79139,
+   "type": "verse",
+   "basis": "verse row at byte 78437",
+   "id": null,
+   "text": "vol. 226, no. 1, pp. 879–896, 2007."
+  },
+  {
+   "start": 79140,
+   "end": 79239,
+   "type": "verse",
+   "basis": "verse row at byte 78478",
+   "id": null,
+   "text": "[12] L. Krivodonova, J. Xin, J.-F. Remacle, N. Chevaugeon, and J. E. Flaherty, “Shock detection and"
+  },
+  {
+   "start": 79240,
+   "end": 79332,
+   "type": "verse",
+   "basis": "verse row at byte 78578",
+   "id": null,
+   "text": "limiting with discontinuous galerkin methods for hyperbolic conservation laws,” Applied"
+  },
+  {
+   "start": 79333,
+   "end": 79383,
+   "type": "verse",
+   "basis": "verse row at byte 78671",
+   "id": null,
+   "text": "Numerical Mathematics 48 (3-4) 323–338, 2004."
+  },
+  {
+   "start": 79384,
+   "end": 79481,
+   "type": "verse",
+   "basis": "verse row at byte 78722",
+   "id": null,
+   "text": "[13] J. Kim , Hojun You , and C. Kim, “Shock-capturing PID Controller for high-order methods with"
+  },
+  {
+   "start": 79482,
+   "end": 79555,
+   "type": "verse",
+   "basis": "verse row at byte 78820",
+   "id": null,
+   "text": "data-driven gain optimization,” J. Comput. Phys., 508, 113015, 2024."
+  },
+  {
+   "start": 79556,
+   "end": 79655,
+   "type": "verse",
+   "basis": "verse row at byte 78894",
+   "id": null,
+   "text": "[14] Q. Lu, G. Liu, P. Ming, and Z.J. Wang, “A parameter-free gradient-based limiter for the FR/CPR"
+  },
+  {
+   "start": 79656,
+   "end": 79714,
+   "type": "verse",
+   "basis": "verse row at byte 78994",
+   "id": null,
+   "text": "method on mixed unstructured meshes,” AIAA 2019-3210."
+  },
+  {
+   "start": 79715,
+   "end": 79812,
+   "type": "verse",
+   "basis": "verse row at byte 79053",
+   "id": null,
+   "text": "[15] S.A. Moe, J.A. Rossmanith, and D.C. Seal, “A simple and effective high-order shock-capturing"
+  },
+  {
+   "start": 79813,
+   "end": 79896,
+   "type": "verse",
+   "basis": "verse row at byte 79151",
+   "id": null,
+   "text": "limiter for discontinuous Galerkin methods,” arXiv:1507.03024 [math.NA], 2015."
+  },
+  {
+   "start": 79897,
+   "end": 79985,
+   "type": "verse",
+   "basis": "verse row at byte 79235",
+   "id": null,
+   "text": "[16] J.S. Park, C. Kim, “Multi-dimensional limiting process for finite volume methods on"
+  },
+  {
+   "start": 79986,
+   "end": 80047,
+   "type": "verse",
+   "basis": "verse row at byte 79324",
+   "id": null,
+   "text": "unstructured grids,” Computers & Fluids, 65, 8–24, 2012."
+  },
+  {
+   "start": 80048,
+   "end": 80142,
+   "type": "verse",
+   "basis": "verse row at byte 79386",
+   "id": null,
+   "text": "[17] J.S. Park and C. Kim, “Higher-order multi-dimensional limiting strategy for discontinuous"
+  },
+  {
+   "start": 80143,
+   "end": 80241,
+   "type": "verse",
+   "basis": "verse row at byte 79481",
+   "id": null,
+   "text": "galerkin methods in compressible inviscid and viscous flows,” Computers & Fluids 96, 377–396,"
+  },
+  {
+   "start": 80242,
+   "end": 80252,
+   "type": "verse",
+   "basis": "verse row at byte 79580",
+   "id": null,
+   "text": "2014."
+  },
+  {
+   "start": 80253,
+   "end": 80354,
+   "type": "verse",
+   "basis": "verse row at byte 79591",
+   "id": null,
+   "text": "[18] J.S. Park and C. Kim, “Hierarchical multi-dimensional limiting strategy for correction procedure"
+  },
+  {
+   "start": 80355,
+   "end": 80416,
+   "type": "verse",
+   "basis": "verse row at byte 79693",
+   "id": null,
+   "text": "via reconstruction,” J. Comput. Phys., 308, 57–80, 2016."
+  },
+  {
+   "start": 80417,
+   "end": 80508,
+   "type": "verse",
+   "basis": "verse row at byte 79755",
+   "id": null,
+   "text": "[19] J. S. Park, S.-H. Yoon, and C. Kim, “Multi-dimensional limiting process for hyperbolic"
+  },
+  {
+   "start": 80509,
+   "end": 80596,
+   "type": "verse",
+   "basis": "verse row at byte 79847",
+   "id": null,
+   "text": "conservation laws on unstructured grids,” J. Comput. Phys., 229 (3) 788–812, 2010."
+  },
+  {
+   "start": 80597,
+   "end": 80691,
+   "type": "verse",
+   "basis": "verse row at byte 79935",
+   "id": null,
+   "text": "[20] J.S. Park, M. Yu, C. Kim, and Z.J. Wang “Comparative study of shock-capturing methods for"
+  },
+  {
+   "start": 80692,
+   "end": 80767,
+   "type": "verse",
+   "basis": "verse row at byte 80030",
+   "id": null,
+   "text": "high-order CPR: MLP and artificial viscosity,” ICCFD8-2014-0067, 2014."
+  },
+  {
+   "start": 80768,
+   "end": 80861,
+   "type": "verse",
+   "basis": "verse row at byte 80106",
+   "id": null,
+   "text": "[21] Per-Olof Persson and Jaime Peraire, “Sub-cell shock capturing for discontinuous Galerkin"
+  },
+  {
+   "start": 80862,
+   "end": 80897,
+   "type": "verse",
+   "basis": "verse row at byte 80200",
+   "id": null,
+   "text": "methods,” AIAA Paper 2006-112."
+  },
+  {
+   "start": 80898,
+   "end": 80991,
+   "type": "verse",
+   "basis": "verse row at byte 80236",
+   "id": null,
+   "text": "[22] C.-.W. Shu and S. Osher, “Efficient implementation of essentially non-oscillatory shock-"
+  },
+  {
+   "start": 80992,
+   "end": 81059,
+   "type": "verse",
+   "basis": "verse row at byte 80330",
+   "id": null,
+   "text": "capturing schemes, II,” J. Comput. Phys., 83, pp. 32-78, 1989."
+  },
+  {
+   "start": 81060,
+   "end": 81157,
+   "type": "verse",
+   "basis": "verse row at byte 80398",
+   "id": null,
+   "text": "[23] G.A, Sod, “A survey of several finite difference methods for systems of nonlinear hyperbolic"
+  },
+  {
+   "start": 81158,
+   "end": 81218,
+   "type": "verse",
+   "basis": "verse row at byte 80496",
+   "id": null,
+   "text": "conservation laws,” J. Comput. Phys., 27(1):1–31, 1978."
+  },
+  {
+   "start": 81219,
+   "end": 81309,
+   "type": "verse",
+   "basis": "verse row at byte 80557",
+   "id": null,
+   "text": "[24] A. Suresh and H. T. Huynh, “Accurate Monotonicity-Preserving Schemes with Runge–Kutta"
+  },
+  {
+   "start": 81310,
+   "end": 81367,
+   "type": "verse",
+   "basis": "verse row at byte 80648",
+   "id": null,
+   "text": "Time Stepping,” J. Comp. Phys., 136, pp 83-99, 1997."
+  },
+  {
+   "start": 81368,
+   "end": 81461,
+   "type": "verse",
+   "basis": "verse row at byte 80706",
+   "id": null,
+   "text": "[25] B. Van Leer, ‘Towards the ultimate conservative difference scheme: IV. A New Approach to"
+  },
+  {
+   "start": 81462,
+   "end": 81530,
+   "type": "verse",
+   "basis": "verse row at byte 80800",
+   "id": null,
+   "text": "Numerical Convection,” J. Comput. Phys., 23, pp. 276–299, 1977."
+  },
+  {
+   "start": 81531,
+   "end": 81624,
+   "type": "verse",
+   "basis": "verse row at byte 80869",
+   "id": null,
+   "text": "[26] P. Woodward and P. Colella, “The numerical simulation of two-dimensional fluid flow with"
+  },
+  {
+   "start": 81625,
+   "end": 81686,
+   "type": "verse",
+   "basis": "verse row at byte 80963",
+   "id": null,
+   "text": "strong shocks,” J. Comput. Phys., 54, pp. 115–173, 1984."
+  },
+  {
+   "start": 81687,
+   "end": 81774,
+   "type": "verse",
+   "basis": "verse row at byte 81025",
+   "id": null,
+   "text": "[27] M. Yang and Z.J. Wang, “A Parameter-Free Generalized Moment Limiter for High-Order"
+  },
+  {
+   "start": 81775,
+   "end": 81869,
+   "type": "verse",
+   "basis": "verse row at byte 81113",
+   "id": null,
+   "text": "Methods on Unstructured Grids,” Adv. Appl. Math. Mech., Vol. 1, No. 4, pp. 451-480, 2009."
+  },
+  {
+   "start": 81870,
+   "end": 81961,
+   "type": "verse",
+   "basis": "verse row at byte 81208",
+   "id": null,
+   "text": "[28] H. You, J. Kim, and C. Kim, Deneb: An open-source high-performance multi-physical flow"
+  },
+  {
+   "start": 81962,
+   "end": 82053,
+   "type": "verse",
+   "basis": "verse row at byte 81300",
+   "id": null,
+   "text": "solver based on high-order DRM-DG method, Computer Physics Communications 286, 108672,"
+  },
+  {
+   "start": 82054,
+   "end": 82064,
+   "type": "verse",
+   "basis": "verse row at byte 81392",
+   "id": null,
+   "text": "2023."
+  },
+  {
+   "start": 82065,
+   "end": 82163,
+   "type": "verse",
+   "basis": "verse row at byte 81403",
+   "id": null,
+   "text": "[29] H. You and C. Kim, “High-order multi-dimensional limiting strategy with subcell resolution I."
+  },
+  {
+   "start": 82164,
+   "end": 82239,
+   "type": "verse",
+   "basis": "verse row at byte 81502",
+   "id": null,
+   "text": "Two-dimensional mixed meshes,” J. Comput. Phys., 375, 1005–1032, 2018."
+  }
+ ]
+}

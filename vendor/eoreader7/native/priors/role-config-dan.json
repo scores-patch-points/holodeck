@@ -1,0 +1,43 @@
+{
+  "schema": "RoleConfig@1",
+  "language": "dan",
+  "provenance": {
+    "builder": "eoreader7 native/scripts/build-role-config.mjs",
+    "source": "/private/tmp/claude-501/tb/dan/train.conllu",
+    "min_volume": 20,
+    "null_draws": 200,
+    "null_alpha": 0.05,
+    "null_seed": 1,
+    "note": "position stats and marker candidates are both derived mechanically from this treebank's own gold dependency annotations — never hand-typed or asserted from general linguistic knowledge. A marker candidate is admitted only when its real precision beats the (1-alpha) quantile of a within-sentence role-label shuffle (II.23), never a fixed ratio — and (S122) that quantile is the MAX-STATISTIC across every eligible closed-class candidate tried, not a per-candidate null, so the admitted marker is significant against the whole search, not merely against itself."
+  },
+  "object": {
+    "total": 4157,
+    "before": 286,
+    "after": 3871,
+    "dominantSide": "after",
+    "reliability": 0.9312003848929516,
+    "usable": true,
+    "marker": {
+      "form": "ingen",
+      "precision": 0.5675675675675675,
+      "nullCeiling": 0.21621621621621623,
+      "volume": 37,
+      "recall": 0.005051719990377676
+    }
+  },
+  "subject": {
+    "total": 7180,
+    "before": 5987,
+    "after": 1193,
+    "dominantSide": "before",
+    "reliability": 0.8338440111420613,
+    "usable": true,
+    "marker": {
+      "form": "havde",
+      "hits": 79,
+      "total": 146,
+      "precision": 0.541095890410959,
+      "nullCeiling": 0.25
+    }
+  }
+}

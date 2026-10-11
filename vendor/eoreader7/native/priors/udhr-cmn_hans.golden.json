@@ -1,0 +1,3456 @@
+{
+ "schema": "EOReadingGolden@1",
+ "specimen": "udhr-cmn_hans",
+ "path": "06-government-legal/un-udhr/udhr-cmn_hans.txt",
+ "rule": "goldens/reading/RULE.md",
+ "window": {
+  "start": 0,
+  "end": 4009,
+  "endText": "活动或行为。",
+  "coordinates": "normalized body (container-stripped, CRLF-normalized); spans in RAW file coordinates"
+ },
+ "notes": "Whole document: Preamble + Articles 1-30 (R8-R12). Preamble+Article 1 re-adjudicated 2026-08-31 verb-first; Articles 2-30 added the same day. Mandarin uniquely verbs Article 2's without-distinction phrase (不分, see udhr:no-distinction-kind), Article 8's when-violated condition, Article 12's attacks clause, Article 22's realization-means restatement, and Article 28's realization clause.",
+ "revisions": [],
+ "rows": [
+  {
+   "subject": null,
+   "relation": "序言",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-preamble",
+   "ground": "preamble",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens — Relate·Existence at Ground grain",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 254,
+    "end": 262
+   },
+   "anchor": "序言"
+  },
+  {
+   "subject": "对人类家庭所有成员的固有尊严及其平等的和不移的权利的承认",
+   "relation": "乃是",
+   "object": "世界自由、正义与和平的基础",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Figure"
+   },
+   "clause": "main",
+   "prop": "udhr:recognition-foundation",
+   "ground": "preamble.1.1",
+   "role": "premise",
+   "because": "copula rule 3 — overt copula '乃是' + unique predicate role (THE foundation)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 264,
+    "end": 317
+   },
+   "anchor": "乃是世界自由、正义与和平的基础"
+  },
+  {
+   "subject": "对人权的无视和侮蔑",
+   "relation": "已发展为",
+   "object": "野蛮暴行",
+   "polarity": "+",
+   "phasepost": {
+    "op": "INS",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:disregard-acts",
+   "ground": "preamble.2.1",
+   "role": "premise",
+   "because": "'发展为' (developed into) brings a class of acts into being — Generate·Existence at pattern grain",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 319,
+    "end": 402
+   },
+   "anchor": "对人权的无视和侮蔑已发展为野蛮暴行"
+  },
+  {
+   "subject": "这些暴行",
+   "relation": "玷污了",
+   "object": "人类的良心",
+   "polarity": "+",
+   "phasepost": {
+    "op": "DEF",
+    "grain": "Figure"
+   },
+   "clause": "coordinate",
+   "prop": "udhr:acts-outrage-conscience",
+   "ground": "preamble.2.2",
+   "role": "premise",
+   "because": "'玷污' (sully) diminishes a moral standing — Differentiate·Interpretation on one identified standing; Chinese continues paratactically (no relative pronoun) where English subordinates — same proposition, `clause` and the sibling address record the syntax",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "'这些暴行' resolved anaphorically to the previous clause's object",
+   "alternate": {
+    "op": "SEG",
+    "grain": "Figure",
+    "because": "readable as marring an arrangement rather than a meaning"
+   },
+   "span": {
+    "start": 319,
+    "end": 402
+   },
+   "anchor": "这些暴行玷污了人类的良心"
+  },
+  {
+   "subject": "一个人人享有言论和信仰自由并免予恐惧和匮乏的世界的来临",
+   "relation": "已被宣布为",
+   "object": "普通人民的最高愿望",
+   "polarity": "+",
+   "phasepost": {
+    "op": "DEF",
+    "grain": "Figure"
+   },
+   "clause": "main",
+   "prop": "udhr:advent-aspiration",
+   "ground": "preamble.2.3",
+   "role": "premise",
+   "because": "proclaiming-as ('被宣布为') assigns a bounded standing to one identified thing — Differentiate·Interpretation at figure grain",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 319,
+    "end": 402
+   },
+   "anchor": "已被宣布为普通人民的最高愿望"
+  },
+  {
+   "subject": "人人",
+   "relation": "享有",
+   "object": "言论和信仰自由",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "relative",
+   "prop": "udhr:enjoy-freedoms",
+   "ground": "preamble.2.3.1",
+   "role": "premise",
+   "because": "RE-TYPED 2026-08-31 (was CON·Pattern, assigned by bucket): '享有自由' — the object names a CONDITION present to the kind, the verbal form of a property predication — Relate·Existence at pattern grain. Contrast '赋有理性' (constituent faculty → CON)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "CON",
+    "grain": "Pattern",
+    "because": "the prior reading: possession as arrangement"
+   },
+   "span": {
+    "start": 319,
+    "end": 402
+   },
+   "anchor": "人人享有言论和信仰自由"
+  },
+  {
+   "subject": "人人",
+   "relation": "免予",
+   "object": "恐惧和匮乏",
+   "polarity": "+",
+   "phasepost": {
+    "op": "NUL",
+    "grain": "Pattern"
+   },
+   "clause": "relative",
+   "prop": "udhr:freed-from-want",
+   "ground": "preamble.2.3.2",
+   "role": "premise",
+   "because": "'免予' (exempt/freed from) is an absence brought about — Differentiate·Existence; A4's rule, the absence IS the act, polarity stays +",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "coordinated relative predicate shares '人人'",
+   "alternate": null,
+   "span": {
+    "start": 319,
+    "end": 402
+   },
+   "anchor": "并免予恐惧和匮乏"
+  },
+  {
+   "subject": "使人权受法治的保护",
+   "relation": "有",
+   "object": "必要",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Figure"
+   },
+   "clause": "main",
+   "prop": "udhr:legal-protection-essential",
+   "ground": "preamble.3.1",
+   "role": "premise",
+   "because": "'有必要' existential-possessive functioning as copula rule 4's extraposed-subject-plus-property pattern",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 404,
+    "end": 450
+   },
+   "anchor": "有必要使人权受法治的保护"
+  },
+  {
+   "subject": "人权",
+   "relation": "受",
+   "object": "法治的保护",
+   "polarity": "+",
+   "phasepost": {
+    "op": "CON",
+    "grain": "Pattern"
+   },
+   "clause": "complement",
+   "prop": "udhr:law-protects-rights",
+   "ground": "preamble.3.1.1",
+   "role": "premise",
+   "because": "'受...保护' — the rights stand under the rule of law's guard: a standing coverage arrangement between two relata, Relate·Structure at pattern grain",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 404,
+    "end": 450
+   },
+   "anchor": "使人权受法治的保护"
+  },
+  {
+   "subject": "人类",
+   "relation": "进行反叛",
+   "object": "对暴政和压迫",
+   "polarity": "-",
+   "phasepost": {
+    "op": "INS",
+    "grain": "Pattern"
+   },
+   "clause": "conditional-adjunct",
+   "prop": "udhr:compelled-to-rebellion",
+   "ground": "preamble.3.1.2",
+   "role": "premise",
+   "because": "RE-TYPED 2026-08-31 (was CON·Pattern). Chinese's own extraction lands directly on the generated act: '进行反叛' (carry out rebellion) — unnegated, the rebellion comes into being under duress ('迫不得已', left with no choice), the same causation shape as '发展为野蛮暴行': Generate·Existence at pattern grain. Negated by '不致' (so as not to): polarity − per R6",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "CON",
+    "grain": "Pattern",
+    "because": "the prior reading: a binding force-relation"
+   },
+   "span": {
+    "start": 404,
+    "end": 450
+   },
+   "anchor": "为使人类不致迫不得已铤而走险对暴政和压迫进行反叛"
+  },
+  {
+   "subject": "促进各国间友好关系的发展",
+   "relation": "有",
+   "object": "必要",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Figure"
+   },
+   "clause": "main",
+   "prop": "udhr:friendly-relations-essential",
+   "ground": "preamble.4.1",
+   "role": "premise",
+   "because": "'有必要' existential-possessive, copula rule 4's extraposed-subject-plus-property pattern",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 452,
+    "end": 476
+   },
+   "anchor": "鉴于有必要促进各国间友好关系的发展"
+  },
+  {
+   "subject": "各联合国国家的人民",
+   "relation": "重申",
+   "object": "他们对基本人权、人格尊严和价值以及男女平等权利的信念",
+   "polarity": "+",
+   "phasepost": {
+    "op": "EVA",
+    "grain": "Figure"
+   },
+   "clause": "main",
+   "prop": "udhr:faith-reaffirmed",
+   "ground": "preamble.5.1",
+   "role": "premise",
+   "because": "a held commitment restated ('信念', conviction), not a frame replaced — Relate·Interpretation at figure grain; REC is the re-zero and concedes a prior ground, which reaffirmation does not. '在联合国宪章中' is adjunct (A2)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "REC",
+    "grain": "Figure",
+    "because": "the prior reading, kept disclosed"
+   },
+   "span": {
+    "start": 478,
+    "end": 556
+   },
+   "anchor": "已在联合国宪章中重申他们对基本人权"
+  },
+  {
+   "subject": "各联合国国家的人民",
+   "relation": "决心",
+   "object": "促成较大自由中的社会进步和生活水平的改善",
+   "polarity": "+",
+   "phasepost": {
+    "op": "DEF",
+    "grain": "Figure"
+   },
+   "clause": "main",
+   "prop": "udhr:progress-determined",
+   "ground": "preamble.5.2",
+   "role": "premise",
+   "because": "forming a resolution bounds a course of action, cutting off the others — Differentiate·Interpretation on one resolve; complement stays inside the object (A1)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "coordinated predicate shares '各联合国国家的人民'",
+   "alternate": {
+    "op": "REC",
+    "grain": "Figure",
+    "because": "readable as generating a new commitment"
+   },
+   "span": {
+    "start": 478,
+    "end": 556
+   },
+   "anchor": "并决心促成较大自由中的社会进步和生活水平的改善"
+  },
+  {
+   "subject": "各会员国",
+   "relation": "誓愿",
+   "object": "对人权和基本自由的普遍尊重和遵行",
+   "polarity": "+",
+   "phasepost": {
+    "op": "CON",
+    "grain": "Figure"
+   },
+   "clause": "main",
+   "prop": "udhr:states-pledged",
+   "ground": "preamble.6.1",
+   "role": "premise",
+   "because": "a vow places the pledger and an undertaking into one standing link — Relate·Structure at figure grain (one specific commitment); '同联合国合作' is adjunct (A2)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 558,
+    "end": 600
+   },
+   "anchor": "各会员国业已誓愿同联合国合作"
+  },
+  {
+   "subject": "对这些权利和自由的普遍了解",
+   "relation": "具有",
+   "object": "很大的重要性",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Figure"
+   },
+   "clause": "main",
+   "prop": "udhr:understanding-importance",
+   "ground": "preamble.7.1",
+   "role": "premise",
+   "because": "'具有' (possesses) + property predicate — copula rule 4's property-predication pattern via a possession verb",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 602,
+    "end": 643
+   },
+   "anchor": "对这些权利和自由的普遍了解对于这个誓愿的充分实现具有很大的重要性"
+  },
+  {
+   "subject": "大会",
+   "relation": "发布",
+   "object": "这一世界人权宣言,作为所有人民和所有国家努力实现的共同标准",
+   "polarity": "+",
+   "phasepost": {
+    "op": "DEF",
+    "grain": "Figure"
+   },
+   "clause": "main",
+   "prop": "udhr:assembly-proclaims",
+   "ground": "preamble.8.1",
+   "role": "operative",
+   "because": "issuing the Declaration's standing — a bounded public act of definition, the operative act the premises support; this file keeps the whole proclamation in ONE paragraph where en/ar/es split it across three",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "subject '大会' stands as a comma-set-off appositive immediately before the verb, within the same paragraph",
+   "alternate": null,
+   "span": {
+    "start": 645,
+    "end": 789
+   },
+   "anchor": "大会,发布这一世界人权宣言"
+  },
+  {
+   "subject": "所有人民和所有国家",
+   "relation": "努力实现",
+   "object": "共同标准",
+   "polarity": "+",
+   "phasepost": {
+    "op": "INS",
+    "grain": "Pattern"
+   },
+   "clause": "relative",
+   "prop": "udhr:standard-to-strive",
+   "ground": "preamble.8.1.1",
+   "role": "operative",
+   "because": "RE-TYPED 2026-08-31 (was CON·Pattern, typed off the deontic frame). '努力实现' — labouring to REALIZE the standard: the product is a state of affairs in which the standard is actual, Generate·Existence at pattern grain (all peoples, standing labour); the conative '努力' is noted, not typed",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "CON",
+    "grain": "Pattern",
+    "because": "the prior reading: prescribed standing conduct"
+   },
+   "span": {
+    "start": 645,
+    "end": 789
+   },
+   "anchor": "作为所有人民和所有国家努力实现的共同标准"
+  },
+  {
+   "subject": "每一个人和社会机构",
+   "relation": "铭念",
+   "object": "本宣言",
+   "polarity": "+",
+   "phasepost": {
+    "op": "EVA",
+    "grain": "Pattern"
+   },
+   "clause": "purpose-adjunct",
+   "prop": "udhr:keep-in-mind",
+   "ground": "preamble.8.1.2",
+   "role": "operative",
+   "because": "a content held in mind by a holder — Relate·Interpretation; '经常' (constantly) makes it habitual, hence Pattern",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 645,
+    "end": 789
+   },
+   "anchor": "以期每一个人和社会机构经常铭念本宣言"
+  },
+  {
+   "subject": "每一个人和社会机构",
+   "relation": "促进",
+   "object": "对权利和自由的尊重",
+   "polarity": "+",
+   "phasepost": {
+    "op": "REC",
+    "grain": "Pattern"
+   },
+   "clause": "purpose-adjunct",
+   "prop": "udhr:promote-respect",
+   "ground": "preamble.8.1.3",
+   "role": "operative",
+   "because": "RE-TYPED 2026-08-31 (was CON·Pattern, typed off the deontic frame). Verb-first: '促进尊重', by teaching and education — fostering a valuation in others, an interpretive product: Generate·Interpretation at pattern grain. Typed from the verb; re-occupying an empty cell is a consequence, not a reason",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "coordinated purpose predicate shares '每一个人和社会机构'",
+   "alternate": {
+    "op": "CON",
+    "grain": "Pattern",
+    "because": "the prior reading: prescribed standing conduct"
+   },
+   "span": {
+    "start": 645,
+    "end": 789
+   },
+   "anchor": "努力通过教诲和教育促进对权利和自由的尊重"
+  },
+  {
+   "subject": "这些权利和自由",
+   "relation": "得到",
+   "object": "普遍和有效的承认和遵行",
+   "polarity": "+",
+   "phasepost": {
+    "op": "REC",
+    "grain": "Pattern"
+   },
+   "clause": "purpose-adjunct",
+   "prop": "udhr:secure-recognition",
+   "ground": "preamble.8.1.4",
+   "role": "operative",
+   "because": "RE-TYPED 2026-08-31 (was CON·Pattern). '得到承认' — the rights COMING TO RECEIVE universal acknowledgment: an interpretive standing generated across the kind, Generate·Interpretation at pattern grain; the coordinated '遵行' (observance) leans structural, disclosed in the alternate",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "INS",
+    "grain": "Pattern",
+    "because": "the observance half read as a state of affairs brought into being"
+   },
+   "span": {
+    "start": 645,
+    "end": 789
+   },
+   "anchor": "使这些权利和自由在各会员国本身人民及在其管辖下领土的人民中得到普遍和有效的承认和遵行"
+  },
+  {
+   "subject": null,
+   "relation": "第一条",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-1",
+   "ground": "article-1",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens — Relate·Existence at Ground grain",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 794,
+    "end": 803
+   },
+   "anchor": "第一条"
+  },
+  {
+   "subject": "人人",
+   "relation": "生而",
+   "object": "自由,在尊严和权利上一律平等",
+   "polarity": "+",
+   "phasepost": {
+    "op": "INS",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:born-free",
+   "ground": "article-1.1.1",
+   "role": "declared",
+   "because": "birth stated as a law over the whole kind — Generate·Existence at pattern grain",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 805,
+    "end": 854
+   },
+   "anchor": "人人生而自由,在尊严和权利上一律平等。"
+  },
+  {
+   "subject": "他们",
+   "relation": "赋有",
+   "object": "理性和良心",
+   "polarity": "+",
+   "phasepost": {
+    "op": "CON",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:endowed-reason",
+   "ground": "article-1.1.2",
+   "role": "declared",
+   "because": "reason and conscience are constituent faculties — a part-whole arrangement stated as a law of the kind: Relate·Structure at pattern grain",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "'他们' → 人人, previous sentence's subject",
+   "alternate": null,
+   "span": {
+    "start": 805,
+    "end": 854
+   },
+   "anchor": "他们赋有理性和良心"
+  },
+  {
+   "subject": "他们",
+   "relation": "相对待",
+   "object": "以兄弟关系的精神",
+   "polarity": "+",
+   "phasepost": {
+    "op": "CON",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:act-brotherhood",
+   "ground": "article-1.1.3",
+   "role": "declared",
+   "because": "'相对待' — a standing mutual relation among members of the kind: Relate·Structure at pattern grain; deontic '应' noted (A3)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "shared subject '他们' → 人人",
+   "alternate": null,
+   "span": {
+    "start": 805,
+    "end": 854
+   },
+   "anchor": "并应以兄弟关系的精神相对待。"
+  },
+  {
+   "subject": null,
+   "relation": "第二条",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-2",
+   "ground": "article-2",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 859,
+    "end": 868
+   },
+   "anchor": "第二条"
+  },
+  {
+   "subject": "人人",
+   "relation": "有资格享有",
+   "object": "本宣言所载的一切权利和自由",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:entitled-to-rights",
+   "ground": "article-2.1.1",
+   "role": "declared",
+   "because": "'有资格享有' (is qualified to enjoy) — a normative standing held by the kind, the same condition-holding shape as enjoy-freedoms: Relate·Existence at pattern grain; '所载的' is attributive and folds (R1)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 870,
+    "end": 946
+   },
+   "anchor": "人人有资格享有本宣言所载的一切权利和自由"
+  },
+  {
+   "subject": "人人",
+   "relation": "不分",
+   "object": "种族、肤色、性别、语言、宗教、政治或其他见解、国籍或社会出身、财产、出生或其他身分等任何区别",
+   "polarity": "-",
+   "phasepost": {
+    "op": "SEG",
+    "grain": "Pattern"
+   },
+   "clause": "coordinate",
+   "prop": "udhr:no-distinction-kind",
+   "ground": "article-2.1.2",
+   "role": "declared",
+   "because": "Mandarin VERBS what the other four carry as a verbless adjunct: '不分' (not-distinguishing-by) — distinguishing cuts the kind into classes, Differentiate·Structure at pattern grain, negated by 不: polarity − per R6. A language-unique row (the prop matrix records the others' folds), the same paratactic pattern as 玷污了",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "the non-distinguishing ranges over the entitled kind '人人', the matrix clause's own subject",
+   "alternate": {
+    "op": "NUL",
+    "grain": "Pattern",
+    "because": "A4's absence-as-act reading, polarity +"
+   },
+   "span": {
+    "start": 870,
+    "end": 946
+   },
+   "anchor": "不分种族、肤色、性别、语言、宗教、政治或其他见解、国籍或社会出身、财产、出生或其他身分等任何区别"
+  },
+  {
+   "subject": "人人",
+   "relation": "有所区别",
+   "object": "因一人所属的国家或领土的政治的、行政的或者国际的地位之不同",
+   "polarity": "-",
+   "phasepost": {
+    "op": "SEG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:no-distinction-status",
+   "ground": "article-2.2.1",
+   "role": "declared",
+   "because": "differentiating-by-status CUTS the kind into classes — Differentiate·Structure at pattern grain, prohibited ('不得'): polarity − per R6; '一人所属的' is attributive and folds; the '无论该领土是…' tail is a concessive alternative-list (folded, noted)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "impersonal prohibition; the ones not to be differentiated are the entitled kind, carried from the previous clause's 人人",
+   "alternate": {
+    "op": "NUL",
+    "grain": "Pattern",
+    "because": "A4's absence-as-act reading, polarity +"
+   },
+   "span": {
+    "start": 948,
+    "end": 1033
+   },
+   "anchor": "并且不得因一人所属的国家或领土的政治的、行政的或者国际的地位之不同而有所区别"
+  },
+  {
+   "subject": null,
+   "relation": "第三条",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-3",
+   "ground": "article-3",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 1038,
+    "end": 1047
+   },
+   "anchor": "第三条"
+  },
+  {
+   "subject": "人人",
+   "relation": "有权享有",
+   "object": "生命、自由和人身安全",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:life-liberty-security",
+   "ground": "article-3.1.1",
+   "role": "declared",
+   "because": "'有权享有' — the right-holding frame: a normative standing held by the kind, Relate·Existence at pattern grain; three coordinated right-objects (R4)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 1049,
+    "end": 1072
+   },
+   "anchor": "人人有权享有生命、自由和人身安全。"
+  },
+  {
+   "subject": null,
+   "relation": "第四条",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-4",
+   "ground": "article-4",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 1077,
+    "end": 1086
+   },
+   "anchor": "第四条"
+  },
+  {
+   "subject": "任何人",
+   "relation": "不得使为",
+   "object": "奴隶或奴役",
+   "polarity": "-",
+   "phasepost": {
+    "op": "INS",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:no-slavery",
+   "ground": "article-4.1.1",
+   "role": "declared",
+   "because": "'使为奴隶' — a CAUSATIVE: making someone BE a slave, the enslaved state brought into being: Generate·Existence at pattern grain, prohibited ('不得'): polarity − per R6. Mandarin and Swahili verb the MAKING where English, Arabic and Spanish verb the holding/subjection (CON) — the two-family split the en row maps",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "CON",
+    "grain": "Pattern",
+    "because": "the siblings' reading: the bondage-arrangement negated"
+   },
+   "span": {
+    "start": 1088,
+    "end": 1129
+   },
+   "anchor": "任何人不得使为奴隶或奴役"
+  },
+  {
+   "subject": "一切形式的奴隶制度和奴隶买卖",
+   "relation": "均应予以禁止",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "DEF",
+    "grain": "Pattern"
+   },
+   "clause": "coordinate",
+   "prop": "udhr:slavery-prohibited",
+   "ground": "article-4.1.2",
+   "role": "declared",
+   "because": "'禁止' (prohibit) DRAWS AN EXCLUSION BOUNDARY around the practice-kind — Differentiate·Interpretation at pattern grain; the prohibition itself is asserted: polarity +; deontic '应' noted (A3)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 1088,
+    "end": 1129
+   },
+   "anchor": "一切形式的奴隶制度和奴隶买卖,均应予以禁止"
+  },
+  {
+   "subject": null,
+   "relation": "第五条",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-5",
+   "ground": "article-5",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 1134,
+    "end": 1143
+   },
+   "anchor": "第五条"
+  },
+  {
+   "subject": "任何人",
+   "relation": "不得加以",
+   "object": "酷刑,或施以残忍的、不人道的或侮辱性的待遇或刑罚",
+   "polarity": "-",
+   "phasepost": {
+    "op": "INS",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:no-torture",
+   "ground": "article-5.1.1",
+   "role": "declared",
+   "because": "'加以酷刑…施以待遇' — the INFLICTING itself verbed (apply torture to, administer treatment to): the infliction generated upon the person, Generate·Existence at pattern grain, prohibited: polarity − (English and Spanish verb the subjection instead, CON — the same two-family split as no-slavery)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "CON",
+    "grain": "Pattern",
+    "because": "the siblings' reading: subjection to the infliction negated"
+   },
+   "span": {
+    "start": 1145,
+    "end": 1183
+   },
+   "anchor": "任何人不得加以酷刑,或施以残忍的、不人道的或侮辱性的待遇或刑罚。"
+  },
+  {
+   "subject": null,
+   "relation": "第六条",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-6",
+   "ground": "article-6",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 1188,
+    "end": 1197
+   },
+   "anchor": "第六条"
+  },
+  {
+   "subject": "人人",
+   "relation": "有权被承认",
+   "object": "在法律前的人格",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:recognition-before-law",
+   "ground": "article-6.1.1",
+   "role": "declared",
+   "because": "the right-holding frame; the recognition stays inside the right-content (A1); '在任何地方' is an adjunct (A2)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 1199,
+    "end": 1225
+   },
+   "anchor": "人人在任何地方有权被承认在法律前的人格。"
+  },
+  {
+   "subject": null,
+   "relation": "第七条",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-7",
+   "ground": "article-7",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 1230,
+    "end": 1239
+   },
+   "anchor": "第七条"
+  },
+  {
+   "subject": "人人",
+   "relation": "平等",
+   "object": "法律之前",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:equal-before-law",
+   "ground": "article-7.1.1",
+   "role": "declared",
+   "because": "a copula-less property predication (fronted locus, adjectival predicate 平等) — rule 4's shape with no copula expressed: a condition held by the kind, Relate·Existence at pattern grain",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 1241,
+    "end": 1318
+   },
+   "anchor": "法律之前人人平等"
+  },
+  {
+   "subject": "人人",
+   "relation": "有权享受",
+   "object": "法律的平等保护",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "coordinate",
+   "prop": "udhr:equal-protection",
+   "ground": "article-7.1.2",
+   "role": "declared",
+   "because": "the right-holding frame; the trailing '不受任何歧视' (without suffering any discrimination) is a manner adjunct-clause, folded with the fold noted (A2)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "coordinated predicate shares '人人'",
+   "alternate": null,
+   "span": {
+    "start": 1241,
+    "end": 1318
+   },
+   "anchor": "并有权享受法律的平等保护,不受任何歧视"
+  },
+  {
+   "subject": "人人",
+   "relation": "有权享受",
+   "object": "平等保护",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:protection-against-discrimination",
+   "ground": "article-7.1.3",
+   "role": "declared",
+   "because": "the right-holding frame; the '以免受…之害' purpose clause (so as not to suffer harm from…) characterizes what the protection is against and folds (A2); '违反本宣言的' is attributive and folds (R1)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 1241,
+    "end": 1318
+   },
+   "anchor": "人人有权享受平等保护,以免受违反本宣言的任何歧视行为"
+  },
+  {
+   "subject": null,
+   "relation": "第八条",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-8",
+   "ground": "article-8",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 1323,
+    "end": 1332
+   },
+   "anchor": "第八条"
+  },
+  {
+   "subject": "任何人",
+   "relation": "有权",
+   "object": "由合格的国家法庭对这种侵害行为作有效的补救",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:effective-remedy",
+   "ground": "article-8.1.1",
+   "role": "declared",
+   "because": "the right-holding frame; the remedy-making stays inside the right-content (A1); the when-violated condition has its own row — Mandarin alone verbs it finitely",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "'这种侵害行为' → the violation the conditional clause names (article-8.1.1.1)",
+   "alternate": null,
+   "span": {
+    "start": 1334,
+    "end": 1388
+   },
+   "anchor": "有权由合格的国家法庭对这种侵害行为作有效的补救"
+  },
+  {
+   "subject": "宪法或法律所赋予他的基本权利",
+   "relation": "遭受",
+   "object": "侵害",
+   "polarity": "+",
+   "phasepost": {
+    "op": "DEF",
+    "grain": "Pattern"
+   },
+   "clause": "conditional-adjunct",
+   "prop": "udhr:rights-violated",
+   "ground": "article-8.1.1.1",
+   "role": "declared",
+   "because": "a language-unique row: Mandarin verbs the violation condition ('遭受侵害', suffer infringement) that English/Arabic/Spanish fold as participles — infringing a right transgresses its normative boundary, marring the standing: Differentiate·Interpretation at pattern grain (a generic when-clause), asserted within the condition: polarity +; '宪法或法律所赋予他的' is attributive and folds (R1)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Pattern",
+    "because": "readable as the protective arrangement breached rather than the meaning marred"
+   },
+   "span": {
+    "start": 1334,
+    "end": 1388
+   },
+   "anchor": "当宪法或法律所赋予他的基本权利遭受侵害时"
+  },
+  {
+   "subject": null,
+   "relation": "第九条",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-9",
+   "ground": "article-9",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 1393,
+    "end": 1402
+   },
+   "anchor": "第九条"
+  },
+  {
+   "subject": "任何人",
+   "relation": "不得加以",
+   "object": "任意逮捕、拘禁或放逐",
+   "polarity": "-",
+   "phasepost": {
+    "op": "INS",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:no-arbitrary-arrest",
+   "ground": "article-9.1.1",
+   "role": "declared",
+   "because": "'加以逮捕' — the infliction verbed again (apply arrest to): the seizure generated upon the person, Generate·Existence at pattern grain, prohibited: polarity − (en/ar/es read the custody-arrangement side, CON — the two-family split, consistently on the zh side of it)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "CON",
+    "grain": "Pattern",
+    "because": "the siblings' reading: the custody-arrangement negated"
+   },
+   "span": {
+    "start": 1404,
+    "end": 1428
+   },
+   "anchor": "任何人不得加以任意逮捕、拘禁或放逐。"
+  },
+  {
+   "subject": null,
+   "relation": "第十条",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-10",
+   "ground": "article-10",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 1433,
+    "end": 1442
+   },
+   "anchor": "第十条"
+  },
+  {
+   "subject": "人人",
+   "relation": "有权",
+   "object": "由一个独立而无偏倚的法庭进行公正的和公开的审讯",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:fair-hearing",
+   "ground": "article-10.1.1",
+   "role": "declared",
+   "because": "the right-holding frame; '完全平等地' is a manner adverb (A2); the hearing and the '以确定…' purpose stay inside the right-content (A1/A2)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 1444,
+    "end": 1508
+   },
+   "anchor": "人人完全平等地有权由一个独立而无偏倚的法庭进行公正的和公开的审讯"
+  },
+  {
+   "subject": null,
+   "relation": "第十一条",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-11",
+   "ground": "article-11",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 1513,
+    "end": 1523
+   },
+   "anchor": "第十一条"
+  },
+  {
+   "subject": "凡受刑事控告者",
+   "relation": "有权被视为",
+   "object": "无罪",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:presumed-innocent",
+   "ground": "article-11.1.1",
+   "role": "declared",
+   "because": "the right-holding frame ('有权被视为无罪', has the right to be deemed innocent) — with English, Spanish and Swahili; Arabic verbs the deeming directly (EVA). The until-proven boundary ('在未经…以前') and the trial-guarantees content stay folded (A2/A1)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 1527,
+    "end": 1583
+   },
+   "anchor": "凡受刑事控告者,在未经获得辩护上所需的一切保证的公开审判而依法证实有罪以前,有权被视为无罪。"
+  },
+  {
+   "subject": "任何人",
+   "relation": "不得被判为",
+   "object": "犯有刑事罪",
+   "polarity": "-",
+   "phasepost": {
+    "op": "EVA",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:no-retroactive-guilt",
+   "ground": "article-11.2.1",
+   "role": "declared",
+   "because": "'被判为' (be adjudged as) — a judgment rendered over a person: Relate·Interpretation at pattern grain, prohibited: polarity − per R6; the topicalized act-or-omission relative has its own row (R8)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "the topic NP '任何人的任何行为或不行为…者' names the act; the one judged is its person ('任何人')",
+   "alternate": null,
+   "span": {
+    "start": 1587,
+    "end": 1660
+   },
+   "anchor": "任何人的任何行为或不行为,在其发生时依国家法或国际法均不构成刑事罪者,不得被判为犯有刑事罪"
+  },
+  {
+   "subject": "任何行为或不行为",
+   "relation": "不构成",
+   "object": "刑事罪",
+   "polarity": "-",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "restrictive-relative",
+   "prop": "udhr:act-not-offence-then",
+   "ground": "article-11.2.1.1",
+   "role": "declared",
+   "because": "'构成' (constitute) is class-membership — the copular family verbal (rule 1): Relate·Existence at pattern grain, negated: polarity − — Mandarin sides with English and Spanish in the four-way nullum crimen split (Arabic deems inside an unless-clause, Swahili negates contravention); '在其发生时' is the temporal boundary, folded (A2)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "the 者-relative restricts '任何行为或不行为', its own head",
+   "alternate": null,
+   "span": {
+    "start": 1587,
+    "end": 1660
+   },
+   "anchor": "在其发生时依国家法或国际法均不构成刑事罪者"
+  },
+  {
+   "subject": "刑罚",
+   "relation": "不得重于",
+   "object": "犯罪时适用的法律规定",
+   "polarity": "-",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "coordinate",
+   "prop": "udhr:no-heavier-penalty",
+   "ground": "article-11.2.2",
+   "role": "declared",
+   "because": "Mandarin states the BARE COMPARATIVE — '重于' (heavier-than), a property relation between penalty and standard: Relate·Existence at pattern grain, prohibited: polarity − — where English, Arabic, Spanish and Swahili verb the IMPOSING (INS): a real construction divergence; '犯罪时适用的' is attributive and folds (R1)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "INS",
+    "grain": "Pattern",
+    "because": "the siblings' reading: the imposition of the heavier penalty negated"
+   },
+   "span": {
+    "start": 1587,
+    "end": 1660
+   },
+   "anchor": "刑罚不得重于犯罪时适用的法律规定。"
+  },
+  {
+   "subject": null,
+   "relation": "第十二条",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-12",
+   "ground": "article-12",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 1667,
+    "end": 1677
+   },
+   "anchor": "第十二条"
+  },
+  {
+   "subject": "任何人的私生活、家庭、住宅和通信",
+   "relation": "不得任意干涉",
+   "object": null,
+   "polarity": "-",
+   "phasepost": {
+    "op": "SEG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:no-arbitrary-interference",
+   "ground": "article-12.1.1",
+   "role": "declared",
+   "because": "'干涉' (interfere with) — the intrusion DISRUPTS the private sphere's arrangement: Differentiate·Structure at pattern grain, prohibited: polarity − (en/ar/es verb the subjection instead, CON); topic-possessor construction, the sphere itself as subject",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "CON",
+    "grain": "Pattern",
+    "because": "the siblings' reading: subjection to interference negated"
+   },
+   "span": {
+    "start": 1679,
+    "end": 1744
+   },
+   "anchor": "任何人的私生活、家庭、住宅和通信不得任意干涉"
+  },
+  {
+   "subject": "他的荣誉和名誉",
+   "relation": "不得加以攻击",
+   "object": null,
+   "polarity": "-",
+   "phasepost": {
+    "op": "DEF",
+    "grain": "Pattern"
+   },
+   "clause": "coordinate",
+   "prop": "udhr:no-attacks-honour",
+   "ground": "article-12.1.2",
+   "role": "declared",
+   "because": "a row of its own — Mandarin (with Swahili) verbs the attacks clause the others fold into a coordinated object: honour and reputation are INTERPRETIVE standings (how one is regarded), and attacking them mars the standing: Differentiate·Interpretation at pattern grain, prohibited: polarity −",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "'他的' → 任何人, the previous clause's possessor",
+   "alternate": {
+    "op": "SEG",
+    "grain": "Pattern",
+    "because": "readable as the standing arrangement damaged rather than the meaning marred"
+   },
+   "span": {
+    "start": 1679,
+    "end": 1744
+   },
+   "anchor": "他的荣誉和名誉不得加以攻击"
+  },
+  {
+   "subject": "人人",
+   "relation": "有权享受",
+   "object": "法律保护",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:protection-of-law",
+   "ground": "article-12.1.3",
+   "role": "declared",
+   "because": "the right-holding frame; the '以免受…' purpose clause folds (A2)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 1679,
+    "end": 1744
+   },
+   "anchor": "人人有权享受法律保护,以免受这种干涉或攻击。"
+  },
+  {
+   "subject": null,
+   "relation": "第十三条",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-13",
+   "ground": "article-13",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 1749,
+    "end": 1759
+   },
+   "anchor": "第十三条"
+  },
+  {
+   "subject": "人人",
+   "relation": "有权",
+   "object": "自由迁徙和居住",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:freedom-of-movement",
+   "ground": "article-13.1.1",
+   "role": "declared",
+   "because": "the right-holding frame; '在各国境内' is a locative adjunct (A2)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 1763,
+    "end": 1790
+   },
+   "anchor": "人人在各国境内有权自由迁徙和居住。"
+  },
+  {
+   "subject": "人人",
+   "relation": "有权离开",
+   "object": "任何国家,包括其本国在内",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:leave-and-return",
+   "ground": "article-13.2.1",
+   "role": "declared",
+   "because": "the right-holding frame; Mandarin REPEATS the right-verb for the return half (并有权返回) — two rows on this prop (R9), like Arabic and Swahili",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 1794,
+    "end": 1833
+   },
+   "anchor": "人人有权离开任何国家,包括其本国在内"
+  },
+  {
+   "subject": "人人",
+   "relation": "有权返回",
+   "object": "他的国家",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "coordinate",
+   "prop": "udhr:leave-and-return",
+   "ground": "article-13.2.2",
+   "role": "declared",
+   "because": "the second right-verb of the pair; same frame, same prop",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "coordinated predicate shares '人人'",
+   "alternate": null,
+   "span": {
+    "start": 1794,
+    "end": 1833
+   },
+   "anchor": "并有权返回他的国家"
+  },
+  {
+   "subject": null,
+   "relation": "第十四条",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-14",
+   "ground": "article-14",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 1840,
+    "end": 1850
+   },
+   "anchor": "第十四条"
+  },
+  {
+   "subject": "人人",
+   "relation": "有权",
+   "object": "在其他国家寻求和享受庇护",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:seek-asylum",
+   "ground": "article-14.1.1",
+   "role": "declared",
+   "because": "the right-holding frame; two coordinated acts (seek, enjoy) inside the right-content (A1); '以避免迫害' is a purpose adjunct (A2)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 1854,
+    "end": 1886
+   },
+   "anchor": "人人有权在其他国家寻求和享受庇护以避免迫害。"
+  },
+  {
+   "subject": "此种权利",
+   "relation": "不得援用",
+   "object": null,
+   "polarity": "-",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:asylum-not-invoked",
+   "ground": "article-14.2.1",
+   "role": "declared",
+   "because": "'援用' (invoke/cite) — APPEALING TO the standing: Relate·Existence at pattern grain, prohibited for the named case-class: polarity − per R6; the fronted '在…情况下' case-class condition folds (A2); impersonal prohibition, the right as patient",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "'此种权利' → the asylum right (article-14.1.1); the invoker is left impersonal",
+   "alternate": {
+    "op": "DEF",
+    "grain": "Pattern",
+    "because": "readable by effect: the right's scope bounded to exclude the case-class"
+   },
+   "span": {
+    "start": 1890,
+    "end": 1945
+   },
+   "anchor": "在真正由于非政治性的罪行或违背联合国的宗旨和原则的行为而被起诉的情况下,不得援用此种权利。"
+  },
+  {
+   "subject": null,
+   "relation": "第十五条",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-15",
+   "ground": "article-15",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 1952,
+    "end": 1962
+   },
+   "anchor": "第十五条"
+  },
+  {
+   "subject": "人人",
+   "relation": "有权享有",
+   "object": "国籍",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:right-to-nationality",
+   "ground": "article-15.1.1",
+   "role": "declared",
+   "because": "the right-holding frame",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 1966,
+    "end": 1985
+   },
+   "anchor": "人人有权享有国籍。"
+  },
+  {
+   "subject": "任何人的国籍",
+   "relation": "不得任意剥夺",
+   "object": null,
+   "polarity": "-",
+   "phasepost": {
+    "op": "SEG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:no-deprive-nationality",
+   "ground": "article-15.2.1",
+   "role": "declared",
+   "because": "'剥夺' (strip away) SEVERS the person-nationality tie — Differentiate·Structure at pattern grain, prohibited: polarity −; topic-possessor construction, the nationality itself as subject",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 1989,
+    "end": 2026
+   },
+   "anchor": "任何人的国籍不得任意剥夺"
+  },
+  {
+   "subject": "任何人",
+   "relation": "不得否认",
+   "object": "其改变国籍的权利",
+   "polarity": "-",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "coordinate",
+   "prop": "udhr:no-deny-change-nationality",
+   "ground": "article-15.2.2",
+   "role": "declared",
+   "because": "'否认' (deny) WITHHOLDS the standing — the right-holding frame under refusal: Relate·Existence at pattern grain, prohibited: polarity −; the change-content stays inside the denied right-object (A1)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "'其' → 任何人, the previous clause's possessor; impersonal prohibition",
+   "alternate": {
+    "op": "EVA",
+    "grain": "Pattern",
+    "because": "denial readable as an adverse judgment rendered"
+   },
+   "span": {
+    "start": 1989,
+    "end": 2026
+   },
+   "anchor": "亦不得否认其改变国籍的权利"
+  },
+  {
+   "subject": null,
+   "relation": "第十六条",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-16",
+   "ground": "article-16",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 2033,
+    "end": 2043
+   },
+   "anchor": "第十六条"
+  },
+  {
+   "subject": "成年男女",
+   "relation": "有权",
+   "object": "婚嫁和成立家庭",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:marry-found-family",
+   "ground": "article-16.1.1",
+   "role": "declared",
+   "because": "the right-holding frame; '不受种族、国籍或宗教的任何限制' is a manner adjunct-clause, folded (A2)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 2047,
+    "end": 2116
+   },
+   "anchor": "成年男女,不受种族、国籍或宗教的任何限制有权婚嫁和成立家庭。"
+  },
+  {
+   "subject": "成年男女",
+   "relation": "应有",
+   "object": "平等的权利",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:equal-rights-marriage",
+   "ground": "article-16.1.2",
+   "role": "declared",
+   "because": "the right-holding frame; the three phase-PPs ('在婚姻方面…') are adjuncts (A2); deontic '应' noted (A3)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "'他们' → 成年男女, previous sentence's subject",
+   "alternate": null,
+   "span": {
+    "start": 2047,
+    "end": 2116
+   },
+   "anchor": "他们在婚姻方面,在结婚期间和在解除婚约时,应有平等的权利。"
+  },
+  {
+   "subject": null,
+   "relation": "才能缔婚",
+   "object": "只有经男女双方的自由和完全的同意",
+   "polarity": "+",
+   "phasepost": {
+    "op": "CON",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:marriage-consent",
+   "ground": "article-16.2.1",
+   "role": "declared",
+   "because": "'缔婚' (tie the marriage) JOINS the parties into the arrangement — Relate·Structure at pattern grain; '只有…才' is a restrictor, not a negation: polarity + (with English and Swahili; Arabic's لا…إلا carries −); impersonal — the intending parties stand inside the 经-phrase",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "subjectless impersonal; the marrying parties are the 经-phrase's 男女双方",
+   "alternate": {
+    "op": "INS",
+    "grain": "Pattern",
+    "because": "readable as the marriage brought into being"
+   },
+   "span": {
+    "start": 2120,
+    "end": 2152
+   },
+   "anchor": "只有经男女双方的自由和完全的同意,才能缔婚。"
+  },
+  {
+   "subject": "家庭",
+   "relation": "是",
+   "object": "天然的和基本的社会单元",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:family-unit-society",
+   "ground": "article-16.3.1",
+   "role": "declared",
+   "because": "copula + bare role-NP with NO definiteness marking — Mandarin has no article, so rule 3's identificational trigger (THE unit) cannot fire on this language's own bytes: read as class-membership over the kind (rule 1), Relate·Existence at pattern grain. The prop's Rosetta finding: article-marked languages (en/ar/es) land SIG·Figure here, Swahili's mereological 'kiungo' lands CON — definiteness marking drives the cell",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SIG",
+    "grain": "Figure",
+    "because": "reading the role as inherently unique despite the unmarked NP — the siblings' cell"
+   },
+   "span": {
+    "start": 2156,
+    "end": 2193
+   },
+   "anchor": "家庭是天然的和基本的社会单元"
+  },
+  {
+   "subject": "家庭",
+   "relation": "应受",
+   "object": "社会和国家的保护",
+   "polarity": "+",
+   "phasepost": {
+    "op": "CON",
+    "grain": "Pattern"
+   },
+   "clause": "coordinate",
+   "prop": "udhr:family-protected",
+   "ground": "article-16.3.2",
+   "role": "declared",
+   "because": "'受…保护' — Mandarin verbs the protection-standing DIRECTLY (the family stands under the guard of society and State): the coverage arrangement, Relate·Structure at pattern grain — where the siblings use an entitlement frame (SIG); deontic '应' noted (A3)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "coordinated predicate shares '家庭'",
+   "alternate": {
+    "op": "SIG",
+    "grain": "Pattern",
+    "because": "the siblings' reading: the protection held as an entitlement"
+   },
+   "span": {
+    "start": 2156,
+    "end": 2193
+   },
+   "anchor": "并应受社会和国家的保护"
+  },
+  {
+   "subject": null,
+   "relation": "第十七条",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-17",
+   "ground": "article-17",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 2200,
+    "end": 2210
+   },
+   "anchor": "第十七条"
+  },
+  {
+   "subject": "人人",
+   "relation": "得有",
+   "object": "单独的财产所有权以及同他人合有的所有权",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:own-property",
+   "ground": "article-17.1.1",
+   "role": "declared",
+   "because": "'得有' (may have) — the licensed holding of ownership: the right-holding frame with the license carried by 得, Relate·Existence at pattern grain",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 2214,
+    "end": 2248
+   },
+   "anchor": "人人得有单独的财产所有权以及同他人合有的所有权。"
+  },
+  {
+   "subject": "任何人的财产",
+   "relation": "不得任意剥夺",
+   "object": null,
+   "polarity": "-",
+   "phasepost": {
+    "op": "SEG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:no-deprive-property",
+   "ground": "article-17.2.1",
+   "role": "declared",
+   "because": "the deprivation frame: the person-property tie severed — Differentiate·Structure at pattern grain, prohibited: polarity −; topic-possessor construction",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 2252,
+    "end": 2275
+   },
+   "anchor": "任何人的财产不得任意剥夺。"
+  },
+  {
+   "subject": null,
+   "relation": "第十八条",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-18",
+   "ground": "article-18",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 2282,
+    "end": 2292
+   },
+   "anchor": "第十八条"
+  },
+  {
+   "subject": "人人",
+   "relation": "有",
+   "object": "思想、良心和宗教自由的权利",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:freedom-of-thought",
+   "ground": "article-18.1.1",
+   "role": "declared",
+   "because": "the right-holding frame",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 2294,
+    "end": 2375
+   },
+   "anchor": "人人有思想、良心和宗教自由的权利"
+  },
+  {
+   "subject": "此项权利",
+   "relation": "包括",
+   "object": "改变他的宗教或信仰的自由,以及单独或集体、公开或秘密地以教义、实践、礼拜和戒律表示他的宗教或信仰的自由",
+   "polarity": "+",
+   "phasepost": {
+    "op": "CON",
+    "grain": "Pattern"
+   },
+   "clause": "coordinate",
+   "prop": "udhr:thought-right-includes",
+   "ground": "article-18.1.2",
+   "role": "declared",
+   "because": "'包括' (include) is CONTAINMENT — the right holds these freedoms as parts: Relate·Structure at pattern grain; the manner alternatives fold (A2)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "'此项权利' → the right to freedom of thought, conscience and religion (article-18.1.1)",
+   "alternate": null,
+   "span": {
+    "start": 2294,
+    "end": 2375
+   },
+   "anchor": "此项权利包括改变他的宗教或信仰的自由"
+  },
+  {
+   "subject": null,
+   "relation": "第十九条",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-19",
+   "ground": "article-19",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 2380,
+    "end": 2390
+   },
+   "anchor": "第十九条"
+  },
+  {
+   "subject": "人人",
+   "relation": "有权享有",
+   "object": "主张和发表意见的自由",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:freedom-of-opinion",
+   "ground": "article-19.1.1",
+   "role": "declared",
+   "because": "the right-holding frame",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 2392,
+    "end": 2463
+   },
+   "anchor": "人人有权享有主张和发表意见的自由"
+  },
+  {
+   "subject": "此项权利",
+   "relation": "包括",
+   "object": "持有主张而不受干涉的自由,和通过任何媒介和不论国界寻求、接受和传递消息和思想的自由",
+   "polarity": "+",
+   "phasepost": {
+    "op": "CON",
+    "grain": "Pattern"
+   },
+   "clause": "coordinate",
+   "prop": "udhr:opinion-right-includes",
+   "ground": "article-19.1.2",
+   "role": "declared",
+   "because": "the inclusion frame: containment — Relate·Structure at pattern grain; the without-interference content stays inside the include-object (A1)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "'此项权利' → the right to freedom of opinion and expression (article-19.1.1)",
+   "alternate": null,
+   "span": {
+    "start": 2392,
+    "end": 2463
+   },
+   "anchor": "此项权利包括持有主张而不受干涉的自由"
+  },
+  {
+   "subject": null,
+   "relation": "第二十条",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-20",
+   "ground": "article-20",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 2468,
+    "end": 2478
+   },
+   "anchor": "第二十条"
+  },
+  {
+   "subject": "人人",
+   "relation": "有权享有",
+   "object": "和平集会和结社的自由",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:freedom-of-assembly",
+   "ground": "article-20.1.1",
+   "role": "declared",
+   "because": "the right-holding frame",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 2482,
+    "end": 2509
+   },
+   "anchor": "人人有权享有和平集会和结社的自由。"
+  },
+  {
+   "subject": "任何人",
+   "relation": "不得迫使",
+   "object": "隶属于某一团体",
+   "polarity": "-",
+   "phasepost": {
+    "op": "INS",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:no-compelled-association",
+   "ground": "article-20.2.1",
+   "role": "declared",
+   "because": "'迫使' — the compulsion frame: causative, forcing the membership into being, Generate·Existence at pattern grain, prohibited: polarity −; part of the matrix's five-way compulsion alignment",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "CON",
+    "grain": "Pattern",
+    "because": "readable as the forced-membership arrangement negated"
+   },
+   "span": {
+    "start": 2513,
+    "end": 2538
+   },
+   "anchor": "任何人不得迫使隶属于某一团体。"
+  },
+  {
+   "subject": null,
+   "relation": "第二十一条",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-21",
+   "ground": "article-21",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 2545,
+    "end": 2556
+   },
+   "anchor": "第二十一条"
+  },
+  {
+   "subject": "人人",
+   "relation": "有",
+   "object": "直接或通过自由选择的代表参与治理本国的权利",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:take-part-government",
+   "ground": "article-21.1.1",
+   "role": "declared",
+   "because": "the right-holding frame; the directly-or-through alternative rides attributively inside the right-NP (A2/R1)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 2560,
+    "end": 2595
+   },
+   "anchor": "人人有直接或通过自由选择的代表参与治理本国的权利。"
+  },
+  {
+   "subject": "人人",
+   "relation": "有",
+   "object": "平等机会参加本国公务的权利",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:equal-access-service",
+   "ground": "article-21.2.1",
+   "role": "declared",
+   "because": "the right-holding frame",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 2599,
+    "end": 2626
+   },
+   "anchor": "人人有平等机会参加本国公务的权利。"
+  },
+  {
+   "subject": "人民的意志",
+   "relation": "是",
+   "object": "政府权力的基础",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Figure"
+   },
+   "clause": "main",
+   "prop": "udhr:will-basis-authority",
+   "ground": "article-21.3.1",
+   "role": "declared",
+   "because": "copula rule 3's identificational — no article, but '政府权力的基础' (the basis OF that authority) is relationally unique: a thing's basis is one, so the unique-role trigger holds on this language's own construction (contrast 社会单元 in article 16, a sortal with no uniqueness, which lands rule 1)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "CON",
+    "grain": "Pattern",
+    "because": "basis-of readable as structural support"
+   },
+   "span": {
+    "start": 2630,
+    "end": 2710
+   },
+   "anchor": "人民的意志是政府权力的基础"
+  },
+  {
+   "subject": "这一意志",
+   "relation": "予以表现",
+   "object": "以定期的和真正的选举",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "coordinate",
+   "prop": "udhr:will-expressed-elections",
+   "ground": "article-21.3.2",
+   "role": "declared",
+   "because": "'予以表现' (be given expression) MAKES the will present as a sign in the elections — Relate·Existence at pattern grain; deontic '应' noted (A3)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "'这一意志' → 人民的意志 (article-21.3.1)",
+   "alternate": null,
+   "span": {
+    "start": 2630,
+    "end": 2710
+   },
+   "anchor": "这一意志应以定期的和真正的选举予以表现"
+  },
+  {
+   "subject": "选举",
+   "relation": "应依据",
+   "object": "普遍和平等的投票权",
+   "polarity": "+",
+   "phasepost": {
+    "op": "CON",
+    "grain": "Pattern"
+   },
+   "clause": "coordinate",
+   "prop": "udhr:elections-suffrage",
+   "ground": "article-21.3.3",
+   "role": "declared",
+   "because": "'依据' (be based on / accord with) — the elections STANDING ON universal and equal suffrage: a grounding arrangement, Relate·Structure at pattern grain — where English states a bare copular property; and a MAIN-level coordinate clause (而…) where English nests a relative: the address records the parataxis",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SIG",
+    "grain": "Pattern",
+    "because": "the en reading: suffrage as a manner-property of the election-kind"
+   },
+   "span": {
+    "start": 2630,
+    "end": 2710
+   },
+   "anchor": "而选举应依据普遍和平等的投票权"
+  },
+  {
+   "subject": "选举",
+   "relation": "进行",
+   "object": "以不记名投票或相当的自由投票程序",
+   "polarity": "+",
+   "phasepost": {
+    "op": "INS",
+    "grain": "Pattern"
+   },
+   "clause": "coordinate",
+   "prop": "udhr:elections-secret-vote",
+   "ground": "article-21.3.4",
+   "role": "declared",
+   "because": "'进行' (be conducted) brings the event about under the named procedure — Generate·Existence at pattern grain; again a main-level coordinate where English nests",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "coordinated predicate shares '选举'",
+   "alternate": null,
+   "span": {
+    "start": 2630,
+    "end": 2710
+   },
+   "anchor": "并以不记名投票或相当的自由投票程序进行"
+  },
+  {
+   "subject": null,
+   "relation": "第二十二条",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-22",
+   "ground": "article-22",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 2717,
+    "end": 2728
+   },
+   "anchor": "第二十二条"
+  },
+  {
+   "subject": "每个人",
+   "relation": "有权享受",
+   "object": "社会保障",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:right-social-security",
+   "ground": "article-22.1.1",
+   "role": "declared",
+   "because": "the right-holding frame; '作为社会的一员' is an appositive parenthetical (A2, presupposed not asserted)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 2730,
+    "end": 2828
+   },
+   "anchor": "每个人,作为社会的一员,有权享受社会保障"
+  },
+  {
+   "subject": "每个人",
+   "relation": "有权享受",
+   "object": "他的个人尊严和人格的自由发展所必需的经济、社会和文化方面各种权利的实现",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "coordinate",
+   "prop": "udhr:entitled-realization",
+   "ground": "article-22.1.2",
+   "role": "declared",
+   "because": "the right-holding frame with its own verb, like English ('is entitled to realization') — Arabic and Spanish fold this under one right-verb; '所必需的' is attributive and folds (R1)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "coordinated predicate shares '每个人'",
+   "alternate": null,
+   "span": {
+    "start": 2730,
+    "end": 2828
+   },
+   "anchor": "并有权享受他的个人尊严和人格的自由发展所必需的经济、社会和文化方面各种权利的实现"
+  },
+  {
+   "subject": "这种实现",
+   "relation": "是通过",
+   "object": "国家努力和国际合作",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "coordinate",
+   "prop": "udhr:entitled-realization",
+   "ground": "article-22.1.3",
+   "role": "declared",
+   "because": "a language-unique restatement: Mandarin gives the realization's MEANS its own copular sentence ('this realization is through national effort and international co-operation') where the siblings carry the means as adjuncts — copula + means-PP read as a property of the realization (rule 4's family): Relate·Existence at pattern grain; a second row on this prop (R9)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "'这种实现' → the realization of those rights (article-22.1.2's object)",
+   "alternate": {
+    "op": "CON",
+    "grain": "Pattern",
+    "because": "readable as the realization standing on the effort — a dependence arrangement"
+   },
+   "span": {
+    "start": 2730,
+    "end": 2828
+   },
+   "anchor": "这种实现是通过国家努力和国际合作并依照各国的组织和资源情况"
+  },
+  {
+   "subject": null,
+   "relation": "第二十三条",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-23",
+   "ground": "article-23",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 2833,
+    "end": 2844
+   },
+   "anchor": "第二十三条"
+  },
+  {
+   "subject": "人人",
+   "relation": "有权",
+   "object": "工作、自由选择职业、享受公正和合适的工作条件并享受免于失业的保障",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:right-to-work",
+   "ground": "article-23.1.1",
+   "role": "declared",
+   "because": "the right-holding frame; ONE 有权 over a serial of four VPs, kept whole (R4) — like English's four coordinated objects",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 2848,
+    "end": 2895
+   },
+   "anchor": "人人有权工作、自由选择职业、享受公正和合适的工作条件并享受免于失业的保障。"
+  },
+  {
+   "subject": "人人",
+   "relation": "有",
+   "object": "同工同酬的权利",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:equal-pay",
+   "ground": "article-23.2.1",
+   "role": "declared",
+   "because": "the right-holding frame; the trailing '不受任何歧视' is a manner adjunct-clause, folded (A2)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 2899,
+    "end": 2927
+   },
+   "anchor": "人人有同工同酬的权利,不受任何歧视。"
+  },
+  {
+   "subject": "每一个工作的人",
+   "relation": "有权享受",
+   "object": "公正和合适的报酬",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:just-remuneration",
+   "ground": "article-23.3.1",
+   "role": "declared",
+   "because": "the right-holding frame; the '保证使…' ensuring clause modifies the remuneration inside the right-object and folds (A1), as does '必要时并辅以…' — the subject's own attributive ('工作的') stays inside the subject NP (R4)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 2931,
+    "end": 2999
+   },
+   "anchor": "每一个工作的人,有权享受公正和合适的报酬"
+  },
+  {
+   "subject": "人人",
+   "relation": "有",
+   "object": "为维护其利益而组织和参加工会的权利",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:form-join-unions",
+   "ground": "article-23.4.1",
+   "role": "declared",
+   "because": "the right-holding frame; the purpose ('为维护其利益') rides attributively inside the right-NP (A2/R1)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 3003,
+    "end": 3034
+   },
+   "anchor": "人人有为维护其利益而组织和参加工会的权利。"
+  },
+  {
+   "subject": null,
+   "relation": "第二十四条",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-24",
+   "ground": "article-24",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 3041,
+    "end": 3052
+   },
+   "anchor": "第二十四条"
+  },
+  {
+   "subject": "人人",
+   "relation": "有",
+   "object": "享有休息和闲暇的权利,包括工作时间有合理限制和定期给薪休假的权利",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:rest-leisure",
+   "ground": "article-24.1.1",
+   "role": "declared",
+   "because": "the right-holding frame; '包括…' is a verbless elaboration inside the object (A2, folded — unlike article 25, where Arabic verbs its includes)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 3054,
+    "end": 3096
+   },
+   "anchor": "人人有享有休息和闲暇的权利,包括工作时间有合理限制和定期给薪休假的权利。"
+  },
+  {
+   "subject": null,
+   "relation": "第二十五条",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-25",
+   "ground": "article-25",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 3101,
+    "end": 3112
+   },
+   "anchor": "第二十五条"
+  },
+  {
+   "subject": "人人",
+   "relation": "有权享受",
+   "object": "为维持他本人和家属的健康和福利所需的生活水准,包括食物、衣着、住房、医疗和必要的社会服务",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:standard-of-living",
+   "ground": "article-25.1.1",
+   "role": "declared",
+   "because": "the right-holding frame; '包括…' is a verbless elaboration, folded (A2); '所需的' attributive folds (R1)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 3116,
+    "end": 3221
+   },
+   "anchor": "人人有权享受为维持他本人和家属的健康和福利所需的生活水准"
+  },
+  {
+   "subject": "人人",
+   "relation": "有权享受",
+   "object": "保障",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "coordinate",
+   "prop": "udhr:security-in-adversity",
+   "ground": "article-25.1.2",
+   "role": "declared",
+   "because": "the right-holding frame with its own verb — Mandarin joins Arabic, Spanish and Swahili in verbing the security right separately (English folds it); the fronted '在…时' adversity-condition folds (A2)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "coordinated predicate shares '人人'",
+   "alternate": null,
+   "span": {
+    "start": 3116,
+    "end": 3221
+   },
+   "anchor": "在遭到失业、疾病、残废、守寡、衰老或在其他不能控制的情况下丧失谋生能力时,有权享受保障"
+  },
+  {
+   "subject": "母亲和儿童",
+   "relation": "有权享受",
+   "object": "特别照顾和协助",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:motherhood-childhood-care",
+   "ground": "article-25.2.1",
+   "role": "declared",
+   "because": "the right-holding frame — Mandarin renders the subjects as the PERSONS ('母亲和儿童', mothers and children) where en/ar/es hold the abstract kinds (motherhood, childhood): a referent-level divergence, noted",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 3225,
+    "end": 3278
+   },
+   "anchor": "母亲和儿童有权享受特别照顾和协助。"
+  },
+  {
+   "subject": "一切儿童",
+   "relation": "应享受",
+   "object": "同样的社会保护",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:children-protection",
+   "ground": "article-25.2.2",
+   "role": "declared",
+   "because": "the enjoy-frame: a condition held by the kind — Relate·Existence at pattern grain; '无论婚生或非婚生' is a concessive alternative-list, folded (A2); deontic '应' noted (A3)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 3225,
+    "end": 3278
+   },
+   "anchor": "一切儿童,无论婚生或非婚生,都应享受同样的社会保护。"
+  },
+  {
+   "subject": null,
+   "relation": "第二十六条",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-26",
+   "ground": "article-26",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 3285,
+    "end": 3296
+   },
+   "anchor": "第二十六条"
+  },
+  {
+   "subject": "人人",
+   "relation": "都有",
+   "object": "受教育的权利",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:right-to-education",
+   "ground": "article-26.1.1",
+   "role": "declared",
+   "because": "the right-holding frame",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 3300,
+    "end": 3385
+   },
+   "anchor": "人人都有受教育的权利"
+  },
+  {
+   "subject": "教育",
+   "relation": "应当",
+   "object": "免费",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:education-free",
+   "ground": "article-26.1.2",
+   "role": "declared",
+   "because": "copula-less adjectival predication (免费, gratis) over the kind — rule 4's shape; the at-least restatement ('至少在初级和基本阶段应如此') folds as the stage-restriction (A2); deontic '应当' noted (A3)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 3300,
+    "end": 3385
+   },
+   "anchor": "教育应当免费,至少在初级和基本阶段应如此"
+  },
+  {
+   "subject": "初级教育",
+   "relation": "应属",
+   "object": "义务性质",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "coordinate",
+   "prop": "udhr:elementary-compulsory",
+   "ground": "article-26.1.3",
+   "role": "declared",
+   "because": "'属' (belong to the category of) — class-membership, the copular family verbal (rule 1): Relate·Existence at pattern grain; deontic '应' noted (A3)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 3300,
+    "end": 3385
+   },
+   "anchor": "初级教育应属义务性质"
+  },
+  {
+   "subject": "技术和职业教育",
+   "relation": "应普遍设立",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "INS",
+    "grain": "Pattern"
+   },
+   "clause": "coordinate",
+   "prop": "udhr:technical-available",
+   "ground": "article-26.1.4",
+   "role": "declared",
+   "because": "'设立' (establish) — the availability GENERATED, a make-verb with English's 'made available' and Arabic's يعمم: Generate·Existence at pattern grain",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SIG",
+    "grain": "Pattern",
+    "because": "readable as the availability-condition itself"
+   },
+   "span": {
+    "start": 3300,
+    "end": 3385
+   },
+   "anchor": "技术和职业教育应普遍设立"
+  },
+  {
+   "subject": "高等教育",
+   "relation": "平等开放",
+   "object": "对一切人",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "coordinate",
+   "prop": "udhr:higher-accessible",
+   "ground": "article-26.1.5",
+   "role": "declared",
+   "because": "'开放' (be open) — an accessibility property of the kind (rule 4's family): Relate·Existence at pattern grain; '根据成绩' is an adjunct (A2)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 3300,
+    "end": 3385
+   },
+   "anchor": "高等教育应根据成绩而对一切人平等开放"
+  },
+  {
+   "subject": "教育的目的",
+   "relation": "在于",
+   "object": "充分发展人的个性并加强对人权和基本自由的尊重",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Figure"
+   },
+   "clause": "main",
+   "prop": "udhr:education-directed",
+   "ground": "article-26.2.1",
+   "role": "declared",
+   "because": "Mandarin NOMINALIZES the aim and equates it — '教育的目的在于…' (education's purpose LIES IN…): an identificational copula on a relationally unique subject (a practice's purpose), rule 3's shape — its SECOND use of the 在于 construction (see article 29's limitation-purpose) where the siblings verb the directing/aiming",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "REC",
+    "grain": "Pattern",
+    "because": "typed off the equated content (发展/加强) instead of the copula — the siblings' family"
+   },
+   "span": {
+    "start": 3389,
+    "end": 3474
+   },
+   "anchor": "教育的目的在于充分发展人的个性并加强对人权和基本自由的尊重"
+  },
+  {
+   "subject": "教育",
+   "relation": "应促进",
+   "object": "各国、各种族或各宗教集团间的了解、容忍和友谊",
+   "polarity": "+",
+   "phasepost": {
+    "op": "REC",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:promote-understanding",
+   "ground": "article-26.2.2",
+   "role": "declared",
+   "because": "'促进' with interpretive-stance objects (understanding, tolerance, friendship) — the promote-frame: fostering valuations across the kind, Generate·Interpretation at pattern grain",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 3389,
+    "end": 3474
+   },
+   "anchor": "教育应促进各国、各种族或各宗教集团间的了解、容忍和友谊"
+  },
+  {
+   "subject": "教育",
+   "relation": "应促进",
+   "object": "联合国维护和平的各项活动",
+   "polarity": "+",
+   "phasepost": {
+    "op": "INS",
+    "grain": "Pattern"
+   },
+   "clause": "coordinate",
+   "prop": "udhr:further-un-activities",
+   "ground": "article-26.2.3",
+   "role": "declared",
+   "because": "the SAME verb 促进 one clause back lands differently here because its object is ACTIVITIES, not stances — their progress generated: Generate·Existence at pattern grain (the object decides the domain, the verb the mode)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "coordinated predicate shares '教育'",
+   "alternate": null,
+   "span": {
+    "start": 3389,
+    "end": 3474
+   },
+   "anchor": "并应促进联合国维护和平的各项活动"
+  },
+  {
+   "subject": "父母",
+   "relation": "有",
+   "object": "优先选择的权利",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:parents-prior-right",
+   "ground": "article-26.3.1",
+   "role": "declared",
+   "because": "the right-holding frame; the education-kind topic ('对其子女所应受的教育的种类') fronts what the choosing ranges over — attributives fold (R1)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 3478,
+    "end": 3513
+   },
+   "anchor": "父母对其子女所应受的教育的种类,有优先选择的权利。"
+  },
+  {
+   "subject": null,
+   "relation": "第二十七条",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-27",
+   "ground": "article-27",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 3520,
+    "end": 3531
+   },
+   "anchor": "第二十七条"
+  },
+  {
+   "subject": "人人",
+   "relation": "有权",
+   "object": "自由参加社会的文化生活,享受艺术,并分享科学进步及其产生的福利",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:participate-cultural-life",
+   "ground": "article-27.1.1",
+   "role": "declared",
+   "because": "the right-holding frame; ONE 有权 over three serial VPs, kept whole (R4)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 3535,
+    "end": 3581
+   },
+   "anchor": "人人有权自由参加社会的文化生活,享受艺术,并分享科学进步及其产生的福利。"
+  },
+  {
+   "subject": "人人",
+   "relation": "有",
+   "object": "享受保护的权利",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:protection-author-interests",
+   "ground": "article-27.2.1",
+   "role": "declared",
+   "because": "the right-holding frame; the interests topic ('对…利益') fronts what the protection covers — its attributives fold (R1)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 3585,
+    "end": 3640
+   },
+   "anchor": "人人对由于他所创作的任何科学、文学或美术作品而产生的精神的和物质的利益,有享受保护的权利。"
+  },
+  {
+   "subject": null,
+   "relation": "第二十八条",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-28",
+   "ground": "article-28",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 3647,
+    "end": 3658
+   },
+   "anchor": "第二十八条"
+  },
+  {
+   "subject": "人人",
+   "relation": "有权要求",
+   "object": "一种社会的和国际的秩序",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:entitled-to-order",
+   "ground": "article-28.1.1",
+   "role": "declared",
+   "because": "the right-holding frame — Mandarin words the entitlement as a right to DEMAND (要求) the order, noted; the order's realization is then asserted in its own clause, uniquely among the five (next row)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 3660,
+    "end": 3710
+   },
+   "anchor": "人人有权要求一种社会的和国际的秩序"
+  },
+  {
+   "subject": "本宣言所载的权利和自由",
+   "relation": "能获得",
+   "object": "充分实现",
+   "polarity": "+",
+   "phasepost": {
+    "op": "INS",
+    "grain": "Pattern"
+   },
+   "clause": "coordinate",
+   "prop": "udhr:order-realizes-rights",
+   "ground": "article-28.1.2",
+   "role": "declared",
+   "because": "a language-unique row: Mandarin asserts the realization at CLAUSE level ('获得实现', obtain realization — the rights made actual: Generate·Existence at pattern grain, modal 能 noted per A3) where the four siblings characterize the sought order inside the right-object and fold (A1 + the mood rule — Spanish's subjunctive is the direct evidence); parataxis again deciding what is asserted",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "'这种秩序' → the demanded order (article-28.1.1's object)",
+   "alternate": null,
+   "span": {
+    "start": 3660,
+    "end": 3710
+   },
+   "anchor": "在这种秩序中,本宣言所载的权利和自由能获得充分实现"
+  },
+  {
+   "subject": null,
+   "relation": "第二十九条",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-29",
+   "ground": "article-29",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 3715,
+    "end": 3726
+   },
+   "anchor": "第二十九条"
+  },
+  {
+   "subject": "人人",
+   "relation": "负有",
+   "object": "对社会",
+   "polarity": "+",
+   "phasepost": {
+    "op": "CON",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:duties-to-community",
+   "ground": "article-29.1.1",
+   "role": "declared",
+   "because": "'负有义务' (bears duties) toward society — a standing bond directed at another party, Relate·Structure at pattern grain",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 3730,
+    "end": 3776
+   },
+   "anchor": "人人对社会负有义务"
+  },
+  {
+   "subject": "他的个性",
+   "relation": "得到",
+   "object": "自由和充分的发展",
+   "polarity": "+",
+   "phasepost": {
+    "op": "INS",
+    "grain": "Pattern"
+   },
+   "clause": "reason-adjunct",
+   "prop": "udhr:development-in-community",
+   "ground": "article-29.1.1.1",
+   "role": "declared",
+   "because": "'得到发展' (obtain development) — the personality's development coming to it: Generate·Existence at pattern grain, modality '可能' noted not typed (A3); '只有在社会中…才' binds it exclusively to the communal ground; the REASON clause (因为) is what shows this content asserted, with Spanish's puesto que",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "'他的' → 人人, the main clause's subject",
+   "alternate": {
+    "op": "SIG",
+    "grain": "Pattern",
+    "because": "read as an availability-condition instead, the en/ar construction"
+   },
+   "span": {
+    "start": 3730,
+    "end": 3776
+   },
+   "anchor": "因为只有在社会中他的个性才可能得到自由和充分的发展"
+  },
+  {
+   "subject": "人人",
+   "relation": "受",
+   "object": "法律所确定的限制",
+   "polarity": "+",
+   "phasepost": {
+    "op": "CON",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:subject-to-limitations",
+   "ground": "article-29.2.1",
+   "role": "declared",
+   "because": "'受限制' — standing UNDER a constraint, the coverage-arrangement family, Relate·Structure at pattern grain; '在行使他的权利和自由时' is a temporal adjunct (A2); '法律所确定的' is attributive and folds (the matrix shows limitations-by-law as a fold here, not a row)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 3780,
+    "end": 3880
+   },
+   "anchor": "人人在行使他的权利和自由时,只受法律所确定的限制"
+  },
+  {
+   "subject": "确定此种限制的唯一目的",
+   "relation": "在于",
+   "object": "保证对旁人的权利和自由给予应有的承认和尊重",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Figure"
+   },
+   "clause": "main",
+   "prop": "udhr:limitation-purpose",
+   "ground": "article-29.2.2",
+   "role": "declared",
+   "because": "Mandarin NOMINALIZES the purpose and equates it: '目的在于…' (the sole purpose LIES IN ensuring…) — an identificational copula, rule 3's unique role (THE sole purpose), Relate·Existence at figure grain; the siblings verb the securing directly (REC·Pattern), a construction divergence the matrix records; '并在一个民主的社会中适应…的正当需要' is the coordinated second half, folded (noted)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "REC",
+    "grain": "Pattern",
+    "because": "typed off the equated content ('保证…承认', ensure recognition) instead of the copula, the siblings' reading"
+   },
+   "span": {
+    "start": 3780,
+    "end": 3880
+   },
+   "anchor": "确定此种限制的唯一目的在于保证对旁人的权利和自由给予应有的承认和尊重"
+  },
+  {
+   "subject": "这些权利和自由的行使",
+   "relation": "不得违背",
+   "object": "联合国的宗旨和原则",
+   "polarity": "-",
+   "phasepost": {
+    "op": "CON",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:no-contrary-exercise",
+   "ground": "article-29.3.1",
+   "role": "declared",
+   "because": "'违背' (contravene) — conduct STANDING AGAINST, Relate·Structure at pattern grain, prohibited universally ('无论在任何情形下均不得'): polarity − per R6",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 3884,
+    "end": 3928
+   },
+   "anchor": "这些权利和自由的行使,无论在任何情形下均不得违背联合国的宗旨和原则"
+  },
+  {
+   "subject": null,
+   "relation": "第三十条",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-30",
+   "ground": "article-30",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 3935,
+    "end": 3945
+   },
+   "anchor": "第三十条"
+  },
+  {
+   "subject": "本宣言的任何条文",
+   "relation": "不得解释为",
+   "object": "默许任何国家、集团或个人有权进行任何旨在破坏本宣言所载的任何权利和自由的活动或行为",
+   "polarity": "-",
+   "phasepost": {
+    "op": "DEF",
+    "grain": "Ground"
+   },
+   "clause": "main",
+   "prop": "udhr:no-destructive-interpretation",
+   "ground": "article-30.1.1",
+   "role": "declared",
+   "because": "bounding the DOCUMENT'S OWN INTERPRETIVE FIELD — '任何条文' (any article whatsoever) quantifies over the whole document's meaning-space, and '不得解释为' excludes a class of readings from it: Differentiate·Interpretation at GROUND grain, polarity − per R6; the tacit-consent content stays inside the intensional object (A1)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "NUL",
+    "grain": "Ground",
+    "because": "A4's absence-as-act reading, polarity + — the ar/sw construction"
+   },
+   "span": {
+    "start": 3947,
+    "end": 4009
+   },
+   "anchor": "本宣言的任何条文,不得解释为默许"
+  }
+ ]
+}

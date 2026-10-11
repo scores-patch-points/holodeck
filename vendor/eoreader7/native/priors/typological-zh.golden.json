@@ -1,0 +1,146 @@
+{
+ "schema": "EOReadingGolden@1",
+ "specimen": "typological-zh",
+ "path": "goldens/reading/typological/zh.txt",
+ "rule": "goldens/reading/RULE.md",
+ "language": "Mandarin Chinese (zh)",
+ "handrolled": true,
+ "handrolledNote": "Composed directly for this golden by the authoring session from linguistic knowledge of the language, NOT fetched from an authoritative source (OHCHR or otherwise). Structural ground truth (what proposition each line asserts, its phasepost) is authored with the same intent-by-construction standing this project's other synthetic goldens use (asserted-eval.mjs, hl-acquire.test.mjs's invented chronicle). Grammaticality is NOT independently native-speaker-verified — treat as reviewed-in-good-faith, not certified.",
+ "window": {
+  "end": 167,
+  "coordinates": "raw file bytes (UTF-8) — no container to strip, no CRLF to normalize; each row's span is its whole source line"
+ },
+ "notes": "One proposition per line, by construction — six short single-clause declaratives loosely drawn from UDHR Articles 1, 3, 4, 15 and 18, simplified to one clause each rather than quoted from the dense legal-register original. See TYPOLOGICAL-FINDINGS.md for the cross-linguistic phasepost comparison across this file's three sibling specimens.",
+ "rows": [
+  {
+   "gloss": "All people are born free.",
+   "subject": "人人",
+   "relation": "生",
+   "object": "自由",
+   "polarity": "+",
+   "phasepost": {
+    "op": "INS",
+    "grain": "Pattern"
+   },
+   "because": "birth stated as a law over the whole kind — Generate·Existence at pattern grain; matches the Arabic row 1 and udhr.golden.json row 10 classifications of the identical proposition",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "anchor": "人人生而自由。",
+   "span": {
+    "start": 0,
+    "end": 21
+   }
+  },
+  {
+   "gloss": "All people are equal in dignity.",
+   "subject": "人人",
+   "relation": "平等",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Figure"
+   },
+   "because": "stative predicate (Chinese adjectives are a verb subclass functioning as predicates with no copula) — copula-rule-4 analog; 在尊严上 is a locative adjunct, not the object",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SIG",
+    "grain": "Pattern",
+    "because": "same undecided universal-quantification-promotion question as the Arabic and Swahili row 2 parallels"
+   },
+   "anchor": "人人在尊严上一律平等。",
+   "span": {
+    "start": 22,
+    "end": 55
+   }
+  },
+  {
+   "gloss": "Everyone has the right to life.",
+   "subject": "人人",
+   "relation": "有",
+   "object": "生命权",
+   "polarity": "+",
+   "phasepost": {
+    "op": "CON",
+    "grain": "Pattern"
+   },
+   "because": "yǒu (has) is a possession verb — Relate·Structure, durable entitlement over the whole kind; matches the Arabic construction's CON·Pattern for the same proposition via a genuinely different (overt-verb, not prepositional) grammar",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "anchor": "人人有生命权。",
+   "span": {
+    "start": 56,
+    "end": 77
+   }
+  },
+  {
+   "gloss": "No one shall be held in slavery.",
+   "subject": "任何人",
+   "relation": "被奴役",
+   "object": null,
+   "polarity": "-",
+   "phasepost": {
+    "op": "CON",
+    "grain": "Figure"
+   },
+   "because": "núyì (enslave) binds the patient into a possession-relation — Relate·Structure, one person's status, Figure grain; polarity − from 不得 (R6); deontic 不得 noted, does not itself move the phasepost (A3). Genuinely diverges from the Arabic row 4 reading (SIG·Figure) because Mandarin's passive construction makes 'enslave' itself the main verb, where Arabic's construction makes 'is-permitted' the main verb over a nominalized 'enslavement' — same proposition, different finite verb, different phasepost, disclosed rather than forced to agree",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "anchor": "任何人不得被奴役。",
+   "span": {
+    "start": 78,
+    "end": 105
+   }
+  },
+  {
+   "gloss": "Everyone has the right to a nationality.",
+   "subject": "人人",
+   "relation": "有权",
+   "object": "享有国籍",
+   "polarity": "+",
+   "phasepost": {
+    "op": "CON",
+    "grain": "Pattern"
+   },
+   "because": "yǒu quán (has the right) — same possession construction as row 3",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "anchor": "人人有权享有国籍。",
+   "span": {
+    "start": 106,
+    "end": 133
+   }
+  },
+  {
+   "gloss": "Everyone has the right to freedom of thought.",
+   "subject": "人人",
+   "relation": "有",
+   "object": "思想自由的权利",
+   "polarity": "+",
+   "phasepost": {
+    "op": "CON",
+    "grain": "Pattern"
+   },
+   "because": "yǒu (has) — same possession construction as rows 3 and 5",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "anchor": "人人有思想自由的权利。",
+   "span": {
+    "start": 134,
+    "end": 167
+   }
+  }
+ ]
+}

@@ -1,0 +1,43 @@
+{
+  "schema": "RoleConfig@1",
+  "language": "ind",
+  "provenance": {
+    "builder": "eoreader7 native/scripts/build-role-config.mjs",
+    "source": "/private/tmp/claude-501/tb/ind/train.conllu",
+    "min_volume": 20,
+    "null_draws": 200,
+    "null_alpha": 0.05,
+    "null_seed": 1,
+    "note": "position stats and marker candidates are both derived mechanically from this treebank's own gold dependency annotations — never hand-typed or asserted from general linguistic knowledge. A marker candidate is admitted only when its real precision beats the (1-alpha) quantile of a within-sentence role-label shuffle (II.23), never a fixed ratio — and (S122) that quantile is the MAX-STATISTIC across every eligible closed-class candidate tried, not a per-candidate null, so the admitted marker is significant against the whole search, not merely against itself."
+  },
+  "object": {
+    "total": 4698,
+    "before": 208,
+    "after": 4490,
+    "dominantSide": "after",
+    "reliability": 0.955725840783312,
+    "usable": true,
+    "marker": {
+      "form": "sejumlah",
+      "precision": 0.38095238095238093,
+      "nullCeiling": 0.23809523809523808,
+      "volume": 21,
+      "recall": 0.0017028522775649213
+    }
+  },
+  "subject": {
+    "total": 7414,
+    "before": 7300,
+    "after": 114,
+    "dominantSide": "before",
+    "reliability": 0.9846236849204208,
+    "usable": true,
+    "marker": {
+      "form": "sedang",
+      "hits": 13,
+      "total": 25,
+      "precision": 0.52,
+      "nullCeiling": 0.24528301886792453
+    }
+  }
+}

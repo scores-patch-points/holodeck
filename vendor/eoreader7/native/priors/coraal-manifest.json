@@ -1,0 +1,855 @@
+{
+  "source": "CORAAL (Corpus of Regional African American Language)",
+  "url": "https://oraal.uoregon.edu/coraal",
+  "access": "Text staged via a documented secondary republication, not a direct CORAAL bulk download: the ground-truth 'content' column of the CORAAL_transcripts.csv reproducibility file from the Koenecke et al. 2020 PNAS paper 'Racial disparities in automated speech recognition' (https://raw.githubusercontent.com/stanford-policylab/asr-disparities/master/input/CORAAL_transcripts.csv, 4,454 rows fetched in full, real human transcription of real CORAAL DCB/PRV/ROC interviews). This CSV itself has no separate license file in its repository; the governing license is CORAAL's own, since the content column is CORAAL's transcript text passed through unmodified. CORAAL's own site (oraal.uoregon.edu/coraal, mirrored at oraal.github.io/coraal) and its HuggingFace mirror (huggingface.co/datasets/zsayers/CORAAL) were both checked directly and independently confirm CC BY-NC-SA 4.0. Audio, TextGrid, and ELAN files were NOT fetched -- this repo (live_priors) holds only text priors; audio/alignment formats are out of scope by the pocket's own definition. The main CORAAL site's own per-component bulk audio+transcript downloads were not used because they are large audio+TextGrid bundles unsuited to a text-only priors repo, and the CSV secondary source already supplies real, clean ground-truth transcript text for the same underlying interviews.",
+  "license": "CC BY-NC-SA 4.0 (Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International) -- noncommercial. Verified directly at two independent sources: (1) oraal.uoregon.edu/coraal (redirects to oraal.github.io/coraal), whose License and Terms of Use page states 'CORAAL is licensed under a Creative Commons Attribution-NonCommercial-ShareAlike (4.0) International license', prohibits commercial applications, requires derivative works to carry the same license terms (ShareAlike), and gives the recommended citation 'Kendall, Tyler and Charlie Farrington. 2023. The Corpus of Regional African American Language. Version 2023.06.'; (2) the HuggingFace mirror huggingface.co/datasets/zsayers/CORAAL, whose dataset card independently declares 'CC BY-NC-SA 4.0'. Tagged NC per this repo's shared staging rules: staged as a real, bounded, representative sample rather than an attempt at completeness, and never treated as equivalent to an open license.",
+  "license_verification": {
+    "checked_at": "2026-08-19",
+    "sources_checked": [
+      "https://oraal.uoregon.edu/coraal (redirected to https://oraal.github.io/coraal)",
+      "https://huggingface.co/datasets/zsayers/CORAAL"
+    ],
+    "result": "CC BY-NC-SA 4.0, confirmed independently at both sources, consistent with the pocket's starting-point note."
+  },
+  "fetched_at": "2026-08-19",
+  "coverage": "Staged 55 of 56 real speaker transcripts present in the CORAAL_transcripts.csv reproducibility file (55 of 56 meet this repo's 600-word-per-document floor; the one excluded speaker, PRV_se0_ag1_f_02, had only 377 words of transcript in this CSV and was skipped rather than padded). That CSV itself is a curated 4,454-row slice covering 3 of CORAAL's 4 regional components (DCB=Washington DC, PRV=Princeville NC, ROC=Rochester NY -- no Detroit/DTA component in this secondary source) built for a specific ASR-fairness study, not the full CORAAL corpus, which spans 220+ interviews and roughly 150+ hours of audio across all four regions and speakers born 1888-2005. This pocket therefore holds a genuine, bounded, real-text sample -- full sentence-level ground-truth transcripts for the great majority of speakers available in that CSV, spread across all three of its regions, four age bands (ag1-ag4, roughly teens/20s through 60s-80s) and both genders -- not a claim of covering CORAAL's full 220+-interview corpus or its Detroit component, and not audio.",
+  "regions": {
+    "DCB": {
+      "label": "Washington, DC",
+      "speakers_staged": 32,
+      "words_staged": 138816
+    },
+    "PRV": {
+      "label": "Princeville, NC",
+      "speakers_staged": 10,
+      "words_staged": 29538
+    },
+    "ROC": {
+      "label": "Rochester, NY",
+      "speakers_staged": 13,
+      "words_staged": 43137
+    }
+  },
+  "totals": {
+    "documents": 55,
+    "total_words": 211491,
+    "total_chars": 1135573
+  },
+  "not_staged": [
+    {
+      "item": "CORAAL audio (WAV) files",
+      "reason": "out_of_scope -- this repo (live_priors) holds text priors only; audio is explicitly out of scope per the pocket description."
+    },
+    {
+      "item": "CORAAL TextGrid / ELAN alignment files",
+      "reason": "out_of_scope -- alignment/annotation formats, not plain transcript text; this pocket stages plain text only."
+    },
+    {
+      "item": "Detroit (DTA) CORAAL component",
+      "reason": "not_available_in_secondary_source -- the Koenecke et al. 2020 reproducibility CSV used as the text source for this pocket contains only DCB, PRV, and ROC rows; it was never fetched from the primary CORAAL site's own DTA bulk download because the CSV was chosen specifically for its clean, ready-to-parse ground-truth text, and re-deriving a fourth region from the primary site's raw per-component ZIPs was judged out of scope for a single bounded staging pass."
+    },
+    {
+      "item": "The remaining ~4,399 CSV rows beyond the 55 staged speaker-documents",
+      "reason": "already_included -- not a gap: every row in the fetched CSV is folded into one of the 55 staged per-speaker documents (grouped by speaker, concatenated in original temporal order) except the rows belonging to the one speaker below the 600-word floor (see 'skipped' below). No row of the fetched CSV was discarded for space reasons."
+    }
+  ],
+  "skipped": [
+    {
+      "speaker": "PRV_se0_ag1_f_02",
+      "region": "PRV",
+      "age": "21",
+      "gender": "Female",
+      "word_count": 377,
+      "reason": "below 600-word floor"
+    }
+  ],
+  "entries": [
+    {
+      "speaker_id": "DCB_se1_ag2_f_01",
+      "region_code": "DCB",
+      "region": "Washington, DC (DCB component)",
+      "age": "28",
+      "gender": "Female",
+      "source_basefiles": [
+        "DCB_se1_ag2_f_01_1"
+      ],
+      "segments": 72,
+      "word_count": 2779,
+      "char_count": 15351,
+      "file": "11-multi-language/dialects-pidgins-creoles/coraal/dcb/DCB_se1_ag2_f_01.txt"
+    },
+    {
+      "speaker_id": "DCB_se1_ag2_f_03",
+      "region_code": "DCB",
+      "region": "Washington, DC (DCB component)",
+      "age": "25",
+      "gender": "Female",
+      "source_basefiles": [
+        "DCB_se1_ag2_f_03_1"
+      ],
+      "segments": 62,
+      "word_count": 3655,
+      "char_count": 19549,
+      "file": "11-multi-language/dialects-pidgins-creoles/coraal/dcb/DCB_se1_ag2_f_03.txt"
+    },
+    {
+      "speaker_id": "DCB_se1_ag2_m_01",
+      "region_code": "DCB",
+      "region": "Washington, DC (DCB component)",
+      "age": "27",
+      "gender": "Male",
+      "source_basefiles": [
+        "DCB_se1_ag2_m_01_1"
+      ],
+      "segments": 132,
+      "word_count": 7183,
+      "char_count": 37366,
+      "file": "11-multi-language/dialects-pidgins-creoles/coraal/dcb/DCB_se1_ag2_m_01.txt"
+    },
+    {
+      "speaker_id": "DCB_se1_ag2_m_02",
+      "region_code": "DCB",
+      "region": "Washington, DC (DCB component)",
+      "age": "29",
+      "gender": "Male",
+      "source_basefiles": [
+        "DCB_se1_ag2_m_02_2"
+      ],
+      "segments": 9,
+      "word_count": 646,
+      "char_count": 4196,
+      "file": "11-multi-language/dialects-pidgins-creoles/coraal/dcb/DCB_se1_ag2_m_02.txt"
+    },
+    {
+      "speaker_id": "DCB_se1_ag2_m_03",
+      "region_code": "DCB",
+      "region": "Washington, DC (DCB component)",
+      "age": "24",
+      "gender": "Male",
+      "source_basefiles": [
+        "DCB_se1_ag2_m_03_2"
+      ],
+      "segments": 27,
+      "word_count": 1748,
+      "char_count": 9928,
+      "file": "11-multi-language/dialects-pidgins-creoles/coraal/dcb/DCB_se1_ag2_m_03.txt"
+    },
+    {
+      "speaker_id": "DCB_se1_ag3_f_01",
+      "region_code": "DCB",
+      "region": "Washington, DC (DCB component)",
+      "age": "42",
+      "gender": "Female",
+      "source_basefiles": [
+        "DCB_se1_ag3_f_01_1"
+      ],
+      "segments": 142,
+      "word_count": 5979,
+      "char_count": 31327,
+      "file": "11-multi-language/dialects-pidgins-creoles/coraal/dcb/DCB_se1_ag3_f_01.txt"
+    },
+    {
+      "speaker_id": "DCB_se1_ag3_f_02",
+      "region_code": "DCB",
+      "region": "Washington, DC (DCB component)",
+      "age": "38",
+      "gender": "Female",
+      "source_basefiles": [
+        "DCB_se1_ag3_f_02_1",
+        "DCB_se1_ag3_f_02_2"
+      ],
+      "segments": 25,
+      "word_count": 908,
+      "char_count": 5679,
+      "file": "11-multi-language/dialects-pidgins-creoles/coraal/dcb/DCB_se1_ag3_f_02.txt"
+    },
+    {
+      "speaker_id": "DCB_se1_ag3_f_03",
+      "region_code": "DCB",
+      "region": "Washington, DC (DCB component)",
+      "age": "34",
+      "gender": "Female",
+      "source_basefiles": [
+        "DCB_se1_ag3_f_03_1"
+      ],
+      "segments": 117,
+      "word_count": 6190,
+      "char_count": 32475,
+      "file": "11-multi-language/dialects-pidgins-creoles/coraal/dcb/DCB_se1_ag3_f_03.txt"
+    },
+    {
+      "speaker_id": "DCB_se1_ag3_m_02",
+      "region_code": "DCB",
+      "region": "Washington, DC (DCB component)",
+      "age": "36",
+      "gender": "Male",
+      "source_basefiles": [
+        "DCB_se1_ag3_m_02_1"
+      ],
+      "segments": 42,
+      "word_count": 2227,
+      "char_count": 12565,
+      "file": "11-multi-language/dialects-pidgins-creoles/coraal/dcb/DCB_se1_ag3_m_02.txt"
+    },
+    {
+      "speaker_id": "DCB_se1_ag4_f_01",
+      "region_code": "DCB",
+      "region": "Washington, DC (DCB component)",
+      "age": "61",
+      "gender": "Female",
+      "source_basefiles": [
+        "DCB_se1_ag4_f_01_1",
+        "DCB_se1_ag4_f_01_2"
+      ],
+      "segments": 107,
+      "word_count": 5851,
+      "char_count": 29641,
+      "file": "11-multi-language/dialects-pidgins-creoles/coraal/dcb/DCB_se1_ag4_f_01.txt"
+    },
+    {
+      "speaker_id": "DCB_se1_ag4_m_01",
+      "region_code": "DCB",
+      "region": "Washington, DC (DCB component)",
+      "age": "61",
+      "gender": "Male",
+      "source_basefiles": [
+        "DCB_se1_ag4_m_01_1"
+      ],
+      "segments": 24,
+      "word_count": 2338,
+      "char_count": 13021,
+      "file": "11-multi-language/dialects-pidgins-creoles/coraal/dcb/DCB_se1_ag4_m_01.txt"
+    },
+    {
+      "speaker_id": "DCB_se1_ag4_m_02",
+      "region_code": "DCB",
+      "region": "Washington, DC (DCB component)",
+      "age": "67",
+      "gender": "Male",
+      "source_basefiles": [
+        "DCB_se1_ag4_m_02_1"
+      ],
+      "segments": 37,
+      "word_count": 2674,
+      "char_count": 14628,
+      "file": "11-multi-language/dialects-pidgins-creoles/coraal/dcb/DCB_se1_ag4_m_02.txt"
+    },
+    {
+      "speaker_id": "DCB_se2_ag2_f_01",
+      "region_code": "DCB",
+      "region": "Washington, DC (DCB component)",
+      "age": "25",
+      "gender": "Female",
+      "source_basefiles": [
+        "DCB_se2_ag2_f_01_1"
+      ],
+      "segments": 69,
+      "word_count": 4370,
+      "char_count": 23236,
+      "file": "11-multi-language/dialects-pidgins-creoles/coraal/dcb/DCB_se2_ag2_f_01.txt"
+    },
+    {
+      "speaker_id": "DCB_se2_ag2_f_02",
+      "region_code": "DCB",
+      "region": "Washington, DC (DCB component)",
+      "age": "23",
+      "gender": "Female",
+      "source_basefiles": [
+        "DCB_se2_ag2_f_02_1"
+      ],
+      "segments": 130,
+      "word_count": 7918,
+      "char_count": 42479,
+      "file": "11-multi-language/dialects-pidgins-creoles/coraal/dcb/DCB_se2_ag2_f_02.txt"
+    },
+    {
+      "speaker_id": "DCB_se2_ag2_m_01",
+      "region_code": "DCB",
+      "region": "Washington, DC (DCB component)",
+      "age": "27",
+      "gender": "Male",
+      "source_basefiles": [
+        "DCB_se2_ag2_m_01_1"
+      ],
+      "segments": 109,
+      "word_count": 6004,
+      "char_count": 31674,
+      "file": "11-multi-language/dialects-pidgins-creoles/coraal/dcb/DCB_se2_ag2_m_01.txt"
+    },
+    {
+      "speaker_id": "DCB_se2_ag3_f_01",
+      "region_code": "DCB",
+      "region": "Washington, DC (DCB component)",
+      "age": "33",
+      "gender": "Female",
+      "source_basefiles": [
+        "DCB_se2_ag3_f_01_1"
+      ],
+      "segments": 37,
+      "word_count": 2695,
+      "char_count": 14887,
+      "file": "11-multi-language/dialects-pidgins-creoles/coraal/dcb/DCB_se2_ag3_f_01.txt"
+    },
+    {
+      "speaker_id": "DCB_se2_ag3_f_02",
+      "region_code": "DCB",
+      "region": "Washington, DC (DCB component)",
+      "age": "31",
+      "gender": "Female",
+      "source_basefiles": [
+        "DCB_se2_ag3_f_02_1"
+      ],
+      "segments": 43,
+      "word_count": 2857,
+      "char_count": 15830,
+      "file": "11-multi-language/dialects-pidgins-creoles/coraal/dcb/DCB_se2_ag3_f_02.txt"
+    },
+    {
+      "speaker_id": "DCB_se2_ag3_m_01",
+      "region_code": "DCB",
+      "region": "Washington, DC (DCB component)",
+      "age": "35",
+      "gender": "Male",
+      "source_basefiles": [
+        "DCB_se2_ag3_m_01_1"
+      ],
+      "segments": 139,
+      "word_count": 7760,
+      "char_count": 40986,
+      "file": "11-multi-language/dialects-pidgins-creoles/coraal/dcb/DCB_se2_ag3_m_01.txt"
+    },
+    {
+      "speaker_id": "DCB_se2_ag3_m_02",
+      "region_code": "DCB",
+      "region": "Washington, DC (DCB component)",
+      "age": "31",
+      "gender": "Male",
+      "source_basefiles": [
+        "DCB_se2_ag3_m_02_1",
+        "DCB_se2_ag3_m_02_2"
+      ],
+      "segments": 34,
+      "word_count": 1850,
+      "char_count": 10759,
+      "file": "11-multi-language/dialects-pidgins-creoles/coraal/dcb/DCB_se2_ag3_m_02.txt"
+    },
+    {
+      "speaker_id": "DCB_se2_ag4_f_01",
+      "region_code": "DCB",
+      "region": "Washington, DC (DCB component)",
+      "age": "58",
+      "gender": "Female",
+      "source_basefiles": [
+        "DCB_se2_ag4_f_01_1"
+      ],
+      "segments": 150,
+      "word_count": 7267,
+      "char_count": 38825,
+      "file": "11-multi-language/dialects-pidgins-creoles/coraal/dcb/DCB_se2_ag4_f_01.txt"
+    },
+    {
+      "speaker_id": "DCB_se2_ag4_f_02",
+      "region_code": "DCB",
+      "region": "Washington, DC (DCB component)",
+      "age": "51",
+      "gender": "Female",
+      "source_basefiles": [
+        "DCB_se2_ag4_f_02_1"
+      ],
+      "segments": 133,
+      "word_count": 5939,
+      "char_count": 30777,
+      "file": "11-multi-language/dialects-pidgins-creoles/coraal/dcb/DCB_se2_ag4_f_02.txt"
+    },
+    {
+      "speaker_id": "DCB_se2_ag4_f_03",
+      "region_code": "DCB",
+      "region": "Washington, DC (DCB component)",
+      "age": "65",
+      "gender": "Female",
+      "source_basefiles": [
+        "DCB_se2_ag4_f_03_1"
+      ],
+      "segments": 44,
+      "word_count": 2143,
+      "char_count": 11760,
+      "file": "11-multi-language/dialects-pidgins-creoles/coraal/dcb/DCB_se2_ag4_f_03.txt"
+    },
+    {
+      "speaker_id": "DCB_se2_ag4_f_05",
+      "region_code": "DCB",
+      "region": "Washington, DC (DCB component)",
+      "age": "61",
+      "gender": "Female",
+      "source_basefiles": [
+        "DCB_se2_ag4_f_05_1"
+      ],
+      "segments": 79,
+      "word_count": 3963,
+      "char_count": 21144,
+      "file": "11-multi-language/dialects-pidgins-creoles/coraal/dcb/DCB_se2_ag4_f_05.txt"
+    },
+    {
+      "speaker_id": "DCB_se2_ag4_m_01",
+      "region_code": "DCB",
+      "region": "Washington, DC (DCB component)",
+      "age": "59",
+      "gender": "Male",
+      "source_basefiles": [
+        "DCB_se2_ag4_m_01_1"
+      ],
+      "segments": 136,
+      "word_count": 7936,
+      "char_count": 40720,
+      "file": "11-multi-language/dialects-pidgins-creoles/coraal/dcb/DCB_se2_ag4_m_01.txt"
+    },
+    {
+      "speaker_id": "DCB_se3_ag3_f_01",
+      "region_code": "DCB",
+      "region": "Washington, DC (DCB component)",
+      "age": "32",
+      "gender": "Female",
+      "source_basefiles": [
+        "DCB_se3_ag3_f_01_1"
+      ],
+      "segments": 55,
+      "word_count": 3479,
+      "char_count": 18629,
+      "file": "11-multi-language/dialects-pidgins-creoles/coraal/dcb/DCB_se3_ag3_f_01.txt"
+    },
+    {
+      "speaker_id": "DCB_se3_ag3_f_02",
+      "region_code": "DCB",
+      "region": "Washington, DC (DCB component)",
+      "age": "39",
+      "gender": "Female",
+      "source_basefiles": [
+        "DCB_se3_ag3_f_02_1"
+      ],
+      "segments": 63,
+      "word_count": 4174,
+      "char_count": 23073,
+      "file": "11-multi-language/dialects-pidgins-creoles/coraal/dcb/DCB_se3_ag3_f_02.txt"
+    },
+    {
+      "speaker_id": "DCB_se3_ag3_m_01",
+      "region_code": "DCB",
+      "region": "Washington, DC (DCB component)",
+      "age": "33",
+      "gender": "Male",
+      "source_basefiles": [
+        "DCB_se3_ag3_m_01_1"
+      ],
+      "segments": 37,
+      "word_count": 2466,
+      "char_count": 13860,
+      "file": "11-multi-language/dialects-pidgins-creoles/coraal/dcb/DCB_se3_ag3_m_01.txt"
+    },
+    {
+      "speaker_id": "DCB_se3_ag3_m_02",
+      "region_code": "DCB",
+      "region": "Washington, DC (DCB component)",
+      "age": "40",
+      "gender": "Male",
+      "source_basefiles": [
+        "DCB_se3_ag3_m_02_1",
+        "DCB_se3_ag3_m_02_2"
+      ],
+      "segments": 141,
+      "word_count": 8014,
+      "char_count": 41934,
+      "file": "11-multi-language/dialects-pidgins-creoles/coraal/dcb/DCB_se3_ag3_m_02.txt"
+    },
+    {
+      "speaker_id": "DCB_se3_ag4_f_01",
+      "region_code": "DCB",
+      "region": "Washington, DC (DCB component)",
+      "age": "59",
+      "gender": "Female",
+      "source_basefiles": [
+        "DCB_se3_ag4_f_01_1"
+      ],
+      "segments": 94,
+      "word_count": 6204,
+      "char_count": 32622,
+      "file": "11-multi-language/dialects-pidgins-creoles/coraal/dcb/DCB_se3_ag4_f_01.txt"
+    },
+    {
+      "speaker_id": "DCB_se3_ag4_f_02",
+      "region_code": "DCB",
+      "region": "Washington, DC (DCB component)",
+      "age": "54",
+      "gender": "Female",
+      "source_basefiles": [
+        "DCB_se3_ag4_f_02_1"
+      ],
+      "segments": 105,
+      "word_count": 5702,
+      "char_count": 30018,
+      "file": "11-multi-language/dialects-pidgins-creoles/coraal/dcb/DCB_se3_ag4_f_02.txt"
+    },
+    {
+      "speaker_id": "DCB_se3_ag4_m_01",
+      "region_code": "DCB",
+      "region": "Washington, DC (DCB component)",
+      "age": "60",
+      "gender": "Male",
+      "source_basefiles": [
+        "DCB_se3_ag4_m_01_1"
+      ],
+      "segments": 67,
+      "word_count": 4081,
+      "char_count": 21958,
+      "file": "11-multi-language/dialects-pidgins-creoles/coraal/dcb/DCB_se3_ag4_m_01.txt"
+    },
+    {
+      "speaker_id": "DCB_se3_ag4_m_02",
+      "region_code": "DCB",
+      "region": "Washington, DC (DCB component)",
+      "age": "66",
+      "gender": "Male",
+      "source_basefiles": [
+        "DCB_se3_ag4_m_02_1",
+        "DCB_se3_ag4_m_02_3",
+        "DCB_se3_ag4_m_02_4",
+        "DCB_se3_ag4_m_02_5"
+      ],
+      "segments": 27,
+      "word_count": 1816,
+      "char_count": 10177,
+      "file": "11-multi-language/dialects-pidgins-creoles/coraal/dcb/DCB_se3_ag4_m_02.txt"
+    },
+    {
+      "speaker_id": "PRV_se0_ag1_f_01",
+      "region_code": "PRV",
+      "region": "Princeville, NC (PRV component)",
+      "age": "19",
+      "gender": "Female",
+      "source_basefiles": [
+        "PRV_se0_ag1_f_01_1",
+        "PRV_se0_ag1_f_01_2"
+      ],
+      "segments": 118,
+      "word_count": 4123,
+      "char_count": 22052,
+      "file": "11-multi-language/dialects-pidgins-creoles/coraal/prv/PRV_se0_ag1_f_01.txt"
+    },
+    {
+      "speaker_id": "PRV_se0_ag2_f_01",
+      "region_code": "PRV",
+      "region": "Princeville, NC (PRV component)",
+      "age": "41",
+      "gender": "Female",
+      "source_basefiles": [
+        "PRV_se0_ag2_f_01_3",
+        "PRV_se0_ag2_f_01_4"
+      ],
+      "segments": 27,
+      "word_count": 811,
+      "char_count": 4973,
+      "file": "11-multi-language/dialects-pidgins-creoles/coraal/prv/PRV_se0_ag2_f_01.txt"
+    },
+    {
+      "speaker_id": "PRV_se0_ag2_f_02",
+      "region_code": "PRV",
+      "region": "Princeville, NC (PRV component)",
+      "age": "48",
+      "gender": "Female",
+      "source_basefiles": [
+        "PRV_se0_ag2_f_02_1",
+        "PRV_se0_ag2_f_02_2"
+      ],
+      "segments": 147,
+      "word_count": 4713,
+      "char_count": 24600,
+      "file": "11-multi-language/dialects-pidgins-creoles/coraal/prv/PRV_se0_ag2_f_02.txt"
+    },
+    {
+      "speaker_id": "PRV_se0_ag2_f_03",
+      "region_code": "PRV",
+      "region": "Princeville, NC (PRV component)",
+      "age": "48",
+      "gender": "Female",
+      "source_basefiles": [
+        "PRV_se0_ag2_f_03_1"
+      ],
+      "segments": 20,
+      "word_count": 637,
+      "char_count": 4108,
+      "file": "11-multi-language/dialects-pidgins-creoles/coraal/prv/PRV_se0_ag2_f_03.txt"
+    },
+    {
+      "speaker_id": "PRV_se0_ag3_f_01",
+      "region_code": "PRV",
+      "region": "Princeville, NC (PRV component)",
+      "age": "61",
+      "gender": "Female",
+      "source_basefiles": [
+        "PRV_se0_ag3_f_01_1",
+        "PRV_se0_ag3_f_01_2"
+      ],
+      "segments": 157,
+      "word_count": 4162,
+      "char_count": 22070,
+      "file": "11-multi-language/dialects-pidgins-creoles/coraal/prv/PRV_se0_ag3_f_01.txt"
+    },
+    {
+      "speaker_id": "PRV_se0_ag3_f_02",
+      "region_code": "PRV",
+      "region": "Princeville, NC (PRV component)",
+      "age": "40",
+      "gender": "Female",
+      "source_basefiles": [
+        "PRV_se0_ag3_f_02_1",
+        "PRV_se0_ag3_f_02_2"
+      ],
+      "segments": 129,
+      "word_count": 2480,
+      "char_count": 13567,
+      "file": "11-multi-language/dialects-pidgins-creoles/coraal/prv/PRV_se0_ag3_f_02.txt"
+    },
+    {
+      "speaker_id": "PRV_se0_ag3_f_04",
+      "region_code": "PRV",
+      "region": "Princeville, NC (PRV component)",
+      "age": "76",
+      "gender": "Female",
+      "source_basefiles": [
+        "PRV_se0_ag3_f_04_1",
+        "PRV_se0_ag3_f_04_2",
+        "PRV_se0_ag3_f_04_3"
+      ],
+      "segments": 186,
+      "word_count": 3463,
+      "char_count": 18351,
+      "file": "11-multi-language/dialects-pidgins-creoles/coraal/prv/PRV_se0_ag3_f_04.txt"
+    },
+    {
+      "speaker_id": "PRV_se0_ag3_m_01",
+      "region_code": "PRV",
+      "region": "Princeville, NC (PRV component)",
+      "age": "64",
+      "gender": "Male",
+      "source_basefiles": [
+        "PRV_se0_ag3_m_01_1",
+        "PRV_se0_ag3_m_01_2"
+      ],
+      "segments": 225,
+      "word_count": 5494,
+      "char_count": 29083,
+      "file": "11-multi-language/dialects-pidgins-creoles/coraal/prv/PRV_se0_ag3_m_01.txt"
+    },
+    {
+      "speaker_id": "PRV_se0_ag3_m_02",
+      "region_code": "PRV",
+      "region": "Princeville, NC (PRV component)",
+      "age": "78",
+      "gender": "Male",
+      "source_basefiles": [
+        "PRV_se0_ag3_m_02_1",
+        "PRV_se0_ag3_m_02_2",
+        "PRV_se0_ag3_m_02_3"
+      ],
+      "segments": 88,
+      "word_count": 2478,
+      "char_count": 13220,
+      "file": "11-multi-language/dialects-pidgins-creoles/coraal/prv/PRV_se0_ag3_m_02.txt"
+    },
+    {
+      "speaker_id": "PRV_se0_ag3_m_03",
+      "region_code": "PRV",
+      "region": "Princeville, NC (PRV component)",
+      "age": "83",
+      "gender": "Male",
+      "source_basefiles": [
+        "PRV_se0_ag3_m_03_1"
+      ],
+      "segments": 49,
+      "word_count": 1177,
+      "char_count": 6839,
+      "file": "11-multi-language/dialects-pidgins-creoles/coraal/prv/PRV_se0_ag3_m_03.txt"
+    },
+    {
+      "speaker_id": "ROC_se0_ag1_f_01",
+      "region_code": "ROC",
+      "region": "Rochester, NY (ROC component)",
+      "age": "26",
+      "gender": "Female",
+      "source_basefiles": [
+        "ROC_se0_ag1_f_01_1"
+      ],
+      "segments": 61,
+      "word_count": 3987,
+      "char_count": 21969,
+      "file": "11-multi-language/dialects-pidgins-creoles/coraal/roc/ROC_se0_ag1_f_01.txt"
+    },
+    {
+      "speaker_id": "ROC_se0_ag1_f_02",
+      "region_code": "ROC",
+      "region": "Rochester, NY (ROC component)",
+      "age": "28",
+      "gender": "Female",
+      "source_basefiles": [
+        "ROC_se0_ag1_f_02_1"
+      ],
+      "segments": 33,
+      "word_count": 2749,
+      "char_count": 15174,
+      "file": "11-multi-language/dialects-pidgins-creoles/coraal/roc/ROC_se0_ag1_f_02.txt"
+    },
+    {
+      "speaker_id": "ROC_se0_ag1_f_03",
+      "region_code": "ROC",
+      "region": "Rochester, NY (ROC component)",
+      "age": "28",
+      "gender": "Female",
+      "source_basefiles": [
+        "ROC_se0_ag1_f_03_1"
+      ],
+      "segments": 149,
+      "word_count": 4823,
+      "char_count": 25385,
+      "file": "11-multi-language/dialects-pidgins-creoles/coraal/roc/ROC_se0_ag1_f_03.txt"
+    },
+    {
+      "speaker_id": "ROC_se0_ag1_m_01",
+      "region_code": "ROC",
+      "region": "Rochester, NY (ROC component)",
+      "age": "24",
+      "gender": "Male",
+      "source_basefiles": [
+        "ROC_se0_ag1_m_01_1"
+      ],
+      "segments": 40,
+      "word_count": 2231,
+      "char_count": 12832,
+      "file": "11-multi-language/dialects-pidgins-creoles/coraal/roc/ROC_se0_ag1_m_01.txt"
+    },
+    {
+      "speaker_id": "ROC_se0_ag1_m_02",
+      "region_code": "ROC",
+      "region": "Rochester, NY (ROC component)",
+      "age": "27",
+      "gender": "Male",
+      "source_basefiles": [
+        "ROC_se0_ag1_m_02_1"
+      ],
+      "segments": 43,
+      "word_count": 3105,
+      "char_count": 16851,
+      "file": "11-multi-language/dialects-pidgins-creoles/coraal/roc/ROC_se0_ag1_m_02.txt"
+    },
+    {
+      "speaker_id": "ROC_se0_ag1_m_03",
+      "region_code": "ROC",
+      "region": "Rochester, NY (ROC component)",
+      "age": "25",
+      "gender": "Male",
+      "source_basefiles": [
+        "ROC_se0_ag1_m_03_1"
+      ],
+      "segments": 60,
+      "word_count": 3072,
+      "char_count": 17196,
+      "file": "11-multi-language/dialects-pidgins-creoles/coraal/roc/ROC_se0_ag1_m_03.txt"
+    },
+    {
+      "speaker_id": "ROC_se0_ag2_f_01",
+      "region_code": "ROC",
+      "region": "Rochester, NY (ROC component)",
+      "age": "31",
+      "gender": "Female",
+      "source_basefiles": [
+        "ROC_se0_ag2_f_01_1"
+      ],
+      "segments": 35,
+      "word_count": 2173,
+      "char_count": 12146,
+      "file": "11-multi-language/dialects-pidgins-creoles/coraal/roc/ROC_se0_ag2_f_01.txt"
+    },
+    {
+      "speaker_id": "ROC_se0_ag2_f_02",
+      "region_code": "ROC",
+      "region": "Rochester, NY (ROC component)",
+      "age": "32",
+      "gender": "Female",
+      "source_basefiles": [
+        "ROC_se0_ag2_f_02_1"
+      ],
+      "segments": 109,
+      "word_count": 5826,
+      "char_count": 31311,
+      "file": "11-multi-language/dialects-pidgins-creoles/coraal/roc/ROC_se0_ag2_f_02.txt"
+    },
+    {
+      "speaker_id": "ROC_se0_ag2_f_03",
+      "region_code": "ROC",
+      "region": "Rochester, NY (ROC component)",
+      "age": "39",
+      "gender": "Female",
+      "source_basefiles": [
+        "ROC_se0_ag2_f_03_1"
+      ],
+      "segments": 65,
+      "word_count": 4089,
+      "char_count": 21972,
+      "file": "11-multi-language/dialects-pidgins-creoles/coraal/roc/ROC_se0_ag2_f_03.txt"
+    },
+    {
+      "speaker_id": "ROC_se0_ag2_f_04",
+      "region_code": "ROC",
+      "region": "Rochester, NY (ROC component)",
+      "age": "43",
+      "gender": "Female",
+      "source_basefiles": [
+        "ROC_se0_ag2_f_04_1"
+      ],
+      "segments": 20,
+      "word_count": 2069,
+      "char_count": 12009,
+      "file": "11-multi-language/dialects-pidgins-creoles/coraal/roc/ROC_se0_ag2_f_04.txt"
+    },
+    {
+      "speaker_id": "ROC_se0_ag3_f_01",
+      "region_code": "ROC",
+      "region": "Rochester, NY (ROC component)",
+      "age": "52",
+      "gender": "Female",
+      "source_basefiles": [
+        "ROC_se0_ag3_f_01_1"
+      ],
+      "segments": 80,
+      "word_count": 3659,
+      "char_count": 19502,
+      "file": "11-multi-language/dialects-pidgins-creoles/coraal/roc/ROC_se0_ag3_f_01.txt"
+    },
+    {
+      "speaker_id": "ROC_se0_ag3_f_02",
+      "region_code": "ROC",
+      "region": "Rochester, NY (ROC component)",
+      "age": "80",
+      "gender": "Female",
+      "source_basefiles": [
+        "ROC_se0_ag3_f_02_1"
+      ],
+      "segments": 97,
+      "word_count": 4694,
+      "char_count": 24950,
+      "file": "11-multi-language/dialects-pidgins-creoles/coraal/roc/ROC_se0_ag3_f_02.txt"
+    },
+    {
+      "speaker_id": "ROC_se0_ag3_m_01",
+      "region_code": "ROC",
+      "region": "Rochester, NY (ROC component)",
+      "age": "63",
+      "gender": "Male",
+      "source_basefiles": [
+        "ROC_se0_ag3_m_01_1"
+      ],
+      "segments": 8,
+      "word_count": 660,
+      "char_count": 4339,
+      "file": "11-multi-language/dialects-pidgins-creoles/coraal/roc/ROC_se0_ag3_m_01.txt"
+    }
+  ]
+}

@@ -1,0 +1,85 @@
+{
+ "schema": "LanguageLawPrior@1",
+ "language": "qalb",
+ "languageName": "قلب (Qalb)",
+ "script": "العربية",
+ "giver": {
+  "resource": "قلب (Qalb)'s own interpreter/grammar source",
+  "engine": {
+   "source": "https://raw.githubusercontent.com/nasser/---/master/peg/qlb.peg",
+   "repo": "https://github.com/nasser/---"
+  },
+  "note": "Fetched from the language's own engine (keyword table / grammar / opcode table), never hand-typed. This is the non-Western proof that LanguageLawPrior@1 is script-agnostic: the keywords are العربية, and the mechanism that derives them is identical to the Latin-script languages."
+ },
+ "lexical": {
+  "keywords": [],
+  "alphabet": [
+   "ؤ",
+   "ئ",
+   "أ",
+   "ا",
+   "ب",
+   "ج",
+   "د",
+   "ه",
+   "و",
+   "ز",
+   "ح",
+   "ت",
+   "ي",
+   "ك",
+   "ل",
+   "م",
+   "ن",
+   "ق",
+   "ش",
+   "ع",
+   "ر",
+   "ت",
+   "ط",
+   "ة",
+   "س",
+   "د",
+   "ف",
+   "غ",
+   "خ",
+   "ص",
+   "ذ",
+   "ن",
+   "م",
+   "ظ",
+   "ى",
+   "آ",
+   "إ",
+   "ض",
+   "ث"
+  ],
+  "numerals": [
+   "١",
+   "٢",
+   "٣",
+   "٤",
+   "٥",
+   "٦",
+   "٧",
+   "٨",
+   "٩",
+   "٠"
+  ]
+ },
+ "grammar": {
+  "structure": [
+   "list = '(' content ')'",
+   "symbol",
+   "string",
+   "number"
+  ]
+ },
+ "note": "Qalb is a Lisp dialect: S-expressions over the Arabic alphabet with Arabic-Indic numerals (٠–٩). There is NO reserved-word law — the built-ins are the .qlb library symbols, not keywords.",
+ "counts": {
+  "keywords": 0,
+  "alphabet": 39,
+  "numerals": 10
+ },
+ "builtAt": "2026-09-15T02:37:34.306Z"
+}

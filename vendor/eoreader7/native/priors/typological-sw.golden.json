@@ -1,0 +1,150 @@
+{
+ "schema": "EOReadingGolden@1",
+ "specimen": "typological-sw",
+ "path": "goldens/reading/typological/sw.txt",
+ "rule": "goldens/reading/RULE.md",
+ "language": "Swahili (sw)",
+ "handrolled": true,
+ "handrolledNote": "Composed directly for this golden by the authoring session from linguistic knowledge of the language, NOT fetched from an authoritative source (OHCHR or otherwise). Structural ground truth (what proposition each line asserts, its phasepost) is authored with the same intent-by-construction standing this project's other synthetic goldens use (asserted-eval.mjs, hl-acquire.test.mjs's invented chronicle). Grammaticality is NOT independently native-speaker-verified — treat as reviewed-in-good-faith, not certified.",
+ "window": {
+  "end": 186,
+  "coordinates": "raw file bytes (UTF-8) — no container to strip, no CRLF to normalize; each row's span is its whole source line"
+ },
+ "notes": "One proposition per line, by construction — six short single-clause declaratives loosely drawn from UDHR Articles 1, 3, 4, 15 and 18, simplified to one clause each rather than quoted from the dense legal-register original. See TYPOLOGICAL-FINDINGS.md for the cross-linguistic phasepost comparison across this file's three sibling specimens.",
+ "rows": [
+  {
+   "gloss": "All people are born free.",
+   "subject": "Watu wote",
+   "relation": "wamezaliwa",
+   "object": "huru",
+   "polarity": "+",
+   "phasepost": {
+    "op": "INS",
+    "grain": "Pattern"
+   },
+   "because": "birth stated as a law over the whole kind — Generate·Existence at pattern grain; matches the Arabic, Mandarin, and udhr.golden.json row 10 classifications of the identical proposition — third independent confirmation",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "anchor": "Watu wote wamezaliwa huru.",
+   "span": {
+    "start": 0,
+    "end": 26
+   }
+  },
+  {
+   "gloss": "All people are equal in dignity.",
+   "subject": "Watu wote",
+   "relation": "ni",
+   "object": "sawa",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Figure"
+   },
+   "because": "ni + property adjective (copula rule 4) — the overt copula particle 'ni' makes this the cleanest copula-rule case of the three languages (Arabic and Mandarin both use zero-copula constructions here)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SIG",
+    "grain": "Pattern",
+    "because": "same undecided universal-quantification-promotion question as the Arabic and Mandarin row 2 parallels"
+   },
+   "anchor": "Watu wote ni sawa katika hadhi.",
+   "span": {
+    "start": 27,
+    "end": 58
+   }
+  },
+  {
+   "gloss": "Everyone has the right to life.",
+   "subject": "Kila mtu",
+   "relation": "ana",
+   "object": "haki ya kuishi",
+   "polarity": "+",
+   "phasepost": {
+    "op": "CON",
+    "grain": "Pattern"
+   },
+   "because": "ana (has, subject-prefix a- + tense-infix -na-) is a possession verb — Relate·Structure, durable entitlement over the whole kind; matches the Arabic and Mandarin CON·Pattern classifications via a THIRD, again grammatically distinct, possessive construction — inflected verb rather than bare verb or preposition",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "anchor": "Kila mtu ana haki ya kuishi.",
+   "span": {
+    "start": 59,
+    "end": 87
+   }
+  },
+  {
+   "gloss": "No one shall be held in slavery.",
+   "subject": "mtu",
+   "relation": "Hakuna",
+   "object": "atakayefanywa mtumwa",
+   "polarity": "+",
+   "phasepost": {
+    "op": "NUL",
+    "grain": "Pattern"
+   },
+   "because": "Hakuna (there-is-not) is an existential-negative subject — RULE.md amendment A4: reads as NUL with polarity +, the absence itself IS the act; read at Pattern grain as a durable categorical guarantee over all persons and all time, matching row 1's INS·Pattern promotion; 'atakayefanywa mtumwa' (who will be made a slave) is a restrictive relative clause and folds into the subject NP per R1, not a separate assertion. The ONE row of 18 where A4 fires rather than plain R6 negation, and the ONE row where all three languages' primary phasepost genuinely disagrees (Arabic SIG·Figure(−), Mandarin CON·Figure(−), Swahili NUL·Pattern(+)) — kept as a disclosed finding, not forced into agreement",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "NUL",
+    "grain": "Figure",
+    "because": "A4's own text describes one individuating instance of absence; Figure is the default grain absent an explicit habitual/universal-promotion argument"
+   },
+   "anchor": "Hakuna mtu atakayefanywa mtumwa.",
+   "span": {
+    "start": 88,
+    "end": 120
+   }
+  },
+  {
+   "gloss": "Everyone has the right to a nationality.",
+   "subject": "Kila mtu",
+   "relation": "ana",
+   "object": "haki ya uraia",
+   "polarity": "+",
+   "phasepost": {
+    "op": "CON",
+    "grain": "Pattern"
+   },
+   "because": "same possession construction as row 3",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "anchor": "Kila mtu ana haki ya uraia.",
+   "span": {
+    "start": 121,
+    "end": 148
+   }
+  },
+  {
+   "gloss": "Everyone has the right to freedom of thought.",
+   "subject": "Kila mtu",
+   "relation": "ana",
+   "object": "haki ya uhuru wa mawazo",
+   "polarity": "+",
+   "phasepost": {
+    "op": "CON",
+    "grain": "Pattern"
+   },
+   "because": "same possession construction as rows 3 and 5",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "anchor": "Kila mtu ana haki ya uhuru wa mawazo.",
+   "span": {
+    "start": 149,
+    "end": 186
+   }
+  }
+ ]
+}

@@ -1,0 +1,43 @@
+{
+  "schema": "RoleConfig@1",
+  "language": "wol",
+  "provenance": {
+    "builder": "eoreader7 native/scripts/build-role-config.mjs",
+    "source": "/private/tmp/claude-501/tb/wol/train.conllu",
+    "min_volume": 20,
+    "null_draws": 200,
+    "null_alpha": 0.05,
+    "null_seed": 1,
+    "note": "position stats and marker candidates are both derived mechanically from this treebank's own gold dependency annotations — never hand-typed or asserted from general linguistic knowledge. A marker candidate is admitted only when its real precision beats the (1-alpha) quantile of a within-sentence role-label shuffle (II.23), never a fixed ratio — and (S122) that quantile is the MAX-STATISTIC across every eligible closed-class candidate tried, not a per-candidate null, so the admitted marker is significant against the whole search, not merely against itself."
+  },
+  "object": {
+    "total": 2120,
+    "before": 584,
+    "after": 1536,
+    "dominantSide": "after",
+    "reliability": 0.7245283018867924,
+    "usable": true,
+    "marker": {
+      "form": "sa",
+      "precision": 0.5161290322580645,
+      "nullCeiling": 0.28205128205128205,
+      "volume": 31,
+      "recall": 0.007547169811320755
+    }
+  },
+  "subject": {
+    "total": 2538,
+    "before": 2532,
+    "after": 6,
+    "dominantSide": "before",
+    "reliability": 0.9976359338061466,
+    "usable": true,
+    "marker": {
+      "form": "ngi",
+      "hits": 36,
+      "total": 56,
+      "precision": 0.6428571428571429,
+      "nullCeiling": 0.2916666666666667
+    }
+  }
+}

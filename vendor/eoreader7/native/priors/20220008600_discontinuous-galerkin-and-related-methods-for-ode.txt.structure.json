@@ -1,0 +1,3723 @@
+{
+ "schema": "SourceStructure@1",
+ "source": "05-academic-papers/ntrs-white-papers/20220008600_discontinuous-galerkin-and-related-methods-for-ode.txt",
+ "bytes": 110842,
+ "bodyOffset": 629,
+ "splitBasis": "463 sentence-punctuation splits",
+ "unsplit": false,
+ "unitCount": 464,
+ "units": [
+  {
+   "start": 629,
+   "end": 916,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 286",
+   "id": null,
+   "text": "Eleventh International Conference on                                                    ICCFD11-xxxx\n Computational Fluid Dynamics (ICCFD11),\n Maui, Hawaii, USA, July 11-15, 2022\n\n\n\n       Discontinuo"
+  },
+  {
+   "start": 916,
+   "end": 919,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 289",
+   "id": null,
+   "text": "T."
+  },
+  {
+   "start": 919,
+   "end": 1114,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 484",
+   "id": null,
+   "text": "Huynh\n                                         huynh@grc.nasa.gov\n                              NASA Glenn Research Center, MS 5-11,\n                                    Cleveland, OH 44135, USA."
+  },
+  {
+   "start": 1114,
+   "end": 1325,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 695",
+   "id": null,
+   "text": "Abstract: A defining feature of the discontinuous Galerkin (DG) method for ODE is\n         that the piecewise polynomial solution can have a jump discontinuity at the beginning\n         of each step."
+  },
+  {
+   "start": 1325,
+   "end": 1435,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 805",
+   "id": null,
+   "text": "Starting from the standard integral formulation, the DG method is derived\n         here in differential form."
+  },
+  {
+   "start": 1435,
+   "end": 1624,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 994",
+   "id": null,
+   "text": "The key ingredient is a polynomial called the correction\n         function, which helps ‘correct’ the discontinuous solution by approximating the jump\n         and yields a continuous one."
+  },
+  {
+   "start": 1624,
+   "end": 1804,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 1174",
+   "id": null,
+   "text": "Under the right Radau quadrature, this continuous solution\n         is identical to the solutions by the right Radau collocation and the continuous Galerkin\n         (CG) methods."
+  },
+  {
+   "start": 1804,
+   "end": 1929,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 1299",
+   "id": null,
+   "text": "Next, the correction function facilitates the construction of the\n         associated implicit Runge-Kutta schemes (IRK-DG)."
+  },
+  {
+   "start": 1929,
+   "end": 2170,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 1540",
+   "id": null,
+   "text": "Different quadratures for DG\n         result in different IRK-DG methods: left Radau quadrature in Radau IA, right Radau\n         quadrature in Radau IIA or right Radau collocation, and Gauss quadratu"
+  },
+  {
+   "start": 2170,
+   "end": 2318,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 1688",
+   "id": null,
+   "text": "The construction of IRK-DG clarifies the meaning and facilitates the\n         proofs of various 𝐵(𝑝), 𝐶(𝜂), and 𝐷(𝜁) conditions for accuracy."
+  },
+  {
+   "start": 2318,
+   "end": 2494,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 1864",
+   "id": null,
+   "text": "The two consequences\n         of these conditions are that all 𝑠-stage IRK-DG methods are accurate to order 2𝑠 − 1,\n         and the IRK-DG methods of Radau type are unique."
+  },
+  {
+   "start": 2494,
+   "end": 2577,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 1947",
+   "id": null,
+   "text": "Numerical examples showing the\n         behavior of the DG solutions are provided."
+  },
+  {
+   "start": 2577,
+   "end": 2729,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 2099",
+   "id": null,
+   "text": "In all, the correction function plays a key\n         role and helps establish the relations among the DG, IRK-DG, collocation, and CG\n         schemes."
+  },
+  {
+   "start": 2729,
+   "end": 3116,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 2486",
+   "id": null,
+   "text": "Keywords: Discontinuous Galerkin, implicit Runge-Kutta, collocation, continuous\n         Galerkin, time stepping, numerical methods, ordinary differential equations.\n\n1    Introduction\nThe finite elem"
+  },
+  {
+   "start": 3116,
+   "end": 3261,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 2631",
+   "id": null,
+   "text": "The continuous\nfinite element, or continuous Galerkin (CG), method was first employed to solve ODE by Argyris &\nScharpf (1969) and Fried (1969)."
+  },
+  {
+   "start": 3261,
+   "end": 3395,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 2765",
+   "id": null,
+   "text": "Hulme (1972) showed that the CG method for ODE is equivalent to the\ncollocation method using quadrature points as collocation points."
+  },
+  {
+   "start": 3395,
+   "end": 3463,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 2833",
+   "id": null,
+   "text": "Collocation is an idea widely applicable in numerical analysis."
+  },
+  {
+   "start": 3463,
+   "end": 3553,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 2923",
+   "id": null,
+   "text": "For ODE, collocation methods enforce\nthe differential equation at the collocation points."
+  },
+  {
+   "start": 3553,
+   "end": 3618,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 2988",
+   "id": null,
+   "text": "These methods were studied by Cooper (1968) and\nAxelsson (1969)."
+  },
+  {
+   "start": 3618,
+   "end": 3715,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 3085",
+   "id": null,
+   "text": "Wright (1970) showed that the collocation process leads to an implicit Runge-Kutta\n(IRK) scheme."
+  },
+  {
+   "start": 3715,
+   "end": 3866,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 3236",
+   "id": null,
+   "text": "Collocation methods are covered in most texts on numerical methods for ODE (e.g., Hairer,\nNorsett, & Wanner 1993, Hairer & Wanner 1991, Lambert 1991)."
+  },
+  {
+   "start": 3866,
+   "end": 4043,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 3413",
+   "id": null,
+   "text": "The discontinuous Galerkin (DG) method, which allows jump discontinuities across cells or elements,\nwas introduced by Reed & Hill (1973) for the neutron transport equation."
+  },
+  {
+   "start": 4043,
+   "end": 4158,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 3528",
+   "id": null,
+   "text": "These methods are popular for\nthe spatial discretization of conservation laws (Cockburn, Karniadakis, & Shu 2000)."
+  },
+  {
+   "start": 4158,
+   "end": 4347,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 3717",
+   "id": null,
+   "text": "LeSaint & Raviart\n(1974) formulated the DG method for ODE and showed, by employing the left Radau quadrature, that the\nmethod results in an IRK scheme that is A-stable and superconvergent."
+  },
+  {
+   "start": 4347,
+   "end": 4625,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 3995",
+   "id": null,
+   "text": "Delfour, Hager, & Trochu (1981)\ngeneralized the DG method by using a weighted average of the left and right values for the boundary terms\n\n\n\n                                                       1\n\fo"
+  },
+  {
+   "start": 4625,
+   "end": 4783,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 4153",
+   "id": null,
+   "text": "In general, such a weighted\naverage leads to the coupling among the steps and a very large system of equations, and the method is no\nlonger of one-step type."
+  },
+  {
+   "start": 4783,
+   "end": 5006,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 4376",
+   "id": null,
+   "text": "More recent efforts on unifying frameworks for DG and related methods as well\nas their associated IRK schemes include the contributions of Borri & Bottasso (1993), Bottasso (1997),\nTang & Sun (2012), "
+  },
+  {
+   "start": 5006,
+   "end": 5092,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 4462",
+   "id": null,
+   "text": "Dissipative dynamical behavior of the DG method was\nstudied by Estep & Stuart (2001)."
+  },
+  {
+   "start": 5092,
+   "end": 5171,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 4541",
+   "id": null,
+   "text": "A posteriori error estimates of the DG method was explored by Baccouch\n(2016)."
+  },
+  {
+   "start": 5171,
+   "end": 5283,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 4653",
+   "id": null,
+   "text": "A time finite element method based on Hamilton’s variational principle can be found in Xing, Qiu,\n& Guo (2017)."
+  },
+  {
+   "start": 5283,
+   "end": 5374,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 4744",
+   "id": null,
+   "text": "An adaptive DG method for very stiff systems was investigated by Fortina & Yakoubi\n(2019)."
+  },
+  {
+   "start": 5374,
+   "end": 5437,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 4807",
+   "id": null,
+   "text": "Additional contributions can be found in the cited references."
+  },
+  {
+   "start": 5437,
+   "end": 5594,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 4964",
+   "id": null,
+   "text": "A common feature of papers on this\nsubject is that they are typically highly algebraic and/or analytic, centering on error estimates and stability\nanalyses."
+  },
+  {
+   "start": 5594,
+   "end": 5703,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 5073",
+   "id": null,
+   "text": "In this paper, we study the DG method for ODE from a perspective different from those in the literature."
+  },
+  {
+   "start": 5703,
+   "end": 5746,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 5116",
+   "id": null,
+   "text": "Our focus is on constructing the solution."
+  },
+  {
+   "start": 5746,
+   "end": 5879,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 5249",
+   "id": null,
+   "text": "This task is accomplished by removing the test function in the\nintegral formulation and deriving the DG method in differential form."
+  },
+  {
+   "start": 5879,
+   "end": 6052,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 5422",
+   "id": null,
+   "text": "The key ingredient is a polynomial\ncalled the correction function, which helps ‘correct’ the discontinuous solution by approximating the jump\nat the beginning of each step."
+  },
+  {
+   "start": 6052,
+   "end": 6107,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 5477",
+   "id": null,
+   "text": "The result is a continuous solution for the DG method."
+  },
+  {
+   "start": 6107,
+   "end": 6247,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 5617",
+   "id": null,
+   "text": "Under the right Radau\nquadrature, this continuous solution is identical to the solutions by the right Radau collocation and the CG\nmethods."
+  },
+  {
+   "start": 6247,
+   "end": 6363,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 5733",
+   "id": null,
+   "text": "Next, the correction function facilitates the construction of the associated implicit Runge-Kutta\nschemes (IRK-DG)."
+  },
+  {
+   "start": 6363,
+   "end": 6577,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 5947",
+   "id": null,
+   "text": "Different quadratures for DG result in different IRK-DG methods: left Radau\nquadrature in Radau IA, right Radau quadrature in Radau IIA or right Radau collocation, and Gauss\nquadrature in a method cal"
+  },
+  {
+   "start": 6577,
+   "end": 6648,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 6018",
+   "id": null,
+   "text": "All 𝑠-stage IRK-DG methods are shown to be accurate to order\n2𝑠 − 1."
+  },
+  {
+   "start": 6648,
+   "end": 6767,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 6137",
+   "id": null,
+   "text": "The proof is carried out by employing the IRK-DG construction to derive various 𝐵(𝑝), 𝐶(𝜂), and\n𝐷(𝜁) conditions."
+  },
+  {
+   "start": 6767,
+   "end": 6851,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 6221",
+   "id": null,
+   "text": "The 𝐶(𝑠) and 𝐷(𝑠) conditions also lead to uniqueness of the Radau type methods."
+  },
+  {
+   "start": 6851,
+   "end": 6925,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 6295",
+   "id": null,
+   "text": "Numerical examples showing the behavior of the DG solutions are provided."
+  },
+  {
+   "start": 6925,
+   "end": 7044,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 6414",
+   "id": null,
+   "text": "In sum, the correction\nfunction plays a crucial role and helps clarify the relations among the DG and related schemes."
+  },
+  {
+   "start": 7044,
+   "end": 7569,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 6939",
+   "id": null,
+   "text": "This paper is essentially self-contained and organized as follows: the DG method is presented in §2,\nthe resulting IRK-DG §3, accuracy §4, numerical examples §5, and conclusions and discussion §6.\n\n\n2"
+  },
+  {
+   "start": 7569,
+   "end": 7791,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 7161",
+   "id": null,
+   "text": "Assuming a solution exists, the methods studied are of one-step type: the data 𝑢𝑛 at 𝑥𝑛 is known and, with\nstep size ℎ (may depend on 𝑛), the solution 𝑢𝑛+1 at 𝑥𝑛+1 = 𝑥𝑛 + ℎ is to be calcula"
+  },
+  {
+   "start": 7791,
+   "end": 7890,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 7260",
+   "id": null,
+   "text": "The DG method approximates the solution on (𝑥𝑛 , 𝑥𝑛 + ℎ] by a polynomial 𝑢ℎ of degree 𝑘."
+  },
+  {
+   "start": 7890,
+   "end": 8019,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 7389",
+   "id": null,
+   "text": "At each\n𝑥𝑛 , the data is 𝑢𝑛 = 𝑢ℎ (𝑥𝑛− ), i.e., upwinding is employed; for 𝑛 = 0, the data is the initial condition 𝑢0 ."
+  },
+  {
+   "start": 8019,
+   "end": 8277,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 7647",
+   "id": null,
+   "text": "A\ndefining feature of the method is that the piecewise polynomial function 𝑢ℎ can be and usually is\n                                                                                       − ).\ndiscont"
+  },
+  {
+   "start": 8277,
+   "end": 8459,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 7829",
+   "id": null,
+   "text": "The solution is 𝑢𝑛+1 = 𝑢ℎ (𝑥𝑛+1\n    As is routine, the reference or local variable 𝜉 on [0, 1] is employed:\n                                                   𝑥 = 𝑥𝑛 + 𝜉ℎ."
+  },
+  {
+   "start": 8459,
+   "end": 8574,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 7944",
+   "id": null,
+   "text": "A function 𝑣(𝑥) on [𝑥𝑛 , 𝑥𝑛+1 ] corresponds to a function on [0, 1] also denoted by 𝑣: 𝑣(𝜉) = 𝑣(𝑥(𝜉))."
+  },
+  {
+   "start": 8574,
+   "end": 8896,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 8266",
+   "id": null,
+   "text": "By\napplying the chain rule to the ODE,\n                                             𝑑𝑢\n                                                 = ℎ𝑓(𝜉, 𝑢(𝜉)).\n                                           "
+  },
+  {
+   "start": 8896,
+   "end": 8932,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 8302",
+   "id": null,
+   "text": "Loosely put, ℎ is absorbed into 𝑓."
+  },
+  {
+   "start": 8932,
+   "end": 10135,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 9505",
+   "id": null,
+   "text": "The case of a general ℎ is straightforward and will be expressed later.\n\n\n                                                          2\n\f   In the rest of this paper, we employ the notation\n            "
+  },
+  {
+   "start": 10135,
+   "end": 10272,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 9642",
+   "id": null,
+   "text": "To involve 𝑢𝑛 ,\nby integration by parts,\n                                 (𝑢ℎ′ , 𝑣) = 𝑢ℎ (1)𝑣(1) − 𝑢ℎ (0+ )𝑣(0) − (𝑢ℎ , 𝑣 ′ )."
+  },
+  {
+   "start": 10272,
+   "end": 10358,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 9728",
+   "id": null,
+   "text": "At 𝜉 = 0, the data 𝑢𝑛 is more critical and is employed instead of 𝑢ℎ (0+ ) above."
+  },
+  {
+   "start": 10358,
+   "end": 10627,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 9997",
+   "id": null,
+   "text": "The DG method seeks 𝑢ℎ of degree 𝑘 on (0, 1] such that for any 𝑣 in 𝑷𝑘 (called a test function),\n                                 𝑢ℎ (1)𝑣(1) − 𝑢𝑛 𝑣(0) − (𝑢ℎ , 𝑣 ′ ) = (𝑓, 𝑣).            "
+  },
+  {
+   "start": 10627,
+   "end": 11032,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 10402",
+   "id": null,
+   "text": "Integrate (𝑢ℎ , 𝑣 ′ ) by parts, we obtain the strong form\n                                    [𝑢ℎ (0+ ) − 𝑢𝑛 ]𝑣(0) + (𝑢ℎ′ , 𝑣) = (𝑓, 𝑣).                              (2.3)\nAt 𝑥𝑛+1 , the so"
+  },
+  {
+   "start": 11032,
+   "end": 11161,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 10531",
+   "id": null,
+   "text": "To simplify the notation, its domain is extended to [0,1] by\n                                               𝑢ℎ (0) = 𝑢ℎ (0+ )."
+  },
+  {
+   "start": 11161,
+   "end": 11276,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 10646",
+   "id": null,
+   "text": "Since 𝑣 ∈ 𝑷𝑘 , we can replace 𝑓 on the right hand side of (2.3) by its projection onto 𝑷𝑘 , i.e., 𝒫𝑘 (𝑓)."
+  },
+  {
+   "start": 11276,
+   "end": 11657,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 11027",
+   "id": null,
+   "text": "Set\n                                                   𝑓ℎ = 𝒫𝑘 (𝑓).                                             (2.5)\nBy the above two equations, the strong form (2.3) can be written as\n          "
+  },
+  {
+   "start": 11657,
+   "end": 11737,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 11107",
+   "id": null,
+   "text": "Loosely put, 𝑢ℎ′ nearly equals 𝑓ℎ except for\nthe term [𝑢ℎ (0) − 𝑢𝑛 ]𝑣(0)."
+  },
+  {
+   "start": 11737,
+   "end": 11820,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 11190",
+   "id": null,
+   "text": "The following simple example shows the essential properties of the DG solution."
+  },
+  {
+   "start": 11820,
+   "end": 11924,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 11294",
+   "id": null,
+   "text": "With 𝜉 on [0, 1], solve\n                                𝑢′ (𝜉) = 𝑓(𝜉) = 6𝜉 − 5,        𝑢(0) = 3."
+  },
+  {
+   "start": 11924,
+   "end": 12407,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 11777",
+   "id": null,
+   "text": "The exact solution is trivial,\n                                             𝑈(𝜉) = 3𝜉 2 − 5𝜉 + 3.                                          (2.7)\nFor the linear DG solution 𝑢ℎ (𝜉) = 𝑎𝜉 + 𝑏, on"
+  },
+  {
+   "start": 12407,
+   "end": 12503,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 11873",
+   "id": null,
+   "text": "Next, on [0, 1], the two left Radau points are 0 and 2/3, and right Radau points, 1/3 and 1."
+  },
+  {
+   "start": 12503,
+   "end": 12700,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 12070",
+   "id": null,
+   "text": "The\nquadratic solution 𝑈 of (2.7) and the linear DG solution 𝑢ℎ above intersect at (1/3, 5/3) and (1,1) i.e.,\nthe abscissas of their intersections are the two right Radau points (see Fig. 2.1b)."
+  },
+  {
+   "start": 12700,
+   "end": 12879,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 12249",
+   "id": null,
+   "text": "Whereas 𝑈 satisfies\n𝑈(0) = 𝑢𝑛 = 3, the DG solution 𝑢ℎ does not, and 𝑢ℎ interpolates 𝑈 at the two right Radau points and is\ndefined by the values of 𝑈 at these two points."
+  },
+  {
+   "start": 12879,
+   "end": 13027,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 12397",
+   "id": null,
+   "text": "On the other hand, 𝑢ℎ′ and 𝑈 ′ intersect at (2/3, −1), i.e.,\nthe abscissa of their intersection is the interior left Radau point (see Fig. 2.1a)."
+  },
+  {
+   "start": 13027,
+   "end": 13560,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 12930",
+   "id": null,
+   "text": "That is, the solutions 𝑈 and\n𝑢ℎ match at the right Radau points, and their derivatives 𝑈 ′ and 𝑢ℎ′ match at the interior left Radau points.\n\n\n\n\n                                                    "
+  },
+  {
+   "start": 13560,
+   "end": 13788,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 13158",
+   "id": null,
+   "text": "Fig. 2.1a shows the plots of 𝑓(𝜉) = 6𝜉 − 5 (thick blue line) and 𝑢ℎ′ = −1 (dot-dashed green line); the\n𝜉-coordinate of their intersection is the nonzero member of the two left Radau points (blue "
+  },
+  {
+   "start": 13788,
+   "end": 14059,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 13429",
+   "id": null,
+   "text": "Fig. 2.1b shows the (exact) quadratic solution 𝑈 (thick blue curve) and the linear DG solution 𝑢ℎ\n(dot-dashed green line); the intersections of 𝑈 and 𝑢ℎ (big red circular dots) and their 𝜉-coordi"
+  },
+  {
+   "start": 14059,
+   "end": 14250,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 13620",
+   "id": null,
+   "text": "We can also turn the problem around and ask: on [0, 1], how do we evaluate the derivative of the\ndiscontinuous function 𝑢ℎ defined by 𝑢ℎ (0) = 3 and, for 0 < 𝜉 ≤ 1, 𝑢ℎ (𝜉) = −𝜉 + 2?"
+  },
+  {
+   "start": 14250,
+   "end": 14556,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 13926",
+   "id": null,
+   "text": "The answer is that\nthe DG method amounts to the following derivative evaluation: reconstruct the solution via 𝑈 of one degree\nhigher than 𝑢ℎ that interpolates 𝑢ℎ at the right Radau points and satis"
+  },
+  {
+   "start": 14556,
+   "end": 14602,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 13972",
+   "id": null,
+   "text": "Note that 𝑈 ′ is of the same degree as 𝑢ℎ ."
+  },
+  {
+   "start": 14602,
+   "end": 14710,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 14080",
+   "id": null,
+   "text": "Such a derivative estimate for a polynomial with a jump discontinuity also holds true for the general case."
+  },
+  {
+   "start": 14710,
+   "end": 15466,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 14836",
+   "id": null,
+   "text": "Left Radau points\n                                                                    𝑈\n\n                                                                                           𝑢ℎ\n               "
+  },
+  {
+   "start": 15466,
+   "end": 15601,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 14971",
+   "id": null,
+   "text": "Approximate Dirac Delta Function 𝛾 at 𝜉 = 0\n   The standard approach is to solve the weak form (2.2) or the strong form (2.3)."
+  },
+  {
+   "start": 15601,
+   "end": 15897,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 15267",
+   "id": null,
+   "text": "Here, the goal is to\ndefine a polynomial 𝑈 of degree 𝑘 + 1 closely related to 𝑢ℎ and has the properties that\n                                          𝑈 ′ = 𝑓ℎ and 𝑈(0) = 𝑢𝑛 .                 "
+  },
+  {
+   "start": 15897,
+   "end": 15937,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 15307",
+   "id": null,
+   "text": "To this end, let ℝ be the real line."
+  },
+  {
+   "start": 15937,
+   "end": 16099,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 15469",
+   "id": null,
+   "text": "The mapping 𝐵 from 𝑷𝑘 to ℝ defined by, for each 𝑣 in 𝑷𝑘 ,\n                                                 𝐵(𝑣) = 𝑣(0),\nis a linear functional on 𝑷𝑘 ."
+  },
+  {
+   "start": 16099,
+   "end": 16385,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 15755",
+   "id": null,
+   "text": "Thus, there exists 𝛾 in 𝑷𝑘 such that 𝐵(𝑣) = (𝛾, 𝑣), i.e.,\n                                                  (𝛾, 𝑣) = 𝑣(0).                                        (2.10)\n    The polynomial 𝛾"
+  },
+  {
+   "start": 16385,
+   "end": 16543,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 15913",
+   "id": null,
+   "text": "In our context, on [0, 1], let the Dirac delta function at 𝜉 = 0 be denoted by 𝛿0 and defined by 𝛿0 (𝑣) =\n𝑣(0) for any continuous function 𝑣 on [0, 1]."
+  },
+  {
+   "start": 16543,
+   "end": 16616,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 15986",
+   "id": null,
+   "text": "Then 𝛾 defined above is an approximation of 𝛿0 by an\nelement of 𝑷𝑘 ."
+  },
+  {
+   "start": 16616,
+   "end": 16661,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 16031",
+   "id": null,
+   "text": "In fact, 𝛾 can be expressed explicitly."
+  },
+  {
+   "start": 16661,
+   "end": 16758,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 16128",
+   "id": null,
+   "text": "Let the 𝑘 + 1 left Radau points on [0, 1] be denoted by 𝜉𝐿,1 , …,\n𝜉𝐿,𝑘+1 where 𝜉𝐿,1 = 0."
+  },
+  {
+   "start": 16758,
+   "end": 16900,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 16270",
+   "id": null,
+   "text": "Let 𝑙𝐿,1, …, 𝑙𝐿,𝑘+1 be the corresponding Lagrange (basis) polynomials, which are\nof degree 𝑘 and satisfy 𝑙𝐿,𝑗 (𝜉𝐿,𝑖 ) = 𝛿𝑖,𝑗 ."
+  },
+  {
+   "start": 16900,
+   "end": 17510,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 16880",
+   "id": null,
+   "text": "Then\n\n\n\n                                                         4\n\f                                                      𝛾 = (𝑘 + 1)2 𝑙𝐿,1 .                                 (2.11)\nTo show the abo"
+  },
+  {
+   "start": 17510,
+   "end": 17664,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 17034",
+   "id": null,
+   "text": "Recall\nthat the Radau quadrature with 𝑘 + 1 evaluation points has a degree of precision 2𝑘, i.e., it is exact for any\npolynomial of degree 2𝑘 or less."
+  },
+  {
+   "start": 17664,
+   "end": 18264,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 17634",
+   "id": null,
+   "text": "As a consequence, for any 𝑣 in 𝑷𝑘 , since 𝑙𝐿,1 𝑣 is of degree 2𝑘 or less, by\napplying the left Radau quadrature, and since 𝑙𝐿,1 vanishes at all Left Radau points except at 𝜉𝐿,1 = 0,\n       "
+  },
+  {
+   "start": 18264,
+   "end": 18316,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 17686",
+   "id": null,
+   "text": "The above and (2.10) completes the proof of (2.11)."
+  },
+  {
+   "start": 18316,
+   "end": 19167,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 18537",
+   "id": null,
+   "text": "Fig. 2.2a shows the 3 left Radau points (blue square dots on the 𝜉-axis) and the corresponding Lagrange\npolynomials for 𝑘 = 2, and Fig. 2.2b shows the approximate Dirac delta function 𝛾 for 𝑘 = 8 "
+  },
+  {
+   "start": 19167,
+   "end": 19654,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 19024",
+   "id": null,
+   "text": "With 𝛾 as in (2.11), by using (2.10), the strong form (2.6) can be written as\n                                  [𝑢ℎ (0) − 𝑢𝑛 ](𝛾, 𝑣) + (𝑢ℎ′ , 𝑣) = (𝑓ℎ , 𝑣).                            (2.13)"
+  },
+  {
+   "start": 19654,
+   "end": 19774,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 19144",
+   "id": null,
+   "text": "It will be shown later that by using a quadrature for DG, 𝑓ℎ can be defined by its values at the quadrature\npoints."
+  },
+  {
+   "start": 19774,
+   "end": 19872,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 19242",
+   "id": null,
+   "text": "As such, the above equation yields a differential formulation for DG involving no inner products."
+  },
+  {
+   "start": 19872,
+   "end": 19956,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 19326",
+   "id": null,
+   "text": "The left Radau points play a special role in the above differential formulation."
+  },
+  {
+   "start": 19956,
+   "end": 20908,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 20278",
+   "id": null,
+   "text": "Indeed, by (2.11), the\nabove implies\n                                     𝑢ℎ′ − [𝑢𝑛 − 𝑢ℎ (0)](𝑘 + 1)2 𝑙𝐿,1 = 𝑓ℎ .                            (2.15)\nThus, in solving 𝑢′ = 𝑓, the DG solution \ud835"
+  },
+  {
+   "start": 20908,
+   "end": 21248,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 20618",
+   "id": null,
+   "text": "In other words, by\nemploying the 𝑘 + 1 left Radau points to evaluate the derivative of 𝑢ℎ , all the corrections caused by the\njump [𝑢𝑛 − 𝑢ℎ (0)] in function values at the left boundary is lumped "
+  },
+  {
+   "start": 21248,
+   "end": 21341,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 20711",
+   "id": null,
+   "text": "This\ndiscussion will be clarified further by the correction function of the next subsection."
+  },
+  {
+   "start": 21341,
+   "end": 21480,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 20850",
+   "id": null,
+   "text": "As a consequence of (2.16) and (2.17), the solution 𝑢ℎ can be constructed from the values of 𝑓ℎ at the\nleft Radau points as follows."
+  },
+  {
+   "start": 21480,
+   "end": 21645,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 21015",
+   "id": null,
+   "text": "Consider 𝑘 of the 𝑘 + 1 left Radau points away from the left boundary,\n                                     (𝑘−1)       (𝑘−1)\nnamely, 𝜉𝐿,𝑗 , 2 ≤ 𝑗 ≤ 𝑘 + 1."
+  },
+  {
+   "start": 21645,
+   "end": 21750,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 21120",
+   "id": null,
+   "text": "Let 𝑙𝐿,2 , …, 𝑙𝐿,𝑘+1 be the corresponding Lagrange (basis) polynomials,\nwhich are of degree 𝑘 − 1."
+  },
+  {
+   "start": 21750,
+   "end": 23584,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 22954",
+   "id": null,
+   "text": "Then, by (2.16) and, since 𝑢ℎ′ is of degree 𝑘 − 1,\n                                                       𝑘+1\n                                                                        (𝑘−1)\n        "
+  },
+  {
+   "start": 23584,
+   "end": 23671,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 23041",
+   "id": null,
+   "text": "Correction Function 𝑔\n   The polynomial 𝛾 approximates the derivative of a jump."
+  },
+  {
+   "start": 23671,
+   "end": 23715,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 23085",
+   "id": null,
+   "text": "We now wish to approximate the jump itself."
+  },
+  {
+   "start": 23715,
+   "end": 23785,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 23155",
+   "id": null,
+   "text": "In other words, we wish to integrate (2.14) by first integrating −𝛾."
+  },
+  {
+   "start": 23785,
+   "end": 24871,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 24241",
+   "id": null,
+   "text": "Let the polynomial 𝑔 of degree 𝑘 + 1 be defined by\n                                           𝑔′ = −𝛾 = −(𝑘 + 1)2 𝑙𝐿,1                                   (2.21)\nand\n                             "
+  },
+  {
+   "start": 24871,
+   "end": 25145,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 24515",
+   "id": null,
+   "text": "As a consequence of 𝑔(0) = 1 and 𝑔′ = −𝛾, similar to (2.17), loosely put, when calculating the\nderivative of a jump at 𝜉 = 0, a jump of size 1 in function values (i.e., 𝑔(0) = 1) leads to a jump "
+  },
+  {
+   "start": 25145,
+   "end": 25521,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 24891",
+   "id": null,
+   "text": "The following assertion holds: the polynomial 𝑔 defined by (2.23) of degree 𝑘 + 1 is orthogonal to all\npolynomials of degree 𝑘 − 1 or less:\n                                                       𝑔"
+  },
+  {
+   "start": 25521,
+   "end": 25666,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 25036",
+   "id": null,
+   "text": "Next, recall that\n𝑔(0) = 1 and 𝑔(1) = 0; thus\n                       (𝑔, 𝑣 ′ ) = 𝑔(1)𝑣(1) − 𝑔(0)𝑣(0) − (𝑔′ , 𝑣) = −𝑣(0) − (𝑔′ , 𝑣)."
+  },
+  {
+   "start": 25666,
+   "end": 25688,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 25058",
+   "id": null,
+   "text": "By (2.21), 𝑔′ = −𝛾."
+  },
+  {
+   "start": 25688,
+   "end": 25826,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 25196",
+   "id": null,
+   "text": "Therefore,\n                                           (𝑔′ , 𝑣) = (−𝛾, 𝑣) = −𝑣(0),\nwhere the last equality above follows from (2.10)."
+  },
+  {
+   "start": 25826,
+   "end": 25959,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 25329",
+   "id": null,
+   "text": "As a result of the above two equations, for all 𝑣 in 𝑷𝑘 ,\n                                                       (𝑔, 𝑣 ′ ) = 0."
+  },
+  {
+   "start": 25959,
+   "end": 26028,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 25398",
+   "id": null,
+   "text": "As 𝑣 spans 𝑷𝑘 , 𝑣 ′ spans 𝑷𝑘−1 , and assertion (2.25) follows."
+  },
+  {
+   "start": 26028,
+   "end": 26231,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 25601",
+   "id": null,
+   "text": "We can now show that 𝑔 defined by (2.23) is identical to the right Radau polynomial of degree 𝑘 + 1\ndefined by the 𝑘 + 2 conditions that it vanishes at the 𝑘 + 1 right Radau points and 𝑔(0) = 1."
+  },
+  {
+   "start": 26231,
+   "end": 26298,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 25668",
+   "id": null,
+   "text": "Indeed, condition 𝑔(0) = 1 is satisfied by requirement (2.22)."
+  },
+  {
+   "start": 26298,
+   "end": 26376,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 25746",
+   "id": null,
+   "text": "Next, let the 𝑘 + 1 right Radau points\nbe denoted by 𝜉𝑅,1 , …, 𝜉𝑅,𝑘+1 ."
+  },
+  {
+   "start": 26376,
+   "end": 26434,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 25804",
+   "id": null,
+   "text": "Among these points, 𝑔(𝜉𝑅,𝑘+1 ) = 𝑔(1) = 0 by (2.24)."
+  },
+  {
+   "start": 26434,
+   "end": 26610,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 25980",
+   "id": null,
+   "text": "Consider now the\n                                                                                (𝑘−1)\n𝑘 members other than the right boundary, namely, 𝜉𝑅,1 , …, 𝜉𝑅,𝑘 ."
+  },
+  {
+   "start": 26610,
+   "end": 26697,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 26067",
+   "id": null,
+   "text": "Let 𝑙𝑅,𝑖 , 1 ≤ 𝑖 ≤ 𝑘, be the\ncorresponding Lagrange polynomials of degree 𝑘 − 1."
+  },
+  {
+   "start": 26697,
+   "end": 27064,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 26434",
+   "id": null,
+   "text": "Then, since, by (2.25), 𝑔 is orthogonal to 𝑷𝑘−1 ,\n                                                         (𝑘−1)\n                                                    (𝑔, 𝑙𝑅,𝑖     ) = 0.\n       "
+  },
+  {
+   "start": 27064,
+   "end": 27397,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 26767",
+   "id": null,
+   "text": "Since 𝑔(1) = 0 and 𝑙𝑅,𝑖                    (𝜉𝑅,𝑗 ) = 𝛿𝑖𝑗 for\n1 ≤ 𝑖, 𝑗 ≤ 𝑘, we obtain, with 𝑏𝑅,𝑖 the Radau weight at 𝜉𝑅,𝑖 ,\n                                 (𝑘−1)                   "
+  },
+  {
+   "start": 27397,
+   "end": 27453,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 26823",
+   "id": null,
+   "text": "The above two equations imply 𝑏𝑅,𝑖 𝑔(𝜉𝑅,𝑖 ) = 0."
+  },
+  {
+   "start": 27453,
+   "end": 27582,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 26952",
+   "id": null,
+   "text": "Since all Radau weights are nonzero (strictly positive),\n                                                      𝑔(𝜉𝑅,𝑖 ) = 0."
+  },
+  {
+   "start": 27582,
+   "end": 27608,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 26978",
+   "id": null,
+   "text": "This completes the proof."
+  },
+  {
+   "start": 27608,
+   "end": 27775,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 27145",
+   "id": null,
+   "text": "Fig. 2.3a shows the cubic correction function 𝑔 for the case 𝑘 = 2; here, 𝑔′ vanishes at two of the three\nleft Radau points: 𝑔′ (𝜉𝐿,2 ) = 𝑔′ (𝜉𝐿,3 ) = 0."
+  },
+  {
+   "start": 27775,
+   "end": 27891,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 27261",
+   "id": null,
+   "text": "Fig. 2.3b shows the correction function of degree 𝑘 + 1 for\n𝑘 = 8 (thin blue curve) and 𝑘 = 9 (thick red curve)."
+  },
+  {
+   "start": 27891,
+   "end": 27929,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 27299",
+   "id": null,
+   "text": "The following remark is in order."
+  },
+  {
+   "start": 27929,
+   "end": 28057,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 27427",
+   "id": null,
+   "text": "In our context, the Heaviside function 𝐻 on [0, 1] is the step-up\nfunction defined by 𝐻(0) = 0 and 𝐻(𝜉) = 1 for 0 < 𝜉 ≤ 1."
+  },
+  {
+   "start": 28057,
+   "end": 28104,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 27474",
+   "id": null,
+   "text": "Then 𝐻 ′ = 𝛿0 or 𝐻 is the integral of 𝛿0 ."
+  },
+  {
+   "start": 28104,
+   "end": 28209,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 27579",
+   "id": null,
+   "text": "Let\nthe step-down function be defined by Stdn = 1 − 𝐻 or Stdn(0) = 1 and, for 0 < 𝜉 ≤ 1, Stdn(𝜉) = 0."
+  },
+  {
+   "start": 28209,
+   "end": 28230,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 27600",
+   "id": null,
+   "text": "Then, Stdn′ = −𝛿0 ."
+  },
+  {
+   "start": 28230,
+   "end": 28390,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 27760",
+   "id": null,
+   "text": "Concerning the corresponding polynomial approximations, 𝑔 of degree 𝑘 + 1\napproximates the step-down function, and 𝑔′ = −𝛾 of degree 𝑘 approximates −𝛿0 ."
+  },
+  {
+   "start": 28390,
+   "end": 28516,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 27886",
+   "id": null,
+   "text": "The correction function 𝑔 can also be defined by using the Legendre polynomials, which are typically\ndefined on [−1, 1]."
+  },
+  {
+   "start": 28516,
+   "end": 28662,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 28032",
+   "id": null,
+   "text": "Any function 𝑉 on [−1, 1] corresponds to a function 𝑣(𝜉) on [0, 1] by\n                                                   𝑣(𝜉) = 𝑉(2𝜉 − 1)."
+  },
+  {
+   "start": 28662,
+   "end": 28747,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 28117",
+   "id": null,
+   "text": "All special polynomials discussed here are on [0, 1] using the above transformation."
+  },
+  {
+   "start": 28747,
+   "end": 28972,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 28342",
+   "id": null,
+   "text": "For any integer 𝑛 ≥ 0\n(𝑛 here has nothing to do with the subscript 𝑛 of 𝑢𝑛 ), the Legendre polynomial of degree 𝑛 denoted by 𝐿𝑛\nis defined by the 𝑛 + 1 conditions that 𝐿𝑛 (1) = 1 and 𝐿𝑛 i"
+  },
+  {
+   "start": 28972,
+   "end": 29137,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 28507",
+   "id": null,
+   "text": "Then, as is well known,\n\n\n\n                                                               7\n\f                                                    𝐿𝑛 (0) = (−1)𝑛 ."
+  },
+  {
+   "start": 29137,
+   "end": 29541,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 28911",
+   "id": null,
+   "text": "Next, the left and right Radau polynomials of degree 𝑛 are respectively defined by\n                                        1                              (−1)𝑛\n                               𝑅𝐿,𝑛"
+  },
+  {
+   "start": 29541,
+   "end": 29684,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 29054",
+   "id": null,
+   "text": "As a consequence of the above definitions,\n                            𝑅𝐿,𝑛 (0) = 0, 𝑅𝐿,𝑛 (1) = 1, 𝑅𝑅,𝑛 (0) = 1, and 𝑅𝑅,𝑛 (1) = 0."
+  },
+  {
+   "start": 29684,
+   "end": 30744,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 30114",
+   "id": null,
+   "text": "The correction function 𝑔 equals the right Radau polynomial of degree 𝑘 + 1 (see Huynh 2007, 2009a):\n                                                      𝑔 = 𝑅𝑅,𝑘+1 .                           "
+  },
+  {
+   "start": 30744,
+   "end": 31100,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 30470",
+   "id": null,
+   "text": "Fig. 2.4 shows, on [0, 1], the graphs of the Legendre polynomials of degree 𝑛 (thin blue curve) and\ndegree 𝑛 − 1 (thin purple curve), the left Radau polynomial of degree 𝑛 or 𝑅𝐿,𝑛 = (𝐿𝑛 + 𝐿𝑛"
+  },
+  {
+   "start": 31100,
+   "end": 31277,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 30647",
+   "id": null,
+   "text": "The zeros of the right Radau polynomial are the right Radau points (red circular\ndots), and the zeros of the left Radau polynomial are the left Radau points (blue square dots)."
+  },
+  {
+   "start": 31277,
+   "end": 31542,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 30912",
+   "id": null,
+   "text": "The interior\nleft Radau points (the exception is the first one, 𝜉 = 0) are the local extrema of the right Radau polynomial\nand, vice versa, the interior right Radau points (the exception is the last "
+  },
+  {
+   "start": 31542,
+   "end": 31649,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 31019",
+   "id": null,
+   "text": "The abscissas of the intersections of the curves 𝐿𝑛−1 and 𝐿𝑛 are also the\ninterior right Radau points."
+  },
+  {
+   "start": 31649,
+   "end": 32505,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 31875",
+   "id": null,
+   "text": "𝐿1                                                𝐿3\n                     𝑅𝑅,2\n                                              𝐿2                                   𝑅𝐿,3         𝑅𝑅,3\n\n         \ud835"
+  },
+  {
+   "start": 32505,
+   "end": 32606,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 31976",
+   "id": null,
+   "text": "They were\nemployed for error estimates in Baccouch (2016) to prove the super-convergence properties."
+  },
+  {
+   "start": 32606,
+   "end": 32645,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 32015",
+   "id": null,
+   "text": "We review the key properties of 𝑔."
+  },
+  {
+   "start": 32645,
+   "end": 32727,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 32097",
+   "id": null,
+   "text": "It is of degree 𝑘 + 1 so that 𝑔′ is of degree 𝑘 matching that of 𝑢ℎ\nand 𝑓ℎ ."
+  },
+  {
+   "start": 32727,
+   "end": 32884,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 32254",
+   "id": null,
+   "text": "It vanishes at the 𝑘 + 1 right Radau points; on the other hand, 𝑔′ vanishes at 𝑘 of the 𝑘 + 1 left\nRadau points; the exception is 𝑔′ (0) = −(𝑘 + 1)2 ."
+  },
+  {
+   "start": 32884,
+   "end": 32951,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 32321",
+   "id": null,
+   "text": "It provides a polynomial approximation to the step-\ndown function."
+  },
+  {
+   "start": 32951,
+   "end": 33027,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 32397",
+   "id": null,
+   "text": "The polynomial −𝑔′ = 𝛾 = (𝑘 + 1)2 𝑙𝐿,1 of degree 𝑘 approximates 𝛿0 ."
+  },
+  {
+   "start": 33027,
+   "end": 33152,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 32522",
+   "id": null,
+   "text": "Finally, 𝑔 is the\npolynomial of degree 𝑘 + 1 defined by the 𝑘 + 2 conditions that 𝑔(0) = 1, 𝑔(1) = 0, and 𝑔 ⊥ 𝑷𝑘−1 ."
+  },
+  {
+   "start": 33152,
+   "end": 33265,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 32635",
+   "id": null,
+   "text": "DG Formulation via Correction Function\n   We can now apply the correction function 𝑔 to the DG formulation."
+  },
+  {
+   "start": 33265,
+   "end": 33416,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 32786",
+   "id": null,
+   "text": "To prepare for the resulting implicit Runge-Kutta methods, from here on, we deal with the equation\n𝑢′ = 𝑑𝑢/𝑑𝜉 = ℎ𝑓 and a general step size ℎ."
+  },
+  {
+   "start": 33416,
+   "end": 34286,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 33656",
+   "id": null,
+   "text": "By (2.21), 𝑔′ = −𝛾; therefore, (2.14) takes the form\n                                       ([𝑢𝑛 − 𝑢ℎ (0)]𝑔 + 𝑢ℎ )′ = ℎ𝑓ℎ .                                 (2.28)\nNext, set\n                   "
+  },
+  {
+   "start": 34286,
+   "end": 34950,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 34320",
+   "id": null,
+   "text": "At the 𝑘 + 1 right Radau points, the values of 𝑈 match those of 𝑢ℎ , i.e., for 1 ≤ 𝑖 ≤ 𝑘 + 1,\n                                             𝑈(𝜉𝑅,𝑖 ) = 𝑢ℎ (𝜉𝑅,𝑖 ).                          "
+  },
+  {
+   "start": 34950,
+   "end": 35362,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 34732",
+   "id": null,
+   "text": "As a result of (2.30) and (2.31), with 𝜉 varies on [0, 1],\n                                                         𝜉\n                                      𝑈(𝜉) = 𝑢𝑛 + ℎ ∫ 𝑓ℎ (𝜂, 𝑢ℎ (𝜂))𝑑𝜂"
+  },
+  {
+   "start": 35362,
+   "end": 35798,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 35168",
+   "id": null,
+   "text": "The solution 𝑢ℎ satisfies, by the above and (2.29),\n                                                                      𝜉\n                          [𝑢𝑛 − 𝑢ℎ (0)]𝑔(𝜉) + 𝑢ℎ (𝜉) = 𝑢𝑛 + ℎ ∫ \ud835"
+  },
+  {
+   "start": 35798,
+   "end": 36195,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 35565",
+   "id": null,
+   "text": "At 𝑥𝑛+1 , or 𝜉 = 1, the solution is\n                                                                  1\n                            𝑢𝑛+1 = 𝑢ℎ (1) = 𝑈(1) = 𝑢𝑛 + ℎ ∫ 𝑓ℎ (𝜂, 𝑢ℎ (𝜂))𝑑𝜂 .   "
+  },
+  {
+   "start": 36195,
+   "end": 36303,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 35673",
+   "id": null,
+   "text": "To prepare, with 𝜉 on [0, 1], consider the ODE 𝑢′ (𝜉) = 𝑑𝑢/𝑑𝜉 = ℎ𝑓(𝜉, 𝑢(𝜉)) and 𝑢(0) = 𝑢𝑛 ."
+  },
+  {
+   "start": 36303,
+   "end": 36402,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 35772",
+   "id": null,
+   "text": "In the case of collocation, let 𝜂𝑖 , 1 ≤ 𝑖 ≤ 𝑘 + 1, be strictly increasing values on [0, 1]."
+  },
+  {
+   "start": 36402,
+   "end": 37126,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 36496",
+   "id": null,
+   "text": "The collocation\nmethod with collocation points 𝜂𝑖 seeks a polynomial solution 𝒰 of degree 𝑘 + 1 satisfying\n\n\n                                                            9\n\f                        "
+  },
+  {
+   "start": 37126,
+   "end": 37211,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 36581",
+   "id": null,
+   "text": "Let 𝑙𝑖 , 1 ≤ 𝑖 ≤ 𝑘 + 1, be the Lagrange polynomials corresponding to 𝜂𝑖 ’s."
+  },
+  {
+   "start": 37211,
+   "end": 37341,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 36711",
+   "id": null,
+   "text": "Then under the quadrature\nassociated with 𝜂𝑖 ’s, the above with 𝑣 = 𝑙𝑖 implies (2.38), which results in the following claim."
+  },
+  {
+   "start": 37341,
+   "end": 37483,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 36853",
+   "id": null,
+   "text": "The CG method using the quadrature associated with the collocation points and the associated\ncollocation method yield identical solutions."
+  },
+  {
+   "start": 37483,
+   "end": 37714,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 37084",
+   "id": null,
+   "text": "For later use, the CG and collocation solution satisfies, by the above claim and by (2.39),\n                                              𝒰′ = ℎ𝒫𝑘 (𝑓(𝜉, 𝒰(𝜉))).                                 "
+  },
+  {
+   "start": 37714,
+   "end": 37902,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 37272",
+   "id": null,
+   "text": "The DG solution 𝑈 given by (2.29) under the 𝑘 + 1 point right Radau quadrature is\nidentical to the right Radau collocation solution as well as the CG solution under the same quadrature."
+  },
+  {
+   "start": 37902,
+   "end": 38188,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 37558",
+   "id": null,
+   "text": "Indeed, at each right Radau point 𝜉𝑅,𝑖 , 1 ≤ 𝑖 ≤ 𝑘 + 1, since 𝑔(𝜉𝑅,𝑖 ) = 0, by (2.29),\n                                                𝑈(𝜉𝑅,𝑖 ) = 𝑢ℎ (𝜉𝑅,𝑖 ).                          "
+  },
+  {
+   "start": 38188,
+   "end": 38332,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 37702",
+   "id": null,
+   "text": "Next, under the right Radau quadrature, 𝑓ℎ = 𝒫𝑘 (𝑓) is\ndetermined by the 𝑘 + 1 values 𝑓(𝜉𝑅,𝑖 , 𝑢ℎ (𝜉𝑅,𝑖 )) (see also (3.5) below)."
+  },
+  {
+   "start": 38332,
+   "end": 38875,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 38245",
+   "id": null,
+   "text": "As a result, for 1 ≤ 𝑖 ≤ 𝑘 + 1,\n                        𝑓ℎ (𝜉𝑅,𝑖 , 𝑢ℎ (𝜉𝑅,𝑖 )) = 𝑓(𝜉𝑅,𝑖 , 𝑢ℎ (𝜉𝑅,𝑖 )) = 𝑓(𝜉𝑅,𝑖 , 𝑈(𝜉𝑅,𝑖 )).           (2.42)\nConsequently, for 1 ≤ 𝑖 ≤ 𝑘 + 1"
+  },
+  {
+   "start": 38875,
+   "end": 39032,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 38402",
+   "id": null,
+   "text": "The claim\nafter (2.39) shows that the collocation solution is the same as the CG solution under the quadrature with\ncollocation points as quadrature points."
+  },
+  {
+   "start": 39032,
+   "end": 39056,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 38426",
+   "id": null,
+   "text": "See also Huynh (2009b)."
+  },
+  {
+   "start": 39056,
+   "end": 39082,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 38452",
+   "id": null,
+   "text": "This completes the proof."
+  },
+  {
+   "start": 39082,
+   "end": 39459,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 38829",
+   "id": null,
+   "text": "The above discussion shows that the right Radau quadrature is a convenient and sensible choice of\nquadrature for the DG method in the context of ODEs. (It is important to note that this comment does n"
+  },
+  {
+   "start": 39459,
+   "end": 39855,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 39225",
+   "id": null,
+   "text": "Below, however, the quadrature can be the\nleft or right Radau, Gauss, or a blending of the Radau quadratures where the evaluation points are the zeros\nof 𝑄 defined by, with 0 ≤ 𝛼 ≤ 1,\n              "
+  },
+  {
+   "start": 39855,
+   "end": 40005,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 39375",
+   "id": null,
+   "text": "Concerning the two DG solutions 𝑢ℎ and 𝑈, if an approximation at 𝜉 for 0 < 𝜉 < 1 is needed, 𝑈(𝜉) is\ngenerally a better choice than 𝑢ℎ (𝜉)."
+  },
+  {
+   "start": 40005,
+   "end": 40152,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 39522",
+   "id": null,
+   "text": "The values of 𝑢ℎ at the right Radau points are more accurate than\nthose at other points since they match the values of 𝑈 (of one degree higher)."
+  },
+  {
+   "start": 40152,
+   "end": 40329,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 39699",
+   "id": null,
+   "text": "What is crucial, however, is\nthat at 𝜉 = 1, 𝑈 and 𝑢ℎ yield the same solution 𝑢𝑛+1, which is accurate to order 2𝑘 + 1, the order of\naccuracy of the right Radau quadrature."
+  },
+  {
+   "start": 40329,
+   "end": 40458,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 39828",
+   "id": null,
+   "text": "On the other hand, the expected order of accuracy for a quadrature\nusing a polynomial approximation of degree 𝑘 is only 𝑘 + 1."
+  },
+  {
+   "start": 40458,
+   "end": 40594,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 39964",
+   "id": null,
+   "text": "The property of much higher accuracy order\nthan expected is also called ‘super convergence’ (e.g., Adjerid et al. 2002, Baccouch 2016)."
+  },
+  {
+   "start": 40594,
+   "end": 40796,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 40166",
+   "id": null,
+   "text": "As a passing remark, the correction function 𝑔 was employed to reconstruct the flux for conservation\nlaws in the flux reconstruction or FR method (Huynh 2007, 2009a, Huynh, Wang, and Vincent 2014)."
+  },
+  {
+   "start": 40796,
+   "end": 40929,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 40299",
+   "id": null,
+   "text": "The\nFR method is used in codes applied to practical calculations such as PyFR (https://www.pyfr.org/) and\nGFR (Spiegel et al. 2022)."
+  },
+  {
+   "start": 40929,
+   "end": 41009,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 40379",
+   "id": null,
+   "text": "Here, the function 𝑢 itself is being reconstructed from 𝑢ℎ in the form of 𝑈."
+  },
+  {
+   "start": 41009,
+   "end": 41343,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 40713",
+   "id": null,
+   "text": "Thus, the above formulation can be considered as the FR, or ‘function reconstruction’, approach for ODE.\n\n\n\n\n                                                            10\n\f3     Implicit Runge-Kutta "
+  },
+  {
+   "start": 41343,
+   "end": 41398,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 40768",
+   "id": null,
+   "text": "Here,\nthe correction function 𝑔 plays a crucial role."
+  },
+  {
+   "start": 41398,
+   "end": 41540,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 40910",
+   "id": null,
+   "text": "To be consistent with the standard RK notation, let the\nnumber of stages be\n                                                     𝑠 = 𝑘 + 1."
+  },
+  {
+   "start": 41540,
+   "end": 41749,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 41119",
+   "id": null,
+   "text": "A quadrature on [0, 1] with 𝑠 evaluation points 𝜉1 , …, 𝜉𝑠 and a degree of precision 2𝑠 − 2 or higher is\nemployed, e.g., the left or right Radau, Gauss, or a blending of the Radau quadratures via"
+  },
+  {
+   "start": 41749,
+   "end": 41884,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 41254",
+   "id": null,
+   "text": "Denote\nthe corresponding Lagrange polynomials by 𝑙𝑗 , 1 ≤ 𝑗 ≤ 𝑠, which are of degree 𝑠 − 1 and defined by\n𝑙𝑗 (𝜉𝑖 ) = 𝛿𝑖𝑗 ."
+  },
+  {
+   "start": 41884,
+   "end": 42327,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 41697",
+   "id": null,
+   "text": "Then, for each 𝑗, the quadrature weight is\n                                                           1\n                                                  𝑏𝑗 = ∫ 𝑙𝑗 (𝜉)𝑑𝜉 .                     "
+  },
+  {
+   "start": 42327,
+   "end": 42663,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 42033",
+   "id": null,
+   "text": "Since the quadrature is assumed to be exact for\npolynomials of degree 2𝑠 − 2 or less, and 𝑙𝑖 𝑙𝑗 is of degree 2𝑠 − 2, for 1 ≤ 𝑖, 𝑗 ≤ 𝑠,\n                                                  (𝑙𝑖 "
+  },
+  {
+   "start": 42663,
+   "end": 43278,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 42648",
+   "id": null,
+   "text": "At each quadrature point 𝜉𝑗 , set\n                                    𝑢𝑛,𝑗 = 𝑢ℎ (𝜉𝑗 ) and 𝑓𝑛,𝑗 = 𝑓(𝜉𝑗 , 𝑢𝑛,𝑗 ).                                  (3.3)\nThen, the solution 𝑢ℎ of degree"
+  },
+  {
+   "start": 43278,
+   "end": 43742,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 43112",
+   "id": null,
+   "text": "Since 𝑙𝑗 , 𝑗 = 1, … , 𝑠, form an orthogonal basis for 𝑷𝑠−1 ,\n                                                                  𝑠     (𝑓, 𝑙𝑗 )\n                                              𝒫"
+  },
+  {
+   "start": 43742,
+   "end": 45434,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 44804",
+   "id": null,
+   "text": "As a result of (3.2) and the above,\nunder the quadrature with evaluation points 𝜉𝑗 ’s,\n                                                                                          𝑠\n                  "
+  },
+  {
+   "start": 45434,
+   "end": 45518,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 44888",
+   "id": null,
+   "text": "For\n𝜉 ≠ 1, however, the quadrature (3.8) has a degree of precision of only 𝑠 − 1."
+  },
+  {
+   "start": 45518,
+   "end": 47168,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 46538",
+   "id": null,
+   "text": "Fig. 3.1a shows, for the case 𝑠 = 3, the cubics 𝑙̃𝑗 , 1 ≤ 𝑗 ≤ 3; here, the quadrature points are the 3 left\nRadau points; the quadratic 𝑙𝑗 used in (3.6) to construct 𝑙̃𝑗 for this case is ident"
+  },
+  {
+   "start": 47168,
+   "end": 47327,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 46697",
+   "id": null,
+   "text": "Assume for the moment, the values 𝑢𝑛,𝑗 at the quadrature points 𝜉𝑗 are known, 1 ≤ 𝑗 ≤ 𝑠; therefore,\n𝑓𝑛,𝑗 = 𝑓(𝜉𝑗 , 𝑢𝑛,𝑗 ) are also known."
+  },
+  {
+   "start": 47327,
+   "end": 47898,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 47268",
+   "id": null,
+   "text": "Using (3.4) and (3.5), Eq. (2.35) implies\n                            𝑠                                   𝑠                                           𝑠            𝜉\n              [𝑢𝑛 − ∑        "
+  },
+  {
+   "start": 47898,
+   "end": 48035,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 47405",
+   "id": null,
+   "text": "Our goal is to obtain an implicit system of equations for 𝑢𝑛,𝑖 , 1 ≤ 𝑖 ≤ 𝑠, as shown below in (3.22)\n(these values define 𝑢ℎ )."
+  },
+  {
+   "start": 48035,
+   "end": 48573,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 47943",
+   "id": null,
+   "text": "To this end, at each right Radau point 𝜉𝑅,𝑖 , since 𝑔(𝜉𝑅,𝑖 ) = 0, by evaluating the\nabove at 𝜉𝑅,𝑖 and by using (3.6),\n                                         𝑠                             "
+  },
+  {
+   "start": 48573,
+   "end": 49402,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 48772",
+   "id": null,
+   "text": "Concerning the left hand side above, with ‘R’ for ‘right’ Radau or ‘row’, and ‘Q’ for ‘quadrature’ or\n‘column’, denote the matrix\n                                                                      "
+  },
+  {
+   "start": 49402,
+   "end": 49551,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 48921",
+   "id": null,
+   "text": "When it does not cause confusion, we simply use the\n                                𝑠\nindex 𝑖 and the notation (𝑢𝑛,𝑖 )𝑖=1 for a column vector."
+  },
+  {
+   "start": 49551,
+   "end": 51524,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 50894",
+   "id": null,
+   "text": "Then, by (3.4), the left hand side of (3.11) implies\n                                                                𝑠                          𝑠\n                                                 𝑠\n"
+  },
+  {
+   "start": 51524,
+   "end": 51908,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 51278",
+   "id": null,
+   "text": "The rightmost hand side above is the 𝑖-th row of the vector 𝑴𝑅𝐼 ∙ 𝒇𝑛 , and\n                                                             𝑠\n                                                (𝑓̃ℎ ("
+  },
+  {
+   "start": 51908,
+   "end": 52487,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 51857",
+   "id": null,
+   "text": "For later use, concerning the components, with each fixed 𝑗, by replacing 𝑓ℎ by 𝑙𝑗 in the above,\n                                                       𝑠                     𝑠\n                  "
+  },
+  {
+   "start": 52487,
+   "end": 52591,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 51961",
+   "id": null,
+   "text": "Fig. 3.1b shows the entries of 𝑴𝑅𝐼 as red round dots (corresponding to the setting in Fig. 3.1a)."
+  },
+  {
+   "start": 52591,
+   "end": 52654,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 52024",
+   "id": null,
+   "text": "Here,\nagain the quadrature points are the 3 left Radau points."
+  },
+  {
+   "start": 52654,
+   "end": 52814,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 52184",
+   "id": null,
+   "text": "For each fixed 𝑖, the 𝑖-th row of 𝑴𝑅𝐼 consists of\nthe values of the three red round dots on the vertical line through the right Radau point 𝜉 = 𝜉𝑅,𝑖 ."
+  },
+  {
+   "start": 52814,
+   "end": 52932,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 52302",
+   "id": null,
+   "text": "For each\nfixed 𝑗, the 𝑗-th column of 𝑴𝑅𝐼 consists of the values of the three red round dots on the curve 𝑙̃𝑗 ."
+  },
+  {
+   "start": 52932,
+   "end": 53279,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 52649",
+   "id": null,
+   "text": "Continuing with the derivation of the IRK method, using (3.13) and (3.15), Eq. (3.11) implies\n                                           𝑴𝑅𝑄 ∙ 𝒖𝑛 = 𝑢𝑛 𝟏 + ℎ 𝑴𝑅𝐼 ∙ 𝒇𝑛 .                    "
+  },
+  {
+   "start": 53279,
+   "end": 53604,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 52974",
+   "id": null,
+   "text": "Set\n                                                           𝑠\n                                         𝑴𝑄𝑅 = {𝑙𝑅,𝑗 (𝜉𝑖 )}𝑖,𝑗=1 .                                 (3.18)\nSuppose the vector"
+  },
+  {
+   "start": 53604,
+   "end": 53681,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 53051",
+   "id": null,
+   "text": "The vector of values of 𝑣 at the quadrature points is given by 𝑴𝑄𝑅 ∙ 𝒗."
+  },
+  {
+   "start": 53681,
+   "end": 53989,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 53359",
+   "id": null,
+   "text": "With 𝑰 denoting the 𝑠 × 𝑠 identity matrix, we next show that\n                                                        𝑴𝑄𝑅 ∙ 𝑴𝑅𝑄 = 𝑰.                                    (3.19)\n   Indeed, let \ud835"
+  },
+  {
+   "start": 53989,
+   "end": 54124,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 53494",
+   "id": null,
+   "text": "Then 𝒘𝑅 = 𝑴𝑅𝑄 ∙ 𝒘𝑄 is the vector of values of 𝑤 at the right Radau points, and 𝒘𝑅 also defines a\npolynomial identical to 𝑤."
+  },
+  {
+   "start": 54124,
+   "end": 54261,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 53631",
+   "id": null,
+   "text": "Next, the vector of values of 𝑤 at the quadrature points is given by 𝑴𝑄𝑅 ∙ 𝒘𝑅 ,\nwhich is identical to 𝒘𝑄 ; thus, (3.19) follows."
+  },
+  {
+   "start": 54261,
+   "end": 54417,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 53787",
+   "id": null,
+   "text": "The constant function 1 takes on the value 1 at all points; as a result,\n                                                𝑴𝑄𝑅 ∙ 𝟏 = 𝑴𝑅𝑄 ∙ 𝟏 = 𝟏."
+  },
+  {
+   "start": 54417,
+   "end": 54733,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 54103",
+   "id": null,
+   "text": "Multiply (3.17) on the left by 𝑴𝑄𝑅 and using the above two equations, we obtain\n                                           𝒖𝑛 = 𝑢𝑛 𝟏 + ℎ 𝑴𝑄𝑅 ∙ 𝑴𝑅𝐼 ∙ 𝒇𝑛 ,                               "
+  },
+  {
+   "start": 54733,
+   "end": 56569,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 55939",
+   "id": null,
+   "text": "Next, set\n                                                      𝑨 = 𝑴𝑄𝑅 ∙ 𝑴𝑅𝐼 ,                                     (3.21)\nThen the resulting IRK-DG method follows from (3.20):\n                "
+  },
+  {
+   "start": 56569,
+   "end": 56820,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 56190",
+   "id": null,
+   "text": "Its meaning is discussed below.\n                                       𝑠\n   The vector 𝑴𝑅𝐼 ∙ 𝒇𝑛 = (𝑓̃ℎ (𝜉𝑅,𝑖 ))   given by (3.15) is the vector of values of 𝑓̃ℎ at the 𝑠 right Radau\n      "
+  },
+  {
+   "start": 56820,
+   "end": 56986,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 56356",
+   "id": null,
+   "text": "These 𝑠 values define a polynomial of degree 𝑠 − 1 denoted by 𝑟, which is generally different from\n                                          𝑠\n𝑓̃ℎ of degree 𝑠."
+  },
+  {
+   "start": 56986,
+   "end": 57810,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 57180",
+   "id": null,
+   "text": "Then, 𝑴𝑄𝑅 ∙ (𝑓̃ℎ (𝜉𝑅,𝑖 ))𝑖=1 yields the vector of values of 𝑟 at the quadrature points:\n                                                  𝑠\n                                          (𝑟(𝜉𝑖"
+  },
+  {
+   "start": 57810,
+   "end": 58352,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 57722",
+   "id": null,
+   "text": "Since 𝑴𝑄𝑅 ∙ 𝑴𝑅𝐼 = 𝑨, the above implies\n                                                           𝑠                              𝑠\n                                              (𝑟𝑗 (𝜉𝑖 ))"
+  },
+  {
+   "start": 58352,
+   "end": 58730,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 58100",
+   "id": null,
+   "text": "In other words,\nfor 1 ≤ 𝑖, 𝑗 ≤ 𝑠,\n                                                           𝑎𝑖𝑗 = 𝑟𝑗 (𝜉𝑖 ).                                  (3.28)\n   As a consequence of the above argument"
+  },
+  {
+   "start": 58730,
+   "end": 58983,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 58353",
+   "id": null,
+   "text": "In\nother words, 𝑨 corresponds to quadrature formulas: for each fixed 𝑖, the 𝑖-th row of 𝑨 corresponds to the\nweights of a quadrature formula for the integration from 0 to 𝜉𝑖 with quadrature poin"
+  },
+  {
+   "start": 58983,
+   "end": 59154,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 58524",
+   "id": null,
+   "text": "Due to the approximation by 𝑟𝑖 , we expect a reduction in the degree of precision\nby 1 as will be discussed when dealing with condition 𝐶(𝜂) for accuracy after (4.3)."
+  },
+  {
+   "start": 59154,
+   "end": 59991,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 59361",
+   "id": null,
+   "text": "Regarding the solution 𝑢ℎ , using the above, Eq. (3.24) implies, for each 𝑖, 1 ≤ 𝑖 ≤ 𝑠,\n                                                                          𝑠\n                               "
+  },
+  {
+   "start": 59991,
+   "end": 60097,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 59467",
+   "id": null,
+   "text": "Fig. 3.2 shows, for 𝑠 = 2 (i.e., 𝑘 = 1), the entries of 𝑨 (big square dots) of the Butcher tableau."
+  },
+  {
+   "start": 60097,
+   "end": 60223,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 59593",
+   "id": null,
+   "text": "The\nIRK-DG method has quadrature points 𝜉𝑖 ’s (small black squares) of type (a) left Radau, (b) Gauss, and (c)\nright Radau."
+  },
+  {
+   "start": 60223,
+   "end": 60452,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 59822",
+   "id": null,
+   "text": "For each fixed 𝑗, the quadratic 𝑙̃𝑗 is shown by the thin curve, and the values of 𝑙̃𝑗 at the two\nright Radau points are given by the two red round dots; these values determine a linear function \ud835"
+  },
+  {
+   "start": 60452,
+   "end": 60666,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 60036",
+   "id": null,
+   "text": "The two values 𝑟𝑗 (𝜉𝑖 ) at the quadrature points 𝜉𝑖 , 1 ≤ 𝑖 ≤ 2, shown as big square dots,\n\n\n                                                                      14\n\fform the 𝑗-th column of t"
+  },
+  {
+   "start": 60666,
+   "end": 60795,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 60165",
+   "id": null,
+   "text": "For each fixed 𝑖, the entries for the 𝑖-th row of 𝑨 are represented by\nthe large square dots on the vertical line 𝜉 = 𝜉𝑖 ."
+  },
+  {
+   "start": 60795,
+   "end": 60960,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 60330",
+   "id": null,
+   "text": "Note that in Fig. 3.2c, since the quadrature points are also\nthe right Radau points, the red round dots are identical to and appear on top of the large square dots."
+  },
+  {
+   "start": 60960,
+   "end": 61137,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 60507",
+   "id": null,
+   "text": "Table 3.1 shows, for 𝑠 = 2, the Butcher tableaux of the IRK-DG methods where, similar to Fig. 3.2,\nthe quadrature is of type (a) left Radau, (b) Gauss, and (c) right Radau."
+  },
+  {
+   "start": 61137,
+   "end": 61231,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 60601",
+   "id": null,
+   "text": "Here, the values for the entries of\n𝑨 match the values at the large square dots of Fig. 3.2."
+  },
+  {
+   "start": 61231,
+   "end": 61348,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 60718",
+   "id": null,
+   "text": "Also note that Table 3.1a corresponds to the Radau\nIA method and Table 3.1c to Radau IIA (Ehle 1969, Axelsson 1969)."
+  },
+  {
+   "start": 61348,
+   "end": 62838,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 62208",
+   "id": null,
+   "text": "The IRK-DG method of Table 3.1b,\nderived here constructively via the correction function, was derived algebraically in (Bottasso 1997, Tang\n& Sun 2012); it is called DG-Gauss here.\n\n\n\n     𝑢         "
+  },
+  {
+   "start": 62838,
+   "end": 62950,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 62320",
+   "id": null,
+   "text": "The quadrature points 𝜉𝑖 ’s\n(small black squares) are of type (a) left Radau, (b) Gauss, and (c) right Radau."
+  },
+  {
+   "start": 62950,
+   "end": 63299,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 62669",
+   "id": null,
+   "text": "The quadratic 𝑙̃𝑗 is shown\nby the thin curve, and the values of 𝑙̃𝑗 at the two right Radau points are given by the two red round dots;\n                                                             "
+  },
+  {
+   "start": 63299,
+   "end": 64617,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 63987",
+   "id": null,
+   "text": "Table 3.1 Butcher tableaux for the IRK-DG method with 𝑠 = 2.\n       (a) Radau IA (left Radau)                       (b) DG-Gauss                      (c) Radau IIA (right Radau)\n                   1 "
+  },
+  {
+   "start": 64617,
+   "end": 65090,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 64460",
+   "id": null,
+   "text": "For comparison, the Gauss collocation method, which is fourth order accurate, has the same 𝑐𝑖 ’s\n                                 1 √   1   3                    √       1       3    1\nand 𝑏𝑗 ’s, b"
+  },
+  {
+   "start": 65090,
+   "end": 65146,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 64516",
+   "id": null,
+   "text": "Fig. 3.3 is the analogous to Fig. 3.2 except 𝑠 = 3."
+  },
+  {
+   "start": 65146,
+   "end": 65282,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 64652",
+   "id": null,
+   "text": "Again, for each fixed 𝑖, the entries for the 𝑖-th row\nof 𝑨 are represented by the large square dots on the vertical line 𝜉 = 𝜉𝑖 ."
+  },
+  {
+   "start": 65282,
+   "end": 65424,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 64794",
+   "id": null,
+   "text": "Table 3.2 shows the Butcher tableaux of the IRK-DG methods with 𝑠 = 3 where the quadrature is of\ntype (a) left Radau and (b) right Radau."
+  },
+  {
+   "start": 65424,
+   "end": 65515,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 64885",
+   "id": null,
+   "text": "Again, the entries of 𝑨 match the values at the large square dots\nof Figs. 3.3a and 3.3c."
+  },
+  {
+   "start": 65515,
+   "end": 65584,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 64954",
+   "id": null,
+   "text": "Tables 3.2a yields Radau IA and Table 3.2b yields Radau IIA methods."
+  },
+  {
+   "start": 65584,
+   "end": 67444,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 66814",
+   "id": null,
+   "text": "Table 3.3 shows, again for 𝑠 = 3, the Butcher tableaux for (a) the IRK-DG method with Gauss\nquadrature (accuracy order 5) and, for comparison, (b) the Gauss collocation method (accuracy order 6).\n\n\n\n"
+  },
+  {
+   "start": 67444,
+   "end": 67556,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 66926",
+   "id": null,
+   "text": "The quadrature\npoints 𝜉𝑖 ’s (small black squares) are of type (a) left Radau, (b) Gauss, and (c) right Radau."
+  },
+  {
+   "start": 67556,
+   "end": 71395,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 70765",
+   "id": null,
+   "text": "Table 3.2 Butcher tableaux for the IRK-DG methods with 𝑠 = 3.\n                  (a) Radau IA (left Radau)                       (b) Radau IIA (right Radau)\n                  1           −1−√6        "
+  },
+  {
+   "start": 71395,
+   "end": 71830,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 71200",
+   "id": null,
+   "text": "The resulting IRK method is straightforward: the matrix 𝑨 is given by, for 1 ≤ 𝑖, 𝑗 ≤ 𝑠,\n                                                                                𝜉𝑅,𝑖\n                   "
+  },
+  {
+   "start": 71830,
+   "end": 71917,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 71287",
+   "id": null,
+   "text": "This IRK-DG scheme is called Radau IIA in the\nliterature (e.g., Hairer & Wanner 1991)."
+  },
+  {
+   "start": 71917,
+   "end": 72410,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 71780",
+   "id": null,
+   "text": "Note that if the quadrature points are not of right Radau type (e.g., left Radau or Gauss type), then the\ncorresponding collocation method is different from the DG method using such a quadrature.\n\n\n\n\n"
+  },
+  {
+   "start": 72410,
+   "end": 72538,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 71908",
+   "id": null,
+   "text": "An elegant derivation of the corresponding IRK method using the left\nRadau quadrature can be found in LeSaint & Raviart (1974)."
+  },
+  {
+   "start": 72538,
+   "end": 72811,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 72181",
+   "id": null,
+   "text": "Although not mentioned in the cited\nreference, as discussed below, the result is an IRK method identical to Radau IA.\n\n\n4     Accuracy\nThe following conditions play a crucial role in the orders of acc"
+  },
+  {
+   "start": 72811,
+   "end": 72883,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 72253",
+   "id": null,
+   "text": "Condition 𝐶(𝜂) and especially 𝐷(𝜁) are typically not easy to grasp."
+  },
+  {
+   "start": 72883,
+   "end": 73029,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 72399",
+   "id": null,
+   "text": "Using the IRK construction in the previous section, these conditions for the IRK-DG methods are relatively\nsimple to interpret and easy to prove."
+  },
+  {
+   "start": 73029,
+   "end": 73206,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 72576",
+   "id": null,
+   "text": "Condition 𝐶(𝜂) amounts to a degree of precision of 𝜂 − 1 for certain\nquadratures, and 𝐷(𝜁) relates to the projection of the polynomial 𝑟𝑗 defined by (3.28) onto 𝑷𝜁−1 ."
+  },
+  {
+   "start": 73206,
+   "end": 73302,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 72672",
+   "id": null,
+   "text": "For more\non these conditions applied to general IRK methods, see, e.g., Hairer & Wanner (1991)."
+  },
+  {
+   "start": 73302,
+   "end": 74425,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 73795",
+   "id": null,
+   "text": "With quadrature points 𝜉𝑖 , Butcher tableau with stage levels 𝑐𝑖 = 𝜉𝑖 (leftmost column), quadrature\nweights 𝑏𝑗 at 𝜉𝑗 (bottom row), and matrix 𝑨 = {𝑎𝑖𝑗 } (upper right), 1 ≤ 𝑖, 𝑗 ≤ 𝑠, t"
+  },
+  {
+   "start": 74425,
+   "end": 74589,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 73959",
+   "id": null,
+   "text": "If the coefficients 𝑏𝑖 , 𝑐𝑖 , and 𝑎𝑖𝑗 of an RK method satisfy 𝐵(𝑝), 𝐶(𝜂), 𝐷(𝜁) with\n𝑝 ≤ 2𝜂 + 2 and 𝑝 ≤ 𝜂 + 𝜁 + 1, then the method is of order 𝑝."
+  },
+  {
+   "start": 74589,
+   "end": 74764,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 74134",
+   "id": null,
+   "text": "In other words, if conditions 𝐵(𝑝), 𝐶(𝜂), 𝐷(𝜁) hold for highest possible integer values of 𝑝, 𝜂, and 𝜁,\nthen the method is of order Min(𝑝, 2𝜂 + 2, 𝜂 + 𝜁 + 1)."
+  },
+  {
+   "start": 74764,
+   "end": 75273,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 74643",
+   "id": null,
+   "text": "Condition 𝐵(𝑝)\n   This condition means the quadrature has a degree of precision 𝑝 − 1 or of order 𝑝, i.e., it is exact for\nany polynomial 𝑣 of degree 𝑝 − 1 or less:\n                             "
+  },
+  {
+   "start": 75273,
+   "end": 76002,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 75372",
+   "id": null,
+   "text": "Condition 𝐶(𝜂)\n   This condition means for each 𝑖, 1 ≤ 𝑖 ≤ 𝑠, the following quadrature with weights 𝑎𝑖𝑗 , 1 ≤ 𝑗 ≤ 𝑠, has\na degree of precision 𝜂 − 1: for any 𝑣 in 𝑷𝜂−1 ,\n                "
+  },
+  {
+   "start": 76002,
+   "end": 76443,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 75813",
+   "id": null,
+   "text": "If the quadrature is exact, then\n                                                      𝑠                𝑞\n                                                                 𝑞−1 𝑐𝑖\n                 "
+  },
+  {
+   "start": 76443,
+   "end": 76889,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 76259",
+   "id": null,
+   "text": "Due to linearity, the fact that the above holds\nfor 𝑞 = 1, … , 𝜂 is equivalent to the fact that (4.1) holds for all 𝑣 in 𝑷𝜂−1 , and the claim follows.\n\n\n                                          "
+  },
+  {
+   "start": 76889,
+   "end": 77394,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 76764",
+   "id": null,
+   "text": "Thus, for each 𝑖, 1 ≤ 𝑖 ≤ 𝑠, the quadrature formula\n                                    𝜉𝑅,𝑖                          𝑠                                        𝑠\n                               "
+  },
+  {
+   "start": 77394,
+   "end": 77509,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 76879",
+   "id": null,
+   "text": "Condition 𝐶(𝑠 − 1) holds for an IRK-DG method under any quadrature of degree of precision 2𝑠 − 2\nor higher."
+  },
+  {
+   "start": 77509,
+   "end": 77698,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 77068",
+   "id": null,
+   "text": "In other words, the degree of precision of (4.1) is reduced by 1, a consequence of 𝑟𝑗 of degree\n𝑠 − 1 approximating 𝑙̃𝑗 of degree 𝑠 to one degree lower as discussed in (3.26)-(3.28)."
+  },
+  {
+   "start": 77698,
+   "end": 78038,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 77408",
+   "id": null,
+   "text": "To prove condition 𝐶(𝑠 − 1), with 1 ≤ 𝑞 ≤ 𝑠 − 1, set\n                                                                  𝑣(𝜉) = 𝜉 𝑞−1 .                                                (4.4)\n     "
+  },
+  {
+   "start": 78038,
+   "end": 78535,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 77905",
+   "id": null,
+   "text": "Next,\n                                                      𝜉\n                                                                          𝜉𝑞    𝑠\n                                                    "
+  },
+  {
+   "start": 78535,
+   "end": 79917,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 79287",
+   "id": null,
+   "text": "Consequently, the 𝑠 values of 𝑣̃ at the right\nRadau points, namely 𝑣̃(𝜉𝑅,𝑖 ), 𝑖 = 1, … , 𝑠, determine a polynomial 𝑟 identical to 𝑣̃:\n                                                        "
+  },
+  {
+   "start": 79917,
+   "end": 79940,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 79310",
+   "id": null,
+   "text": "Condition 𝐷(𝜁)."
+  },
+  {
+   "start": 79940,
+   "end": 80017,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 79387",
+   "id": null,
+   "text": "This condition relates to the projection of 𝑟𝑗 onto 𝑷𝜁−1 as follows."
+  },
+  {
+   "start": 80017,
+   "end": 80080,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 79450",
+   "id": null,
+   "text": "For each fixed 𝑗, 𝑟𝑗 defined by (3.27)\nis of degree 𝑠 − 1."
+  },
+  {
+   "start": 80080,
+   "end": 80157,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 79527",
+   "id": null,
+   "text": "If 𝑣 is of degree 𝑠 − 1 or less, then 𝑣𝑟𝑗 is of degree 2𝑠 − 2 or less."
+  },
+  {
+   "start": 80157,
+   "end": 80692,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 80062",
+   "id": null,
+   "text": "Since the quadrature\nassociated with 𝜉𝑖 ’s has a degree of precision 2𝑠 − 2 or higher,\n                            1                                 𝑠                                        𝑠\n   "
+  },
+  {
+   "start": 80692,
+   "end": 80761,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 80131",
+   "id": null,
+   "text": "Next, similar to (4.4), but with 1 ≤ 𝑞 ≤ 𝑠, set\n𝑣(𝜉) = 𝜉 𝑞−1 ."
+  },
+  {
+   "start": 80761,
+   "end": 80798,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 80168",
+   "id": null,
+   "text": "Then 𝑣 is of degree 𝑠 − 1 or less."
+  },
+  {
+   "start": 80798,
+   "end": 81382,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 80752",
+   "id": null,
+   "text": "Eq. (4.5) implies,\n                                                          1                                   𝑠\n                                            𝑞−1                                    "
+  },
+  {
+   "start": 81382,
+   "end": 81521,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 80891",
+   "id": null,
+   "text": "Thus, condition 𝐷(𝜁) means for all 𝑗, the projection of 𝑟𝑗 onto 𝑷𝜁−1 is given exactly by the quadrature\nassociated with 𝜉𝑖 ’s."
+  },
+  {
+   "start": 81521,
+   "end": 81552,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 80922",
+   "id": null,
+   "text": "We can now show the following."
+  },
+  {
+   "start": 81552,
+   "end": 81666,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 81036",
+   "id": null,
+   "text": "Condition 𝐷(𝑠 − 1) holds for an IRK-DG method under any quadrature of degree of precision 2𝑠 − 2\nor higher."
+  },
+  {
+   "start": 81666,
+   "end": 81930,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 81300",
+   "id": null,
+   "text": "The condition resulting in 𝐷(𝑠) will be discussed following the completion of this proof.\n\n\n\n\n                                                                           18\n\f   Indeed, the key to the"
+  },
+  {
+   "start": 81930,
+   "end": 82021,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 81391",
+   "id": null,
+   "text": "With 1 ≤ 𝑞 ≤ 𝑠 − 1, or\n𝑞 − 1 ≤ 𝑠 − 2, we focus on the projection of 𝑟𝑗 onto 𝑷𝑠−2 ."
+  },
+  {
+   "start": 82021,
+   "end": 84272,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 83642",
+   "id": null,
+   "text": "By employing the 𝑠-point right Radau\nquadrature, and since 𝑙̃𝑗 − 𝑟𝑗 vanishes at the right Radau points (𝑟𝑗 interpolates 𝑙̃𝑗 at the right Radau points),\n                                       "
+  },
+  {
+   "start": 84272,
+   "end": 84350,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 83720",
+   "id": null,
+   "text": "Condition 𝐷(𝑠) holds for the DG method under the left Radau quadrature."
+  },
+  {
+   "start": 84350,
+   "end": 84402,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 83772",
+   "id": null,
+   "text": "Indeed, we wish to show (4.10) for 1 ≤ 𝑞 ≤ 𝑠."
+  },
+  {
+   "start": 84402,
+   "end": 84507,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 83877",
+   "id": null,
+   "text": "To this end, since 𝑞 − 1 ≤ 𝑠 − 1, for the projection of\n𝑟𝑗 onto 𝑷𝑠−1 , consider (𝑟𝑗 , 𝜉 𝑞−1 )."
+  },
+  {
+   "start": 84507,
+   "end": 85069,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 84439",
+   "id": null,
+   "text": "We have, by using the quadrature, which is of left Radau type here,\n                                                      1                                  𝑠\n                                        "
+  },
+  {
+   "start": 85069,
+   "end": 85120,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 84490",
+   "id": null,
+   "text": "Since 𝑙1 = 𝑙𝐿,1 , by (2.21), 𝑙1 = −𝑔′ /𝑠 2 ."
+  },
+  {
+   "start": 85120,
+   "end": 85162,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 84532",
+   "id": null,
+   "text": "Consequently, 𝑙̃1 = constant − 𝑔/𝑠 2 ."
+  },
+  {
+   "start": 85162,
+   "end": 85540,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 84910",
+   "id": null,
+   "text": "Next, since 𝑙̃1 (0) = 0, and 𝑔(0) = 1,\n                                                           1−𝑔\n                                                      𝑙̃1 = 2 .                               "
+  },
+  {
+   "start": 85540,
+   "end": 85635,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 85005",
+   "id": null,
+   "text": "Thus, 𝑟1 defined by\n𝑙̃1 (𝜉𝑅,𝑖 ), 1 ≤ 𝑖 ≤ 𝑠, is a constant function: 𝑟1 (𝜉) = 1/𝑠 2 ."
+  },
+  {
+   "start": 85635,
+   "end": 86311,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 85681",
+   "id": null,
+   "text": "As a result, for 1 ≤ 𝑖 ≤ 𝑠,\n                                                                 1\n                                              𝑎𝑖1 = 𝑟1 (𝜉𝑖 ) = 2 = 𝑏1 .\n                         "
+  },
+  {
+   "start": 86311,
+   "end": 86811,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 86181",
+   "id": null,
+   "text": "For 𝑗 ≥ 2, again with 1 ≤ 𝑞 ≤ 𝑠, by applying integration by parts to (𝜉 𝑞−1 , 𝑟𝑗 ),\n                                   1\n                                                  1 𝑞 1 1 1 𝑞 ′\n      "
+  },
+  {
+   "start": 86811,
+   "end": 87249,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 86619",
+   "id": null,
+   "text": "Thus,\n\n\n\n\n                                                                      19\n\f                                                                   1\n                                               "
+  },
+  {
+   "start": 87249,
+   "end": 87560,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 86930",
+   "id": null,
+   "text": "Since 𝑔′ vanishes at all left Radau points except at 𝜉 = 0, we have, for 2 ≤ 𝑖 ≤ 𝑠,\n                                      𝑟𝑗′ (𝜉𝐿,𝑖 ) = 𝑙̃𝐿,𝑗\n                                              "
+  },
+  {
+   "start": 87560,
+   "end": 89048,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 88418",
+   "id": null,
+   "text": "By applying the left Radau quadrature to the last term of (4.14), the above implies, for 1 ≤ 𝑞 ≤ 𝑠,\n                   1                     𝑠                                      𝑠\n              "
+  },
+  {
+   "start": 89048,
+   "end": 89097,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 88467",
+   "id": null,
+   "text": "This, together with (4.13), completes the proof."
+  },
+  {
+   "start": 89097,
+   "end": 89253,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 88623",
+   "id": null,
+   "text": "Conditions 𝐵(𝑝), 𝐶(𝜂), and 𝐷(𝜁) for IRK-DG Method\n   The above argument shows that the following table of conditions holds for the IRK-DG method."
+  },
+  {
+   "start": 89253,
+   "end": 90327,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 89697",
+   "id": null,
+   "text": "Table 4.1\n     Quadrature            IRK-DG method                       𝐵(𝑝)                            𝐶(𝜂)                     𝐷(𝜁)\n     Left Radau                Radau IA                    "
+  },
+  {
+   "start": 90327,
+   "end": 90417,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 89787",
+   "id": null,
+   "text": "That is, all IRK-DG methods with solution of degree 𝑠 − 1 are accurate to order 2𝑠 − 1."
+  },
+  {
+   "start": 90417,
+   "end": 90705,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 90075",
+   "id": null,
+   "text": "Uniqueness of Matrix 𝑨 by Condition 𝐶(𝑠) for IRK Method with Right Radau Quadrature\n      If 𝑐𝑖 ’s are the right Radau points, 𝑐𝑖 = 𝜉𝑅,𝑖 , and 𝑏𝑗 ’s are the right Radau quadrature weights,"
+  },
+  {
+   "start": 90705,
+   "end": 90746,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 90116",
+   "id": null,
+   "text": "Consequently, 𝐶(𝑠) implies 𝐷(𝑠 − 1)."
+  },
+  {
+   "start": 90746,
+   "end": 90898,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 90268",
+   "id": null,
+   "text": "Indeed, with 𝑐𝑖 = 𝜉𝑅,𝑖 , let the corresponding Lagrange polynomials be 𝑙𝑖 = 𝑙𝑅,𝑖 , 1 ≤ 𝑖 ≤ 𝑠, and set\ñ𝑙𝑗 (𝜉) = ∫𝜉 𝑙𝑗 (𝜂)𝑑𝜂."
+  },
+  {
+   "start": 90898,
+   "end": 91133,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 90503",
+   "id": null,
+   "text": "By (4.3), the matrix {𝑙̃𝑗 (𝑐𝑖 )}𝑠      satisfies condition 𝐶(𝑠).\n          0                                                𝑖,𝑗=1\n                      𝑠\n   Next, let {𝐴𝑖𝑗 }𝑖,𝑗=1 be a m"
+  },
+  {
+   "start": 91133,
+   "end": 91685,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 91055",
+   "id": null,
+   "text": "By (4.1), the following quadrature has a\ndegree of precision 𝑠 − 1: for any 𝑣 in 𝑷𝑠−1 ,\n                                                𝑐𝑖                      𝑠\n                               "
+  },
+  {
+   "start": 91685,
+   "end": 92167,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 91537",
+   "id": null,
+   "text": "To this end, with a fixed 𝑗, set 𝑣 = 𝑙𝑗 in the above and, since 𝑙𝑗 (𝑐𝑚 ) = 𝛿𝑗𝑚 , we obtain\n                                       𝑐𝑖                      𝑠\n                              "
+  },
+  {
+   "start": 92167,
+   "end": 92299,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 91669",
+   "id": null,
+   "text": "This fact and the above imply, for 1 ≤ 𝑖, 𝑚 ≤ 𝑠,\n                                                        𝐴𝑖𝑗 = 𝑙̃𝑗 (𝑐𝑖 )."
+  },
+  {
+   "start": 92299,
+   "end": 92325,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 91695",
+   "id": null,
+   "text": "This completes the proof."
+  },
+  {
+   "start": 92325,
+   "end": 92420,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 91790",
+   "id": null,
+   "text": "An IRK method using the right Radau quadrature is uniquely determined by condition 𝐶(𝑠)."
+  },
+  {
+   "start": 92420,
+   "end": 92569,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 91939",
+   "id": null,
+   "text": "That is,\nsuch a method is identical to the IRK-DG scheme under the same quadrature as well as the IRK method\nfor the right Radau collocation scheme."
+  },
+  {
+   "start": 92569,
+   "end": 92615,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 91985",
+   "id": null,
+   "text": "As a consequence, condition 𝐷(𝑠 − 1) holds."
+  },
+  {
+   "start": 92615,
+   "end": 92694,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 92064",
+   "id": null,
+   "text": "The method is called\nRadau IIA in the literature (e.g., Hairer & Wanner 1991)."
+  },
+  {
+   "start": 92694,
+   "end": 92976,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 92346",
+   "id": null,
+   "text": "Uniqueness of Matrix 𝑨 by Condition 𝐷(𝑠) for IRK Method with Left Radau Quadrature\n   If 𝑐𝑖 ’s are the left Radau points, 𝑐𝑖 = 𝜉𝐿,𝑖 , and 𝑏𝑗 ’s are the corresponding quadrature weights, 𝑏"
+  },
+  {
+   "start": 92976,
+   "end": 93017,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 92387",
+   "id": null,
+   "text": "Consequently, 𝐷(𝑠) implies 𝐶(𝑠 − 1)."
+  },
+  {
+   "start": 93017,
+   "end": 94007,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 93377",
+   "id": null,
+   "text": "For the proof, with 𝑟𝑗 defined by (3.27), using the left Radau quadrature, for 𝑞 ≤ 𝑠,\n                                                        𝑠                        𝑏𝑗\n                       "
+  },
+  {
+   "start": 94007,
+   "end": 94476,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 93846",
+   "id": null,
+   "text": "Then, for a fixed 𝑗, by using the (left\nRadau) quadrature,\n                                                   𝑠              𝑏𝑗\n                                                        𝑞−1        "
+  },
+  {
+   "start": 94476,
+   "end": 94621,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 93991",
+   "id": null,
+   "text": "Consequently,\nfor 1 ≤ 𝑖, 𝑗 ≤ 𝑠, 𝑅𝑗 (𝜉𝑖 ) = 𝑟𝑗 (𝜉𝑖 ), or\n                                                            𝐴𝑖𝑗 = 𝑎𝑖𝑗 ."
+  },
+  {
+   "start": 94621,
+   "end": 94647,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 94017",
+   "id": null,
+   "text": "This completes the proof."
+  },
+  {
+   "start": 94647,
+   "end": 94751,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 94121",
+   "id": null,
+   "text": "Therefore, an IRK method using the left Radau quadrature is uniquely determined by condition 𝐷(𝑠)."
+  },
+  {
+   "start": 94751,
+   "end": 94882,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 94252",
+   "id": null,
+   "text": "Such a method is thus identical to the IRK-DG scheme under the left Radau quadrature and, as a result,\ncondition 𝐶(𝑠 − 1) holds."
+  },
+  {
+   "start": 94882,
+   "end": 95073,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 94443",
+   "id": null,
+   "text": "The method is called Radau IA in the literature (e.g., Hairer & Wanner 1991).\n\n\n5     Numerical Examples of DG Solutions\nTwo simple examples show the behavior of the DG solutions 𝑢ℎ and 𝑈."
+  },
+  {
+   "start": 95073,
+   "end": 95534,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 94904",
+   "id": null,
+   "text": "For the first example, the ODE on [0, 1] is given by\n                                                           𝜋              1\n                              𝑢′ (𝑥) = 𝑓(𝑥) = 𝜋 cos(𝜋𝑥 + ) ,   "
+  },
+  {
+   "start": 95534,
+   "end": 95946,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 95316",
+   "id": null,
+   "text": "The exact solution is obvious:\n                                                              𝜋\n                                        𝑢exact (𝑥) = sin (𝜋𝑥 + ).\n                                  "
+  },
+  {
+   "start": 95946,
+   "end": 96060,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 95430",
+   "id": null,
+   "text": "Consequently, the Gauss quadrature produces a result accurate to one order higher than the two Radau\nquadratures."
+  },
+  {
+   "start": 96060,
+   "end": 96129,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 95499",
+   "id": null,
+   "text": "This gain in accuracy, however, does not hold in the second example."
+  },
+  {
+   "start": 96129,
+   "end": 96398,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 95768",
+   "id": null,
+   "text": "For the quadratures employed, the projection of 𝑓 reduces to interpolation, i.e., with quadrature points\n𝜉𝑖 , 1 ≤ 𝑖 ≤ 𝑘 + 1, 𝑓ℎ is defined by 𝑓(𝜉𝑖 ): 𝑓ℎ = 𝒫𝑘 (𝑓) = ∑𝑘+1\n                 "
+  },
+  {
+   "start": 96398,
+   "end": 97079,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 96449",
+   "id": null,
+   "text": "The solution 𝑈 is given by (2.34):\n                                          𝜉             𝑘+1       𝜉\n                                    1               1\n                           𝑈(𝜉) =    "
+  },
+  {
+   "start": 97079,
+   "end": 97175,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 96545",
+   "id": null,
+   "text": "As for 𝑢ℎ , it is defined by 𝑈(𝜉𝑅,𝑖 ) at the\nright Radau points 𝜉𝑅,𝑖 , 1 ≤ 𝑖 ≤ 𝑘 + 1."
+  },
+  {
+   "start": 97175,
+   "end": 97434,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 96804",
+   "id": null,
+   "text": "Fig. 5.1 shows, on [0, 1], the graphs of the exact 𝑓 (thin red curve) and, for the case 𝑘 = 1, the linear\n𝑓ℎ (thick blue line) defined by the values at the two quadrature points (red square dots) o"
+  },
+  {
+   "start": 97434,
+   "end": 97729,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 97099",
+   "id": null,
+   "text": "Fig. 5.2 shows the graphs of the exact solution 𝑢exact (thin red curve) and, for 𝑘 = 1, the quadratic DG\nsolution 𝑈 (thick blue curve) as well as the linear DG solution 𝑢ℎ (dot-dashed green curve)"
+  },
+  {
+   "start": 97729,
+   "end": 97836,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 97206",
+   "id": null,
+   "text": "Here, each continuous curve\nis the integral of the corresponding counterpart in Fig. 5.1 with 𝑢(0) = 1/2."
+  },
+  {
+   "start": 97836,
+   "end": 97984,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 97354",
+   "id": null,
+   "text": "For 1 ≤ 𝑖 ≤ 𝑘 + 1, the\nsolutions 𝑢𝑛,𝑖 at the quadrature points by the IRK-DG method are shown as the large green square dots on\nthe line 𝑢ℎ ."
+  },
+  {
+   "start": 97984,
+   "end": 98156,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 97526",
+   "id": null,
+   "text": "Note that the solution at 𝜉 = 1 in (b) is most accurate, a fact consistent with the Gauss\nquadrature being more accurate by one order compared with the Radau quadratures."
+  },
+  {
+   "start": 98156,
+   "end": 100162,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 99532",
+   "id": null,
+   "text": "Fig. 5.3 is analogous to Fig. 5.1 but with 𝑘 = 2, and the same is true for Fig. 5.4 relative to Fig. 5.2.\n\n\n\n\n                (a)                                  (b)                                 "
+  },
+  {
+   "start": 100162,
+   "end": 100235,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 99605",
+   "id": null,
+   "text": "For the second and final example, the ODE on [0, 1] is 𝑢′ = 𝜆𝑢."
+  },
+  {
+   "start": 100235,
+   "end": 100374,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 99744",
+   "id": null,
+   "text": "We employ two different values for\n𝜆, 2𝜋𝒾/3 and 𝜋𝒾/3, which is equivalent to halving the step size; here, 𝒾 is the imaginary number."
+  },
+  {
+   "start": 100374,
+   "end": 100410,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 99780",
+   "id": null,
+   "text": "The\ninitial condition is 𝑢(0) = 1."
+  },
+  {
+   "start": 100410,
+   "end": 100457,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 99827",
+   "id": null,
+   "text": "The exact solution is 𝑢exact (𝜉) = 𝑒 𝜆𝜉 ."
+  },
+  {
+   "start": 100457,
+   "end": 100542,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 99912",
+   "id": null,
+   "text": "We wish to obtain the DG solutions\n𝑢ℎ and 𝑈 with ℎ = 1 for both 𝑘 = 1 and 𝑘 = 2."
+  },
+  {
+   "start": 100542,
+   "end": 100713,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 100083",
+   "id": null,
+   "text": "For this problem, provided the quadrature has a degree of precision 2𝑘 or higher, the DG solution is\nindependent of the quadrature employed as discussed after (6.2)."
+  },
+  {
+   "start": 100713,
+   "end": 101673,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 101043",
+   "id": null,
+   "text": "Fig. 5.5 shows the graphs of 𝑢exact (red dashed curve) and the DG solutions 𝑢ℎ (dot-dashed green line)\nand 𝑈 (continuous blue curve) for the case 𝑘 = 1 where 𝜆 equals (a) 2𝜋𝒾/3 and (b) 𝜋𝒾/3.\n"
+  },
+  {
+   "start": 101673,
+   "end": 102535,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 101905",
+   "id": null,
+   "text": "Note the significant improvement in accuracy by halving the step size (𝜆 from 2𝜋𝒾/3 to 𝜋𝒾/3) or by\nincreasing the degree of approximation (𝑘 from 1 to 2).\n\n\n\n\n                                𝑢e"
+  },
+  {
+   "start": 102535,
+   "end": 102653,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 102023",
+   "id": null,
+   "text": "The error in the DG solution 𝑢ℎ (1) is\n                                          Er = |𝑢exact (1) − 𝑢ℎ (1)|."
+  },
+  {
+   "start": 102653,
+   "end": 102801,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 102171",
+   "id": null,
+   "text": "In the piecewise linear case of Fig. 5.5, for 𝜆 = 2𝜋𝒾/3, the error is Er1 ≈ 0.1720; for 𝜆 = 𝜋𝒾/3, Er2 ≈\n0.01520 resulting in Er1 /Er2 ≈ 11.3."
+  },
+  {
+   "start": 102801,
+   "end": 102923,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 102293",
+   "id": null,
+   "text": "The next halving of the step size (𝜆 = 𝜋𝒾/6) results in Er2 /Er3 ≈\n14.9 and then 15.7 approaching a ratio of 16 = 24 ."
+  },
+  {
+   "start": 102923,
+   "end": 103046,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 102416",
+   "id": null,
+   "text": "Thus, the error reduction is consistent with the fact\nthat the piecewise linear DG method for ODE is third-order accurate."
+  },
+  {
+   "start": 103046,
+   "end": 103118,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 102488",
+   "id": null,
+   "text": "Similarly, the piecewise parabolic\nDG solution is fifth-order accurate."
+  },
+  {
+   "start": 103118,
+   "end": 103305,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 102675",
+   "id": null,
+   "text": "We omit the details.\n\n\n6     Conclusions and Discussion\nIn summary, we studied the numerical solutions for ODE by the DG method from a perspective different\nfrom those in the literature."
+  },
+  {
+   "start": 103305,
+   "end": 103402,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 102772",
+   "id": null,
+   "text": "Our focus was on constructing the solution by first deriving the DG method in\ndifferential form."
+  },
+  {
+   "start": 103402,
+   "end": 103541,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 102911",
+   "id": null,
+   "text": "The derivation is made possible by a polynomial called the correction function, which\napproximates the jump at the beginning of each step."
+  },
+  {
+   "start": 103541,
+   "end": 103645,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 103015",
+   "id": null,
+   "text": "The correction function facilitates the construction\nof the IRK-DG schemes under different quadratures."
+  },
+  {
+   "start": 103645,
+   "end": 103895,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 103265",
+   "id": null,
+   "text": "The IRK-DG construction in turn clarifies the\nmeaning and facilitates the proofs of various 𝐵(𝑝), 𝐶(𝜂), and 𝐷(𝜁) conditions, which play a crucial role\nin the order of accuracy of the schemes as "
+  },
+  {
+   "start": 103895,
+   "end": 103930,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 103300",
+   "id": null,
+   "text": "Numerical\nsolutions were provided."
+  },
+  {
+   "start": 103930,
+   "end": 104045,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 103415",
+   "id": null,
+   "text": "In all, the correction function plays a central role and clarifies the relations among\nthe DG and related schemes."
+  },
+  {
+   "start": 104045,
+   "end": 104207,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 103577",
+   "id": null,
+   "text": "In addition to clarifying the relations among methods, the current approach can be employed to simplify\nthe time discretization of the space-time DG methods."
+  },
+  {
+   "start": 104207,
+   "end": 104341,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 103711",
+   "id": null,
+   "text": "Concerning existing space-time DG methods, see,\ne.g., Johnson et al. (1984), Van der Vegt & Van der Ven (2002), Murman et al. (2016)."
+  },
+  {
+   "start": 104341,
+   "end": 104541,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 103911",
+   "id": null,
+   "text": "Iterative procedures\namenable to modern supercomputers for the IRK as well as other high-order time stepping methods are\ncurrently an active area of research (Wang et al. 2013, Slotnick et al. 2014)."
+  },
+  {
+   "start": 104541,
+   "end": 104560,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 103930",
+   "id": null,
+   "text": "Acknowledgements."
+  },
+  {
+   "start": 104560,
+   "end": 104649,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 104019",
+   "id": null,
+   "text": "The author was supported by the Transformational Tools and Technologies Project\nof NASA."
+  },
+  {
+   "start": 104649,
+   "end": 104677,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 104047",
+   "id": null,
+   "text": "He also wishes to thank Dr."
+  },
+  {
+   "start": 104677,
+   "end": 104778,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 104148",
+   "id": null,
+   "text": "Dimitri Mavriplis for several interesting discussions on DG methods\napplied to time stepping and Dr."
+  },
+  {
+   "start": 104778,
+   "end": 104899,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 104269",
+   "id": null,
+   "text": "Seth Spiegel for his thorough review.\n\n\n\n                                                         24\n\fReferences\n [1] S."
+  },
+  {
+   "start": 104899,
+   "end": 104913,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 104283",
+   "id": null,
+   "text": "Adjerid, K.D."
+  },
+  {
+   "start": 104913,
+   "end": 104930,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 104300",
+   "id": null,
+   "text": "Devine, and J.E."
+  },
+  {
+   "start": 104930,
+   "end": 104946,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 104316",
+   "id": null,
+   "text": "Flaherty and L."
+  },
+  {
+   "start": 104946,
+   "end": 105131,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 104501",
+   "id": null,
+   "text": "Krivodonova, A posteriori error estimation for\n       discontinuous Galerkin solutions of hyperbolic problems, Comput Methods Appl Mech Eng, 191\n       (2002), pp. 1097-1112.\n [2] J.H."
+  },
+  {
+   "start": 105131,
+   "end": 105148,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 104518",
+   "id": null,
+   "text": "Argyris and D.W."
+  },
+  {
+   "start": 105148,
+   "end": 105197,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 104567",
+   "id": null,
+   "text": "Scharpf, Finite elements in time and space, Aer."
+  },
+  {
+   "start": 105197,
+   "end": 105200,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 104570",
+   "id": null,
+   "text": "J."
+  },
+  {
+   "start": 105200,
+   "end": 105211,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 104581",
+   "id": null,
+   "text": "Royal Aer."
+  },
+  {
+   "start": 105211,
+   "end": 105255,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 104625",
+   "id": null,
+   "text": "Soc., 73, 1041-\n       1044 (1969).\n [3] O."
+  },
+  {
+   "start": 105255,
+   "end": 105310,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 104680",
+   "id": null,
+   "text": "Axelsson, A class of A-stable Methods, Nordisk Tidskr."
+  },
+  {
+   "start": 105310,
+   "end": 105379,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 104749",
+   "id": null,
+   "text": "Informationbehandling (BIT), v. 9, 1969,\n       pp. 185-199.\n [4] M."
+  },
+  {
+   "start": 105379,
+   "end": 105579,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 104949",
+   "id": null,
+   "text": "Baccouch, Analysis of a posteriori error estimates of the discontinuous Galerkin method for\n       nonlinear ordinary differential equations, Applied Numerical Mathematics 106 (2016) 129–153.\n [5] M."
+  },
+  {
+   "start": 105579,
+   "end": 105594,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 104964",
+   "id": null,
+   "text": "Borri and C.L."
+  },
+  {
+   "start": 105594,
+   "end": 105690,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 105060",
+   "id": null,
+   "text": "Bottasso, A general framework for interpreting time finite element formulations,\n       Comput."
+  },
+  {
+   "start": 105690,
+   "end": 105727,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 105097",
+   "id": null,
+   "text": "Mech., 13, 133-142 (1993).\n [6] C.L."
+  },
+  {
+   "start": 105727,
+   "end": 105895,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 105265",
+   "id": null,
+   "text": "Bottasso, A new look at finite elements in time: a variational interpretation of Runge-Kutta\n       methods, Applied Numerical Mathematics, 25, 355-368 (1997).\n [7] B."
+  },
+  {
+   "start": 105895,
+   "end": 105908,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 105278",
+   "id": null,
+   "text": "Cockburn, G."
+  },
+  {
+   "start": 105908,
+   "end": 105931,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 105301",
+   "id": null,
+   "text": "Karniadakis, and C.-W."
+  },
+  {
+   "start": 105931,
+   "end": 106039,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 105409",
+   "id": null,
+   "text": "Shu, Discontinuous Galerkin methods: Theory,\n       Computation, and Applications, Springer (2000).\n [8] G."
+  },
+  {
+   "start": 106039,
+   "end": 106042,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 105412",
+   "id": null,
+   "text": "J."
+  },
+  {
+   "start": 106042,
+   "end": 106130,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 105500",
+   "id": null,
+   "text": "Cooper, Interpolation and quadrature methods for ordinary differential equations, Math."
+  },
+  {
+   "start": 106130,
+   "end": 106176,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 105546",
+   "id": null,
+   "text": "Comp.,\n       v. 22, 1968, pp. 69-76.\n [9] M."
+  },
+  {
+   "start": 106176,
+   "end": 106188,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 105558",
+   "id": null,
+   "text": "Delfour, W."
+  },
+  {
+   "start": 106188,
+   "end": 106202,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 105572",
+   "id": null,
+   "text": "Hager, and F."
+  },
+  {
+   "start": 106202,
+   "end": 106291,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 105661",
+   "id": null,
+   "text": "Trochu, Discontinuous Galerkin methods for ordinary differential\n       equations, Math."
+  },
+  {
+   "start": 106291,
+   "end": 106335,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 105705",
+   "id": null,
+   "text": "Comp., v. 36, 1981, pp. 455-473.\n [10] B.L."
+  },
+  {
+   "start": 106335,
+   "end": 106482,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 105852",
+   "id": null,
+   "text": "Ehle, A-Stable Methods and Padé Approximations to the Exponential, SIAM Journal on\n       Mathematical Analysis, v. 4, 1973, pp. 671-680.\n [11] D."
+  },
+  {
+   "start": 106482,
+   "end": 106495,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 105865",
+   "id": null,
+   "text": "Estep and A."
+  },
+  {
+   "start": 106495,
+   "end": 106608,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 105978",
+   "id": null,
+   "text": "Stuart, The dynamical behavior of the discontinuous Galerkin method and related\n       difference schemes, Math."
+  },
+  {
+   "start": 106608,
+   "end": 106648,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 106018",
+   "id": null,
+   "text": "Comput., 71, 1075-1103 (2001).\n [12] K."
+  },
+  {
+   "start": 106648,
+   "end": 106661,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 106031",
+   "id": null,
+   "text": "Eriksson, D."
+  },
+  {
+   "start": 106661,
+   "end": 106671,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 106041",
+   "id": null,
+   "text": "Estep, P."
+  },
+  {
+   "start": 106671,
+   "end": 106686,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 106056",
+   "id": null,
+   "text": "Hansbo, and C."
+  },
+  {
+   "start": 106686,
+   "end": 106838,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 106208",
+   "id": null,
+   "text": "Johnson, Computational Differential Equations,\n       Cambridge University Press (1996) or https://www.csc.kth.se/~jjan/private/cde.pdf (2009)\n [13] I."
+  },
+  {
+   "start": 106838,
+   "end": 106937,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 106307",
+   "id": null,
+   "text": "Fried, Finite element analysis of time dependent phenomena, AIAA J., 7, 1170-1173 (1969).\n [14] A."
+  },
+  {
+   "start": 106937,
+   "end": 106952,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 106322",
+   "id": null,
+   "text": "Fortina and D."
+  },
+  {
+   "start": 106952,
+   "end": 107075,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 106445",
+   "id": null,
+   "text": "Yakoubi, An adaptive discontinuous Galerkin method for very stiff systems of\n       ordinary differential equations, Appl."
+  },
+  {
+   "start": 107075,
+   "end": 107081,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 106451",
+   "id": null,
+   "text": "Math."
+  },
+  {
+   "start": 107081,
+   "end": 107125,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 106495",
+   "id": null,
+   "text": "Comput, v. 358, 2019, pp. 330-347.\n [15] E."
+  },
+  {
+   "start": 107125,
+   "end": 107136,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 106506",
+   "id": null,
+   "text": "Hairer, S."
+  },
+  {
+   "start": 107136,
+   "end": 107139,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 106509",
+   "id": null,
+   "text": "P."
+  },
+  {
+   "start": 107139,
+   "end": 107155,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 106525",
+   "id": null,
+   "text": "Norsett, and G."
+  },
+  {
+   "start": 107155,
+   "end": 107259,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 106629",
+   "id": null,
+   "text": "Wanner, Solving ordinary differential equations I, 2nd edition,\n       Springer-Verlag (1993).\n [16] E."
+  },
+  {
+   "start": 107259,
+   "end": 107273,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 106643",
+   "id": null,
+   "text": "Hairer and G."
+  },
+  {
+   "start": 107273,
+   "end": 107360,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 106730",
+   "id": null,
+   "text": "Wanner, Solving ordinary differential equations II, Springer-Verlag (1991).\n [17] F.B."
+  },
+  {
+   "start": 107360,
+   "end": 107431,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 106801",
+   "id": null,
+   "text": "Hildebrand, Introduction to Numerical Analysis, Dover (1987).\n [18] B."
+  },
+  {
+   "start": 107431,
+   "end": 107528,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 106898",
+   "id": null,
+   "text": "Hulme, Discrete Galerkin and related one-step methods for ordinary differential equations, Math."
+  },
+  {
+   "start": 107528,
+   "end": 107586,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 106956",
+   "id": null,
+   "text": "Comp., v. 26, 1972, pp. 881-891.\n [19] Thomas J.R."
+  },
+  {
+   "start": 107586,
+   "end": 107659,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 107029",
+   "id": null,
+   "text": "Hughes, The finite element method, Dover Publications (2012).\n [20] H.T."
+  },
+  {
+   "start": 107659,
+   "end": 107827,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 107197",
+   "id": null,
+   "text": "Huynh, A flux reconstruction approach to high-order schemes including discontinuous\n       Galerkin methods, 18th AIAA-CFD Conference, AIAA paper 2007-4079.\n [21] H.T."
+  },
+  {
+   "start": 107827,
+   "end": 107977,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 107347",
+   "id": null,
+   "text": "Huynh (2009a), A Reconstruction Approach to High-Order Schemes Including Discontinuous\n       Galerkin for Diffusion, AIAA Paper 2009-403.\n [22] H.T."
+  },
+  {
+   "start": 107977,
+   "end": 108073,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 107443",
+   "id": null,
+   "text": "Huynh (2009b), Collocation and Galerkin Time-Stepping Methods, AIAA Paper 2009-4323.\n [23] H.T."
+  },
+  {
+   "start": 108073,
+   "end": 108204,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 107574",
+   "id": null,
+   "text": "Huynh, On Formulations of Discontinuous Galerkin and Related Methods for Conservation\n       Laws, NASA/TM—2014-218135.\n [24] H.T."
+  },
+  {
+   "start": 108204,
+   "end": 108216,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 107586",
+   "id": null,
+   "text": "Huynh, Z.J."
+  },
+  {
+   "start": 108216,
+   "end": 108227,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 107597",
+   "id": null,
+   "text": "Wang, P.E."
+  },
+  {
+   "start": 108227,
+   "end": 108371,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 107741",
+   "id": null,
+   "text": "Vincent, High-order methods for computational fluid dynamics: a brief\n       review of compact differential formulations on unstructured grids."
+  },
+  {
+   "start": 108371,
+   "end": 108379,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 107749",
+   "id": null,
+   "text": "Comput."
+  },
+  {
+   "start": 108379,
+   "end": 108422,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 107792",
+   "id": null,
+   "text": "Fluids 98, 209–220\n       (2014).\n [25] C."
+  },
+  {
+   "start": 108422,
+   "end": 108557,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 107927",
+   "id": null,
+   "text": "Johnson, Numerical Solution of Partial Differential Equations by the Finite Element method,\n       Dover Publications (2012).\n [26] C."
+  },
+  {
+   "start": 108557,
+   "end": 108569,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 107939",
+   "id": null,
+   "text": "Johnson, U."
+  },
+  {
+   "start": 108569,
+   "end": 108584,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 107954",
+   "id": null,
+   "text": "Nävert, and J."
+  },
+  {
+   "start": 108584,
+   "end": 108665,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 108035",
+   "id": null,
+   "text": "Pikäranta, Finite element methods for linear hyperbolic problems,\n       Comput."
+  },
+  {
+   "start": 108665,
+   "end": 108679,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 108049",
+   "id": null,
+   "text": "Methods Appl."
+  },
+  {
+   "start": 108679,
+   "end": 108685,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 108055",
+   "id": null,
+   "text": "Mech."
+  },
+  {
+   "start": 108685,
+   "end": 108728,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 108098",
+   "id": null,
+   "text": "Eng., v. 45, 1984, pp. 285-312.\n [27] J.D."
+  },
+  {
+   "start": 108728,
+   "end": 108827,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 108197",
+   "id": null,
+   "text": "Lambert, Numerical methods for ordinary differential systems, John Wiley and Sons (1991).\n [28] P."
+  },
+  {
+   "start": 108827,
+   "end": 108844,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 108214",
+   "id": null,
+   "text": "LeSaint and P.A."
+  },
+  {
+   "start": 108844,
+   "end": 109145,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 108515",
+   "id": null,
+   "text": "Raviart, On the finite element method for solving the neutron transport equation,\n       in C. de Boor, editor, Mathematical aspects of finite elements in partial differential equations,\n       Academ"
+  },
+  {
+   "start": 109145,
+   "end": 109156,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 108526",
+   "id": null,
+   "text": "Murman, L."
+  },
+  {
+   "start": 109156,
+   "end": 109168,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 108538",
+   "id": null,
+   "text": "Diosady, A."
+  },
+  {
+   "start": 109168,
+   "end": 109182,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 108552",
+   "id": null,
+   "text": "Garai, and M."
+  },
+  {
+   "start": 109182,
+   "end": 109291,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 108661",
+   "id": null,
+   "text": "Ceze, A Space-Time Discontinuous-Galerkin\n     Approach for Separated Flows, AIAA Paper 2016-1059.\n[30] W.H."
+  },
+  {
+   "start": 109291,
+   "end": 109305,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 108675",
+   "id": null,
+   "text": "Reed and T.R."
+  },
+  {
+   "start": 109305,
+   "end": 109377,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 108747",
+   "id": null,
+   "text": "Hill, Triangular mesh methods for the neutron transport equation, Tech."
+  },
+  {
+   "start": 109377,
+   "end": 109451,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 108821",
+   "id": null,
+   "text": "Report\n     LA-UR-73-479, Los Alamos Scientific Laboratory, 1973.\n[31] J."
+  },
+  {
+   "start": 109451,
+   "end": 109580,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 108950",
+   "id": null,
+   "text": "Slotnick, et al., CFD Vision 2030 Study: A Path to Revolutionary Computational Aerosciences,\n     NASA/CR–2014-218178.\n[32] S.C."
+  },
+  {
+   "start": 109580,
+   "end": 109594,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 108964",
+   "id": null,
+   "text": "Spiegel, M.R."
+  },
+  {
+   "start": 109594,
+   "end": 109610,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 108980",
+   "id": null,
+   "text": "Borghi and D.A."
+  },
+  {
+   "start": 109610,
+   "end": 109754,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 109124",
+   "id": null,
+   "text": "Yoder, Simulations of a Single-Injector Cooling Flow Using\n     the High-Order Flux Reconstruction Method, AIAA Paper AIAA 2022-1813.\n[33] W.S."
+  },
+  {
+   "start": 109754,
+   "end": 109768,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 109138",
+   "id": null,
+   "text": "Tang and Y.J."
+  },
+  {
+   "start": 109768,
+   "end": 109866,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 109236",
+   "id": null,
+   "text": "Sun, Time finite element methods: A unified framework for numerical\n     discretizations of odes."
+  },
+  {
+   "start": 109866,
+   "end": 109872,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 109242",
+   "id": null,
+   "text": "Appl."
+  },
+  {
+   "start": 109872,
+   "end": 109878,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 109248",
+   "id": null,
+   "text": "Math."
+  },
+  {
+   "start": 109878,
+   "end": 110080,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 109450",
+   "id": null,
+   "text": "Comput. 2012, 219, 2158–2180.\n[34] J.J.W. van der Vegt and H. van der Ven “Space-time discontinuous Galerkin finite element method\n     with dynamic grid motion for inviscid compressible flows, Part I"
+  },
+  {
+   "start": 110080,
+   "end": 110105,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 109475",
+   "id": null,
+   "text": "General formulation”, J."
+  },
+  {
+   "start": 110105,
+   "end": 110113,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 109483",
+   "id": null,
+   "text": "Comput."
+  },
+  {
+   "start": 110113,
+   "end": 110226,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 109596",
+   "id": null,
+   "text": "Phys., 182 (2002) 546-585.\n[35] Wang, Z.J., et al.: High-order CFD methods: current status and perspective."
+  },
+  {
+   "start": 110226,
+   "end": 110231,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 109601",
+   "id": null,
+   "text": "Int."
+  },
+  {
+   "start": 110231,
+   "end": 110234,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 109604",
+   "id": null,
+   "text": "J."
+  },
+  {
+   "start": 110234,
+   "end": 110241,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 109611",
+   "id": null,
+   "text": "Numer."
+  },
+  {
+   "start": 110241,
+   "end": 110247,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 109617",
+   "id": null,
+   "text": "Meth."
+  },
+  {
+   "start": 110247,
+   "end": 110290,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 109660",
+   "id": null,
+   "text": "Fluids 72(8), 811–845 (2013).\n[36] K."
+  },
+  {
+   "start": 110290,
+   "end": 110447,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 109817",
+   "id": null,
+   "text": "Wright, “Some relationship between implicit Runge-Kutta, Collocation and Lanczos 𝜏-methods,\n     and their stability properties”, BIT, v. 10, 1970.\n[37] Y."
+  },
+  {
+   "start": 110447,
+   "end": 110456,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 109826",
+   "id": null,
+   "text": "Xing, M."
+  },
+  {
+   "start": 110456,
+   "end": 110464,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 109834",
+   "id": null,
+   "text": "Qin, J."
+  },
+  {
+   "start": 110464,
+   "end": 110583,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 109953",
+   "id": null,
+   "text": "Guo, A Time Finite Element Method Based on the Differential Quadrature Rule\n     and Hamilton’s Variational Principle."
+  },
+  {
+   "start": 110583,
+   "end": 110625,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 109995",
+   "id": null,
+   "text": "Applied Sciences. 2017; 7(2):138.\n[38] S."
+  },
+  {
+   "start": 110625,
+   "end": 110639,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 110009",
+   "id": null,
+   "text": "Zhao and G.W."
+  },
+  {
+   "start": 110639,
+   "end": 110842,
+   "type": "sentence",
+   "basis": "trailing text",
+   "id": null,
+   "text": "Wei, A unified discontinuous Galerkin framework for time Integration,\n     Mathematical Methods in the Applied Sciences, v. 37(7), 2014.\n\n\n\n\n                                                    26\n\f27"
+  }
+ ]
+}

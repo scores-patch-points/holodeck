@@ -1,0 +1,2907 @@
+{
+ "schema": "SourceStructure@1",
+ "source": "05-academic-papers/ntrs-white-papers/19830026406_computational-methods-for-ideal-compressible-flow.txt",
+ "bytes": 68326,
+ "bodyOffset": 618,
+ "splitBasis": "361 sentence-punctuation splits",
+ "unsplit": false,
+ "unitCount": 362,
+ "units": [
+  {
+   "start": 618,
+   "end": 944,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 325",
+   "id": null,
+   "text": "N AS.A Contractor Report 172180\n\n                                                                                      NASA-CR-172180\n\n\nleASE                                                           "
+  },
+  {
+   "start": 944,
+   "end": 2404,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 1785",
+   "id": null,
+   "text": "NASl-l58l0\n July 1983\n\n\n\n\nINSTITUTE FOR COMPUTER APPLICATIONS IN SCIENCE AND ENGINEERING\nNASA Langley Research Center~ Hampton, Virginia 23665\n\nOperated by the Universities Space Research Association\n"
+  },
+  {
+   "start": 2404,
+   "end": 2610,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 1991",
+   "id": null,
+   "text": "Box 9513, 2300 RA Leiden, The Netherlands\n\n\n\n\nLectures presented at the Von Karman Institute for Fluid Dynamics, Rhode-St-\n\nGenese, Belgium, in Lecture Series 1983-04 on Computational Fluid Dynamics.\n"
+  },
+  {
+   "start": 2610,
+   "end": 2721,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 2102",
+   "id": null,
+   "text": "Conservative dissipative difference schemes                                                               p."
+  },
+  {
+   "start": 2721,
+   "end": 2729,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 2110",
+   "id": null,
+   "text": "I\n\n2."
+  },
+  {
+   "start": 2729,
+   "end": 2847,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 2228",
+   "id": null,
+   "text": "The recognition and representation of discontinuities                                                     p. 13\n\n3."
+  },
+  {
+   "start": 2847,
+   "end": 3095,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 2476",
+   "id": null,
+   "text": "Multi-dimensional methods                                                                                 p. 18\n\n\n\n\nThe research reported here was partially supported                                  "
+  },
+  {
+   "start": 3095,
+   "end": 3452,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 2833",
+   "id": null,
+   "text": "NAS1--15810 while the author was in residence at ICASE, NASA Langley Research\n\nCenter,          Hampton,                     VA           23665,             and   partially   by   Leiden   Observatory"
+  },
+  {
+   "start": 3452,
+   "end": 3585,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 2966",
+   "id": null,
+   "text": "Box 356, 2600 AJ Delft, The Netherlands\n\n                                                                                      i\n\f1."
+  },
+  {
+   "start": 3585,
+   "end": 3637,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 3018",
+   "id": null,
+   "text": "CONSERVATIVE DISSIPATIVE DIFFERENCE SCHEMES\n\n\n\n1.1."
+  },
+  {
+   "start": 3637,
+   "end": 3700,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 3081",
+   "id": null,
+   "text": "Introduction: Why Conservative Dissipative Difference Schemes?"
+  },
+  {
+   "start": 3700,
+   "end": 3915,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 3296",
+   "id": null,
+   "text": "In solving problems of gas dynamics it is often permitted to ignore the\n\ndissipative          processes       in    the     gas,        that    is,     viscous   friction        and     heat\n\nconducti"
+  },
+  {
+   "start": 3915,
+   "end": 4347,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 3728",
+   "id": null,
+   "text": "This     simplification        of     the physical picture          boils        down,    mathe-\n\nmatically,          to    a   degeneration        of     the    partial        differential     equati"
+  },
+  {
+   "start": 4347,
+   "end": 4499,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 3880",
+   "id": null,
+   "text": "Even in\n\nthis    approximation           there     remains      a bewildering variety of                complicated flow\n\nproblems."
+  },
+  {
+   "start": 4499,
+   "end": 4822,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 4203",
+   "id": null,
+   "text": "Particularly           notorious      are        the     problems         involving    such      a     strong\n\ncompression of the gas that, in spite of the a priori assumption, dissipation\n\nsooner    "
+  },
+  {
+   "start": 4822,
+   "end": 4987,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 4368",
+   "id": null,
+   "text": "In a          shock the flow quantities undergo a significant change over a\n\ndistance typical of the dissipative interaction, i.e. the molecular mean free\n\npath."
+  },
+  {
+   "start": 4987,
+   "end": 5098,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 4479",
+   "id": null,
+   "text": "It is,       of course,      impossible to infer the structure of a shock from the\n\nequations of rCF."
+  },
+  {
+   "start": 5098,
+   "end": 5216,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 4597",
+   "id": null,
+   "text": "The concept of IeF traditionally is saved and extended by\n\nrepresenting a shock as a flow discontinuity."
+  },
+  {
+   "start": 5216,
+   "end": 5547,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 4928",
+   "id": null,
+   "text": "The motion of           such an idealized shock may be derived from an integral\n\nversion        of    the      first-order        conservation          laws,      expressing    the     particular\n\ncon"
+  },
+  {
+   "start": 5547,
+   "end": 5643,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 5024",
+   "id": null,
+   "text": "Mathematically, this leads to the theory of weak solutions of nonlinar\n\nconservation equations."
+  },
+  {
+   "start": 5643,
+   "end": 5766,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 5147",
+   "id": null,
+   "text": "The algebraic equations relating the propagation speed\n\nof a discontinutiy to its amplitude are called the jump equations."
+  },
+  {
+   "start": 5766,
+   "end": 5820,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 5201",
+   "id": null,
+   "text": "Weak    solutions        are not     unique."
+  },
+  {
+   "start": 5820,
+   "end": 6135,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 5516",
+   "id": null,
+   "text": "Shock discontinuties in which friction\n\nproduc:es kinetic energy instead of dissipating it, and heat flows from lower\n\f                                                       2\n\n\n\nto   higher        te"
+  },
+  {
+   "start": 6135,
+   "end": 6182,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 5563",
+   "id": null,
+   "text": "Clearly a selection criterion must be invoked."
+  },
+  {
+   "start": 6182,
+   "end": 6412,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 5793",
+   "id": null,
+   "text": "We shall accept a\n\nweak solution of the first-order conservation equations only if it is the\n\nlimit     solution,         for     vanishingly      small     dissipation,         of    the     second-o"
+  },
+  {
+   "start": 6412,
+   "end": 6643,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 6024",
+   "id": null,
+   "text": "For gasdynamics this is equivalent to the following\n\nrequirement:         the entropy of the gas,               measure of the accumulated effect of\n\ndissipation,         must    not     decrease     "
+  },
+  {
+   "start": 6643,
+   "end": 6703,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 6084",
+   "id": null,
+   "text": "This     is    called       the   entropy\n\ni neq uali ty."
+  },
+  {
+   "start": 6703,
+   "end": 6951,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 6332",
+   "id": null,
+   "text": "Thus, the advantage of lowering the order of the flow equations is partly\n\noffset by the need to introduce extra equations and an extra inequality. rn\n\nconsequence, analytic treatment of rCF problems "
+  },
+  {
+   "start": 6951,
+   "end": 7013,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 6394",
+   "id": null,
+   "text": "The numerical treatment, however, can be entirely successful."
+  },
+  {
+   "start": 7013,
+   "end": 7096,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 6477",
+   "id": null,
+   "text": "The key\n\nto success is the combination of conservation and artificial dissipation."
+  },
+  {
+   "start": 7096,
+   "end": 7262,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 6643",
+   "id": null,
+   "text": "The idea behind artificial dissipation is that, since in rCF the effect\n\nof dissipation is ignored,                 it may as well be           ~~aggerated."
+  },
+  {
+   "start": 7262,
+   "end": 7542,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 6923",
+   "id": null,
+   "text": "By providing a\n\ndifference         scheme    for    rCF with sufficiently large dissipative terms it is\n\npossible to achieve that shocks, whenever these appear,                                  posses"
+  },
+  {
+   "start": 7542,
+   "end": 7752,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 7133",
+   "id": null,
+   "text": "The   concept       of     conservation enters         if we make       the       difference     scheme\n\nconsistent with the integral form, rather than the differential form, of the\n\nequations of rCF."
+  },
+  {
+   "start": 7752,
+   "end": 7934,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 7315",
+   "id": null,
+   "text": "The scheme is then said to be \"conservative\" or to have the\n\n\"conservation         form\";        another     often-heard       description            is     \"finite-volume\n\nscheme\"."
+  },
+  {
+   "start": 7934,
+   "end": 8214,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 7595",
+   "id": null,
+   "text": "It    has     been shown,        in theory and in practice,                 that,    in using a\n\nconservative         scheme,       the   numerical    stability       of   a   solution containing an\n\n"
+  },
+  {
+   "start": 8214,
+   "end": 8573,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 7954",
+   "id": null,
+   "text": "But\n\nin order to achieve numerical stability and to select the proper shocks, the\n\nscheme indeed has to be dissipative.\n\f                                                            3\n\n\n\n\n        The f"
+  },
+  {
+   "start": 8573,
+   "end": 8644,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 8025",
+   "id": null,
+   "text": "It is the least accurate of its kind and has no practical value today."
+  },
+  {
+   "start": 8644,
+   "end": 8876,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 8257",
+   "id": null,
+   "text": "More    influential           was   its      second-order-accurate              successor,     the Lax-Wendroff\n\n(LW) scheme (I960) which still is widely used by aerodynamicists in the two-\n\nstep form"
+  },
+  {
+   "start": 8876,
+   "end": 8982,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 8363",
+   "id": null,
+   "text": "The survivor among first-order schemes is Godunov's (1959) method based\n\non up,dnd differencing."
+  },
+  {
+   "start": 8982,
+   "end": 9152,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 8533",
+   "id": null,
+   "text": "The decision which direction is upwind is made on the\n\nbasis     of    the     speeds      of    the   finite'-amplftude waves by which discrete fluid\n\nvolumes interact."
+  },
+  {
+   "start": 9152,
+   "end": 9321,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 8702",
+   "id": null,
+   "text": "With this strategy, the solution of Riemann's initial-value\n\nproblem -        the shock-tube or diaphragm problem - becomes a building block of\n\nthe d:lfference scheme."
+  },
+  {
+   "start": 9321,
+   "end": 9609,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 8990",
+   "id": null,
+   "text": "At present we see a rapid expansion of the literature\n\non \"approximate Riemann solvers\":                         Roe    (1980),      Osher (1980),        darten and Lax\n\n(1981), Van Leer (1982), Colel"
+  },
+  {
+   "start": 9609,
+   "end": 9757,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 9138",
+   "id": null,
+   "text": "A review of this subject was given by\n\nHarten, Lax and Van Leer (1983);                      I    shall return to it later in the present\n\nlecture."
+  },
+  {
+   "start": 9757,
+   "end": 9923,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 9304",
+   "id": null,
+   "text": "It     turns    out     that     the    history         of   conservative dissipative            difference\n\nschemes is divided more or less by the decades."
+  },
+  {
+   "start": 9923,
+   "end": 10050,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 9431",
+   "id": null,
+   "text": "During        the     fifties,       first-order-accurate              methods     were     developed    and\n\ntested."
+  },
+  {
+   "start": 10050,
+   "end": 10255,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 9636",
+   "id": null,
+   "text": "These    methods        are   what     now is         called     \"robust\"    and,    schematically\n\nspeaking,        had     no    other      problems        than       their    modest    accuracy."
+  },
+  {
+   "start": 10255,
+   "end": 10322,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 9703",
+   "id": null,
+   "text": "Particularly\n\nannoyi.ng was the numerical diffusion of entropy."
+  },
+  {
+   "start": 10322,
+   "end": 10431,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 9812",
+   "id": null,
+   "text": "The sixties gave us the second--order-accurate schemes, meaning different\n\nkinds     of    trouble."
+  },
+  {
+   "start": 10431,
+   "end": 10805,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 10186",
+   "id": null,
+   "text": "Numerical       oscillations and              nonlinear     instabilities       near\n\nshock     waves        largely      spoiled     the       pleasure       of    the     reduction    in   artificia"
+  },
+  {
+   "start": 10805,
+   "end": 10900,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 10281",
+   "id": null,
+   "text": "For instance,             the prevention of numerical oscillations is now well\n\nunderstood."
+  },
+  {
+   "start": 10900,
+   "end": 11063,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 10444",
+   "id": null,
+   "text": "As    this         knowledge     has   not     been      fully    absorbed    by    the    IeF\n\ncommunity, I have made it the subject of the second lecture."
+  },
+  {
+   "start": 11063,
+   "end": 11225,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 10606",
+   "id": null,
+   "text": "The eighties have started with an increased interest in explicitly using\n\nthe physics embedded in the IeF equations for improving the numerical methods."
+  },
+  {
+   "start": 11225,
+   "end": 11292,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 10673",
+   "id": null,
+   "text": "In particular, there is a strong emphasis on upwind differencing."
+  },
+  {
+   "start": 11292,
+   "end": 11571,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 10952",
+   "id": null,
+   "text": "Some modern\n\nideas     on how       to        compute   one-dimensional flow are                covered by   the present\n\nlecture;    how    well           these    ideas   carry       over   to    mu"
+  },
+  {
+   "start": 11571,
+   "end": 11776,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 11157",
+   "id": null,
+   "text": "A family of second-order finite-volume schemes\n\n\n\n        I shall illustrate the recent developments in computing one-dimensional\n\nIeF on the basis of a family of second-order-accurate difference sche"
+  },
+  {
+   "start": 11776,
+   "end": 11981,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 11362",
+   "id": null,
+   "text": "The\n\ninitial-value representation and algorithm structure are the same as in Van\n\nLeer (1980);       the notation is also the same, except for the present use of a\n\nsuperscript to indicate the time le"
+  },
+  {
+   "start": 11981,
+   "end": 12370,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 11751",
+   "id": null,
+   "text": "We start with schemes for the scalar linear convection equation\n\n\n\n\n                            0,       a = constant,                                      (1)\n\n\n\n\nassumin~    a piecewise linear initi"
+  },
+  {
+   "start": 12370,
+   "end": 13002,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 12383",
+   "id": null,
+   "text": "The gradient is computed by averaging the\n\f                                                                          5\n\n\n\nnumerieal gradient values in the neighborhood of                              "
+  },
+  {
+   "start": 13002,
+   "end": 13315,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 12696",
+   "id": null,
+   "text": "The       three\n\npossible values of                  K   most frequently met are\n\n\n\n           I(    = sgn a - s, 0 and -s                                                                              "
+  },
+  {
+   "start": 13315,
+   "end": 13658,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 13039",
+   "id": null,
+   "text": "The           evolution        in        one       time--step         of   the     initial-value               distribution\n\ndiscretized               as     above        is     now          computed "
+  },
+  {
+   "start": 13658,
+   "end": 14365,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 13746",
+   "id": null,
+   "text": "Averaging         over         the   finite       volumes         then\n                                                     n+1\nyields the updated values qi                                  '    from "
+  },
+  {
+   "start": 14365,
+   "end": 15118,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 14499",
+   "id": null,
+   "text": "The LW scheme\n                                                                                                           n        n              n\nis    a    so-called             central-difference  "
+  },
+  {
+   "start": 15118,
+   "end": 15359,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 14740",
+   "id": null,
+   "text": "Fromm's scheme is upwind biased,                                    involves qi-2s' qi-s' qi and qi+s' and\n\f                                                    6\n\n\n\nhas a zero phase error at         0"
+  },
+  {
+   "start": 15359,
+   "end": 15399,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 14780",
+   "id": null,
+   "text": "Its stability domain is\ngiven by (5.1)."
+  },
+  {
+   "start": 15399,
+   "end": 15867,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 15248",
+   "id": null,
+   "text": "The A-scheme,       involving only the upwind value of the gradient of qn ,\n\nremains    fully     one-sided;       the    values                         and           are     used    to\n           n+1"
+  },
+  {
+   "start": 15867,
+   "end": 15966,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 15347",
+   "id": null,
+   "text": "Under (5.1) the phase error of the A-scheme is\n\npredominantly positive (see Fromm (1967».\n\n\n\n\n1.4."
+  },
+  {
+   "start": 15966,
+   "end": 16392,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 15773",
+   "id": null,
+   "text": "From convection to IeF\n\n\n\n      In order to convert the above difference schemes for a single linear\n\nconvection equation into schemes for the hyperbolic system of the nonlinear\n\nconservation       la"
+  },
+  {
+   "start": 16392,
+   "end": 16568,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 15949",
+   "id": null,
+   "text": "Since    a     now depends\n\non    q, so does     K,   and it suddenly appears impractical (although feasible) to\n\nuse any other value than          K   = O."
+  },
+  {
+   "start": 16568,
+   "end": 16790,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 16171",
+   "id": null,
+   "text": "This leads to the following observation:\n\n      In upwind-biased schemes the discretized initial-value distribution is\n\nindependent of the direction in which the various physical signals propagate;\n\ns"
+  },
+  {
+   "start": 16790,
+   "end": 16940,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 16321",
+   "id": null,
+   "text": "Restricting ourselves to Fromm's scheme, we follow the recipe from [24]\n\nfor advancing in time (the approach by Van Leer (1979) is different)."
+  },
+  {
+   "start": 16940,
+   "end": 17186,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 16567",
+   "id": null,
+   "text": "We\n\nfirst update the distribution in each volume over a half step in time,\n\f                                                     7\n\n\n\nwithout regard to the neighboring volumes, with a central-differen"
+  },
+  {
+   "start": 17186,
+   "end": 17478,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 16859",
+   "id": null,
+   "text": "For the characteristic quantities (other state quantities may be used) this\n\nboils down to\n\n\n\n                                                                             (7.1)\n\n\n\n                    "
+  },
+  {
+   "start": 17478,
+   "end": 17579,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 16960",
+   "id": null,
+   "text": "Subseqm~ntly,       time-centered values are obtained on the upwind side of\n\neach interface."
+  },
+  {
+   "start": 17579,
+   "end": 17958,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 17339",
+   "id": null,
+   "text": "For IeF, described by the system of conservation laws\n\n\n\n       wt + [few)] x = 0,                                                    ( 8)\n\n\n\nthis means we must compute the complete states wL and wR o"
+  },
+  {
+   "start": 17958,
+   "end": 18774,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 18155",
+   "id": null,
+   "text": "In formula:\n\n\n         n+t                                                                 (9.1)\n       q(iH ):~\n\n\n\n                       w( q (ift )+)                                         (9.2)\n\n"
+  },
+  {
+   "start": 18774,
+   "end": 18916,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 18297",
+   "id": null,
+   "text": "The first exchange, finite-differencing of qi at t n , is purely numerical\n\n- initial-value interpolation - and involves no physics."
+  },
+  {
+   "start": 18916,
+   "end": 19129,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 18510",
+   "id": null,
+   "text": "We may at this stage\n\nuse     any       complete   set    of   state   quantities;     the     choice     of    characteristic\n\nquantities is imperative only near boundaries and advisable near discont"
+  },
+  {
+   "start": 19129,
+   "end": 19295,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 18676",
+   "id": null,
+   "text": "The second exchange, solving the Riemann problem defined by w(i+!-) - and\n\nw(i+!-)+'         is   purely     physical:   interaction      through     waves."
+  },
+  {
+   "start": 19295,
+   "end": 19468,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 18849",
+   "id": null,
+   "text": "Simplifying   the\n\nsolution of the Riemann problem, while desirable for numerical reasons, is a\n\nmatter of simplifying the physics of the wave interactions.\n\n\n\n\n1.5."
+  },
+  {
+   "start": 19468,
+   "end": 19695,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 19076",
+   "id": null,
+   "text": "Approximate Riemann solvers\n\n\n\n\n        I       shall discuss two distinct approximate solvers of Riemann's problem:\n\nthe one by Roe (1980), based on linear waves, and the one by Van Leer (1982),\n\nbas"
+  },
+  {
+   "start": 19695,
+   "end": 20334,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 19715",
+   "id": null,
+   "text": "Roe solves the Riemann problem defined by the initial values\n\n\n                                x <0\n            w                                                                                  (11)\n"
+  },
+  {
+   "start": 20334,
+   "end": 20483,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 19864",
+   "id": null,
+   "text": "Mathematically it is clear that\n\n\n\n                                                                  (14)\n\n\n\nwhich is fine for weak waves."
+  },
+  {
+   "start": 20483,
+   "end": 20637,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 20018",
+   "id": null,
+   "text": "Roe demands that the solution also be exact i f\n\ntherE! is only one wave with a nonzero amplitude;         this wave, however, maybe\n\narbitrarily strong."
+  },
+  {
+   "start": 20637,
+   "end": 20837,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 20218",
+   "id": null,
+   "text": "This can be achieved only by chosing A such that\n\n\n          \"\n         A(wL,wR)·(wR-w )                                        (15)\n                       L\n\n\n\nthe   discretli! analogue   of   (13)."
+  },
+  {
+   "start": 20837,
+   "end": 21221,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 20602",
+   "id": null,
+   "text": "If w   and w can be connected by a single\n                                            R        L\ndiscontinuity with speed U, the          jumps in wand f are connected by the jump\n\nequation\n\n\n\n       "
+  },
+  {
+   "start": 21221,
+   "end": 21904,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 21285",
+   "id": null,
+   "text": "Harten (1981) has shown for hyperbolic systems (8) admitting an entropy\n\ncondition, that the mean value\n\n\n\n                                                                 (17)\n\n\n\nnot only satisfies ("
+  },
+  {
+   "start": 21904,
+   "end": 22157,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 21538",
+   "id": null,
+   "text": "\"+\n      Once A has been found, it is split in its positive and negative parts A\n\nand           positive   and   negative    refer   to   the   eigenvalues   of   the   matrix."
+  },
+  {
+   "start": 22157,
+   "end": 22476,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 21857",
+   "id": null,
+   "text": "Correspondingly we may split ~f           = f(wR) - f(wL) in\n\n                                                                        (18.1)\n\n\n\n       (~f)                                             "
+  },
+  {
+   "start": 22476,
+   "end": 22518,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 21899",
+   "id": null,
+   "text": "This is called flux-difference splitting."
+  },
+  {
+   "start": 22518,
+   "end": 22793,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 22174",
+   "id": null,
+   "text": "It is easy to see that the flux ~(wL,wR)            needed in Eq. (9.3) equals\n\n\n\n                                                                        (19.1)\n\n\n\n                                    "
+  },
+  {
+   "start": 22793,
+   "end": 22917,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 22298",
+   "id": null,
+   "text": "A word of caution:        the jump condition (16) does not imply the entropy\n\ncondition: wL and wR may be exchanged."
+  },
+  {
+   "start": 22917,
+   "end": 23106,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 22487",
+   "id": null,
+   "text": "Likewise, if\n\n\n\n                                                                        (20)\n\n\n\nthe scheme incorporating A can not recognize inadmissible shocks and may not\n\ndestroy these."
+  },
+  {
+   "start": 23106,
+   "end": 23533,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 22914",
+   "id": null,
+   "text": "Some asymmetry must therefore be introduced in the dependence\n\nof A on wL and wR; see Harten and Lax (1981).\n\f                                                              11\n\n\n\n\n        An alternativ"
+  },
+  {
+   "start": 23533,
+   "end": 23903,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 23284",
+   "id": null,
+   "text": "In the review by Harten, Lax and Van Leer (1983) it is demonstrated that this\n\nkind     of     splitting            follows       from    interpreting         the    conservation        laws    (8)   "
+  },
+  {
+   "start": 23903,
+   "end": 24009,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 23390",
+   "id": null,
+   "text": "Van Leer (1982) shows how to achieve a splitting like (21) for the flux\n\nin the Euler equations."
+  },
+  {
+   "start": 24009,
+   "end": 24450,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 23831",
+   "id": null,
+   "text": "Care must be taken to ensure that                 f+(w)        and\n\nf-(w)     are continuously differentiable functions of                                  w, so that Eq. (8) can be\n\nconsistently     "
+  },
+  {
+   "start": 24450,
+   "end": 25143,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 24524",
+   "id": null,
+   "text": "In any    case,\n\nsecond-order           terms         with     split       fluxes    or    split        flux-differences           must    be\n\navoidE~d;       see Mulder and Van Leer (1983).\n\n\n\n1.6   "
+  },
+  {
+   "start": 25143,
+   "end": 25154,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 24535",
+   "id": null,
+   "text": "F(k-l) /6."
+  },
+  {
+   "start": 25154,
+   "end": 25202,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 24582",
+   "id": null,
+   "text": "W',\n           l.\n                  .."
+  },
+  {
+   "start": 25202,
+   "end": 25680,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 25061",
+   "id": null,
+   "text": "Wi\n                                k!\n                                        6.t    i              x, k=l, •• ,m,\n\f                                                                       12\n\n\n\n       "
+  },
+  {
+   "start": 25680,
+   "end": 25852,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 25233",
+   "id": null,
+   "text": "The same steady\n\nstate would be                     found    with the     two-step           scheme from Sec.              1.4,    in the limit\n\nof t::.t    +       O."
+  },
+  {
+   "start": 25852,
+   "end": 26170,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 25551",
+   "id": null,
+   "text": "Unfortunately,                  the   stability         condition      associated          with        upwind-biased\n\nspatial-differencing                       operators        is    rather      rest"
+  },
+  {
+   "start": 26170,
+   "end": 26250,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 25631",
+   "id": null,
+   "text": "This is illustrated\n\nin Figure 1 (taken from work done in collaboration with E."
+  },
+  {
+   "start": 26250,
+   "end": 26480,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 25861",
+   "id": null,
+   "text": "Turkel                                                        (1982)),\n\nfor the combination of Fromm's space-differencing and fourth-order four-step\n\nRinge-Kutta               time-stepping           "
+  },
+  {
+   "start": 26480,
+   "end": 27266,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 26647",
+   "id": null,
+   "text": "The         stability      conditon\n\nafter four steps is a meagre\n\n\n\n                                                                                                                         (23.1)\n\n\n\n"
+  },
+  {
+   "start": 27266,
+   "end": 27406,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 26787",
+   "id": null,
+   "text": "We        conclude      that    upwind       differencing           is     not\n\nefficient in combination with Runge-Kutta time-stepping."
+  },
+  {
+   "start": 27406,
+   "end": 27627,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 27008",
+   "id": null,
+   "text": "Another            possibility         is   to        use   implicit       time     stepping,          such     as      the\n\n\"backward                Euler\"       or     \"implicit       Euler\"        "
+  },
+  {
+   "start": 27627,
+   "end": 27748,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 27129",
+   "id": null,
+   "text": "In     practice           the     implicit\n\ndifference scheme must be linearized in time to make inversion possible."
+  },
+  {
+   "start": 27748,
+   "end": 27936,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 27317",
+   "id": null,
+   "text": "The\n\f                                                           13\n\n\n\nlinear:ization is only feasible i f the numerical flux-function F is differen-\n\ntiable with n~spect to its arguments."
+  },
+  {
+   "start": 27936,
+   "end": 28035,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 27416",
+   "id": null,
+   "text": "This requirement favors the use of flux-\n\nvector splitting; see Mulder and Van Leer (1983).\n\n\n\n\n2."
+  },
+  {
+   "start": 28035,
+   "end": 28526,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 27907",
+   "id": null,
+   "text": "THE RECOGNITION AND REPRESENTATION OF DISCONTINUITIES\n\n\n\n\n                                            n\n         The formula (3) for <5.q                is based on the assumption that the gradient of"
+  },
+  {
+   "start": 28526,
+   "end": 28622,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 28003",
+   "id": null,
+   "text": "The sight of a shock\n\nwith numerical oscillations is well known and needs no illustration here."
+  },
+  {
+   "start": 28622,
+   "end": 28793,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 28174",
+   "id": null,
+   "text": "A local discontinuity in w or Wx may be recognized,                                    in a sequence of\n\nmesh-refinements, by a local extremum of fli-'-J. w/fl."
+  },
+  {
+   "start": 28793,
+   "end": 28944,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 28325",
+   "id": null,
+   "text": "J.w that goes to infinity or\n                                                                     --'2       1-2\n\nto   a    finite   value    .f    1."
+  },
+  {
+   "start": 28944,
+   "end": 29067,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 28448",
+   "id": null,
+   "text": "The    only     place         in a     smooth   solution where       this\n\nbehaviour is also seen is at an extremum."
+  },
+  {
+   "start": 29067,
+   "end": 29276,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 28657",
+   "id": null,
+   "text": "It: has been demonstrated by Van Leer                       (1972, 1974, 1977) that meaningful\n\nvalues of <5 are obtained under the extra constraint                                  of monotonicity."
+  },
+  {
+   "start": 29276,
+   "end": 29528,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 28909",
+   "id": null,
+   "text": "For a\n\nlinear convection equation it says that the updated discrete distribution must\n\nbe monotone if the discrete initial--value distribution is monotone;                                         this"
+  },
+  {
+   "start": 29528,
+   "end": 29934,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 29315",
+   "id": null,
+   "text": "Satisfying this condition turns out to\n\nsimply be a matter of monotonicly                          interpolating the initial values inside\n\nvolumes.\n                                                 n "
+  },
+  {
+   "start": 29934,
+   "end": 30634,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 30015",
+   "id": null,
+   "text": "It is easily seen that,                for\n                           1-'2                      1\"2        1\n\nthe pn~servation of monotonicity at tn+l, we must limit                                   "
+  },
+  {
+   "start": 30634,
+   "end": 30958,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 30339",
+   "id": null,
+   "text": "Taking the minimum of condition (34) over all values of 0, we arrive at\n\n\n\n                                                                                                     (35)\n\n\n\nWith 0 within th"
+  },
+  {
+   "start": 30958,
+   "end": 31334,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 30714",
+   "id": null,
+   "text": "For     the    three      schemes          of   Sec.    1.3,   (35)    means   that   no   limiting is\n\nnecessary if\n\n\n\n         (LW)           o \" I'. +It:. - \"2,                                     "
+  },
+  {
+   "start": 31334,
+   "end": 31722,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 31102",
+   "id": null,
+   "text": "I'. +II'. - ..   00                                                   (36.3)\n\n\n\nUsing\n\n\n\n                                                                                                   (37)\n\n\n\nas a"
+  },
+  {
+   "start": 31722,
+   "end": 32370,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 31751",
+   "id": null,
+   "text": "S       .. -                                                         (38.1)\n                                  1      3\n\n\n\n         (Fromm)                                                              "
+  },
+  {
+   "start": 32370,
+   "end": 32746,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 32127",
+   "id": null,
+   "text": "Hence,       the   initial-value dicretization for          Fromm's\n\nscheme remains independent of the physics.\n\n\n\n2.2. 1imiters, switches and artificial dissipation\n\n\n\nEq. (35) can be satisfied by li"
+  },
+  {
+   "start": 32746,
+   "end": 32914,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 32295",
+   "id": null,
+   "text": "Harmful effects of clippi.ng\n\ncaused by suddenly acting limiters like (39) are described by Van Leer (1977),\n\nWoodward and Colella (1982) and Van Albada et a!. (1982)."
+  },
+  {
+   "start": 32914,
+   "end": 33985,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 33366",
+   "id": null,
+   "text": "In the latter paper a smooth limiter for Fromm's scheme was described:\n\n                               2         2              2       2\n                          (f::,+ + £ )f::, + (f::, + £ )f::,+\n"
+  },
+  {
+   "start": 33985,
+   "end": 34457,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 33838",
+   "id": null,
+   "text": "The treshold can\n\nbe chosen sueh that the limiting effect disappears in the neighborhood of a\n                                                                                            2\nsmooth extre"
+  },
+  {
+   "start": 34457,
+   "end": 34610,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 33991",
+   "id": null,
+   "text": "Eq.    (40.1)           shows that 0lim is a weighted average of ~ + and ~                             ,biased\n\ntoward the smaller of the two."
+  },
+  {
+   "start": 34610,
+   "end": 34811,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 34192",
+   "id": null,
+   "text": "In the limit of ~                                     /~    =   00   or 0 , the average\n                                                                                   + -\nequals the smaller value."
+  },
+  {
+   "start": 34811,
+   "end": 35220,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 34601",
+   "id": null,
+   "text": "Eqs.                                 (40.2) and (40.3) show that 0lim equals its\n\nunlimited value (3) multiplied by a switch factor; this factor falls about\n\n\n                                         "
+  },
+  {
+   "start": 35220,
+   "end": 35289,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 34670",
+   "id": null,
+   "text": "The appearance of the logarithmic second\n\nderivative is no surprise."
+  },
+  {
+   "start": 35289,
+   "end": 36050,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 35431",
+   "id": null,
+   "text": "A tighter fit to (39) is\n\n\n\n\n                             (2~ 2 + e2)~ + (2~ 2 + e2)~\n                                +               -        +\n          °  ,\n           1 1m\n                        "
+  },
+  {
+   "start": 36050,
+   "end": 36306,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 35687",
+   "id": null,
+   "text": "The numerical experiments of Mulder and Van Leer (1983) suggest that\n\n(40) gives a cleaner representation of the solution near a steady shock than\n\n(41) •\n\n         The effect of the switch factor in "
+  },
+  {
+   "start": 36306,
+   "end": 36515,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 35896",
+   "id": null,
+   "text": "According to (40.2) the switch turns off the nominal gradient\n\nin a zone; since it is the gradient that leads to second-order accuracy, the\n\nswitch can be said to turn off the second-order term of the"
+  },
+  {
+   "start": 36515,
+   "end": 36849,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 36230",
+   "id": null,
+   "text": "Symbolicly\n\n(ignoring the conservation form):\n\f                                                    17\n\n\n\n\n                                                                                              "
+  },
+  {
+   "start": 36849,
+   "end": 36985,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 36366",
+   "id": null,
+   "text": "Since L 1-L 2        is    predominantly     a   dissipative         term,    52    must be an\n\nartificial-dissipation coefficient."
+  },
+  {
+   "start": 36985,
+   "end": 37202,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 36583",
+   "id": null,
+   "text": "Writing (42.1) as\n\n\n\n       (L2) lim                                                                                   (42.2)\n\n\n\nreveals that (L 2 )lim symbolizes a so-called hybrid scheme, see Harten"
+  },
+  {
+   "start": 37202,
+   "end": 37540,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 36921",
+   "id": null,
+   "text": "Writing (42.1) as\n\n\n\n                                                                                                   (42.3)\n\n\n\nreminds us of         the Flux-Corrected Transport (FCT)              "
+  },
+  {
+   "start": 37540,
+   "end": 37959,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 37340",
+   "id": null,
+   "text": "These, however, are the methods mentioned earlier that show the\n\ndisastrous clipping effect.\n\n\n\n2.3 Nonlinear case\n\n\n\n       The    analysis       in    2.1   shows   that    for   a    linear convect"
+  },
+  {
+   "start": 37959,
+   "end": 38139,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 37520",
+   "id": null,
+   "text": "This        recipe     works\n\nsurprisingly well for nonlinear convection and seldom needs adjustments; see,\n\nhowever, Woodward and Colella (1982), Colella and Woodward (1982)."
+  },
+  {
+   "start": 38139,
+   "end": 38372,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 37753",
+   "id": null,
+   "text": "For s:l.ng1e\n\nnonlinear conservation laws it can be made exact; see Harten (1982).\n\f                                                    18\n\n\n\n        What do shock profiles, computed with monotonicity"
+  },
+  {
+   "start": 38372,
+   "end": 38728,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 38109",
+   "id": null,
+   "text": "To answer this question an example of shock propagation by three\n\nupwind-biased schemes based on monotone initial-value interpolation is given\n\nin Figure 2, taken from Woodward (1980).\n\n\n\n\n2.4 Related"
+  },
+  {
+   "start": 38728,
+   "end": 38838,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 38219",
+   "id": null,
+   "text": "Obviously the choice of the time-\n\nstepping algorithm will               influence     the numerical results."
+  },
+  {
+   "start": 38838,
+   "end": 39072,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 38453",
+   "id": null,
+   "text": "The sharpness of\n\nsteady shocks, for instance, depends on the Riemann solver used, although the\n\ndifferences        among    second-order        schemes   are much less important        than among\n\nfi"
+  },
+  {
+   "start": 39072,
+   "end": 39191,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 38572",
+   "id": null,
+   "text": "Van Leer (1981) •. (This subject will be reviewed\n\nin a forthcoming paper by Enquist, Osher, Roe, and Van Leer (1983»."
+  },
+  {
+   "start": 39191,
+   "end": 39421,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 38802",
+   "id": null,
+   "text": "Discontinuities          that    have    spread    too    much,   in   particular    contact\n\ndiscontinuities,           may   be     steepened   by    applying Harten's     (1977)   artificial\n\ncompr"
+  },
+  {
+   "start": 39421,
+   "end": 39531,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 38912",
+   "id": null,
+   "text": "It is possible to use a smoothness monitor for other purposes than to\n\nlimit    gradient     values."
+  },
+  {
+   "start": 39531,
+   "end": 39746,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 39127",
+   "id": null,
+   "text": "Some applications are:        to indicate ,where      the grid\n\nshould be refined or moved, and where shock-fitting or shock-recovery should\n\nbe carried out; for the latter subject see Morton (1982).\n"
+  },
+  {
+   "start": 39746,
+   "end": 40104,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 39485",
+   "id": null,
+   "text": "MULTI-DIMENSIONAL METHODS\n\n\n\n3.1 Multi-dimensional convection\n\n\n\n        In order to illustrate how the one-dimensional schemes of Section 2 can\n\f                                                19\n\n\n\n"
+  },
+  {
+   "start": 40104,
+   "end": 40297,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 39678",
+   "id": null,
+   "text": "Godunov's   one-dimensional         scheme     is   what        we   get   if,        in    the    schemes\n\nstudied    pr,evious1y, oq is         always   set    equal       to   zero."
+  },
+  {
+   "start": 40297,
+   "end": 40453,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 39834",
+   "id": null,
+   "text": "In    other       words,       the\n\ninitial values in each volume are chosen to be uniform, which accounts for the\n\nloss of the second-order accuracy."
+  },
+  {
+   "start": 40453,
+   "end": 40563,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 39944",
+   "id": null,
+   "text": "The Lax-Friedrichs scheme also uses uniform\n\ninitial values in each volume but the grid is staggered in time."
+  },
+  {
+   "start": 40563,
+   "end": 40595,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 39976",
+   "id": null,
+   "text": "I shall start\n\nwith the latter."
+  },
+  {
+   "start": 40595,
+   "end": 41029,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 40410",
+   "id": null,
+   "text": "The convection equation to be approximated is\n\n\n\n                              0,      a > 0, b > O.                                    (43)\n\n\n\nFor convenlence the points (xi' Yj)' (xi-I' Yj)' (xi' Yj"
+  },
+  {
+   "start": 41029,
+   "end": 41057,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 40438",
+   "id": null,
+   "text": "This is shown in Figure 3a."
+  },
+  {
+   "start": 41057,
+   "end": 41924,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 41305",
+   "id": null,
+   "text": "Af ter moving    the        piecewise-uniform distribution with                   a    velocity       (a, b)\n\nover a time interval La we find~ by weighting q according to area (see Figure\n\n3b):\n\n\n\n\n  "
+  },
+  {
+   "start": 41924,
+   "end": 42062,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 41443",
+   "id": null,
+   "text": "Here q E is the time-average of the space average of q on the East side (Ae)\n\nof volume M;      the other averages are defined similarly."
+  },
+  {
+   "start": 42062,
+   "end": 42206,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 41587",
+   "id": null,
+   "text": "This formula differ$\n\nfrom the version given orignally by Lax (1954), where the fluxes through the\n\nsides of volume M are not centered in time."
+  },
+  {
+   "start": 42206,
+   "end": 42395,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 41776",
+   "id": null,
+   "text": "This removes the cross-difference\n             n    n    n    n\nterm Ox ay(q A - qB - qe + qD) from           the     scheme       and     reduces         the   scheme's\n\nstability domain."
+  },
+  {
+   "start": 42395,
+   "end": 43061,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 42442",
+   "id": null,
+   "text": "Scheme      (44)   can   be     written as     the product      of    two   one-dimensional LF\n\nschemes:\n\n\n\n                     [t(l+T -1) _ a (l-T -l))[t(l+T -1)                            -1      n"
+  },
+  {
+   "start": 43061,
+   "end": 43174,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 42555",
+   "id": null,
+   "text": "Hence,    the method of fractional          time-steps or time-splitting is\n\nexact for the linear LF scheme."
+  },
+  {
+   "start": 43174,
+   "end": 43771,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 43152",
+   "id": null,
+   "text": "Godunov's scheme, illustrated in Figure 4, can be written as\n\n\n\n       n+1                       n                   n               n        n\n      q A        (1- a ) 0- a ) qA     + a (1- a ) q B +"
+  },
+  {
+   "start": 43771,
+   "end": 44876,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 44257",
+   "id": null,
+   "text": "Again the proper\n\ncross-difference term is included and exact factorization is possible:\n\n\n\n                    { (1-0 (I-T -I ) } { 1-0 (I-T -1 ) }qi.\n                                                "
+  },
+  {
+   "start": 44876,
+   "end": 44928,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 44309",
+   "id": null,
+   "text": "The    other   fluxes    are\n\nobtained similarly."
+  },
+  {
+   "start": 44928,
+   "end": 45525,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 44906",
+   "id": null,
+   "text": "An lllseful approximation of (48) results i f we first average w:\n\f                                                      22\n\n                         1         n+1 .A\n                     = ~t~y tItn\n"
+  },
+  {
+   "start": 45525,
+   "end": 45720,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 45101",
+   "id": null,
+   "text": "Note    that,    owing   to   conservation,    the\n\ncomputation of the average wE\n                                             n+t does not require knowledge of the detailed\n\nRiemann solution."
+  },
+  {
+   "start": 45720,
+   "end": 45830,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 45211",
+   "id": null,
+   "text": "Eq. (49) is, of course, the               one-dimensio~al     LF scheme for flow along the\n\nline CA."
+  },
+  {
+   "start": 45830,
+   "end": 45905,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 45286",
+   "id": null,
+   "text": "This inspires the following implementation of the LF scheme for Eq.\n\n(47)."
+  },
+  {
+   "start": 45905,
+   "end": 46830,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 46211",
+   "id": null,
+   "text": "\"\"Il.+t        LLF(~) wn..                                                       (51.1)\n         wi'J-\"21        Y 2    1J\n\n\n         ~\n        w.1-\"2l J'      LLF(~t) Wn..                            "
+  },
+  {
+   "start": 46830,
+   "end": 47327,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 46708",
+   "id": null,
+   "text": "To reduce the asymmetry\n\nbetwen      x      and        y, the sequence          LyLx      is alternated with             LyLx:\n\n\n\n\n                             L (At)L (At)L (At)L (At) •              "
+  },
+  {
+   "start": 47327,
+   "end": 47457,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 46838",
+   "id": null,
+   "text": "Th:ls    solution        is      only   known       for    a   single\n\nconservation law and was obtained by Wagner (1980)."
+  },
+  {
+   "start": 47457,
+   "end": 48107,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 47488",
+   "id": null,
+   "text": "In the same way as (51) is\n\nderived from (44b), we may derive from (46.2)                                     an approximation to Godunov's\n\nscheme based entirely on the solution of one-dimensional Ri"
+  },
+  {
+   "start": 48107,
+   "end": 49150,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 48531",
+   "id": null,
+   "text": "J\n                         n\n                        w..\n                         1J\n                                  At (in+ t\n                                  t.x  i+1 j\n                          "
+  },
+  {
+   "start": 49150,
+   "end": 49299,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 48680",
+   "id": null,
+   "text": "Thus,                                     the one-dimensional\n                            L R\nRiemann solver is used twice in ea.ch space dimension."
+  },
+  {
+   "start": 49299,
+   "end": 50676,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 50057",
+   "id": null,
+   "text": "ExpreBsing (53) in terms of L~D only leads to\n\f                                                      24\n\n\n                                  G\n        L~O(f1t) = I + (Lx (f1t) - I) LG(f1t)\n            "
+  },
+  {
+   "start": 50676,
+   "end": 51208,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 50589",
+   "id": null,
+   "text": "G                                (f1 t) ] ,\n                        + Ly (f1t)     (LG(f1 t)\n                                         x\n                                                   + I) - LG\n   "
+  },
+  {
+   "start": 51208,
+   "end": 51266,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 50647",
+   "id": null,
+   "text": "This, of course, is only true in the linear case.\n\n\n\n3.3."
+  },
+  {
+   "start": 51266,
+   "end": 51536,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 50917",
+   "id": null,
+   "text": "Second-order schemes\n\n\n\n        The    examples         of the previous section teach us that                      it    is possible to\n\nmimic    two-dimensional               wave-interactions       "
+  },
+  {
+   "start": 51536,
+   "end": 51624,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 51005",
+   "id": null,
+   "text": "These schemes contain terms\" (f1t)2, but only have first-\n\norder accuracy."
+  },
+  {
+   "start": 51624,
+   "end": 51734,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 51115",
+   "id": null,
+   "text": "It is possible to apply the ideas of Section 3.1 and 3.2 to\n\nthe second-order schemes of Section 2."
+  },
+  {
+   "start": 51734,
+   "end": 51804,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 51185",
+   "id": null,
+   "text": "This clearly involves more algebra and\n\nwill not be carried out here."
+  },
+  {
+   "start": 51804,
+   "end": 51922,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 51303",
+   "id": null,
+   "text": "One of the reasons is that none of these two-\n\ndimensional            schemes    has     yet      been    programmed."
+  },
+  {
+   "start": 51922,
+   "end": 52152,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 51533",
+   "id": null,
+   "text": "It   remains      to   be   shown    in\n\f                                                25\n\n\n\npractice if the more subtle ways of splitting like (53) are indeed preferable\n\nto a pure product operator"
+  },
+  {
+   "start": 52152,
+   "end": 52262,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 51643",
+   "id": null,
+   "text": "Related subjects\n\n\n\n     In two dimensions the grid plays an even more important role than in one\n\ndimension."
+  },
+  {
+   "start": 52262,
+   "end": 52543,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 51924",
+   "id": null,
+   "text": "Various ingredients of the schemes discussed in these lectures may\n\nbe used more than once,           in order to make decisions about refining the grid,\n\nmoving the grid or        just rotating the f"
+  },
+  {
+   "start": 52543,
+   "end": 52922,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 52303",
+   "id": null,
+   "text": "For the latter decision we may use the direction of the gradient of the\n\nsolution -      readily available from 0 wand 0 w in a second-order scheme -              or\n                                  "
+  },
+  {
+   "start": 52922,
+   "end": 52981,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 52362",
+   "id": null,
+   "text": "The latter idea is due to Harten (private communication)."
+  },
+  {
+   "start": 52981,
+   "end": 53158,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 52539",
+   "id": null,
+   "text": "Moving a grid interface at the speed of the best-fitting single wave was\n\nreallzed in one dimension by Harten and Hyman (1982); two-dimensional results\n\nwill soon follow."
+  },
+  {
+   "start": 53158,
+   "end": 53313,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 52694",
+   "id": null,
+   "text": "It appears that the improvement due to the grid movement is\n\ndramatic   for    a    first-order   scheme and not nearly so much for second-order\n\nschemes."
+  },
+  {
+   "start": 53313,
+   "end": 53405,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 52786",
+   "id": null,
+   "text": "A two-dimensional extension of Roe\"s matrix theory is being considered\n\n(Baines,   M."
+  },
+  {
+   "start": 53405,
+   "end": 53568,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 52949",
+   "id": null,
+   "text": "J.,    (1982),    University   of   Reading,   United   Kingdom,   private\n\ncommunicati()n).\n\f                                         26\n\n\n\n\nREFERENCES\n\n   1."
+  },
+  {
+   "start": 53568,
+   "end": 53573,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 52954",
+   "id": null,
+   "text": "J."
+  },
+  {
+   "start": 53573,
+   "end": 53576,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 52957",
+   "id": null,
+   "text": "P."
+  },
+  {
+   "start": 53576,
+   "end": 53589,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 52970",
+   "id": null,
+   "text": "Boris and D."
+  },
+  {
+   "start": 53589,
+   "end": 53592,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 52973",
+   "id": null,
+   "text": "L."
+  },
+  {
+   "start": 53592,
+   "end": 53608,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 52989",
+   "id": null,
+   "text": "Book (1973), J."
+  },
+  {
+   "start": 53608,
+   "end": 53641,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 53022",
+   "id": null,
+   "text": "Computational Phys.~, 38.\n\n   2."
+  },
+  {
+   "start": 53641,
+   "end": 53646,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 53027",
+   "id": null,
+   "text": "P."
+  },
+  {
+   "start": 53646,
+   "end": 53661,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 53042",
+   "id": null,
+   "text": "Colella and P."
+  },
+  {
+   "start": 53661,
+   "end": 53664,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 53045",
+   "id": null,
+   "text": "R."
+  },
+  {
+   "start": 53664,
+   "end": 53781,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 53162",
+   "id": null,
+   "text": "Woodward (1982), \"The piecewise-parabolic method\n\n             for gasdynamical simulations\", Lawrence Berkeley Lab."
+  },
+  {
+   "start": 53781,
+   "end": 53821,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 53202",
+   "id": null,
+   "text": "Report LBL-\n\n             14661.\n\n   3."
+  },
+  {
+   "start": 53821,
+   "end": 53826,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 53207",
+   "id": null,
+   "text": "P."
+  },
+  {
+   "start": 53826,
+   "end": 53946,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 53327",
+   "id": null,
+   "text": "Colella (1982),    \"Approximate solution of the Riemann problem for\n\n             real gases\", Lawrence Berkeley Lab."
+  },
+  {
+   "start": 53946,
+   "end": 53971,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 53352",
+   "id": null,
+   "text": "Report LBL-14442.\n\n   4."
+  },
+  {
+   "start": 53971,
+   "end": 53976,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 53357",
+   "id": null,
+   "text": "J."
+  },
+  {
+   "start": 53976,
+   "end": 53979,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 53360",
+   "id": null,
+   "text": "E."
+  },
+  {
+   "start": 53979,
+   "end": 53996,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 53377",
+   "id": null,
+   "text": "Fromm (1967), J."
+  },
+  {
+   "start": 53996,
+   "end": 54031,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 53412",
+   "id": null,
+   "text": "Computational Phys. ~, 176.\n\n   5."
+  },
+  {
+   "start": 54031,
+   "end": 54036,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 53417",
+   "id": null,
+   "text": "S."
+  },
+  {
+   "start": 54036,
+   "end": 54039,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 53420",
+   "id": null,
+   "text": "K."
+  },
+  {
+   "start": 54039,
+   "end": 54063,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 53444",
+   "id": null,
+   "text": "Godunov (1959), Matern."
+  },
+  {
+   "start": 54063,
+   "end": 54084,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 53465",
+   "id": null,
+   "text": "Sb • .i, 271.\n\n   6."
+  },
+  {
+   "start": 54084,
+   "end": 54089,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 53470",
+   "id": null,
+   "text": "A."
+  },
+  {
+   "start": 54089,
+   "end": 54110,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 53491",
+   "id": null,
+   "text": "Harten (1977), Comm."
+  },
+  {
+   "start": 54110,
+   "end": 54121,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 53502",
+   "id": null,
+   "text": "Pure Appl."
+  },
+  {
+   "start": 54121,
+   "end": 54142,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 53523",
+   "id": null,
+   "text": "Math. ~, 611.\n\n   7."
+  },
+  {
+   "start": 54142,
+   "end": 54147,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 53528",
+   "id": null,
+   "text": "A."
+  },
+  {
+   "start": 54147,
+   "end": 54168,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 53549",
+   "id": null,
+   "text": "Harten (1978), Math."
+  },
+  {
+   "start": 54168,
+   "end": 54189,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 53570",
+   "id": null,
+   "text": "Compo ~, 363.\n\n   8."
+  },
+  {
+   "start": 54189,
+   "end": 54194,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 53575",
+   "id": null,
+   "text": "A."
+  },
+  {
+   "start": 54194,
+   "end": 54325,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 53706",
+   "id": null,
+   "text": "Harten (1981),      \"On the symmetric form of systems of conservation\n\n             laws with entropy\", ICASE Report 81-34.\n\n   9."
+  },
+  {
+   "start": 54325,
+   "end": 54330,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 53711",
+   "id": null,
+   "text": "A."
+  },
+  {
+   "start": 54330,
+   "end": 54476,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 53857",
+   "id": null,
+   "text": "Harten (1982), \"High-resolution schemes for hyperbolic systems of\n\n             conservation laws\", Report DOE/ER/03077-67, New York Univ.\n\n  10."
+  },
+  {
+   "start": 54476,
+   "end": 54481,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 53862",
+   "id": null,
+   "text": "A."
+  },
+  {
+   "start": 54481,
+   "end": 54495,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 53876",
+   "id": null,
+   "text": "Harten and J."
+  },
+  {
+   "start": 54495,
+   "end": 54498,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 53879",
+   "id": null,
+   "text": "M."
+  },
+  {
+   "start": 54498,
+   "end": 54630,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 54011",
+   "id": null,
+   "text": "Hyman (1981), \"Self-adjusting grid methods for one-\n\n             dimensional    hyperbolic conservation laws\",   Los Alamos   Sci."
+  },
+  {
+   "start": 54630,
+   "end": 54637,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 54018",
+   "id": null,
+   "text": "Lab."
+  },
+  {
+   "start": 54637,
+   "end": 54674,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 54055",
+   "id": null,
+   "text": "Report LA 9105.\n\n  11."
+  },
+  {
+   "start": 54674,
+   "end": 54679,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 54060",
+   "id": null,
+   "text": "A."
+  },
+  {
+   "start": 54679,
+   "end": 54693,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 54074",
+   "id": null,
+   "text": "Harten and P."
+  },
+  {
+   "start": 54693,
+   "end": 54696,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 54077",
+   "id": null,
+   "text": "D."
+  },
+  {
+   "start": 54696,
+   "end": 54716,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 54097",
+   "id": null,
+   "text": "Lax (1981), SIAM J."
+  },
+  {
+   "start": 54716,
+   "end": 54723,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 54104",
+   "id": null,
+   "text": "Numer."
+  },
+  {
+   "start": 54723,
+   "end": 54744,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 54125",
+   "id": null,
+   "text": "Anal. ~, 289.\n\n  12."
+  },
+  {
+   "start": 54744,
+   "end": 54749,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 54130",
+   "id": null,
+   "text": "A."
+  },
+  {
+   "start": 54749,
+   "end": 54760,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 54141",
+   "id": null,
+   "text": "Harten, P."
+  },
+  {
+   "start": 54760,
+   "end": 54763,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 54144",
+   "id": null,
+   "text": "D."
+  },
+  {
+   "start": 54763,
+   "end": 54938,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 54319",
+   "id": null,
+   "text": "Lax and B. van Leer (1983), \"On upstream differencing\n\n             and Godunov-type schemes for hyperbolic conservation laws\",         SIAM\n\n             Rev. 32, 35.\n\n  13."
+  },
+  {
+   "start": 54938,
+   "end": 54943,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 54324",
+   "id": null,
+   "text": "A."
+  },
+  {
+   "start": 54943,
+   "end": 54955,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 54336",
+   "id": null,
+   "text": "Jameson, W."
+  },
+  {
+   "start": 54955,
+   "end": 54970,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 54351",
+   "id": null,
+   "text": "Schmidt and E."
+  },
+  {
+   "start": 54970,
+   "end": 55012,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 54393",
+   "id": null,
+   "text": "Turkel (1981), AlAA Paper 81-1259.\n\n  14."
+  },
+  {
+   "start": 55012,
+   "end": 55017,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 54398",
+   "id": null,
+   "text": "P."
+  },
+  {
+   "start": 55017,
+   "end": 55020,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 54401",
+   "id": null,
+   "text": "D."
+  },
+  {
+   "start": 55020,
+   "end": 55038,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 54419",
+   "id": null,
+   "text": "Lax (1954), Comm."
+  },
+  {
+   "start": 55038,
+   "end": 55049,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 54430",
+   "id": null,
+   "text": "Pure Appl."
+  },
+  {
+   "start": 55049,
+   "end": 55070,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 54451",
+   "id": null,
+   "text": "Math. ~, 159.\n\n  15."
+  },
+  {
+   "start": 55070,
+   "end": 55075,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 54456",
+   "id": null,
+   "text": "P."
+  },
+  {
+   "start": 55075,
+   "end": 55078,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 54459",
+   "id": null,
+   "text": "D."
+  },
+  {
+   "start": 55078,
+   "end": 55089,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 54470",
+   "id": null,
+   "text": "Lax and B."
+  },
+  {
+   "start": 55089,
+   "end": 55112,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 54493",
+   "id": null,
+   "text": "Wendroff (1960), Comm."
+  },
+  {
+   "start": 55112,
+   "end": 55123,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 54504",
+   "id": null,
+   "text": "Pure Appl."
+  },
+  {
+   "start": 55123,
+   "end": 55144,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 54525",
+   "id": null,
+   "text": "Math. ~, 217.\n\n  16."
+  },
+  {
+   "start": 55144,
+   "end": 55149,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 54530",
+   "id": null,
+   "text": "R."
+  },
+  {
+   "start": 55149,
+   "end": 55152,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 54533",
+   "id": null,
+   "text": "W."
+  },
+  {
+   "start": 55152,
+   "end": 55197,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 54578",
+   "id": null,
+   "text": "MacGormack (1969), AlAA Paper 69-354.\n\n  17."
+  },
+  {
+   "start": 55197,
+   "end": 55202,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 54583",
+   "id": null,
+   "text": "G."
+  },
+  {
+   "start": 55202,
+   "end": 55304,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 54685",
+   "id": null,
+   "text": "Maretti (1979), Computers and Fluids~, 191.\n\f                                              27\n\n\n\n\n18."
+  },
+  {
+   "start": 55304,
+   "end": 55310,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 54691",
+   "id": null,
+   "text": "K."
+  },
+  {
+   "start": 55310,
+   "end": 55315,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 54696",
+   "id": null,
+   "text": "W."
+  },
+  {
+   "start": 55315,
+   "end": 55423,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 54804",
+   "id": null,
+   "text": "Morton (1982), \"Shock capturing, fitting and recovery\", Lecture\n\n            Notes in Physics 170, 77.\n\n19."
+  },
+  {
+   "start": 55423,
+   "end": 55429,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 54810",
+   "id": null,
+   "text": "W."
+  },
+  {
+   "start": 55429,
+   "end": 55432,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 54813",
+   "id": null,
+   "text": "A."
+  },
+  {
+   "start": 55432,
+   "end": 55541,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 54922",
+   "id": null,
+   "text": "Mulder and B. van Leer (1983), \"Implicit upwind methods for the\n\n            Euler   equations\",       Proc."
+  },
+  {
+   "start": 55541,
+   "end": 55676,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 55057",
+   "id": null,
+   "text": "AlAA   6th    Computational   Fluid    Dynamics\n\n            Conference, Danvers, Mass., July 1983, Paper 83-1930, pp. 303-310.\n\n20."
+  },
+  {
+   "start": 55676,
+   "end": 55682,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 55063",
+   "id": null,
+   "text": "S."
+  },
+  {
+   "start": 55682,
+   "end": 55685,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 55066",
+   "id": null,
+   "text": "J."
+  },
+  {
+   "start": 55685,
+   "end": 55719,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 55100",
+   "id": null,
+   "text": "Osher (1981), North-Holland Math."
+  },
+  {
+   "start": 55719,
+   "end": 55742,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 55123",
+   "id": null,
+   "text": "Studies!!2., 179.\n\n2l."
+  },
+  {
+   "start": 55742,
+   "end": 55748,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 55129",
+   "id": null,
+   "text": "P."
+  },
+  {
+   "start": 55748,
+   "end": 55751,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 55132",
+   "id": null,
+   "text": "L."
+  },
+  {
+   "start": 55751,
+   "end": 55803,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 55184",
+   "id": null,
+   "text": "Roe (1980), Lecture Notes in Physics 141, 354.\n\n22."
+  },
+  {
+   "start": 55803,
+   "end": 55809,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 55190",
+   "id": null,
+   "text": "P."
+  },
+  {
+   "start": 55809,
+   "end": 55812,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 55193",
+   "id": null,
+   "text": "L."
+  },
+  {
+   "start": 55812,
+   "end": 55827,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 55208",
+   "id": null,
+   "text": "Roe (1981), J."
+  },
+  {
+   "start": 55827,
+   "end": 55862,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 55243",
+   "id": null,
+   "text": "Computational Phys. 43_, 357.\n\n23."
+  },
+  {
+   "start": 55862,
+   "end": 55868,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 55249",
+   "id": null,
+   "text": "G."
+  },
+  {
+   "start": 55868,
+   "end": 55891,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 55272",
+   "id": null,
+   "text": "Strang (1968), SIAM J."
+  },
+  {
+   "start": 55891,
+   "end": 55898,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 55279",
+   "id": null,
+   "text": "Numer."
+  },
+  {
+   "start": 55898,
+   "end": 55919,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 55300",
+   "id": null,
+   "text": "Anal. .2., 506.\n\n24."
+  },
+  {
+   "start": 55919,
+   "end": 55925,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 55306",
+   "id": null,
+   "text": "G."
+  },
+  {
+   "start": 55925,
+   "end": 55959,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 55340",
+   "id": null,
+   "text": "D. van Albada, B. van Leer and W."
+  },
+  {
+   "start": 55959,
+   "end": 55962,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 55343",
+   "id": null,
+   "text": "W."
+  },
+  {
+   "start": 55962,
+   "end": 55991,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 55372",
+   "id": null,
+   "text": "Roberts, Jr. (1982), Astron."
+  },
+  {
+   "start": 55991,
+   "end": 56029,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 55410",
+   "id": null,
+   "text": "Astrophys. 108, 76.\n\n25."
+  },
+  {
+   "start": 56029,
+   "end": 56092,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 55473",
+   "id": null,
+   "text": "B. van Leer (1972), Lecture Notes in Physics .!!' 163.\n\n26."
+  },
+  {
+   "start": 56092,
+   "end": 56118,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 55499",
+   "id": null,
+   "text": "B. van Leer (1974), J."
+  },
+  {
+   "start": 56118,
+   "end": 56151,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 55532",
+   "id": null,
+   "text": "Computational Phys. ~, 36l.\n\n27."
+  },
+  {
+   "start": 56151,
+   "end": 56177,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 55558",
+   "id": null,
+   "text": "B. van Leer (1977), J."
+  },
+  {
+   "start": 56177,
+   "end": 56210,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 55591",
+   "id": null,
+   "text": "Computational Phys. ~, 276.\n\n28."
+  },
+  {
+   "start": 56210,
+   "end": 56236,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 55617",
+   "id": null,
+   "text": "B. van Leer (1979), J."
+  },
+  {
+   "start": 56236,
+   "end": 56271,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 55652",
+   "id": null,
+   "text": "Computational Phys. .E., 10l.\n\n29."
+  },
+  {
+   "start": 56271,
+   "end": 56340,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 55721",
+   "id": null,
+   "text": "B. van Leer (1980) , in \"Numerical Methods for Engineering\", Eds."
+  },
+  {
+   "start": 56340,
+   "end": 56343,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 55724",
+   "id": null,
+   "text": "E."
+  },
+  {
+   "start": 56343,
+   "end": 56367,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 55748",
+   "id": null,
+   "text": "Absi,   R."
+  },
+  {
+   "start": 56367,
+   "end": 56387,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 55768",
+   "id": null,
+   "text": "Glowinski,     P."
+  },
+  {
+   "start": 56387,
+   "end": 56402,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 55783",
+   "id": null,
+   "text": "Lascaux and H."
+  },
+  {
+   "start": 56402,
+   "end": 56683,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 56064",
+   "id": null,
+   "text": "Veysseyre, Vol. 1, p.        137,\n\n            Durand, Paris.\n\n30\"    B.   van Leer (1981),       \"On the relation between the upwind-differencing\n\n            schemes of Godunov, Enquist-Osher and Ro"
+  },
+  {
+   "start": 56683,
+   "end": 56688,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 56069",
+   "id": null,
+   "text": "Sci."
+  },
+  {
+   "start": 56688,
+   "end": 56694,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 56075",
+   "id": null,
+   "text": "Stat."
+  },
+  {
+   "start": 56694,
+   "end": 56706,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 56086",
+   "id": null,
+   "text": "Compo\n\n31.."
+  },
+  {
+   "start": 56706,
+   "end": 56772,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 56153",
+   "id": null,
+   "text": "B.   v~m   Leer (1982), Lecture Notes in Physics 170, 507.\n\n32."
+  },
+  {
+   "start": 56772,
+   "end": 56778,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 56159",
+   "id": null,
+   "text": "D."
+  },
+  {
+   "start": 56778,
+   "end": 56941,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 56322",
+   "id": null,
+   "text": "Wagner (1980),         \"The Riemann problem in two space dimensions for a\n\n            sllngle conservation law\", Report TSR 112363, University of Wisconsin.\n\n33."
+  },
+  {
+   "start": 56941,
+   "end": 56947,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 56328",
+   "id": null,
+   "text": "P."
+  },
+  {
+   "start": 56947,
+   "end": 56950,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 56331",
+   "id": null,
+   "text": "R."
+  },
+  {
+   "start": 56950,
+   "end": 57115,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 56496",
+   "id": null,
+   "text": "Woodward (1980),           \"Trade-offs in designing explicit hydrodynamic\n\n            sehemes      for   Vector   Computers\",    in    Parallel   Computing,    Ed."
+  },
+  {
+   "start": 57115,
+   "end": 57122,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 56503",
+   "id": null,
+   "text": "G."
+  },
+  {
+   "start": 57122,
+   "end": 57219,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 56600",
+   "id": null,
+   "text": "Rodrigue, Academic Press, New York.\n\f                                    28\n\n\n\n\n34."
+  },
+  {
+   "start": 57219,
+   "end": 57224,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 56605",
+   "id": null,
+   "text": "P."
+  },
+  {
+   "start": 57224,
+   "end": 57227,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 56608",
+   "id": null,
+   "text": "R."
+  },
+  {
+   "start": 57227,
+   "end": 57243,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 56624",
+   "id": null,
+   "text": "Woodward and P."
+  },
+  {
+   "start": 57243,
+   "end": 57371,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 56752",
+   "id": null,
+   "text": "Colella (1982), \"The numerical simulation of two-\n\n         dimensional fluid flow with strong shocks\", Lawrence Livermore Lab."
+  },
+  {
+   "start": 57371,
+   "end": 57807,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 57188",
+   "id": null,
+   "text": "Report UCRL 86952.\n\f                                                                29\n\n\n\n\n                                                                         (b)\n                                "
+  },
+  {
+   "start": 57807,
+   "end": 58050,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 57431",
+   "id": null,
+   "text": "Stability          domain of           four-step   Runge-Kutta      methods   in   the   complex\n\nplane.\n                   (1)          (2)          (3)          ef)\na) With ex               = ex    "
+  },
+  {
+   "start": 58050,
+   "end": 59729,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 59110",
+   "id": null,
+   "text": "The inner contour is the locus of the\n\nFourier       transform of                 the     second-order upwind spatial-differencing operator,\n\nforcr=1.3.\n               ( 1)\nb) With       (X           "
+  },
+  {
+   "start": 59729,
+   "end": 59932,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 59310",
+   "id": null,
+   "text": "Propagation of a one-dimensional      2.0\nshock, as represented by first-order (a),     1.5\nsecond-order (b) and third-order (c) up-\n                                              1.3                .."
+  },
+  {
+   "start": 59932,
+   "end": 59956,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 59337",
+   "id": null,
+   "text": "\" \" , \\~,\nwind methods."
+  },
+  {
+   "start": 59956,
+   "end": 60014,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 59395",
+   "id": null,
+   "text": "Note that the overall dis-\n\ntribution is always monotone."
+  },
+  {
+   "start": 60014,
+   "end": 60321,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 59702",
+   "id": null,
+   "text": "Reproduced\n                                               .5                ~\\\\~~        (c)\n                                                                               PPl'l\n                      "
+  },
+  {
+   "start": 60321,
+   "end": 60439,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 59820",
+   "id": null,
+   "text": "CS)\n                                                            ."
+  },
+  {
+   "start": 60439,
+   "end": 60613,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 59994",
+   "id": null,
+   "text": "IJ.)   CS)    Ln    cs)\n                                                                                  .       ."
+  },
+  {
+   "start": 60613,
+   "end": 61795,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 61176",
+   "id": null,
+   "text": "IJ.)\n\n\n\n                                                    ~ELOCITY\n                                                                              C'-I     C'-I\n\f                                      "
+  },
+  {
+   "start": 61795,
+   "end": 63008,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 62387",
+   "id": null,
+   "text": "I\n                1                                                                           I\n                                                                                         --1\n           "
+  },
+  {
+   "start": 63008,
+   "end": 63018,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 62399",
+   "id": null,
+   "text": "F:lg. 3."
+  },
+  {
+   "start": 63018,
+   "end": 63211,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 62592",
+   "id": null,
+   "text": "Two-dimensional convection by the Lax-Friedrichs scheme. (a) Staggered\n\ngrid of finite volumes.             (b) Contours of the convected distribution after one\n\ntime   step    (broken lines)."
+  },
+  {
+   "start": 63211,
+   "end": 63811,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 63192",
+   "id": null,
+   "text": "The updated average                    value     in zone M is an area-\n\nwc~ighted     average   of    the    values            in   A,   B,      C and      D;    the    areas       are   shaded\n\nd:lst"
+  },
+  {
+   "start": 63811,
+   "end": 64726,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 64107",
+   "id": null,
+   "text": "I\n                                                                      x    ..\n\n                                                                                (b)\n\n\n\n\n                               "
+  },
+  {
+   "start": 64726,
+   "end": 64884,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 64265",
+   "id": null,
+   "text": "I\n                                                                                x\n\n\nFig. 4."
+  },
+  {
+   "start": 64884,
+   "end": 64932,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 64313",
+   "id": null,
+   "text": "Two-dimensional convection by Godunov's scheme."
+  },
+  {
+   "start": 64932,
+   "end": 64989,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 64370",
+   "id": null,
+   "text": "Same as Fig. 3, except\n\nupdating is done in zone A.\n\f 1."
+  },
+  {
+   "start": 64989,
+   "end": 65044,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 64425",
+   "id": null,
+   "text": "RepeIrt No.                                         2."
+  },
+  {
+   "start": 65044,
+   "end": 65098,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 64479",
+   "id": null,
+   "text": "Government Accession No.                          3 ."
+  },
+  {
+   "start": 65098,
+   "end": 65122,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 64503",
+   "id": null,
+   "text": "Recipient's Catalog No."
+  },
+  {
+   "start": 65122,
+   "end": 65150,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 64531",
+   "id": null,
+   "text": "NA.,SA CR-172180\n 4."
+  },
+  {
+   "start": 65150,
+   "end": 65282,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 64663",
+   "id": null,
+   "text": "Title and Subtitle\n                                                    I                                                         5."
+  },
+  {
+   "start": 65282,
+   "end": 65529,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 64910",
+   "id": null,
+   "text": "Report Date\n                                                                                                                 July 1983\n      Co mputational Methods for Ideal Compressible Flow         "
+  },
+  {
+   "start": 65529,
+   "end": 65564,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 64945",
+   "id": null,
+   "text": "Performing Organization Code\n\n\n 7."
+  },
+  {
+   "start": 65564,
+   "end": 65673,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 65054",
+   "id": null,
+   "text": "Auth orIs)                                                                                                8."
+  },
+  {
+   "start": 65673,
+   "end": 65708,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 65089",
+   "id": null,
+   "text": "Performing Organization Report No."
+  },
+  {
+   "start": 65708,
+   "end": 65941,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 65322",
+   "id": null,
+   "text": "Br am van Leer                                                                                            83-38\n                                                                                        "
+  },
+  {
+   "start": 65941,
+   "end": 65959,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 65340",
+   "id": null,
+   "text": "Work Unit No.\n 9."
+  },
+  {
+   "start": 65959,
+   "end": 66168,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 65549",
+   "id": null,
+   "text": "PerfeIrming Organization Name and Address\n      In.stitute for Computer Applications in Science\n        and Engineering                                                                                 "
+  },
+  {
+   "start": 66168,
+   "end": 66190,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 65571",
+   "id": null,
+   "text": "Contract or Grant No."
+  },
+  {
+   "start": 66190,
+   "end": 66427,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 65808",
+   "id": null,
+   "text": "Ma.il Stop l32C, NASA Langley Research Center                                                              NASl-158l0\n      Ha.mpton, VA 23665                                                          "
+  },
+  {
+   "start": 66427,
+   "end": 66465,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 65846",
+   "id": null,
+   "text": "Type of Report and Period Covered\n12."
+  },
+  {
+   "start": 66465,
+   "end": 66742,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 66123",
+   "id": null,
+   "text": "Spon soring Agency Name and Address\n                                                                                                              Contractor report\n       Na.tional Aeronautics and Spa"
+  },
+  {
+   "start": 66742,
+   "end": 66802,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 66183",
+   "id": null,
+   "text": "Sponsoring Agency Code\n       Wa.shington, D.C.  20546\n\n15."
+  },
+  {
+   "start": 66802,
+   "end": 66891,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 66272",
+   "id": null,
+   "text": "Suppdementary Notes\n\n\n       Langley Technical Monitor:                        Robert H."
+  },
+  {
+   "start": 66891,
+   "end": 66924,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 66305",
+   "id": null,
+   "text": "Tolson\n       Fj.nal Report\n\n16."
+  },
+  {
+   "start": 66924,
+   "end": 67118,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 66499",
+   "id": null,
+   "text": "Abst ract\n\n\n\n       LE!ctures presented at the Von Karman Institute for Fluid Dynamics, Rhode-St--Genese,\n       B~ !lgium, in Lecture Series 1983-04 on Computational Fluid Dynamics.\n\n       1."
+  },
+  {
+   "start": 67118,
+   "end": 67233,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 66614",
+   "id": null,
+   "text": "Conservative dissipative difference schemes                                                   p.l\n\n       2."
+  },
+  {
+   "start": 67233,
+   "end": 67309,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 66690",
+   "id": null,
+   "text": "The recognition and representation of discontinuities p.13\n\n       3."
+  },
+  {
+   "start": 67309,
+   "end": 67422,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 66803",
+   "id": null,
+   "text": "Mul ti·-dimensional methods                                                                   p.18\n\n\n\n\n17."
+  },
+  {
+   "start": 67422,
+   "end": 67502,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 66883",
+   "id": null,
+   "text": "Key Words (Suggested by Author(s))                                          18."
+  },
+  {
+   "start": 67502,
+   "end": 67777,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 67158",
+   "id": null,
+   "text": "Distribution Statement\n\n        co nservative difference schemes                                                64 Numerical Analysis\n        Euler equations\n        sh ock waves                      "
+  },
+  {
+   "start": 67777,
+   "end": 67826,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 67207",
+   "id": null,
+   "text": "SecUI' ity Classif. (of this report)         20."
+  },
+  {
+   "start": 67826,
+   "end": 67870,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 67251",
+   "id": null,
+   "text": "Security Classif. (of this page)        21."
+  },
+  {
+   "start": 67870,
+   "end": 67896,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 67277",
+   "id": null,
+   "text": "No. of Pages          22."
+  },
+  {
+   "start": 67896,
+   "end": 68326,
+   "type": "sentence",
+   "basis": "trailing text",
+   "id": null,
+   "text": "Price\n        Un classified                             Unclassified                                     34                     A03\n\n                                    For sale by the National Techni"
+  }
+ ]
+}

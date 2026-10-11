@@ -1,0 +1,5155 @@
+{
+ "schema": "SourceStructure@1",
+ "source": "05-academic-papers/ntrs-white-papers/20260005760_mission-design-considerations-for-a-low-thrust-spacecraft.txt",
+ "bytes": 55853,
+ "bodyOffset": 635,
+ "splitBasis": "643 line-delimited rows",
+ "unsplit": false,
+ "unitCount": 643,
+ "units": [
+  {
+   "start": 636,
+   "end": 731,
+   "type": "verse",
+   "basis": "verse row at byte 1",
+   "id": null,
+   "text": "AAS 26-657"
+  },
+  {
+   "start": 735,
+   "end": 786,
+   "type": "verse",
+   "basis": "verse row at byte 100",
+   "id": null,
+   "text": "MISSION DESIGN CONSIDERATIONS FOR A LOW-THRUST"
+  },
+  {
+   "start": 787,
+   "end": 820,
+   "type": "verse",
+   "basis": "verse row at byte 152",
+   "id": null,
+   "text": "SPACECRAFT"
+  },
+  {
+   "start": 822,
+   "end": 881,
+   "type": "verse",
+   "basis": "verse row at byte 187",
+   "id": null,
+   "text": "Scott N. Karn*"
+  },
+  {
+   "start": 883,
+   "end": 975,
+   "type": "verse",
+   "basis": "verse row at byte 248",
+   "id": null,
+   "text": "Developing an executable low-thrust trajectory for use in a spaceflight mission"
+  },
+  {
+   "start": 976,
+   "end": 1070,
+   "type": "verse",
+   "basis": "verse row at byte 341",
+   "id": null,
+   "text": "requires the design and optimization of a deterministic trajectory as well as the"
+  },
+  {
+   "start": 1071,
+   "end": 1169,
+   "type": "verse",
+   "basis": "verse row at byte 436",
+   "id": null,
+   "text": "validation that the selected architecture is robust to some set of uncertainties, ex-"
+  },
+  {
+   "start": 1170,
+   "end": 1268,
+   "type": "verse",
+   "basis": "verse row at byte 535",
+   "id": null,
+   "text": "ecution errors, and potential contingencies. Uncertainty in the ability of the space-"
+  },
+  {
+   "start": 1269,
+   "end": 1362,
+   "type": "verse",
+   "basis": "verse row at byte 634",
+   "id": null,
+   "text": "craft and its launch vehicle to execute a trajectory as well as potential devia-"
+  },
+  {
+   "start": 1363,
+   "end": 1457,
+   "type": "verse",
+   "basis": "verse row at byte 728",
+   "id": null,
+   "text": "tions such as in-flight anomalies combine with design-to constraints and require-"
+  },
+  {
+   "start": 1458,
+   "end": 1545,
+   "type": "verse",
+   "basis": "verse row at byte 823",
+   "id": null,
+   "text": "ments to complicate the optimization problem. The approach by which robust"
+  },
+  {
+   "start": 1546,
+   "end": 1638,
+   "type": "verse",
+   "basis": "verse row at byte 911",
+   "id": null,
+   "text": "mission design was accomplished for the initial capability of NASA’s Gateway is"
+  },
+  {
+   "start": 1639,
+   "end": 1692,
+   "type": "verse",
+   "basis": "verse row at byte 1004",
+   "id": null,
+   "text": "presented as well as associated results."
+  },
+  {
+   "start": 1694,
+   "end": 1704,
+   "type": "verse",
+   "basis": "verse row at byte 1059",
+   "id": null,
+   "text": "BACKGROUND"
+  },
+  {
+   "start": 1706,
+   "end": 1802,
+   "type": "verse",
+   "basis": "verse row at byte 1071",
+   "id": null,
+   "text": "Over the past 30 years, solar electric propulsion (SEP) has grown from an experimental tech-"
+  },
+  {
+   "start": 1803,
+   "end": 1902,
+   "type": "verse",
+   "basis": "verse row at byte 1168",
+   "id": null,
+   "text": "nology serving in handful of relatively niche applications to a workhorse widely adopted across the"
+  },
+  {
+   "start": 1903,
+   "end": 1998,
+   "type": "verse",
+   "basis": "verse row at byte 1268",
+   "id": null,
+   "text": "industry1. Since the early 2000s SEP thruster and spacecraft power generation technologies have"
+  },
+  {
+   "start": 1999,
+   "end": 2095,
+   "type": "verse",
+   "basis": "verse row at byte 1364",
+   "id": null,
+   "text": "matured substantially, allowing SEP to move out of the realm of bespoke, cutting-edge spacecraft"
+  },
+  {
+   "start": 2096,
+   "end": 2192,
+   "type": "verse",
+   "basis": "verse row at byte 1461",
+   "id": null,
+   "text": "such as Deep Space 1 and Dawn and into use on proliferated Low Earth Orbit (LEO) constellations,"
+  },
+  {
+   "start": 2193,
+   "end": 2290,
+   "type": "verse",
+   "basis": "verse row at byte 1558",
+   "id": null,
+   "text": "geostationary (GEO) communications satellites, and exploration platforms. In particular, the mat-"
+  },
+  {
+   "start": 2291,
+   "end": 2392,
+   "type": "verse",
+   "basis": "verse row at byte 1656",
+   "id": null,
+   "text": "uration of hall effect thrusters (HETs) in the last three decades2 has led to their first use in deep"
+  },
+  {
+   "start": 2393,
+   "end": 2489,
+   "type": "verse",
+   "basis": "verse row at byte 1758",
+   "id": null,
+   "text": "space3 as well as the development of high-power systems for use in human exploration4. This rise"
+  },
+  {
+   "start": 2490,
+   "end": 2590,
+   "type": "verse",
+   "basis": "verse row at byte 1855",
+   "id": null,
+   "text": "in the use of SEP-equipped spacecraft has also resulted in increased interest in the formulation and"
+  },
+  {
+   "start": 2591,
+   "end": 2688,
+   "type": "verse",
+   "basis": "verse row at byte 1956",
+   "id": null,
+   "text": "development of new missions as well as significant advances in the field of low-thrust trajectory"
+  },
+  {
+   "start": 2689,
+   "end": 2713,
+   "type": "verse",
+   "basis": "verse row at byte 2054",
+   "id": null,
+   "text": "design and optimization."
+  },
+  {
+   "start": 2714,
+   "end": 2811,
+   "type": "verse",
+   "basis": "verse row at byte 2079",
+   "id": null,
+   "text": "Despite increasing interest and research, low-thrust trajectory design remains an underdevel-"
+  },
+  {
+   "start": 2812,
+   "end": 2909,
+   "type": "verse",
+   "basis": "verse row at byte 2177",
+   "id": null,
+   "text": "oped field when compared to its high-thrust counterpart. This is particularly true in the area of"
+  },
+  {
+   "start": 2910,
+   "end": 3000,
+   "type": "verse",
+   "basis": "verse row at byte 2275",
+   "id": null,
+   "text": "robust mission design, where a wide gap exists between methods which can be used to design"
+  },
+  {
+   "start": 3001,
+   "end": 3100,
+   "type": "verse",
+   "basis": "verse row at byte 2366",
+   "id": null,
+   "text": "trajectories that are mathematically valid and those that are executable by a physical, operational"
+  },
+  {
+   "start": 3101,
+   "end": 3201,
+   "type": "verse",
+   "basis": "verse row at byte 2466",
+   "id": null,
+   "text": "spacecraft. While the design and optimization of deterministic low-thrust trajectories is often com-"
+  },
+  {
+   "start": 3202,
+   "end": 3304,
+   "type": "verse",
+   "basis": "verse row at byte 2567",
+   "id": null,
+   "text": "putationally difficult and resource intensive, robust trajectory design increases this difficulty sig-"
+  },
+  {
+   "start": 3305,
+   "end": 3400,
+   "type": "verse",
+   "basis": "verse row at byte 2670",
+   "id": null,
+   "text": "nificantly as mission performance must be assessed and validated against expected execution er-"
+  },
+  {
+   "start": 3401,
+   "end": 3502,
+   "type": "verse",
+   "basis": "verse row at byte 2766",
+   "id": null,
+   "text": "rors, performance uncertainties, and risks. Beyond-Earth missions are particularly sensitive to these"
+  },
+  {
+   "start": 3503,
+   "end": 3602,
+   "type": "verse",
+   "basis": "verse row at byte 2868",
+   "id": null,
+   "text": "sources of error as they transit often-chaotic multibody dynamical environments, but the rarity and"
+  },
+  {
+   "start": 3606,
+   "end": 3607,
+   "type": "verse",
+   "basis": "verse row at byte 2971",
+   "id": null,
+   "text": "*"
+  },
+  {
+   "start": 3608,
+   "end": 3718,
+   "type": "verse",
+   "basis": "verse row at byte 2973",
+   "id": null,
+   "text": "Mission Design Engineer, Mission Architecture and Analysis Branch, NASA Glenn Research Center, 21000 Brookpark"
+  },
+  {
+   "start": 3719,
+   "end": 3745,
+   "type": "verse",
+   "basis": "verse row at byte 3084",
+   "id": null,
+   "text": "Road, Cleveland, OH, 44135"
+  },
+  {
+   "start": 3750,
+   "end": 3807,
+   "type": "verse",
+   "basis": "verse row at byte 3115",
+   "id": null,
+   "text": "1"
+  },
+  {
+   "start": 3808,
+   "end": 3909,
+   "type": "verse",
+   "basis": "verse row at byte 3173",
+   "id": null,
+   "text": "bespoke nature of these missions means that the tools used to develop robust, flight-ready trajecto-"
+  },
+  {
+   "start": 3910,
+   "end": 3997,
+   "type": "verse",
+   "basis": "verse row at byte 3275",
+   "id": null,
+   "text": "ries are often built from scratch or involve significant overhauls of heritage methods."
+  },
+  {
+   "start": 4002,
+   "end": 4072,
+   "type": "verse",
+   "basis": "verse row at byte 3367",
+   "id": null,
+   "text": "Figure 1: Lunar Transit mission diagram"
+  },
+  {
+   "start": 4073,
+   "end": 4166,
+   "type": "verse",
+   "basis": "verse row at byte 3438",
+   "id": null,
+   "text": "The initial capability of NASA’s Gateway lunar space station was envisioned to be one such"
+  },
+  {
+   "start": 4167,
+   "end": 4255,
+   "type": "verse",
+   "basis": "verse row at byte 3532",
+   "id": null,
+   "text": "mission, wherein a 50kW SEP-equipped Power and Propulsion Element (PPE) would transfer a"
+  },
+  {
+   "start": 4256,
+   "end": 4349,
+   "type": "verse",
+   "basis": "verse row at byte 3621",
+   "id": null,
+   "text": "large, human-exploration spacecraft from a Geostationary Transfer Orbit (GTO) to a 9:2 Earth-"
+  },
+  {
+   "start": 4350,
+   "end": 4444,
+   "type": "verse",
+   "basis": "verse row at byte 3715",
+   "id": null,
+   "text": "Moon Near Rectilinear Halo Orbit (NRHO)4. The maturation of this low-thrust Lunar Transit tra-"
+  },
+  {
+   "start": 4445,
+   "end": 4543,
+   "type": "verse",
+   "basis": "verse row at byte 3810",
+   "id": null,
+   "text": "jectory (Figure 1) from early, feasibility-focused, design reference missions (DRMs) towards full-"
+  },
+  {
+   "start": 4544,
+   "end": 4644,
+   "type": "verse",
+   "basis": "verse row at byte 3909",
+   "id": null,
+   "text": "fidelity, executable flight trajectories necessitated the development of novel methods and tools for"
+  },
+  {
+   "start": 4645,
+   "end": 4741,
+   "type": "verse",
+   "basis": "verse row at byte 4010",
+   "id": null,
+   "text": "robust mission design. Many of these methods leveraged heritage approaches to low-thrust mission"
+  },
+  {
+   "start": 4742,
+   "end": 4835,
+   "type": "verse",
+   "basis": "verse row at byte 4107",
+   "id": null,
+   "text": "design authored by the Deep Space 1 and Dawn mission teams5. The assessment of navigation and"
+  },
+  {
+   "start": 4836,
+   "end": 4933,
+   "type": "verse",
+   "basis": "verse row at byte 4201",
+   "id": null,
+   "text": "cycle-to-cycle statistical uncertainties evolved from these methods and has been described previ-"
+  },
+  {
+   "start": 4934,
+   "end": 5032,
+   "type": "verse",
+   "basis": "verse row at byte 4299",
+   "id": null,
+   "text": "ously6. This publication will focus on how uncertainty in the performance of the integrated space-"
+  },
+  {
+   "start": 5033,
+   "end": 5128,
+   "type": "verse",
+   "basis": "verse row at byte 4398",
+   "id": null,
+   "text": "craft, including launch vehicle insertion errors, SEP thruster and power system performance, as"
+  },
+  {
+   "start": 5129,
+   "end": 5222,
+   "type": "verse",
+   "basis": "verse row at byte 4494",
+   "id": null,
+   "text": "well as contingency scenarios and off-nominal events such as missed thrust events (MTEs) were"
+  },
+  {
+   "start": 5223,
+   "end": 5232,
+   "type": "verse",
+   "basis": "verse row at byte 4588",
+   "id": null,
+   "text": "assessed."
+  },
+  {
+   "start": 5237,
+   "end": 5289,
+   "type": "verse",
+   "basis": "verse row at byte 4602",
+   "id": null,
+   "text": "2"
+  },
+  {
+   "start": 5290,
+   "end": 5303,
+   "type": "verse",
+   "basis": "verse row at byte 4655",
+   "id": null,
+   "text": "INTRODUCTION"
+  },
+  {
+   "start": 5305,
+   "end": 5407,
+   "type": "verse",
+   "basis": "verse row at byte 4670",
+   "id": null,
+   "text": "In a conceptual or low-fidelity space, the objective of trajectory design is often simply to find a"
+  },
+  {
+   "start": 5408,
+   "end": 5507,
+   "type": "verse",
+   "basis": "verse row at byte 4773",
+   "id": null,
+   "text": "solution which successfully transits between two locations of interest (the Earth and the Moon, for"
+  },
+  {
+   "start": 5508,
+   "end": 5606,
+   "type": "verse",
+   "basis": "verse row at byte 4873",
+   "id": null,
+   "text": "example). For flight missions, this already challenging optimization problem becomes significantly"
+  },
+  {
+   "start": 5607,
+   "end": 5703,
+   "type": "verse",
+   "basis": "verse row at byte 4972",
+   "id": null,
+   "text": "more complex due to the presence of physical systems which must execute a mission as well as the"
+  },
+  {
+   "start": 5704,
+   "end": 5802,
+   "type": "verse",
+   "basis": "verse row at byte 5069",
+   "id": null,
+   "text": "programmatic context in which a mission exists. Mission objectives, requirements, constraints, and"
+  },
+  {
+   "start": 5803,
+   "end": 5900,
+   "type": "verse",
+   "basis": "verse row at byte 5168",
+   "id": null,
+   "text": "“desirements” or “nice-to-haves” must all be balanced against one another. A solution space which"
+  },
+  {
+   "start": 5901,
+   "end": 5997,
+   "type": "verse",
+   "basis": "verse row at byte 5266",
+   "id": null,
+   "text": "before may only have been bounded by physics and a handful of critical choices (spacecraft mass,"
+  },
+  {
+   "start": 5998,
+   "end": 6094,
+   "type": "verse",
+   "basis": "verse row at byte 5363",
+   "id": null,
+   "text": "propulsion system performance, etc) now becomes heavily laden with myriad inputs and constraints"
+  },
+  {
+   "start": 6095,
+   "end": 6192,
+   "type": "verse",
+   "basis": "verse row at byte 5460",
+   "id": null,
+   "text": "(many of which are often competing or contradictory). In this way, an already-challenging optimi-"
+  },
+  {
+   "start": 6193,
+   "end": 6278,
+   "type": "verse",
+   "basis": "verse row at byte 5558",
+   "id": null,
+   "text": "zation problem becomes significantly more daunting as a mission develops and matures."
+  },
+  {
+   "start": 6279,
+   "end": 6374,
+   "type": "verse",
+   "basis": "verse row at byte 5644",
+   "id": null,
+   "text": "Adding every possible argument directly into the optimization of a trajectory would rapidly"
+  },
+  {
+   "start": 6375,
+   "end": 6473,
+   "type": "verse",
+   "basis": "verse row at byte 5740",
+   "id": null,
+   "text": "result in a model that is too dense and too complex to be useful (or to even converge in the first"
+  },
+  {
+   "start": 6474,
+   "end": 6573,
+   "type": "verse",
+   "basis": "verse row at byte 5839",
+   "id": null,
+   "text": "place). Many details are thus considered a-priori or a-posteriori in order to simplify computation;"
+  },
+  {
+   "start": 6574,
+   "end": 6674,
+   "type": "verse",
+   "basis": "verse row at byte 5939",
+   "id": null,
+   "text": "lower-fidelity methods can be used to filter out some set of initial conditions prior to simulation,"
+  },
+  {
+   "start": 6675,
+   "end": 6773,
+   "type": "verse",
+   "basis": "verse row at byte 6040",
+   "id": null,
+   "text": "trajectory results may be post-processed to determine compliance with a known set of requirements,"
+  },
+  {
+   "start": 6774,
+   "end": 6871,
+   "type": "verse",
+   "basis": "verse row at byte 6139",
+   "id": null,
+   "text": "and statistical methods such as Monte Carlo analyses can be used to assess trajectory performance"
+  },
+  {
+   "start": 6872,
+   "end": 6970,
+   "type": "verse",
+   "basis": "verse row at byte 6237",
+   "id": null,
+   "text": "under known uncertainties and risks. This, however, requires an extensive set of tools and methods"
+  },
+  {
+   "start": 6971,
+   "end": 7069,
+   "type": "verse",
+   "basis": "verse row at byte 6336",
+   "id": null,
+   "text": "to accomplish. And while varied and complex, these analyses must be reliable and scalable in order"
+  },
+  {
+   "start": 7070,
+   "end": 7129,
+   "type": "verse",
+   "basis": "verse row at byte 6435",
+   "id": null,
+   "text": "to support the cadence associated with mission development."
+  },
+  {
+   "start": 7130,
+   "end": 7230,
+   "type": "verse",
+   "basis": "verse row at byte 6495",
+   "id": null,
+   "text": "This a-posteriori approach to uncertainty analysis proved to be a substantial undertaking for the"
+  },
+  {
+   "start": 7231,
+   "end": 7323,
+   "type": "verse",
+   "basis": "verse row at byte 6596",
+   "id": null,
+   "text": "PPE and the Lunar Transit mission. Leveraging previous work to develop a robust framework by"
+  },
+  {
+   "start": 7324,
+   "end": 7423,
+   "type": "verse",
+   "basis": "verse row at byte 6689",
+   "id": null,
+   "text": "which deterministic nominal reference trajectories could be developed7 and a similarly standardized"
+  },
+  {
+   "start": 7424,
+   "end": 7515,
+   "type": "verse",
+   "basis": "verse row at byte 6789",
+   "id": null,
+   "text": "methodology for the assessment of MTEs8, an expanded analysis suite was developed to enable"
+  },
+  {
+   "start": 7516,
+   "end": 7616,
+   "type": "verse",
+   "basis": "verse row at byte 6881",
+   "id": null,
+   "text": "large scale assessments of integrated performance uncertainties in critical mission parameters. This"
+  },
+  {
+   "start": 7617,
+   "end": 7710,
+   "type": "verse",
+   "basis": "verse row at byte 6982",
+   "id": null,
+   "text": "package, named Aberrant and built around the existing Copernicus trajectory design software9,"
+  },
+  {
+   "start": 7711,
+   "end": 7808,
+   "type": "verse",
+   "basis": "verse row at byte 7076",
+   "id": null,
+   "text": "enabled large scale Monte Carlo analysis of launch vehicle insertion errors, uncertainties in SEP"
+  },
+  {
+   "start": 7809,
+   "end": 7907,
+   "type": "verse",
+   "basis": "verse row at byte 7174",
+   "id": null,
+   "text": "thruster and spacecraft power system performance, and off-nominal events such as thruster failures"
+  },
+  {
+   "start": 7908,
+   "end": 8003,
+   "type": "verse",
+   "basis": "verse row at byte 7273",
+   "id": null,
+   "text": "as well as including the existing MTE framework. Results from large-scale runs could be quickly"
+  },
+  {
+   "start": 8004,
+   "end": 8098,
+   "type": "verse",
+   "basis": "verse row at byte 7369",
+   "id": null,
+   "text": "assessed for compliance with existing mission requirements and constraints including operating"
+  },
+  {
+   "start": 8099,
+   "end": 8201,
+   "type": "verse",
+   "basis": "verse row at byte 7464",
+   "id": null,
+   "text": "limits of critical limits and data provided critical insight into the necessary propellant margins and"
+  },
+  {
+   "start": 8202,
+   "end": 8271,
+   "type": "verse",
+   "basis": "verse row at byte 7567",
+   "id": null,
+   "text": "reserves to ensure successful execution of the Lunar Transit mission."
+  },
+  {
+   "start": 8273,
+   "end": 8309,
+   "type": "verse",
+   "basis": "verse row at byte 7638",
+   "id": null,
+   "text": "MISSION GROUND RULES AND ASSUMPTIONS"
+  },
+  {
+   "start": 8311,
+   "end": 8409,
+   "type": "verse",
+   "basis": "verse row at byte 7676",
+   "id": null,
+   "text": "The mission design process, as with any modeling effort, starts with some known set of initial"
+  },
+  {
+   "start": 8410,
+   "end": 8504,
+   "type": "verse",
+   "basis": "verse row at byte 7775",
+   "id": null,
+   "text": "conditions with which to develop a trajectory. This set may be referred to as ground rules and"
+  },
+  {
+   "start": 8505,
+   "end": 8598,
+   "type": "verse",
+   "basis": "verse row at byte 7870",
+   "id": null,
+   "text": "assumptions (GR&As) and it contains formal mission requirements, operating and design-to con-"
+  },
+  {
+   "start": 8599,
+   "end": 8695,
+   "type": "verse",
+   "basis": "verse row at byte 7964",
+   "id": null,
+   "text": "straints, performance assumptions for major subsystems, programmatic objectives and desires, and"
+  },
+  {
+   "start": 8696,
+   "end": 8793,
+   "type": "verse",
+   "basis": "verse row at byte 8061",
+   "id": null,
+   "text": "details of the computational environment in which a trajectory will be modeled. In the context of"
+  },
+  {
+   "start": 8794,
+   "end": 8890,
+   "type": "verse",
+   "basis": "verse row at byte 8159",
+   "id": null,
+   "text": "the Lunar Transit mission these GR&As can include, among others (Figure 2 presents a larger, but"
+  },
+  {
+   "start": 8891,
+   "end": 8912,
+   "type": "verse",
+   "basis": "verse row at byte 8256",
+   "id": null,
+   "text": "not exhaustive list):"
+  },
+  {
+   "start": 8913,
+   "end": 8983,
+   "type": "verse",
+   "basis": "verse row at byte 8278",
+   "id": null,
+   "text": "1.   Minimum mass delivery to the NRHO (requirement/constraint)"
+  },
+  {
+   "start": 8984,
+   "end": 9066,
+   "type": "verse",
+   "basis": "verse row at byte 8349",
+   "id": null,
+   "text": "2.   Qualified operating lifetime of SEP thrusters (requirement/constraint)"
+  },
+  {
+   "start": 9067,
+   "end": 9128,
+   "type": "verse",
+   "basis": "verse row at byte 8432",
+   "id": null,
+   "text": "3.   Maximum eclipse duration (requirement constraint)"
+  },
+  {
+   "start": 9129,
+   "end": 9193,
+   "type": "verse",
+   "basis": "verse row at byte 8494",
+   "id": null,
+   "text": "4.   Maximum total ionizing dose (requirement/constraint)"
+  },
+  {
+   "start": 9198,
+   "end": 9250,
+   "type": "verse",
+   "basis": "verse row at byte 8563",
+   "id": null,
+   "text": "3"
+  },
+  {
+   "start": 9251,
+   "end": 9322,
+   "type": "verse",
+   "basis": "verse row at byte 8616",
+   "id": null,
+   "text": "5.     Launch vehicle performance (system performance estimate)"
+  },
+  {
+   "start": 9323,
+   "end": 9404,
+   "type": "verse",
+   "basis": "verse row at byte 8688",
+   "id": null,
+   "text": "6.     Thruster and power system performance (system performance estimate)"
+  },
+  {
+   "start": 9405,
+   "end": 9455,
+   "type": "verse",
+   "basis": "verse row at byte 8770",
+   "id": null,
+   "text": "7.     Launch date (programmatic direction)"
+  },
+  {
+   "start": 9456,
+   "end": 9529,
+   "type": "verse",
+   "basis": "verse row at byte 8821",
+   "id": null,
+   "text": "8.     Available computing resources (computational consideration)"
+  },
+  {
+   "start": 9530,
+   "end": 9614,
+   "type": "verse",
+   "basis": "verse row at byte 8895",
+   "id": null,
+   "text": "9.     Trajectory design software capabilities (computational considerations)"
+  },
+  {
+   "start": 9619,
+   "end": 9711,
+   "type": "verse",
+   "basis": "verse row at byte 8984",
+   "id": null,
+   "text": "Figure 2: Dependencies of the Lunar Transit integrated trajectory design problem"
+  },
+  {
+   "start": 9712,
+   "end": 9806,
+   "type": "verse",
+   "basis": "verse row at byte 9077",
+   "id": null,
+   "text": "The complete list of GR&As form the context within which a deterministic trajectory is de-"
+  },
+  {
+   "start": 9807,
+   "end": 9900,
+   "type": "verse",
+   "basis": "verse row at byte 9172",
+   "id": null,
+   "text": "signed. Some GR&As, such as the choice of trajectory simulation software and available compu-"
+  },
+  {
+   "start": 9901,
+   "end": 9997,
+   "type": "verse",
+   "basis": "verse row at byte 9266",
+   "id": null,
+   "text": "tational resources, may be selected according to specific mission needs or supplemented at cost."
+  },
+  {
+   "start": 9998,
+   "end": 10092,
+   "type": "verse",
+   "basis": "verse row at byte 9363",
+   "id": null,
+   "text": "Others, such as concept of operations (CONOPS) events and timelines, may be determined through"
+  },
+  {
+   "start": 10093,
+   "end": 10191,
+   "type": "verse",
+   "basis": "verse row at byte 9458",
+   "id": null,
+   "text": "engineering assessments of mission needs and can be adjusted within a defined risk posture to ease"
+  },
+  {
+   "start": 10192,
+   "end": 10283,
+   "type": "verse",
+   "basis": "verse row at byte 9557",
+   "id": null,
+   "text": "the burden on trajectory design. Many GR&As, often taking the form of requirements and con-"
+  },
+  {
+   "start": 10284,
+   "end": 10380,
+   "type": "verse",
+   "basis": "verse row at byte 9649",
+   "id": null,
+   "text": "straints, are dictated to engineering teams or are natural consequences of decisions such as the"
+  },
+  {
+   "start": 10381,
+   "end": 10459,
+   "type": "verse",
+   "basis": "verse row at byte 9746",
+   "id": null,
+   "text": "selection of a specific launch vehicle, thruster type, and solar array design."
+  },
+  {
+   "start": 10460,
+   "end": 10557,
+   "type": "verse",
+   "basis": "verse row at byte 9825",
+   "id": null,
+   "text": "The specific hardware that is selected for a spacecraft, and the manner in which it is tested,"
+  },
+  {
+   "start": 10558,
+   "end": 10659,
+   "type": "verse",
+   "basis": "verse row at byte 9923",
+   "id": null,
+   "text": "forms an inherent limitation on the operation of the vehicle. Hardware is typically qualified to some"
+  },
+  {
+   "start": 10660,
+   "end": 10758,
+   "type": "verse",
+   "basis": "verse row at byte 10025",
+   "id": null,
+   "text": "defined test criteria, whether it be a safe envelope of operating temperatures, operating lifetime"
+  },
+  {
+   "start": 10759,
+   "end": 10859,
+   "type": "verse",
+   "basis": "verse row at byte 10124",
+   "id": null,
+   "text": "before a component may fail, or limits on operating environment before reliability is reduced. These"
+  },
+  {
+   "start": 10860,
+   "end": 10954,
+   "type": "verse",
+   "basis": "verse row at byte 10225",
+   "id": null,
+   "text": "qualification limits are themselves constraints, governing the manner in which a system can be"
+  },
+  {
+   "start": 10955,
+   "end": 11054,
+   "type": "verse",
+   "basis": "verse row at byte 10320",
+   "id": null,
+   "text": "assumed to be safe to operate. In practice, this means that a mission which accounts for a physical"
+  },
+  {
+   "start": 11055,
+   "end": 11155,
+   "type": "verse",
+   "basis": "verse row at byte 10420",
+   "id": null,
+   "text": "spacecraft finds itself far more limited than a theoretical one. Life limits, maximum rate of change"
+  },
+  {
+   "start": 11156,
+   "end": 11253,
+   "type": "verse",
+   "basis": "verse row at byte 10521",
+   "id": null,
+   "text": "of vehicle attitude10, minimum fly-by altitudes governed by thermal limits of components, or max-"
+  },
+  {
+   "start": 11254,
+   "end": 11349,
+   "type": "verse",
+   "basis": "verse row at byte 10619",
+   "id": null,
+   "text": "imum eclipse durations due to temperature and energy storage capabilities all form bounds which"
+  },
+  {
+   "start": 11350,
+   "end": 11445,
+   "type": "verse",
+   "basis": "verse row at byte 10715",
+   "id": null,
+   "text": "are often more constraining than formal mission requirements or objectives. Requirements may be"
+  },
+  {
+   "start": 11450,
+   "end": 11503,
+   "type": "verse",
+   "basis": "verse row at byte 10815",
+   "id": null,
+   "text": "4"
+  },
+  {
+   "start": 11504,
+   "end": 11603,
+   "type": "verse",
+   "basis": "verse row at byte 10869",
+   "id": null,
+   "text": "waived if the situation demands it, while hardware failures that lead to loss of mission cannot be"
+  },
+  {
+   "start": 11604,
+   "end": 11627,
+   "type": "verse",
+   "basis": "verse row at byte 10969",
+   "id": null,
+   "text": "ignored or written off."
+  },
+  {
+   "start": 11628,
+   "end": 11728,
+   "type": "verse",
+   "basis": "verse row at byte 10993",
+   "id": null,
+   "text": "These limits and criteria rigidly bound a trajectory and must either be directly included in the"
+  },
+  {
+   "start": 11729,
+   "end": 11823,
+   "type": "verse",
+   "basis": "verse row at byte 11094",
+   "id": null,
+   "text": "optimization problem or assessed a-posteriori for compliance. Additionally, system performance"
+  },
+  {
+   "start": 11824,
+   "end": 11917,
+   "type": "verse",
+   "basis": "verse row at byte 11189",
+   "id": null,
+   "text": "assumptions may contain interdependencies which complicate modeling. The parking orbit a tra-"
+  },
+  {
+   "start": 11918,
+   "end": 12014,
+   "type": "verse",
+   "basis": "verse row at byte 11283",
+   "id": null,
+   "text": "jectory may begin from is dependent on the performance of the selected launch vehicle as well as"
+  },
+  {
+   "start": 12015,
+   "end": 12110,
+   "type": "verse",
+   "basis": "verse row at byte 11380",
+   "id": null,
+   "text": "the mass and separation condition requirements of the spacecraft and the power available to the"
+  },
+  {
+   "start": 12111,
+   "end": 12209,
+   "type": "verse",
+   "basis": "verse row at byte 11476",
+   "id": null,
+   "text": "SEP system is a function of the performance of the vehicle power system, including the solar array"
+  },
+  {
+   "start": 12210,
+   "end": 12309,
+   "type": "verse",
+   "basis": "verse row at byte 11575",
+   "id": null,
+   "text": "capabilities and the ability of the energy storage system to recover from periods of eclipse. These"
+  },
+  {
+   "start": 12310,
+   "end": 12404,
+   "type": "verse",
+   "basis": "verse row at byte 11675",
+   "id": null,
+   "text": "system interactions may be modeled and determined a-priori (such as park orbit energy) or they"
+  },
+  {
+   "start": 12405,
+   "end": 12498,
+   "type": "verse",
+   "basis": "verse row at byte 11770",
+   "id": null,
+   "text": "may need to be modeled within the trajectory optimization problem (such as SEP system perfor-"
+  },
+  {
+   "start": 12499,
+   "end": 12591,
+   "type": "verse",
+   "basis": "verse row at byte 11864",
+   "id": null,
+   "text": "mance over time), further complicating the process of developing a deterministic trajectory."
+  },
+  {
+   "start": 12593,
+   "end": 12614,
+   "type": "verse",
+   "basis": "verse row at byte 11958",
+   "id": null,
+   "text": "MISSION UNCERTAINTIES"
+  },
+  {
+   "start": 12616,
+   "end": 12718,
+   "type": "verse",
+   "basis": "verse row at byte 11981",
+   "id": null,
+   "text": "In addition to the complexities of developing a single, nominal, deterministic trajectory a flight"
+  },
+  {
+   "start": 12719,
+   "end": 12815,
+   "type": "verse",
+   "basis": "verse row at byte 12084",
+   "id": null,
+   "text": "mission must consider a host of uncertainties and unknowns to determine whether a mission design"
+  },
+  {
+   "start": 12816,
+   "end": 12913,
+   "type": "verse",
+   "basis": "verse row at byte 12181",
+   "id": null,
+   "text": "is executable. To carry a sufficiently high confidence that a mission can be successfully flown a"
+  },
+  {
+   "start": 12914,
+   "end": 13007,
+   "type": "verse",
+   "basis": "verse row at byte 12279",
+   "id": null,
+   "text": "mission designer needs to incorporate some set of performance parameters and events which may"
+  },
+  {
+   "start": 13008,
+   "end": 13107,
+   "type": "verse",
+   "basis": "verse row at byte 12373",
+   "id": null,
+   "text": "be realized during flight but cannot be accurately predicted beforehand. Beginning with launch, the"
+  },
+  {
+   "start": 13108,
+   "end": 13210,
+   "type": "verse",
+   "basis": "verse row at byte 12473",
+   "id": null,
+   "text": "spacecraft will be inserted into an initial orbit with some previously unknown (but quantified) error,"
+  },
+  {
+   "start": 13211,
+   "end": 13310,
+   "type": "verse",
+   "basis": "verse row at byte 12576",
+   "id": null,
+   "text": "vehicle systems will perform differently than predicted pre-flight (these differences may be within"
+  },
+  {
+   "start": 13311,
+   "end": 13411,
+   "type": "verse",
+   "basis": "verse row at byte 12676",
+   "id": null,
+   "text": "quantified uncertainties or they may be significant if an anomaly has occurred), and so the as-flown"
+  },
+  {
+   "start": 13412,
+   "end": 13513,
+   "type": "verse",
+   "basis": "verse row at byte 12777",
+   "id": null,
+   "text": "trajectory will depart from the pre-flight reference (Figure 3). The magnitude of these uncertainties"
+  },
+  {
+   "start": 13514,
+   "end": 13608,
+   "type": "verse",
+   "basis": "verse row at byte 12879",
+   "id": null,
+   "text": "and unknowns which the mission designer must protect for is defined through the mission’s risk"
+  },
+  {
+   "start": 13609,
+   "end": 13628,
+   "type": "verse",
+   "basis": "verse row at byte 12974",
+   "id": null,
+   "text": "management process."
+  },
+  {
+   "start": 13633,
+   "end": 13735,
+   "type": "verse",
+   "basis": "verse row at byte 12998",
+   "id": null,
+   "text": "Figure 3: Simplification of differences between deterministic (black) vs realized (colored) launch"
+  },
+  {
+   "start": 13736,
+   "end": 13828,
+   "type": "verse",
+   "basis": "verse row at byte 13101",
+   "id": null,
+   "text": "vehicle injection orbits, spacecraft performances, and trajectories to reach the NRHO"
+  },
+  {
+   "start": 13829,
+   "end": 13858,
+   "type": "verse",
+   "basis": "verse row at byte 13194",
+   "id": null,
+   "text": "General Mission Uncertainties"
+  },
+  {
+   "start": 13859,
+   "end": 13956,
+   "type": "verse",
+   "basis": "verse row at byte 13224",
+   "id": null,
+   "text": "All space missions, regardless of size, objective, or design, must deal with the epistemic and"
+  },
+  {
+   "start": 13957,
+   "end": 14051,
+   "type": "verse",
+   "basis": "verse row at byte 13322",
+   "id": null,
+   "text": "aleatoric uncertainties inherent to remotely operating a complex system in an environment that"
+  },
+  {
+   "start": 14056,
+   "end": 14109,
+   "type": "verse",
+   "basis": "verse row at byte 13421",
+   "id": null,
+   "text": "5"
+  },
+  {
+   "start": 14110,
+   "end": 14216,
+   "type": "verse",
+   "basis": "verse row at byte 13475",
+   "id": null,
+   "text": "cannot be fully recreated or simulated in a test facility. Pre-flight designs rely on the quality of test"
+  },
+  {
+   "start": 14217,
+   "end": 14313,
+   "type": "verse",
+   "basis": "verse row at byte 13582",
+   "id": null,
+   "text": "data, system-level simulations, and environmental models. This pre-flight knowledge can vary de-"
+  },
+  {
+   "start": 14314,
+   "end": 14414,
+   "type": "verse",
+   "basis": "verse row at byte 13679",
+   "id": null,
+   "text": "pending on the capabilities of the facilities used for testing, the precision of the instruments and"
+  },
+  {
+   "start": 14415,
+   "end": 14512,
+   "type": "verse",
+   "basis": "verse row at byte 13780",
+   "id": null,
+   "text": "methods used to collect data, and the fidelity of the models used to generate performance predic-"
+  },
+  {
+   "start": 14513,
+   "end": 14611,
+   "type": "verse",
+   "basis": "verse row at byte 13878",
+   "id": null,
+   "text": "tions. The uncertainty present in test measurements and integrated models can often be quantified,"
+  },
+  {
+   "start": 14612,
+   "end": 14708,
+   "type": "verse",
+   "basis": "verse row at byte 13977",
+   "id": null,
+   "text": "meaning that it is a “known unknown”. Some statistical understanding of the uncertainty provides"
+  },
+  {
+   "start": 14709,
+   "end": 14808,
+   "type": "verse",
+   "basis": "verse row at byte 14074",
+   "id": null,
+   "text": "engineers with a probability distribution of the degree to which uncertainty may be realized during"
+  },
+  {
+   "start": 14809,
+   "end": 14896,
+   "type": "verse",
+   "basis": "verse row at byte 14174",
+   "id": null,
+   "text": "mission execution, allowing its impact to be characterized through Monte Carlo methods."
+  },
+  {
+   "start": 14897,
+   "end": 14992,
+   "type": "verse",
+   "basis": "verse row at byte 14262",
+   "id": null,
+   "text": "The manner in which a spacecraft is flown also dictates how uncertainties may impact opera-"
+  },
+  {
+   "start": 14993,
+   "end": 15088,
+   "type": "verse",
+   "basis": "verse row at byte 14358",
+   "id": null,
+   "text": "tions. No physical system can perfectly execute commands and so there will always be some delta"
+  },
+  {
+   "start": 15089,
+   "end": 15191,
+   "type": "verse",
+   "basis": "verse row at byte 14454",
+   "id": null,
+   "text": "between what the ground wants a spacecraft to do and what it actually does (this is typically referred"
+  },
+  {
+   "start": 15192,
+   "end": 15287,
+   "type": "verse",
+   "basis": "verse row at byte 14557",
+   "id": null,
+   "text": "to as an execution error). Determining what a spacecraft has executed, and at what time, is not"
+  },
+  {
+   "start": 15288,
+   "end": 15385,
+   "type": "verse",
+   "basis": "verse row at byte 14653",
+   "id": null,
+   "text": "necessarily a straightforward task. Unlike ground-based systems, it is not possible to physically"
+  },
+  {
+   "start": 15386,
+   "end": 15485,
+   "type": "verse",
+   "basis": "verse row at byte 14751",
+   "id": null,
+   "text": "inspect an on-orbit spacecraft and the knowledge that operators have of the vehicle in real-time is"
+  },
+  {
+   "start": 15486,
+   "end": 15580,
+   "type": "verse",
+   "basis": "verse row at byte 14851",
+   "id": null,
+   "text": "only as extensive as the onboard sensors and downlinked telemetry allow. Telemetry is also not"
+  },
+  {
+   "start": 15581,
+   "end": 15679,
+   "type": "verse",
+   "basis": "verse row at byte 14946",
+   "id": null,
+   "text": "always available depending on the frequency with which ground stations are available or scheduled,"
+  },
+  {
+   "start": 15680,
+   "end": 15775,
+   "type": "verse",
+   "basis": "verse row at byte 15045",
+   "id": null,
+   "text": "meaning that available knowledge can quickly become obsolete. This gap between the state of the"
+  },
+  {
+   "start": 15776,
+   "end": 15873,
+   "type": "verse",
+   "basis": "verse row at byte 15141",
+   "id": null,
+   "text": "spacecraft and the ground’s understanding of it must be considered pre-flight and included in un-"
+  },
+  {
+   "start": 15874,
+   "end": 15931,
+   "type": "verse",
+   "basis": "verse row at byte 15239",
+   "id": null,
+   "text": "certainty analysis to validate a trajectory architecture."
+  },
+  {
+   "start": 15932,
+   "end": 15977,
+   "type": "verse",
+   "basis": "verse row at byte 15297",
+   "id": null,
+   "text": "Uncertainties Inherent to Electric Propulsion"
+  },
+  {
+   "start": 15978,
+   "end": 16065,
+   "type": "verse",
+   "basis": "verse row at byte 15343",
+   "id": null,
+   "text": "While HETs are a mature technology, there remains a significant lack of fundamental"
+  },
+  {
+   "start": 16066,
+   "end": 16160,
+   "type": "verse",
+   "basis": "verse row at byte 15431",
+   "id": null,
+   "text": "knowledge regarding the in-space performance of these systems. While HETs are some of the most"
+  },
+  {
+   "start": 16161,
+   "end": 16262,
+   "type": "verse",
+   "basis": "verse row at byte 15526",
+   "id": null,
+   "text": "numerous forms of propulsion on-orbit today, it remains difficult to characterize the output of these"
+  },
+  {
+   "start": 16263,
+   "end": 16361,
+   "type": "verse",
+   "basis": "verse row at byte 15628",
+   "id": null,
+   "text": "thrusters on the ground, there is no standard or agreed upon method by which to extrapolate ground"
+  },
+  {
+   "start": 16362,
+   "end": 16461,
+   "type": "verse",
+   "basis": "verse row at byte 15727",
+   "id": null,
+   "text": "test data (in a facility which imperfectly simulates vacuum) to on-orbit performance, and it is not"
+  },
+  {
+   "start": 16462,
+   "end": 16557,
+   "type": "verse",
+   "basis": "verse row at byte 15827",
+   "id": null,
+   "text": "often possible to recreate precise estimates of on-orbit performance from spacecraft telemetry."
+  },
+  {
+   "start": 16558,
+   "end": 16648,
+   "type": "verse",
+   "basis": "verse row at byte 15923",
+   "id": null,
+   "text": "The AEPS thruster, of which three were planned to be used on PPE, produces a maximum of"
+  },
+  {
+   "start": 16649,
+   "end": 16743,
+   "type": "verse",
+   "basis": "verse row at byte 16014",
+   "id": null,
+   "text": "586 mN of thrust at a discharge power of 12 kW11. The thruster has a mass of <47 kg12, meaning"
+  },
+  {
+   "start": 16744,
+   "end": 16843,
+   "type": "verse",
+   "basis": "verse row at byte 16109",
+   "id": null,
+   "text": "that AEPS has a thrust to weight ratio of roughly 0.001 at standard gravity. Measuring such a small"
+  },
+  {
+   "start": 16844,
+   "end": 16935,
+   "type": "verse",
+   "basis": "verse row at byte 16209",
+   "id": null,
+   "text": "force acting upon a much more significant mass is inherently challenging. For PPE, the AEPS"
+  },
+  {
+   "start": 16936,
+   "end": 17032,
+   "type": "verse",
+   "basis": "verse row at byte 16301",
+   "id": null,
+   "text": "thruster performed qualification and acceptance testing at NASA Glenn Research Center’s electric"
+  },
+  {
+   "start": 17033,
+   "end": 17133,
+   "type": "verse",
+   "basis": "verse row at byte 16398",
+   "id": null,
+   "text": "propulsion test facility. Measurement uncertainty at this facility has previously been characterized"
+  },
+  {
+   "start": 17134,
+   "end": 17232,
+   "type": "verse",
+   "basis": "verse row at byte 16499",
+   "id": null,
+   "text": "as +/- 6.9 mN at a 95% confidence interval for a thruster as powerful as AEPS13. While small, this"
+  },
+  {
+   "start": 17233,
+   "end": 17332,
+   "type": "verse",
+   "basis": "verse row at byte 16598",
+   "id": null,
+   "text": "uncertainty still represents 1.2% of the full thrust magnitude, an error that must be accounted for"
+  },
+  {
+   "start": 17333,
+   "end": 17399,
+   "type": "verse",
+   "basis": "verse row at byte 16698",
+   "id": null,
+   "text": "across roughly 300 days of thrusting in the Lunar Transit mission."
+  },
+  {
+   "start": 17400,
+   "end": 17497,
+   "type": "verse",
+   "basis": "verse row at byte 16765",
+   "id": null,
+   "text": "In addition to accurately measuring the performance of a thruster on the ground, this perfor-"
+  },
+  {
+   "start": 17498,
+   "end": 17591,
+   "type": "verse",
+   "basis": "verse row at byte 16863",
+   "id": null,
+   "text": "mance must be extrapolated to an on-orbit environment. Previous work has shown that HETs, in-"
+  },
+  {
+   "start": 17592,
+   "end": 17689,
+   "type": "verse",
+   "basis": "verse row at byte 16957",
+   "id": null,
+   "text": "cluding the magnetically shielded AEPS, are sensitive to facility backpressure when tested on the"
+  },
+  {
+   "start": 17690,
+   "end": 17786,
+   "type": "verse",
+   "basis": "verse row at byte 17055",
+   "id": null,
+   "text": "ground14. Generally, a HET will display higher specific impulse (efficiency) at higher backpres-"
+  },
+  {
+   "start": 17787,
+   "end": 17880,
+   "type": "verse",
+   "basis": "verse row at byte 17152",
+   "id": null,
+   "text": "sures associated with ground-based vacuum test chambers. As space forms a more perfect vacuum"
+  },
+  {
+   "start": 17881,
+   "end": 17981,
+   "type": "verse",
+   "basis": "verse row at byte 17246",
+   "id": null,
+   "text": "than any test chamber, the on-orbit background pressure is very close to zero and the realized effi-"
+  },
+  {
+   "start": 17982,
+   "end": 18079,
+   "type": "verse",
+   "basis": "verse row at byte 17347",
+   "id": null,
+   "text": "ciency and thrust magnitude of a HET is often lower than that observed in pre-flight testing. Un-"
+  },
+  {
+   "start": 18080,
+   "end": 18176,
+   "type": "verse",
+   "basis": "verse row at byte 17445",
+   "id": null,
+   "text": "fortunately, due to the general lack of in-space data available for HET performance, no standard"
+  },
+  {
+   "start": 18177,
+   "end": 18274,
+   "type": "verse",
+   "basis": "verse row at byte 17542",
+   "id": null,
+   "text": "method exists by which to characterize this difference and account for it in pre-flight analysis."
+  },
+  {
+   "start": 18279,
+   "end": 18333,
+   "type": "verse",
+   "basis": "verse row at byte 17644",
+   "id": null,
+   "text": "6"
+  },
+  {
+   "start": 18334,
+   "end": 18434,
+   "type": "verse",
+   "basis": "verse row at byte 17699",
+   "id": null,
+   "text": "Just as ground-test data carries a high-degree of uncertainty for HETs, in-flight estimates can"
+  },
+  {
+   "start": 18435,
+   "end": 18535,
+   "type": "verse",
+   "basis": "verse row at byte 17800",
+   "id": null,
+   "text": "be difficult to obtain and imprecise. Performance estimates of thrusters in space are often obtained"
+  },
+  {
+   "start": 18536,
+   "end": 18631,
+   "type": "verse",
+   "basis": "verse row at byte 17901",
+   "id": null,
+   "text": "by reconstructing thrust magnitude over some period of time from orbit determination (OD) solu-"
+  },
+  {
+   "start": 18632,
+   "end": 18729,
+   "type": "verse",
+   "basis": "verse row at byte 17997",
+   "id": null,
+   "text": "tions, meaning that these estimates are dependent on the quality of the OD being performed. Vehi-"
+  },
+  {
+   "start": 18730,
+   "end": 18827,
+   "type": "verse",
+   "basis": "verse row at byte 18095",
+   "id": null,
+   "text": "cle telemetry pertaining to the state of valves within the propellant management system can addi-"
+  },
+  {
+   "start": 18828,
+   "end": 18927,
+   "type": "verse",
+   "basis": "verse row at byte 18193",
+   "id": null,
+   "text": "tionally provide insight into the mass flow rate of the system over time, allowing specific impulse"
+  },
+  {
+   "start": 18928,
+   "end": 19024,
+   "type": "verse",
+   "basis": "verse row at byte 18293",
+   "id": null,
+   "text": "and mass evolution to be reconstructed as well. These methods also carry their own uncertainties"
+  },
+  {
+   "start": 19025,
+   "end": 19117,
+   "type": "verse",
+   "basis": "verse row at byte 18390",
+   "id": null,
+   "text": "and missed communications passes may lead to onboard data being permanently lost due to data"
+  },
+  {
+   "start": 19118,
+   "end": 19215,
+   "type": "verse",
+   "basis": "verse row at byte 18483",
+   "id": null,
+   "text": "storage limits, meaning that an accurate accounting of the spacecraft’s mass over time may not be"
+  },
+  {
+   "start": 19216,
+   "end": 19312,
+   "type": "verse",
+   "basis": "verse row at byte 18581",
+   "id": null,
+   "text": "available. Without an accurate mass estimate thrust estimation is further complicated, even when"
+  },
+  {
+   "start": 19313,
+   "end": 19350,
+   "type": "verse",
+   "basis": "verse row at byte 18678",
+   "id": null,
+   "text": "onboard accelerometers are available."
+  },
+  {
+   "start": 19351,
+   "end": 19446,
+   "type": "verse",
+   "basis": "verse row at byte 18716",
+   "id": null,
+   "text": "While precise characterization of how a thruster will perform on or-orbit when commanded is"
+  },
+  {
+   "start": 19447,
+   "end": 19544,
+   "type": "verse",
+   "basis": "verse row at byte 18812",
+   "id": null,
+   "text": "currently not available to mission designers, the Psyche mission has shown that even systems with"
+  },
+  {
+   "start": 19545,
+   "end": 19640,
+   "type": "verse",
+   "basis": "verse row at byte 18910",
+   "id": null,
+   "text": "considerable flight heritage may exhibit unexpected behaviors. The SPT-140, flown on the Psyche"
+  },
+  {
+   "start": 19641,
+   "end": 19738,
+   "type": "verse",
+   "basis": "verse row at byte 19006",
+   "id": null,
+   "text": "spacecraft, has a strong flight heritage with Intuitive Machines (formerly Maxar) having operated"
+  },
+  {
+   "start": 19739,
+   "end": 19839,
+   "type": "verse",
+   "basis": "verse row at byte 19104",
+   "id": null,
+   "text": "at least 4 SPT-140-equipped spacecraft prior to Psyche’s launch15. Despite this extensive history of"
+  },
+  {
+   "start": 19840,
+   "end": 19935,
+   "type": "verse",
+   "basis": "verse row at byte 19205",
+   "id": null,
+   "text": "on-orbit use and characterization, the mode-hopping behavior3 observed during Psyche’s electric"
+  },
+  {
+   "start": 19936,
+   "end": 20031,
+   "type": "verse",
+   "basis": "verse row at byte 19301",
+   "id": null,
+   "text": "propulsion checkout activities had never been documented previously. This performance instabil-"
+  },
+  {
+   "start": 20032,
+   "end": 20134,
+   "type": "verse",
+   "basis": "verse row at byte 19397",
+   "id": null,
+   "text": "ity, in a thruster with a significant amount of previous operation, further exemplifies the uncertain-"
+  },
+  {
+   "start": 20135,
+   "end": 20214,
+   "type": "verse",
+   "basis": "verse row at byte 19500",
+   "id": null,
+   "text": "ties inherent in the use of high-powered electric propulsion in space missions."
+  },
+  {
+   "start": 20215,
+   "end": 20245,
+   "type": "verse",
+   "basis": "verse row at byte 19580",
+   "id": null,
+   "text": "Mission Specific Uncertainties"
+  },
+  {
+   "start": 20246,
+   "end": 20341,
+   "type": "verse",
+   "basis": "verse row at byte 19611",
+   "id": null,
+   "text": "Gateway and the PPE were envisioned to be a first-of-its-kind application of SEP to a large,"
+  },
+  {
+   "start": 20342,
+   "end": 20438,
+   "type": "verse",
+   "basis": "verse row at byte 19707",
+   "id": null,
+   "text": "high mass, human-rated exploration vehicle. Gateway was to incorporate a number of never-before-"
+  },
+  {
+   "start": 20439,
+   "end": 20536,
+   "type": "verse",
+   "basis": "verse row at byte 19804",
+   "id": null,
+   "text": "flown technologies, including the largest roll-out solar arrays (ROSAs) and the highest power SEP"
+  },
+  {
+   "start": 20537,
+   "end": 20632,
+   "type": "verse",
+   "basis": "verse row at byte 19902",
+   "id": null,
+   "text": "system developed to date. This system included two newly developed thruster types (AEPS and the"
+  },
+  {
+   "start": 20633,
+   "end": 20731,
+   "type": "verse",
+   "basis": "verse row at byte 19998",
+   "id": null,
+   "text": "BHT-6000) neither of which has operated in-space. The result was a mission that inherently carried"
+  },
+  {
+   "start": 20732,
+   "end": 20829,
+   "type": "verse",
+   "basis": "verse row at byte 20097",
+   "id": null,
+   "text": "uncertainties in the performance of critical systems that have never previously operated on-orbit"
+  },
+  {
+   "start": 20830,
+   "end": 20929,
+   "type": "verse",
+   "basis": "verse row at byte 20195",
+   "id": null,
+   "text": "(such as power and propulsion). Further uncertainty is added by the novel nature of this mission to"
+  },
+  {
+   "start": 20930,
+   "end": 21022,
+   "type": "verse",
+   "basis": "verse row at byte 20295",
+   "id": null,
+   "text": "NASA human space flight (HSF), which has previously only operated high-thrust spacecraft and"
+  },
+  {
+   "start": 21023,
+   "end": 21074,
+   "type": "verse",
+   "basis": "verse row at byte 20388",
+   "id": null,
+   "text": "has largely been confined to low-Earth Orbit (LEO)."
+  },
+  {
+   "start": 21075,
+   "end": 21162,
+   "type": "verse",
+   "basis": "verse row at byte 20440",
+   "id": null,
+   "text": "While all space missions account for some uncertainty in system performance about a"
+  },
+  {
+   "start": 21163,
+   "end": 21258,
+   "type": "verse",
+   "basis": "verse row at byte 20528",
+   "id": null,
+   "text": "mean/nominal specification, the number of new technologies onboard PPE/Gateway led to a statis-"
+  },
+  {
+   "start": 21259,
+   "end": 21360,
+   "type": "verse",
+   "basis": "verse row at byte 20624",
+   "id": null,
+   "text": "tically significant degree of variation in the mean value itself. Where heritage low-thrust verifica-"
+  },
+  {
+   "start": 21361,
+   "end": 21457,
+   "type": "verse",
+   "basis": "verse row at byte 20726",
+   "id": null,
+   "text": "tion methods utilizing Veil and the newly developed Stampede6 have assessed cycle-to-cycle vari-"
+  },
+  {
+   "start": 21458,
+   "end": 21556,
+   "type": "verse",
+   "basis": "verse row at byte 20823",
+   "id": null,
+   "text": "ation of performance about a mean value, the Lunar Transit required significant focus to be put on"
+  },
+  {
+   "start": 21557,
+   "end": 21655,
+   "type": "verse",
+   "basis": "verse row at byte 20922",
+   "id": null,
+   "text": "analysis of variations in mean performance values for SEP thrust magnitude and power availability."
+  },
+  {
+   "start": 21656,
+   "end": 21751,
+   "type": "verse",
+   "basis": "verse row at byte 21021",
+   "id": null,
+   "text": "Further complicating this analysis was the need to perform this analysis across a wide range of"
+  },
+  {
+   "start": 21752,
+   "end": 21850,
+   "type": "verse",
+   "basis": "verse row at byte 21117",
+   "id": null,
+   "text": "potential launch dates due to system sensitivity to seasonal variations in solar array performance"
+  },
+  {
+   "start": 21851,
+   "end": 21883,
+   "type": "verse",
+   "basis": "verse row at byte 21216",
+   "id": null,
+   "text": "and Earth-Moon system alignment."
+  },
+  {
+   "start": 21884,
+   "end": 21923,
+   "type": "verse",
+   "basis": "verse row at byte 21249",
+   "id": null,
+   "text": "Missed Thrust and Contingency Scenarios"
+  },
+  {
+   "start": 21924,
+   "end": 22020,
+   "type": "verse",
+   "basis": "verse row at byte 21289",
+   "id": null,
+   "text": "In addition to the uncertainties discussed above, the Lunar Transit mission design needed to"
+  },
+  {
+   "start": 22021,
+   "end": 22118,
+   "type": "verse",
+   "basis": "verse row at byte 21386",
+   "id": null,
+   "text": "consider a number of potential disruptive events that could occur during execution. These include"
+  },
+  {
+   "start": 22119,
+   "end": 22211,
+   "type": "verse",
+   "basis": "verse row at byte 21484",
+   "id": null,
+   "text": "MTEs (a catch-all term used to describe any time that a vehicle safe-mode or unplanned coast"
+  },
+  {
+   "start": 22212,
+   "end": 22308,
+   "type": "verse",
+   "basis": "verse row at byte 21577",
+   "id": null,
+   "text": "period disrupts the execution of a low-thrust maneuver) as well as contingency scenarios such as"
+  },
+  {
+   "start": 22309,
+   "end": 22407,
+   "type": "verse",
+   "basis": "verse row at byte 21674",
+   "id": null,
+   "text": "failed SEP thruster. MTEs are a persistent threat to any low-thrust mission, and the Lunar Transit"
+  },
+  {
+   "start": 22412,
+   "end": 22464,
+   "type": "verse",
+   "basis": "verse row at byte 21777",
+   "id": null,
+   "text": "7"
+  },
+  {
+   "start": 22465,
+   "end": 22562,
+   "type": "verse",
+   "basis": "verse row at byte 21830",
+   "id": null,
+   "text": "was no different. With more than 300 days of planned thruster operation, missed thrust proved to"
+  },
+  {
+   "start": 22563,
+   "end": 22665,
+   "type": "verse",
+   "basis": "verse row at byte 21928",
+   "id": null,
+   "text": "be a significant driver of sensitivity analysis. Additionally, due to the high thruster throughput re-"
+  },
+  {
+   "start": 22666,
+   "end": 22764,
+   "type": "verse",
+   "basis": "verse row at byte 22031",
+   "id": null,
+   "text": "quired to reach the NRHO (more than 3,000 m/s ∆v), the loss of a SEP thruster and particularly the"
+  },
+  {
+   "start": 22765,
+   "end": 22861,
+   "type": "verse",
+   "basis": "verse row at byte 22130",
+   "id": null,
+   "text": "loss of one of the three AEPS would make successful execution of the remainder of the trajectory"
+  },
+  {
+   "start": 22862,
+   "end": 22874,
+   "type": "verse",
+   "basis": "verse row at byte 22227",
+   "id": null,
+   "text": "challenging."
+  },
+  {
+   "start": 22875,
+   "end": 22972,
+   "type": "verse",
+   "basis": "verse row at byte 22240",
+   "id": null,
+   "text": "Application of the methods described by Imken, et al16, to the Lunar Transit reflected a high"
+  },
+  {
+   "start": 22973,
+   "end": 23070,
+   "type": "verse",
+   "basis": "verse row at byte 22338",
+   "id": null,
+   "text": "likelihood of multiple vehicle safe mode events over the duration of the mission. These empirical"
+  },
+  {
+   "start": 23071,
+   "end": 23166,
+   "type": "verse",
+   "basis": "verse row at byte 22436",
+   "id": null,
+   "text": "forecasts, developed against historical safe-mode event occurrences and durations in deep space"
+  },
+  {
+   "start": 23167,
+   "end": 23260,
+   "type": "verse",
+   "basis": "verse row at byte 22532",
+   "id": null,
+   "text": "missions, indicated that operators could expect to experience between 2 and 7 individual MTEs"
+  },
+  {
+   "start": 23261,
+   "end": 23358,
+   "type": "verse",
+   "basis": "verse row at byte 22626",
+   "id": null,
+   "text": "with a total outage duration between 3 and 10 days (Figure 4). In addition to MTEs caused by safe"
+  },
+  {
+   "start": 23359,
+   "end": 23453,
+   "type": "verse",
+   "basis": "verse row at byte 22724",
+   "id": null,
+   "text": "mode events, operational considerations such as orbital object conjunctions were accounted for"
+  },
+  {
+   "start": 23454,
+   "end": 23549,
+   "type": "verse",
+   "basis": "verse row at byte 22819",
+   "id": null,
+   "text": "under the missed thrust umbrella. Previous publications17 have detailed the strategy PPE MD de-"
+  },
+  {
+   "start": 23550,
+   "end": 23641,
+   "type": "verse",
+   "basis": "verse row at byte 22915",
+   "id": null,
+   "text": "veloped for collision avoidance maneuvers (CAMs) during the Lunar Transit by which an addi-"
+  },
+  {
+   "start": 23642,
+   "end": 23737,
+   "type": "verse",
+   "basis": "verse row at byte 23007",
+   "id": null,
+   "text": "tional, unplanned, coast period would be used to generate separation between the Gateway space-"
+  },
+  {
+   "start": 23738,
+   "end": 23835,
+   "type": "verse",
+   "basis": "verse row at byte 23103",
+   "id": null,
+   "text": "craft and a potential conjuncting object. Due to the highly eccentric nature of the Lunar Transit"
+  },
+  {
+   "start": 23836,
+   "end": 23931,
+   "type": "verse",
+   "basis": "verse row at byte 23201",
+   "id": null,
+   "text": "during the early phases of flight, a coast on the order of an hour placed at apogee passage was"
+  },
+  {
+   "start": 23932,
+   "end": 24029,
+   "type": "verse",
+   "basis": "verse row at byte 23297",
+   "id": null,
+   "text": "shown to be effective at producing miss distances on the order of tens to hundreds of kilometers."
+  },
+  {
+   "start": 24030,
+   "end": 24129,
+   "type": "verse",
+   "basis": "verse row at byte 23395",
+   "id": null,
+   "text": "Due to the low initial perigee altitude of the Lunar Transit (200 km) and the dense object environ-"
+  },
+  {
+   "start": 24130,
+   "end": 24225,
+   "type": "verse",
+   "basis": "verse row at byte 23495",
+   "id": null,
+   "text": "ment at low Earth altitudes below 2,000 km, multiple CAMs were anticipated to be necessary dur-"
+  },
+  {
+   "start": 24226,
+   "end": 24321,
+   "type": "verse",
+   "basis": "verse row at byte 23591",
+   "id": null,
+   "text": "ing flight. As CAM implementation was based in the addition of unplanned coasting, this was, by"
+  },
+  {
+   "start": 24322,
+   "end": 24404,
+   "type": "verse",
+   "basis": "verse row at byte 23687",
+   "id": null,
+   "text": "definition, intentional missed thrust and was included in the broader MTE context."
+  },
+  {
+   "start": 24409,
+   "end": 24498,
+   "type": "verse",
+   "basis": "verse row at byte 23774",
+   "id": null,
+   "text": "Figure 4: Empirical MTE forecasting using methods outlined by Imken, et al16"
+  },
+  {
+   "start": 24499,
+   "end": 24594,
+   "type": "verse",
+   "basis": "verse row at byte 23864",
+   "id": null,
+   "text": "Failures within the primary propulsion system can have catastrophic consequences for space-"
+  },
+  {
+   "start": 24595,
+   "end": 24688,
+   "type": "verse",
+   "basis": "verse row at byte 23960",
+   "id": null,
+   "text": "craft and lead to loss of mission. PPE’s SEP system inherently carried redundancy through the"
+  },
+  {
+   "start": 24689,
+   "end": 24785,
+   "type": "verse",
+   "basis": "verse row at byte 24054",
+   "id": null,
+   "text": "integration of 7 separate thrusters, 3x AEPS and 4x BHT-6000 thrusters. During transit, however,"
+  },
+  {
+   "start": 24786,
+   "end": 24880,
+   "type": "verse",
+   "basis": "verse row at byte 24151",
+   "id": null,
+   "text": "the AEPS strings would have produced roughly 80% of the total impulse required (a natural con-"
+  },
+  {
+   "start": 24881,
+   "end": 24973,
+   "type": "verse",
+   "basis": "verse row at byte 24246",
+   "id": null,
+   "text": "sequence of the AEPS units being roughly twice as powerful as the BHT-6000). Thruster string"
+  },
+  {
+   "start": 24974,
+   "end": 25074,
+   "type": "verse",
+   "basis": "verse row at byte 24339",
+   "id": null,
+   "text": "failures were thus analyzed through the bounding case of the loss of a single AEPS unit on the first"
+  },
+  {
+   "start": 25079,
+   "end": 25131,
+   "type": "verse",
+   "basis": "verse row at byte 24444",
+   "id": null,
+   "text": "8"
+  },
+  {
+   "start": 25132,
+   "end": 25230,
+   "type": "verse",
+   "basis": "verse row at byte 24497",
+   "id": null,
+   "text": "day of the mission, at mission elapsed time (MET) +0 days. Analysis focused on the ability of the"
+  },
+  {
+   "start": 25231,
+   "end": 25327,
+   "type": "verse",
+   "basis": "verse row at byte 24596",
+   "id": null,
+   "text": "spacecraft to reach the NRHO within existing mission constraints while utilizing the remaining 6"
+  },
+  {
+   "start": 25328,
+   "end": 25406,
+   "type": "verse",
+   "basis": "verse row at byte 24693",
+   "id": null,
+   "text": "healthy strings in order to show fault tolerance within the propulsion system."
+  },
+  {
+   "start": 25408,
+   "end": 25423,
+   "type": "verse",
+   "basis": "verse row at byte 24773",
+   "id": null,
+   "text": "RISK MITIGATION"
+  },
+  {
+   "start": 25425,
+   "end": 25526,
+   "type": "verse",
+   "basis": "verse row at byte 24790",
+   "id": null,
+   "text": "Uncertainties and contingency scenarios represent risks to the ability of the combined spacecraft"
+  },
+  {
+   "start": 25527,
+   "end": 25625,
+   "type": "verse",
+   "basis": "verse row at byte 24892",
+   "id": null,
+   "text": "and operator teams to successfully execute the mission within established constraints and require-"
+  },
+  {
+   "start": 25626,
+   "end": 25728,
+   "type": "verse",
+   "basis": "verse row at byte 24991",
+   "id": null,
+   "text": "ments. To ensure that sufficient capability exists to protect against a set of accepted risks, margins"
+  },
+  {
+   "start": 25729,
+   "end": 25828,
+   "type": "verse",
+   "basis": "verse row at byte 25094",
+   "id": null,
+   "text": "and reserves were applied to critical mission and spacecraft parameters. If, when, and to what mag-"
+  },
+  {
+   "start": 25829,
+   "end": 25928,
+   "type": "verse",
+   "basis": "verse row at byte 25194",
+   "id": null,
+   "text": "nitude a risk would be realized during flight would prompt the consumption of part of these margins"
+  },
+  {
+   "start": 25929,
+   "end": 25963,
+   "type": "verse",
+   "basis": "verse row at byte 25294",
+   "id": null,
+   "text": "and reserves to offset the impact."
+  },
+  {
+   "start": 25964,
+   "end": 26062,
+   "type": "verse",
+   "basis": "verse row at byte 25329",
+   "id": null,
+   "text": "Within the context of mission design, margins and reserves were primarily applied to propellant"
+  },
+  {
+   "start": 26063,
+   "end": 26161,
+   "type": "verse",
+   "basis": "verse row at byte 25428",
+   "id": null,
+   "text": "(particularly xenon mass) and time, including thruster duty cycles included for maneuver expansion"
+  },
+  {
+   "start": 26162,
+   "end": 26261,
+   "type": "verse",
+   "basis": "verse row at byte 25527",
+   "id": null,
+   "text": "periods, explicit coast periods reserved for things like missed thrust recovery, and padding placed"
+  },
+  {
+   "start": 26262,
+   "end": 26362,
+   "type": "verse",
+   "basis": "verse row at byte 25627",
+   "id": null,
+   "text": "on required coasting events such as eclipse passage to protect against navigation state uncertainty."
+  },
+  {
+   "start": 26363,
+   "end": 26455,
+   "type": "verse",
+   "basis": "verse row at byte 25728",
+   "id": null,
+   "text": "Broader vehicle margins such as mass growth allowance are beyond the scope of mission design"
+  },
+  {
+   "start": 26456,
+   "end": 26499,
+   "type": "verse",
+   "basis": "verse row at byte 25821",
+   "id": null,
+   "text": "and thus not discussed in this publication."
+  },
+  {
+   "start": 26500,
+   "end": 26597,
+   "type": "verse",
+   "basis": "verse row at byte 25865",
+   "id": null,
+   "text": "For the Lunar Transit mission margin and reserves were defined as separate quantities and ap-"
+  },
+  {
+   "start": 26598,
+   "end": 26690,
+   "type": "verse",
+   "basis": "verse row at byte 25963",
+   "id": null,
+   "text": "plied to specific forms of uncertainty. Reserves were aimed at protecting against “known un-"
+  },
+  {
+   "start": 26691,
+   "end": 26790,
+   "type": "verse",
+   "basis": "verse row at byte 26056",
+   "id": null,
+   "text": "knowns”, uncertainties that were likely or guaranteed to be realized but the magnitude of the real-"
+  },
+  {
+   "start": 26791,
+   "end": 26889,
+   "type": "verse",
+   "basis": "verse row at byte 26156",
+   "id": null,
+   "text": "ization would not be known pre-flight. This includes epistemic and aleatoric uncertainties such as"
+  },
+  {
+   "start": 26890,
+   "end": 26985,
+   "type": "verse",
+   "basis": "verse row at byte 26255",
+   "id": null,
+   "text": "thruster performance dispersions and launch vehicle injection error. Missed thrust was also in-"
+  },
+  {
+   "start": 26986,
+   "end": 27085,
+   "type": "verse",
+   "basis": "verse row at byte 26351",
+   "id": null,
+   "text": "cluded under reserves due to the high likelihood of realization indicated by empirical forecasting."
+  },
+  {
+   "start": 27086,
+   "end": 27182,
+   "type": "verse",
+   "basis": "verse row at byte 26451",
+   "id": null,
+   "text": "Margins, on the other hand, targeted “unknown unknowns”, events or uncertainties that may or may"
+  },
+  {
+   "start": 27183,
+   "end": 27281,
+   "type": "verse",
+   "basis": "verse row at byte 26548",
+   "id": null,
+   "text": "not occur during flight. This category broadly included anything where both the occurrence and the"
+  },
+  {
+   "start": 27282,
+   "end": 27381,
+   "type": "verse",
+   "basis": "verse row at byte 26647",
+   "id": null,
+   "text": "magnitude of realization was not certain, such as contingency scenarios and significant dispersions"
+  },
+  {
+   "start": 27382,
+   "end": 27479,
+   "type": "verse",
+   "basis": "verse row at byte 26747",
+   "id": null,
+   "text": "beyond the magnitude protected for with reserves (typically 3 standard deviations). Also included"
+  },
+  {
+   "start": 27480,
+   "end": 27579,
+   "type": "verse",
+   "basis": "verse row at byte 26845",
+   "id": null,
+   "text": "in margins were any risks, uncertainties, or events that were not being tracked at all in preflight"
+  },
+  {
+   "start": 27580,
+   "end": 27678,
+   "type": "verse",
+   "basis": "verse row at byte 26945",
+   "id": null,
+   "text": "analysis due to incomplete or insufficient knowledge of their potential existence. While some mar-"
+  },
+  {
+   "start": 27679,
+   "end": 27779,
+   "type": "verse",
+   "basis": "verse row at byte 27044",
+   "id": null,
+   "text": "gins, such as contingencies, could be directly quantified through analysis these “surprises” lurking"
+  },
+  {
+   "start": 27780,
+   "end": 27875,
+   "type": "verse",
+   "basis": "verse row at byte 27145",
+   "id": null,
+   "text": "beyond the limits of the engineering team’s knowledge would be covered with whatever propellant"
+  },
+  {
+   "start": 27876,
+   "end": 27971,
+   "type": "verse",
+   "basis": "verse row at byte 27241",
+   "id": null,
+   "text": "or time was naturally “left over” in the development of the deterministic mission. For example,"
+  },
+  {
+   "start": 27972,
+   "end": 28068,
+   "type": "verse",
+   "basis": "verse row at byte 27337",
+   "id": null,
+   "text": "should a surplus of xenon exist between the onboard storage capacity and the nominal mission and"
+  },
+  {
+   "start": 28069,
+   "end": 28163,
+   "type": "verse",
+   "basis": "verse row at byte 27434",
+   "id": null,
+   "text": "reserve and margin needs, then this extra propellant would flow to margins. Table 1 summarizes"
+  },
+  {
+   "start": 28164,
+   "end": 28182,
+   "type": "verse",
+   "basis": "verse row at byte 27529",
+   "id": null,
+   "text": "these definitions."
+  },
+  {
+   "start": 28183,
+   "end": 28221,
+   "type": "verse",
+   "basis": "verse row at byte 27548",
+   "id": null,
+   "text": "Table 1: Reserves and margins overview"
+  },
+  {
+   "start": 28222,
+   "end": 28281,
+   "type": "verse",
+   "basis": "verse row at byte 27587",
+   "id": null,
+   "text": "Reserves                                           Margins"
+  },
+  {
+   "start": 28282,
+   "end": 28350,
+   "type": "verse",
+   "basis": "verse row at byte 27647",
+   "id": null,
+   "text": "Known Unknowns                                     Unknown Unknowns"
+  },
+  {
+   "start": 28351,
+   "end": 28428,
+   "type": "verse",
+   "basis": "verse row at byte 27716",
+   "id": null,
+   "text": "§   Thruster performance uncertainty               §   Thruster failures"
+  },
+  {
+   "start": 28429,
+   "end": 28512,
+   "type": "verse",
+   "basis": "verse row at byte 27794",
+   "id": null,
+   "text": "§   Orbit insertion dispersions                    §   Prolonged loss of comms"
+  },
+  {
+   "start": 28513,
+   "end": 28594,
+   "type": "verse",
+   "basis": "verse row at byte 27878",
+   "id": null,
+   "text": "§   Power availability uncertainty                 §   Beyond 3σ dispersions"
+  },
+  {
+   "start": 28595,
+   "end": 28688,
+   "type": "verse",
+   "basis": "verse row at byte 27960",
+   "id": null,
+   "text": "§   Navigation uncertainty                         §   Risks not being tracked preflight"
+  },
+  {
+   "start": 28689,
+   "end": 28770,
+   "type": "verse",
+   "basis": "verse row at byte 28054",
+   "id": null,
+   "text": "§   Execution errors                               §   Vehicle contingencies"
+  },
+  {
+   "start": 28771,
+   "end": 28800,
+   "type": "verse",
+   "basis": "verse row at byte 28136",
+   "id": null,
+   "text": "§   Missed thrust events"
+  },
+  {
+   "start": 28805,
+   "end": 28858,
+   "type": "verse",
+   "basis": "verse row at byte 28170",
+   "id": null,
+   "text": "9"
+  },
+  {
+   "start": 28859,
+   "end": 28867,
+   "type": "verse",
+   "basis": "verse row at byte 28224",
+   "id": null,
+   "text": "RESULTS"
+  },
+  {
+   "start": 28869,
+   "end": 28963,
+   "type": "verse",
+   "basis": "verse row at byte 28234",
+   "id": null,
+   "text": "Monte Carlo analyses and targeted assessments of specific contingency cases became a focus"
+  },
+  {
+   "start": 28964,
+   "end": 29053,
+   "type": "verse",
+   "basis": "verse row at byte 28329",
+   "id": null,
+   "text": "of PPE MD as the Lunar Transit mission advanced from conceptual design towards execution."
+  },
+  {
+   "start": 29054,
+   "end": 29153,
+   "type": "verse",
+   "basis": "verse row at byte 28419",
+   "id": null,
+   "text": "Validating the robustness of trajectories to expected uncertainties became a critical and necessary"
+  },
+  {
+   "start": 29154,
+   "end": 29254,
+   "type": "verse",
+   "basis": "verse row at byte 28519",
+   "id": null,
+   "text": "step towards certification of flight readiness. While many analyses covering a large array of uncer-"
+  },
+  {
+   "start": 29255,
+   "end": 29354,
+   "type": "verse",
+   "basis": "verse row at byte 28620",
+   "id": null,
+   "text": "tainties, execution errors, and operational implementations were undertaken, results presented here"
+  },
+  {
+   "start": 29355,
+   "end": 29453,
+   "type": "verse",
+   "basis": "verse row at byte 28720",
+   "id": null,
+   "text": "will focus on launch vehicle injection error, thruster performance uncertainty, MTEs, and thruster"
+  },
+  {
+   "start": 29454,
+   "end": 29554,
+   "type": "verse",
+   "basis": "verse row at byte 28819",
+   "id": null,
+   "text": "failures. Reserves and margins are presented in terms of the percent of the deterministic xenon cost"
+  },
+  {
+   "start": 29555,
+   "end": 29656,
+   "type": "verse",
+   "basis": "verse row at byte 28920",
+   "id": null,
+   "text": "required to account for each realization. A brief discussion of time margins as it pertains to a max-"
+  },
+  {
+   "start": 29657,
+   "end": 29725,
+   "type": "verse",
+   "basis": "verse row at byte 29022",
+   "id": null,
+   "text": "imum experienced eclipse requirement of 90-minutes is also included."
+  },
+  {
+   "start": 29726,
+   "end": 29756,
+   "type": "verse",
+   "basis": "verse row at byte 29091",
+   "id": null,
+   "text": "Launch Vehicle Injection Error"
+  },
+  {
+   "start": 29757,
+   "end": 29857,
+   "type": "verse",
+   "basis": "verse row at byte 29122",
+   "id": null,
+   "text": "The Lunar Transit trajectory begins with a target interface point (TIP), which serves as a patch"
+  },
+  {
+   "start": 29858,
+   "end": 29956,
+   "type": "verse",
+   "basis": "verse row at byte 29223",
+   "id": null,
+   "text": "point between the ascent trajectory modeled by the launch vehicle team and the in-space trajectory"
+  },
+  {
+   "start": 29957,
+   "end": 30053,
+   "type": "verse",
+   "basis": "verse row at byte 29322",
+   "id": null,
+   "text": "modeled by PPE MD. The spacecraft will not perfectly be delivered to the identified TIP state by"
+  },
+  {
+   "start": 30054,
+   "end": 30154,
+   "type": "verse",
+   "basis": "verse row at byte 29419",
+   "id": null,
+   "text": "the launch vehicle and so the parking orbit from which the Lunar Transit begins will initialize with"
+  },
+  {
+   "start": 30155,
+   "end": 30255,
+   "type": "verse",
+   "basis": "verse row at byte 29520",
+   "id": null,
+   "text": "some insertion error. The first week of the Lunar Transit was envisioned to consist of system check-"
+  },
+  {
+   "start": 30256,
+   "end": 30348,
+   "type": "verse",
+   "basis": "verse row at byte 29621",
+   "id": null,
+   "text": "outs and a multi-day SEP system commissioning, meaning that insertion errors would propagate"
+  },
+  {
+   "start": 30349,
+   "end": 30448,
+   "type": "verse",
+   "basis": "verse row at byte 29714",
+   "id": null,
+   "text": "freely during this time without the ability to perform correction maneuvers. Due to the low perigee"
+  },
+  {
+   "start": 30449,
+   "end": 30548,
+   "type": "verse",
+   "basis": "verse row at byte 29814",
+   "id": null,
+   "text": "altitude of this parking orbit (200 km), perturbations due to drag, Earth spherical oblateness, and"
+  },
+  {
+   "start": 30549,
+   "end": 30606,
+   "type": "verse",
+   "basis": "verse row at byte 29914",
+   "id": null,
+   "text": "solar gravity would magnify dispersions in initial state."
+  },
+  {
+   "start": 30607,
+   "end": 30705,
+   "type": "verse",
+   "basis": "verse row at byte 29972",
+   "id": null,
+   "text": "Lunar Transit operations planning assumed that the pre-flight reference trajectory would be re-"
+  },
+  {
+   "start": 30706,
+   "end": 30803,
+   "type": "verse",
+   "basis": "verse row at byte 30071",
+   "id": null,
+   "text": "designed during the initial 7-day checkout to incorporate real-time knowledge in park orbit state"
+  },
+  {
+   "start": 30804,
+   "end": 30898,
+   "type": "verse",
+   "basis": "verse row at byte 30169",
+   "id": null,
+   "text": "and vehicle system performance. Dispersions in TIP insertion would thus be incorporated into a"
+  },
+  {
+   "start": 30899,
+   "end": 30997,
+   "type": "verse",
+   "basis": "verse row at byte 30264",
+   "id": null,
+   "text": "newly designed reference trajectory which would mitigate their impact relative to requiring short-"
+  },
+  {
+   "start": 30998,
+   "end": 31097,
+   "type": "verse",
+   "basis": "verse row at byte 30363",
+   "id": null,
+   "text": "term retargeting of the original, pre-flight reference. Analysis completed using the Aberrant pack-"
+  },
+  {
+   "start": 31098,
+   "end": 31193,
+   "type": "verse",
+   "basis": "verse row at byte 30463",
+   "id": null,
+   "text": "age simulated this process by sampling from a known distribution of perturbations to park orbit"
+  },
+  {
+   "start": 31194,
+   "end": 31215,
+   "type": "verse",
+   "basis": "verse row at byte 30559",
+   "id": null,
+   "text": "parameters including:"
+  },
+  {
+   "start": 31216,
+   "end": 31243,
+   "type": "verse",
+   "basis": "verse row at byte 30581",
+   "id": null,
+   "text": "1.   Apogee altitude"
+  },
+  {
+   "start": 31244,
+   "end": 31272,
+   "type": "verse",
+   "basis": "verse row at byte 30609",
+   "id": null,
+   "text": "2.   Perigee altitude"
+  },
+  {
+   "start": 31273,
+   "end": 31296,
+   "type": "verse",
+   "basis": "verse row at byte 30638",
+   "id": null,
+   "text": "3.   Inclination"
+  },
+  {
+   "start": 31297,
+   "end": 31334,
+   "type": "verse",
+   "basis": "verse row at byte 30662",
+   "id": null,
+   "text": "4.   Argument of perigee (AOP)"
+  },
+  {
+   "start": 31335,
+   "end": 31420,
+   "type": "verse",
+   "basis": "verse row at byte 30700",
+   "id": null,
+   "text": "5.   Right Ascension of the Ascending Node (RAAN) (determined by launch epoch)"
+  },
+  {
+   "start": 31421,
+   "end": 31516,
+   "type": "verse",
+   "basis": "verse row at byte 30786",
+   "id": null,
+   "text": "The resulting trajectory was then reoptimized to reach the NRHO. Of note is that due to the"
+  },
+  {
+   "start": 31517,
+   "end": 31612,
+   "type": "verse",
+   "basis": "verse row at byte 30882",
+   "id": null,
+   "text": "manner in which TIP states were defined (in an Earth body-fixed frame), RAAN was solely a func-"
+  },
+  {
+   "start": 31613,
+   "end": 31711,
+   "type": "verse",
+   "basis": "verse row at byte 30978",
+   "id": null,
+   "text": "tion of the time of day in which a launch occurred (assuming that ascent guidance and duration did"
+  },
+  {
+   "start": 31712,
+   "end": 31810,
+   "type": "verse",
+   "basis": "verse row at byte 31077",
+   "id": null,
+   "text": "not change from one minute to the next). Monte Carlo analysis sampled across distributions in each"
+  },
+  {
+   "start": 31811,
+   "end": 31906,
+   "type": "verse",
+   "basis": "verse row at byte 31176",
+   "id": null,
+   "text": "parameter simultaneously and covered a potential launch window of 20 minutes centered about the"
+  },
+  {
+   "start": 31907,
+   "end": 32000,
+   "type": "verse",
+   "basis": "verse row at byte 31272",
+   "id": null,
+   "text": "optimal epoch determined in reference trajectory development (+/- 10 minutes). Representative"
+  },
+  {
+   "start": 32001,
+   "end": 32098,
+   "type": "verse",
+   "basis": "verse row at byte 31366",
+   "id": null,
+   "text": "analysis covers a single, notional, month of potential launches (presented here as March of 2027)"
+  },
+  {
+   "start": 32099,
+   "end": 32135,
+   "type": "verse",
+   "basis": "verse row at byte 31464",
+   "id": null,
+   "text": "and contains roughly 20,000 samples."
+  },
+  {
+   "start": 32140,
+   "end": 32192,
+   "type": "verse",
+   "basis": "verse row at byte 31505",
+   "id": null,
+   "text": "10"
+  },
+  {
+   "start": 32193,
+   "end": 32292,
+   "type": "verse",
+   "basis": "verse row at byte 31558",
+   "id": null,
+   "text": "Figure 5: Sobol sensitivity indices of propellant consumption to varied TIP state parameters"
+  },
+  {
+   "start": 32293,
+   "end": 32388,
+   "type": "verse",
+   "basis": "verse row at byte 31658",
+   "id": null,
+   "text": "As multiple parameters are being varied simultaneously (apogee, perigee, inclination, RAAN,"
+  },
+  {
+   "start": 32389,
+   "end": 32490,
+   "type": "verse",
+   "basis": "verse row at byte 31754",
+   "id": null,
+   "text": "AOP, and launch date), a Sobol sensitivity analysis18 is conducted to determine trajectory propellant"
+  },
+  {
+   "start": 32491,
+   "end": 32592,
+   "type": "verse",
+   "basis": "verse row at byte 31856",
+   "id": null,
+   "text": "usage sensitivity to variations in each value. From Figure 5 it can be seen that variations in apogee"
+  },
+  {
+   "start": 32593,
+   "end": 32698,
+   "type": "verse",
+   "basis": "verse row at byte 31958",
+   "id": null,
+   "text": "altitude (and thus orbital energy) dominate the data set. This is to be expected, as increases in orbital"
+  },
+  {
+   "start": 32699,
+   "end": 32792,
+   "type": "verse",
+   "basis": "verse row at byte 32064",
+   "id": null,
+   "text": "energy decrease the ∆v required from the spacecraft to transit from GTO to NRHO (and the con-"
+  },
+  {
+   "start": 32793,
+   "end": 32888,
+   "type": "verse",
+   "basis": "verse row at byte 32158",
+   "id": null,
+   "text": "verse is true as well). The second most sensitive component is launch date, represented by park"
+  },
+  {
+   "start": 32889,
+   "end": 32985,
+   "type": "verse",
+   "basis": "verse row at byte 32254",
+   "id": null,
+   "text": "orbit injection epoch, which is also to be expected due to the daily evolution of the Earth-Moon"
+  },
+  {
+   "start": 32986,
+   "end": 33081,
+   "type": "verse",
+   "basis": "verse row at byte 32351",
+   "id": null,
+   "text": "system geometry and the fixed launch inclination of 28.5˚. Finally, variations in TIP RAAN form"
+  },
+  {
+   "start": 33082,
+   "end": 33172,
+   "type": "verse",
+   "basis": "verse row at byte 32447",
+   "id": null,
+   "text": "the final significant contribution to changes in xenon use, which will be discussed below."
+  },
+  {
+   "start": 33173,
+   "end": 33274,
+   "type": "verse",
+   "basis": "verse row at byte 32538",
+   "id": null,
+   "text": "As indicated by the Sobol results, xenon propellant required to correct for dispersions in apogee"
+  },
+  {
+   "start": 33275,
+   "end": 33376,
+   "type": "verse",
+   "basis": "verse row at byte 32640",
+   "id": null,
+   "text": "altitude forms a clearly identifiable trend, where higher apogee altitudes (positive dispersions) re-"
+  },
+  {
+   "start": 33377,
+   "end": 33472,
+   "type": "verse",
+   "basis": "verse row at byte 32742",
+   "id": null,
+   "text": "quire less propellant than the nominal trajectory (lower xenon reserve). Figure 6 shows that 3σ"
+  },
+  {
+   "start": 33473,
+   "end": 33572,
+   "type": "verse",
+   "basis": "verse row at byte 32838",
+   "id": null,
+   "text": "dispersions in apogee altitude result in between +/- 3% impact to available xenon reserves with hot"
+  },
+  {
+   "start": 33573,
+   "end": 33671,
+   "type": "verse",
+   "basis": "verse row at byte 32938",
+   "id": null,
+   "text": "insertions potentially saving xenon relative to the mean. The results also show two clear solution"
+  },
+  {
+   "start": 33672,
+   "end": 33765,
+   "type": "verse",
+   "basis": "verse row at byte 33037",
+   "id": null,
+   "text": "families separated by TIP RAAN, with one family forming around 45˚ and one forming near -15˚."
+  },
+  {
+   "start": 33766,
+   "end": 33861,
+   "type": "verse",
+   "basis": "verse row at byte 33131",
+   "id": null,
+   "text": "This trend is known to PPE MD, where solutions fall into one of two RAAN orientations depending"
+  },
+  {
+   "start": 33862,
+   "end": 33965,
+   "type": "verse",
+   "basis": "verse row at byte 33227",
+   "id": null,
+   "text": "on launch date. This is a result of the orientation of a launch trajectory with a 28.5˚ inclination and"
+  },
+  {
+   "start": 33966,
+   "end": 34065,
+   "type": "verse",
+   "basis": "verse row at byte 33331",
+   "id": null,
+   "text": "the Moon’s orbital plane about the Earth, where the -15˚ and 45˚ solution families produce a space-"
+  },
+  {
+   "start": 34066,
+   "end": 34169,
+   "type": "verse",
+   "basis": "verse row at byte 33431",
+   "id": null,
+   "text": "craft trajectory that arrive in a plane conducive to a lunar intercept at the end of the Earth-centered"
+  },
+  {
+   "start": 34170,
+   "end": 34270,
+   "type": "verse",
+   "basis": "verse row at byte 33535",
+   "id": null,
+   "text": "spiral portion of the Lunar Transit. Solutions within these two families can exhibit different xenon"
+  },
+  {
+   "start": 34271,
+   "end": 34367,
+   "type": "verse",
+   "basis": "verse row at byte 33636",
+   "id": null,
+   "text": "costs and eclipse trends from one another and this behavior has been noted across three separate"
+  },
+  {
+   "start": 34368,
+   "end": 34465,
+   "type": "verse",
+   "basis": "verse row at byte 33733",
+   "id": null,
+   "text": "iterations of reference trajectory design covering launch dates spanning three years (2026, 2027,"
+  },
+  {
+   "start": 34466,
+   "end": 34566,
+   "type": "verse",
+   "basis": "verse row at byte 33831",
+   "id": null,
+   "text": "and 2028). The RAAN sensitivity seen in the Sobol results are thus a product of this solution family"
+  },
+  {
+   "start": 34567,
+   "end": 34662,
+   "type": "verse",
+   "basis": "verse row at byte 33932",
+   "id": null,
+   "text": "behavior, and not the +/- 10-minute launch window perturbation applied to the Monte Carlo anal-"
+  },
+  {
+   "start": 34663,
+   "end": 34761,
+   "type": "verse",
+   "basis": "verse row at byte 34028",
+   "id": null,
+   "text": "ysis (and in fact no significant sensitivity between launch window and trajectory performance have"
+  },
+  {
+   "start": 34762,
+   "end": 34784,
+   "type": "verse",
+   "basis": "verse row at byte 34127",
+   "id": null,
+   "text": "been noted by PPE MD)."
+  },
+  {
+   "start": 34789,
+   "end": 34843,
+   "type": "verse",
+   "basis": "verse row at byte 34154",
+   "id": null,
+   "text": "11"
+  },
+  {
+   "start": 34844,
+   "end": 34926,
+   "type": "verse",
+   "basis": "verse row at byte 34209",
+   "id": null,
+   "text": "Figure 6: Xenon reserve sensitivity to apogee altitude dispersions"
+  },
+  {
+   "start": 34927,
+   "end": 34959,
+   "type": "verse",
+   "basis": "verse row at byte 34292",
+   "id": null,
+   "text": "Thruster Performance Uncertainty"
+  },
+  {
+   "start": 34960,
+   "end": 35056,
+   "type": "verse",
+   "basis": "verse row at byte 34325",
+   "id": null,
+   "text": "As discussed previously, PPE carried inherent uncertainty in the on-orbit performance of the"
+  },
+  {
+   "start": 35057,
+   "end": 35147,
+   "type": "verse",
+   "basis": "verse row at byte 34422",
+   "id": null,
+   "text": "SEP thrusters due to ground measurement uncertainty and performance differences in varying"
+  },
+  {
+   "start": 35148,
+   "end": 35246,
+   "type": "verse",
+   "basis": "verse row at byte 34513",
+   "id": null,
+   "text": "back-pressure environments. As with TIP insertion accuracy, a statistical distribution of thruster"
+  },
+  {
+   "start": 35247,
+   "end": 35338,
+   "type": "verse",
+   "basis": "verse row at byte 34612",
+   "id": null,
+   "text": "performance (thrust magnitude and specific impulse) as well as power system performance (in"
+  },
+  {
+   "start": 35339,
+   "end": 35434,
+   "type": "verse",
+   "basis": "verse row at byte 34704",
+   "id": null,
+   "text": "power available to the SEP system) was developed and applied to Lunar Transit reference trajec-"
+  },
+  {
+   "start": 35435,
+   "end": 35467,
+   "type": "verse",
+   "basis": "verse row at byte 34800",
+   "id": null,
+   "text": "tories in a Monte Carlo fashion."
+  },
+  {
+   "start": 35468,
+   "end": 35568,
+   "type": "verse",
+   "basis": "verse row at byte 34833",
+   "id": null,
+   "text": "Once again, a Sobol sensitivity analysis is employed to determine the sensitivity of xenon usage"
+  },
+  {
+   "start": 35569,
+   "end": 35669,
+   "type": "verse",
+   "basis": "verse row at byte 34934",
+   "id": null,
+   "text": "to variations in thrust magnitude, specific impulse, power to SEP, and launch date (this analysis is"
+  },
+  {
+   "start": 35670,
+   "end": 35763,
+   "type": "verse",
+   "basis": "verse row at byte 35035",
+   "id": null,
+   "text": "performed over the same March 2027 period as above). Sobol results (Figure 7) show a dominant"
+  },
+  {
+   "start": 35764,
+   "end": 35861,
+   "type": "verse",
+   "basis": "verse row at byte 35129",
+   "id": null,
+   "text": "sensitivity to variations in thruster efficiency with a secondary impact from thrust magnitude, a"
+  },
+  {
+   "start": 35862,
+   "end": 35959,
+   "type": "verse",
+   "basis": "verse row at byte 35227",
+   "id": null,
+   "text": "small contribution from power to SEP (which serves as an additional adjustment to thrust and spe-"
+  },
+  {
+   "start": 35960,
+   "end": 36063,
+   "type": "verse",
+   "basis": "verse row at byte 35325",
+   "id": null,
+   "text": "cific impulse via thruster throttle level), and very little impact from launch date. This result is in-"
+  },
+  {
+   "start": 36064,
+   "end": 36158,
+   "type": "verse",
+   "basis": "verse row at byte 35429",
+   "id": null,
+   "text": "dicative of the comparatively larger uncertainty in SEP thruster performance than power system"
+  },
+  {
+   "start": 36159,
+   "end": 36253,
+   "type": "verse",
+   "basis": "verse row at byte 35524",
+   "id": null,
+   "text": "performance, which is better characterized due to the mature implementation of ROSAs in space-"
+  },
+  {
+   "start": 36254,
+   "end": 36349,
+   "type": "verse",
+   "basis": "verse row at byte 35619",
+   "id": null,
+   "text": "flight missions. The second order impact of thrust magnitude to xenon usage has been determined"
+  },
+  {
+   "start": 36350,
+   "end": 36449,
+   "type": "verse",
+   "basis": "verse row at byte 35715",
+   "id": null,
+   "text": "to be a result of lower-thrust trajectories experiencing a greater number of eclipses than nominals"
+  },
+  {
+   "start": 36450,
+   "end": 36550,
+   "type": "verse",
+   "basis": "verse row at byte 35815",
+   "id": null,
+   "text": "(to be discussed below). This greater time spent in shadow increases the time required to spiral out"
+  },
+  {
+   "start": 36551,
+   "end": 36645,
+   "type": "verse",
+   "basis": "verse row at byte 35916",
+   "id": null,
+   "text": "of Earth’s gravity well, resulting in worsening geometric alignment of the trajectory with the"
+  },
+  {
+   "start": 36646,
+   "end": 36744,
+   "type": "verse",
+   "basis": "verse row at byte 36011",
+   "id": null,
+   "text": "Moon’s orbital plane when the spacecraft reaches lunar intercept. This alignment is corrected pro-"
+  },
+  {
+   "start": 36745,
+   "end": 36829,
+   "type": "verse",
+   "basis": "verse row at byte 36110",
+   "id": null,
+   "text": "pulsively, resulting in increased propellant consumption at lower thrust magnitudes."
+  },
+  {
+   "start": 36834,
+   "end": 36887,
+   "type": "verse",
+   "basis": "verse row at byte 36199",
+   "id": null,
+   "text": "12"
+  },
+  {
+   "start": 36888,
+   "end": 36980,
+   "type": "verse",
+   "basis": "verse row at byte 36253",
+   "id": null,
+   "text": "Figure 7: Sobol sensitivity of xenon usage to changes in SEP performance parameters"
+  },
+  {
+   "start": 36981,
+   "end": 37081,
+   "type": "verse",
+   "basis": "verse row at byte 36346",
+   "id": null,
+   "text": "Results (Figure 8) show a strong correlation between specific impulse and xenon use, as expected"
+  },
+  {
+   "start": 37082,
+   "end": 37183,
+   "type": "verse",
+   "basis": "verse row at byte 36447",
+   "id": null,
+   "text": "via the rocket equation. This trend is nearly 1:1, with a 1σ reduction in specific impulse requiring,"
+  },
+  {
+   "start": 37184,
+   "end": 37278,
+   "type": "verse",
+   "basis": "verse row at byte 36549",
+   "id": null,
+   "text": "on average, 1% more xenon to recovery from. This nearly linear relationship between propellant"
+  },
+  {
+   "start": 37279,
+   "end": 37377,
+   "type": "verse",
+   "basis": "verse row at byte 36644",
+   "id": null,
+   "text": "use and specific impulse is a happy coincidence of the magnitude of performance dispersion, which,"
+  },
+  {
+   "start": 37378,
+   "end": 37470,
+   "type": "verse",
+   "basis": "verse row at byte 36743",
+   "id": null,
+   "text": "for the purposes of analysis, was assumed to be roughly 0.8% 1σ. A ~1% variation in specific"
+  },
+  {
+   "start": 37471,
+   "end": 37571,
+   "type": "verse",
+   "basis": "verse row at byte 36836",
+   "id": null,
+   "text": "impulse resulting in a ~1% variation in propellant use not surprising to mission designers, but this"
+  },
+  {
+   "start": 37572,
+   "end": 37667,
+   "type": "verse",
+   "basis": "verse row at byte 36937",
+   "id": null,
+   "text": "linearity is an example of not only the law of small numbers but also how the high baseline SEP"
+  },
+  {
+   "start": 37668,
+   "end": 37765,
+   "type": "verse",
+   "basis": "verse row at byte 37033",
+   "id": null,
+   "text": "specific impulse of over 2,600 s helps to flatten the curve of the rocket equation. These results"
+  },
+  {
+   "start": 37766,
+   "end": 37865,
+   "type": "verse",
+   "basis": "verse row at byte 37131",
+   "id": null,
+   "text": "additionally show that just above 4% xenon reserve is required to protect against 3σ dispersions in"
+  },
+  {
+   "start": 37866,
+   "end": 37892,
+   "type": "verse",
+   "basis": "verse row at byte 37231",
+   "id": null,
+   "text": "thruster specific impulse."
+  },
+  {
+   "start": 37893,
+   "end": 37991,
+   "type": "verse",
+   "basis": "verse row at byte 37258",
+   "id": null,
+   "text": "Unlike propellant consumption, which is primarily a function of specific impulse, eclipse pro-"
+  },
+  {
+   "start": 37992,
+   "end": 38087,
+   "type": "verse",
+   "basis": "verse row at byte 37357",
+   "id": null,
+   "text": "files are primarily a function of thrust magnitude. Higher thrust magnitudes mean that when the"
+  },
+  {
+   "start": 38088,
+   "end": 38190,
+   "type": "verse",
+   "basis": "verse row at byte 37453",
+   "id": null,
+   "text": "spacecraft reaches the beginning of an eclipse season, the size of the vehicle’s orbit will have grown"
+  },
+  {
+   "start": 38191,
+   "end": 38288,
+   "type": "verse",
+   "basis": "verse row at byte 37556",
+   "id": null,
+   "text": "at a faster rate than the nominal. Meaning that each revolution within the eclipse season will be"
+  },
+  {
+   "start": 38289,
+   "end": 38387,
+   "type": "verse",
+   "basis": "verse row at byte 37654",
+   "id": null,
+   "text": "larger and thus orbital velocity across that revolution will, on average, be lower. This means the"
+  },
+  {
+   "start": 38388,
+   "end": 38486,
+   "type": "verse",
+   "basis": "verse row at byte 37753",
+   "id": null,
+   "text": "spacecraft will transit the Earth’s umbra more slowly, leading to increased eclipse durations with"
+  },
+  {
+   "start": 38487,
+   "end": 38587,
+   "type": "verse",
+   "basis": "verse row at byte 37852",
+   "id": null,
+   "text": "higher thrust magnitudes. The spacecraft will, however, exit an eclipse season entirely more quickly"
+  },
+  {
+   "start": 38588,
+   "end": 38687,
+   "type": "verse",
+   "basis": "verse row at byte 37953",
+   "id": null,
+   "text": "due to the higher rate of change of semi-major axis. This behavior is seen in Figure 9, which shows"
+  },
+  {
+   "start": 38688,
+   "end": 38783,
+   "type": "verse",
+   "basis": "verse row at byte 38053",
+   "id": null,
+   "text": "increasing eclipse durations and decreasing Earth eclipse counts with higher thrust dispersions"
+  },
+  {
+   "start": 38784,
+   "end": 38882,
+   "type": "verse",
+   "basis": "verse row at byte 38149",
+   "id": null,
+   "text": "across the entirety of March of 2027. Across 3σ dispersions in thrust, the duration of the longest"
+  },
+  {
+   "start": 38883,
+   "end": 38980,
+   "type": "verse",
+   "basis": "verse row at byte 38248",
+   "id": null,
+   "text": "experienced eclipse increases by ~3 minutes over baseline, while the number of eclipses decreases"
+  },
+  {
+   "start": 38981,
+   "end": 39078,
+   "type": "verse",
+   "basis": "verse row at byte 38346",
+   "id": null,
+   "text": "by roughly 10. Figure 9 also shows trajectories which violate the 90-minute requirement at higher"
+  },
+  {
+   "start": 39079,
+   "end": 39175,
+   "type": "verse",
+   "basis": "verse row at byte 38444",
+   "id": null,
+   "text": "thrust dispersions, meaning that while the baseline trajectory may have been requirement compli-"
+  },
+  {
+   "start": 39176,
+   "end": 39275,
+   "type": "verse",
+   "basis": "verse row at byte 38541",
+   "id": null,
+   "text": "ant, a mission design which accounts for uncertainty in performance is not. This trend reflects the"
+  },
+  {
+   "start": 39276,
+   "end": 39372,
+   "type": "verse",
+   "basis": "verse row at byte 38641",
+   "id": null,
+   "text": "need for margin to be applied to path constraints such as a maximum eclipse duration in order to"
+  },
+  {
+   "start": 39373,
+   "end": 39421,
+   "type": "verse",
+   "basis": "verse row at byte 38738",
+   "id": null,
+   "text": "account for real world uncertainty in execution."
+  },
+  {
+   "start": 39426,
+   "end": 39479,
+   "type": "verse",
+   "basis": "verse row at byte 38791",
+   "id": null,
+   "text": "13"
+  },
+  {
+   "start": 39480,
+   "end": 39563,
+   "type": "verse",
+   "basis": "verse row at byte 38845",
+   "id": null,
+   "text": "Figure 8: Xenon reserves required vs specific impulse dispersions"
+  },
+  {
+   "start": 39568,
+   "end": 39668,
+   "type": "verse",
+   "basis": "verse row at byte 38933",
+   "id": null,
+   "text": "Figure 9: Eclipse duration (left) and number of total Earth eclipses (right) vs thrust magnitude"
+  },
+  {
+   "start": 39669,
+   "end": 39736,
+   "type": "verse",
+   "basis": "verse row at byte 39034",
+   "id": null,
+   "text": "dispersion, colored by launch date"
+  },
+  {
+   "start": 39737,
+   "end": 39750,
+   "type": "verse",
+   "basis": "verse row at byte 39102",
+   "id": null,
+   "text": "Missed Thrust"
+  },
+  {
+   "start": 39751,
+   "end": 39850,
+   "type": "verse",
+   "basis": "verse row at byte 39116",
+   "id": null,
+   "text": "Previous work10 as well as the empirical results in Figure 4 have highlighted the probability of"
+  },
+  {
+   "start": 39851,
+   "end": 39944,
+   "type": "verse",
+   "basis": "verse row at byte 39216",
+   "id": null,
+   "text": "missed thrust across the end-to-end Lunar Transit. While the empirical results indicated a 3σ"
+  },
+  {
+   "start": 39949,
+   "end": 40001,
+   "type": "verse",
+   "basis": "verse row at byte 39314",
+   "id": null,
+   "text": "14"
+  },
+  {
+   "start": 40002,
+   "end": 40102,
+   "type": "verse",
+   "basis": "verse row at byte 39367",
+   "id": null,
+   "text": "probability of encountering just under 10-days of total thrust outage during the Lunar Transit, the"
+  },
+  {
+   "start": 40103,
+   "end": 40198,
+   "type": "verse",
+   "basis": "verse row at byte 39468",
+   "id": null,
+   "text": "combined PPE engineering and operations team conducted a separate, vehicle specific, assessment"
+  },
+  {
+   "start": 40199,
+   "end": 40293,
+   "type": "verse",
+   "basis": "verse row at byte 39564",
+   "id": null,
+   "text": "to determine a required missed thrust tolerance for the Lunar Transit. Flight controllers from"
+  },
+  {
+   "start": 40294,
+   "end": 40382,
+   "type": "verse",
+   "basis": "verse row at byte 39659",
+   "id": null,
+   "text": "NASA’s Mission Control Center Houston (MCC-H) along with mission design concluded that a"
+  },
+  {
+   "start": 40383,
+   "end": 40480,
+   "type": "verse",
+   "basis": "verse row at byte 39748",
+   "id": null,
+   "text": "resilience to 21-days of total thrust outage occurring at any time during transit would provide a"
+  },
+  {
+   "start": 40481,
+   "end": 40576,
+   "type": "verse",
+   "basis": "verse row at byte 39846",
+   "id": null,
+   "text": "reasonable not-to-exceed time for anomaly resolution and spacecraft recovery during operations."
+  },
+  {
+   "start": 40577,
+   "end": 40666,
+   "type": "verse",
+   "basis": "verse row at byte 39942",
+   "id": null,
+   "text": "This maximum outage duration of 21-days became a “known unknown”, with the xenon required"
+  },
+  {
+   "start": 40667,
+   "end": 40743,
+   "type": "verse",
+   "basis": "verse row at byte 40032",
+   "id": null,
+   "text": "to protect against an outage of this duration coming in the form of reserve."
+  },
+  {
+   "start": 40744,
+   "end": 40833,
+   "type": "verse",
+   "basis": "verse row at byte 40109",
+   "id": null,
+   "text": "Using the framework contained in Aberrant, 21-day MTEs were analyzed using the Rolling"
+  },
+  {
+   "start": 40834,
+   "end": 40929,
+   "type": "verse",
+   "basis": "verse row at byte 40199",
+   "id": null,
+   "text": "Outage approach10, beginning at MET +0 and continuing through the end of the Spiral Phase (near"
+  },
+  {
+   "start": 40930,
+   "end": 41022,
+   "type": "verse",
+   "basis": "verse row at byte 40295",
+   "id": null,
+   "text": "MET +275). Further analysis assessed MTEs in the Alignment and Insertion Phases but have not"
+  },
+  {
+   "start": 41023,
+   "end": 41120,
+   "type": "verse",
+   "basis": "verse row at byte 40388",
+   "id": null,
+   "text": "been included here for conciseness. In each case, the remaining spacecraft trajectory was reopti-"
+  },
+  {
+   "start": 41121,
+   "end": 41212,
+   "type": "verse",
+   "basis": "verse row at byte 40486",
+   "id": null,
+   "text": "mized post-MTE to target the NRHO. To limit the propellant impact of an outage, 21-day MTEs"
+  },
+  {
+   "start": 41213,
+   "end": 41306,
+   "type": "verse",
+   "basis": "verse row at byte 40578",
+   "id": null,
+   "text": "prompted an arrival delay of 4 NRHO revolutions, roughly corresponding to one lunar month, or"
+  },
+  {
+   "start": 41307,
+   "end": 41404,
+   "type": "verse",
+   "basis": "verse row at byte 40672",
+   "id": null,
+   "text": "29 days. This delay prevented the need for excessive thrusting during later phases of the mission"
+  },
+  {
+   "start": 41405,
+   "end": 41500,
+   "type": "verse",
+   "basis": "verse row at byte 40770",
+   "id": null,
+   "text": "and preserved optimal coasting in the Alignment Phase while maintaining a favorable geometry by"
+  },
+  {
+   "start": 41501,
+   "end": 41551,
+   "type": "verse",
+   "basis": "verse row at byte 40866",
+   "id": null,
+   "text": "which the Gateway would execute a lunar intercept."
+  },
+  {
+   "start": 41556,
+   "end": 41653,
+   "type": "verse",
+   "basis": "verse row at byte 40921",
+   "id": null,
+   "text": "Figure 10: Xenon reserve as a function of the MET occurrence of a 21-day missed thrust event"
+  },
+  {
+   "start": 41654,
+   "end": 41752,
+   "type": "verse",
+   "basis": "verse row at byte 41019",
+   "id": null,
+   "text": "Missed thrust results for 21-day outages show that a xenon reserve of roughly 2% is sufficient"
+  },
+  {
+   "start": 41753,
+   "end": 41849,
+   "type": "verse",
+   "basis": "verse row at byte 41118",
+   "id": null,
+   "text": "to recover from MTEs at any point in the Spiral Phase, provided the spacecraft can arrive at the"
+  },
+  {
+   "start": 41850,
+   "end": 41947,
+   "type": "verse",
+   "basis": "verse row at byte 41215",
+   "id": null,
+   "text": "NRHO 29 days later than planned (Figure 10). Sensitivity is not constant over the duration of the"
+  },
+  {
+   "start": 41948,
+   "end": 42039,
+   "type": "verse",
+   "basis": "verse row at byte 41313",
+   "id": null,
+   "text": "Spiral Phase, however, with xenon costs decreasing as the MET at which an outage occurs in-"
+  },
+  {
+   "start": 42040,
+   "end": 42137,
+   "type": "verse",
+   "basis": "verse row at byte 41405",
+   "id": null,
+   "text": "creases. This is due to the increasing perigee altitude of the trajectory over time, meaning that"
+  },
+  {
+   "start": 42142,
+   "end": 42193,
+   "type": "verse",
+   "basis": "verse row at byte 41507",
+   "id": null,
+   "text": "15"
+  },
+  {
+   "start": 42194,
+   "end": 42290,
+   "type": "verse",
+   "basis": "verse row at byte 41559",
+   "id": null,
+   "text": "atmospheric drag and Earth spherical oblateness induce fewer perturbations to trajectories with"
+  },
+  {
+   "start": 42291,
+   "end": 42389,
+   "type": "verse",
+   "basis": "verse row at byte 41656",
+   "id": null,
+   "text": "outages later in the mission. The results also show a launch date sensitivity, with certain launch"
+  },
+  {
+   "start": 42390,
+   "end": 42486,
+   "type": "verse",
+   "basis": "verse row at byte 41755",
+   "id": null,
+   "text": "dates exhibiting lower costs than others (the May 7th solution is noticeably more robust to MTEs"
+  },
+  {
+   "start": 42487,
+   "end": 42530,
+   "type": "verse",
+   "basis": "verse row at byte 41852",
+   "id": null,
+   "text": "than solutions on May 1st through the 6th)."
+  },
+  {
+   "start": 42531,
+   "end": 42548,
+   "type": "verse",
+   "basis": "verse row at byte 41896",
+   "id": null,
+   "text": "Thruster Failures"
+  },
+  {
+   "start": 42549,
+   "end": 42649,
+   "type": "verse",
+   "basis": "verse row at byte 41914",
+   "id": null,
+   "text": "Given the strategic value of the Gateway to the Artemis architecture as envisioned in the begin-"
+  },
+  {
+   "start": 42650,
+   "end": 42747,
+   "type": "verse",
+   "basis": "verse row at byte 42015",
+   "id": null,
+   "text": "ning of 2026, it was desirable to maintain fault tolerance and anomaly resilience where possible."
+  },
+  {
+   "start": 42748,
+   "end": 42848,
+   "type": "verse",
+   "basis": "verse row at byte 42113",
+   "id": null,
+   "text": "This included resilience to thruster failures, with the MET +0 loss of a single AEPS thruster deter-"
+  },
+  {
+   "start": 42849,
+   "end": 42948,
+   "type": "verse",
+   "basis": "verse row at byte 42214",
+   "id": null,
+   "text": "mined to be the most stressing case for the Lunar Transit. To assess this contingency, the same set"
+  },
+  {
+   "start": 42949,
+   "end": 43046,
+   "type": "verse",
+   "basis": "verse row at byte 42314",
+   "id": null,
+   "text": "of trajectories analyzed in the missed thrust assessment were modified to represent the loss of a"
+  },
+  {
+   "start": 43047,
+   "end": 43138,
+   "type": "verse",
+   "basis": "verse row at byte 42412",
+   "id": null,
+   "text": "single AEPS. While the PPE carried 3x AEPS, it also would have carried 4x BHT-6000s, and so"
+  },
+  {
+   "start": 43139,
+   "end": 43230,
+   "type": "verse",
+   "basis": "verse row at byte 42504",
+   "id": null,
+   "text": "following the loss of a 12 kW string the Lunar Transit would be completed on 2x AEPS and 4x"
+  },
+  {
+   "start": 43231,
+   "end": 43328,
+   "type": "verse",
+   "basis": "verse row at byte 42596",
+   "id": null,
+   "text": "BHTs. Complicating this analysis is the need to complete a recovery within the qualified lifetime"
+  },
+  {
+   "start": 43329,
+   "end": 43424,
+   "type": "verse",
+   "basis": "verse row at byte 42694",
+   "id": null,
+   "text": "of the BHT-6000 strings which, due to their lack of magnetic shielding, are expected to degrade"
+  },
+  {
+   "start": 43425,
+   "end": 43488,
+   "type": "verse",
+   "basis": "verse row at byte 42790",
+   "id": null,
+   "text": "over their life and eventually fail due to this wear mechanism."
+  },
+  {
+   "start": 43493,
+   "end": 43570,
+   "type": "verse",
+   "basis": "verse row at byte 42858",
+   "id": null,
+   "text": "Figure 11: Single AEPS out recovery results for May 2027"
+  },
+  {
+   "start": 43571,
+   "end": 43665,
+   "type": "verse",
+   "basis": "verse row at byte 42936",
+   "id": null,
+   "text": "Figure 11 shows the xenon margin (not reserve, as contingencies are defined as unknown-un-"
+  },
+  {
+   "start": 43666,
+   "end": 43757,
+   "type": "verse",
+   "basis": "verse row at byte 43031",
+   "id": null,
+   "text": "knowns) required to recover from an MET +0 AEPS failure across launch dates in May of 2027."
+  },
+  {
+   "start": 43758,
+   "end": 43859,
+   "type": "verse",
+   "basis": "verse row at byte 43123",
+   "id": null,
+   "text": "These recovery costs are significantly higher than those for the three types of stochastic uncertain-"
+  },
+  {
+   "start": 43860,
+   "end": 43956,
+   "type": "verse",
+   "basis": "verse row at byte 43225",
+   "id": null,
+   "text": "ties described above, with a maximum value of ~10%. Due to the significant shift in impulse han-"
+  },
+  {
+   "start": 43957,
+   "end": 44048,
+   "type": "verse",
+   "basis": "verse row at byte 43322",
+   "id": null,
+   "text": "dling away from the AEPS and towards the remaining BHT-6000s, total system efficiency drops"
+  },
+  {
+   "start": 44049,
+   "end": 44143,
+   "type": "verse",
+   "basis": "verse row at byte 43414",
+   "id": null,
+   "text": "in these recovery cases and propellant consumption increases. While the AEPS thrusters produce"
+  },
+  {
+   "start": 44144,
+   "end": 44243,
+   "type": "verse",
+   "basis": "verse row at byte 43509",
+   "id": null,
+   "text": "nearly 80% of the total required mission impulse in nominal scenarios, that share drops to just 60%"
+  },
+  {
+   "start": 44248,
+   "end": 44300,
+   "type": "verse",
+   "basis": "verse row at byte 43613",
+   "id": null,
+   "text": "16"
+  },
+  {
+   "start": 44301,
+   "end": 44404,
+   "type": "verse",
+   "basis": "verse row at byte 43666",
+   "id": null,
+   "text": "in a failure case. Margin, like reserves, is not made of just one value but is meant to cover multiple"
+  },
+  {
+   "start": 44405,
+   "end": 44505,
+   "type": "verse",
+   "basis": "verse row at byte 43770",
+   "id": null,
+   "text": "potentialities. One individual scenario requiring 10% margin represents a significant driver of pro-"
+  },
+  {
+   "start": 44506,
+   "end": 44600,
+   "type": "verse",
+   "basis": "verse row at byte 43871",
+   "id": null,
+   "text": "pellant needs and posed program leadership with a challenging risk posture to incorporate into"
+  },
+  {
+   "start": 44601,
+   "end": 44626,
+   "type": "verse",
+   "basis": "verse row at byte 43966",
+   "id": null,
+   "text": "mission-level accounting."
+  },
+  {
+   "start": 44631,
+   "end": 44702,
+   "type": "verse",
+   "basis": "verse row at byte 43996",
+   "id": null,
+   "text": "Figure 12: BHT-6000 lifetime utilization"
+  },
+  {
+   "start": 44703,
+   "end": 44800,
+   "type": "verse",
+   "basis": "verse row at byte 44068",
+   "id": null,
+   "text": "Nominal Lunar Transit trajectories required roughly 50% of the available lifetime of each BHT-"
+  },
+  {
+   "start": 44801,
+   "end": 44897,
+   "type": "verse",
+   "basis": "verse row at byte 44166",
+   "id": null,
+   "text": "6000 thruster to complete (a more comprehensive discussion of thruster utilization has been pre-"
+  },
+  {
+   "start": 44898,
+   "end": 44994,
+   "type": "verse",
+   "basis": "verse row at byte 44263",
+   "id": null,
+   "text": "sented previously19). As Figure 12 reflects, AEPS failure recoveries nearly double that usage to"
+  },
+  {
+   "start": 44995,
+   "end": 45088,
+   "type": "verse",
+   "basis": "verse row at byte 44360",
+   "id": null,
+   "text": "between 93% and 95%. In practice, mission designers were forced to throttle the BHT thrusters"
+  },
+  {
+   "start": 45089,
+   "end": 45184,
+   "type": "verse",
+   "basis": "verse row at byte 44454",
+   "id": null,
+   "text": "back in these recovery scenarios in order to prevent lifetime exceedances, further reducing the"
+  },
+  {
+   "start": 45185,
+   "end": 45282,
+   "type": "verse",
+   "basis": "verse row at byte 44550",
+   "id": null,
+   "text": "overall system efficiency and increasing propellant consumption further. This qualification limit"
+  },
+  {
+   "start": 45283,
+   "end": 45377,
+   "type": "verse",
+   "basis": "verse row at byte 44648",
+   "id": null,
+   "text": "became a difficult design constraint to comply with and one that drove thruster implementation"
+  },
+  {
+   "start": 45378,
+   "end": 45418,
+   "type": "verse",
+   "basis": "verse row at byte 44743",
+   "id": null,
+   "text": "decisions during contingency recoveries."
+  },
+  {
+   "start": 45419,
+   "end": 45449,
+   "type": "verse",
+   "basis": "verse row at byte 44784",
+   "id": null,
+   "text": "Impact to Margins and Reserves"
+  },
+  {
+   "start": 45450,
+   "end": 45545,
+   "type": "verse",
+   "basis": "verse row at byte 44815",
+   "id": null,
+   "text": "These four analyses each are the result of the application of some set of accepted GR&As to"
+  },
+  {
+   "start": 45546,
+   "end": 45650,
+   "type": "verse",
+   "basis": "verse row at byte 44911",
+   "id": null,
+   "text": "reference trajectories representing deterministic missions. The results reflect a potential distribution"
+  },
+  {
+   "start": 45651,
+   "end": 45752,
+   "type": "verse",
+   "basis": "verse row at byte 45016",
+   "id": null,
+   "text": "of risk postures, with mean values for stochastic uncertainty sensitivity near zero for all three re-"
+  },
+  {
+   "start": 45753,
+   "end": 45850,
+   "type": "verse",
+   "basis": "verse row at byte 45118",
+   "id": null,
+   "text": "serve-based analyses up to 4.6% 3σ in the case of thruster performance errors. Likewise, AEPS out"
+  },
+  {
+   "start": 45851,
+   "end": 45951,
+   "type": "verse",
+   "basis": "verse row at byte 45216",
+   "id": null,
+   "text": "cases represent a choice to protect against single fault tolerance in the SEP system, driving a high"
+  },
+  {
+   "start": 45952,
+   "end": 46047,
+   "type": "verse",
+   "basis": "verse row at byte 45317",
+   "id": null,
+   "text": "propellant margin of nearly 10%. When added together, these analyses represent 9% (3σ) of xenon"
+  },
+  {
+   "start": 46048,
+   "end": 46146,
+   "type": "verse",
+   "basis": "verse row at byte 45413",
+   "id": null,
+   "text": "reserve and 9.9% of xenon margin (Table 2). It is, of course, possible to reduce these margins and"
+  },
+  {
+   "start": 46147,
+   "end": 46244,
+   "type": "verse",
+   "basis": "verse row at byte 45512",
+   "id": null,
+   "text": "reserves by choosing to accept a higher degree of risk on mission execution. Mission managers can"
+  },
+  {
+   "start": 46245,
+   "end": 46337,
+   "type": "verse",
+   "basis": "verse row at byte 45610",
+   "id": null,
+   "text": "choose to account for 2σ uncertainties in values such as thruster performance or reliability"
+  },
+  {
+   "start": 46342,
+   "end": 46396,
+   "type": "verse",
+   "basis": "verse row at byte 45707",
+   "id": null,
+   "text": "17"
+  },
+  {
+   "start": 46397,
+   "end": 46496,
+   "type": "verse",
+   "basis": "verse row at byte 45762",
+   "id": null,
+   "text": "assessments may indicate that an AEPS failure is not likely enough to warrant carrying an explicit"
+  },
+  {
+   "start": 46497,
+   "end": 46594,
+   "type": "verse",
+   "basis": "verse row at byte 45862",
+   "id": null,
+   "text": "margin. These decisions are themselves part of the GR&As that guide analysis and the risk posture"
+  },
+  {
+   "start": 46595,
+   "end": 46693,
+   "type": "verse",
+   "basis": "verse row at byte 45960",
+   "id": null,
+   "text": "that has been accepted at a project or program level drive not only trajectory design and analysis"
+  },
+  {
+   "start": 46694,
+   "end": 46791,
+   "type": "verse",
+   "basis": "verse row at byte 46059",
+   "id": null,
+   "text": "decisions but also hardware decisions on the spacecraft (such as propellant tank size to accommo-"
+  },
+  {
+   "start": 46792,
+   "end": 46815,
+   "type": "verse",
+   "basis": "verse row at byte 46157",
+   "id": null,
+   "text": "date additional xenon)."
+  },
+  {
+   "start": 46816,
+   "end": 46853,
+   "type": "verse",
+   "basis": "verse row at byte 46181",
+   "id": null,
+   "text": "Table 2: Reserves and Margins Impacts"
+  },
+  {
+   "start": 46854,
+   "end": 46936,
+   "type": "verse",
+   "basis": "verse row at byte 46219",
+   "id": null,
+   "text": "Mean + 3σ Xenon Reserve            Xenon Margin"
+  },
+  {
+   "start": 46937,
+   "end": 47038,
+   "type": "verse",
+   "basis": "verse row at byte 46302",
+   "id": null,
+   "text": "TIP Injection Error                                          1.7%                                 0%"
+  },
+  {
+   "start": 47039,
+   "end": 47140,
+   "type": "verse",
+   "basis": "verse row at byte 46404",
+   "id": null,
+   "text": "SEP Uncertainty                                              4.6%                                 0%"
+  },
+  {
+   "start": 47141,
+   "end": 47242,
+   "type": "verse",
+   "basis": "verse row at byte 46506",
+   "id": null,
+   "text": "Missed Thrust (21-days)                                      2.7%                                 0%"
+  },
+  {
+   "start": 47243,
+   "end": 47344,
+   "type": "verse",
+   "basis": "verse row at byte 46608",
+   "id": null,
+   "text": "AEPS Failure                                                   0%                               9.9%"
+  },
+  {
+   "start": 47345,
+   "end": 47445,
+   "type": "verse",
+   "basis": "verse row at byte 46710",
+   "id": null,
+   "text": "Total                                                          9%                              9.9%"
+  },
+  {
+   "start": 47448,
+   "end": 47474,
+   "type": "verse",
+   "basis": "verse row at byte 46813",
+   "id": null,
+   "text": "CONCLUSIONS AND DISCUSSION"
+  },
+  {
+   "start": 47476,
+   "end": 47573,
+   "type": "verse",
+   "basis": "verse row at byte 46841",
+   "id": null,
+   "text": "Hardware, as a mission designer may come to learn, is a synonym for constraint. Real, physical"
+  },
+  {
+   "start": 47574,
+   "end": 47672,
+   "type": "verse",
+   "basis": "verse row at byte 46939",
+   "id": null,
+   "text": "systems inherently are imperfect as are the humans that operate them. Ground based facilities pro-"
+  },
+  {
+   "start": 47673,
+   "end": 47767,
+   "type": "verse",
+   "basis": "verse row at byte 47038",
+   "id": null,
+   "text": "vide imperfect or incomplete recreations of the space environment, models imperfectly simulate"
+  },
+  {
+   "start": 47768,
+   "end": 47865,
+   "type": "verse",
+   "basis": "verse row at byte 47133",
+   "id": null,
+   "text": "the operations of systems, and spacecraft and the supporting ground-based apparatuses imperfectly"
+  },
+  {
+   "start": 47866,
+   "end": 47926,
+   "type": "verse",
+   "basis": "verse row at byte 47231",
+   "id": null,
+   "text": "execute missions within the context of incomplete knowledge."
+  },
+  {
+   "start": 47927,
+   "end": 48027,
+   "type": "verse",
+   "basis": "verse row at byte 47292",
+   "id": null,
+   "text": "When hardware is qualified for use on a mission, the parameters of those tests set the limits to"
+  },
+  {
+   "start": 48028,
+   "end": 48122,
+   "type": "verse",
+   "basis": "verse row at byte 47393",
+   "id": null,
+   "text": "which systems are accepted to safely operate. On-orbit, systems may safely operate well beyond"
+  },
+  {
+   "start": 48123,
+   "end": 48222,
+   "type": "verse",
+   "basis": "verse row at byte 47488",
+   "id": null,
+   "text": "those bounds but they do so at risk without existing data. In the case of the BHT-6000 thruster (as"
+  },
+  {
+   "start": 48223,
+   "end": 48324,
+   "type": "verse",
+   "basis": "verse row at byte 47588",
+   "id": null,
+   "text": "an example), this takes the form of a qualified lifetime. This number is not a true limit after which"
+  },
+  {
+   "start": 48325,
+   "end": 48427,
+   "type": "verse",
+   "basis": "verse row at byte 47690",
+   "id": null,
+   "text": "the thruster catastrophically fails, it is a limit in knowledge that becomes a design-to constraint in"
+  },
+  {
+   "start": 48428,
+   "end": 48528,
+   "type": "verse",
+   "basis": "verse row at byte 47793",
+   "id": null,
+   "text": "pre-flight analysis. During flight, mission managers may choose to exceed this limit particularly in"
+  },
+  {
+   "start": 48529,
+   "end": 48623,
+   "type": "verse",
+   "basis": "verse row at byte 47894",
+   "id": null,
+   "text": "the event of an anomaly or contingency. Such a capability cannot, however, be depended upon to"
+  },
+  {
+   "start": 48624,
+   "end": 48718,
+   "type": "verse",
+   "basis": "verse row at byte 47989",
+   "id": null,
+   "text": "ensure mission robustness in development. These limits in knowledge become the limits to which"
+  },
+  {
+   "start": 48719,
+   "end": 48818,
+   "type": "verse",
+   "basis": "verse row at byte 48084",
+   "id": null,
+   "text": "engineers can design and analyze, and the final design of a mission will reflect the known capabil-"
+  },
+  {
+   "start": 48819,
+   "end": 48864,
+   "type": "verse",
+   "basis": "verse row at byte 48184",
+   "id": null,
+   "text": "ities of a spacecraft, not the true maximums."
+  },
+  {
+   "start": 48865,
+   "end": 48962,
+   "type": "verse",
+   "basis": "verse row at byte 48230",
+   "id": null,
+   "text": "Any low-thrust spacecraft may face the same uncertainties and contingencies presented in this"
+  },
+  {
+   "start": 48963,
+   "end": 49061,
+   "type": "verse",
+   "basis": "verse row at byte 48328",
+   "id": null,
+   "text": "work. Launch vehicle injection errors apply to all space missions, the thruster performance uncer-"
+  },
+  {
+   "start": 49062,
+   "end": 49166,
+   "type": "verse",
+   "basis": "verse row at byte 48427",
+   "id": null,
+   "text": "tainties described here are inherent to all electric propulsion technologies, missed thrust is a persis-"
+  },
+  {
+   "start": 49167,
+   "end": 49268,
+   "type": "verse",
+   "basis": "verse row at byte 48532",
+   "id": null,
+   "text": "tent risk to low-thrust missions, and thruster failures may strike any spacecraft. Likewise, the mag-"
+  },
+  {
+   "start": 49269,
+   "end": 49369,
+   "type": "verse",
+   "basis": "verse row at byte 48634",
+   "id": null,
+   "text": "nitude of margins and reserves necessary to protect against not just these, but all forms of errors,"
+  },
+  {
+   "start": 49370,
+   "end": 49472,
+   "type": "verse",
+   "basis": "verse row at byte 48735",
+   "id": null,
+   "text": "uncertainties, and risks that face a spacecraft must be accounted for in the development of any flight"
+  },
+  {
+   "start": 49473,
+   "end": 49481,
+   "type": "verse",
+   "basis": "verse row at byte 48838",
+   "id": null,
+   "text": "mission."
+  },
+  {
+   "start": 49482,
+   "end": 49577,
+   "type": "verse",
+   "basis": "verse row at byte 48847",
+   "id": null,
+   "text": "To offset just four unknowns in the Lunar Transit required 18.9% of the deterministic xenon"
+  },
+  {
+   "start": 49578,
+   "end": 49682,
+   "type": "verse",
+   "basis": "verse row at byte 48943",
+   "id": null,
+   "text": "utilization (9% for reserves and 9.9% for thruster failures). This is a valuable lesson about the nature"
+  },
+  {
+   "start": 49683,
+   "end": 49782,
+   "type": "verse",
+   "basis": "verse row at byte 49048",
+   "id": null,
+   "text": "of maturing a mission from formulation to flight. Early in mission development (typically following"
+  },
+  {
+   "start": 49783,
+   "end": 49883,
+   "type": "verse",
+   "basis": "verse row at byte 49148",
+   "id": null,
+   "text": "the preliminary design review), the overall architecture and structure of a spacecraft trajectory is"
+  },
+  {
+   "start": 49884,
+   "end": 49985,
+   "type": "verse",
+   "basis": "verse row at byte 49249",
+   "id": null,
+   "text": "likely to be frozen. At this stage, if one were to assume that the spacecraft mass was 10,000 kg, and"
+  },
+  {
+   "start": 49990,
+   "end": 50044,
+   "type": "verse",
+   "basis": "verse row at byte 49355",
+   "id": null,
+   "text": "18"
+  },
+  {
+   "start": 50045,
+   "end": 50142,
+   "type": "verse",
+   "basis": "verse row at byte 49410",
+   "id": null,
+   "text": "transit required consuming 1,000 kg of xenon, systems engineers may allocate the remaining 9,000"
+  },
+  {
+   "start": 50143,
+   "end": 50238,
+   "type": "verse",
+   "basis": "verse row at byte 49508",
+   "id": null,
+   "text": "kg to the remainder of the vehicle. Avionics, power systems, structure, and all other manner of"
+  },
+  {
+   "start": 50239,
+   "end": 50338,
+   "type": "verse",
+   "basis": "verse row at byte 49604",
+   "id": null,
+   "text": "hardware will then be developed, fabricated, and integrated onto a physical spacecraft such that it"
+  },
+  {
+   "start": 50339,
+   "end": 50442,
+   "type": "verse",
+   "basis": "verse row at byte 49704",
+   "id": null,
+   "text": "weighs in at allocation (or often slightly above allocation) prior to launch. If this work is completed"
+  },
+  {
+   "start": 50443,
+   "end": 50539,
+   "type": "verse",
+   "basis": "verse row at byte 49808",
+   "id": null,
+   "text": "without considering margins required to ensure robust mission design, then systems engineers may"
+  },
+  {
+   "start": 50540,
+   "end": 50636,
+   "type": "verse",
+   "basis": "verse row at byte 49905",
+   "id": null,
+   "text": "be shocked to learn during later phases of development that the analysts are not just asking for"
+  },
+  {
+   "start": 50637,
+   "end": 50735,
+   "type": "verse",
+   "basis": "verse row at byte 50002",
+   "id": null,
+   "text": "1,000 kg of xenon, they are asking for 20%, or 200 kg more! If the now 10,200 kg spacecraft cannot"
+  },
+  {
+   "start": 50736,
+   "end": 50831,
+   "type": "verse",
+   "basis": "verse row at byte 50101",
+   "id": null,
+   "text": "complete the mission, managers must undertake the painful process of either accepting increased"
+  },
+  {
+   "start": 50832,
+   "end": 50927,
+   "type": "verse",
+   "basis": "verse row at byte 50197",
+   "id": null,
+   "text": "risk to burn down margins and reserves or maintain their risk posture and offload mass from the"
+  },
+  {
+   "start": 50928,
+   "end": 51025,
+   "type": "verse",
+   "basis": "verse row at byte 50293",
+   "id": null,
+   "text": "spacecraft. Should this happen after systems are integrated, this may mean directing a technician"
+  },
+  {
+   "start": 51026,
+   "end": 51086,
+   "type": "verse",
+   "basis": "verse row at byte 50391",
+   "id": null,
+   "text": "to physically cut hardware off a nearly complete spacecraft."
+  },
+  {
+   "start": 51087,
+   "end": 51186,
+   "type": "verse",
+   "basis": "verse row at byte 50452",
+   "id": null,
+   "text": "Propellant is not the only margin or reserve that must be accounted for, as seen in the case of"
+  },
+  {
+   "start": 51187,
+   "end": 51282,
+   "type": "verse",
+   "basis": "verse row at byte 50552",
+   "id": null,
+   "text": "the 90-minute maximum eclipse requirement on the Lunar Transit. Dispersions in thruster perfor-"
+  },
+  {
+   "start": 51283,
+   "end": 51377,
+   "type": "verse",
+   "basis": "verse row at byte 50648",
+   "id": null,
+   "text": "mance indicated that eclipse durations may vary by up to +/- 5 minutes due to uncertainties in"
+  },
+  {
+   "start": 51378,
+   "end": 51479,
+   "type": "verse",
+   "basis": "verse row at byte 50743",
+   "id": null,
+   "text": "mission execution. This indicates to the mission designer that the design-to constraint for determin-"
+  },
+  {
+   "start": 51480,
+   "end": 51580,
+   "type": "verse",
+   "basis": "verse row at byte 50845",
+   "id": null,
+   "text": "istic trajectories is not a maximum of 90 minutes but instead is some lower value such as 85 minutes"
+  },
+  {
+   "start": 51581,
+   "end": 51630,
+   "type": "verse",
+   "basis": "verse row at byte 50946",
+   "id": null,
+   "text": "to incorporate sufficient robustness to unknowns."
+  },
+  {
+   "start": 51631,
+   "end": 51723,
+   "type": "verse",
+   "basis": "verse row at byte 50996",
+   "id": null,
+   "text": "This same philosophy can be extended to myriad other unknowns; some conservatism must be"
+  },
+  {
+   "start": 51724,
+   "end": 51824,
+   "type": "verse",
+   "basis": "verse row at byte 51089",
+   "id": null,
+   "text": "added to the deterministic trajectory in order to ensure that the mission can be executed under real"
+  },
+  {
+   "start": 51825,
+   "end": 51924,
+   "type": "verse",
+   "basis": "verse row at byte 51190",
+   "id": null,
+   "text": "world realizations. A flyable trajectory is therefore less performant than a conceptual optimal so-"
+  },
+  {
+   "start": 51925,
+   "end": 52020,
+   "type": "verse",
+   "basis": "verse row at byte 51290",
+   "id": null,
+   "text": "lution designed under less stringent assumptions. Engineers may then choose to incorporate this"
+  },
+  {
+   "start": 52021,
+   "end": 52121,
+   "type": "verse",
+   "basis": "verse row at byte 51386",
+   "id": null,
+   "text": "conservatism early into the formulation process to ensure that a mission is not designed so close to"
+  },
+  {
+   "start": 52122,
+   "end": 52215,
+   "type": "verse",
+   "basis": "verse row at byte 51487",
+   "id": null,
+   "text": "the theoretical maximum performance as to become brittle or impossible to execute when uncer-"
+  },
+  {
+   "start": 52216,
+   "end": 52315,
+   "type": "verse",
+   "basis": "verse row at byte 51581",
+   "id": null,
+   "text": "tainties are later realized. Likewise, in the development of testing and qualification campaigns it"
+  },
+  {
+   "start": 52316,
+   "end": 52413,
+   "type": "verse",
+   "basis": "verse row at byte 51681",
+   "id": null,
+   "text": "may be valuable to consider the situations in which a system may be used and not just the case of"
+  },
+  {
+   "start": 52414,
+   "end": 52506,
+   "type": "verse",
+   "basis": "verse row at byte 51779",
+   "id": null,
+   "text": "a nominal mission. Whether or not a mission may successfully advance from formulation to de-"
+  },
+  {
+   "start": 52507,
+   "end": 52608,
+   "type": "verse",
+   "basis": "verse row at byte 51872",
+   "id": null,
+   "text": "tailed design to execution is a function of not only available funding and resources, but also to how"
+  },
+  {
+   "start": 52609,
+   "end": 52673,
+   "type": "verse",
+   "basis": "verse row at byte 51974",
+   "id": null,
+   "text": "well the limits of knowledge were considered during development."
+  },
+  {
+   "start": 52678,
+   "end": 52731,
+   "type": "verse",
+   "basis": "verse row at byte 52043",
+   "id": null,
+   "text": "19"
+  },
+  {
+   "start": 52732,
+   "end": 52743,
+   "type": "verse",
+   "basis": "verse row at byte 52097",
+   "id": null,
+   "text": "REFERENCES"
+  },
+  {
+   "start": 52744,
+   "end": 52745,
+   "type": "verse",
+   "basis": "verse row at byte 52109",
+   "id": null,
+   "text": "1"
+  },
+  {
+   "start": 52746,
+   "end": 52851,
+   "type": "verse",
+   "basis": "verse row at byte 52111",
+   "id": null,
+   "text": "J.R. Brophy, “Perspectives on the Success of Electric Propulsion”, Journal of Electric Propulsion, 2022"
+  },
+  {
+   "start": 52852,
+   "end": 52853,
+   "type": "verse",
+   "basis": "verse row at byte 52217",
+   "id": null,
+   "text": "2"
+  },
+  {
+   "start": 52854,
+   "end": 52969,
+   "type": "verse",
+   "basis": "verse row at byte 52219",
+   "id": null,
+   "text": "M. J. Patterson and J. S. Sovey, “History of Electric Propulsion at NASA Glenn Research Center: 1956 to Present”,"
+  },
+  {
+   "start": 52970,
+   "end": 53011,
+   "type": "verse",
+   "basis": "verse row at byte 52335",
+   "id": null,
+   "text": "American Society of Civil Engineers, 2013"
+  },
+  {
+   "start": 53012,
+   "end": 53013,
+   "type": "verse",
+   "basis": "verse row at byte 52377",
+   "id": null,
+   "text": "3"
+  },
+  {
+   "start": 53014,
+   "end": 53124,
+   "type": "verse",
+   "basis": "verse row at byte 52379",
+   "id": null,
+   "text": "S. Snyder, “Initial Checkout of the Psyche Electric Propulsion System”, Journal of Electric Propulsion, 2025"
+  },
+  {
+   "start": 53125,
+   "end": 53126,
+   "type": "verse",
+   "basis": "verse row at byte 52490",
+   "id": null,
+   "text": "4"
+  },
+  {
+   "start": 53127,
+   "end": 53240,
+   "type": "verse",
+   "basis": "verse row at byte 52492",
+   "id": null,
+   "text": "M. McGuire, S. McCarty, D. Grebow, T. Pavlak, S. Karn, K. Ponnapalli, D. Davis, K. Hack, “Overview of the Lunar"
+  },
+  {
+   "start": 53241,
+   "end": 53350,
+   "type": "verse",
+   "basis": "verse row at byte 52606",
+   "id": null,
+   "text": "Transfer Trajectory of the Co-Manifested First Elements of NASA’s Gateway”, AAS/AIAA Astrodynamics Specialist"
+  },
+  {
+   "start": 53351,
+   "end": 53371,
+   "type": "verse",
+   "basis": "verse row at byte 52716",
+   "id": null,
+   "text": "Conference, Aug 2021"
+  },
+  {
+   "start": 53372,
+   "end": 53373,
+   "type": "verse",
+   "basis": "verse row at byte 52737",
+   "id": null,
+   "text": "5"
+  },
+  {
+   "start": 53374,
+   "end": 53487,
+   "type": "verse",
+   "basis": "verse row at byte 52739",
+   "id": null,
+   "text": "D. Han, “Orbit Transfers for Dawn’s Vesta Operations: Navigation and Mission Design Experience”, International"
+  },
+  {
+   "start": 53488,
+   "end": 53528,
+   "type": "verse",
+   "basis": "verse row at byte 52853",
+   "id": null,
+   "text": "Symposium on Space Flight Dynamics, 2012"
+  },
+  {
+   "start": 53529,
+   "end": 53530,
+   "type": "verse",
+   "basis": "verse row at byte 52894",
+   "id": null,
+   "text": "6"
+  },
+  {
+   "start": 53531,
+   "end": 53642,
+   "type": "verse",
+   "basis": "verse row at byte 52896",
+   "id": null,
+   "text": "C. Venigalla and S. McCarty, “Monte Carlo Analysis of Low-Thrust Many-Revolution Spiral Out Trajectories with"
+  },
+  {
+   "start": 53643,
+   "end": 53728,
+   "type": "verse",
+   "basis": "verse row at byte 53008",
+   "id": null,
+   "text": "Statistical Errors for NASA’s Gateway”, AAS/AIAA Space Flight Mechanics Meeting, 2025"
+  },
+  {
+   "start": 53729,
+   "end": 53730,
+   "type": "verse",
+   "basis": "verse row at byte 53094",
+   "id": null,
+   "text": "7"
+  },
+  {
+   "start": 53731,
+   "end": 53845,
+   "type": "verse",
+   "basis": "verse row at byte 53096",
+   "id": null,
+   "text": "S. McCarty, “Mission Scan Approach for the Gateway Low Thrust Spiral to a Near Rectilinear Halo Orbit”, AAS/AIAA"
+  },
+  {
+   "start": 53846,
+   "end": 53886,
+   "type": "verse",
+   "basis": "verse row at byte 53211",
+   "id": null,
+   "text": "Spaceflight Mechanics Meeting, Jan 2025."
+  },
+  {
+   "start": 53887,
+   "end": 53888,
+   "type": "verse",
+   "basis": "verse row at byte 53252",
+   "id": null,
+   "text": "8"
+  },
+  {
+   "start": 53889,
+   "end": 53999,
+   "type": "verse",
+   "basis": "verse row at byte 53254",
+   "id": null,
+   "text": "S. Karn and M. Wentzel-Long, “A Missed Thrust Framework for Low-Thrust Spiral Trajectories to the NRHO”, Na-"
+  },
+  {
+   "start": 54000,
+   "end": 54049,
+   "type": "verse",
+   "basis": "verse row at byte 53365",
+   "id": null,
+   "text": "tional Aeronautics and Space Administration, 2026"
+  },
+  {
+   "start": 54050,
+   "end": 54051,
+   "type": "verse",
+   "basis": "verse row at byte 53415",
+   "id": null,
+   "text": "9"
+  },
+  {
+   "start": 54052,
+   "end": 54164,
+   "type": "verse",
+   "basis": "verse row at byte 53417",
+   "id": null,
+   "text": "Copernicus Trajectory Design and Optimization System, Software Package, Ver. 5.4.0, NASA Johnson Space Center,"
+  },
+  {
+   "start": 54165,
+   "end": 54182,
+   "type": "verse",
+   "basis": "verse row at byte 53530",
+   "id": null,
+   "text": "Houston, TX, 2025"
+  },
+  {
+   "start": 54183,
+   "end": 54185,
+   "type": "verse",
+   "basis": "verse row at byte 53548",
+   "id": null,
+   "text": "10"
+  },
+  {
+   "start": 54186,
+   "end": 54302,
+   "type": "verse",
+   "basis": "verse row at byte 53551",
+   "id": null,
+   "text": "M. Martini and B. Humphreys, “The Effects of Solar Beta Angle on Low Thrust Spirals for Solar Electric Propulsion"
+  },
+  {
+   "start": 54303,
+   "end": 54364,
+   "type": "verse",
+   "basis": "verse row at byte 53668",
+   "id": null,
+   "text": "Vehicles”, AAS/AIAA Space Flight Mechanics Meetings, Jan 2025"
+  },
+  {
+   "start": 54365,
+   "end": 54367,
+   "type": "verse",
+   "basis": "verse row at byte 53730",
+   "id": null,
+   "text": "11"
+  },
+  {
+   "start": 54368,
+   "end": 54482,
+   "type": "verse",
+   "basis": "verse row at byte 53733",
+   "id": null,
+   "text": "R. Shastry, H. Kamhawi, and J. Frieman, “12-kW Advanced Electric Propulsion System Hall Thruster Current Quali-"
+  },
+  {
+   "start": 54483,
+   "end": 54567,
+   "type": "verse",
+   "basis": "verse row at byte 53848",
+   "id": null,
+   "text": "fication and Production Status”, International Electric Propulsion Conference, 2024."
+  },
+  {
+   "start": 54568,
+   "end": 54570,
+   "type": "verse",
+   "basis": "verse row at byte 53933",
+   "id": null,
+   "text": "12"
+  },
+  {
+   "start": 54571,
+   "end": 54647,
+   "type": "verse",
+   "basis": "verse row at byte 53936",
+   "id": null,
+   "text": "“Advanced Electric Propulsion System (AEPS)” L3 Harris Technologies, 2024"
+  },
+  {
+   "start": 54648,
+   "end": 54650,
+   "type": "verse",
+   "basis": "verse row at byte 54013",
+   "id": null,
+   "text": "13"
+  },
+  {
+   "start": 54651,
+   "end": 54763,
+   "type": "verse",
+   "basis": "verse row at byte 54016",
+   "id": null,
+   "text": "J. Mackey, et al, “Uncertainty in Inverted Pendulum Thrust Measurements”, 54th AIAA/SAE/AIAA Joint Propulsion"
+  },
+  {
+   "start": 54764,
+   "end": 54784,
+   "type": "verse",
+   "basis": "verse row at byte 54129",
+   "id": null,
+   "text": "Conference, Jul 2018"
+  },
+  {
+   "start": 54785,
+   "end": 54787,
+   "type": "verse",
+   "basis": "verse row at byte 54150",
+   "id": null,
+   "text": "14"
+  },
+  {
+   "start": 54788,
+   "end": 54909,
+   "type": "verse",
+   "basis": "verse row at byte 54153",
+   "id": null,
+   "text": "H. Kamhawi, et al, “Performance, Facility Pressure Effects, and Stability Characterization Tests of NASA’s Hall Effect"
+  },
+  {
+   "start": 54910,
+   "end": 55008,
+   "type": "verse",
+   "basis": "verse row at byte 54275",
+   "id": null,
+   "text": "Rocket with Magnetic Shielding Thruster”, 52nd AIAA/SAE/AIAA Joint Propulsion Conference, Jul 2016"
+  },
+  {
+   "start": 55009,
+   "end": 55011,
+   "type": "verse",
+   "basis": "verse row at byte 54374",
+   "id": null,
+   "text": "15"
+  },
+  {
+   "start": 55012,
+   "end": 55124,
+   "type": "verse",
+   "basis": "verse row at byte 54377",
+   "id": null,
+   "text": "T. Kerl, et al “Maxar Electric Propulsion Development for Deep Space”, AIAA Propulsion and Energy Forum, 2020"
+  },
+  {
+   "start": 55125,
+   "end": 55127,
+   "type": "verse",
+   "basis": "verse row at byte 54490",
+   "id": null,
+   "text": "16"
+  },
+  {
+   "start": 55128,
+   "end": 55238,
+   "type": "verse",
+   "basis": "verse row at byte 54493",
+   "id": null,
+   "text": "T. Imken, R. Randolph, M. DiNicola, and A. Nicholas, “Modeling Spacecraft Safe Mode Events”, IEEE Aerospace"
+  },
+  {
+   "start": 55239,
+   "end": 55255,
+   "type": "verse",
+   "basis": "verse row at byte 54604",
+   "id": null,
+   "text": "Conference, 2018"
+  },
+  {
+   "start": 55256,
+   "end": 55258,
+   "type": "verse",
+   "basis": "verse row at byte 54621",
+   "id": null,
+   "text": "17"
+  },
+  {
+   "start": 55259,
+   "end": 55376,
+   "type": "verse",
+   "basis": "verse row at byte 54624",
+   "id": null,
+   "text": "S. Karn, et al, “Ballistic Leverage for Collision Avoidance During the Lunar Transit Trajectory of NASA’s Co-Mani-"
+  },
+  {
+   "start": 55377,
+   "end": 55444,
+   "type": "verse",
+   "basis": "verse row at byte 54742",
+   "id": null,
+   "text": "fested Vehicle”, AAS/AIAA Astrodynamics Specialist Conference, 2023"
+  },
+  {
+   "start": 55445,
+   "end": 55447,
+   "type": "verse",
+   "basis": "verse row at byte 54810",
+   "id": null,
+   "text": "18"
+  },
+  {
+   "start": 55448,
+   "end": 55559,
+   "type": "verse",
+   "basis": "verse row at byte 54813",
+   "id": null,
+   "text": "I. Sobol, “On sensitivity estimation for nonlinear mathematical models”, Matematicheskoe Modelirovanie, 1990"
+  },
+  {
+   "start": 55560,
+   "end": 55562,
+   "type": "verse",
+   "basis": "verse row at byte 54925",
+   "id": null,
+   "text": "19"
+  },
+  {
+   "start": 55563,
+   "end": 55681,
+   "type": "verse",
+   "basis": "verse row at byte 54928",
+   "id": null,
+   "text": "M. McGuire, S. McCarty, K. Hack, S. Karn, “Application of Solar Electric Propulsion to the Low Thrust Lunar Transit"
+  },
+  {
+   "start": 55682,
+   "end": 55783,
+   "type": "verse",
+   "basis": "verse row at byte 55047",
+   "id": null,
+   "text": "of the Gateway Power and Propulsion Element”, 38th International Electric Propulsion Conference, 2024"
+  },
+  {
+   "start": 55788,
+   "end": 55850,
+   "type": "verse",
+   "basis": "verse row at byte 55153",
+   "id": null,
+   "text": "20"
+  }
+ ]
+}

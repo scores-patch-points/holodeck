@@ -1,0 +1,97 @@
+{
+ "schema": "EOReadingGolden@1",
+ "specimen": "quran-2-37",
+ "path": "14-holy-texts/tanzil-quran/quran_quran-uthmani.txt",
+ "rule": "goldens/reading/RULE.md",
+ "window": {
+  "start": 5518,
+  "startText": "فَتَلَقَّىٰٓ ءَادَمُ",
+  "end": 5619,
+  "endText": "ٱلتَّوَّابُ ٱلرَّحِيمُ",
+  "coordinates": "normalized body (container-stripped, CRLF-normalized); spans in RAW file coordinates"
+ },
+ "notes": "Quran 2:37 (Uthmani text): the tawba — REC·Figure in Arabic (فَتَابَ عَلَيْهِ, He turned/relented toward him: one identified relational standing re-grounded), with the receiving of the words (EVA·Figure) and the rule-3 identificational epithet sentence (إِنَّهُۥ هُوَ ٱلتَّوَّابُ).",
+ "revisions": [],
+ "rows": [
+  {
+   "subject": "ءَادَمُ",
+   "relation": "فَتَلَقَّىٰٓ",
+   "object": "مِن رَّبِّهِۦ كَلِمَٰتٍۢ",
+   "polarity": "+",
+   "phasepost": {
+    "op": "EVA",
+    "grain": "Figure"
+   },
+   "clause": "main",
+   "prop": "quran:adam-received-words",
+   "ground": "quran-2.37.1",
+   "role": "declared",
+   "because": "تَلَقَّىٰ (received) — words taken into a holder's keeping: content held, Relate·Interpretation at figure grain (the keep-in-mind family's entry act)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "CON",
+    "grain": "Figure",
+    "because": "receiving readable as the transfer-arrangement itself"
+   },
+   "span": {
+    "start": 336,
+    "end": 5819
+   },
+   "anchor": "فَتَلَقَّىٰٓ ءَادَمُ مِن رَّبِّهِۦ كَلِمَٰتٍۢ"
+  },
+  {
+   "subject": "رَّبِّهِۦ",
+   "relation": "فَتَابَ",
+   "object": "عَلَيْهِ",
+   "polarity": "+",
+   "phasepost": {
+    "op": "REC",
+    "grain": "Figure"
+   },
+   "clause": "coordinate",
+   "prop": "quran:god-relented",
+   "ground": "quran-2.37.2",
+   "role": "declared",
+   "because": "تَابَ عَلَيْهِ — the tawba, the TURNING itself: one identified relational standing re-grounded (wrath conceded, mercy begun) — the re-zero on a single bond, Generate·Interpretation at figure grain",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "the verb's subject → رَبِّهِ (his Lord); 'عَلَيْهِ' → ءَادَمُ",
+   "alternate": {
+    "op": "EVA",
+    "grain": "Figure",
+    "because": "readable as mercy held toward him rather than the turning act"
+   },
+   "span": {
+    "start": 336,
+    "end": 5819
+   },
+   "anchor": "فَتَابَ عَلَيْهِ"
+  },
+  {
+   "subject": "إِنَّهُۥ",
+   "relation": "هُوَ",
+   "object": "ٱلتَّوَّابُ ٱلرَّحِيمُ",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Figure"
+   },
+   "clause": "main",
+   "prop": "quran:he-is-relenting",
+   "ground": "quran-2.37.3",
+   "role": "declared",
+   "because": "copula rule 3 — the pronoun copula هُوَ + definite unique epithets (THE Oft-Relenting, THE Merciful): the identificational shape, the Arabic هي precedent",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "'إِنَّهُ' → the Lord of the previous clause",
+   "alternate": null,
+   "span": {
+    "start": 336,
+    "end": 5819
+   },
+   "anchor": "إِنَّهُۥ هُوَ ٱلتَّوَّابُ ٱلرَّحِيمُ"
+  }
+ ]
+}

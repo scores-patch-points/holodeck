@@ -1,0 +1,168 @@
+{
+  "source": "DialectBench (aggregator)",
+  "url": "https://github.com/ffaisal93/DialectBench",
+  "paper": "Faisal, Fabrizio, Anastasopoulos. 'DialectBench: An NLP Benchmark for Dialects, Varieties, and Closely-Related Languages.' ACL 2024. https://aclanthology.org/2024.acl-long.777/",
+  "repo_own_license": "The DialectBench repository's own code (download_data.sh, all_commands.sh, scripts/*.py, etc.) is Apache License 2.0 -- verified directly from the LICENSE file at the repo root of a real `git clone --depth 1 https://github.com/ffaisal93/DialectBench.git`. This license covers DialectBench's OWN scripts only; it says nothing about the data those scripts pull, which is why this manifest carries a separate, independently-verified license per sub-source below rather than one blanket license for the whole aggregator.",
+  "aggregator_structure_as_found": "DialectBench aggregates 10 NLP tasks (dependency parsing, POS tagging, NER, topic classification, NLI, sentiment analysis, dialect identification, reading comprehension/QA, machine translation) across 281 language varieties, pulled from many independently-licensed upstream sources via `download_data.sh` and `scripts/*/process_dataset.py`. Two distinct fetch mechanisms exist in the aggregator's own scripts: (1) most tasks (sib-200, sdqa-gold, ner, pos_tagging, parsing, sentiment_analysis, dialect_identification, reading_comprehension, machine_translation_turkish) are pre-bundled zip files hosted on the maintainer's personal GMU SharePoint/OneDrive share links, each bundling MANY upstream sub-datasets together with no single consolidated license statement; (2) two tasks (`sentiment_analysis_raw`, `dialect_identification_raw`) instead `git clone` a list of small, individually-named upstream GitHub repositories directly and run scripts/process_dataset.py to reshape each into train/test CSVs -- this is the mechanism this pocket actually ran and adapted, because each of its sub-sources is independently inspectable and independently licensed, which is exactly what the per-sub-source verification this pocket requires depends on.",
+  "fetched_at": "2026-08-27",
+  "fetch_method": "Real `git clone --depth 1` of the DialectBench repository itself (to read download_data.sh and process_dataset.py verbatim), followed by real `git clone --depth 1` of each individual upstream sub-source repository named inside download_data.sh's `sentiment_analysis_raw` and `dialect_identification_raw` sections. Every LICENSE/LICENSE.md file below was read directly from its own cloned repository, not assumed from the pocket description or from memory. AJGT.xlsx was converted to CSV locally with openpyxl (columns kept: ID, Feed, Sentiment) mirroring exactly what DialectBench's own `process_ajgt()` function in scripts/process_dataset.py does, so the shape matches the aggregator's own intended use of the file.",
+  "coverage": "This pocket stages 4 of DialectBench's smaller, individually-licensed sub-sources (all reached via the aggregator's own git-clone-based `sentiment_analysis_raw` / `dialect_identification_raw` fetch path) -- a small slice of the benchmark's full 281-variety / 10-task scope. Within each staged sub-source, coverage varies and is stated per-entry below: two (Greek dialect classifier, AJGT) are staged in full because the whole upstream dataset is itself small (hundreds to ~1,800 rows); two (TUNIZI, TSAC) are staged as bounded, label-stratified proportional samples (roughly 2% and 10-15% respectively) of much larger upstream files, explicitly NOT the full corpus. Nothing from the SharePoint-hosted task bundles (the other 8-9 DialectBench tasks) is staged at all -- see `sharepoint_bundles_not_attempted` below.",
+  "sub_sources": [
+    {
+      "id": "tunizi",
+      "name": "TUNIZI (Tunisian Arabizi sentiment corpus)",
+      "upstream_repo": "https://github.com/iCompass-ai/TUNIZI",
+      "used_by_dialectbench_as": "dialect_identification_raw task, Tunisian Arabic (aeb_Latn) variety, via `python scripts/process_dataset.py --dataset TUNIZI`",
+      "variety": "Tunisian Arabic written in Latin-script Arabizi (aeb_Latn)",
+      "license": "MIT License",
+      "license_verification": {
+        "checked_at": "2026-08-27",
+        "method": "Real `git clone --depth 1 https://github.com/iCompass-ai/TUNIZI.git`, then LICENSE and README.md read directly from the cloned repository.",
+        "found": "LICENSE file at repo root: standard MIT License text, 'Copyright (c) 2021 iCompass-ai'. No conflicting statement anywhere else in the repo.",
+        "result": "Clearly open (OSI MIT). Staged generously relative to the sub-source's own size, per this repo's rule 2."
+      },
+      "fetched_at": "2026-08-27",
+      "coverage": "TUNIZI ships two files, both `sentence;label` format. TUNIZI_V1.txt (9,210 lines, binary label in {-1,1}: 4,372 negative / 4,838 positive) is staged in FULL -- it is the smaller of the two files and its label balance is already near-even, so no sampling was needed. TUNIZI_V2.txt (100,000 lines, three-way label in {-1,0,1}) is staged as a bounded SAMPLE of 1,999 rows (~2% of the full file) -- NOT the full corpus. The sample was drawn proportionally per label class (label counts in the full file: -1 -> 43,767; 0 -> 3,522; 1 -> 52,711) with a fixed random seed (Python `random.seed(42)`), so the sample's label balance matches the source file's true label balance rather than reflecting the file's own on-disk ordering (the raw file is sorted by label, so a naive head/tail slice would have been all-one-class; this was checked before sampling, not assumed).",
+      "entries": [
+        {
+          "id": "tunizi-v1-full",
+          "title": "TUNIZI V1 (binary-labeled Arabizi sentiment, full)",
+          "file": "11-multi-language/dialects-pidgins-creoles/dialectbench/tunizi/TUNIZI_V1_full.txt",
+          "lines": 9210,
+          "bytes": 491055,
+          "sample_fraction": "1.0 (full file)"
+        },
+        {
+          "id": "tunizi-v2-sample",
+          "title": "TUNIZI V2 (sentiment-labeled Arabizi, proportional stratified sample)",
+          "file": "11-multi-language/dialects-pidgins-creoles/dialectbench/tunizi/TUNIZI_V2_sample.txt",
+          "lines": 1999,
+          "bytes": 123162,
+          "sample_fraction": "~0.02 of the 100,000-line full file",
+          "sampling_method": "proportional stratified by label, seed=42, label distribution preserved from the full file"
+        }
+      ],
+      "staged_support_files": [
+        "11-multi-language/dialects-pidgins-creoles/dialectbench/tunizi/LICENSE (verbatim upstream MIT license)",
+        "11-multi-language/dialects-pidgins-creoles/dialectbench/tunizi/UPSTREAM_README.md (verbatim upstream README)"
+      ]
+    },
+    {
+      "id": "greek-dialect-classifier",
+      "name": "Cypriot Greek vs Standard Modern Greek dialect classifier corpus",
+      "upstream_repo": "https://github.com/hb20007/greek-dialect-classifier",
+      "used_by_dialectbench_as": "dialect_identification_raw task, Greek dialects (Cypriot Greek 'cg' vs Standard Modern Greek 'smg'), via `python scripts/process_dataset.py --dataset greek-dialect-classifier`",
+      "variety": "Cypriot Greek (cg) and Standard Modern Greek (smg), each subdivided by register: Facebook comments, Twitter, and other web text",
+      "license": "MIT License",
+      "license_verification": {
+        "checked_at": "2026-08-27",
+        "method": "Real `git clone --depth 1 https://github.com/hb20007/greek-dialect-classifier.git`, then LICENSE.md and README.md read directly from the cloned repository.",
+        "found": "LICENSE.md at repo root: 'The MIT License (MIT), Copyright (c) 2026 H. Z. Sababa', standard MIT terms in full. No conflicting statement found.",
+        "result": "Clearly open (OSI MIT). Staged in FULL, per this repo's rule 2 (clearly open -> stage generously) -- the whole dataset (6 small text files, 6 varieties x registers) totals under 155KB, so 'generously' and 'completely' coincide here."
+      },
+      "fetched_at": "2026-08-27",
+      "coverage": "All 6 of the upstream Data/ files staged in full -- 100% of this sub-source as it exists in the upstream repository (748 total lines, one raw text sample per line, no labels beyond the filename-encoded dialect+register).",
+      "entries": [
+        {"id": "cg_fb", "title": "Cypriot Greek, Facebook comments", "file": "11-multi-language/dialects-pidgins-creoles/dialectbench/greek-dialect-classifier/cg_fb.txt", "lines": 83, "bytes": 11221, "sample_fraction": "1.0 (full file)"},
+        {"id": "cg_other", "title": "Cypriot Greek, other web text", "file": "11-multi-language/dialects-pidgins-creoles/dialectbench/greek-dialect-classifier/cg_other.txt", "lines": 194, "bytes": 46268, "sample_fraction": "1.0 (full file)"},
+        {"id": "cg_twitter", "title": "Cypriot Greek, Twitter", "file": "11-multi-language/dialects-pidgins-creoles/dialectbench/greek-dialect-classifier/cg_twitter.txt", "lines": 152, "bytes": 17606, "sample_fraction": "1.0 (full file)"},
+        {"id": "smg_fb", "title": "Standard Modern Greek, Facebook comments", "file": "11-multi-language/dialects-pidgins-creoles/dialectbench/greek-dialect-classifier/smg_fb.txt", "lines": 41, "bytes": 17842, "sample_fraction": "1.0 (full file)"},
+        {"id": "smg_other", "title": "Standard Modern Greek, other web text", "file": "11-multi-language/dialects-pidgins-creoles/dialectbench/greek-dialect-classifier/smg_other.txt", "lines": 74, "bytes": 23713, "sample_fraction": "1.0 (full file)"},
+        {"id": "smg_twitter", "title": "Standard Modern Greek, Twitter", "file": "11-multi-language/dialects-pidgins-creoles/dialectbench/greek-dialect-classifier/smg_twitter.txt", "lines": 204, "bytes": 38547, "sample_fraction": "1.0 (full file)"}
+      ],
+      "staged_support_files": [
+        "11-multi-language/dialects-pidgins-creoles/dialectbench/greek-dialect-classifier/LICENSE.md (verbatim upstream MIT license)",
+        "11-multi-language/dialects-pidgins-creoles/dialectbench/greek-dialect-classifier/UPSTREAM_README.md (verbatim upstream README)"
+      ]
+    },
+    {
+      "id": "ajgt",
+      "name": "AJGT (Arabic Jordanian General Tweets)",
+      "upstream_repo": "https://github.com/komari6/Arabic-twitter-corpus-AJGT",
+      "used_by_dialectbench_as": "dialect_identification_raw task, Jordanian Arabic (jor_arab) variety, via `python scripts/process_dataset.py --dataset Arabic-twitter-corpus-AJGT`",
+      "variety": "Jordanian Arabic (jor_arab)",
+      "license": "Academic Free License (AFL) v3.0",
+      "license_verification": {
+        "checked_at": "2026-08-27",
+        "method": "Real `git clone --depth 1 https://github.com/komari6/Arabic-twitter-corpus-AJGT.git`, then LICENSE.md and README.md read directly from the cloned repository.",
+        "found": "LICENSE.md at repo root: full text of the OSI-approved Academic Free License v3.0, explicitly granting worldwide, royalty-free, non-exclusive, sublicensable rights to reproduce, prepare derivative works, publicly perform/display, and distribute the Original Work, with an explicit patent grant as well.",
+        "result": "Clearly open (OSI-approved AFL 3.0, research- and redistribution-permissive). Staged in FULL, per this repo's rule 2 -- the whole dataset is only ~1,800 rows."
+      },
+      "fetched_at": "2026-08-27",
+      "coverage": "Full upstream dataset staged -- 1,800 tweets with sentiment labels (Positive/Negative), 100% of the AJGT.xlsx file's rows. Both the original .xlsx and a converted .csv (columns ID, Feed, Sentiment -- same columns DialectBench's own process_ajgt() function keeps) are staged so the content is readable without a spreadsheet tool as well as byte-identical to the upstream file.",
+      "entries": [
+        {"id": "ajgt-csv", "title": "AJGT full dataset (CSV, converted from upstream .xlsx)", "file": "11-multi-language/dialects-pidgins-creoles/dialectbench/ajgt/AJGT_full.csv", "rows_incl_header": 1801, "bytes": 181542, "sample_fraction": "1.0 (full file)"},
+        {"id": "ajgt-xlsx", "title": "AJGT full dataset (original upstream .xlsx, byte-for-byte)", "file": "11-multi-language/dialects-pidgins-creoles/dialectbench/ajgt/AJGT.xlsx", "bytes": 107395, "sample_fraction": "1.0 (full file)"}
+      ],
+      "staged_support_files": [
+        "11-multi-language/dialects-pidgins-creoles/dialectbench/ajgt/LICENSE.md (verbatim upstream AFL 3.0 license)",
+        "11-multi-language/dialects-pidgins-creoles/dialectbench/ajgt/UPSTREAM_README.md (verbatim upstream README)"
+      ]
+    },
+    {
+      "id": "tsac",
+      "name": "TSAC (Tunisian Sentiment Analysis Corpus)",
+      "upstream_repo": "https://github.com/fbougares/TSAC",
+      "used_by_dialectbench_as": "sentiment_analysis_raw task, Tunisian Arabic (aeb_Arab) variety, via `python scripts/process_dataset.py --dataset TSAC`",
+      "variety": "Tunisian Arabic, Arabic script (aeb_Arab) -- Facebook comments on Tunisian radio/TV pages, 2015-2016",
+      "license": "GNU Lesser General Public License v3.0 (LGPL-3.0)",
+      "license_verification": {
+        "checked_at": "2026-08-27",
+        "method": "Real `git clone --depth 1 https://github.com/fbougares/TSAC.git`, then LICENSE and README.md read directly from the cloned repository.",
+        "found": "LICENSE file at repo root: full verbatim text of the GNU Lesser General Public License, Version 3, 29 June 2007. No separate data-specific license statement exists anywhere in the repo; the README only credits the introducing WANLP 2017 paper and asks users citing the corpus to cite that paper.",
+        "caveat_disclosed": "LGPL-3.0 is a copyleft SOFTWARE license, and this repository contains a plain-text data corpus with no code -- the repo owner appears to have applied GitHub's own generic license picker to a data repo, which is common but imprecise. Treated here as an open, OSI-approved license (permissive to use/copy/redistribute, with a copyleft condition on derivative works) rather than as 'all rights reserved,' but the mismatch between a software license and a text corpus is disclosed rather than silently smoothed over. Not treated as 'clearly unrestricted public-domain-equivalent' the way the MIT/AFL sub-sources above are.",
+        "result": "Open per an explicit, verifiable license statement -- staged as a bounded, clearly-tagged SAMPLE (not staged generously) specifically because of the copyleft-on-data ambiguity just disclosed, per this repo's rule 2's middle case."
+      },
+      "fetched_at": "2026-08-27",
+      "coverage": "TSAC's four upstream files (train_pos.txt 7,152 lines, train_neg.txt 6,513 lines, test_pos.txt 1,700 lines, test_neg.txt 1,700 lines; total 17,065 lines) are staged as a bounded RANDOM sample (seed=42, no stratification needed since each file is already single-label): 700 of train_pos, 700 of train_neg, 300 of test_pos, 300 of test_neg -- 2,000 lines total, roughly 11.7% of the full corpus. Explicitly a sample, not the full corpus.",
+      "entries": [
+        {"id": "tsac-train-pos-sample", "title": "TSAC train, positive polarity (sample)", "file": "11-multi-language/dialects-pidgins-creoles/dialectbench/tsac/train_pos_sample.txt", "lines": 700, "bytes": 33095, "sample_fraction": "700/7152 = ~0.098"},
+        {"id": "tsac-train-neg-sample", "title": "TSAC train, negative polarity (sample)", "file": "11-multi-language/dialects-pidgins-creoles/dialectbench/tsac/train_neg_sample.txt", "lines": 700, "bytes": 45648, "sample_fraction": "700/6513 = ~0.107"},
+        {"id": "tsac-test-pos-sample", "title": "TSAC test, positive polarity (sample)", "file": "11-multi-language/dialects-pidgins-creoles/dialectbench/tsac/test_pos_sample.txt", "lines": 300, "bytes": 15548, "sample_fraction": "300/1700 = ~0.176"},
+        {"id": "tsac-test-neg-sample", "title": "TSAC test, negative polarity (sample)", "file": "11-multi-language/dialects-pidgins-creoles/dialectbench/tsac/test_neg_sample.txt", "lines": 300, "bytes": 18068, "sample_fraction": "300/1700 = ~0.176"}
+      ],
+      "staged_support_files": [
+        "11-multi-language/dialects-pidgins-creoles/dialectbench/tsac/LICENSE (verbatim upstream LGPL-3.0 license)",
+        "11-multi-language/dialects-pidgins-creoles/dialectbench/tsac/UPSTREAM_README.md (verbatim upstream README)"
+      ]
+    }
+  ],
+  "deliberately_not_staged": [
+    {
+      "id": "sharepoint-bundles",
+      "items": ["sib-200", "sdqa-gold (SDQA question answering)", "ner (WikiANN + Norwegian NER bundle)", "pos_tagging", "parsing (dependency parsing / UD treebanks)", "sentiment_analysis (pre-bundled zip)", "dialect_identification (pre-bundled zip, includes MADAR etc.)", "reading_comprehension", "machine_translation_turkish"],
+      "status": "gated -- not fetched, not attempted",
+      "reason": "Every one of these 9 tasks is fetched in download_data.sh exclusively via a personal GMU SharePoint/OneDrive 'share link' (URLs of the form gmuedu-my.sharepoint.com/:u:/g/personal/ffaisal_gmu_edu/...?download=1) rather than a stable public URL or a per-source repository. A live check (curl -I) of one such link returned HTTP 200 with `content-type: text/html` rather than a direct zip stream -- i.e. even mechanically, this is not a plain public file fetch but an ad-hoc, credential-adjacent sharing mechanism whose behavior for an unauthenticated automated client is not guaranteed. More importantly for the license question this pocket exists to answer: each of these zips BUNDLES many different upstream sub-datasets together (for example the `ner` bundle mixes WikiANN, which is CC-BY-SA via Wikipedia, with a separate Norwegian NER dataset; the `parsing`/`pos_tagging` bundles are built from many individual Universal Dependencies treebanks, most CC BY-SA 4.0 but not uniformly so; the pre-bundled `dialect_identification` zip includes MADAR, which itself requires a separate license agreement/registration with the Linguistic Data Consortium-adjacent MADAR release process) -- there is no single license statement covering the zip as a whole, and verifying every sub-dataset packed inside each zip was out of scope for a small, bounded pocket. Per the pocket's explicit instruction ('flag, don't attempt to work around'), these are named here and none of their content is staged, sampled, or guessed at."
+    },
+    {
+      "id": "dzsentia",
+      "upstream_repo": "https://github.com/adelabdelli/DzSentiA",
+      "status": "skipped -- no license found",
+      "reason": "Real `git clone --depth 1` performed; the cloned repository contains no LICENSE or LICENSE.md file, and no license statement appears in its README.md. Per this pocket's rule 2 ('if you cannot determine the license... do not fetch or stage the raw content'), nothing from this sub-source is staged."
+    },
+    {
+      "id": "mac-moroccan-arabic-corpus",
+      "upstream_repo": "https://github.com/LeMGarouani/MAC",
+      "status": "skipped -- no license found",
+      "reason": "Real `git clone --depth 1` performed; the cloned repository contains no LICENSE file and no license statement in its README.md (only a citation request for the introducing Springer book chapter). Not staged."
+    },
+    {
+      "id": "saudi-bank-sentiment-dataset",
+      "upstream_repo": "https://github.com/iwan-rg/Saudi-Bank-Sentiment-Dataset",
+      "status": "checked but not staged -- out of scope for this pocket's bounded slice",
+      "reason": "This repo DOES carry an explicit LICENSE file (GNU GPL v3.0, verified by direct clone and read), so it is not license-gated the way DzSentiA/MAC are. It was not staged simply because this pocket's bounded slice (2-4 sub-sources) was already filled by the 4 sub-sources above with cleaner OSI-permissive licenses (MIT/MIT/AFL) plus one disclosed copyleft case (TSAC's LGPL); adding a second GPL-licensed sub-source did not add new license-verification value. Named here rather than silently omitted, since it was actually cloned and inspected."
+    },
+    {
+      "id": "astd-arabic-sentiment-tweets",
+      "upstream_repo": "https://github.com/mahmoudnabil/ASTD",
+      "status": "checked but not staged -- same reasoning as Saudi-Bank-Sentiment-Dataset",
+      "reason": "LICENSE file present and verified (GNU GPL v2.0, full text read from the cloned repo). Not staged for the same 'slice already filled, no new verification value' reason as above -- named here rather than silently omitted."
+    },
+    {
+      "id": "dsl-tl",
+      "upstream_repo": "https://github.com/LanguageTechnologyLab/DSL-TL",
+      "status": "skipped -- unclear/contested license",
+      "reason": "Real `git clone --depth 1` performed; the repository has no LICENSE file of any kind, and its README (a VarDial shared-task dataset description) contains no license statement -- only a contact email. Shared-task competition data of this kind commonly carries usage restrictions tied to the competition itself even when not stated in the repo; absent any explicit grant, this is exactly the 'genuinely ambiguous, do not guess' case named in this pocket's rule 2. Not staged."
+    }
+  ]
+}

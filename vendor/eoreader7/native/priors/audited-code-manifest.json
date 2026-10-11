@@ -1,0 +1,677 @@
+{
+  "source": "Security-audited open source repositories",
+  "tier": "audited",
+  "fetched_at": "2026-08-16T16:47:33.453Z",
+  "pinning": "branch head resolved to a commit SHA via git ls-remote; every file fetched at that SHA; sha256 recorded per file",
+  "min_words_floor": 600,
+  "repos": [
+    {
+      "owner": "curl",
+      "repo": "curl",
+      "branch": "master",
+      "commit": "8eb978b9c212068371c39b37be1522904a790811",
+      "lang": "C",
+      "license": "curl (MIT-style)",
+      "tier": "audited",
+      "why": "The data-transfer engine embedded in cars, TVs, servers and billions of devices; one of the most widely deployed C codebases in existence.",
+      "security": {
+        "summary": "Independently audited twice with public reports: Cure53 (2016) and Trail of Bits, coordinated by OSTIF (2022). Continuously fuzzed in Google OSS-Fuzz. Documents its whole vulnerability-handling process in-tree.",
+        "refs": [
+          {
+            "label": "Cure53 penetration test and source audit of curl, 2016",
+            "url": "https://cure53.de/pentest-report_curl.pdf"
+          },
+          {
+            "label": "Trail of Bits security review of curl, 2022 (OSTIF)",
+            "url": "https://github.com/trailofbits/publications"
+          },
+          {
+            "label": "curl vulnerability disclosure policy (collected in-tree below)"
+          }
+        ]
+      },
+      "github_url": "https://github.com/curl/curl",
+      "raw_base": "https://raw.githubusercontent.com/curl/curl/8eb978b9c212068371c39b37be1522904a790811",
+      "files": [
+        {
+          "path": "docs/VULN-DISCLOSURE-POLICY.md",
+          "chars": 20400,
+          "words": 3177,
+          "sha256": "f7828eb196fdb7c0dfd8baca222db6016fa535d54926c14b0c74b16343ca518b",
+          "local": "09-source-code/curl_curl/docs_VULN-DISCLOSURE-POLICY.md"
+        },
+        {
+          "path": "lib/url.c",
+          "chars": 83773,
+          "words": 8438,
+          "sha256": "af40462b7534d970b643300336e91251c922273858628c2d659faa148e67de22",
+          "local": "09-source-code/curl_curl/lib_url.c"
+        },
+        {
+          "path": "lib/http.c",
+          "chars": 157659,
+          "words": 16884,
+          "sha256": "83fbd4f749479bac89f01819c0506c4b3713522e1cec544b1bbfc9f90cedd3f6",
+          "local": "09-source-code/curl_curl/lib_http.c"
+        }
+      ],
+      "folded": [
+        {
+          "path": "COPYING",
+          "chars": 1088,
+          "words": 174,
+          "sha256": "82f2f4427d6545ee5aaac4f0b80428da6cc8ba41c2cf5da3a03680ec327b9681"
+        },
+        {
+          "path": "README",
+          "chars": 1461,
+          "words": 213,
+          "sha256": "4e3177f14f86cac279e34a80001da61fdf0476f68cf647c9b52f5422d7a132a0"
+        }
+      ],
+      "missing": [],
+      "provenance": {
+        "local": "09-source-code/curl_curl/PROVENANCE.md",
+        "sha256": "bc5e4795536cdc71546c7285bffdc6df18511433756c23246ede7356f9637e5a",
+        "words": 587
+      }
+    },
+    {
+      "owner": "git",
+      "repo": "git",
+      "branch": "master",
+      "commit": "745601a9a94110d74769ab605ccd4f61339758d2",
+      "lang": "C",
+      "license": "GPL-2.0",
+      "tier": "audited",
+      "why": "The version-control system underneath nearly all modern software development.",
+      "security": {
+        "summary": "Full source-code security audit by X41 D-Sec (2023), commissioned by OSTIF with GitLab; report public.",
+        "refs": [
+          {
+            "label": "X41 D-Sec source code audit of Git, 2023 (OSTIF/GitLab)",
+            "url": "https://x41-dsec.de/static/reports/X41-OSTIF-Gitlab-Git-Security-Audit-20230117-public.pdf"
+          }
+        ]
+      },
+      "github_url": "https://github.com/git/git",
+      "raw_base": "https://raw.githubusercontent.com/git/git/745601a9a94110d74769ab605ccd4f61339758d2",
+      "files": [
+        {
+          "path": "COPYING",
+          "chars": 18765,
+          "words": 3073,
+          "sha256": "5b2198d1645f767585e8a88ac0499b04472164c0d2da22e75ecf97ef443ab32e",
+          "local": "09-source-code/git_git/COPYING"
+        },
+        {
+          "path": "Documentation/CodingGuidelines",
+          "chars": 36558,
+          "words": 5112,
+          "sha256": "775a38e4d9152784db3eeafa377eab4d5d6d5eea1094c82fa697542b86935ee0",
+          "local": "09-source-code/git_git/Documentation_CodingGuidelines"
+        },
+        {
+          "path": "refs.c",
+          "chars": 96066,
+          "words": 8939,
+          "sha256": "c0e5406b2d198ff26a9da541c85363a48e39fa6c012bc7e82569c7f60298460b",
+          "local": "09-source-code/git_git/refs.c"
+        },
+        {
+          "path": "builtin/commit.c",
+          "chars": 62316,
+          "words": 5095,
+          "sha256": "3404e51612fd63c284275c9d9a98b16dd4eeea80d650339643ae60b18207a121",
+          "local": "09-source-code/git_git/builtin_commit.c"
+        }
+      ],
+      "folded": [
+        {
+          "path": "README.md",
+          "chars": 3808,
+          "words": 451,
+          "sha256": "da0bd9ed3f4ef6046ba391493911a36284db2515f9ee1771d4f02adeb2de8b05"
+        }
+      ],
+      "missing": [],
+      "provenance": {
+        "local": "09-source-code/git_git/PROVENANCE.md",
+        "sha256": "ec49a744deba27f7e040c9bf28e63d041641ca85e0a2a8aebfb12457b088a7ea",
+        "words": 589
+      }
+    },
+    {
+      "owner": "openssl",
+      "repo": "openssl",
+      "branch": "master",
+      "commit": "17bf6c48ea8a6af1cb90f2f2aab4bb4b9e2adfc5",
+      "lang": "C",
+      "license": "Apache-2.0",
+      "tier": "audited",
+      "why": "The TLS and cryptography library terminating most of the encrypted traffic on the internet.",
+      "security": {
+        "summary": "Audited by NCC Group Cryptography Services (2016) under the Linux Foundation Core Infrastructure Initiative, the direct institutional response to Heartbleed. Continuously fuzzed in OSS-Fuzz; security policy published in-tree.",
+        "refs": [
+          {
+            "label": "NCC Group audit of OpenSSL, 2016 (Core Infrastructure Initiative)"
+          }
+        ]
+      },
+      "github_url": "https://github.com/openssl/openssl",
+      "raw_base": "https://raw.githubusercontent.com/openssl/openssl/17bf6c48ea8a6af1cb90f2f2aab4bb4b9e2adfc5",
+      "files": [
+        {
+          "path": "LICENSE.txt",
+          "chars": 10175,
+          "words": 1413,
+          "sha256": "7d5450cb2d142651b8afa315b5f238efc805dad827d91ba367d8516bc9d49e7a",
+          "local": "09-source-code/openssl_openssl/LICENSE.txt"
+        },
+        {
+          "path": "README.md",
+          "chars": 8586,
+          "words": 917,
+          "sha256": "64464d90ab175816fb57d9241bd241d3c95f2f5229644854a3e98ae5dc888e9a",
+          "local": "09-source-code/openssl_openssl/README.md"
+        },
+        {
+          "path": "ssl/ssl_lib.c",
+          "chars": 227975,
+          "words": 21065,
+          "sha256": "ed49d5e61d0d7b35f41fcc61229f1ab2e30aed8e7172bcdb5e54c64938b852c3",
+          "local": "09-source-code/openssl_openssl/ssl_ssl_lib.c"
+        },
+        {
+          "path": "crypto/evp/evp_enc.c",
+          "chars": 47749,
+          "words": 4233,
+          "sha256": "8afacee7fae28f3d42c0b43a7616a8ede4d75c53a4d98f53dabb7b262a521a26",
+          "local": "09-source-code/openssl_openssl/crypto_evp_evp_enc.c"
+        }
+      ],
+      "folded": [],
+      "missing": [],
+      "provenance": {
+        "local": "09-source-code/openssl_openssl/PROVENANCE.md",
+        "sha256": "1b7c90e12233eefd55e0c2cc9be4a9568c6c7dfc15431b01ea61d0071bad0057",
+        "words": 130
+      }
+    },
+    {
+      "owner": "openssh",
+      "repo": "openssh-portable",
+      "branch": "master",
+      "commit": "9ee20dd69537b13558ec56a37afc64920bc6ddbc",
+      "lang": "C",
+      "license": "BSD-style (see LICENCE)",
+      "tier": "audited",
+      "why": "The SSH implementation on effectively every Unix system; remote administration of the internet runs through it.",
+      "security": {
+        "summary": "Developed under the OpenBSD project's continuous, proactive source-audit process — the longest-running such discipline in open source — with privilege separation as a designed-in mitigation.",
+        "refs": [
+          {
+            "label": "OpenBSD security process",
+            "url": "https://www.openbsd.org/security.html"
+          }
+        ]
+      },
+      "github_url": "https://github.com/openssh/openssh-portable",
+      "raw_base": "https://raw.githubusercontent.com/openssh/openssh-portable/9ee20dd69537b13558ec56a37afc64920bc6ddbc",
+      "files": [
+        {
+          "path": "LICENCE",
+          "chars": 21137,
+          "words": 3114,
+          "sha256": "5bb5b160726ef5756e4f32fe95b35249c294962419650f48d05134b486d27ccb",
+          "local": "09-source-code/openssh_openssh-portable/LICENCE"
+        },
+        {
+          "path": "PROTOCOL",
+          "chars": 25246,
+          "words": 3441,
+          "sha256": "4a9e7f6d26d3f59deae825ab11ca34a4ffb260b47a19b5a174ddfd1ee009bca4",
+          "local": "09-source-code/openssh_openssh-portable/PROTOCOL"
+        },
+        {
+          "path": "ssh.c",
+          "chars": 75501,
+          "words": 5024,
+          "sha256": "bb830a224536e1b6797448f04da408bdf2c1c8d44413bdce5be0d7f7d3bbd1f9",
+          "local": "09-source-code/openssh_openssh-portable/ssh.c"
+        },
+        {
+          "path": "sshkey.c",
+          "chars": 92200,
+          "words": 9805,
+          "sha256": "e80e13a6494ae19175f6598b9fe448fdb9ebca40b38da57cad45207074698efe",
+          "local": "09-source-code/openssh_openssh-portable/sshkey.c"
+        }
+      ],
+      "folded": [
+        {
+          "path": "README.md",
+          "chars": 5666,
+          "words": 555,
+          "sha256": "a7d14381e5bffeb73c3b83c89f72223dc82e05b7de76aef37c8301b0e3c79cd2"
+        }
+      ],
+      "missing": [],
+      "provenance": {
+        "local": "09-source-code/openssh_openssh-portable/PROVENANCE.md",
+        "sha256": "15956a277475c2c6cd853e38122992dfbae26babcf3ba1e1ef86c1c0108f5f95",
+        "words": 704
+      }
+    },
+    {
+      "owner": "jedisct1",
+      "repo": "libsodium",
+      "branch": "master",
+      "commit": "e6324db75c453ee8de91065f48b692362c0c2b65",
+      "lang": "C",
+      "license": "ISC",
+      "tier": "audited",
+      "why": "The misuse-resistant cryptography library that a generation of applications standardized on for NaCl-style crypto.",
+      "security": {
+        "summary": "Independent security assessment (2017), funded by Private Internet Access, with a public report.",
+        "refs": [
+          {
+            "label": "libsodium security assessment, 2017 (funded by Private Internet Access)"
+          }
+        ]
+      },
+      "github_url": "https://github.com/jedisct1/libsodium",
+      "raw_base": "https://raw.githubusercontent.com/jedisct1/libsodium/e6324db75c453ee8de91065f48b692362c0c2b65",
+      "files": [
+        {
+          "path": "src/libsodium/crypto_pwhash/argon2/argon2.c",
+          "chars": 8659,
+          "words": 811,
+          "sha256": "1e85bab3b4195fe16bdf5b37acae3e788b8bd3674b6a085673d4bbd0f5fb9852",
+          "local": "09-source-code/jedisct1_libsodium/src_libsodium_crypto_pwhash_argon2_argon2.c"
+        },
+        {
+          "path": "src/libsodium/sodium/utils.c",
+          "chars": 21534,
+          "words": 1460,
+          "sha256": "a1c5d4bca5af3f7535c390ea41e0850d235817b4c2f624a9190b9b76993f6871",
+          "local": "09-source-code/jedisct1_libsodium/src_libsodium_sodium_utils.c"
+        }
+      ],
+      "folded": [
+        {
+          "path": "LICENSE",
+          "chars": 823,
+          "words": 136,
+          "sha256": "508a76d186356c0dd807a670ef510964f8724557024796a2c426c6c0e19ab683"
+        },
+        {
+          "path": "README.markdown",
+          "chars": 3763,
+          "words": 304,
+          "sha256": "912320deaa456b6f3b43f3ab5467cb5870da98160552d6a1cfdb7a59179f45dc"
+        }
+      ],
+      "missing": [],
+      "provenance": {
+        "local": "09-source-code/jedisct1_libsodium/PROVENANCE.md",
+        "sha256": "e9fe2eda090f3419fa7dedfecd16414ff131ed975500a6af1a9eb0c1cb9ccefe",
+        "words": 589
+      }
+    },
+    {
+      "owner": "WireGuard",
+      "repo": "wireguard-go",
+      "branch": "master",
+      "commit": "ecfc5a8d54462e18e13c72173e2623d16d8e25a0",
+      "lang": "Go",
+      "license": "MIT",
+      "tier": "audited",
+      "why": "The userspace implementation of WireGuard, the VPN protocol that displaced far larger predecessors by being small enough to audit.",
+      "security": {
+        "summary": "The WireGuard protocol carries machine-checked symbolic verification in Tamarin, published by the project; the design paper was peer-reviewed at NDSS 2017. The implementation is deliberately small enough to be read in full.",
+        "refs": [
+          {
+            "label": "WireGuard formal verification (Tamarin)",
+            "url": "https://www.wireguard.com/formal-verification/"
+          },
+          {
+            "label": "WireGuard: Next Generation Kernel Network Tunnel, NDSS 2017",
+            "url": "https://www.wireguard.com/papers/wireguard.pdf"
+          }
+        ]
+      },
+      "github_url": "https://github.com/WireGuard/wireguard-go",
+      "raw_base": "https://raw.githubusercontent.com/WireGuard/wireguard-go/ecfc5a8d54462e18e13c72173e2623d16d8e25a0",
+      "files": [
+        {
+          "path": "device/noise-protocol.go",
+          "chars": 17919,
+          "words": 1590,
+          "sha256": "55e2b3e9034029922e3f12a637a553235acc76187507180e04c00f0190cfaeeb",
+          "local": "09-source-code/WireGuard_wireguard-go/device_noise-protocol.go"
+        },
+        {
+          "path": "device/send.go",
+          "chars": 14872,
+          "words": 909,
+          "sha256": "9ba682734747200ac835fb9739f1197fd0ff2fb46677d00582627ffabd703e01",
+          "local": "09-source-code/WireGuard_wireguard-go/device_send.go"
+        }
+      ],
+      "folded": [
+        {
+          "path": "LICENSE",
+          "chars": 1023,
+          "words": 162,
+          "sha256": "91276db973f25602d1aa43491f59cbc84cb88e6f151e1d0cc82a755563ce0195"
+        },
+        {
+          "path": "README.md",
+          "chars": 3913,
+          "words": 586,
+          "sha256": "b71a3690a654a4ef4571564c2d740f3074e9e1730f8837499058c51960c3bd43"
+        }
+      ],
+      "missing": [],
+      "provenance": {
+        "local": "09-source-code/WireGuard_wireguard-go/PROVENANCE.md",
+        "sha256": "ae1eaf05209cddbc193b6b2f399f0f7072bea01fb9613915f94c1c7a2d0cf369",
+        "words": 929
+      }
+    },
+    {
+      "owner": "kubernetes",
+      "repo": "kubernetes",
+      "branch": "master",
+      "commit": "a231bf3f37761e8955eefba61855da1a526a3eb9",
+      "lang": "Go",
+      "license": "Apache-2.0",
+      "tier": "audited",
+      "why": "The orchestration layer most of the world's production container workloads run on.",
+      "security": {
+        "summary": "CNCF-commissioned third-party security audits with public reports: Trail of Bits with Atredis Partners (2019) and a follow-up audit (2023), both published through the Kubernetes security SIG.",
+        "refs": [
+          {
+            "label": "Kubernetes third-party security audits (SIG Security)",
+            "url": "https://github.com/kubernetes/sig-security"
+          }
+        ]
+      },
+      "github_url": "https://github.com/kubernetes/kubernetes",
+      "raw_base": "https://raw.githubusercontent.com/kubernetes/kubernetes/a231bf3f37761e8955eefba61855da1a526a3eb9",
+      "files": [
+        {
+          "path": "LICENSE",
+          "chars": 11358,
+          "words": 1581,
+          "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+          "local": "09-source-code/kubernetes_kubernetes/LICENSE"
+        },
+        {
+          "path": "pkg/kubelet/kubelet.go",
+          "chars": 155864,
+          "words": 11070,
+          "sha256": "c29e8a38ccc588d881e77efd7520d20d07c6b21bdca5db3826bdc03e620a9b85",
+          "local": "09-source-code/kubernetes_kubernetes/pkg_kubelet_kubelet.go"
+        }
+      ],
+      "folded": [
+        {
+          "path": "README.md",
+          "chars": 4387,
+          "words": 435,
+          "sha256": "ca72a02de7afff935feb2beb5c670b758617eac433a8473703ed151f9641bb62"
+        },
+        {
+          "path": "SECURITY_CONTACTS",
+          "chars": 665,
+          "words": 87,
+          "sha256": "0cbc1bd2cd1c38d1692c78dfa85ece3c78de7a36d014ca95807402c08c7e973b"
+        }
+      ],
+      "missing": [],
+      "provenance": {
+        "local": "09-source-code/kubernetes_kubernetes/PROVENANCE.md",
+        "sha256": "ef5b9aa726fff1f9c1665625ff99847cf704f4c1e3d92b09b15d83e2ed4b1880",
+        "words": 681
+      }
+    },
+    {
+      "owner": "aws",
+      "repo": "s2n-tls",
+      "branch": "main",
+      "commit": "72f5db1fb96635a655ec90569ade0d500ea0555c",
+      "lang": "C",
+      "license": "Apache-2.0",
+      "tier": "audited",
+      "why": "AWS's TLS implementation — a rare example of formal methods running in ordinary production CI rather than in a paper.",
+      "security": {
+        "summary": "Core components (HMAC, DRBG) carry machine-checked correctness proofs in SAW/Cryptol, re-checked continuously in CI (\"Continuous formal verification of Amazon s2n\", CAV 2018, with Galois).",
+        "refs": [
+          {
+            "label": "s2n-tls repository (proofs under tests/saw)",
+            "url": "https://github.com/aws/s2n-tls"
+          }
+        ]
+      },
+      "github_url": "https://github.com/aws/s2n-tls",
+      "raw_base": "https://raw.githubusercontent.com/aws/s2n-tls/72f5db1fb96635a655ec90569ade0d500ea0555c",
+      "files": [
+        {
+          "path": "LICENSE",
+          "chars": 11358,
+          "words": 1581,
+          "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+          "local": "09-source-code/aws_s2n-tls/LICENSE"
+        },
+        {
+          "path": "README.md",
+          "chars": 11757,
+          "words": 1416,
+          "sha256": "8dc63513011b3cb7193250ebba1e93b17bffab9b0b81a8e3ea0a7d525d1c71e9",
+          "local": "09-source-code/aws_s2n-tls/README.md"
+        },
+        {
+          "path": "tls/s2n_handshake_io.c",
+          "chars": 77995,
+          "words": 5495,
+          "sha256": "658b60edfc2c47bb81fd348baba943af6f608e2a456a6167820c458259c54a8c",
+          "local": "09-source-code/aws_s2n-tls/tls_s2n_handshake_io.c"
+        },
+        {
+          "path": "api/s2n.h",
+          "chars": 190712,
+          "words": 12825,
+          "sha256": "afc2dd1ccd9c53528707a0780c962b2f4bfa725d5fb884837aa1d4c9292a045a",
+          "local": "09-source-code/aws_s2n-tls/api_s2n.h"
+        }
+      ],
+      "folded": [],
+      "missing": [],
+      "provenance": {
+        "local": "09-source-code/aws_s2n-tls/PROVENANCE.md",
+        "sha256": "bde031290af01d6ee5b1a26f3b9db939b8908e42c12a32e4001f079501cd584f",
+        "words": 130
+      }
+    },
+    {
+      "owner": "bitcoin",
+      "repo": "bitcoin",
+      "branch": "master",
+      "commit": "c90c23d388f66b7eef67f4c6f69184c088727d6a",
+      "lang": "C++",
+      "license": "MIT",
+      "tier": "audited",
+      "why": "Consensus-critical code where any exploitable defect is directly monetizable at global scale.",
+      "security": {
+        "summary": "No single commissioned audit; instead the most sustained adversarial review environment in open source — every line of consensus code defends real value, and the project's review and disclosure culture is built around that fact (policy in-tree).",
+        "refs": [
+          {
+            "label": "Bitcoin Core security policy (collected in-tree below)"
+          }
+        ]
+      },
+      "github_url": "https://github.com/bitcoin/bitcoin",
+      "raw_base": "https://raw.githubusercontent.com/bitcoin/bitcoin/c90c23d388f66b7eef67f4c6f69184c088727d6a",
+      "files": [
+        {
+          "path": "doc/developer-notes.md",
+          "chars": 65327,
+          "words": 5991,
+          "sha256": "89cd8efadc27eb20d8b0f1fb4d22edad0099a5192becbe3b5bfe98bc0d5d87ca",
+          "local": "09-source-code/bitcoin_bitcoin/doc_developer-notes.md"
+        },
+        {
+          "path": "src/validation.cpp",
+          "chars": 313698,
+          "words": 27987,
+          "sha256": "f96522f7528393e09462faa1ac2e5c89f4f2a149ec554ff978a331a8edec852b",
+          "local": "09-source-code/bitcoin_bitcoin/src_validation.cpp"
+        },
+        {
+          "path": "src/script/interpreter.cpp",
+          "chars": 91396,
+          "words": 4722,
+          "sha256": "57a6f328c7e6202f499e48366a86eb26e09c8ebb78e92eef7e839207230be333",
+          "local": "09-source-code/bitcoin_bitcoin/src_script_interpreter.cpp"
+        }
+      ],
+      "folded": [
+        {
+          "path": "COPYING",
+          "chars": 1142,
+          "words": 178,
+          "sha256": "b028769f3852a9368ab10bd754ff01ebb741f84a2fa658c9aff82a631bc6ecfc"
+        },
+        {
+          "path": "SECURITY.md",
+          "chars": 867,
+          "words": 130,
+          "sha256": "c2a2223402183e8673bb1d9e157afddfee496c32366d5cdc45a5ca3ce6e78c57"
+        }
+      ],
+      "missing": [],
+      "provenance": {
+        "local": "09-source-code/bitcoin_bitcoin/PROVENANCE.md",
+        "sha256": "82685ac81ad46171049e6460585e4a5e00d40ae02c23af82ca5aa916431de31a",
+        "words": 484
+      }
+    },
+    {
+      "owner": "apache",
+      "repo": "httpd",
+      "branch": "trunk",
+      "commit": "dec51f1f869a8ebd7b805c6900b419f802f09680",
+      "lang": "C",
+      "license": "Apache-2.0",
+      "tier": "audited",
+      "why": "The reference HTTP server since 1995; the project the Apache License is named after.",
+      "security": {
+        "summary": "Audited under the European Commission's EU-FOSSA pilot (2016), which selected Apache HTTP Server core as one of its two audit targets.",
+        "refs": [
+          {
+            "label": "EU-FOSSA pilot project (European Commission, 2016)"
+          }
+        ]
+      },
+      "github_url": "https://github.com/apache/httpd",
+      "raw_base": "https://raw.githubusercontent.com/apache/httpd/dec51f1f869a8ebd7b805c6900b419f802f09680",
+      "files": [
+        {
+          "path": "LICENSE",
+          "chars": 25479,
+          "words": 3700,
+          "sha256": "47b8c2b6c3309282a99d4a3001575c790fead690cc14734628c4667d2bbffc43",
+          "local": "09-source-code/apache_httpd/LICENSE"
+        },
+        {
+          "path": "server/core.c",
+          "chars": 206331,
+          "words": 17448,
+          "sha256": "41c37fefbdb39627bc4ddaee508ae7d9bae5aa056736f2732e247ee1e8ba83fb",
+          "local": "09-source-code/apache_httpd/server_core.c"
+        },
+        {
+          "path": "modules/http/http_request.c",
+          "chars": 29720,
+          "words": 3165,
+          "sha256": "a7095295e2915727f0d0a23e05bebce21914c51b54ba4e08a039e1522b7a4363",
+          "local": "09-source-code/apache_httpd/modules_http_http_request.c"
+        }
+      ],
+      "folded": [
+        {
+          "path": "README",
+          "chars": 4696,
+          "words": 598,
+          "sha256": "daa00b5c04882402fe0f228d8ca7f55b387b88c0c481a4b9966fdf1eb44c8e6d"
+        }
+      ],
+      "missing": [],
+      "provenance": {
+        "local": "09-source-code/apache_httpd/PROVENANCE.md",
+        "sha256": "39d846ecaa34860368d54d8717fc89ae922ff8d32b0e7260a5e1bf926cd38db0",
+        "words": 735
+      }
+    },
+    {
+      "owner": "signalapp",
+      "repo": "libsignal",
+      "branch": "main",
+      "commit": "b056faa6dd02961cff24064c54c089c52e1a0753",
+      "lang": "Rust",
+      "license": "AGPL-3.0",
+      "tier": "audited",
+      "why": "The protocol library behind Signal's (and formerly WhatsApp's) end-to-end encryption.",
+      "security": {
+        "summary": "The Signal protocol has published, peer-reviewed formal security analyses: Cohn-Gordon et al. (IEEE EuroS&P 2017) and ProVerif models from the INRIA Prosecco group.",
+        "refs": [
+          {
+            "label": "A Formal Security Analysis of the Signal Messaging Protocol (eprint 2016/1013)",
+            "url": "https://eprint.iacr.org/2016/1013"
+          }
+        ]
+      },
+      "github_url": "https://github.com/signalapp/libsignal",
+      "raw_base": "https://raw.githubusercontent.com/signalapp/libsignal/b056faa6dd02961cff24064c54c089c52e1a0753",
+      "files": [
+        {
+          "path": "LICENSE",
+          "chars": 34523,
+          "words": 5515,
+          "sha256": "0d96a4ff68ad6d4b6f1f30f713b18d5184912ba8dd389f86aa7710db079abcb0",
+          "local": "09-source-code/signalapp_libsignal/LICENSE"
+        },
+        {
+          "path": "README.md",
+          "chars": 12122,
+          "words": 1639,
+          "sha256": "b750fb041f95e6733209a3b5bf233ce446e0ceb3771826712e7967707a6803d4",
+          "local": "09-source-code/signalapp_libsignal/README.md"
+        },
+        {
+          "path": "rust/protocol/src/session.rs",
+          "chars": 9278,
+          "words": 644,
+          "sha256": "d8dba05207b36dc49e6898d6e38a27d44ce31a8a1d32a64df80bb7e1b3697cbb",
+          "local": "09-source-code/signalapp_libsignal/rust_protocol_src_session.rs"
+        }
+      ],
+      "folded": [
+        {
+          "path": "rust/protocol/src/lib.rs",
+          "chars": 3504,
+          "words": 279,
+          "sha256": "a3de683393c5d65cc8add1315e820a0879b28b33f909e35ac659f425ef8d77b1"
+        }
+      ],
+      "missing": [],
+      "provenance": {
+        "local": "09-source-code/signalapp_libsignal/PROVENANCE.md",
+        "sha256": "4c3b6beec7e558b463b811d9639370a29eeee0b25964f41c075f94531de4e4b1",
+        "words": 421
+      }
+    }
+  ]
+}

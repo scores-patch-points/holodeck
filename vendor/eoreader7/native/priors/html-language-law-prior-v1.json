@@ -1,0 +1,56 @@
+{
+ "schema": "LanguageLawPrior@1",
+ "language": "html",
+ "giver": {
+  "resource": "tree-sitter grammar (the language's syntax law as data)",
+  "engine": {
+   "source": "https://raw.githubusercontent.com/tree-sitter/tree-sitter-html/master/src/node-types.json",
+   "repo": "https://github.com/tree-sitter/tree-sitter-html"
+  },
+  "note": "Derived from the language's tree-sitter grammar via node-types.json. Node types are the structure (open/close/nest); anonymous lowercase tokens are the reserved keywords; anonymous symbol tokens are the operators. Where the source is grammar.js (the generated grammars), extraction is a disclosed heuristic over the source, not a parse. Semantics/type-checking stay in the language's own compiler; identifier law is Unicode XID in most of these languages, not the grammar's Latin-shaped word rule."
+ },
+ "lexical": {
+  "keywords": [
+   "doctype"
+  ],
+  "operators": [
+   "\"",
+   "'",
+   "/>",
+   "<",
+   "<!",
+   "</",
+   "=",
+   ">"
+  ]
+ },
+ "grammar": {
+  "nodeTypes": [
+   "attribute",
+   "attribute_name",
+   "attribute_value",
+   "comment",
+   "doctype",
+   "document",
+   "element",
+   "end_tag",
+   "entity",
+   "erroneous_end_tag",
+   "erroneous_end_tag_name",
+   "quoted_attribute_value",
+   "raw_text",
+   "script_element",
+   "self_closing_tag",
+   "start_tag",
+   "style_element",
+   "tag_name",
+   "text"
+  ]
+ },
+ "counts": {
+  "keywords": 1,
+  "operators": 8,
+  "nodeTypes": 19
+ },
+ "builtAt": "2026-09-15T02:28:55.125Z"
+}

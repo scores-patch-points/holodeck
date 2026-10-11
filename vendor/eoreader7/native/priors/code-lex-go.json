@@ -1,0 +1,1987 @@
+{
+ "schema": "CodeLexPrior@1",
+ "language": "go",
+ "grammar": "go",
+ "provenance": {
+  "giver": "tree-sitter grammar `go` (tree-sitter-language-pack via eval/coding-competence/gold.py, gold-1), TRAIN repositories only",
+  "goldVersion": "gold-1",
+  "trainRepos": [
+   {
+    "repo": "WireGuard/wireguard-go",
+    "url": "https://github.com/WireGuard/wireguard-go",
+    "commit": null,
+    "license": "MIT"
+   },
+   {
+    "repo": "apache/thrift",
+    "url": "https://github.com/apache/thrift",
+    "commit": "50bbda109593a0b5c7634ac21c5d98eee97fe7ec",
+    "license": "apache-2.0",
+    "license_text_family": "apache-2.0"
+   },
+   {
+    "repo": "google/flatbuffers",
+    "url": "https://github.com/google/flatbuffers",
+    "commit": "b8431fbcd7a5c71817f314e18b332c0648554efa",
+    "license": "apache-2.0",
+    "license_text_family": "apache-2.0"
+   },
+   {
+    "repo": "ollama/ollama",
+    "url": "https://github.com/ollama/ollama",
+    "commit": "42e911bc3d05798cad729cb474bf62f378cb2e26",
+    "license": "mit",
+    "license_text_family": "mit"
+   },
+   {
+    "repo": "scality/metalk8s",
+    "url": "https://github.com/scality/metalk8s",
+    "commit": "92d520f5c5a4af6bfd6d0a10cd2370e41abda23c",
+    "license": "apache-2.0",
+    "license_text_family": "apache-2.0"
+   }
+  ],
+  "trainFiles": [
+   {
+    "rel": "device_noise-protocol.go",
+    "repo": "WireGuard/wireguard-go",
+    "sha256": "55e2b3e9034029922e3f12a637a553235acc76187507180e04c00f0190cfaeeb",
+    "bytes": 17919
+   },
+   {
+    "rel": "lib/go/thrift/pointerize.go",
+    "repo": "apache/thrift",
+    "sha256": "057b26ed7082828fbf407ff3d56a8229be2f195b1219df74a2a7b2c975459853",
+    "bytes": 2586
+   },
+   {
+    "rel": "examples/go-echo/client/client.go",
+    "repo": "google/flatbuffers",
+    "sha256": "0089d66c8af8ccbf2dba0745b76fd6dcf297c58b383838676a71025eb6a7b6e5",
+    "bytes": 947
+   },
+   {
+    "rel": "internal/proxy/codex_desktop_errors_test.go",
+    "repo": "ollama/ollama",
+    "sha256": "006871e54b80f67456c1987c38aa817ad828f9b34696dcba2d84c5e36d9b6583",
+    "bytes": 10610
+   },
+   {
+    "rel": "operator/pkg/controller/clusterconfig/controller.go",
+    "repo": "scality/metalk8s",
+    "sha256": "254f2dc4dc440501d50e18d3eb6fe4b8c81f2511d297903b8ea243bc4354036d",
+    "bytes": 5371
+   },
+   {
+    "rel": "device_send.go",
+    "repo": "WireGuard/wireguard-go",
+    "sha256": "9ba682734747200ac835fb9739f1197fd0ff2fb46677d00582627ffabd703e01",
+    "bytes": 14872
+   },
+   {
+    "rel": "lib/go/test/tests/write_texception_test.go",
+    "repo": "apache/thrift",
+    "sha256": "09a04e09188ecc33f621b923348d2a032e2137a89e1326b43b65051e8cca82ae",
+    "bytes": 2415
+   },
+   {
+    "rel": "grpc/tests/go_test.go",
+    "repo": "google/flatbuffers",
+    "sha256": "0ac511629363198139fa83b65c52aee7efb0bcea641956b7e5de83c14fc7c6ff",
+    "bytes": 2613
+   },
+   {
+    "rel": "format/time_test.go",
+    "repo": "ollama/ollama",
+    "sha256": "0074eb9acebe8d38b7f17f843000aa306d94cd2775bd7958c4e117e797e003fc",
+    "bytes": 1061
+   },
+   {
+    "rel": "operator/internal/controller/suite_test.go",
+    "repo": "scality/metalk8s",
+    "sha256": "2fb0bc511c14336d9b48aee7b3e7fbe52aa062e5873c2afa0d53ff7dbe442b9e",
+    "bytes": 3455
+   },
+   {
+    "rel": "lib/go/thrift/socket_aix_syscall.go",
+    "repo": "apache/thrift",
+    "sha256": "0a786b72c1f6aec4934320fb9b122e871ed85c7998e70af44a8b1f91bf432a4d",
+    "bytes": 1000
+   },
+   {
+    "rel": "examples/go-echo/server/server.go",
+    "repo": "google/flatbuffers",
+    "sha256": "15109cd2dbbb7a10488c840a7f894b881f00cc86b862ebbffe87c1215a07d9ef",
+    "bytes": 536
+   },
+   {
+    "rel": "mlxrunner/tokenizer/tokenizer.go",
+    "repo": "ollama/ollama",
+    "sha256": "08d3e8f2b2dbbe3da7893582c80b8871ddd0caa2a74ac298897fad3d5fe53170",
+    "bytes": 3000
+   },
+   {
+    "rel": "go/solution-operator-lib/pkg/config/config.go",
+    "repo": "scality/metalk8s",
+    "sha256": "33bea71fa4c91873028ea0208b0364f23f3165022838fb84a0ba78d24094714b",
+    "bytes": 3078
+   },
+   {
+    "rel": "lib/go/test/tests/typedef_struct_test.go",
+    "repo": "apache/thrift",
+    "sha256": "135a42a8be883b17397fa28f6ec4147f1b6363857eecfb8db652c1b053a97626",
+    "bytes": 5582
+   },
+   {
+    "rel": "go/table.go",
+    "repo": "google/flatbuffers",
+    "sha256": "5b519519ab8368b5305cd621f98a2d21fedcd1b70e108d0bb6915434854cf541",
+    "bytes": 13845
+   },
+   {
+    "rel": "cmd/tui/welcome.go",
+    "repo": "ollama/ollama",
+    "sha256": "0e2c9933ceb5b5d8821408835e3e1f2a293d4c34f1317eba7247145743461a20",
+    "bytes": 6604
+   },
+   {
+    "rel": "operator/pkg/controller/utils/image.go",
+    "repo": "scality/metalk8s",
+    "sha256": "36cd98c07d907e5f5ca2e91c9cf2c5215ba425c4b0b89b87a19908f72416ebdc",
+    "bytes": 595
+   },
+   {
+    "rel": "lib/go/test/tests/required_fields_test.go",
+    "repo": "apache/thrift",
+    "sha256": "1a5bf73eed077e6ea435a61e55ab30a20af743998e4f2416beef6c011eeb5026",
+    "bytes": 4921
+   },
+   {
+    "rel": "go/sizes.go",
+    "repo": "google/flatbuffers",
+    "sha256": "64f79012e63447e6eecc20e7f4053dcc2a57f1c268bfd6c1568e5be60645e80e",
+    "bytes": 1530
+   },
+   {
+    "rel": "mlxrunner/model/gemma4/media.go",
+    "repo": "ollama/ollama",
+    "sha256": "1347a11db06bc0f331a7b2ac75aa274ec55e093f2707ccda69367feac19f2793",
+    "bytes": 10245
+   },
+   {
+    "rel": "operator/api/v1alpha1/clusterconfig_types_test.go",
+    "repo": "scality/metalk8s",
+    "sha256": "3ca6afc010b1c91f0daf3e280de26e2e4abaf274c5996dc614f4442a23d7b2e2",
+    "bytes": 6057
+   },
+   {
+    "rel": "lib/go/thrift/messagetype.go",
+    "repo": "apache/thrift",
+    "sha256": "1bfe4644d9d3b67f3c9109d5005777783e21759cce0a134d549729e259d41f1c",
+    "bytes": 1106
+   },
+   {
+    "rel": "tests/go_test.go",
+    "repo": "google/flatbuffers",
+    "sha256": "6776e5603459f19f8be34ff193d4f687bcbc6b68e83e0c085dacce826af875a3",
+    "bytes": 81444
+   },
+   {
+    "rel": "fs/gguf/keyvalue_test.go",
+    "repo": "ollama/ollama",
+    "sha256": "1642d931e7837f500de4afa585ba27b963f125181de59790787b1d5611ca6779",
+    "bytes": 4995
+   },
+   {
+    "rel": "operator/test/utils/utils.go",
+    "repo": "scality/metalk8s",
+    "sha256": "44aee74a227e80857d7ac776ffeaea051f941e29604b11fa937ab63091db7e17",
+    "bytes": 7199
+   },
+   {
+    "rel": "lib/go/thrift/multiplexed_protocol.go",
+    "repo": "apache/thrift",
+    "sha256": "2812d75ad8ad013d40825cb43d4b0fc5de822c5ddeb2ba195ff8582d110903c9",
+    "bytes": 8218
+   },
+   {
+    "rel": "go/grpc.go",
+    "repo": "google/flatbuffers",
+    "sha256": "8d6425ad3b934f07956b6f688faa0a41eeaa381739a6775bb2c7d015219c4351",
+    "bytes": 1889
+   },
+   {
+    "rel": "model/renderers/gemma4_reference_test.go",
+    "repo": "ollama/ollama",
+    "sha256": "17caa71b84b61ba42459326f8f8e7e3e19baf4170454c212669b5348a542bcfd",
+    "bytes": 74215
+   },
+   {
+    "rel": "storage-operator/test/utils/utils.go",
+    "repo": "scality/metalk8s",
+    "sha256": "44aee74a227e80857d7ac776ffeaea051f941e29604b11fa937ab63091db7e17",
+    "bytes": 7199
+   },
+   {
+    "rel": "lib/go/test/tests/struct_key_test.go",
+    "repo": "apache/thrift",
+    "sha256": "293dda15d26aa0eb13ca11ca08b31357e447d28a9168f6649968a23f36dade2f",
+    "bytes": 15209
+   },
+   {
+    "rel": "go/builder.go",
+    "repo": "google/flatbuffers",
+    "sha256": "af809291108700b2084cf3462a9e69fd71c38ced6ec86347e20707da6be775df",
+    "bytes": 24857
+   },
+   {
+    "rel": "mlxrunner/nn/norm.go",
+    "repo": "ollama/ollama",
+    "sha256": "1908f6d38cb78715ae79027e85f4607219481e844c8171bb859fdfc15dda66c5",
+    "bytes": 721
+   },
+   {
+    "rel": "go/solution-operator-lib/pkg/config/config_test.go",
+    "repo": "scality/metalk8s",
+    "sha256": "49cab02694143f2b553e4fad86ecaa34025f93afb7bab6dc3eb37a3d6afc9e5b",
+    "bytes": 4694
+   },
+   {
+    "rel": "lib/go/thrift/simple_server.go",
+    "repo": "apache/thrift",
+    "sha256": "2bb0ebe2031c2564f1f3aaeccda67b534086ced26598f9892959f48204ae42bd",
+    "bytes": 12046
+   },
+   {
+    "rel": "grpc/examples/go/greeter/server/main.go",
+    "repo": "google/flatbuffers",
+    "sha256": "b4790e49b5977be99e24b5b027ee08113beac075a20d33b82bd613789b15046b",
+    "bytes": 1686
+   },
+   {
+    "rel": "server/fixblobs_test.go",
+    "repo": "ollama/ollama",
+    "sha256": "1a8a71f038549ceb2b4eb9af1dc5f20e3e79760ff19ad1d794ea1996420d75f7",
+    "bytes": 2134
+   },
+   {
+    "rel": "storage-operator/salt/token_test.go",
+    "repo": "scality/metalk8s",
+    "sha256": "4e7048fef2fa0a46fc3675a6a433b29fcf74e9e9b9e7ed1539ca2fb8496b4109",
+    "bytes": 476
+   },
+   {
+    "rel": "test/go/src/common/server.go",
+    "repo": "apache/thrift",
+    "sha256": "2ded6a19e977a2efe5943f6f2be677060ecd0b8f6cfd0baa897da087b97f406a",
+    "bytes": 4497
+   },
+   {
+    "rel": "go/encode.go",
+    "repo": "google/flatbuffers",
+    "sha256": "bce495b2e23250b71c0e7ce84a326b031bf990ffa57d215e72ca9cc997f29a9e",
+    "bytes": 6313
+   },
+   {
+    "rel": "fs/gguf/keyvalue.go",
+    "repo": "ollama/ollama",
+    "sha256": "2046b440ef98974871a23e7d29947575459cd43971c7cef40612f69a9374f65e",
+    "bytes": 3811
+   },
+   {
+    "rel": "operator/cmd/main.go",
+    "repo": "scality/metalk8s",
+    "sha256": "5a59fa538d99dda8e1dbaa6612f4b7f511cfcaa95c6d07d3886e9fe4fd13f365",
+    "bytes": 9875
+   },
+   {
+    "rel": "lib/go/thrift/lowlevel_benchmarks_test.go",
+    "repo": "apache/thrift",
+    "sha256": "32fffc107cf8e92f4dd069317b1a756967b08ecdc7a48df3ea08b7f28cc31a05",
+    "bytes": 11181
+   },
+   {
+    "rel": "samples/sample_binary.go",
+    "repo": "google/flatbuffers",
+    "sha256": "cce32d74d29f57d543001c2f3616fbdf2bacb9bf2c77dc85fc0ac961c74bef8e",
+    "bytes": 6691
+   },
+   {
+    "rel": "integration/tools_routes_test.go",
+    "repo": "ollama/ollama",
+    "sha256": "2890aba74791a0f9e6b344047e26ca4d1491d86e1728180a30b9d69129ff19c5",
+    "bytes": 13626
+   },
+   {
+    "rel": "operator/api/v1alpha1/clusterconfig_types.go",
+    "repo": "scality/metalk8s",
+    "sha256": "5fd328e601301046db3189e086048b2cb450c3547571c1d7eebb2e5ff0961c73",
+    "bytes": 6623
+   },
+   {
+    "rel": "lib/go/thrift/zlib_transport_test.go",
+    "repo": "apache/thrift",
+    "sha256": "34b89d777757d244a614823736883b5fa802f5b4710d3bce3f69c252886f3b72",
+    "bytes": 7405
+   },
+   {
+    "rel": "grpc/examples/go/greeter/client/main.go",
+    "repo": "google/flatbuffers",
+    "sha256": "d96fcf6370e5a35faf1b79c2db45458687dc075b96024abbd2770f75488c1e3b",
+    "bytes": 2071
+   },
+   {
+    "rel": "cmd/interactive_test.go",
+    "repo": "ollama/ollama",
+    "sha256": "3060d4e790c16ea5f12744708b3aaee06b8a41699f2ee9f4cb23c4ca95496257",
+    "bytes": 5039
+   },
+   {
+    "rel": "charts/loki/test/config_test.go",
+    "repo": "scality/metalk8s",
+    "sha256": "66c072759f424b9ff6949eca397445fd797f17cb3696767993c4c0c3b526102e",
+    "bytes": 5971
+   },
+   {
+    "rel": "lib/go/thrift/simple_server_test.go",
+    "repo": "apache/thrift",
+    "sha256": "3db6a5ad10e68f4b3ae859ac9227c72f400ff19bdfc651dc834c14bdaf9ffcb0",
+    "bytes": 7526
+   },
+   {
+    "rel": "go/lib.go",
+    "repo": "google/flatbuffers",
+    "sha256": "e38ef9aafbcee3441f6146b70cbbad7d3e83b602ea7993e0660a8ef3cedbaecd",
+    "bytes": 1888
+   },
+   {
+    "rel": "server/gemma4_test.go",
+    "repo": "ollama/ollama",
+    "sha256": "33221c898fab276975e72d91a4ffcdbce1ac477d62e485a172e0ba707d363a35",
+    "bytes": 2642
+   },
+   {
+    "rel": "storage-operator/test/e2e/e2e_test.go",
+    "repo": "scality/metalk8s",
+    "sha256": "66c3c6072bc686244c750265ce8a475e088389939c15d8d68b1ac5eaa326d8c4",
+    "bytes": 11963
+   },
+   {
+    "rel": "lib/go/thrift/context.go",
+    "repo": "apache/thrift",
+    "sha256": "460e8631b6e71e6c2ae3854fc9c864db999bc94edff808f238c04f91347ef8fd",
+    "bytes": 877
+   },
+   {
+    "rel": "model/renderers/cohere_test.go",
+    "repo": "ollama/ollama",
+    "sha256": "433e63dc99e44674df614fd3eb3cf7db6a54dcbd94bda4ba5b2e6201282e5353",
+    "bytes": 7292
+   },
+   {
+    "rel": "operator/pkg/controller/utils/image_test.go",
+    "repo": "scality/metalk8s",
+    "sha256": "688ef32fd45803f32880d0b264f2450320209893c7cac488786587bbc21ceb6d",
+    "bytes": 467
+   },
+   {
+    "rel": "lib/go/test/tests/initialisms_test.go",
+    "repo": "apache/thrift",
+    "sha256": "48dd4b7753d79dfb6ef5499e8e0e340d4250894e8a644a302f6aedd71d315e46",
+    "bytes": 1303
+   },
+   {
+    "rel": "mlxrunner/media.go",
+    "repo": "ollama/ollama",
+    "sha256": "460ad6dabd8606aa4272b7c636d8efdbc0095fff3aa1cf0fb8b3bff601f9e2b2",
+    "bytes": 7155
+   },
+   {
+    "rel": "operator/pkg/controller/clusterconfig/workloadplane/virtualippool.go",
+    "repo": "scality/metalk8s",
+    "sha256": "6d57d4c28f2535277e8ad13c605fa15f203f2d9d91136b50183007f727dfe3a4",
+    "bytes": 6877
+   },
+   {
+    "rel": "lib/go/thrift/transport_exception.go",
+    "repo": "apache/thrift",
+    "sha256": "4977fa5d6fe95d6277d9915892e9cab780511ba8bc12b46220c4ec6da516fc33",
+    "bytes": 2819
+   },
+   {
+    "rel": "mlxrunner/model/globalscale_test.go",
+    "repo": "ollama/ollama",
+    "sha256": "49ec3514764bebbcf30108c0ea9ae51f26ed9043e7e347d4246a2c37748cf70c",
+    "bytes": 8790
+   },
+   {
+    "rel": "storage-operator/api/v1alpha1/volume_types.go",
+    "repo": "scality/metalk8s",
+    "sha256": "8088f93eb407ae51e3c07284f86aec7480da3340a995f7f93c5f4c091ed40075",
+    "bytes": 10877
+   },
+   {
+    "rel": "lib/go/thrift/configuration.go",
+    "repo": "apache/thrift",
+    "sha256": "4afd6374088a6324d9e20b94350b0a70a182899a517ad5fb810eb93cc0dba5e2",
+    "bytes": 15265
+   },
+   {
+    "rel": "mlxrunner/model/nemotron_h/vision_prompt_test.go",
+    "repo": "ollama/ollama",
+    "sha256": "4fa5c720ff475f27704bcb81dcc9e46888b3365248aee2df01ce5b4e3eab146e",
+    "bytes": 4605
+   },
+   {
+    "rel": "images/metalk8s-alert-logger/main.go",
+    "repo": "scality/metalk8s",
+    "sha256": "82d1e4e5403212b2a5a2558d27d50523e3ed2530c185e77499c7512c726ed6cf",
+    "bytes": 1147
+   },
+   {
+    "rel": "test/go/src/bin/testclient/main.go",
+    "repo": "apache/thrift",
+    "sha256": "4ef11e771709dc7bcf95fecb2316b586ed299ddbfbd91c440dc8f41b88f89d26",
+    "bytes": 10455
+   },
+   {
+    "rel": "docs/tools/extract-examples/main.go",
+    "repo": "ollama/ollama",
+    "sha256": "5773f66b87d89a108ab4ca034fe5eb69db9a6fb261460e7b76dffab35f158c71",
+    "bytes": 3268
+   },
+   {
+    "rel": "storage-operator/internal/controller/slice.go",
+    "repo": "scality/metalk8s",
+    "sha256": "842c04f09d767a5819c91cca388cff67ddc17d1929c317268b467eadb6681bf3",
+    "bytes": 1045
+   },
+   {
+    "rel": "lib/go/thrift/buffered_transport_test.go",
+    "repo": "apache/thrift",
+    "sha256": "4f5c01d96e71ad663213812baa9bf943ba292361fc14110b9e7954c67146a214",
+    "bytes": 980
+   },
+   {
+    "rel": "types/model/name.go",
+    "repo": "ollama/ollama",
+    "sha256": "5a57960ce67a46383dc8a0e96df648be7e137ffa6510c39982e74dea793a0cd7",
+    "bytes": 10108
+   },
+   {
+    "rel": "operator/pkg/controller/utils/reconcile.go",
+    "repo": "scality/metalk8s",
+    "sha256": "89e829538f1a60093b184804ca3dbd7e781209771cfc2aa556f067d88249361d",
+    "bytes": 2840
+   },
+   {
+    "rel": "lib/go/thrift/max_container_size_test.go",
+    "repo": "apache/thrift",
+    "sha256": "546a3f0af4f17ff7edb96e9fcdbb2c10a75ba6c957213f619539c013855316ab",
+    "bytes": 7214
+   },
+   {
+    "rel": "mlxrunner/model/audio/audio_test.go",
+    "repo": "ollama/ollama",
+    "sha256": "5a924a1a1ad4cfb291ca602bea1ce402be5c710ff212737a93b0c13e8a1190ed",
+    "bytes": 9524
+   },
+   {
+    "rel": "operator/internal/controller/virtualippool_controller.go",
+    "repo": "scality/metalk8s",
+    "sha256": "8a9b090e15666d31d19fc0155d14fd1bcbb4dc51ce33f8c7a8d8265d9c802ae5",
+    "bytes": 1743
+   },
+   {
+    "rel": "lib/go/thrift/slog.go",
+    "repo": "apache/thrift",
+    "sha256": "5568ed6caa88c7d7cee1bad291b2780a7c727db576d8dea05610404081030d0f",
+    "bytes": 1710
+   },
+   {
+    "rel": "model/parsers/cohere_test.go",
+    "repo": "ollama/ollama",
+    "sha256": "5d5b50a8c99df84fa6040306e4ad15dc4fbe17d4d88a4112400775ebd40e6dab",
+    "bytes": 8066
+   },
+   {
+    "rel": "charts/loki/src/helm-test/canary_test.go",
+    "repo": "scality/metalk8s",
+    "sha256": "991b3a268f79a8e8425a29c12c1f61db0db8d1b413d54cdb958e747c39e1b79f",
+    "bytes": 5829
+   },
+   {
+    "rel": "lib/go/test/tests/string_parse_allocation_test.go",
+    "repo": "apache/thrift",
+    "sha256": "5833d21e6f749d6637091fa0fd7400c8530d6a3aa303612c20281fc488926ea7",
+    "bytes": 1991
+   },
+   {
+    "rel": "app/tools/url_policy_test.go",
+    "repo": "ollama/ollama",
+    "sha256": "5e7015824c7384f225fe00e379724e5c2a7d39e1dc645b931168150438537ee8",
+    "bytes": 630
+   },
+   {
+    "rel": "storage-operator/salt/creds.go",
+    "repo": "scality/metalk8s",
+    "sha256": "9970b4b2abb39cd378e3dad205560adf71f5c338f7413be7bb817f548e6b16b5",
+    "bytes": 786
+   },
+   {
+    "rel": "lib/go/test/tests/conflict_arg_names_test.go",
+    "repo": "apache/thrift",
+    "sha256": "5dcf92861f830ecb40f5a3d343adf9a168266481daaa3c4d25e10379f772c191",
+    "bytes": 1031
+   },
+   {
+    "rel": "app/dialog/dlgs_darwin.go",
+    "repo": "ollama/ollama",
+    "sha256": "5f35fb266ea866076acb2c8057cfb138044bf038b78ede9e718891740f5884f0",
+    "bytes": 1840
+   },
+   {
+    "rel": "storage-operator/internal/controller/volume_controller_test.go",
+    "repo": "scality/metalk8s",
+    "sha256": "a29f7995d0a66b849293869c527f33e4de9f10cb5f0847677dccbd3a29935854",
+    "bytes": 888
+   },
+   {
+    "rel": "lib/go/thrift/serializer.go",
+    "repo": "apache/thrift",
+    "sha256": "6453403db1a3670d52b602bd80f064b55cfb5b45456df6191d11112179915e28",
+    "bytes": 3433
+   },
+   {
+    "rel": "model/parsers/nemotron3nano.go",
+    "repo": "ollama/ollama",
+    "sha256": "62c694a07f878e304e62193eff5efb5ecec09a51d5f8231861088ea340ff6d7f",
+    "bytes": 5785
+   },
+   {
+    "rel": "storage-operator/salt/client_test.go",
+    "repo": "scality/metalk8s",
+    "sha256": "a80c8a40bba5a992940a15e0a9856e4286e45248e14b49c965cab1e3d16f0a5e",
+    "bytes": 9632
+   },
+   {
+    "rel": "lib/go/thrift/unordered_equal.go",
+    "repo": "apache/thrift",
+    "sha256": "66aa83bf91aca986ee1fee49df18172c0ffe544e48de1904d15d0ffd8c6fe7e7",
+    "bytes": 2490
+   },
+   {
+    "rel": "app/updater/updater_test.go",
+    "repo": "ollama/ollama",
+    "sha256": "6682afb3fb79f370747a71d4f1f64af41f5747e3b3b2207e6429b4db271e5adc",
+    "bytes": 19642
+   },
+   {
+    "rel": "storage-operator/salt/creds_test.go",
+    "repo": "scality/metalk8s",
+    "sha256": "aa65069820b1dc4e5506964003509c42586887de3643782edd8c319e4bf44882",
+    "bytes": 642
+   },
+   {
+    "rel": "lib/go/thrift/memory_buffer_test.go",
+    "repo": "apache/thrift",
+    "sha256": "69bad755e6bfcfcdb3222e506e788102851c73337e9c85b6e5c8bffa6d105abf",
+    "bytes": 952
+   },
+   {
+    "rel": "mlxrunner/cache/recurrent_test.go",
+    "repo": "ollama/ollama",
+    "sha256": "6aa707eac96a667b1ab8bdc386ffd2217841f4dec3560e6c14374de94d60b069",
+    "bytes": 7878
+   },
+   {
+    "rel": "storage-operator/salt/job.go",
+    "repo": "scality/metalk8s",
+    "sha256": "ab281ca4afa29e972d15d1f55dfb9c5e8ef75c85f704f4f07567f5fe697c43b6",
+    "bytes": 705
+   },
+   {
+    "rel": "lib/go/thrift/simple_json_protocol_size_limit_test.go",
+    "repo": "apache/thrift",
+    "sha256": "750e89ce5ed7021f969fb9c40f8a8fd3d34acf5f0abcf8961a4ae99f171dfa23",
+    "bytes": 7329
+   },
+   {
+    "rel": "cmd/launch/muse_test.go",
+    "repo": "ollama/ollama",
+    "sha256": "7695a03ebe802013065188af8c0be8af63e479cf966eba3fd969fa3205e1d255",
+    "bytes": 19235
+   },
+   {
+    "rel": "operator/pkg/controller/clusterconfig/controlplane/ingress.go",
+    "repo": "scality/metalk8s",
+    "sha256": "ae294fb10be83331502b580014d54e6c5f5dcb5c32f036368da1f860983802b5",
+    "bytes": 8371
+   },
+   {
+    "rel": "lib/go/thrift/fuzz_test.go",
+    "repo": "apache/thrift",
+    "sha256": "7cabc598e1823a2b0bfc37abd1f35bd7b6da2a51c669b62a3dd0efc1685ea0ac",
+    "bytes": 8689
+   },
+   {
+    "rel": "server/fixblobs.go",
+    "repo": "ollama/ollama",
+    "sha256": "77cda712acb5b7785d51db1db6eaf0a883aa142a0c3612ac08669f737da22319",
+    "bytes": 598
+   },
+   {
+    "rel": "operator/test/e2e/e2e_suite_test.go",
+    "repo": "scality/metalk8s",
+    "sha256": "af6e75754e76baf5bd5e9f1e058a921c39eaf2c0a33eab1c6cdce2b0bd5e7ae3",
+    "bytes": 3566
+   },
+   {
+    "rel": "lib/go/thrift/binary_protocol.go",
+    "repo": "apache/thrift",
+    "sha256": "802fae4925eec6be0fbc883d7ff7f6cbd5a76e6f630188e9ae31381289c89cc6",
+    "bytes": 15904
+   },
+   {
+    "rel": "mlx/mlxthread/mlxthreadtest/mlxthreadtest.go",
+    "repo": "ollama/ollama",
+    "sha256": "81f62a44378a11bc537bb41087a16a7d1c6a00d9ea0b3d3513638861ec2e2ec2",
+    "bytes": 4169
+   },
+   {
+    "rel": "operator/api/v1alpha1/conditions.go",
+    "repo": "scality/metalk8s",
+    "sha256": "b28cf4a0b8ff13ea6c5e7711eaa23a8cdb81b0c33e2cc13fcedd9e77e94eaccb",
+    "bytes": 1676
+   },
+   {
+    "rel": "lib/go/thrift/type.go",
+    "repo": "apache/thrift",
+    "sha256": "854dcc1f770bb4c5f5ad5c5c750555a3fe63a9d3bcfa45c90dfbf713bc9986c8",
+    "bytes": 1468
+   },
+   {
+    "rel": "create/cohere2moe.go",
+    "repo": "ollama/ollama",
+    "sha256": "8c486aedac3794c192fe9e270078420e4e83bfbf6780eaf4b2862a23ccd06b4d",
+    "bytes": 2432
+   },
+   {
+    "rel": "storage-operator/internal/controller/volume_controller.go",
+    "repo": "scality/metalk8s",
+    "sha256": "ba26958e6437be48df61fc7b0ef1db30e84f0630ecbfde5ef56d8aa07564e534",
+    "bytes": 40244
+   },
+   {
+    "rel": "lib/go/thrift/header_transport.go",
+    "repo": "apache/thrift",
+    "sha256": "8b6b9b9e9a9171c4fb0c312c5bcdd77337202399e9527a7f6b5da51a0efe2708",
+    "bytes": 27901
+   },
+   {
+    "rel": "app/cmd/app/app_test.go",
+    "repo": "ollama/ollama",
+    "sha256": "8e95d15351401dcd478844252fa24472db11d18f4874006a0a4c5dff724e091e",
+    "bytes": 4725
+   },
+   {
+    "rel": "storage-operator/internal/controller/suite_test.go",
+    "repo": "scality/metalk8s",
+    "sha256": "bee166b46b5273529b724d7b9142af13f4e243cbf13035d5b779929508efbbb4",
+    "bytes": 3441
+   },
+   {
+    "rel": "lib/go/thrift/response_helper_test.go",
+    "repo": "apache/thrift",
+    "sha256": "8c10c27c1e69564a5f084350a99cfead464006e9ce461293ac9e179278ba5000",
+    "bytes": 3390
+   },
+   {
+    "rel": "mlxrunner/speculate.go",
+    "repo": "ollama/ollama",
+    "sha256": "90250f3eeb61c217daee58e4bac1d6ad5993d44d750a8b11288a10e121cb3462",
+    "bytes": 19797
+   },
+   {
+    "rel": "operator/test/e2e/e2e_test.go",
+    "repo": "scality/metalk8s",
+    "sha256": "bf66f7b83bf5424028125c9d3caceb588d93f5d43dd1965a3a873fe940fe78f5",
+    "bytes": 11915
+   },
+   {
+    "rel": "lib/go/test/tests/const_optional_field_test.go",
+    "repo": "apache/thrift",
+    "sha256": "928d21beebe5ce3a212465ae5dd74aa4e41b1dce83ef4ef9df886925d1878810",
+    "bytes": 6196
+   },
+   {
+    "rel": "mlxrunner/model/nemotron_h/vision_prompt.go",
+    "repo": "ollama/ollama",
+    "sha256": "96ecb8f48c870eadae68c8a7435aae671a80e6f48a2d524f0549f02c0fbac70d",
+    "bytes": 6252
+   },
+   {
+    "rel": "storage-operator/salt/job_test.go",
+    "repo": "scality/metalk8s",
+    "sha256": "bf9627d4eca42ee49a4602268b5cc13d9f994206d33db1b78e4bbe4561e20c23",
+    "bytes": 889
+   },
+   {
+    "rel": "lib/go/thrift/binary_protocol_test.go",
+    "repo": "apache/thrift",
+    "sha256": "92cc2d4d7f67f5bab179436a60713a58f2832438b8ca694ee87997cd986880bf",
+    "bytes": 8805
+   },
+   {
+    "rel": "cmd/tui/signin_test.go",
+    "repo": "ollama/ollama",
+    "sha256": "9a4daad24fbf4067e99b7289c91c2e2581eb93222bb662d5ffa4ab7f04c391bd",
+    "bytes": 5625
+   },
+   {
+    "rel": "operator/api/v1alpha1/virtualippool_types.go",
+    "repo": "scality/metalk8s",
+    "sha256": "d215e62524b629d02db008a969810cec45cf70dc191495070c9551c08df50886",
+    "bytes": 5405
+   },
+   {
+    "rel": "lib/go/thrift/container_size_test.go",
+    "repo": "apache/thrift",
+    "sha256": "93575b006d546134525fdeed92b873a9a5740c37eeaa96ae2475addc69d24c20",
+    "bytes": 14432
+   },
+   {
+    "rel": "model/parsers/gemma4_test.go",
+    "repo": "ollama/ollama",
+    "sha256": "9ac07ad75ef52c57c877fff171fd4607450d6a1ef15bfbdfdb91b8adf8bff398",
+    "bytes": 41936
+   },
+   {
+    "rel": "storage-operator/salt/client.go",
+    "repo": "scality/metalk8s",
+    "sha256": "d87afd2c6d92338cbdae2a24d546362c155a0195385c8634e80bcaf1fb2f944b",
+    "bytes": 16823
+   },
+   {
+    "rel": "lib/go/thrift/buffered_transport.go",
+    "repo": "apache/thrift",
+    "sha256": "968ce1c8e91d364acf4e80316690bbb4c4320973b8f045b2f6007973d678b8ea",
+    "bytes": 2877
+   },
+   {
+    "rel": "cmd/welcome.go",
+    "repo": "ollama/ollama",
+    "sha256": "a228696e06c979d0ac2adde4c1c711cbdeedd21ac9596f08b0d3e6b979d6b1c7",
+    "bytes": 1997
+   },
+   {
+    "rel": "operator/pkg/controller/virtualippool/controller.go",
+    "repo": "scality/metalk8s",
+    "sha256": "dacea1ea269812490256f3d575e34096b85e9797661ae16cffa26bb226dd5ee7",
+    "bytes": 14258
+   },
+   {
+    "rel": "lib/go/thrift/numeric.go",
+    "repo": "apache/thrift",
+    "sha256": "9acff6ecbd5f732da3fbef7064043fe2ce23d360f1dee239c41fd54abcb3c47d",
+    "bytes": 3973
+   },
+   {
+    "rel": "create/plan_test.go",
+    "repo": "ollama/ollama",
+    "sha256": "a297fa699c20ae0397f5224ff30230d9c149a57994f17e6c203187d98fbebfec",
+    "bytes": 12491
+   },
+   {
+    "rel": "operator/pkg/controller/virtualippool/hl_config.go",
+    "repo": "scality/metalk8s",
+    "sha256": "dc2cd857dc10d25fd74d4bbd590819a2d4fb35c12ecf43a384c1dd4dbafb1ec5",
+    "bytes": 2218
+   },
+   {
+    "rel": "lib/go/thrift/header_context_test.go",
+    "repo": "apache/thrift",
+    "sha256": "9c966f782cd6deeef9dd0dfba92ca146157fb85afb333cbc22e71e51f4f42189",
+    "bytes": 3038
+   },
+   {
+    "rel": "cmd/launch/droid_test.go",
+    "repo": "ollama/ollama",
+    "sha256": "a3b0ffc1c0e3eee25bbdff256a4e861f0937b23a1441e6344bc18f5d539ef1ce",
+    "bytes": 36794
+   },
+   {
+    "rel": "operator/api/v1alpha1/virtualippool_types_test.go",
+    "repo": "scality/metalk8s",
+    "sha256": "e01f40b8bd7047b971a6a0e61c18ce67764197de0b5f1831b0a54112e559a93d",
+    "bytes": 3321
+   },
+   {
+    "rel": "lib/go/test/fuzz/fuzz_test.go",
+    "repo": "apache/thrift",
+    "sha256": "a33766708a28ca91948351d5319dc6c66e9440988ad9ac19a81db0d634fcec5f",
+    "bytes": 941
+   },
+   {
+    "rel": "cmd/launch/models.go",
+    "repo": "ollama/ollama",
+    "sha256": "b1992d5b3a1852629277f7dec3413dc93491f14a9816fe97b079b1aaee0a8bb1",
+    "bytes": 18363
+   },
+   {
+    "rel": "storage-operator/api/v1alpha1/volume_types_test.go",
+    "repo": "scality/metalk8s",
+    "sha256": "e07df9c38629dec29eb0c464f183e52e845040a2a6fc43937de3f14684a2e997",
+    "bytes": 5228
+   },
+   {
+    "rel": "lib/go/test/tests/conflict_namespace_test.go",
+    "repo": "apache/thrift",
+    "sha256": "a8e8a30569b1e379d9e5270b0d99c524184be53da9264c85c09dc6e636195f89",
+    "bytes": 1008
+   },
+   {
+    "rel": "discover/cuda_compat.go",
+    "repo": "ollama/ollama",
+    "sha256": "b844e9f7b2261a2f29af4e63325ee8cef2cc98d9b12f78351fec83a94b0b497c",
+    "bytes": 2804
+   },
+   {
+    "rel": "storage-operator/api/v1alpha1/groupversion_info.go",
+    "repo": "scality/metalk8s",
+    "sha256": "e226a71e2fca15c85ed204e0a30e5505a63206f980d16e0e4b90e4c4074fb6a3",
+    "bytes": 1255
+   },
+   {
+    "rel": "lib/go/thrift/protocol.go",
+    "repo": "apache/thrift",
+    "sha256": "aba69d526699dbc347e256ca75bd079db464914dd20f786cd5f361b4dca9a853",
+    "bytes": 6586
+   },
+   {
+    "rel": "ml/path_test.go",
+    "repo": "ollama/ollama",
+    "sha256": "bf92ed432bbb8b94ddc827431af07ddccf64456ca26dcd1b14bacd56bd667192",
+    "bytes": 3632
+   },
+   {
+    "rel": "go/solution-operator-lib/pkg/config/errors.go",
+    "repo": "scality/metalk8s",
+    "sha256": "e3e87a921f5185c75bb4f3977e5b266ecc910af5a78e061354491cacd647740d",
+    "bytes": 1108
+   },
+   {
+    "rel": "lib/go/test/fuzz/fuzz.go",
+    "repo": "apache/thrift",
+    "sha256": "b054b38226680b4c0dd9f5b4e53cec5a94bb3ecbedd5806f290e045e74744c04",
+    "bytes": 10004
+   },
+   {
+    "rel": "mlx/gpu_kernel.go",
+    "repo": "ollama/ollama",
+    "sha256": "c25eace1d5ae37bd269648ff180d0f27ee084e6d3edb6227b4c0cb108e8154bc",
+    "bytes": 11044
+   },
+   {
+    "rel": "storage-operator/cmd/main.go",
+    "repo": "scality/metalk8s",
+    "sha256": "ed5cd270b7f4597b12e2714744e06470b0b5cb9f305de91114ab076fced35a48",
+    "bytes": 9612
+   },
+   {
+    "rel": "lib/go/test/tests/union_default_value_test.go",
+    "repo": "apache/thrift",
+    "sha256": "b29b2b47fffebf331ad4588be923a8f6f92b7f30dae13362e12a2726562e59fc",
+    "bytes": 2516
+   },
+   {
+    "rel": "model/parsers/qwen35.go",
+    "repo": "ollama/ollama",
+    "sha256": "c369a5220e11c89f32ed6efce659c7c735f7b10490606015b23a89b77cc54405",
+    "bytes": 7660
+   },
+   {
+    "rel": "operator/api/v1alpha1/groupversion_info.go",
+    "repo": "scality/metalk8s",
+    "sha256": "f1726c54736617d14844731b63c178118089d9c5d0c23e198f2af41d8a270575",
+    "bytes": 1232
+   },
+   {
+    "rel": "lib/go/test/tests/server_connectivity_check_test.go",
+    "repo": "apache/thrift",
+    "sha256": "b637e24d6cdfb0f669abd864f600927387188d9469920580574153abfbdaa366",
+    "bytes": 2943
+   },
+   {
+    "rel": "server/model.go",
+    "repo": "ollama/ollama",
+    "sha256": "c3cdc8a92785cc3674072ad002871071b0d2ec52fa029a8805759901964689d8",
+    "bytes": 3779
+   },
+   {
+    "rel": "operator/internal/controller/clusterconfig_controller.go",
+    "repo": "scality/metalk8s",
+    "sha256": "f252b11c0268affde14abed3583c4c899d827a22d9cc326207afd7cd87007368",
+    "bytes": 1695
+   },
+   {
+    "rel": "lib/go/thrift/zlib_transport.go",
+    "repo": "apache/thrift",
+    "sha256": "b73e50ea6c09308a92ac6f7797946497b358f950fdfcf3a412fb3638916e73e9",
+    "bytes": 5543
+   },
+   {
+    "rel": "fs/gguf/lazy.go",
+    "repo": "ollama/ollama",
+    "sha256": "c84d65cb6f7473560123b461e4e0ee12ad1b0e51275fb9ef1cff6283cfcc2b33",
+    "bytes": 1858
+   },
+   {
+    "rel": "storage-operator/salt/token.go",
+    "repo": "scality/metalk8s",
+    "sha256": "f4c84b0b416a73016830bb9e08aea2aa6f19486c6daf959d6eb4b747e8d7c45c",
+    "bytes": 651
+   },
+   {
+    "rel": "lib/go/thrift/json_protocol_test.go",
+    "repo": "apache/thrift",
+    "sha256": "b923c2a82d7e77ee8182a7fd195faaefa9e660e6461a8a3535fcd45f9c7f70d7",
+    "bytes": 22501
+   },
+   {
+    "rel": "create/create_test.go",
+    "repo": "ollama/ollama",
+    "sha256": "c95c01066f9ce216258069483531e7b00959481087593be936a212bad5767516",
+    "bytes": 19506
+   },
+   {
+    "rel": "operator/pkg/controller/utils/object.go",
+    "repo": "scality/metalk8s",
+    "sha256": "f69082f027912cc94ca46973ab49c198b9c22c6732bfcb76e55ef0b4a96de5d0",
+    "bytes": 6947
+   },
+   {
+    "rel": "lib/go/test/dontexportrwtest/compile_test.go",
+    "repo": "apache/thrift",
+    "sha256": "ba7eef26ed8f393cd0e16001cc05deb19b7dfa7212bbbbc9246fcf067e87732f",
+    "bytes": 1174
+   },
+   {
+    "rel": "cmd/launch/copilot_test.go",
+    "repo": "ollama/ollama",
+    "sha256": "cbc312f185886812ce3b6c46de7d19c84c44849f80dfc9b89b6c8ad63e83b642",
+    "bytes": 4252
+   },
+   {
+    "rel": "operator/pkg/controller/utils/object_test.go",
+    "repo": "scality/metalk8s",
+    "sha256": "f8ec76fe390b8661d9117742632a225afea0be71bdb54b9d30fc0b1b7b7dcd3e",
+    "bytes": 12492
+   },
+   {
+    "rel": "lib/go/thrift/transport.go",
+    "repo": "apache/thrift",
+    "sha256": "c70cccc58f82ace509fcde0c9b4634b4553c5411cf8948a0359428aabf454ae0",
+    "bytes": 2929
+   },
+   {
+    "rel": "mlx/act_test.go",
+    "repo": "ollama/ollama",
+    "sha256": "cfd02a3263ac5f3d088cc3690818b9c9828a9150b6bb788529f49bdd1b10db8b",
+    "bytes": 5029
+   },
+   {
+    "rel": "operator/pkg/controller/utils/reconcile_test.go",
+    "repo": "scality/metalk8s",
+    "sha256": "fa82b8202aeececbd168fac60f3550412271c430c46f64536cc19970f4ca6ea6",
+    "bytes": 4097
+   },
+   {
+    "rel": "lib/go/test/tests/encoding_json_test.go",
+    "repo": "apache/thrift",
+    "sha256": "dba536997c7ddc0a5d02fcb210848752f81dde39104ec5dac718a89c275dfe34",
+    "bytes": 2242
+   },
+   {
+    "rel": "model/renderers/deepseek3.go",
+    "repo": "ollama/ollama",
+    "sha256": "dd0799deed1ab740b7e3462ac0859f07f6e9521ca56160ecf74279d7c3c67275",
+    "bytes": 4682
+   },
+   {
+    "rel": "storage-operator/test/e2e/e2e_suite_test.go",
+    "repo": "scality/metalk8s",
+    "sha256": "fcd04009934fee810c30bebe5eeb7218f4e6b18a7ad0fea2cf1a78ebc5c199cd",
+    "bytes": 3590
+   },
+   {
+    "rel": "lib/go/thrift/common_test.go",
+    "repo": "apache/thrift",
+    "sha256": "dfc96945a3941e5f9b5257fc6bc1f5d02ceb2759f8bddb22a1b8db1091dd7d76",
+    "bytes": 3592
+   },
+   {
+    "rel": "mlxrunner/cache/recurrent.go",
+    "repo": "ollama/ollama",
+    "sha256": "e9d69dd000d9c0fcfffb9dea60bda5efdb7bb7856819bd6ceeb1881a1f835251",
+    "bytes": 9276
+   },
+   {
+    "rel": "operator/api/v1alpha1/conditions_test.go",
+    "repo": "scality/metalk8s",
+    "sha256": "fd0c495ad4b9f22d6ef1d57393ddf8c072af7047261663179790025d433c9f62",
+    "bytes": 2485
+   },
+   {
+    "rel": "lib/go/thrift/multiplexed_protocol_test.go",
+    "repo": "apache/thrift",
+    "sha256": "dff4ef8816ff0edbcff4520f4dbdb84d5fbabcc430dab68570bf3a1c3575dc40",
+    "bytes": 1502
+   },
+   {
+    "rel": "mlx/gated_delta.go",
+    "repo": "ollama/ollama",
+    "sha256": "ea7431c8f2cf45f0b83ab49fb0e690b1f7446187222c2f93f507f3fe2a4291fd",
+    "bytes": 24634
+   },
+   {
+    "rel": "lib/go/test/tests/slog_tstruct_wrapper_test.go",
+    "repo": "apache/thrift",
+    "sha256": "e1379bb4fe71ab15d2940796286e7f847ff005002abba2add8f2ae67339b4268",
+    "bytes": 3458
+   },
+   {
+    "rel": "ml/device_test.go",
+    "repo": "ollama/ollama",
+    "sha256": "ee235f97e2fef637c7aa4595447d1d18cde3c454fffd691e300298441909b9ad",
+    "bytes": 7456
+   },
+   {
+    "rel": "lib/go/thrift/processor_factory.go",
+    "repo": "apache/thrift",
+    "sha256": "e266ce9a84e4c5f640d8669883e546919971081222ff909935caa70f294eabe1",
+    "bytes": 3863
+   },
+   {
+    "rel": "cmd/launch/models_test.go",
+    "repo": "ollama/ollama",
+    "sha256": "ef3c91eb9140de3ecb710f3e3766f375423b4b1f86d0267ec058b3ff95f478ab",
+    "bytes": 2456
+   },
+   {
+    "rel": "lib/go/thrift/pool_test.go",
+    "repo": "apache/thrift",
+    "sha256": "e782d5fef2c91e33de978eaa17ccc855fa73a82ce41455e7a4029b0c3ea73c3c",
+    "bytes": 1360
+   },
+   {
+    "rel": "model/parsers/olmo3_test.go",
+    "repo": "ollama/ollama",
+    "sha256": "f09ce370c1448b4a683abad58f6fe325abef79eeee5d4fe13fdb3d22b2268a8f",
+    "bytes": 12614
+   },
+   {
+    "rel": "lib/go/test/tests/recursion_depth_test.go",
+    "repo": "apache/thrift",
+    "sha256": "ede2f5b171470a2648d33ea5e88639091595b11555a0a6fe83ac278b79383689",
+    "bytes": 11613
+   },
+   {
+    "rel": "mlxrunner/model/nemotron_h/nemotron_h_test.go",
+    "repo": "ollama/ollama",
+    "sha256": "f2333731a54753de71aabb180479ef4662801c427d411c670fcecbea6f93a18b",
+    "bytes": 26314
+   },
+   {
+    "rel": "lib/go/thrift/protocol_factory.go",
+    "repo": "apache/thrift",
+    "sha256": "f52875baa83a7719f29ec815911e4d96c60d74a32828db92f311afea24398aac",
+    "bytes": 956
+   },
+   {
+    "rel": "cmd/launch/muse.go",
+    "repo": "ollama/ollama",
+    "sha256": "f84793eaa9ba83e35445ab955926080a0af76b606f46dae382c3477841cf8b1c",
+    "bytes": 12607
+   },
+   {
+    "rel": "lib/go/thrift/application_exception.go",
+    "repo": "apache/thrift",
+    "sha256": "f7442db6db6bb00e8c0f3d144159ce913daacbff0662d90e7f22e89c354db401",
+    "bytes": 5575
+   },
+   {
+    "rel": "server/upload.go",
+    "repo": "ollama/ollama",
+    "sha256": "f859b1a686a7989883f974ac2c62900ab153793837dfda0d1a9efd0d270d44d3",
+    "bytes": 9355
+   },
+   {
+    "rel": "lib/go/test/tests/names_test.go",
+    "repo": "apache/thrift",
+    "sha256": "fb008ddfb28e14c47d7d48a352c825e8ae3893ccd8941348ca734cde571e0242",
+    "bytes": 2079
+   },
+   {
+    "rel": "mlx/io.go",
+    "repo": "ollama/ollama",
+    "sha256": "f8ed7715c33c3b1f4ff62750963def299e6bd965d1e2b644acf5b772fcc945e6",
+    "bytes": 4434
+   },
+   {
+    "rel": "lib/go/thrift/http_transport.go",
+    "repo": "apache/thrift",
+    "sha256": "fd62fe351054c22998459fe3c6d3e3930a1d64d7bc7c3ecaecc74b7aa4fff920",
+    "bytes": 2361
+   },
+   {
+    "rel": "server/inference_request_log.go",
+    "repo": "ollama/ollama",
+    "sha256": "fa5e49084ef74e34626e4c914e7d46bce69ae329689ca8866e490aba022ac5ec",
+    "bytes": 3719
+   },
+   {
+    "rel": "lib/go/thrift/example_processor_middleware_test.go",
+    "repo": "apache/thrift",
+    "sha256": "fe44158d6581d56f9214a8734cc50c1104c601c3bf130ac45d07e9376bc061f6",
+    "bytes": 1782
+   },
+   {
+    "rel": "create/create.go",
+    "repo": "ollama/ollama",
+    "sha256": "fdd260b54b27938e86fcef0866d6ddd66586a390d8f498820108e7c873ef1f29",
+    "bytes": 16646
+   }
+  ],
+  "trainTokens": 237125,
+  "builder": "eval/coding-competence/build-lex-prior.mjs",
+  "derive": {
+   "MIN_WORD_COUNT": 3,
+   "MIN_WORD_REPOS": 2,
+   "MIN_SYMBOL_COUNT": 1,
+   "MUNCH_PRECISION": 0.5,
+   "OPENER_MIN_COUNT": 5,
+   "OPENER1_PRECISION": 0.95,
+   "OPENER2_PRECISION": 0.99,
+   "LCP_SHARE": 0.99,
+   "STRING_MIN_COUNT": 5,
+   "STRING_OPEN_PRECISION": 0.95,
+   "MATCH_MIN": 0.9,
+   "EXTRA_MIN_COUNT": 20,
+   "EXTRA_PRECISION": 0.9,
+   "PREFIX_MIN_COUNT": 20,
+   "PREFIX_ATTACH": 0.5,
+   "SUFFIX_MIN_COUNT": 20,
+   "SUFFIX_ATTACH": 0.5,
+   "COND_MIN_COUNT": 5,
+   "COND_PRECISION": 0.95,
+   "INTERP_MIN_COUNT": 20,
+   "INTERP_MIN_SHARE": 0.02,
+   "STRPREFIX_MIN_COUNT": 3,
+   "SAMPLE": 400,
+   "IDENT_SAMPLE_MIN": 300
+  },
+  "note": "Derived from TRAIN gold only (split by repository). Every threshold is in provenance.derive. A prior nominates and refuses; it never admits an identity.",
+  "selection": {
+   "split": "train",
+   "maxFiles": 100000,
+   "maxBytes": 200000,
+   "goldErrTol": 0.02,
+   "eligible": 185,
+   "excluded": {
+    "restricted": 0,
+    "tooBig": 0
+   },
+   "gaps": [],
+   "builtAt": "2026-10-05"
+  }
+ },
+ "words": {
+  "keyword": [
+   "break",
+   "case",
+   "chan",
+   "const",
+   "continue",
+   "default",
+   "defer",
+   "else",
+   "fallthrough",
+   "for",
+   "func",
+   "go",
+   "goto",
+   "if",
+   "import",
+   "interface",
+   "map",
+   "package",
+   "range",
+   "return",
+   "select",
+   "struct",
+   "switch",
+   "type",
+   "var"
+  ],
+  "literal": [
+   "false",
+   "nil",
+   "true"
+  ],
+  "counts": {
+   "package": 185,
+   "import": 179,
+   "type": 243,
+   "const": 141,
+   "func": 2417,
+   "switch": 64,
+   "case": 253,
+   "return": 2244,
+   "default": 47,
+   "struct": 303,
+   "var": 413,
+   "if": 3007,
+   "nil": 2378,
+   "defer": 158,
+   "false": 370,
+   "true": 379,
+   "else": 153,
+   "for": 587,
+   "range": 457,
+   "continue": 57,
+   "map": 538,
+   "chan": 18,
+   "select": 25,
+   "go": 19,
+   "goto": 3,
+   "interface": 118,
+   "break": 39,
+   "fallthrough": 5,
+   "err": 3443,
+   "t": 3218,
+   "string": 1687,
+   "b": 1410,
+   "name": 849,
+   "p": 793,
+   "T": 723,
+   "ctx": 701,
+   "testing": 685,
+   "api": 623,
+   "got": 600,
+   "Fatalf": 586,
+   "s": 581,
+   "len": 552,
+   "error": 549,
+   "byte": 503,
+   "i": 490,
+   "v": 461,
+   "Errorf": 459,
+   "c": 439,
+   "trans": 439,
+   "Name": 433,
+   "int": 426,
+   "bool": 394,
+   "want": 394,
+   "context": 383,
+   "tt": 363,
+   "any": 360,
+   "fmt": 351,
+   "int32": 347,
+   "m": 347,
+   "r": 342,
+   "value": 319,
+   "n": 307,
+   "Fatal": 299,
+   "mlx": 297,
+   "buf": 293,
+   "expected": 286,
+   "Error": 282,
+   "ok": 278,
+   "Expect": 269,
+   "Run": 265,
+   "Context": 255,
+   "Role": 248,
+   "thrift": 247,
+   "os": 244,
+   "e": 242,
+   "off": 239,
+   "Content": 220,
+   "strings": 218,
+   "cfg": 217,
+   "data": 209,
+   "self": 203,
+   "To": 197,
+   "settings": 194,
+   "metav1": 192,
+   "client": 189,
+   "Type": 184,
+   "cmd": 173,
+   "dims": 171,
+   "example": 171,
+   "Function": 170,
+   "q": 168,
+   "UOffsetT": 163,
+   "filepath": 160,
+   "float32": 159,
+   "size": 159,
+   "make": 156,
+   "utils": 156,
+   "monster": 152,
+   "msg": 152,
+   "input": 151,
+   "assert": 150,
+   "corev1": 150,
+   "k": 150,
+   "Array": 149,
+   "d": 149,
+   "Bytes": 148,
+   "Join": 148,
+   "volume": 148,
+   "models": 146,
+   "flatbuffers": 145,
+   "Message": 144,
+   "tc": 143,
+   "obj": 142,
+   "f": 140,
+   "json": 139,
+   "Background": 138,
+   "peer": 137,
+   "model": 136,
+   "time": 136,
+   "x": 136,
+   "C": 134,
+   "WriteString": 134,
+   "fail": 134,
+   "Sprintf": 133,
+   "append": 131,
+   "int64": 130,
+   "Equal": 129,
+   "http": 129,
+   "Write": 128,
+   "message": 127,
+   "tests": 127,
+   "String": 126,
+   "Arguments": 122,
+   "status": 122,
+   "handshake": 121,
+   "content": 117,
+   "float64": 117,
+   "B": 115,
+   "Contains": 115,
+   "result": 115,
+   "ToolCall": 113,
+   "w": 113,
+   "ToolCallFunction": 111,
+   "reason": 110,
+   "tools": 110,
+   "diff": 109,
+   "Builder": 108,
+   "device": 108,
+   "testArgs": 107,
+   "thetype": 107,
+   "messages": 103,
+   "Close": 102,
+   "binary": 102,
+   "builder": 102,
+   "testcase": 102,
+   "Value": 99,
+   "item": 98,
+   "errors": 96,
+   "settingsPath": 94,
+   "Add": 93,
+   "Tool": 93,
+   "config": 92,
+   "Pos": 90,
+   "Status": 90,
+   "Description": 87,
+   "out": 87,
+   "uint32": 87,
+   "math": 86,
+   "Spec": 85,
+   "TConfiguration": 85,
+   "res": 85,
+   "tmpDir": 85,
+   "a": 84,
+   "key": 84,
+   "structkeytest": 84,
+   "ObjectMeta": 83,
+   "GetProtocol": 81,
+   "Key": 81,
+   "buffer": 81,
+   "TTransport": 80,
+   "Table": 80,
+   "h": 80,
+   "reflect": 79,
+   "settingsDir": 77,
+   "exec": 76,
+   "log": 76,
+   "Command": 75,
+   "body": 75,
+   "conf": 75,
+   "check": 74,
+   "uint64": 73,
+   "NewTMemoryBuffer": 72,
+   "cond": 72,
+   "reqLogger": 72,
+   "TempDir": 71,
+   "l": 71,
+   "transport": 71,
+   "ID": 68,
+   "NewBuilder": 68,
+   "TProtocol": 68,
+   "g": 68,
+   "state": 68,
+   "Info": 67,
+   "offset": 67,
+   "GetTransport": 66,
+   "elem": 66,
+   "HaveOccurred": 65,
+   "id": 64,
+   "optional_scalars": 64,
+   "pv": 64,
+   "io": 63,
+   "st": 63,
+   "Client": 62,
+   "int16": 62,
+   "Reset": 61,
+   "bytes": 61,
+   "path": 61,
+   "DeviceID": 60,
+   "Unmarshal": 60,
+   "in": 60,
+   "payload": 60,
+   "sb": 60,
+   "Offset": 59,
+   "instance": 59,
+   "job": 59,
+   "resp": 59,
+   "It": 58,
+   "New": 58,
+   "calcVOffsetT": 58,
+   "now": 58,
+   "thinking": 58,
+   "values": 58,
+   "calls": 57,
+   "server": 57,
+   "slog": 57,
+   "Model": 56,
+   "TBinaryProtocol": 56,
+   "typeId": 56,
+   "By": 54,
+   "ConditionTrue": 54,
+   "WriteFile": 54,
+   "Flush": 53,
+   "Read": 53,
+   "Result": 53,
+   "count": 53,
+   "kind": 53,
+   "prepared": 53,
+   "LittleEndian": 52,
+   "current": 52,
+   "slot": 52,
+   "handler": 51,
+   "tensors": 51,
+   "Hv": 50,
+   "Loop": 50,
+   "NotTo": 50,
+   "ToolCalls": 50,
+   "ctrl": 49,
+   "launch": 49,
+   "output": 49,
+   "tfv": 49,
+   "expectEq": 48,
+   "factory": 48,
+   "flag": 48,
+   "head": 48,
+   "request": 48,
+   "logger": 47,
+   "protocol": 47,
+   "shape": 47,
+   "start": 47,
+   "uint16": 47,
+   "VOffsetT": 46,
+   "cancel": 46,
+   "int8": 46,
+   "panic": 46,
+   "chunks": 45,
+   "inner": 45,
+   "FailString": 44,
+   "URL": 44,
+   "processor": 44,
+   "Namespace": 43,
+   "Size": 43,
+   "changed": 43,
+   "kv": 43,
+   "limit": 43,
+   "mgr": 43,
+   "new": 43,
+   "proto": 43,
+   "Store": 42,
+   "nodeName": 42,
+   "o": 42,
+   "Config": 41,
+   "Fprintf": 41,
+   "FromValues": 41,
+   "PropertyType": 41,
+   "TType": 41,
+   "dst": 41,
+   "url": 41,
+   "Init": 40,
+   "ReadFile": 40,
+   "bldr": 40,
+   "items": 40,
+   "namespace": 40,
+   "setTestHome": 40,
+   "dir": 39,
+   "hash": 39,
+   "storagev1alpha1": 39,
+   "Edit": 38,
+   "Kind": 38,
+   "Volume": 38,
+   "addr": 38,
+   "metalk8sscalitycomv1alpha1": 38,
+   "Describe": 37,
+   "Helper": 37,
+   "Load": 37,
+   "Tokens": 37,
+   "scheme": 37,
+   "token": 37,
+   "Millisecond": 36,
+   "Reason": 36,
+   "cmp": 36,
+   "done": 36,
+   "updater": 36,
+   "Finish": 35,
+   "Library": 35,
+   "Object": 35,
+   "Parameters": 35,
+   "ToolName": 35,
+   "ToolProperty": 35
+  },
+  "identifierSample": [
+   "err",
+   "t",
+   "string",
+   "b",
+   "name",
+   "p",
+   "T",
+   "ctx",
+   "testing",
+   "api",
+   "got",
+   "Fatalf",
+   "s",
+   "len",
+   "error",
+   "byte",
+   "i",
+   "v",
+   "Errorf",
+   "c",
+   "trans",
+   "Name",
+   "int",
+   "bool",
+   "want",
+   "context",
+   "tt",
+   "any",
+   "fmt",
+   "int32",
+   "m",
+   "r",
+   "value",
+   "n",
+   "Fatal",
+   "mlx",
+   "buf",
+   "expected",
+   "Error",
+   "ok",
+   "Expect",
+   "Run",
+   "Context",
+   "Role",
+   "thrift",
+   "os",
+   "e",
+   "off",
+   "Content",
+   "strings",
+   "cfg",
+   "data",
+   "self",
+   "To",
+   "settings",
+   "metav1",
+   "client",
+   "Type",
+   "cmd",
+   "dims",
+   "example",
+   "Function",
+   "q",
+   "UOffsetT",
+   "filepath",
+   "float32",
+   "size",
+   "make",
+   "utils",
+   "monster",
+   "msg",
+   "input",
+   "assert",
+   "corev1",
+   "k",
+   "Array",
+   "d",
+   "Bytes",
+   "Join",
+   "volume",
+   "models",
+   "flatbuffers",
+   "Message",
+   "tc",
+   "obj",
+   "f",
+   "json",
+   "Background",
+   "peer",
+   "model",
+   "time",
+   "x",
+   "C",
+   "WriteString",
+   "fail",
+   "Sprintf",
+   "append",
+   "int64",
+   "Equal",
+   "http",
+   "Write",
+   "message",
+   "tests",
+   "String",
+   "Arguments",
+   "status",
+   "handshake",
+   "content",
+   "float64",
+   "B",
+   "Contains",
+   "result",
+   "ToolCall",
+   "w",
+   "ToolCallFunction",
+   "reason",
+   "tools",
+   "diff",
+   "Builder",
+   "device",
+   "testArgs",
+   "thetype",
+   "messages",
+   "Close",
+   "binary",
+   "builder",
+   "testcase",
+   "Value",
+   "item",
+   "errors",
+   "settingsPath",
+   "Add",
+   "Tool",
+   "config",
+   "Pos",
+   "Status",
+   "Description",
+   "out",
+   "uint32",
+   "math",
+   "Spec",
+   "TConfiguration",
+   "res",
+   "tmpDir",
+   "a",
+   "key",
+   "structkeytest",
+   "ObjectMeta",
+   "GetProtocol",
+   "Key",
+   "buffer",
+   "TTransport",
+   "Table",
+   "h",
+   "reflect",
+   "settingsDir",
+   "exec",
+   "log",
+   "Command",
+   "body",
+   "conf",
+   "check",
+   "uint64",
+   "NewTMemoryBuffer",
+   "cond",
+   "reqLogger",
+   "TempDir",
+   "l",
+   "transport",
+   "ID",
+   "NewBuilder",
+   "TProtocol",
+   "g",
+   "state",
+   "Info",
+   "offset",
+   "GetTransport",
+   "elem",
+   "HaveOccurred",
+   "id",
+   "optional_scalars",
+   "pv",
+   "io",
+   "st",
+   "Client",
+   "int16",
+   "Reset",
+   "bytes",
+   "path",
+   "DeviceID",
+   "Unmarshal",
+   "in",
+   "payload",
+   "sb",
+   "Offset",
+   "instance",
+   "job",
+   "resp",
+   "It",
+   "New",
+   "calcVOffsetT",
+   "now",
+   "thinking",
+   "values",
+   "calls",
+   "server",
+   "slog",
+   "Model",
+   "TBinaryProtocol",
+   "typeId",
+   "By",
+   "ConditionTrue",
+   "WriteFile",
+   "Flush",
+   "Read",
+   "Result",
+   "count",
+   "kind",
+   "prepared",
+   "LittleEndian",
+   "current",
+   "slot",
+   "handler",
+   "tensors",
+   "Hv",
+   "Loop",
+   "NotTo",
+   "ToolCalls",
+   "ctrl",
+   "launch",
+   "output",
+   "tfv",
+   "expectEq",
+   "factory",
+   "flag",
+   "head",
+   "request",
+   "logger",
+   "protocol",
+   "shape",
+   "start",
+   "uint16",
+   "VOffsetT",
+   "cancel",
+   "int8",
+   "panic",
+   "chunks",
+   "inner",
+   "FailString",
+   "URL",
+   "processor",
+   "Namespace",
+   "Size",
+   "changed",
+   "kv",
+   "limit",
+   "mgr",
+   "new",
+   "proto",
+   "Store",
+   "nodeName",
+   "o",
+   "Config",
+   "Fprintf",
+   "FromValues",
+   "PropertyType",
+   "TType",
+   "dst",
+   "url",
+   "Init",
+   "ReadFile",
+   "bldr",
+   "items",
+   "namespace",
+   "setTestHome",
+   "dir",
+   "hash",
+   "storagev1alpha1",
+   "Edit",
+   "Kind",
+   "Volume",
+   "addr",
+   "metalk8sscalitycomv1alpha1",
+   "Describe",
+   "Helper",
+   "Load",
+   "Tokens",
+   "scheme",
+   "token",
+   "Millisecond",
+   "Reason",
+   "cmp",
+   "done",
+   "updater",
+   "Finish",
+   "Library",
+   "Object",
+   "Parameters",
+   "ToolName",
+   "ToolProperty"
+  ]
+ },
+ "wordChars": {
+  "extra": [],
+  "prefixes": [],
+  "suffix": []
+ },
+ "shape": {
+  "number": "literal",
+  "unknownWord": "identifier",
+  "unknownSymbol": "operator"
+ },
+ "comments": [
+  {
+   "open": "/*",
+   "close": "*/",
+   "matchRate": 1,
+   "n": 96
+  },
+  {
+   "open": "//",
+   "close": null,
+   "matchRate": 1,
+   "n": 4313
+  }
+ ],
+ "strings": [
+  {
+   "open": "\"",
+   "close": "\"",
+   "escape": "\\",
+   "multiline": false,
+   "trailing": false,
+   "interp": [],
+   "interpQuotes": [],
+   "prefixes": [],
+   "class": "string",
+   "matchRate": 1,
+   "n": 9746
+  },
+  {
+   "open": "`",
+   "close": "`",
+   "escape": null,
+   "multiline": true,
+   "trailing": false,
+   "interp": [],
+   "interpQuotes": [],
+   "prefixes": [],
+   "class": "string",
+   "matchRate": 1,
+   "n": 597
+  },
+  {
+   "open": "'",
+   "close": "'",
+   "escape": null,
+   "multiline": false,
+   "trailing": false,
+   "interp": [],
+   "interpQuotes": [],
+   "prefixes": [],
+   "class": "string",
+   "matchRate": 1,
+   "n": 122
+  }
+ ],
+ "conditional": [],
+ "symbols": {
+  "table": {
+   "(": "punctuation",
+   ")": "punctuation",
+   "=": "operator",
+   "{": "punctuation",
+   ":": "punctuation",
+   ".": "punctuation",
+   ",": "punctuation",
+   "}": "punctuation",
+   "+": "operator",
+   "[": "punctuation",
+   "]": "punctuation",
+   "*": "operator",
+   "!=": "operator",
+   ":=": "operator",
+   "&": "operator",
+   "==": "operator",
+   "||": "operator",
+   "!": "operator",
+   "<=": "operator",
+   "&&": "operator",
+   ";": "punctuation",
+   "<-": "operator",
+   "<": "operator",
+   ">": "operator",
+   "++": "operator",
+   ">>": "operator",
+   ">=": "operator",
+   "-": "operator",
+   "^": "operator",
+   "%=": "operator",
+   "...": "punctuation",
+   "|": "operator",
+   "+=": "operator",
+   "/": "operator",
+   "%": "operator",
+   "--": "operator",
+   "<<": "operator",
+   "&=": "operator",
+   "-=": "operator",
+   "|=": "operator",
+   "&^": "operator",
+   "*=": "operator"
+  },
+  "maxLen": 3
+ },
+ "classShare": {
+  "comment": 0.01859,
+  "keyword": 0.04923,
+  "identifier": 0.3314,
+  "punctuation": 0.45799,
+  "string": 0.04414,
+  "operator": 0.06389,
+  "literal": 0.03476
+ }
+}

@@ -1,0 +1,47 @@
+{
+  "$comment": "An INDUCED modifier-order typology. Data only, no code. Staged here for transfer to eoPriors; nothing in induction/ or modifier-order/ may hardcode any of it.",
+  "schema": "ModifierTypologyPrior@1",
+  "population": "live_priors:pg11_Alice_s_Adventures_in_Wonderland.txt",
+  "provenance": {
+    "source": "Induced by eoreader6 induction/stacks.js, run via scripts/induction-stacks-live-priors.mjs against Alice's Adventures in Wonderland (Project Gutenberg #11, public domain), fetched from live_priors (clovenbradshaw-ctrl/live_priors, 01-literature-books/gutenberg/pg11_Alice_s_Adventures_in_Wonderland.txt). Baked once, offline; see induction/typology.js and induction/stacks.js headers for why this never runs per-reading.",
+    "built_by": "measurement, not a cited linguistic authority. The giver named on `giver` below IS the measurement itself, per II.2 of eo-constitution's CONSTITUTION.md.",
+    "parameters": {
+      "minAnchorFrequency": 5,
+      "maxAnchorFrequency": 150,
+      "minStackLength": 2,
+      "maxStackLength": 6,
+      "headSide": "end",
+      "minPairOccurrences": 20,
+      "foldCase": "lowercase"
+    }
+  },
+  "notes": [
+    "Every ranked token here cleared a p<0.05 binomial significance test on its own pairwise position consistency inside genuinely bound modifier stacks -- see induction/stacks.js's header for the full mechanism and why it replaced an earlier, weaker clustering-based attempt.",
+    "COVERAGE IS NARROW BY DESIGN, NOT AN OVERSIGHT: only 8 tokens cleared this evidence floor against one ~27K-token book. Lower minPairOccurrences settings recover more tokens at the cost of mixing in more contamination (pronouns, contractions) -- see scripts/induction-stacks-live-priors.mjs's own header for the measured tradeoff curve. This prior is directly useful mainly when reading Alice's Adventures in Wonderland itself, or text quoting it -- a real, disclosed limitation, not a general-purpose adjective-order table. A broader prior needs induction run across many more books from live_priors, aggregated, which has not been done yet.",
+    "NOT ALL RANKED PAIRS ARE ADJECTIVE-NOUN STRUCTURE: 6 of 8 tokens (turtle/mock, rabbit/white, hare/march) are genuine, textbook-correct head-modifier recoveries -- three of the book's most-repeated named characters (Mock Turtle, White Rabbit, March Hare), each an epithet bound tightly to its head noun every time it appears (p as low as 1.4e-17). The remaining pair (not/did) is real monotonic structure too, but verb-phrase negation ('did not'), not modifier-noun order -- disclosed here rather than filtered out, since filtering it would require semantic knowledge this mechanism does not have and should not fabricate.",
+    "This file's classOf treats each token as its own class (no clustering into named 'kinds' -- see induction/stacks.js's header for why that step was skipped for the purpose of getting usable ranks).",
+    "direction is 'pre' because this corpus's own bound stacks measured that way; a different corpus could measure 'post' and would need its own file, never this one reused with the direction flipped."
+  ],
+  "direction": "pre",
+  "giver": "induced from population \"live_priors:pg11_Alice_s_Adventures_in_Wonderland.txt\": 4 token pair(s) with a significant (p<0.05) monotonic position within a shared bound stack, over 8 ranked token(s); rank = a Copeland-style score built only from pairs whose relative order cleared significance",
+  "ranks": {
+    "turtle": -1,
+    "rabbit": -1,
+    "not": -1,
+    "hare": -1,
+    "mock": 1,
+    "white": 1,
+    "did": 1,
+    "march": 1
+  },
+  "classOf": {
+    "turtle": "turtle",
+    "mock": "mock",
+    "rabbit": "rabbit",
+    "white": "white",
+    "not": "not",
+    "did": "did",
+    "hare": "hare",
+    "march": "march"
+  }
+}

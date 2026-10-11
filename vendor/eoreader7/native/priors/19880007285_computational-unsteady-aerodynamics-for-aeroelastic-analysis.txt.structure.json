@@ -1,0 +1,2219 @@
+{
+ "schema": "SourceStructure@1",
+ "source": "05-academic-papers/ntrs-white-papers/19880007285_computational-unsteady-aerodynamics-for-aeroelastic-analysis.txt",
+ "bytes": 44076,
+ "bodyOffset": 632,
+ "splitBasis": "275 sentence-punctuation splits",
+ "unsplit": false,
+ "unitCount": 276,
+ "units": [
+  {
+   "start": 632,
+   "end": 1176,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 543",
+   "id": null,
+   "text": "NASA Technical Memorandum\n\n\n\n      COMPUTATIONAL UNSTEADY AERODYNAMICS FOR\n      AEROELASTIC ANALYSIS\n\n\n\n\n     WOODROW WHITLOW, JR.\n\n\n     4 L A S B - T B - 1005 23) CCBFUTA!llCLAL UNSTEADY           "
+  },
+  {
+   "start": 1176,
+   "end": 1415,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 782",
+   "id": null,
+   "text": "National Aeronautics and\n    Space Adrntnistratlon\n    Langley Research Center\n    Hampton,Virginia 23665-5225\n\f     COMPUTATIONAL UNSTEADY AERODYNAMICS FOR AEROELASTIC ANALYSIS\n\n                     "
+  },
+  {
+   "start": 1415,
+   "end": 1768,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 1135",
+   "id": null,
+   "text": "NASA Langley Research Center\n                               Hampton, V i r g i n i a 23665-5225\n\n\n\n                                            Summarv\n\n    This report summarizes the status of computa"
+  },
+  {
+   "start": 1768,
+   "end": 1937,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 1304",
+   "id": null,
+   "text": "The flight\n\nconditions for which various types of flows exist are described and the aeroelastic phenomena\n\nthat can occur in those flight regimes are discussed."
+  },
+  {
+   "start": 1937,
+   "end": 2076,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 1443",
+   "id": null,
+   "text": "Some important aeroelastic problems of\n\ncurrent interest are described, and the aerodynamic methods needed to analyze them are\n\npresented."
+  },
+  {
+   "start": 2076,
+   "end": 2171,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 1538",
+   "id": null,
+   "text": "The capabilities and limitations of existing unsteady aerodynamics methods are\n\ndiscussed."
+  },
+  {
+   "start": 2171,
+   "end": 2292,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 1659",
+   "id": null,
+   "text": "Computer resources required to perform aeroelastic analysis of various flight\n\nvehicle configurations are presented."
+  },
+  {
+   "start": 2292,
+   "end": 2414,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 1781",
+   "id": null,
+   "text": "Recommendations for future research are made, and\n\nschedules for completion of proposed research tasks are presented."
+  },
+  {
+   "start": 2414,
+   "end": 2576,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 1943",
+   "id": null,
+   "text": "J n t r o m\n\n    Computational aerodynamics is rapidly becoming an important tool in the design of flight\n\nvehicles."
+  },
+  {
+   "start": 2576,
+   "end": 2751,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 2118",
+   "id": null,
+   "text": "It allows computer simulation of flows past configurations that previously would have\n\nrequired large budget and personnel resources to determine the flows experimentally."
+  },
+  {
+   "start": 2751,
+   "end": 2841,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 2208",
+   "id": null,
+   "text": "In\n\naddition, many design options can be examined using computational methods."
+  },
+  {
+   "start": 2841,
+   "end": 2987,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 2354",
+   "id": null,
+   "text": "To model the flow\n\npast flight vehicles, today's engineer must choose from a range of options based upon available\n\ncomputer capacity and budget."
+  },
+  {
+   "start": 2987,
+   "end": 3312,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 2679",
+   "id": null,
+   "text": "The choices range from the calculation of the flow past a\n\nrelatively complete description of the entire aircraft using lower order approximations to the\n\nequations of fluid flow to the calculation of"
+  },
+  {
+   "start": 3312,
+   "end": 3618,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 2985",
+   "id": null,
+   "text": "Flow models can be grouped into lower order potential flow models--full potential (FP) and\n\ntransonic small disturbance (TSD) potential--and the higher order models typified by various\n\napproximations"
+  },
+  {
+   "start": 3618,
+   "end": 3741,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 3108",
+   "id": null,
+   "text": "The intermediate Euler equations flow model is obtained from the\n\nNavier-Stokes equations by neglecting the viscous terms."
+  },
+  {
+   "start": 3741,
+   "end": 3957,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 3324",
+   "id": null,
+   "text": "This paper presents some current aeroelastic problems of interest to the aerospace\n\ncommunity and the computational aerodynamics methods available for simulating flow fields and\n\nanalyzing aeroelastic"
+  },
+  {
+   "start": 3957,
+   "end": 4114,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 3481",
+   "id": null,
+   "text": "This is followed by a discussion of the capabilities of existing\n\nmethods and the computer resources required to use those methods for aeroelastic analysis."
+  },
+  {
+   "start": 4114,
+   "end": 4234,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 3601",
+   "id": null,
+   "text": "Finally, recommendations for future research directions and schedules for completion of\n\nproposed tasks are presented."
+  },
+  {
+   "start": 4234,
+   "end": 4441,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 3808",
+   "id": null,
+   "text": "Current Aeroelastic Problem3\n\n   This section describes some of the aeroelastic phenomena that have been observed on modern\n\naircraft and the nature of the flows involved."
+  },
+  {
+   "start": 4441,
+   "end": 4536,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 3903",
+   "id": null,
+   "text": "The aerodynamic methods necessary to analyze\n\neach type of aeroelastic response are discussed."
+  },
+  {
+   "start": 4536,
+   "end": 4684,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 4051",
+   "id": null,
+   "text": "Figure 1 shows the characteristics of attached, mixed, and separated flow for complete\n\naircraft at free stream Mach numbers between 0 and 2.0."
+  },
+  {
+   "start": 4684,
+   "end": 4734,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 4101",
+   "id": null,
+   "text": "In region I, the flow is predominantly\n\nattached."
+  },
+  {
+   "start": 4734,
+   "end": 4947,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 4314",
+   "id": null,
+   "text": "To obtain optimum performance and to avoid the drag penalty associated with flow\n\nseparation, design cruise conditions for aircraft typically are located in region I, near the\n\nboundary of region II ("
+  },
+  {
+   "start": 4947,
+   "end": 5067,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 4434",
+   "id": null,
+   "text": "As speed andlor angle of attack increases, a transition region of mixed flow (region II of\n\nfig. 1) is encountered."
+  },
+  {
+   "start": 5067,
+   "end": 5223,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 4590",
+   "id": null,
+   "text": "For rigid structures, this region is typified by the onset of localized\n\nregions of flow separation which may exhibit significant aerodynamic unsteadiness."
+  },
+  {
+   "start": 5223,
+   "end": 5465,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 4832",
+   "id": null,
+   "text": "For\n\n\n\n\n                                                   2\n\f            realistic, flexible structures, the aeroelastic response of the structure interacts with the\n\n            airflow to induce mu"
+  },
+  {
+   "start": 5465,
+   "end": 5655,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 5022",
+   "id": null,
+   "text": "Structural vibrations can cause the flow to\nI   '\n            alternately separate and reattach at flow conditions where a rigid structure would support\n        b\n            attached flow."
+  },
+  {
+   "start": 5655,
+   "end": 5871,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 5238",
+   "id": null,
+   "text": "The associated highly unsteady aerodynamic loading can interact with the\n\n            structural dynamic response to cause unusual aeroelastic phenomena which may restrict the\n\n            vehicle fli"
+  },
+  {
+   "start": 5871,
+   "end": 6071,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 5438",
+   "id": null,
+   "text": "With further speed and/or angle of attack increases which are encountered under\n\n            maneuvering conditions, stable separated flow conditions emerge (region I l l of fig. 1)."
+  },
+  {
+   "start": 6071,
+   "end": 6165,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 5532",
+   "id": null,
+   "text": "Leading-\n\n            edge vortex flows and shock-induced separated flows are of this nature."
+  },
+  {
+   "start": 6165,
+   "end": 6244,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 5611",
+   "id": null,
+   "text": "At still higher angles of\n\n            attack, vortex bursting is encountered."
+  },
+  {
+   "start": 6244,
+   "end": 6363,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 5730",
+   "id": null,
+   "text": "Within such regions, the flow is highly unsteady,\n\n            requiring careful attention to turbulence modeling."
+  },
+  {
+   "start": 6363,
+   "end": 6611,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 5978",
+   "id": null,
+   "text": "While predictive methods for attached flows are reasonably well developed, the picket fence\n\n            in fig. 1 emphasizes the difficulty in predicting aeroelastic phenomena in the mixed and\n\n     "
+  },
+  {
+   "start": 6611,
+   "end": 6720,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 6087",
+   "id": null,
+   "text": "It also symbolizes novel features that are being encountered in\n\n            transonic flutter testing."
+  },
+  {
+   "start": 6720,
+   "end": 6882,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 6249",
+   "id": null,
+   "text": "Modern high performance aircraft are capable of maneuvering at\n\n            transonic speeds, leading to a much enlarged parameter space for flutter clearance."
+  },
+  {
+   "start": 6882,
+   "end": 7210,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 6577",
+   "id": null,
+   "text": "Wingstore\n\n            loading, speed, angle of attack, wing shape, altitude and wing sweep all must be considered, and\n\n            the traditional flutter boundary parameterization of dynamic pressu"
+  },
+  {
+   "start": 7210,
+   "end": 7397,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 6764",
+   "id": null,
+   "text": "For\n\n            instance, flutter tests give some indication that these additional parameters affect the detailed\n\n            aeroelastic stability condition near the flutter boundary."
+  },
+  {
+   "start": 7397,
+   "end": 7777,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 7144",
+   "id": null,
+   "text": "Thus, the pickets of the fence in fig. 1\n\n            represent isolated regions of instability and low damping that may be encountered.\n\n\n\n\n                                                           "
+  },
+  {
+   "start": 7777,
+   "end": 7902,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 7269",
+   "id": null,
+   "text": "The flow may be modeled using a velocity potential equation, the Euler\n\nequations, or a form of the Navier-Stokes equations."
+  },
+  {
+   "start": 7902,
+   "end": 8231,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 7598",
+   "id": null,
+   "text": "Problems of current interest include (1)\n\naircraft operating at maximum speed at design conditions, (2) aircraft operating in\n\nattached/mildly separated flow conditions, and (3) maneuvering, high-perf"
+  },
+  {
+   "start": 8231,
+   "end": 8513,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 7880",
+   "id": null,
+   "text": "To impact the design of modern aircraft, new methods should provide accurate predictions of\n\nnonclassical flutter features such as those observed near the edge of the flutter envelope, and\n\nvortex flo"
+  },
+  {
+   "start": 8513,
+   "end": 8603,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 7970",
+   "id": null,
+   "text": "These\n\nmethods also should provide a means for modeling the effects of active controls."
+  },
+  {
+   "start": 8603,
+   "end": 9027,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 8394",
+   "id": null,
+   "text": "Enhancing the\n\ncomputational aeroelastic analysis capability will result in opportunities to examine key\n\naeroelastic problems, including the minimum in flutter boundaries usually observed at\n\ntranson"
+  },
+  {
+   "start": 9027,
+   "end": 9130,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 8497",
+   "id": null,
+   "text": "Figure 2 shows a traditional flutter boundary of dynamic pressure at flutter versus Mach\n\nnumber."
+  },
+  {
+   "start": 9130,
+   "end": 9290,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 8657",
+   "id": null,
+   "text": "The boundary tends to decrease with increasing Mach number for subsonic speeds,\n\nreaching a minimum in the transonic speed range, followed by a rapid increase."
+  },
+  {
+   "start": 9290,
+   "end": 9393,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 8760",
+   "id": null,
+   "text": "Such\n\nboundaries are usually established for straight and level, trimmed flight conditions."
+  },
+  {
+   "start": 9393,
+   "end": 9545,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 8912",
+   "id": null,
+   "text": "The\n\nboundary shown in fig. 2 represents \"hard\" flutter conditions typified by divergent structural\n\noscillations that lead to structural failure."
+  },
+  {
+   "start": 9545,
+   "end": 9687,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 9054",
+   "id": null,
+   "text": "For subsonic speeds, attached flow conditions\n\nprevail (region I, fig. 1) and linear aerodynamic methods have been used quite successfully."
+  },
+  {
+   "start": 9687,
+   "end": 9893,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 9260",
+   "id": null,
+   "text": "As\n\n\n\n\n                                                 4\n\fspeed increases into the transonic regime, the flutter boundary deviates from that predicted\n\nwith linear methods, which can become unconsewa"
+  },
+  {
+   "start": 9893,
+   "end": 10043,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 9410",
+   "id": null,
+   "text": "The minimum of the flutter boundary\n\nis associated with the formation of shock waves and the onset of flow separation, typical of flow\n\nin region II."
+  },
+  {
+   "start": 10043,
+   "end": 10177,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 9544",
+   "id": null,
+   "text": "This minimum is a critical condition for flutter analysis and represents a primary\n\nchallenge for computational aeroelastic analysis."
+  },
+  {
+   "start": 10177,
+   "end": 10279,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 9646",
+   "id": null,
+   "text": "A key question is the level of flow model\n\nrequired to predict this minimum flutter speed accurately."
+  },
+  {
+   "start": 10279,
+   "end": 10447,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 9814",
+   "id": null,
+   "text": "It is very likely that many cases\n\nmay be treated using an inviscid flow method (Le. a potential or Euler equation code) coupled\n\nwith a viscous boundary layer method."
+  },
+  {
+   "start": 10447,
+   "end": 10534,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 9901",
+   "id": null,
+   "text": "The nonclassical aeroelastic response of the DAST ARW-2 is illustrated in fig. 3."
+  },
+  {
+   "start": 10534,
+   "end": 10685,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 10052",
+   "id": null,
+   "text": "This is a\n\nregion of high dynamic response at constant Mach number encountered at dynamic pressures\n\nwell below those for which flutter was predicted."
+  },
+  {
+   "start": 10685,
+   "end": 10877,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 10244",
+   "id": null,
+   "text": "The motion is of the limit-amplitude type,\n\nand the response is believed to be associated with flow separation and reattachment over the\n\nsupercritical wing, again a region II flow condition."
+  },
+  {
+   "start": 10877,
+   "end": 11019,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 10386",
+   "id": null,
+   "text": "Interacted viscous/inviscid methods may\n\ntreat the types of flows associated with this response and may be used in the aeroelastic\n\nanalysis."
+  },
+  {
+   "start": 11019,
+   "end": 11234,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 10601",
+   "id": null,
+   "text": "Wingktore limit amplitude flutter is experienced by modern, high performance aircraft\n\nunder various loading and maneuvering conditions at transonic Mach numbers, resulting in\n\nvehicle placards on per"
+  },
+  {
+   "start": 11234,
+   "end": 11302,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 10669",
+   "id": null,
+   "text": "The conditions for which this response occurs are shown in\n\nfig. 4."
+  },
+  {
+   "start": 11302,
+   "end": 11396,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 10763",
+   "id": null,
+   "text": "The flow is characterized by mixed flow--region II-- over portions of the wing\n\nsurfaces."
+  },
+  {
+   "start": 11396,
+   "end": 11547,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 10914",
+   "id": null,
+   "text": "Thin layer Navier-Stokes methods can model the flows characteristic of region II and\n\nmay be required to calculate winglstore limit-amplitude flutter."
+  },
+  {
+   "start": 11547,
+   "end": 11671,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 11038",
+   "id": null,
+   "text": "Vortex-induced oscillations observed on the 6-1 wing occur for high wing sweep angles,\n\nduring wind-up turn maneuvers."
+  },
+  {
+   "start": 11671,
+   "end": 11710,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 11077",
+   "id": null,
+   "text": "The flow is of the type in region Ill."
+  },
+  {
+   "start": 11710,
+   "end": 11908,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 11275",
+   "id": null,
+   "text": "The instability is of the\n\nfirst wing bending mode type and occurs over a wide Mach number range (0.6 - 0.95) at angles\n\n\n\n\n                                                5\n\fof attack 7-9 degrees."
+  },
+  {
+   "start": 11908,
+   "end": 11986,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 11353",
+   "id": null,
+   "text": "The range of conditions for which this phenomenon occurs is shown in\n\nfig. 5."
+  },
+  {
+   "start": 11986,
+   "end": 12163,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 11530",
+   "id": null,
+   "text": "A Reynolds-averaged Navier-Stokes method can model the stable, separated flows\n\nassociated with this instability and may be used to calculate the vortex-induced oscillations."
+  },
+  {
+   "start": 12163,
+   "end": 12323,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 11690",
+   "id": null,
+   "text": "Tail buffet on twin-tail fighters occurs when a vortex encounters downstream lifting\n\nsurfaces, horizontal and vertical tails, causing structural fatigue."
+  },
+  {
+   "start": 12323,
+   "end": 12431,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 11798",
+   "id": null,
+   "text": "This type of aeroelastic\n\nresponse occurs when aircraft operate in flows characteristic of region Ill."
+  },
+  {
+   "start": 12431,
+   "end": 12502,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 11869",
+   "id": null,
+   "text": "Figure 6 shows the\n\noperating conditions for which tail buffet occurs."
+  },
+  {
+   "start": 12502,
+   "end": 12649,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 12016",
+   "id": null,
+   "text": "Buffet of horizontal tails can occur at\n\nintermediate angles of attack and is a result of an unburst vortex encountering a lifting surface."
+  },
+  {
+   "start": 12649,
+   "end": 12740,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 12107",
+   "id": null,
+   "text": "As angle of attack increases, the location of vortex bursting moves upstream in the wake."
+  },
+  {
+   "start": 12740,
+   "end": 12916,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 12283",
+   "id": null,
+   "text": "Loss\n\nof lift is associated with the burst location reaching the vicinity of the aircraft, and vertical tail\n\nsurfaces located in such regions experience severe dynamic loads."
+  },
+  {
+   "start": 12916,
+   "end": 12989,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 12356",
+   "id": null,
+   "text": "Typically, this occurs at\n\nangles of attack of approximately 30 degrees."
+  },
+  {
+   "start": 12989,
+   "end": 13122,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 12489",
+   "id": null,
+   "text": "Navier-Stokes methods with more sophisticated\n\nturbulence models than are currently available are needed to analyze these responses."
+  },
+  {
+   "start": 13122,
+   "end": 13225,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 12592",
+   "id": null,
+   "text": "This is\n\nbecause the burst vortex phenomenon involves massive separation and large-scale unsteadiness."
+  },
+  {
+   "start": 13225,
+   "end": 13282,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 12649",
+   "id": null,
+   "text": "Current turbulence models are not valid for such flows."
+  },
+  {
+   "start": 13282,
+   "end": 13444,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 12811",
+   "id": null,
+   "text": "Aerodvnamic Methods\n\n    Various aerodynamic methods are available to analyze the aeroelastic phenomena discussed\n\nabove."
+  },
+  {
+   "start": 13444,
+   "end": 13553,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 12920",
+   "id": null,
+   "text": "They range from potential flow codes for complete aircraft to Navier-Stokes methods for\n\nairfoils and wings."
+  },
+  {
+   "start": 13553,
+   "end": 13695,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 13062",
+   "id": null,
+   "text": "Table I provides a summary of current research activities in computational\n\nunsteady aerodynamics at the NASA Langley Research Center (LaRC)."
+  },
+  {
+   "start": 13695,
+   "end": 14003,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 13370",
+   "id": null,
+   "text": "The discussion below\n\ndetails the methods and the types of problems to which they are applicable.\n\n\n\n\n                                                  6\n\f    Potential Flow Methods\n\n       These meth"
+  },
+  {
+   "start": 14003,
+   "end": 14079,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 13446",
+   "id": null,
+   "text": "They are applicable only to aircraft operating in attached flow (region I)."
+  },
+  {
+   "start": 14079,
+   "end": 14248,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 13615",
+   "id": null,
+   "text": "Current potential flow capability includes the XTRAN3S (ref. 1) and CAP-TSD (computational\n\n    qeroelasticity Erogram-Lransonic Small Risturbance) (ref. 2) codes."
+  },
+  {
+   "start": 14248,
+   "end": 14412,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 13779",
+   "id": null,
+   "text": "The XTRAN3S code\n\n    solves the transonic small disturbance (TSD) potential equation and was developed for analysis\n\n    of isolated wing configurations."
+  },
+  {
+   "start": 14412,
+   "end": 14541,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 13908",
+   "id": null,
+   "text": "Extensive modifications to the code have enabled the analysis of\n\n    either wing/fuselage or winglcanard (tail) configurations."
+  },
+  {
+   "start": 14541,
+   "end": 14698,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 14065",
+   "id": null,
+   "text": "The CAP-TSD code was developed by\n\n    the Unsteady Aerodynamics Branch (UAB) at Langley and can be used for aeroelastic analysis of\n\n    complete aircraft."
+  },
+  {
+   "start": 14698,
+   "end": 14850,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 14217",
+   "id": null,
+   "text": "As an example, ref. 2 gives the details of modeling an F-16 aircraft,\n\n    including the wing, strake, tail, fuselage, tip launcher, and tip missile."
+  },
+  {
+   "start": 14850,
+   "end": 14991,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 14358",
+   "id": null,
+   "text": "Methods based on TSD theory are valid for thin bodies at small angles of incidence undergoing\n\n    small amplitude unsteady motions."
+  },
+  {
+   "start": 14991,
+   "end": 15097,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 14464",
+   "id": null,
+   "text": "In addition, the flow equations are derived assuming that the\n\n    free stream Mach number is near unity."
+  },
+  {
+   "start": 15097,
+   "end": 15151,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 14518",
+   "id": null,
+   "text": "Thus, full potential (FP) methods are being explored."
+  },
+  {
+   "start": 15151,
+   "end": 15324,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 14691",
+   "id": null,
+   "text": "The state-of-the-art differencing method for calculating unsteady full potential flows was\n\n    developed by UAB personnel with two university researchers (refs. 3-5)."
+  },
+  {
+   "start": 15324,
+   "end": 15385,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 14752",
+   "id": null,
+   "text": "This method is based\n\n    on differencing the flux function."
+  },
+  {
+   "start": 15385,
+   "end": 15983,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 15350",
+   "id": null,
+   "text": "It is an improvement upon previously-used methods since the\n\n    flux-differencing method (a) accurately tracks sonic conditions and requires no empirical\n\n    constants to specify the amount of artif"
+  },
+  {
+   "start": 15983,
+   "end": 16187,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 15554",
+   "id": null,
+   "text": "Flux differencing was implemented\n\n\n\n\n                                                      7\n\fin an approximate factorization algorithm to yield a two-dimensional unsteady full potential\n\ncode (ref. "
+  },
+  {
+   "start": 16187,
+   "end": 16249,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 15616",
+   "id": null,
+   "text": "This algorithm and the algorithm used in CAP-TSD are similar."
+  },
+  {
+   "start": 16249,
+   "end": 16432,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 15799",
+   "id": null,
+   "text": "It has been shown that when shock waves are in flow fields modeled using potential flow\n\nmethods, the calculated loads can be highly inaccurate and even multivalued (refs. 6-9)."
+  },
+  {
+   "start": 16432,
+   "end": 16564,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 15931",
+   "id": null,
+   "text": "This\n\nis because the entropy generated by shock waves is not modeled in the isentropic formulation of\n\npotential flow aerodynamics."
+  },
+  {
+   "start": 16564,
+   "end": 16710,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 16077",
+   "id": null,
+   "text": "Methods have been developed to modify isentropic potential theory\n\nat the 2-D and 3-D TSD levels (refs. 8,9) and at the 2 - 0 FP (ref. 5 ) level."
+  },
+  {
+   "start": 16710,
+   "end": 16908,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 16275",
+   "id": null,
+   "text": "Calculations of\n\nattached flows with strong shocks indicate that the modified potential methods improve the\n\naccuracy of and extends the range of validity of potential flow solutions (refs. 5,8,9)."
+  },
+  {
+   "start": 16908,
+   "end": 17001,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 16368",
+   "id": null,
+   "text": "The\n\nmethod used in ref. 5 for 2-D FP calculations can be applied in three dimensions."
+  },
+  {
+   "start": 17001,
+   "end": 17192,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 16559",
+   "id": null,
+   "text": "ELIer/Na vier-Stokes      Methods\n\n   Navier-Stokes methods are needed to analyze aeroelastic phenomena that occur in mildly\n\nseparated (region 11) and fully separated flows (region 111)."
+  },
+  {
+   "start": 17192,
+   "end": 17276,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 16643",
+   "id": null,
+   "text": "Steady flow codes have been\n\ndeveloped by the Analytical Methods Branch at Langley."
+  },
+  {
+   "start": 17276,
+   "end": 17382,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 16749",
+   "id": null,
+   "text": "The CFL2D code (ref.10) is used for\n\n2-D flows, and the CFL3D code (ref. 11) is used in three dimensions."
+  },
+  {
+   "start": 17382,
+   "end": 17504,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 16871",
+   "id": null,
+   "text": "The CFL2D and C F U D\n\ncodes are the most efficient and stable of existing codes for solving the Navier-Stokes equations."
+  },
+  {
+   "start": 17504,
+   "end": 17615,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 16982",
+   "id": null,
+   "text": "These codes use upwind differencing with flux-vector splitting to achieve unconditionally stable\n\nalgorithms."
+  },
+  {
+   "start": 17615,
+   "end": 17726,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 17093",
+   "id": null,
+   "text": "Solutions of the Euler equations are obtained from the Navier-Stokes codes by\n\nneglecting the viscous terms."
+  },
+  {
+   "start": 17726,
+   "end": 17911,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 17278",
+   "id": null,
+   "text": "Although viscous effects are neglected, which limits applicability\n\nto region I, the Euler equations can accurately model flows containing curved shock waves and\n\nvorticity convection."
+  },
+  {
+   "start": 17911,
+   "end": 18026,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 17393",
+   "id": null,
+   "text": "Recently, the CFL2D and CFL3D codes were modified to allow the\n\ncalculation of time-accurate unsteady solutions."
+  },
+  {
+   "start": 18026,
+   "end": 18172,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 17539",
+   "id": null,
+   "text": "Euler calculations for oscillating airfoils and\n\n\n\n\n                                                8\n\f    wings have been obtained (ref. 12)."
+  },
+  {
+   "start": 18172,
+   "end": 18248,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 17615",
+   "id": null,
+   "text": "These unsteady codes are available to be used in aeroelastic\n\n    analysis."
+  },
+  {
+   "start": 18248,
+   "end": 18527,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 17894",
+   "id": null,
+   "text": "I\n\n\n\n    Interacted Viscous /Inviscid Methods\n\n        Since inviscid flow methods--potential and Euler--are limited to the attached flow regime,\n\n    it is necessary to interact the solutions with vi"
+  },
+  {
+   "start": 18527,
+   "end": 18679,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 18046",
+   "id": null,
+   "text": "Coupling viscous boundary layer methods with inviscid flow codes\n\n    results in a capability for more accurately resolving some aeroelastic phenomena."
+  },
+  {
+   "start": 18679,
+   "end": 18923,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 18290",
+   "id": null,
+   "text": "In\n\n    particular, accurate definition of the transonic \"flutter dip\" and calculation of the nonclassical\n\n    aeroelastic response observed for the DAST ARW-2 are among the problems that may be trea"
+  },
+  {
+   "start": 18923,
+   "end": 19033,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 18400",
+   "id": null,
+   "text": "Available boundary layer methods include one with which mildly separated\n\n    flows can be modeled (ref. 13)."
+  },
+  {
+   "start": 19033,
+   "end": 19141,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 18508",
+   "id": null,
+   "text": "This method has been tested, in a quasi-steady manner, in the\n\n    2-D unsteady TSD code XTRAN2L (ref. 14)."
+  },
+  {
+   "start": 19141,
+   "end": 19224,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 18591",
+   "id": null,
+   "text": "Implementation in CAP-TSD, in a quasi-steady,\n\n    2-D strip fashion, is underway."
+  },
+  {
+   "start": 19224,
+   "end": 19302,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 18669",
+   "id": null,
+   "text": "These methods also can be coupled with full potential and Euler\n\n    methods."
+  },
+  {
+   "start": 19302,
+   "end": 19456,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 18823",
+   "id": null,
+   "text": "Coupling Euler and viscous methods provides a means for calculating separated flows,\n\n    for some cases, as well as attached and mildly separated flows."
+  },
+  {
+   "start": 19456,
+   "end": 19562,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 18929",
+   "id": null,
+   "text": "For some cases, it may be\n\n    necessary for a vortex tracking method to be coupled with the flow solver."
+  },
+  {
+   "start": 19562,
+   "end": 19735,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 19102",
+   "id": null,
+   "text": "A contracted effort supported by UAB to develop a finite difference computer code for solving\n\n    the unsteady 3-D boundary layer equations is nearing completion."
+  },
+  {
+   "start": 19735,
+   "end": 20087,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 19454",
+   "id": null,
+   "text": "When complete, it will\n\n    provide a 3-D viscous boundary layer method (ref. 15) that is more accurate than those\n\n    currently available.\n\n\n\n0   Vortex Flow Methods\n\nb      The development of metho"
+  },
+  {
+   "start": 20087,
+   "end": 20253,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 19620",
+   "id": null,
+   "text": "A hybrid vortex method (ref. 16) that can be used to predict vortex\n\nflows arising from leading edge separation on wings at high angles of attack has been developed."
+  },
+  {
+   "start": 20253,
+   "end": 20370,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 19737",
+   "id": null,
+   "text": "In this method, the full potential equation is solved over most of the flow field using integral\n\nequation methods."
+  },
+  {
+   "start": 20370,
+   "end": 20477,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 19844",
+   "id": null,
+   "text": "Regions of the flow containing strong shock waves or vortices are treated by\n\nsolving the Euler equations."
+  },
+  {
+   "start": 20477,
+   "end": 20616,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 19983",
+   "id": null,
+   "text": "Euler methods may be used for the analysis of vortex flows arising from separation at sharp\n\nedged wings at moderate angles of attack."
+  },
+  {
+   "start": 20616,
+   "end": 20734,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 20101",
+   "id": null,
+   "text": "In order to predict the separation line on round-edged\n\nwings, solutions of the Navier-Stokes equations are required."
+  },
+  {
+   "start": 20734,
+   "end": 20829,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 20196",
+   "id": null,
+   "text": "Research in these areas is being\n\npursued under a university grant supported by UAB (ref. 16)."
+  },
+  {
+   "start": 20829,
+   "end": 21023,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 20390",
+   "id": null,
+   "text": "Cornmiter Resource Reauirements\n\n   This section discusses the computer resources required to analyze aeroelastic phenomena\n\nusing various aerodynamic methods."
+  },
+  {
+   "start": 21023,
+   "end": 21135,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 20502",
+   "id": null,
+   "text": "The resources required for analysis of a complete aircraft\n\nand a wing/body/canard configuration are presented."
+  },
+  {
+   "start": 21135,
+   "end": 21291,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 20658",
+   "id": null,
+   "text": "The computer resources required to calculate a single flutter point for a complete aircraft\n\nusing TSD and Navier-Stokes methods are shown in Table 11."
+  },
+  {
+   "start": 21291,
+   "end": 21415,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 20782",
+   "id": null,
+   "text": "The required resources are\n\npresented as central processing unit (CPU) time on the Control Data Corporation VPS-32."
+  },
+  {
+   "start": 21415,
+   "end": 21719,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 21086",
+   "id": null,
+   "text": "Required CPU times are obtained assuming that a flutter point can be determined by calculating\n\na steady, loaded condition and three aeroelastic responses at varying dynamic pressures to\n\ndetermine ne"
+  },
+  {
+   "start": 21719,
+   "end": 21873,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 21240",
+   "id": null,
+   "text": "The time for the TSD calculation is obtained using the computation speed for\n\nactual CAP-TSD calculations--2.7 microseconds per grid point per time step."
+  },
+  {
+   "start": 21873,
+   "end": 21933,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 21300",
+   "id": null,
+   "text": "This works out\n\nto 2.3 hours of CPU time per flutter point."
+  },
+  {
+   "start": 21933,
+   "end": 22042,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 21409",
+   "id": null,
+   "text": "This problem requires approximately 30 million of\n\nthe 32 million words of memory available with the VPS-32."
+  },
+  {
+   "start": 22042,
+   "end": 22250,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 21617",
+   "id": null,
+   "text": "When calculating symmetric\n\n\n\n\n                                               10\n\faoroolaslic responses, a half spar1 modo1 can bo used, with a proportional decrease in required\n\nmemory and CPU time."
+  },
+  {
+   "start": 22250,
+   "end": 22346,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 21713",
+   "id": null,
+   "text": "For run times of this length, turnaround times on the VPS-32 can be\n\nexpected to be quite long."
+  },
+  {
+   "start": 22346,
+   "end": 22429,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 21796",
+   "id": null,
+   "text": "Thus attention to ways of automating the calculation of flutter points\n\nis needed."
+  },
+  {
+   "start": 22429,
+   "end": 22521,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 21888",
+   "id": null,
+   "text": "One such method has been developed at UAB and implemented with a 2-0 TSD method\n\n(ref. 17)."
+  },
+  {
+   "start": 22521,
+   "end": 22690,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 22057",
+   "id": null,
+   "text": "Use of a FP method would increase the computer resource requirements by 50-100\n\npercent, while Euler methods are approximately 2-5 times more expensive than FP methods."
+  },
+  {
+   "start": 22690,
+   "end": 23067,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 22434",
+   "id": null,
+   "text": "The time for the Navier-Stokes analysis in Table II is calculated from the following relationship\n\n\n\n                 TIME = (GRID PTS) X        OPS        X (ITER)/(OPS/SEC)\n\n                        "
+  },
+  {
+   "start": 23067,
+   "end": 23178,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 22545",
+   "id": null,
+   "text": "For Reynolds number of 10 million, 77.8\n\nhours of VPS-32 time is required to calculate a single flutter point."
+  },
+  {
+   "start": 23178,
+   "end": 23330,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 22697",
+   "id": null,
+   "text": "This points out that\n\nroutine aeroelastic analysis of complex configurations using Navier-Stokes aerodynamics is not\n\nfeasible using the VPS-32."
+  },
+  {
+   "start": 23330,
+   "end": 23501,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 22868",
+   "id": null,
+   "text": "Table Ill shows the CPU times required to calculate a flutter boundary for a\n\nwing/body/canard (tail) configuration with increasingly complex aerodynamic methods."
+  },
+  {
+   "start": 23501,
+   "end": 23690,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 23057",
+   "id": null,
+   "text": "The\n\nboundary is assumed to consist of flutter points at ten Mach numbers with each point requiring\n\nthe calculation of a steady, loaded condition and three aeroelastic responses."
+  },
+  {
+   "start": 23690,
+   "end": 23768,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 23135",
+   "id": null,
+   "text": "The steady condition\n\nand each response can be calculated in 1000 time steps."
+  },
+  {
+   "start": 23768,
+   "end": 23881,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 23248",
+   "id": null,
+   "text": "The computation speed on the VPS-32\n\nis assumed to be 100 MFLOPS, and that on the NAS is taken to be 250 MFLOPS."
+  },
+  {
+   "start": 23881,
+   "end": 24152,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 23519",
+   "id": null,
+   "text": "Computational\n\ngrids for the TSD, full potential, and Euler calculations are assumed to have 750 000 points,\n\nand its estimated that a grid with 14.5 million points is required for the Navier-Stokes\n\n"
+  },
+  {
+   "start": 24152,
+   "end": 24506,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 23873",
+   "id": null,
+   "text": "Also, it is assumed that the TSD calculations require 200 operations per grid\n\npoint per time step, the full potential calculations require 300 operations per grid point per\n\ntime step, the Euler calc"
+  },
+  {
+   "start": 24506,
+   "end": 24615,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 23982",
+   "id": null,
+   "text": "The times\n\nshown for the TSD and full potential calculations are 180 percent of the inviscid flow times."
+  },
+  {
+   "start": 24615,
+   "end": 24773,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 24140",
+   "id": null,
+   "text": "The 80 percent increase in run time (compared to inviscid calculations) has been observed for\n\npotential flow coupled with boundary layer methods (ref. 13)."
+  },
+  {
+   "start": 24773,
+   "end": 24896,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 24263",
+   "id": null,
+   "text": "Coupling a boundary layer\n\nmethod with an Euler solution increases the required CPU time by approximately 30 percent."
+  },
+  {
+   "start": 24896,
+   "end": 25003,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 24370",
+   "id": null,
+   "text": "Thus the times shown in Table Ill for the Euler solutions are 1.3 times the inviscid Euler\n\nrequirements."
+  },
+  {
+   "start": 25003,
+   "end": 25147,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 24514",
+   "id": null,
+   "text": "Because of the differences in the multiplicative factors--l.8 versus 1.3-4he\n\nratio of required times for Euler and TSD solutions decreases."
+  },
+  {
+   "start": 25147,
+   "end": 25256,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 24623",
+   "id": null,
+   "text": "The TSD method with boundary\n\nlayer can be used for problems in region I and for some problems in region II."
+  },
+  {
+   "start": 25256,
+   "end": 25383,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 24750",
+   "id": null,
+   "text": "Using this flow\n\nmodel, 30 hours and 12 hours on the VPS-32 and NAS, respectively, are required to define a\n\nflutter boundary."
+  },
+  {
+   "start": 25383,
+   "end": 25458,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 24825",
+   "id": null,
+   "text": "Full potential with boundary layer also can be used in regions I and It."
+  },
+  {
+   "start": 25458,
+   "end": 25534,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 24901",
+   "id": null,
+   "text": "Estimated CPU requirements are 45 hours on the VPS-32 and 18 hours on NAS."
+  },
+  {
+   "start": 25534,
+   "end": 25654,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 25021",
+   "id": null,
+   "text": "An Euler\n\nmethod with viscous modeling can be used in regions I and II and for some problems in region Ill."
+  },
+  {
+   "start": 25654,
+   "end": 25780,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 25147",
+   "id": null,
+   "text": "Sixty-five hours of VPS-32 time and 26 hours of NAS time are required to define the flutter\n\nboundary using this flow model."
+  },
+  {
+   "start": 25780,
+   "end": 25837,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 25204",
+   "id": null,
+   "text": "Navier-Stokes methods can be used in regions II and 111."
+  },
+  {
+   "start": 25837,
+   "end": 25974,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 25341",
+   "id": null,
+   "text": "At a\n\nReynolds number of 100 million, 1611 hours on the VPS-32 and 644 hours on NAS are\n\nrequired to calculate the flutter boundary."
+  },
+  {
+   "start": 25974,
+   "end": 26154,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 25521",
+   "id": null,
+   "text": "Sufficient experience with NAS has not been obtained\n\nto make a judgement on turnaround time, but it is expected to be significantly better than that\n\nexperienced with the VPS-32."
+  },
+  {
+   "start": 26154,
+   "end": 26297,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 25664",
+   "id": null,
+   "text": "However, for the simplest of flow models, the computer\n\nrequirements will not allow routine analysis of complex aircraft configurations."
+  },
+  {
+   "start": 26297,
+   "end": 26469,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 25836",
+   "id": null,
+   "text": "Future\n\n\n\n\n                                               12\n\fgeneration supercomputers are required to predict aeroelastic responses of complex\n\nconfigurations."
+  },
+  {
+   "start": 26469,
+   "end": 26680,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 26047",
+   "id": null,
+   "text": "Recommendations\n\n   The development of computational aeroelastic methods should proceed on two fronts--at the\n\nEuler/Navier-Stokes level and at the potential flow level."
+  },
+  {
+   "start": 26680,
+   "end": 26849,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 26216",
+   "id": null,
+   "text": "The CFL2D and CFL3D codes for\n\nsolving the unsteady 2-D and 3-D EuleVNavier-Stokes equations are available in the NASA\n\nLangley Computational Fluid Dynamics Laboratory."
+  },
+  {
+   "start": 26849,
+   "end": 27057,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 26424",
+   "id": null,
+   "text": "The CFL2D code (Navier-Stokes option)\n\npresently is being used to correlate with unsteady pressure data measured at transonic speeds,\n\ncryogenic temperatures, and Reynolds numbers up to 35 million (re"
+  },
+  {
+   "start": 27057,
+   "end": 27167,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 26534",
+   "id": null,
+   "text": "Results from the\n\nunsteady CFL3D code (Euler option) are being compared with results from unsteady TSD codes."
+  },
+  {
+   "start": 27167,
+   "end": 27315,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 26682",
+   "id": null,
+   "text": "RECOMMENDATION:            INCORPORATE THE AEROELASTIC ANALYSIS METHODS\n\n                           INTO AV AI LABLE EULER/NAVI ER-STOKES CODES."
+  },
+  {
+   "start": 27315,
+   "end": 27404,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 26771",
+   "id": null,
+   "text": "Since the aerodynamic codes are available, this effort should proceed immediately."
+  },
+  {
+   "start": 27404,
+   "end": 27517,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 26884",
+   "id": null,
+   "text": "This will\n\nallow analysis of some aeroelastic phenomena where vortex and separated (mixed) flows are\n\nimportant."
+  },
+  {
+   "start": 27517,
+   "end": 27681,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 27048",
+   "id": null,
+   "text": "Such problems of current interest include the DAST ARW-2 nonclassical flutter\n\nresponse, wingktore limit amplitude flutter, and B-1 vortex-induced oscillations."
+  },
+  {
+   "start": 27681,
+   "end": 27737,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 27104",
+   "id": null,
+   "text": "These will\n\nbe limitations of the resulting method."
+  },
+  {
+   "start": 27737,
+   "end": 27804,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 27171",
+   "id": null,
+   "text": "One of the most important is the limitation of turbulence\n\nmodels."
+  },
+  {
+   "start": 27804,
+   "end": 28033,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 27400",
+   "id": null,
+   "text": "Present turbulence models yield poor results for flows in which 3-D effects are\n\nimportant and do not do a good job in regions of massive separation, large-scale unsteadiness,\n\nand transition from lam"
+  },
+  {
+   "start": 28033,
+   "end": 28155,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 27522",
+   "id": null,
+   "text": "Aeroelasticians are dependent upon\n\naerodynamicists to develop turbulence models that are valid in these regions."
+  },
+  {
+   "start": 28155,
+   "end": 28372,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 27739",
+   "id": null,
+   "text": "Until this is\n\n\n\n\n                                                13\n\faccomplished, aeroelastic phenomena such as those due to vortex bursting cannot be modeled\n\naccurately using existing Navier-Stoke"
+  },
+  {
+   "start": 28372,
+   "end": 28490,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 27857",
+   "id": null,
+   "text": "Problems of current interest that fall into\n\nthis category include vertical tail buffet of twin-tail fighters."
+  },
+  {
+   "start": 28490,
+   "end": 28591,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 27958",
+   "id": null,
+   "text": "Euler/Navier-Stokes codes currently are too expensive to use for routine aeroelastic\n\nanalysis."
+  },
+  {
+   "start": 28591,
+   "end": 28686,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 28053",
+   "id": null,
+   "text": "For a large class of problems, potential flow or potential flow/boundary layer is\n\nadequate."
+  },
+  {
+   "start": 28686,
+   "end": 28767,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 28134",
+   "id": null,
+   "text": "An effort is needed to determine when the Euler/Navier-Stokesmethods are needed."
+  },
+  {
+   "start": 28767,
+   "end": 28863,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 28230",
+   "id": null,
+   "text": "The only way to accomplish this is to construct a full potential code for evaluation purposes."
+  },
+  {
+   "start": 28863,
+   "end": 29008,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 28375",
+   "id": null,
+   "text": "RECOMMENDATION:            DEVELOP AN AEROELASTIC ANALYSIS CAPABILITY BASED\n\n                           ON THE FULL POTENTIAL FLOW EQUATIONS."
+  },
+  {
+   "start": 29008,
+   "end": 29093,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 28460",
+   "id": null,
+   "text": "A logical step is to extend the FP method discussed above to three dimensions."
+  },
+  {
+   "start": 29093,
+   "end": 29205,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 28572",
+   "id": null,
+   "text": "It would be an\n\nimprovement upon TSD methods because of improved accuracy of the calculated aerodynamic\n\nloads."
+  },
+  {
+   "start": 29205,
+   "end": 29379,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 28746",
+   "id": null,
+   "text": "Full Potential methods can be used for analysis of thick, blunt bodies such as blended\n\nwing/fuselage configurations that are characteristic of Advanced Technology Fighters."
+  },
+  {
+   "start": 29379,
+   "end": 29531,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 28898",
+   "id": null,
+   "text": "Because\n\ngrids used in unsteady FP methods can follow the vehicle motion, body boundary conditions are\n\napplied at the instantaneous surface locations."
+  },
+  {
+   "start": 29531,
+   "end": 29659,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 29026",
+   "id": null,
+   "text": "In TSD methods, the boundary conditions are\n\napplied on mean surfaces that must not be much different than the actual surfaces."
+  },
+  {
+   "start": 29659,
+   "end": 29770,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 29137",
+   "id": null,
+   "text": "Thus, FP\n\nmethods should be useful in predicting aeroelastic responses that involve larger amplitude\n\nmotions."
+  },
+  {
+   "start": 29770,
+   "end": 29863,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 29230",
+   "id": null,
+   "text": "This should be done by developing a CAP-FP code that, initially, treats isolated wings."
+  },
+  {
+   "start": 29863,
+   "end": 29991,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 29358",
+   "id": null,
+   "text": "The\n\nresulting code can be used to evaluate the advantages of FP over TSD methods without developing\n\na complete aircraft code."
+  },
+  {
+   "start": 29991,
+   "end": 30132,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 29499",
+   "id": null,
+   "text": "If it is determined that those advantages warrant further development\n\nof FP methods, a code for complex configurations should be developed."
+  },
+  {
+   "start": 30132,
+   "end": 30327,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 29694",
+   "id": null,
+   "text": "This capability should be\n\n\n\n\n                                                  14\n\f    developed in conjunction with the development of Euler/Navier-Stokes aeroelastic analysis\n\n    capability."
+  },
+  {
+   "start": 30327,
+   "end": 30525,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 29892",
+   "id": null,
+   "text": "RECOMMENDATION:            COMPLETE DEVELOPMENT OF TRANSONIC SMALL\n\n                               DISTURBANCE CODE FOR COMPLETE VEHICLE AEROELASTIC\n\n                               ANALYSIS."
+  },
+  {
+   "start": 30525,
+   "end": 30642,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 30009",
+   "id": null,
+   "text": "This code will provide the first capability for complete vehicle computational aeroelastic\n\n    analysis."
+  },
+  {
+   "start": 30642,
+   "end": 30753,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 30120",
+   "id": null,
+   "text": "The initial goal should be to use the TSD code for analysis of vehicles in level flight at\n\n    maximum speed."
+  },
+  {
+   "start": 30753,
+   "end": 30883,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 30250",
+   "id": null,
+   "text": "At such conditions, aircraft operate in attached flow (region I) or attached\n\n    flow with mildly separated regions (region 11)."
+  },
+  {
+   "start": 30883,
+   "end": 30970,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 30337",
+   "id": null,
+   "text": "The TSD and FP methods should be augmented by including nonisentropic effects."
+  },
+  {
+   "start": 30970,
+   "end": 31107,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 30474",
+   "id": null,
+   "text": "In addition,\n\n    the inviscid flow methods (potential and Euler) should be coupled with direct and inverse\n\n    boundary layer methods."
+  },
+  {
+   "start": 31107,
+   "end": 31206,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 30573",
+   "id": null,
+   "text": "A list of activities directed at accomplishing these recommendations is shown in Table IV."
+  },
+  {
+   "start": 31206,
+   "end": 31275,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 30642",
+   "id": null,
+   "text": "Correlation of CFL2D with transonic cryogenic data is underway."
+  },
+  {
+   "start": 31275,
+   "end": 31386,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 30753",
+   "id": null,
+   "text": "This will serve to validate\n\n    this higher equation level code for unsteady flow about oscillating airfoils."
+  },
+  {
+   "start": 31386,
+   "end": 31525,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 30892",
+   "id": null,
+   "text": "In parallel with this\n\n    effort, initial calculation of flutter of an isolated wing using Navier-Stokes aerodynamics is\n\n    proceeding."
+  },
+  {
+   "start": 31525,
+   "end": 31719,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 31086",
+   "id": null,
+   "text": "In addition, a full potential code for the analysis of isolated wings is under\n\n    development which will be used to evaluate the utility of such a code for more complex\n\n    configurations."
+  },
+  {
+   "start": 31719,
+   "end": 32207,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 31574",
+   "id": null,
+   "text": "The initial version of CAP-TSD (Version 1.O) including nonisentropic and\n\n    vorticity corrections is available, and a version with viscous boundary layer modeling\n3\n    (Version 2.0) is under develo"
+  },
+  {
+   "start": 32207,
+   "end": 32276,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 31643",
+   "id": null,
+   "text": "Aeroelastic\n\nproblems of current interest are discussed."
+  },
+  {
+   "start": 32276,
+   "end": 32517,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 31884",
+   "id": null,
+   "text": "These include (a) the minimum flutter speed, (b)\n\nthe nonclassical aeroelastic response of the DAST ARW-2, (c) wing/store limit amplitude\n\nflutter, (d) vortex-induced oscillations on the B-1 wing, and"
+  },
+  {
+   "start": 32517,
+   "end": 32659,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 32026",
+   "id": null,
+   "text": "The aerodynamic methods available to analyze various aeroelastic phenomena and the\n\ncomputer requirements to use those methods are discussed."
+  },
+  {
+   "start": 32659,
+   "end": 32793,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 32160",
+   "id": null,
+   "text": "The requirements for aeroelastic\n\nanalysis of complex configurations using even relatively simple flow models are quite\n\nrestrictive."
+  },
+  {
+   "start": 32793,
+   "end": 33098,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 32465",
+   "id": null,
+   "text": "Recommendations for future research activities include (a) incorporating\n\naeroelastic analysis methods into available EulerINavier-Stokes codes, (b) developing a pilot\n\nfull potential code, and (c) co"
+  },
+  {
+   "start": 33098,
+   "end": 33163,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 32530",
+   "id": null,
+   "text": "References\n\n\n    1 ."
+  },
+  {
+   "start": 33163,
+   "end": 33175,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 32542",
+   "id": null,
+   "text": "Borland, C."
+  },
+  {
+   "start": 33175,
+   "end": 33196,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 32563",
+   "id": null,
+   "text": "J.; and Rizzetta, D."
+  },
+  {
+   "start": 33196,
+   "end": 33297,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 32664",
+   "id": null,
+   "text": "P.: Nonlinear Transonic Flutter Analysis, AIAA Journal,\nVOI. 20, NO. 11, pp. 1606-1615, 1982.\n\n   2."
+  },
+  {
+   "start": 33297,
+   "end": 33478,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 32845",
+   "id": null,
+   "text": "Batina, John T.; Seidel, David A.; Bland, Samuel R.; and Bennett, Robert M.: Unsteady\nTransonic Flow Calculations for Realistic Aircraft Configurations, AlAA 87-0850, 1987.\n\n    3."
+  },
+  {
+   "start": 33478,
+   "end": 33700,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 33067",
+   "id": null,
+   "text": "Osher, S.; Hafez, M.; and Whitlow, W., Jr.:             Entropy Condition Satisfying\nApproximations for the Full Potential Equation of Transonic Flow, Mathematics of Computation,\nVOI. 44, NO. 169, pp."
+  },
+  {
+   "start": 33700,
+   "end": 33842,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 33209",
+   "id": null,
+   "text": "Hafez, M.; Whitlow, W., Jr.; and Osher, S.:    Improved Finite Difference Schemes for\nTransonic Flow Calculations, AIAA 84-0092, 1984.\n\n   5."
+  },
+  {
+   "start": 33842,
+   "end": 34093,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 33460",
+   "id": null,
+   "text": "Whitlow, Woodrow, Jr.; Hafez, Mohamed M.; and Osher, Stanley, J.: An Entropy                 c\n\nCorrection Method for Unsteady Full Potential Flows with Strong Shocks, NASA TM 87769,\n1986.\n\n\n\n\n       "
+  },
+  {
+   "start": 34093,
+   "end": 34251,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 33618",
+   "id": null,
+   "text": "Steinhoff, John; and Jameson, Antony: Multiple Solutions of the Transonic Potential\nFlow Equation, AlAA Journal, Vol. 20, No.11, pp. 1521-1525, 1982.\n\n   7 ."
+  },
+  {
+   "start": 34251,
+   "end": 34261,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 33628",
+   "id": null,
+   "text": "Salas, M."
+  },
+  {
+   "start": 34261,
+   "end": 34281,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 33648",
+   "id": null,
+   "text": "D.; and Gumbert, C."
+  },
+  {
+   "start": 34281,
+   "end": 34368,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 33735",
+   "id": null,
+   "text": "R.:     Breakdown of the Conservative Potential Equation,\nAlAA 85-0367. 1985.\n\n    8 ."
+  },
+  {
+   "start": 34368,
+   "end": 34500,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 33867",
+   "id": null,
+   "text": "Fuglsang, Dennis F.; and Williams, Marc H.: Non-Isentropic Unsteady Transonic Small\nDisturbance Theory, AlAA 85-0600, 1985.\n\n   9 ."
+  },
+  {
+   "start": 34500,
+   "end": 34512,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 33879",
+   "id": null,
+   "text": "Gibbons, M."
+  },
+  {
+   "start": 34512,
+   "end": 34551,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 33918",
+   "id": null,
+   "text": "D.; Whitlow, W., Jr.; and Williams, M."
+  },
+  {
+   "start": 34551,
+   "end": 34662,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 34029",
+   "id": null,
+   "text": "H.: Nonisentropic Unsteady Three\nDimensional Small Disturbance Potential Theory, AlAA 86-0863, 1986.\n\n    1 0."
+  },
+  {
+   "start": 34662,
+   "end": 34673,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 34040",
+   "id": null,
+   "text": "Rumsey, C."
+  },
+  {
+   "start": 34673,
+   "end": 34783,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 34150",
+   "id": null,
+   "text": "L.: Time-Dependent Navier-Stokes Computations of Separated Flows over\nAirfoils, AlAA 85-1684, 1985.\n\n   1 1 ."
+  },
+  {
+   "start": 34783,
+   "end": 34794,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 34161",
+   "id": null,
+   "text": "Thomas, J."
+  },
+  {
+   "start": 34794,
+   "end": 34809,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 34176",
+   "id": null,
+   "text": "L.; Taylor, S."
+  },
+  {
+   "start": 34809,
+   "end": 34830,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 34197",
+   "id": null,
+   "text": "L.; and Anderson, W."
+  },
+  {
+   "start": 34830,
+   "end": 34937,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 34304",
+   "id": null,
+   "text": "K.:Navier-Stokes Computations of\nVortical Flows over Low Aspect Ratio Wings, AlAA 87-0207, 1987.\n\n   1 2 ."
+  },
+  {
+   "start": 34937,
+   "end": 34950,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 34317",
+   "id": null,
+   "text": "Anderson, W."
+  },
+  {
+   "start": 34950,
+   "end": 35132,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 34499",
+   "id": null,
+   "text": "Kyle; Thomas, James L.; and Rumsey, Christopher L.: Extension and\nApplications of Flux-Vector Splitting to Unsteady Calculations on Dynamic Meshes, AIAA 87-\n1152-CP. 1987.\n\n   1 3 ."
+  },
+  {
+   "start": 35132,
+   "end": 35144,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 34511",
+   "id": null,
+   "text": "Howlett, J."
+  },
+  {
+   "start": 35144,
+   "end": 35282,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 34649",
+   "id": null,
+   "text": "T.:\n                       Efficient Self-Consistent Viscous-Inviscid Solutions for Unsteady\nTransonic Flow, AlAA 85-0482, 1985.\n\n  1 4 ."
+  },
+  {
+   "start": 35282,
+   "end": 35585,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 34952",
+   "id": null,
+   "text": "Whitlow, Woodrow, Jr.: XTRAN2L: A Program for Solving the General-Frequency\nUnsteady Transonic Small Disturbance Equation, NASA TM 85723, 1983.\n\n   15.Weinberg, Bernard C.; and Shamroth, Stephen J.: T"
+  },
+  {
+   "start": 35585,
+   "end": 35596,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 34963",
+   "id": null,
+   "text": "Kandil, 0."
+  },
+  {
+   "start": 35596,
+   "end": 35757,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 35124",
+   "id": null,
+   "text": "A.; Chuang, A.; and Chu, L.-C.: Finite-Volume and Integral-Equation\nTechniques for Transonic and Supersonic Vortex-Dominated Flows, ICAS-86-1.5.4, 1986.\n\n   17."
+  },
+  {
+   "start": 35757,
+   "end": 35769,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 35136",
+   "id": null,
+   "text": "Gallman, J."
+  },
+  {
+   "start": 35769,
+   "end": 35784,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 35151",
+   "id": null,
+   "text": "W.; Batina, J."
+  },
+  {
+   "start": 35784,
+   "end": 35801,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 35168",
+   "id": null,
+   "text": "T.; and Yang, T."
+  },
+  {
+   "start": 35801,
+   "end": 35905,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 35272",
+   "id": null,
+   "text": "Y.:       A Computational Transonic Flutter\nBoundary Tracking Procedure, NASA TM 87708, 1986.\n\n   1 8 ."
+  },
+  {
+   "start": 35905,
+   "end": 36288,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 35655",
+   "id": null,
+   "text": "Hess, Robert W.; Seidel, David A.; Igoe, William B.; and Lawing, Pierce L.: Highlights of\nUnsteady Pressure Tests on a 14 Percent Supercritical Airfoil at High Reynolds Number,\nTransonic Condition, AI"
+  },
+  {
+   "start": 36288,
+   "end": 39472,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 38839",
+   "id": null,
+   "text": "I-\nz\nW\nU\nU\n3\n0\n-\nW\nJ        I   L   L   L   I\nm\na\nI-       I   1\n\fI-\n-\nZ\n-                   U\n0                   U\nn                   co\nU                   t-\nW\nI-                  t-\nI-\n3\nA\nLL\nW\n"
+  },
+  {
+   "start": 39472,
+   "end": 40466,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 39833",
+   "id": null,
+   "text": "ACTIVITIES IN COMPUTATIONAL\n                    UNSTEADY AERODYNAMICS\n\n\n\n0 CORRELATION OF NAVIER-STOKES AND TRANSONIC CRYOGENIC\n   PRESSURES\n\n0 NAVIER-STOKES FLUTTER ANALYSIS\n\n0 FULL POTENTIAL (ISOLAT"
+  },
+  {
+   "start": 40466,
+   "end": 41053,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 40420",
+   "id": null,
+   "text": "P\n              E\n              a\n\n\n\n\n         0\n\n\n\n\na\n\n    25\n\f              b\n\n\n\n\n         aJ\n         L\n         3\n     0\n\n\n\n\n0\n\n\n\n\n26\n\f         0\n         (D\n\n\n\n\n         0\n         w-\n\n\n         "
+  },
+  {
+   "start": 41053,
+   "end": 41099,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 40466",
+   "id": null,
+   "text": "Raport No.                                 2."
+  },
+  {
+   "start": 41099,
+   "end": 41147,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 40514",
+   "id": null,
+   "text": "Government Accession No.                     3."
+  },
+  {
+   "start": 41147,
+   "end": 41171,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 40538",
+   "id": null,
+   "text": "Recipient's Catalog No."
+  },
+  {
+   "start": 41171,
+   "end": 41331,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 40698",
+   "id": null,
+   "text": "NASA TPI- 100523\n                                          -\n                                                                                              5."
+  },
+  {
+   "start": 41331,
+   "end": 41553,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 40920",
+   "id": null,
+   "text": "Report Date\n\n\n                                                                                               Decem be r 1987\n                                                                           "
+  },
+  {
+   "start": 41553,
+   "end": 41588,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 40955",
+   "id": null,
+   "text": "Performing Organization Code\n\n\n\n7."
+  },
+  {
+   "start": 41588,
+   "end": 41682,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 41049",
+   "id": null,
+   "text": "Authods)                                                                                   8."
+  },
+  {
+   "start": 41682,
+   "end": 41717,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 41084",
+   "id": null,
+   "text": "Performing Organization Report No."
+  },
+  {
+   "start": 41717,
+   "end": 41837,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 41204",
+   "id": null,
+   "text": "Woodrow Whitlow, J r .\n                                                                                             10."
+  },
+  {
+   "start": 41837,
+   "end": 41855,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 41222",
+   "id": null,
+   "text": "Work Unit No.\n\n9."
+  },
+  {
+   "start": 41855,
+   "end": 42101,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 41468",
+   "id": null,
+   "text": "Performing Organization Name and Address\n                                                                                               505-63-21-01\nNASA Langley Research Center                       "
+  },
+  {
+   "start": 42101,
+   "end": 42123,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 41490",
+   "id": null,
+   "text": "Contract or Grant No."
+  },
+  {
+   "start": 42123,
+   "end": 42255,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 41622",
+   "id": null,
+   "text": "Hampton, Vi r g i n i a 23665-5225\n                                                                                             13."
+  },
+  {
+   "start": 42255,
+   "end": 42293,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 41660",
+   "id": null,
+   "text": "Type of Report and Period Covered\n'2."
+  },
+  {
+   "start": 42293,
+   "end": 42595,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 41962",
+   "id": null,
+   "text": "Sponsoring Agency Name and Address\n                                                                                               Technical Memorandum\nNational Aeronautics and Space Admi n i s t r a t"
+  },
+  {
+   "start": 42595,
+   "end": 42643,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 42010",
+   "id": null,
+   "text": "Sponsoring Agency Code\nWashington, DC 20546\n\n5."
+  },
+  {
+   "start": 42643,
+   "end": 42670,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 42037",
+   "id": null,
+   "text": "Supplementary Notes\n\n\n\n\n6."
+  },
+  {
+   "start": 42670,
+   "end": 42864,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 42231",
+   "id": null,
+   "text": "Abstract\n         This report summarizes the status of computational unsteady aerodynamics\nmethods f o r aeroelastic analysis and makes recommendations for future research\na c t i v i t i e s ."
+  },
+  {
+   "start": 42864,
+   "end": 43042,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 42409",
+   "id": null,
+   "text": "The f l i g h t conditions f o r which various types of flows e x i s t are\ndescribed and the aeroelastic phenomena that can occur i n those f l i g h t regimes a r e\ndiscussed."
+  },
+  {
+   "start": 43042,
+   "end": 43187,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 42554",
+   "id": null,
+   "text": "Some important acroelastic problems of current i n t e r e s t are described,\nand the aerodynamic methods needed t o analyze them are presented."
+  },
+  {
+   "start": 43187,
+   "end": 43288,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 42655",
+   "id": null,
+   "text": "The c a p a b i l i t i e s\nand limitations of existing unsteady aerodynamics methods are discussed."
+  },
+  {
+   "start": 43288,
+   "end": 43410,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 42777",
+   "id": null,
+   "text": "Computer\nresources required t o perform aeroelastic analysis of various f l i g h t vehicle\nconfigurations are presented."
+  },
+  {
+   "start": 43410,
+   "end": 43540,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 42907",
+   "id": null,
+   "text": "Recommendations f o r future research a r e made, and\nschedules f o r completion of proposed research tasks are presented.\n\n\n\n\n7."
+  },
+  {
+   "start": 43540,
+   "end": 43611,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 42978",
+   "id": null,
+   "text": "Key Words (Suggested by Authork))                                  18."
+  },
+  {
+   "start": 43611,
+   "end": 43829,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 43196",
+   "id": null,
+   "text": "Distribution Statement\n\n Computational Aeroelasticity                                          Unclassified - Unlimited\n Unsteady Aerodynamics                                                 Subject C"
+  },
+  {
+   "start": 43829,
+   "end": 43872,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 43239",
+   "id": null,
+   "text": "Security Classif. (of this report)     20."
+  },
+  {
+   "start": 43872,
+   "end": 43923,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 43290",
+   "id": null,
+   "text": "Security Classif. (of this page)               21."
+  },
+  {
+   "start": 43923,
+   "end": 43945,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 43312",
+   "id": null,
+   "text": "No. of pages      22."
+  },
+  {
+   "start": 43945,
+   "end": 44076,
+   "type": "sentence",
+   "basis": "trailing text",
+   "id": null,
+   "text": "Price\n\n Unclassified                                 Uncl ass i f i ed                                    28                A03"
+  }
+ ]
+}

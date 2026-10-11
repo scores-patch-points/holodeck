@@ -1,0 +1,125 @@
+{
+ "schema": "EOReadingGolden@1",
+ "specimen": "lear-france",
+ "path": "01-literature-books/gutenberg/pg100_Complete_Works_of_Shakespeare.txt",
+ "rule": "goldens/reading/RULE.md",
+ "window": {
+  "start": 2378825,
+  "startText": "Thou hast her, France: let her be thine; for we",
+  "end": 2378999,
+  "endText": "Without our grace, our love, our benison.",
+  "coordinates": "normalized body (container-stripped, CRLF-normalized); spans in RAW file coordinates"
+ },
+ "notes": "King Lear 1.1, the casting-off: NUL·Figure in English ('we Have no such daughter' — A4's negative possession of ONE identified person, the exact mirror of the UDHR's negative existentials) beside the grant and the forsworn seeing. 'Therefore be gone' is a situational directive and folds (R11, disclosed).",
+ "revisions": [],
+ "rows": [
+  {
+   "subject": "Thou",
+   "relation": "hast",
+   "object": "her",
+   "polarity": "+",
+   "phasepost": {
+    "op": "CON",
+    "grain": "Figure"
+   },
+   "clause": "main",
+   "prop": "lear:france-has-her",
+   "ground": "lear-1-1.1.1",
+   "role": "declared",
+   "because": "having-her — a holding between two identified persons: Relate·Structure at figure grain",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "'Thou' → France, the addressed king; 'her' → Cordelia",
+   "alternate": null,
+   "span": {
+    "start": 2464201,
+    "end": 2464408
+   },
+   "anchor": "Thou hast her, France:"
+  },
+  {
+   "subject": "her",
+   "relation": "let her be",
+   "object": "thine",
+   "polarity": "+",
+   "phasepost": {
+    "op": "CON",
+    "grain": "Figure"
+   },
+   "clause": "coordinate",
+   "prop": "lear:let-her-be-thine",
+   "ground": "lear-1-1.1.2",
+   "role": "declared",
+   "because": "a performative GRANT — the holding assigned by jussive (a main-line jussive is the assertion, R11): the conferring family, Relate·Structure at figure grain",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "'her' → Cordelia; 'thine' → France's",
+   "alternate": {
+    "op": "INS",
+    "grain": "Figure",
+    "because": "the grant readable as brought into being"
+   },
+   "span": {
+    "start": 2464201,
+    "end": 2464408
+   },
+   "anchor": "let her be thine;"
+  },
+  {
+   "subject": "we",
+   "relation": "Have no",
+   "object": "such daughter",
+   "polarity": "+",
+   "phasepost": {
+    "op": "NUL",
+    "grain": "Figure"
+   },
+   "clause": "reason-adjunct",
+   "prop": "lear:no-such-daughter",
+   "ground": "lear-1-1.1.2.1",
+   "role": "declared",
+   "because": "A4 at FIGURE grain: 'we have no such daughter' — the negative possession of ONE identified person, and the absence-to-him IS the asserted act (polarity +): the same construction family as the UDHR's فلن يكون هناك and Hakuna, landed on a figure instead of a kind — spoken over a daughter standing before him, which is what makes it an act and not a report",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "royal 'we' → Lear; 'such daughter' → Cordelia, disclaimed",
+   "alternate": {
+    "op": "CON",
+    "grain": "Figure",
+    "because": "the sibling construction: the kinship-holding negated, polarity − — mirror-disclosed both ways as the UDHR pattern requires"
+   },
+   "span": {
+    "start": 2464201,
+    "end": 2464408
+   },
+   "anchor": "for we\nHave no such daughter,"
+  },
+  {
+   "subject": "we",
+   "relation": "shall ever see",
+   "object": "That face of hers",
+   "polarity": "-",
+   "phasepost": {
+    "op": "EVA",
+    "grain": "Figure"
+   },
+   "clause": "coordinate",
+   "prop": "lear:never-see-face",
+   "ground": "lear-1-1.1.2.2",
+   "role": "declared",
+   "because": "seeing is content taken into a holder's view — the perception family (Relate·Interpretation, with gen:saw-light-good) at figure grain, negated ('nor…ever'): polarity − per R6",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "coordinated predicate shares royal 'we' → Lear; 'hers' → Cordelia",
+   "alternate": {
+    "op": "SIG",
+    "grain": "Figure",
+    "because": "seeing readable as presence-to-the-eye"
+   },
+   "span": {
+    "start": 2464201,
+    "end": 2464408
+   },
+   "anchor": "nor shall ever see\nThat face of hers again."
+  }
+ ]
+}

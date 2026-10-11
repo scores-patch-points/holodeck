@@ -1,0 +1,412 @@
+{
+ "schema": "NotationPrior@1",
+ "family": "closed_codes",
+ "kind": "morse-table",
+ "giver": {
+  "name": "ITU-R M.1677-1 (10/2009) International Morse code",
+  "url": "https://www.itu.int/dms_pubrec/itu-r/rec/m/R-REC-M.1677-1-200910-I!!PDF-E.pdf",
+  "section": "Annex 1 Part I s1.1 (signals), s2 (spacing)",
+  "licence_note": "ITU copyright, free download; the signal table is facts; PDF is NOT redistributed; only the table is transcribed by scripts/parse_itu.py",
+  "audit": {
+   "morse3_MIT": [
+    44,
+    44
+   ],
+   "morsepy_MIT": [
+    49,
+    49
+   ]
+  }
+ },
+ "built": "2026-10-06",
+ "train": {
+  "sources": [
+   "moby-dick",
+   "origin-of-species",
+   "pride-and-prejudice",
+   "tale-of-two-cities"
+  ],
+  "sentences": 25917,
+  "chars": 3588959,
+  "text_sha256": "55bb1a08d2a3f726c05956efddd7ef6c46ed396bb70cbd1950ef8e7be9912d37"
+ },
+ "rule": "priors REFUSE or NOMINATE, never admit: a unit absent from the table is a typed gap, never a guess",
+ "signals": [
+  {
+   "char": "A",
+   "signal": ".-",
+   "class": "letter"
+  },
+  {
+   "char": "I",
+   "signal": "..",
+   "class": "letter"
+  },
+  {
+   "char": "R",
+   "signal": ".-.",
+   "class": "letter"
+  },
+  {
+   "char": "B",
+   "signal": "-...",
+   "class": "letter"
+  },
+  {
+   "char": "J",
+   "signal": ".---",
+   "class": "letter"
+  },
+  {
+   "char": "S",
+   "signal": "...",
+   "class": "letter"
+  },
+  {
+   "char": "C",
+   "signal": "-.-.",
+   "class": "letter"
+  },
+  {
+   "char": "K",
+   "signal": "-.-",
+   "class": "letter"
+  },
+  {
+   "char": "T",
+   "signal": "-",
+   "class": "letter"
+  },
+  {
+   "char": "D",
+   "signal": "-..",
+   "class": "letter"
+  },
+  {
+   "char": "L",
+   "signal": ".-..",
+   "class": "letter"
+  },
+  {
+   "char": "U",
+   "signal": "..-",
+   "class": "letter"
+  },
+  {
+   "char": "E",
+   "signal": ".",
+   "class": "letter"
+  },
+  {
+   "char": "M",
+   "signal": "--",
+   "class": "letter"
+  },
+  {
+   "char": "V",
+   "signal": "...-",
+   "class": "letter"
+  },
+  {
+   "char": "N",
+   "signal": "-.",
+   "class": "letter"
+  },
+  {
+   "char": "W",
+   "signal": ".--",
+   "class": "letter"
+  },
+  {
+   "char": "F",
+   "signal": "..-.",
+   "class": "letter"
+  },
+  {
+   "char": "O",
+   "signal": "---",
+   "class": "letter"
+  },
+  {
+   "char": "X",
+   "signal": "-..-",
+   "class": "letter"
+  },
+  {
+   "char": "G",
+   "signal": "--.",
+   "class": "letter"
+  },
+  {
+   "char": "P",
+   "signal": ".--.",
+   "class": "letter"
+  },
+  {
+   "char": "Y",
+   "signal": "-.--",
+   "class": "letter"
+  },
+  {
+   "char": "H",
+   "signal": "....",
+   "class": "letter"
+  },
+  {
+   "char": "Q",
+   "signal": "--.-",
+   "class": "letter"
+  },
+  {
+   "char": "Z",
+   "signal": "--..",
+   "class": "letter"
+  },
+  {
+   "char": "1",
+   "signal": ".----",
+   "class": "figure"
+  },
+  {
+   "char": "6",
+   "signal": "-....",
+   "class": "figure"
+  },
+  {
+   "char": "2",
+   "signal": "..---",
+   "class": "figure"
+  },
+  {
+   "char": "7",
+   "signal": "--...",
+   "class": "figure"
+  },
+  {
+   "char": "3",
+   "signal": "...--",
+   "class": "figure"
+  },
+  {
+   "char": "8",
+   "signal": "---..",
+   "class": "figure"
+  },
+  {
+   "char": "4",
+   "signal": "....-",
+   "class": "figure"
+  },
+  {
+   "char": "9",
+   "signal": "----.",
+   "class": "figure"
+  },
+  {
+   "char": "5",
+   "signal": ".....",
+   "class": "figure"
+  },
+  {
+   "char": "0",
+   "signal": "-----",
+   "class": "figure"
+  },
+  {
+   "char": ".",
+   "signal": ".-.-.-",
+   "class": "punctuation",
+   "name": "Full stop"
+  },
+  {
+   "char": ",",
+   "signal": "--..--",
+   "class": "punctuation",
+   "name": "Comma"
+  },
+  {
+   "char": ":",
+   "signal": "---...",
+   "class": "punctuation",
+   "name": "Colon or division sign"
+  },
+  {
+   "char": "?",
+   "signal": "..--..",
+   "class": "punctuation",
+   "name": "Question mark"
+  },
+  {
+   "char": "'",
+   "signal": ".----.",
+   "class": "punctuation",
+   "name": "Apostrophe"
+  },
+  {
+   "char": "-",
+   "signal": "-....-",
+   "class": "punctuation",
+   "name": "Hyphen or dash or subtraction sign"
+  },
+  {
+   "char": "/",
+   "signal": "-..-.",
+   "class": "punctuation",
+   "name": "Fraction bar or division sign"
+  },
+  {
+   "char": "(",
+   "signal": "-.--.",
+   "class": "punctuation",
+   "name": "Left-hand bracket"
+  },
+  {
+   "char": ")",
+   "signal": "-.--.-",
+   "class": "punctuation",
+   "name": "Right-hand bracket"
+  },
+  {
+   "char": "\"",
+   "signal": ".-..-.",
+   "class": "punctuation",
+   "name": "Inverted commas"
+  },
+  {
+   "char": "=",
+   "signal": "-...-",
+   "class": "punctuation",
+   "name": "Double hyphen"
+  },
+  {
+   "char": "<VE>",
+   "signal": "...-.",
+   "class": "signal",
+   "name": "understood"
+  },
+  {
+   "char": "<ERR>",
+   "signal": "........",
+   "class": "signal",
+   "name": "error"
+  },
+  {
+   "char": "+",
+   "signal": ".-.-.",
+   "class": "punctuation",
+   "name": "Cross or addition sign"
+  },
+  {
+   "char": "<K>",
+   "signal": "-.-",
+   "class": "signal",
+   "name": "invitation_to_transmit"
+  },
+  {
+   "char": "<AS>",
+   "signal": ".-...",
+   "class": "signal",
+   "name": "wait"
+  },
+  {
+   "char": "<SK>",
+   "signal": "...-.-",
+   "class": "signal",
+   "name": "end_of_work"
+  },
+  {
+   "char": "<KA>",
+   "signal": "-.-.-",
+   "class": "signal",
+   "name": "starting_signal"
+  },
+  {
+   "char": "×",
+   "signal": "-..-",
+   "class": "punctuation",
+   "name": "multiplication_sign",
+   "alias_of": "X"
+  },
+  {
+   "char": "@",
+   "signal": ".--.-.",
+   "class": "punctuation",
+   "name": "Commercial at1"
+  },
+  {
+   "char": "é",
+   "signal": "..-..",
+   "class": "letter",
+   "name": "accented_e"
+  }
+ ],
+ "timing_ratios": {
+  "dash": 3,
+  "intra_letter_gap": 1,
+  "letter_gap": 3,
+  "word_gap": 7,
+  "dot": 1
+ },
+ "refuses": {
+  "signals_not_in_giver": [
+   "-.-.-- (!)",
+   "-.-.-. (;)",
+   "..--.- (_)",
+   "accents other than e"
+  ],
+  "note": "oracle packages carry these; ITU M.1677-1 does not: refused"
+ },
+ "counts": {
+  "from": "TRAIN",
+  "char_counts": {
+   "\"": 12701,
+   "'": 5132,
+   "(": 752,
+   ")": 742,
+   ",": 63495,
+   "-": 8099,
+   ".": 29577,
+   "/": 25,
+   "0": 405,
+   "1": 847,
+   "2": 533,
+   "3": 603,
+   "4": 488,
+   "5": 330,
+   "6": 295,
+   "7": 306,
+   "8": 380,
+   "9": 341,
+   ":": 1132,
+   "?": 2506,
+   "A": 228716,
+   "B": 47357,
+   "C": 76693,
+   "D": 116586,
+   "E": 362800,
+   "F": 67767,
+   "G": 57236,
+   "H": 174109,
+   "I": 201240,
+   "J": 3046,
+   "K": 18787,
+   "L": 118724,
+   "M": 72321,
+   "N": 200955,
+   "O": 210941,
+   "P": 49744,
+   "Q": 3556,
+   "R": 169582,
+   "S": 187049,
+   "T": 257652,
+   "U": 77609,
+   "V": 28833,
+   "W": 60983,
+   "X": 4576,
+   "Y": 54723,
+   "Z": 2122
+  },
+  "space_count": 606563,
+  "n_chars": 3588959
+ }
+}

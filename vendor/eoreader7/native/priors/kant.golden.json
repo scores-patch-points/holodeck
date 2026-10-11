@@ -1,0 +1,228 @@
+{
+ "schema": "EOReadingGolden@1",
+ "specimen": "kant",
+ "path": "02-encyclopedic/wikipedia/Immanuel_Kant.txt",
+ "rule": "goldens/reading/RULE.md",
+ "window": {
+  "start": 0,
+  "end": 2120,
+  "endText": "conform to its objects.",
+  "coordinates": "normalized body (container-stripped, CRLF-normalized); spans in RAW file coordinates"
+ },
+ "notes": "Window includes ~800 chars of infobox debris carrying no finite main clause (R1 yields nothing there). Three prose paragraphs follow.",
+ "revisions": [],
+ "rows": [
+  {
+   "subject": "Immanuel Kant",
+   "relation": "was",
+   "object": "a German philosopher",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "because": "copula rule 2: standing-as-a-kind (philosopher, German) — Relate·Existence at kind grain",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 568,
+    "end": 1267
+   },
+   "anchor": "was a German philosopher."
+  },
+  {
+   "subject": "Immanuel Kant",
+   "relation": "born",
+   "object": "Emanuel Kant; 22 April 1724 – 12 February 1804",
+   "polarity": "+",
+   "phasepost": {
+    "op": "INS",
+    "grain": "Figure"
+   },
+   "because": "parenthetical asserts birth (name + lifespan): one individual comes into being — Generate·Existence at figure grain",
+   "embedded": true,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 568,
+    "end": 1267
+   },
+   "anchor": "(born Emanuel Kant; 22 April 1724"
+  },
+  {
+   "subject": "Immanuel Kant",
+   "relation": "born in",
+   "object": "Königsberg in the Kingdom of Prussia",
+   "polarity": "+",
+   "phasepost": {
+    "op": "INS",
+    "grain": "Figure"
+   },
+   "because": "fronted participial asserts his birth (one individual); the place is the act's adjunct, kept in object as the participle's own complement",
+   "embedded": true,
+   "unresolved": false,
+   "resolution": "\"he\"-chain: the fronted participle attaches to the main clause subject, resolved to the article's own established topic (Immanuel Kant)",
+   "alternate": null,
+   "span": {
+    "start": 568,
+    "end": 1267
+   },
+   "anchor": "Born in Königsberg in the Kingdom of Prussia, he is considered"
+  },
+  {
+   "subject": "Immanuel Kant",
+   "relation": "is considered",
+   "object": "one of the central thinkers of the Age of Enlightenment",
+   "polarity": "+",
+   "phasepost": {
+    "op": "EVA",
+    "grain": "Figure"
+   },
+   "because": "copula rule 1: participle of consider — a claim held (by unnamed holders) about one figure — Relate·Interpretation at figure grain",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "\"he\" → Immanuel Kant, the sentence-1 subject and the article's topic",
+   "alternate": null,
+   "span": {
+    "start": 568,
+    "end": 1267
+   },
+   "anchor": "he is considered one of the central thinkers of the Age of EnlightenmentEnlightenment."
+  },
+  {
+   "subject": "Kant's comprehensive and systematic works in epistemology, metaphysics, logic, ethics, aesthetics, political theory, and the philosophy of religion",
+   "relation": "have made",
+   "object": "him one of the most influential and highly discussed figures in modern Western philosophy",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SYN",
+    "grain": "Figure"
+   },
+   "because": "the works PRODUCE his standing — a position within the field's arrangement — Generate·Structure landing on one figure",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "\"His\" → Kant's; \"him\" → Kant — both from the paragraph's established topic",
+   "alternate": {
+    "op": "REC",
+    "grain": "Figure",
+    "because": "readable as producing a new interpretive standing rather than a structural position"
+   },
+   "span": {
+    "start": 568,
+    "end": 1267
+   },
+   "anchor": "have made him one of the most influential and highly discussed figures in modern Western philosophy."
+  },
+  {
+   "subject": "Kant's philosophy",
+   "relation": "is centered on",
+   "object": "the human subject",
+   "polarity": "+",
+   "phasepost": {
+    "op": "CON",
+    "grain": "Ground"
+   },
+   "because": "the philosophy as a whole is held in arrangement around a center — Relate·Structure at ground grain",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 1269,
+    "end": 2120
+   },
+   "anchor": "Kant's philosophy is centered on the human subject"
+  },
+  {
+   "subject": "Kant's philosophy",
+   "relation": "is motivated by",
+   "object": "the desire to secure the possibility of both knowledge and morality against the threats of skepticism and determinism",
+   "polarity": "+",
+   "phasepost": {
+    "op": "EVA",
+    "grain": "Ground"
+   },
+   "because": "relates the whole philosophy to its aim — an interpretive relation over the whole project",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "coordinated predicate shares sentence-subject \"Kant's philosophy\"",
+   "alternate": {
+    "op": "CON",
+    "grain": "Ground",
+    "because": "readable as a structural relation between the philosophy and its motive force"
+   },
+   "span": {
+    "start": 1269,
+    "end": 2120
+   },
+   "anchor": "motivated by the desire to secure the possibility of both knowledge and morality against the threats of skepticism and determinism."
+  },
+  {
+   "subject": "Kant",
+   "relation": "argues for",
+   "object": "transcendental idealism",
+   "polarity": "+",
+   "phasepost": {
+    "op": "DEF",
+    "grain": "Figure"
+   },
+   "because": "advocating a position bounds a claim — Differentiate·Interpretation on one doctrine; the in-the-Critique adjunct stays outside the object (A2)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 1269,
+    "end": 2120
+   },
+   "anchor": "Kant argues for transcendental idealism"
+  },
+  {
+   "subject": "transcendental idealism",
+   "relation": "is",
+   "object": "the doctrine that space and time are mere \"forms of intuition\" that structure all experience and that we have knowledge only of \"appearances\" and not of the nature of things in themselves",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Figure"
+   },
+   "because": "non-restrictive appositive identifies one named doctrine — copula rule 3, unique identity; the that-clause content stays inside the identity (A1)",
+   "embedded": true,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 1269,
+    "end": 2120
+   },
+   "anchor": "the doctrine that space and time are mere"
+  },
+  {
+   "subject": "Kant",
+   "relation": "drew a parallel to",
+   "object": "the Copernican Revolution",
+   "polarity": "+",
+   "phasepost": {
+    "op": "CON",
+    "grain": "Figure"
+   },
+   "because": "places his proposal and the Copernican Revolution in explicit relation — one link made — Relate·Structure at figure grain; the in-his-proposal material is adjunct (A2)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "EVA",
+    "grain": "Figure",
+    "because": "a drawn parallel is also an interpretive comparison"
+   },
+   "span": {
+    "start": 1269,
+    "end": 2120
+   },
+   "anchor": "Kant drew a parallel to the Copernican Revolution"
+  }
+ ]
+}

@@ -1,0 +1,43 @@
+{
+  "schema": "RoleConfig@1",
+  "language": "bul",
+  "provenance": {
+    "builder": "eoreader7 native/scripts/build-role-config.mjs",
+    "source": "/private/tmp/claude-501/tb/bul/train.conllu",
+    "min_volume": 20,
+    "null_draws": 200,
+    "null_alpha": 0.05,
+    "null_seed": 1,
+    "note": "position stats and marker candidates are both derived mechanically from this treebank's own gold dependency annotations — never hand-typed or asserted from general linguistic knowledge. A marker candidate is admitted only when its real precision beats the (1-alpha) quantile of a within-sentence role-label shuffle (II.23), never a fixed ratio — and (S122) that quantile is the MAX-STATISTIC across every eligible closed-class candidate tried, not a per-candidate null, so the admitted marker is significant against the whole search, not merely against itself."
+  },
+  "object": {
+    "total": 8184,
+    "before": 1543,
+    "after": 6641,
+    "dominantSide": "after",
+    "reliability": 0.8114613880742912,
+    "usable": true,
+    "marker": {
+      "form": "своите",
+      "precision": 0.5,
+      "nullCeiling": 0.2857142857142857,
+      "volume": 30,
+      "recall": 0.0018328445747800588
+    }
+  },
+  "subject": {
+    "total": 9177,
+    "before": 7019,
+    "after": 2158,
+    "dominantSide": "before",
+    "reliability": 0.7648468998583415,
+    "usable": true,
+    "marker": {
+      "form": "бе",
+      "hits": 76,
+      "total": 203,
+      "precision": 0.37438423645320196,
+      "nullCeiling": 0.2413793103448276
+    }
+  }
+}

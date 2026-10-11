@@ -1,0 +1,43 @@
+{
+  "schema": "RoleConfig@1",
+  "language": "vie",
+  "provenance": {
+    "builder": "eoreader7 native/scripts/build-role-config.mjs",
+    "source": "/private/tmp/claude-501/tb/vie/train.conllu",
+    "min_volume": 20,
+    "null_draws": 200,
+    "null_alpha": 0.05,
+    "null_seed": 1,
+    "note": "position stats and marker candidates are both derived mechanically from this treebank's own gold dependency annotations — never hand-typed or asserted from general linguistic knowledge. A marker candidate is admitted only when its real precision beats the (1-alpha) quantile of a within-sentence role-label shuffle (II.23), never a fixed ratio — and (S122) that quantile is the MAX-STATISTIC across every eligible closed-class candidate tried, not a per-candidate null, so the admitted marker is significant against the whole search, not merely against itself."
+  },
+  "object": {
+    "total": 1677,
+    "before": 9,
+    "after": 1668,
+    "dominantSide": "after",
+    "reliability": 0.9946332737030411,
+    "usable": true,
+    "marker": {
+      "form": "các",
+      "precision": 0.3125,
+      "nullCeiling": 0.25,
+      "volume": 96,
+      "recall": 0.017889087656529516
+    }
+  },
+  "subject": {
+    "total": 1679,
+    "before": 1674,
+    "after": 5,
+    "dominantSide": "before",
+    "reliability": 0.9970220369267421,
+    "usable": true,
+    "marker": {
+      "form": "có thể",
+      "hits": 9,
+      "total": 24,
+      "precision": 0.375,
+      "nullCeiling": 0.25
+    }
+  }
+}

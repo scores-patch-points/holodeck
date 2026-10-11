@@ -1,0 +1,43 @@
+{
+  "schema": "RoleConfig@1",
+  "language": "ron",
+  "provenance": {
+    "builder": "eoreader7 native/scripts/build-role-config.mjs",
+    "source": "/private/tmp/claude-501/tb/ron/train.conllu",
+    "min_volume": 20,
+    "null_draws": 200,
+    "null_alpha": 0.05,
+    "null_seed": 1,
+    "note": "position stats and marker candidates are both derived mechanically from this treebank's own gold dependency annotations — never hand-typed or asserted from general linguistic knowledge. A marker candidate is admitted only when its real precision beats the (1-alpha) quantile of a within-sentence role-label shuffle (II.23), never a fixed ratio — and (S122) that quantile is the MAX-STATISTIC across every eligible closed-class candidate tried, not a per-candidate null, so the admitted marker is significant against the whole search, not merely against itself."
+  },
+  "object": {
+    "total": 8015,
+    "before": 1547,
+    "after": 6468,
+    "dominantSide": "after",
+    "reliability": 0.8069868995633188,
+    "usable": true,
+    "marker": {
+      "form": "toată",
+      "precision": 0.2857142857142857,
+      "nullCeiling": 0.2222222222222222,
+      "volume": 42,
+      "recall": 0.0014971927635683093
+    }
+  },
+  "subject": {
+    "total": 10227,
+    "before": 8343,
+    "after": 1884,
+    "dominantSide": "before",
+    "reliability": 0.8157817541801115,
+    "usable": true,
+    "marker": {
+      "form": "meu",
+      "hits": 10,
+      "total": 26,
+      "precision": 0.38461538461538464,
+      "nullCeiling": 0.24
+    }
+  }
+}

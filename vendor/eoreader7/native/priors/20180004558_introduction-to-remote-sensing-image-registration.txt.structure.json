@@ -1,0 +1,1283 @@
+{
+ "schema": "SourceStructure@1",
+ "source": "05-academic-papers/ntrs-white-papers/20180004558_introduction-to-remote-sensing-image-registration.txt",
+ "bytes": 32598,
+ "bodyOffset": 632,
+ "splitBasis": "158 sentence-punctuation splits",
+ "unsplit": false,
+ "unitCount": 159,
+ "units": [
+  {
+   "start": 632,
+   "end": 1498,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 865",
+   "id": null,
+   "text": "INTRODUCTION TO REMOTE SENSING IMAGE REGISTRATION\n\n                                                   Jacqueline Le Moigne\n\n                     Software Engineering Division, NASA Goddard Space Fligh"
+  },
+  {
+   "start": 1498,
+   "end": 1593,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 960",
+   "id": null,
+   "text": "It is even more difficult when dealing with\nstep before subsequent processing and integration."
+  },
+  {
+   "start": 1593,
+   "end": 1695,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 1062",
+   "id": null,
+   "text": "Image\n                                                                  other planets than the Earth."
+  },
+  {
+   "start": 1695,
+   "end": 2055,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 1422",
+   "id": null,
+   "text": "Finally, the size of the datasets\nregistration is defined by several steps and each step can be\n                                                                  often represents an additional challen"
+  },
+  {
+   "start": 2055,
+   "end": 2331,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 1698",
+   "id": null,
+   "text": "Therefore, many different methods for\nadvantages and drawbacks depending on the type of data,\nthe type of applications, the a priori information known          image registration have been developed t"
+  },
+  {
+   "start": 2331,
+   "end": 2695,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 2062",
+   "id": null,
+   "text": "This    the multiple image characteristics and the multiple\n                                                                  conditions and applications that need to be dealt with when\npaper will fir"
+  },
+  {
+   "start": 2695,
+   "end": 3308,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 2675",
+   "id": null,
+   "text": "This\nimage registration and then will go over a few specific\n                                                                  paper will present a general overview of remote sensing\nmethods and their"
+  },
+  {
+   "start": 3308,
+   "end": 3357,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 2724",
+   "id": null,
+   "text": "WHAT IS IMAGE REGISTRATION\n                   1."
+  },
+  {
+   "start": 3357,
+   "end": 4030,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 3397",
+   "id": null,
+   "text": "INTRODUCTION\n                                                                  In the Earth remote sensing domain, the datasets are usually\nEarth science studies deal with issues such as climate\n     "
+  },
+  {
+   "start": 4030,
+   "end": 4414,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 3781",
+   "id": null,
+   "text": "Image\nthe impact of human activity on major Earth ecosystems.\n                                                                  registration is then often called feature-based precision\nThese issues a"
+  },
+  {
+   "start": 4414,
+   "end": 4680,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 4047",
+   "id": null,
+   "text": "All these systems support multiple-time or       correction and is based on selected features extracted from\n                                                                  the image data.\nsimultane"
+  },
+  {
+   "start": 4680,
+   "end": 5082,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 4449",
+   "id": null,
+   "text": "Remote sensing systems provide global          As a general definition, image registration is the process of\nmeasurements that are not available using ground or even          aligning two or more imag"
+  },
+  {
+   "start": 5082,
+   "end": 5395,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 4762",
+   "id": null,
+   "text": "To reach          Image registration can be described within a mathematical\nthe full benefit of such complementary measurements, all          framework in which I1(x,y) and I2(x,y) are two images or\nt"
+  },
+  {
+   "start": 5395,
+   "end": 5537,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 4904",
+   "id": null,
+   "text": "The\nfirst step in this correlation and integration is image           registration challenge is to find the mapping (f,g) which\nregistration."
+  },
+  {
+   "start": 5537,
+   "end": 5975,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 5342",
+   "id": null,
+   "text": "The difficulty in registering these various data    transforms I1 into I2 such that:\nis that they usually have varying resolutions – spatial,                  I2(x,y) = g(I1( fx(x,y ), fy(x,y) )) + n("
+  },
+  {
+   "start": 5975,
+   "end": 6329,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 5696",
+   "id": null,
+   "text": "Examples of spatial\nseasons, time of day, cloud coverage, and they cover              transformations can be a translation, a rigid or affine\nfeatures with various characteristics, e.g., natural featu"
+  },
+  {
+   "start": 6329,
+   "end": 6383,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 5750",
+   "id": null,
+   "text": "Examples of radiometric\nas cities, bridges and roads."
+  },
+  {
+   "start": 6383,
+   "end": 6987,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 6354",
+   "id": null,
+   "text": "In addition to these various        transformations are nearest neighbors, bilinear or cubic\ncharacteristics of the data, the application for which the data   convolution transforms.\nneeds to be regis"
+  },
+  {
+   "start": 6987,
+   "end": 7044,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 6411",
+   "id": null,
+   "text": "The Search Space of potential transformations, f\n\f    2."
+  },
+  {
+   "start": 7044,
+   "end": 7286,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 6653",
+   "id": null,
+   "text": "The Feature Space of information extracted from        a Fourier-Mellin Transform [13]) or can be found by\n           the 2 datasets                                         combining local measurement"
+  },
+  {
+   "start": 7286,
+   "end": 7502,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 6869",
+   "id": null,
+   "text": "The Similarity Metric used to match the 2 sets of        such as cross-correlation.\n           features                                               When using salient points, they can be matched eit"
+  },
+  {
+   "start": 7502,
+   "end": 8045,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 7412",
+   "id": null,
+   "text": "The Search Strategy that finds the optimal               finding point-to-point correspondences and then by\n           transformation.                                        computing the overall tran"
+  },
+  {
+   "start": 8045,
+   "end": 8121,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 7488",
+   "id": null,
+   "text": "The Resampling Method used to create the                 of salient points."
+  },
+  {
+   "start": 8121,
+   "end": 8278,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 7645",
+   "id": null,
+   "text": "Apart from a general edge detector (e.g.,\n           corrected image, if needed                             Sobel, or Canny), other methods can be utilized."
+  },
+  {
+   "start": 8278,
+   "end": 8297,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 7664",
+   "id": null,
+   "text": "The first\n      6."
+  },
+  {
+   "start": 8297,
+   "end": 8860,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 8227",
+   "id": null,
+   "text": "The Validation Method by which the image                 class of methods is linked to harmonic analysis, starting\n           registration algorithm is evaluated as accurate and    with short-time Fou"
+  },
+  {
+   "start": 8860,
+   "end": 9044,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 8411",
+   "id": null,
+   "text": "Wavelets, shearlets and wavelet-like representations\nspecific domain such as remote sensing or medical imagery         such as the Simoncelli decomposition can also be utilized\n[1–5]."
+  },
+  {
+   "start": 9044,
+   "end": 9325,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 8692",
+   "id": null,
+   "text": "These surveys describe the many algorithms that have       [7,8]; these representations allow to locally separate the pass\nbeen designed in which various choices have been made and         and high-pa"
+  },
+  {
+   "start": 9325,
+   "end": 9919,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 9286",
+   "id": null,
+   "text": "As described in [1],         values of these components can be used as salient points:\n                                                                                            2\n                   "
+  },
+  {
+   "start": 9919,
+   "end": 10360,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 9727",
+   "id": null,
+   "text": "Area-based methods match                                   -2\n\nareas or regions without an explicit correspondence between       Salient points can also be obtained using an interest or a\npoints in th"
+  },
+  {
+   "start": 10360,
+   "end": 10492,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 9859",
+   "id": null,
+   "text": "But these 2 approaches are often combined in        spatial information correspond to contours, lines or general\nactual algorithms."
+  },
+  {
+   "start": 10492,
+   "end": 10825,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 10192",
+   "id": null,
+   "text": "So another way to group image                  shapes, can be extracted by methods such as line fitting, a\nregistration considers the following categories:                  simple or generalized Hough"
+  },
+  {
+   "start": 10825,
+   "end": 11318,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 10685",
+   "id": null,
+   "text": "Another approach,\n      • Correlation-Related Methods                               that was used for detecting animals such as flamingos,\n      • Fourier-Domain and Other Transform-Based             "
+  },
+  {
+   "start": 11318,
+   "end": 11659,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 11026",
+   "id": null,
+   "text": "An MPP is a\n           Approaches                                             framework in which probabilistic models are defined on\n      • Feature-Point Methods                                     c"
+  },
+  {
+   "start": 11659,
+   "end": 11777,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 11144",
+   "id": null,
+   "text": "A configuration consists of a set of\nIn the remaining of this paper, we will focus on the 3 main       marked points."
+  },
+  {
+   "start": 11777,
+   "end": 11908,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 11275",
+   "id": null,
+   "text": "Random parameters (called marks)\ncomponents that are essential to design all these algorithms,     are associated with each point."
+  },
+  {
+   "start": 11908,
+   "end": 12064,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 11431",
+   "id": null,
+   "text": "This framework allows to\nnamely: feature extraction, similarity metrics and matching       model geometric constraints about each or a group of\nstrategies."
+  },
+  {
+   "start": 12064,
+   "end": 12127,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 11494",
+   "id": null,
+   "text": "Then, we will briefly describe a few                  objects."
+  },
+  {
+   "start": 12127,
+   "end": 12375,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 11742",
+   "id": null,
+   "text": "Each realization of an MPP represents a model for\nrepresentative algorithms and their applications to NASA          the possible spatial distribution of several objects in an\ndata.                    "
+  },
+  {
+   "start": 12375,
+   "end": 12568,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 11935",
+   "id": null,
+   "text": "Contours, shapes and objects are usually matched\n                                                                  one-to-one and the transformation, f, is computed from these\n              3."
+  },
+  {
+   "start": 12568,
+   "end": 12639,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 12006",
+   "id": null,
+   "text": "FEATURE EXTRACTION                               individual matchings."
+  },
+  {
+   "start": 12639,
+   "end": 13079,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 12446",
+   "id": null,
+   "text": "Features can be either gray levels, either original or after      Finally, methods like the Scale-Invariant Feature Transform\nenhancement; salient points such as those defined by an           (SIFT) a"
+  },
+  {
+   "start": 13079,
+   "end": 13381,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 12748",
+   "id": null,
+   "text": "The extracted features are invariant to uniform\ncontours, lines, shapes or regions.                               scaling, orientation and illumination changes; this allows for\n                       "
+  },
+  {
+   "start": 13381,
+   "end": 13524,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 12891",
+   "id": null,
+   "text": "When features are chosen as gray levels, the values can be\nthe original values of the images or they can be the values                      4."
+  },
+  {
+   "start": 13524,
+   "end": 13770,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 13137",
+   "id": null,
+   "text": "SIMILARITY METRICS\nobtained after an enhancement operator such as an edge\nextractor, i.e., edge magnitudes, or a wavelet transformation,    When matching any of the features described in Section 3,\ni."
+  },
+  {
+   "start": 13770,
+   "end": 14047,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 13414",
+   "id": null,
+   "text": "In this case,     one wants to choose a similarity metrics that is the most\nthe transformations f and g from Equation (1) are either          appropriate to the algorithms and to the type of extracted"
+  },
+  {
+   "start": 14047,
+   "end": 14257,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 13624",
+   "id": null,
+   "text": "These metrics include distances that will need to be\n\fminimized and correlation-like measures that will need to be                                           with great success by computing a phase cor"
+  },
+  {
+   "start": 14257,
+   "end": 14272,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 13639",
+   "id": null,
+   "text": "The\nmaximized."
+  },
+  {
+   "start": 14272,
+   "end": 15516,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 14883",
+   "id": null,
+   "text": "Some examples are:                                                                          correlation can be computed efficiently in the Fourier\n• The Sum of Squared Distances (SSD), an L2 norm, ove"
+  },
+  {
+   "start": 15516,
+   "end": 16311,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 15678",
+   "id": null,
+   "text": "If larger rotations and scales are\n                                                  M -1 N -1\n                                                                                                       in"
+  },
+  {
+   "start": 16311,
+   "end": 16767,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 16134",
+   "id": null,
+   "text": "M -1 N -1                                                               Still, the most popular strategy for matching features seems\n                               å å éë I (m, n) - I ùû éë I ( x + m,"
+  },
+  {
+   "start": 16767,
+   "end": 17314,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 16681",
+   "id": null,
+   "text": "It can be applied to gray levels as well as\nNCCI1 , I 2 ( x, y ) =         m=0 n =0\n                          M -1 N -1                              M -1 N -1                             to individual"
+  },
+  {
+   "start": 17314,
+   "end": 18883,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 18250",
+   "id": null,
+   "text": "There are various types of\n               m=0 n =0           m=0 n =0               (5)\n                                                                                                       optimizat"
+  },
+  {
+   "start": 18883,
+   "end": 19542,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 18909",
+   "id": null,
+   "text": "MI ( I1 , I 2 ) =     åå hI ,I ( g1 , g2 ) × log çç h ( g1 2) × h ( g ) ÷÷\n                         M g1 g2 1 2                                                                   Another strategy invol"
+  },
+  {
+   "start": 19542,
+   "end": 20112,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 19479",
+   "id": null,
+   "text": "When dealing with contours and shapes, other approaches\n• Another similarity metrics that has been utilized in some                                            are being considered; for example, local "
+  },
+  {
+   "start": 20112,
+   "end": 20483,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 19850",
+   "id": null,
+   "text": "H K ( I1 , I 2 ) = K thp1ÎI1 min p2ÎI2 dist ( p1 , p2 ) ,                                    More recently, neural networks have also been considered to\n                                               "
+  },
+  {
+   "start": 20483,
+   "end": 21141,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 20508",
+   "id": null,
+   "text": "Although counter-intuitive\n• Finally, another less common metrics is the Discrete                                                 for a well-defined problem such as registration, the mapping\n  Gaussia"
+  },
+  {
+   "start": 21141,
+   "end": 22420,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 21787",
+   "id": null,
+   "text": "Although it\n                                                                                                       has not yet reached its full potential, it offers great promise\n               DGMs ("
+  },
+  {
+   "start": 22420,
+   "end": 22558,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 21925",
+   "id": null,
+   "text": "STRATEGIES FOR IMAGE MATCHING                                                              recombined to compute a global transformation."
+  },
+  {
+   "start": 22558,
+   "end": 23609,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 22976",
+   "id": null,
+   "text": "Other\n                                                                                                       approaches look at multi-resolution approaches, such as\nMatching strategies are paired with"
+  },
+  {
+   "start": 23609,
+   "end": 23998,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 23365",
+   "id": null,
+   "text": "The most obvious matching strategy is the exhaustive                                                   Similar approaches can be taken by using other types of\nsearch, i.e., looking at all potential tr"
+  },
+  {
+   "start": 23998,
+   "end": 24085,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 23452",
+   "id": null,
+   "text": "Of course, this approach becomes                                                    6."
+  },
+  {
+   "start": 24085,
+   "end": 24224,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 23591",
+   "id": null,
+   "text": "A FEW IMAGE REGISTRATION ALGORITHMS\nexponential with the dimensionality of the transformation\nspace and can rarely be applied in practice."
+  },
+  {
+   "start": 24224,
+   "end": 24697,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 24064",
+   "id": null,
+   "text": "In this section, a few algorithms combining previously\n                                                                                                       described feature extraction methods, simi"
+  },
+  {
+   "start": 24697,
+   "end": 24771,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 24138",
+   "id": null,
+   "text": "Goshtasby, 2-D and 3-D Image Registration for Medical,\nprevious sections."
+  },
+  {
+   "start": 24771,
+   "end": 24978,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 24345",
+   "id": null,
+   "text": "Remote sensing, and Industrial Applications, John Wiley and Sons,\n                                                                   Hoboken, N.J., 2005.\n6.1."
+  },
+  {
+   "start": 24978,
+   "end": 25047,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 24414",
+   "id": null,
+   "text": "Wavelet and Wavelet-Like Based Algorithms                     [6] W."
+  },
+  {
+   "start": 25047,
+   "end": 25057,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 24424",
+   "id": null,
+   "text": "Czaja, B."
+  },
+  {
+   "start": 25057,
+   "end": 25069,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 24436",
+   "id": null,
+   "text": "Manning, J."
+  },
+  {
+   "start": 25069,
+   "end": 25080,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 24447",
+   "id": null,
+   "text": "Murphy, K."
+  },
+  {
+   "start": 25080,
+   "end": 25233,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 24600",
+   "id": null,
+   "text": "Stubbs, 2016, “Discrete\n                                                                   Directional Gabor Frames,” Applied & Compl Harmonic Analysis."
+  },
+  {
+   "start": 25233,
+   "end": 25307,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 24674",
+   "id": null,
+   "text": "Our team developed several algorithms based on wavelet or          [7] I."
+  },
+  {
+   "start": 25307,
+   "end": 25323,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 24690",
+   "id": null,
+   "text": "Zavorin, and J."
+  },
+  {
+   "start": 25323,
+   "end": 25693,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 25060",
+   "id": null,
+   "text": "Le Moigne, “Use of Multiresolution Wavelet\nwavelet-like features, using several similarity metrics such       Feature Pyramids for Automatic Registration of Multisensor\nas L2 Norm and mutual informati"
+  },
+  {
+   "start": 25693,
+   "end": 25704,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 25071",
+   "id": null,
+   "text": "Murphy, J."
+  },
+  {
+   "start": 25704,
+   "end": 25718,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 25085",
+   "id": null,
+   "text": "Le Moigne, D."
+  },
+  {
+   "start": 25718,
+   "end": 25971,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 25338",
+   "id": null,
+   "text": "Harding, “Automatic Registration\nresolution optimization matching strategy following the\n                                                                   of Multi-Modal Remotely Sensed Data with Glo"
+  },
+  {
+   "start": 25971,
+   "end": 26021,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 25388",
+   "id": null,
+   "text": "Results, presented         Features,” IEEE Trans."
+  },
+  {
+   "start": 26021,
+   "end": 26136,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 25503",
+   "id": null,
+   "text": "Geosc. & Remote Sensing, 54, No.3, 2016.\nin refs [1,7,8], show the strengths and weaknesses of various      [9] C."
+  },
+  {
+   "start": 26136,
+   "end": 26150,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 25517",
+   "id": null,
+   "text": "Harris and M."
+  },
+  {
+   "start": 26150,
+   "end": 26385,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 25752",
+   "id": null,
+   "text": "Stephens, “A Combined Corner and Edge\nfeatures depending on the initial conditions of the                Detector,” 4th Vision Conference, pp. 147-151, 1988.\noptimization process; some features will p"
+  },
+  {
+   "start": 26385,
+   "end": 26753,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 26120",
+   "id": null,
+   "text": "Lowe, “Local Feature View Clustering for 3D Object\nregistration accuracy when starting close to the solution,         Recognition,” IEEE Conference on Computer Vision and Pattern\nwhile some other feat"
+  },
+  {
+   "start": 26753,
+   "end": 26766,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 26133",
+   "id": null,
+   "text": "Kupfer, N.S."
+  },
+  {
+   "start": 26766,
+   "end": 26784,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 26151",
+   "id": null,
+   "text": "Netanyahu, and I."
+  },
+  {
+   "start": 26784,
+   "end": 26866,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 26233",
+   "id": null,
+   "text": "Shimshoni, “An Efficient,\nwhen the optimization starts further from the solution."
+  },
+  {
+   "start": 26866,
+   "end": 27305,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 26672",
+   "id": null,
+   "text": "SIFT-Based Mode-Seeking Algorithm for Sub-Pixel Registration\nResults presented in [8] also show that for very textured          of Remotely Sensed Images,” IEEE Geoscience and Remote\nimages, regular f"
+  },
+  {
+   "start": 27305,
+   "end": 27320,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 26687",
+   "id": null,
+   "text": "Orchard, E.-C."
+  },
+  {
+   "start": 27320,
+   "end": 27334,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 26701",
+   "id": null,
+   "text": "Chang, and S."
+  },
+  {
+   "start": 27334,
+   "end": 27501,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 26868",
+   "id": null,
+   "text": "Martucci, “A\naccount (such as shearlets) can quickly provide an                 fast direct Fourier-based algorithm for subpixel registration of\napproximate solution."
+  },
+  {
+   "start": 27501,
+   "end": 27567,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 26934",
+   "id": null,
+   "text": "Mutual information, although                 images”, IEEE Trans."
+  },
+  {
+   "start": 27567,
+   "end": 27687,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 27054",
+   "id": null,
+   "text": "Geosc. & Remote Sensing, 39, No. 10, 2001.\ncomputationally more expensive, provides a sharper peak            [13] Q.S."
+  },
+  {
+   "start": 27687,
+   "end": 27696,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 27063",
+   "id": null,
+   "text": "Chen, M."
+  },
+  {
+   "start": 27696,
+   "end": 27712,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 27079",
+   "id": null,
+   "text": "Defrise, and F."
+  },
+  {
+   "start": 27712,
+   "end": 28114,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 27481",
+   "id": null,
+   "text": "Deconinck, “Symmetric phase-\n                                                                   only matched filtering of Fourier-Mellin transforms for image\nand therefore a better accuracy for the fi"
+  },
+  {
+   "start": 28114,
+   "end": 28184,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 27551",
+   "id": null,
+   "text": "Marked Point Process Based Algorithms                         [14] P."
+  },
+  {
+   "start": 28184,
+   "end": 28197,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 27564",
+   "id": null,
+   "text": "Thevenaz, U."
+  },
+  {
+   "start": 28197,
+   "end": 28200,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 27567",
+   "id": null,
+   "text": "E."
+  },
+  {
+   "start": 28200,
+   "end": 28218,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 27585",
+   "id": null,
+   "text": "Ruttimann, and M."
+  },
+  {
+   "start": 28218,
+   "end": 28555,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 27922",
+   "id": null,
+   "text": "Unser, “A pyramid\nMore recently, we performed work using MPP models for              Approach to Subpixel Registration Based on Intensity”, IEEE\ncrater detection and we used these extracted craters as"
+  },
+  {
+   "start": 28555,
+   "end": 28571,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 27938",
+   "id": null,
+   "text": "Cole-Rhodes, K."
+  },
+  {
+   "start": 28571,
+   "end": 28583,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 27950",
+   "id": null,
+   "text": "Johnson, J."
+  },
+  {
+   "start": 28583,
+   "end": 28601,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 27968",
+   "id": null,
+   "text": "Le Moigne, and I."
+  },
+  {
+   "start": 28601,
+   "end": 28659,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 28026",
+   "id": null,
+   "text": "Zavorin,\nfeatures to perform planetary data registration."
+  },
+  {
+   "start": 28659,
+   "end": 28948,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 28315",
+   "id": null,
+   "text": "Hausdorff         “Multiresolution Registration of Remote Sensing Imagery by\ndistance and Mutual Information were used as similarity            Optimization of Mutual Information Using a Stocchastic\nm"
+  },
+  {
+   "start": 28948,
+   "end": 29059,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 28426",
+   "id": null,
+   "text": "Image Processing, 12, No. 12, 2003.\nbased approach were used as search strategies, and a genetic       [16] N."
+  },
+  {
+   "start": 29059,
+   "end": 29073,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 28440",
+   "id": null,
+   "text": "Netanyahu, J."
+  },
+  {
+   "start": 29073,
+   "end": 29090,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 28457",
+   "id": null,
+   "text": "Le Moigne and J."
+  },
+  {
+   "start": 29090,
+   "end": 29156,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 28523",
+   "id": null,
+   "text": "Masek, “Geo-Registration\nalgorithm provided the feature matching."
+  },
+  {
+   "start": 29156,
+   "end": 29272,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 28639",
+   "id": null,
+   "text": "Results are               of Landsat Data by Robust Matching of Wavelet Features,” IEEE\npresented in [22] and [23]."
+  },
+  {
+   "start": 29272,
+   "end": 29450,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 28817",
+   "id": null,
+   "text": "Transactions on Geoscience and Remote Sensing, 42, No. 7, 2004.\n                                                                   [17] G."
+  },
+  {
+   "start": 29450,
+   "end": 29462,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 28829",
+   "id": null,
+   "text": "Troglio, J."
+  },
+  {
+   "start": 29462,
+   "end": 29478,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 28845",
+   "id": null,
+   "text": "Le Moigne, J.A."
+  },
+  {
+   "start": 29478,
+   "end": 29495,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 28862",
+   "id": null,
+   "text": "Benediktsson, G."
+  },
+  {
+   "start": 29495,
+   "end": 29574,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 28941",
+   "id": null,
+   "text": "Moser,\n                                                                   S.B."
+  },
+  {
+   "start": 29574,
+   "end": 29657,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 29024",
+   "id": null,
+   "text": "Serpico, “Automatic Extraction of Ellipsoidal Features for\n                     7."
+  },
+  {
+   "start": 29657,
+   "end": 29932,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 29299",
+   "id": null,
+   "text": "CONCLUSION                                 Planetary Image Registration”, IEEE Geoscience and Remote\nThis paper presented a brief introduction to remote sensing        Sensing Letters, 9, No.1, 2012.\n"
+  },
+  {
+   "start": 29932,
+   "end": 29945,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 29312",
+   "id": null,
+   "text": "Elhanany, M."
+  },
+  {
+   "start": 29945,
+   "end": 29959,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 29326",
+   "id": null,
+   "text": "Sheinfeld, A."
+  },
+  {
+   "start": 29959,
+   "end": 29968,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 29335",
+   "id": null,
+   "text": "Beck, Y."
+  },
+  {
+   "start": 29968,
+   "end": 29979,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 29346",
+   "id": null,
+   "text": "Kadmon, N."
+  },
+  {
+   "start": 29979,
+   "end": 30057,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 29424",
+   "id": null,
+   "text": "Tal and\n                                                                   D."
+  },
+  {
+   "start": 30057,
+   "end": 30169,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 29536",
+   "id": null,
+   "text": "Tirosh, “Robust Image Registration Based on Feedforward\nextraction, similarity metrics and matching strategies."
+  },
+  {
+   "start": 30169,
+   "end": 30425,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 29792",
+   "id": null,
+   "text": "These      Neural Networks”, 2000 IEEE International Conference on\ncomponents need to be adapted to the variety of data to            Systems, Man and Cybernetics, Oct. 8-11, 2000.\nregister, the many "
+  },
+  {
+   "start": 30425,
+   "end": 30439,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 29806",
+   "id": null,
+   "text": "Pelissier, M."
+  },
+  {
+   "start": 30439,
+   "end": 30449,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 29816",
+   "id": null,
+   "text": "Halem, T."
+  },
+  {
+   "start": 30449,
+   "end": 30459,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 29826",
+   "id": null,
+   "text": "Clune, J."
+  },
+  {
+   "start": 30459,
+   "end": 30538,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 29905",
+   "id": null,
+   "text": "Le Moigne, and G.\nas well as the many applications registration is needed for."
+  },
+  {
+   "start": 30538,
+   "end": 30932,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 30299",
+   "id": null,
+   "text": "Nearing, “Image Registration and Data Assimilation as a QUBO\nCurrent and future work will involve a systematic                  on the D-Wave Quantum Annealer”, 2016 American Geophysical\nassessment of"
+  },
+  {
+   "start": 30932,
+   "end": 30943,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 30310",
+   "id": null,
+   "text": "Han and Y."
+  },
+  {
+   "start": 30943,
+   "end": 31208,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 30575",
+   "id": null,
+   "text": "Byun, “Automatic and Accurate Registration\nusers choose the most appropriate image registration\n                                                                   of Very High Resolution Optical and S"
+  },
+  {
+   "start": 31208,
+   "end": 31259,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 30626",
+   "id": null,
+   "text": "Quadtree Structure”, Intern J."
+  },
+  {
+   "start": 31259,
+   "end": 31367,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 30734",
+   "id": null,
+   "text": "Remote Sensing, 36, No. 9, 2015.\n                                                                   [21] G."
+  },
+  {
+   "start": 31367,
+   "end": 31379,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 30746",
+   "id": null,
+   "text": "Troglio, J."
+  },
+  {
+   "start": 31379,
+   "end": 31382,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 30749",
+   "id": null,
+   "text": "A."
+  },
+  {
+   "start": 31382,
+   "end": 31399,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 30766",
+   "id": null,
+   "text": "Benediktsson, G."
+  },
+  {
+   "start": 31399,
+   "end": 31412,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 30779",
+   "id": null,
+   "text": "Moser and S."
+  },
+  {
+   "start": 31412,
+   "end": 31415,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 30782",
+   "id": null,
+   "text": "B."
+  },
+  {
+   "start": 31415,
+   "end": 31448,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 30815",
+   "id": null,
+   "text": "Serpico,\n                     8."
+  },
+  {
+   "start": 31448,
+   "end": 31561,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 30928",
+   "id": null,
+   "text": "REFERENCES                                 “Crater Detection Based on Marked Point Processes,” Signal and\n[1] J."
+  },
+  {
+   "start": 31561,
+   "end": 31577,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 30944",
+   "id": null,
+   "text": "Le Moigne, N.S."
+  },
+  {
+   "start": 31577,
+   "end": 31597,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 30964",
+   "id": null,
+   "text": "Netanyahu, and R.D."
+  },
+  {
+   "start": 31597,
+   "end": 31675,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 31042",
+   "id": null,
+   "text": "Eastman, Image          Image Processing for Remote Sensing, CRC Press, 2012."
+  },
+  {
+   "start": 31675,
+   "end": 31724,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 31091",
+   "id": null,
+   "text": "Registration for Remote Sensing, Cambridge Univ."
+  },
+  {
+   "start": 31724,
+   "end": 31750,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 31117",
+   "id": null,
+   "text": "Press, 2011.      [22] A."
+  },
+  {
+   "start": 31750,
+   "end": 31762,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 31129",
+   "id": null,
+   "text": "Gotelli, J."
+  },
+  {
+   "start": 31762,
+   "end": 31776,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 31143",
+   "id": null,
+   "text": "Le Moigne, G."
+  },
+  {
+   "start": 31776,
+   "end": 31788,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 31155",
+   "id": null,
+   "text": "Moser, S.B."
+  },
+  {
+   "start": 31788,
+   "end": 31817,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 31184",
+   "id": null,
+   "text": "Serpico, “Planetary\n[2] L.G."
+  },
+  {
+   "start": 31817,
+   "end": 31975,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 31342",
+   "id": null,
+   "text": "Brown, “A survey of image registration techniques”, ACM   Crater Detection and Registration Using Marked Point Processes,\nComputing Surveys, 24, No. 4, 1992."
+  },
+  {
+   "start": 31975,
+   "end": 32074,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 31441",
+   "id": null,
+   "text": "Graph Cut Algorithms, and Wavelet Transforms”, IGARSS17.\n[3] L.M.G."
+  },
+  {
+   "start": 32074,
+   "end": 32091,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 31458",
+   "id": null,
+   "text": "Fonseca and B.S."
+  },
+  {
+   "start": 32091,
+   "end": 32138,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 31505",
+   "id": null,
+   "text": "Manjunath, “Registration techniques    [23] D."
+  },
+  {
+   "start": 32138,
+   "end": 32150,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 31517",
+   "id": null,
+   "text": "Solarna, G."
+  },
+  {
+   "start": 32150,
+   "end": 32160,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 31527",
+   "id": null,
+   "text": "Moser, J."
+  },
+  {
+   "start": 32160,
+   "end": 32179,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 31546",
+   "id": null,
+   "text": "Le Moigne and S.B."
+  },
+  {
+   "start": 32179,
+   "end": 32366,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 31733",
+   "id": null,
+   "text": "Serpico,\nfor multisensor remotely sensed imagery”, Photogrammetric          “Planetary Crater Detection and Registration Using Marked Point\nEngineering & Remote Sensing, 62, No. 9, 1996."
+  },
+  {
+   "start": 32366,
+   "end": 32453,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 31820",
+   "id": null,
+   "text": "Processes, Multiple Birth and Death Algorithms, and Region-\n[4] B."
+  },
+  {
+   "start": 32453,
+   "end": 32467,
+   "type": "sentence",
+   "basis": "sentence punctuation at byte 31834",
+   "id": null,
+   "text": "Zitova and J."
+  },
+  {
+   "start": 32467,
+   "end": 32598,
+   "type": "sentence",
+   "basis": "trailing text",
+   "id": null,
+   "text": "Flusser, “Image registration methods: a       Based Analysis”, IGARSS17.\nsurvey”, Image and Vision Computing, 21, No. 11, 2003."
+  }
+ ]
+}

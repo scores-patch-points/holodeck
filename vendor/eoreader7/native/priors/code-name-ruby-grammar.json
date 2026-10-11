@@ -1,0 +1,6756 @@
+{
+ "schema": "CodeNamePrior@1",
+ "language": "ruby",
+ "provenance": {
+  "giver": "tree-sitter grammar parses (tree-sitter-language-pack 1.21.0 via eval/coding-competence/gold.py, gold-1) of the manifest ruby TRAIN split, fetched repositories only (4 permissively licensed repositories): a treebank-like corpus; labels are definition-name nodes of the grammar's own tags.scm (core kinds method, class, module)",
+  "split": "train",
+  "manifest": "manifest.json",
+  "manifestGeneratedAt": "2026-10-05T20:16:47Z",
+  "splitRule": "BY REPOSITORY: sha256(lower(owner/repo)) mod 4 -> {0,1:train, 2:dev, 3:test}",
+  "trainRepos": [
+   "Homebrew/brew",
+   "apache/thrift",
+   "fastlane/fastlane",
+   "postalserver/postal"
+  ],
+  "trainRepoFiles": {
+   "Homebrew/brew": 60,
+   "apache/thrift": 60,
+   "fastlane/fastlane": 60,
+   "postalserver/postal": 60
+  },
+  "trainRepoDetails": [
+   {
+    "repo": "Homebrew/brew",
+    "url": "https://github.com/Homebrew/brew",
+    "commit": "8e124cf27a52937b721566fec9c43da55ba9ab7c",
+    "license": "bsd-2-clause",
+    "fetched_at": "2026-10-05T19:29:12Z",
+    "files": 60
+   },
+   {
+    "repo": "apache/thrift",
+    "url": "https://github.com/apache/thrift",
+    "commit": "50bbda109593a0b5c7634ac21c5d98eee97fe7ec",
+    "license": "apache-2.0",
+    "fetched_at": "2026-10-05T19:28:47Z",
+    "files": 60
+   },
+   {
+    "repo": "fastlane/fastlane",
+    "url": "https://github.com/fastlane/fastlane",
+    "commit": "596db349d17c3bdda6db9a6d9c5e4aa71bfab7cb",
+    "license": "mit",
+    "fetched_at": "2026-10-05T19:29:11Z",
+    "files": 60
+   },
+   {
+    "repo": "postalserver/postal",
+    "url": "https://github.com/postalserver/postal",
+    "commit": "d96eddbadeda600595d6247486f9ceb8e99cbc15",
+    "license": "mit",
+    "fetched_at": "2026-10-05T19:32:16Z",
+    "files": 60
+   }
+  ],
+  "trainFiles": 240,
+  "trainFilesDigestSha256": "95004c5ac68f6eb905755d398d737df149c01c5e1a195d78431d3ceb68c29539",
+  "filesExcluded": {
+   "gold_error": 0,
+   "parse_fail": 0,
+   "not_fetched_or_unverified_licence": [
+    {
+     "repo": "rails/rails",
+     "rel": "railties_lib_rails_application.rb",
+     "why": "origin ethos-local: licence \"known-upstream-unverified-locally\", commit null: not verified at fetch (rule 11)"
+    }
+   ]
+  },
+  "recipe": {
+   "kind": "grammar definition names (gold defs of CORE kinds)",
+   "coreKinds": [
+    "function",
+    "method",
+    "class",
+    "interface",
+    "type",
+    "enum",
+    "variant",
+    "module",
+    "macro",
+    "table",
+    "view",
+    "index",
+    "sequence",
+    "schema",
+    "trigger",
+    "event",
+    "theorem",
+    "paragraph"
+   ],
+   "nameRule": "scope prefix removed (Foo::Bar -> Bar); must match the Ruby identifier law /^[\\p{L}_][\\p{L}\\p{N}_]*[?!]?$/u",
+   "parseFailThreshold": 0.02,
+   "note": "no regex recipe exists for ruby in code-structure.js; the grammar is the recipe"
+  },
+  "builder": "eval/coding-competence/build-ruby-priors.mjs",
+  "builtOn": "2026-10-06",
+  "sumCheck": {
+   "reference": "priors/code-name-ruby.json (eval/coding-competence/build-c2-priors.mjs, unmodified): reproduced entry for entry by this builder's aggregator on the reference's 241-file set",
+   "entryForEntryEqual": true,
+   "entries": 998,
+   "perRepoPartitionSum": 968,
+   "pooledAttestations": 968
+  },
+  "validity": {
+   "genericityVsHeldOutRepo": {
+    "design": "leave-one-repository-out inside TRAIN; names declared in >=2 of the other repos vs exactly 1, hit = declared in the held-out repo",
+    "pooledLift": 28.426086956521743,
+    "rateG": 0.30434782608695654,
+    "rateS": 0.010706638115631691,
+    "controlMedianLift": 0.9535530821917808,
+    "controlMaxLift": 1.372463233356175,
+    "verdict": "pass"
+   },
+   "readerAgreement": {
+    "reader": "adapters/text/code-structure.js parseDeclarations",
+    "declarationsOnTrain": 0,
+    "note": "the reader has no ruby recipe: it declares nothing in these files"
+   }
+  },
+  "gaps": [
+   {
+    "gap": "setters-and-operator-methods-not-tallied",
+    "setters": 4,
+    "operators": 7,
+    "note": "gold.py emits no def for `def name=(v)` or operator methods (`==`, `[]`, `<=>`...); a literal line scan of the TRAIN files counts the omissions"
+   },
+   {
+    "gap": "four-train-repos",
+    "note": "genericity at floor 2 rests on 4 repositories; a name is generic here only if it recurs in 2 of 4"
+   },
+   {
+    "gap": "ethos-local-rails-excluded",
+    "note": "rails/rails (1 file, origin ethos-local, licence not verified locally) is excluded; including it changes 5 names' repo counts and adds 55 names (card I1)"
+   },
+   {
+    "gap": "scoped-names-by-last-segment",
+    "note": "a scoped declaration `class Foo::Bar` is tallied as Bar; the incumbent code-name-ruby.json tallies it as Foo (card N1b)"
+   }
+  ],
+  "note": "genericity is a fact about this language's own codebases: repos counts only the TRAIN repositories attesting the name as a declared method/class/module. Names are exact strings; capitalisation is not a witness."
+ },
+ "counts": {
+  "files": 240,
+  "repos": 4,
+  "totalBytes": 1266693,
+  "distinctNames": 943,
+  "totalDeclarations": 1492,
+  "namesAtOrAboveGenericFloor": 19
+ },
+ "names": {
+  "AST": {
+   "repos": 1,
+   "files": 2,
+   "kinds": [
+    "module"
+   ]
+  },
+  "AbstractCoreTap": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "AbstractTab": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "ActionDeletionsScheduledTask": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "Actions": {
+   "repos": 1,
+   "files": 9,
+   "kinds": [
+    "module"
+   ]
+  },
+  "AddEndpointsToMessages": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "AddressEndpointsController": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "AppClipAppStoreReviewDetail": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "AppStoreVersionPhasedRelease": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "AppiumAction": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "AppleDevelopment": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "AppleDistribution": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "ApplePay": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "ApplePayMerchantIdentity": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "Application": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "ApplicationController": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "ApplicationException": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "B2bUser": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "BaseProtocol": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "BaseProtocolFactory": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "BaseServerTransport": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "BenchmarkHandler": {
+   "repos": 1,
+   "files": 2,
+   "kinds": [
+    "class"
+   ]
+  },
+  "BenchmarkManager": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "BinaryProtocol": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "BinaryProtocolAcceleratedFactory": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "BinaryProtocolFactory": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "BounceMessage": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "BuildUpload": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "Bundle": {
+   "repos": 1,
+   "files": 2,
+   "kinds": [
+    "module"
+   ]
+  },
+  "Bytes": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "module"
+   ]
+  },
+  "CacheStore": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "Cask": {
+   "repos": 1,
+   "files": 5,
+   "kinds": [
+    "module"
+   ]
+  },
+  "CaskAST": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "CaskBlock": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "Caveats": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "Certificate": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "CheckAllDNSScheduledTask": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "ClassMethods": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "module"
+   ]
+  },
+  "Cleaner": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "module"
+   ]
+  },
+  "Client": {
+   "repos": 2,
+   "files": 3,
+   "kinds": [
+    "class",
+    "module"
+   ]
+  },
+  "CloudContainer": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "Cmd": {
+   "repos": 1,
+   "files": 6,
+   "kinds": [
+    "module"
+   ]
+  },
+  "CompletionsCmd": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "ConfigParser": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "ConnectAPI": {
+   "repos": 1,
+   "files": 3,
+   "kinds": [
+    "class"
+   ]
+  },
+  "ConnectAPIStubbing": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "ConvertDatabaseToUtf8mb4": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "Cop": {
+   "repos": 1,
+   "files": 7,
+   "kinds": [
+    "module"
+   ]
+  },
+  "CoreTap": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "CreateClicks": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "CreateLinks": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "CreateMigrations": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "CreateRawMessageSizes": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "CreateSpamChecks": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "CreateStats": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "Credential": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "CredentialsController": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "Delivery": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "DevCmd": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "module"
+   ]
+  },
+  "DeveloperIdApplication": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "DeveloperIdInstaller": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "Development": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "DevelopmentPush": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "DisplayFamily": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "Docs": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "module"
+   ]
+  },
+  "DotgpgEnvironmentAction": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "Endpoint": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "EnvActivation": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "module"
+   ]
+  },
+  "EphemeralServerSocket": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "Exception": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "Fastlane": {
+   "repos": 1,
+   "files": 13,
+   "kinds": [
+    "module"
+   ]
+  },
+  "FinalUpgradeSummary": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "Fixes": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "module"
+   ]
+  },
+  "FormulaAST": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "FormulaAudit": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "module"
+   ]
+  },
+  "FormulaPin": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "FormulaeUpgradeContext": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "Frameit": {
+   "repos": 1,
+   "files": 2,
+   "kinds": [
+    "module"
+   ]
+  },
+  "GeneralHelpers": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "module"
+   ]
+  },
+  "GenericUnar": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "GetGithubReleaseAction": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "GetInfoPlistValueAction": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "GitPullAction": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "Gym": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "module"
+   ]
+  },
+  "Handler": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "HardwareKeyboardFix": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "HasPrometheusMetrics": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "module"
+   ]
+  },
+  "Hashcash": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "module"
+   ]
+  },
+  "HeaderProtocol": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "HeaderProtocolFactory": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "Homebrew": {
+   "repos": 1,
+   "files": 15,
+   "kinds": [
+    "module"
+   ]
+  },
+  "HomepageHelper": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "module"
+   ]
+  },
+  "IOStreamTransport": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "IPPoolRulesController": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "InHouse": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "IncreaseLinksUrlSize": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "InitialProcessor": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "InitialSchema": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "Install": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "module"
+   ]
+  },
+  "Internal": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "module"
+   ]
+  },
+  "LastGitCommitAction": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "LegacyAPI": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "module"
+   ]
+  },
+  "Lgtm": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "Livecheck": {
+   "repos": 1,
+   "files": 2,
+   "kinds": [
+    "module"
+   ]
+  },
+  "LuaRock": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "Mac": {
+   "repos": 1,
+   "files": 2,
+   "kinds": [
+    "module"
+   ]
+  },
+  "MacAppDistribution": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "MacDevelopment": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "MacDevelopmentPush": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "MacEditor": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "MacInstallerDistribution": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "MacOSRequirement": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "MacProductionPush": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "MakeChangelogFromJenkinsAction": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "Manager": {
+   "repos": 1,
+   "files": 2,
+   "kinds": [
+    "class"
+   ]
+  },
+  "MarkdownDocsGenerator": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "MatchNukeAction": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "MemoryBufferTransport": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "MessageDB": {
+   "repos": 1,
+   "files": 10,
+   "kinds": [
+    "module"
+   ]
+  },
+  "MessageDequeuer": {
+   "repos": 1,
+   "files": 3,
+   "kinds": [
+    "module"
+   ]
+  },
+  "MessageInspection": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "Messages": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "Migrations": {
+   "repos": 1,
+   "files": 9,
+   "kinds": [
+    "module"
+   ]
+  },
+  "Missing": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "module"
+   ]
+  },
+  "MissingFormula": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "module"
+   ]
+  },
+  "NoCommandLiteral": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "OS": {
+   "repos": 1,
+   "files": 2,
+   "kinds": [
+    "module"
+   ]
+  },
+  "OSDependsOn": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "OnUrlStanza": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "module"
+   ]
+  },
+  "OrganizationIPPoolsController": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "Passbook": {
+   "repos": 1,
+   "files": 2,
+   "kinds": [
+    "class"
+   ]
+  },
+  "PhasedReleaseState": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "module"
+   ]
+  },
+  "Playground": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "Portal": {
+   "repos": 1,
+   "files": 3,
+   "kinds": [
+    "module"
+   ]
+  },
+  "Postal": {
+   "repos": 1,
+   "files": 14,
+   "kinds": [
+    "module"
+   ]
+  },
+  "Precheck": {
+   "repos": 1,
+   "files": 2,
+   "kinds": [
+    "module"
+   ]
+  },
+  "ProcessorSpec": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "Produce": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "module"
+   ]
+  },
+  "Production": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "ProductionPush": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "ProtocolBenchmark": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "module"
+   ]
+  },
+  "ProtocolDecorator": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "module"
+   ]
+  },
+  "ProtocolException": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "PruneWebhookRequestsScheduledTask": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "PushCertificate": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "PyenvSync": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "ReceivedHeader": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "ResetSimulators": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "Route": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "RuboCop": {
+   "repos": 1,
+   "files": 8,
+   "kinds": [
+    "module"
+   ]
+  },
+  "SMTPClient": {
+   "repos": 1,
+   "files": 3,
+   "kinds": [
+    "module"
+   ]
+  },
+  "SMTPServer": {
+   "repos": 1,
+   "files": 2,
+   "kinds": [
+    "module"
+   ]
+  },
+  "SMTPSessionNotStartedError": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "SSLSocket": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "Scan": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "module"
+   ]
+  },
+  "SecondHandler": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "SelfExtractingExecutable": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "SendController": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "Serializer": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "Server": {
+   "repos": 2,
+   "files": 4,
+   "kinds": [
+    "class",
+    "module"
+   ]
+  },
+  "ServersController": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "SessionsController": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "SetupRuby": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "Sha256ArchOrder": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "SharedValues": {
+   "repos": 1,
+   "files": 4,
+   "kinds": [
+    "module"
+   ]
+  },
+  "Shell": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "module"
+   ]
+  },
+  "Signer": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "SimpleClientTest": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "SimpleHandler": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "SimpleServer": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "SimulatorLauncherConfiguration": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "SkipConditions": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "module"
+   ]
+  },
+  "Skipper": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "module"
+   ]
+  },
+  "Snapshot": {
+   "repos": 1,
+   "files": 4,
+   "kinds": [
+    "module"
+   ]
+  },
+  "SocketServer": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "Spaceship": {
+   "repos": 1,
+   "files": 12,
+   "kinds": [
+    "module"
+   ]
+  },
+  "Sparkle": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "SpecServerSocket": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "SpecTransport": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "SrvHandler": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "Staged": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "module"
+   ]
+  },
+  "StanzaBlock": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "StopAfterVoidHandler": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "Strategy": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "module"
+   ]
+  },
+  "Struct": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "module"
+   ]
+  },
+  "Struct_Union": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "module"
+   ]
+  },
+  "TapCmd": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "TestCompactProtocol": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "TestException": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "TestJsonProtocol": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "TestLogger": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "ThreadPoolServer": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "ThreadedServer": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "Thrift": {
+   "repos": 1,
+   "files": 20,
+   "kinds": [
+    "module"
+   ]
+  },
+  "ToolNameFormatting": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "TrackDomainsController": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "Tunes": {
+   "repos": 1,
+   "files": 3,
+   "kinds": [
+    "module"
+   ]
+  },
+  "UNIXSocket": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "Union": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "UnpackStrategy": {
+   "repos": 1,
+   "files": 3,
+   "kinds": [
+    "module"
+   ]
+  },
+  "Update": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "UpdateReport": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "UpgradeCmd": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "User": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "Users": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "Utils": {
+   "repos": 1,
+   "files": 2,
+   "kinds": [
+    "module"
+   ]
+  },
+  "Variables": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "VoipPush": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "VscodeExtension": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "WebhookEvent": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "WebsitePush": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "XctoolAction": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "_endpoint": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "accept": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "actions_md_contents": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "actions_path": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "activate_extensions!": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "add": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "add_bottle_block": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "add_missing_os_dependency": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "add_offenses": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "add_stable_stanzas_after": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "add_stanza": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "add_stanzas_after": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "add_transform": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "additional_route_endpoints_array": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "admin_required": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "alias_dir": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "alias_file_to_name": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "alias_table": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "all": {
+   "repos": 1,
+   "files": 5,
+   "kinds": [
+    "method"
+   ]
+  },
+  "all_actions_from_enhancer": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "all_version_changes": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "allow_non_target_configuration_file": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "allow_target_configuration_file": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "allows?": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "analytics_message": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "analyze_output": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "append_features": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "append_info_to_payload": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "ask_for_2fa_code": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "assignments": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "audit_exceptions": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "audit_formula": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "audit_homepage": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "auth_session_error": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "author": {
+   "repos": 1,
+   "files": 3,
+   "kinds": [
+    "method"
+   ]
+  },
+  "authors": {
+   "repos": 1,
+   "files": 6,
+   "kinds": [
+    "method"
+   ]
+  },
+  "auto_update_header": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "autobump": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "autocorrect_macos_comparison_strings": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "available": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "available_options": {
+   "repos": 1,
+   "files": 7,
+   "kinds": [
+    "method"
+   ]
+  },
+  "available_port": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "banner_name": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "bare_os_depends_on?": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "batch_installable?": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "begin_password_reset": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "benchmark_scenarios": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "binary_message": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "binary_protocol": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "binary_protocol_builder": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "blank_node?": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "block": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "body": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "body_children": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "bottle_block": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "build_client": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "build_io_manager": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "build_message": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "build_sample_structs": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "build_scenarios": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "build_server": {
+   "repos": 1,
+   "files": 2,
+   "kinds": [
+    "method"
+   ]
+  },
+  "build_ssl_client": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "building_mac_catalyst_for_mac?": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "call": {
+   "repos": 1,
+   "files": 3,
+   "kinds": [
+    "method"
+   ]
+  },
+  "call_node_match?": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "can_extract?": {
+   "repos": 1,
+   "files": 3,
+   "kinds": [
+    "method"
+   ]
+  },
+  "canonical_remote?": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "capture_accept": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "cask_deprecated": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "cask_deps": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "cask_disabled": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "cask_extract_plist": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "cask_node": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "cask_reason": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "cask_url_unversioned": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "cask_version_latest": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "category": {
+   "repos": 1,
+   "files": 9,
+   "kinds": [
+    "method"
+   ]
+  },
+  "change_paths_to_absolutes!": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "check": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "check_conflicting_os_requirements": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "check_fonts": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "check_label": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "check_message_exists": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "check_message_is_ready": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "check_redundant_bare_macos": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "check_string_size": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "choose_phone_number": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "cleanup!": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "cleanup_heading": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "cleanup_items": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "clear_everything!": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "clear_headers": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "close": {
+   "repos": 1,
+   "files": 4,
+   "kinds": [
+    "method"
+   ]
+  },
+  "closed?": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "collect_output": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "compact_message": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "compact_protocol_builder": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "complete": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "component_match?": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "configure_rspec": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "configured_ssl_context": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "connect_ssl_client": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "connection_sending": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "contains_call?": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "convert_to_string": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "convert_to_utf8_byte_buffer": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "core_tap?": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "create": {
+   "repos": 3,
+   "files": 10,
+   "kinds": [
+    "method"
+   ]
+  },
+  "create!": {
+   "repos": 1,
+   "files": 3,
+   "kinds": [
+    "method"
+   ]
+  },
+  "create_certificate_signing_request": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "create_client_ssl_context": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "create_factories": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "create_from_oidc": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "create_messages": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "create_parser_fuzzer": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "create_plain_text_message": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "create_protocol": {
+   "repos": 1,
+   "files": 2,
+   "kinds": [
+    "method"
+   ]
+  },
+  "create_roundtrip_fuzzer": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "create_server_ssl_context": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "cross_platform_cask?": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "csh_quote": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "custom_action_docs_path": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "default_helo_hostname": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "delete!": {
+   "repos": 1,
+   "files": 2,
+   "kinds": [
+    "method"
+   ]
+  },
+  "dependencies": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "depends_on_macos?": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "depends_on_pairs": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "deps": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "dequeue_pending_seqid": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "description": {
+   "repos": 2,
+   "files": 11,
+   "kinds": [
+    "method"
+   ]
+  },
+  "deserialize": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "destroy": {
+   "repos": 1,
+   "files": 6,
+   "kinds": [
+    "method"
+   ]
+  },
+  "details": {
+   "repos": 1,
+   "files": 6,
+   "kinds": [
+    "method"
+   ]
+  },
+  "detect_appium": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "device_line_usable?": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "devices": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "differences": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "direct_stanzas": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "disallowed_reason": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "dispatch": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "display_caveats": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "display_install_times": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "display_messages": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "display_s": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "docs": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "donation_message": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "download": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "download_raw": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "each_field": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "email_tag": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "empty": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "empty_byte_buffer": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "endpoints": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "ensure_installed!": {
+   "repos": 1,
+   "files": 2,
+   "kinds": [
+    "method"
+   ]
+  },
+  "eql?": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "example_code": {
+   "repos": 1,
+   "files": 9,
+   "kinds": [
+    "method"
+   ]
+  },
+  "exception_initialize": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "executable_path?": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "execute_action_command": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "expect_forced_screen_size": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "expect_invalid_screen_size_from_file": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "expect_screen_size_from_file": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "export_value": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "extensions": {
+   "repos": 1,
+   "files": 4,
+   "kinds": [
+    "method"
+   ]
+  },
+  "extract_to_dir": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "factory": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "fetch_value": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "fetched_head_formula_current?": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "fibonacci": {
+   "repos": 1,
+   "files": 2,
+   "kinds": [
+    "method"
+   ]
+  },
+  "field_accessor": {
+   "repos": 1,
+   "files": 2,
+   "kinds": [
+    "method"
+   ]
+  },
+  "field_info": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "fields_with_default_values": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "filename_for_action": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "fill_built_in_actions": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "filter_items": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "filter_runtimes": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "final_upgrade_summary": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "find": {
+   "repos": 1,
+   "files": 4,
+   "kinds": [
+    "method"
+   ]
+  },
+  "find_by_name_and_domain": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "find_from_oidc": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "find_helper": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "find_other_messages_for_batch": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "find_tool_name_formatting_errors": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "find_versions": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "finish_password_reset": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "finish_smtp_session": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "first_stanza_value": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "flash_now": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "flush": {
+   "repos": 1,
+   "files": 3,
+   "kinds": [
+    "method"
+   ]
+  },
+  "force_binary_encoding": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "formula_component_before_target?": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "formula_deprecated": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "formula_dir": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "formula_disabled": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "formula_file_to_name": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "formula_files": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "formula_files_by_name": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "formula_head_only": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "formula_names": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "formula_outdated?": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "formula_renames": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "formula_to_dep_hash": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "formula_upgrade_descriptions": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "formula_upgrade_display_version": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "formula_upgrade_size": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "formula_versioned": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "formulae_upgrade_context": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "forward_address": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "framed": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "frames_queued": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "from_file": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "from_file_content": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "from_path": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "from_username": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "full_stanza_source_range": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "generate": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "generate!": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "generate_accessors": {
+   "repos": 1,
+   "files": 2,
+   "kinds": [
+    "method"
+   ]
+  },
+  "generate_background": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "generate_key": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "generate_team_table": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "get_headers": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "get_protocol": {
+   "repos": 1,
+   "files": 4,
+   "kinds": [
+    "method"
+   ]
+  },
+  "get_set_field": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "get_socket_connection": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "get_string_byte": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "get_struct": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "get_value": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "greeting": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "handle_action_command": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "handle_control_command": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "handle_disconnect": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "handle_message": {
+   "repos": 1,
+   "files": 2,
+   "kinds": [
+    "method"
+   ]
+  },
+  "handle_two_factor": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "handle_two_step": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "handle_two_step_for_device": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "handle_two_step_or_factor": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "has_logged?": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "hash": {
+   "repos": 2,
+   "files": 3,
+   "kinds": [
+    "method"
+   ]
+  },
+  "header": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "header_frame": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "header_protocol_builder": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "ignorable_fuzz_exception?": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "implicitly_trusted?": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "increment_dequeue_metric": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "increment_prometheus_counter": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "index": {
+   "repos": 1,
+   "files": 6,
+   "kinds": [
+    "method"
+   ]
+  },
+  "initialize": {
+   "repos": 4,
+   "files": 43,
+   "kinds": [
+    "method"
+   ]
+  },
+  "input_protocol": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "inspect": {
+   "repos": 2,
+   "files": 3,
+   "kinds": [
+    "method"
+   ]
+  },
+  "inspect_buffer": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "inspect_collection": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "inspect_field": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "install": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "install!": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "install_batch!": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "install_formula?": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "install_from_api_message": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "install_package!": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "installed_extensions": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "installed_info_cask": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "installed_info_formula": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "installed_on_request_present?": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "installed_packages": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "instance": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "integer_or_percentage": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "interactive": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "invoke_appium_server": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "ip": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "ipaddr": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "ipv4?": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "ipv6?": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "is_complex_framing_mode?": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "is_container?": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "is_push?": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "is_supported?": {
+   "repos": 1,
+   "files": 9,
+   "kinds": [
+    "method"
+   ]
+  },
+  "items_from_content": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "json_protocol_builder": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "jwk": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "large_run_label": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "line_end_pos": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "link_completions_manpages_and_docs": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "link_pyenv_versions": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "linuxbrew_core?": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "listen": {
+   "repos": 3,
+   "files": 5,
+   "kinds": [
+    "method"
+   ]
+  },
+  "literal_value": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "load": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "load_actions": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "load_custom_action_md": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "load_custom_action_md_erb": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "load_frame": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "log_line": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "logger": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "login": {
+   "repos": 2,
+   "files": 2,
+   "kinds": [
+    "method"
+   ]
+  },
+  "login_required": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "lookup": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "mac?": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "macos_version_satisfied?": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "make": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "make_phone_watch_pair": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "match?": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "match_phone_to_masked_phone": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "matching_stanzas": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "maximum_version": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "measure_job": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "message": {
+   "repos": 2,
+   "files": 2,
+   "kinds": [
+    "method"
+   ]
+  },
+  "messages_supported?": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "method_definition": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "method_missing": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "migrate_caskroom_caskfiles_to_json": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "migrate_gcc_dependents_if_needed": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "minimum_macos_value?": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "minimum_version": {
+   "repos": 1,
+   "files": 2,
+   "kinds": [
+    "method"
+   ]
+  },
+  "minimum_version_casks": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "mock_trans": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "name": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "name_to_id": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "native?": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "native_available?": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "new": {
+   "repos": 1,
+   "files": 5,
+   "kinds": [
+    "method"
+   ]
+  },
+  "new_formula_path": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "new_formula_subdirectory": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "next_run_after": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "next_seqid!": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "no_changes_message": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "normalize_run_count": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "normalize_scenarios": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "number_of_launches_for_action": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "oauth_failure": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "observe_prometheus_histogram": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "oidc?": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "on_block": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "on_cask": {
+   "repos": 1,
+   "files": 2,
+   "kinds": [
+    "method"
+   ]
+  },
+  "on_cask_stanza_block": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "on_send": {
+   "repos": 1,
+   "files": 2,
+   "kinds": [
+    "method"
+   ]
+  },
+  "on_system_blocks": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "on_xstr": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "open": {
+   "repos": 1,
+   "files": 4,
+   "kinds": [
+    "method"
+   ]
+  },
+  "open?": {
+   "repos": 1,
+   "files": 3,
+   "kinds": [
+    "method"
+   ]
+  },
+  "organizations_scope": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "os_depends_on?": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "os_only_stanza?": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "output": {
+   "repos": 1,
+   "files": 3,
+   "kinds": [
+    "method"
+   ]
+  },
+  "output_protocol": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "output_update_report": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "package_installed": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "package_installed?": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "package_manager_executable": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "package_or_resource_skip": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "package_record": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "packages": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "page_title": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "parent": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "parse": {
+   "repos": 2,
+   "files": 2,
+   "kinds": [
+    "method"
+   ]
+  },
+  "parse_and_execute_command": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "parse_run_options": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "parsed_homebrew_version": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "password?": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "patch": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "path": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "pause": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "peek": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "persist": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "phone_id_from_masked_number": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "phone_id_from_number": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "pin": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "pin_at": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "pinnable?": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "pinned?": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "pinned_version": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "platform_block_stanzas": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "plugin_manager": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "portal_type": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "postmaster_address": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "preferred": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "preferred_path": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "prefetch_outdated_casks!": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "preinstall!": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "prepare_environment": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "prepare_image": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "prepend_path_in_profile": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "primitiveMethod": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "print!": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "print_exception": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "print_skip_information": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "process": {
+   "repos": 2,
+   "files": 2,
+   "kinds": [
+    "method"
+   ]
+  },
+  "process_action_command": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "process_cask": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "process_formula": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "process_message": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "process_source": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "process_work": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "profile": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "profile_redirect_target": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "protocol_class": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "public_key": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "push_mode_from_masked_number": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "push_mode_from_number": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "put_device_into_background": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "pwsh_quote": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "qmark_isset_method": {
+   "repos": 1,
+   "files": 2,
+   "kinds": [
+    "method"
+   ]
+  },
+  "queue": {
+   "repos": 1,
+   "files": 2,
+   "kinds": [
+    "method"
+   ]
+  },
+  "raise_application_exception": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "raise_two_factor_service_errors!": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "raw": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "raw_message": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "read": {
+   "repos": 1,
+   "files": 7,
+   "kinds": [
+    "method"
+   ]
+  },
+  "read_all": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "read_binary": {
+   "repos": 1,
+   "files": 4,
+   "kinds": [
+    "method"
+   ]
+  },
+  "read_binary_fixture_file": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "read_bool": {
+   "repos": 1,
+   "files": 4,
+   "kinds": [
+    "method"
+   ]
+  },
+  "read_byte": {
+   "repos": 1,
+   "files": 5,
+   "kinds": [
+    "method"
+   ]
+  },
+  "read_double": {
+   "repos": 1,
+   "files": 4,
+   "kinds": [
+    "method"
+   ]
+  },
+  "read_field": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "read_field_begin": {
+   "repos": 1,
+   "files": 4,
+   "kinds": [
+    "method"
+   ]
+  },
+  "read_field_end": {
+   "repos": 1,
+   "files": 3,
+   "kinds": [
+    "method"
+   ]
+  },
+  "read_fixture_file": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "read_from": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "read_fuzz_test": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "read_i16": {
+   "repos": 1,
+   "files": 4,
+   "kinds": [
+    "method"
+   ]
+  },
+  "read_i32": {
+   "repos": 1,
+   "files": 4,
+   "kinds": [
+    "method"
+   ]
+  },
+  "read_i64": {
+   "repos": 1,
+   "files": 4,
+   "kinds": [
+    "method"
+   ]
+  },
+  "read_into_buffer": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "read_list_begin": {
+   "repos": 1,
+   "files": 4,
+   "kinds": [
+    "method"
+   ]
+  },
+  "read_list_end": {
+   "repos": 1,
+   "files": 3,
+   "kinds": [
+    "method"
+   ]
+  },
+  "read_map_begin": {
+   "repos": 1,
+   "files": 4,
+   "kinds": [
+    "method"
+   ]
+  },
+  "read_map_end": {
+   "repos": 1,
+   "files": 3,
+   "kinds": [
+    "method"
+   ]
+  },
+  "read_message_begin": {
+   "repos": 1,
+   "files": 4,
+   "kinds": [
+    "method"
+   ]
+  },
+  "read_message_end": {
+   "repos": 1,
+   "files": 3,
+   "kinds": [
+    "method"
+   ]
+  },
+  "read_set_begin": {
+   "repos": 1,
+   "files": 4,
+   "kinds": [
+    "method"
+   ]
+  },
+  "read_set_end": {
+   "repos": 1,
+   "files": 3,
+   "kinds": [
+    "method"
+   ]
+  },
+  "read_string": {
+   "repos": 1,
+   "files": 4,
+   "kinds": [
+    "method"
+   ]
+  },
+  "read_struct_begin": {
+   "repos": 1,
+   "files": 4,
+   "kinds": [
+    "method"
+   ]
+  },
+  "read_struct_end": {
+   "repos": 1,
+   "files": 3,
+   "kinds": [
+    "method"
+   ]
+  },
+  "read_type": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "read_unframed_message": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "read_uuid": {
+   "repos": 1,
+   "files": 4,
+   "kinds": [
+    "method"
+   ]
+  },
+  "readable_category_name": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "rebuild": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "receive_and_process_commands": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "receive_message": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "receive_message_begin": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "record_caveats": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "record_completions_and_elisp": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "record_formula_upgrade_summary": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "redirect_to_with_json": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "redirect_to_with_return_to": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "referenced_skip_information": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "register_prometheus_counter": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "register_prometheus_histogram": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "register_prometheus_metrics": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "registry": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "remote": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "remove_nonexistent": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "remove_patches": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "remove_stable_stanza": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "remove_stable_stanzas": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "remove_stanza": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "remove_stanza_node": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "render_form_errors": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "render_team": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "replace_bottle_block": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "replace_first_stanza_value": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "replace_resource_stanza_hash_value": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "replace_resource_stanza_value": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "replace_resource_stanzas": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "replace_root_stanza_with_arch_blocks": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "replace_stable_stanza_hash_value": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "replace_stable_stanza_value": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "replace_stanza": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "replace_stanza_argument": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "replace_stanza_hash_value": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "replace_stanza_value": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "report_output": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "request_two_factor_code_from_phone": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "request_two_factor_code_from_phone_choose": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "require_local_authentication": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "require_organization_owner": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "rescuable_serve": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "reset!": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "reset_buffer": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "reset_protocol_if_needed": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "reset_smtp_session": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "resolve_const": {
+   "repos": 1,
+   "files": 2,
+   "kinds": [
+    "method"
+   ]
+  },
+  "resource": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "resource_stanza": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "resource_stanza?": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "resource_stanza_group_range": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "resource_stanza_groups": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "resource_stanzas_contiguous?": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "respond_to_missing?": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "resume": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "return_path?": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "return_type": {
+   "repos": 1,
+   "files": 2,
+   "kinds": [
+    "method"
+   ]
+  },
+  "return_value": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "revoke!": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "ruby_literal": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "run": {
+   "repos": 4,
+   "files": 20,
+   "kinds": [
+    "method"
+   ]
+  },
+  "run_event_loop": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "runtimes": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "safe_params": {
+   "repos": 1,
+   "files": 3,
+   "kinds": [
+    "method"
+   ]
+  },
+  "sample_return_value": {
+   "repos": 1,
+   "files": 2,
+   "kinds": [
+    "method"
+   ]
+  },
+  "save_additional_route_endpoints": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "scan": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "scanfile_name": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "scenario": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "screen_size_from": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "secondtestString": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "select_scenarios": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "select_team": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "send_message": {
+   "repos": 2,
+   "files": 2,
+   "kinds": [
+    "method"
+   ]
+  },
+  "send_message_args": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "send_oneway_message": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "send_response": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "send_server_hostname?": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "send_webhooks": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "serialize": {
+   "repos": 1,
+   "files": 2,
+   "kinds": [
+    "method"
+   ]
+  },
+  "serve": {
+   "repos": 1,
+   "files": 3,
+   "kinds": [
+    "method"
+   ]
+  },
+  "server_context": {
+   "repos": 1,
+   "files": 2,
+   "kinds": [
+    "method"
+   ]
+  },
+  "server_hostname_for_verification": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "set_header": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "set_ownership": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "set_permissions": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "set_string_byte": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "set_timezone": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "set_variable_in_profile": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "setup": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "setup_client": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "setup_client_thread": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "setup_tls_client": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "setup_url_rule_mock": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "sh_quote": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "sha1_sign": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "sha1_sign64": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "shell_with_prompt": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "shorten_revision": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "should_report_analytics?": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "show": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "show_final_upgrade_summary": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "show_final_upgrade_summary_section": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "shutdown": {
+   "repos": 1,
+   "files": 3,
+   "kinds": [
+    "method"
+   ]
+  },
+  "sibling_depends_on_calls": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "sibling_depends_on_pairs": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "sign": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "sign64": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "skip": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "skip?": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "skip_information": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "skip_string": {
+   "repos": 1,
+   "files": 4,
+   "kinds": [
+    "method"
+   ]
+  },
+  "skipped_entries": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "sleep": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "sms_automatically_sent": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "sms_fallback": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "socket_class": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "sort_items": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "sorted_field_ids": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "source_range_with_leading_resource_error_comments": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "source_range_with_trailing_comments": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "spam_score": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "spawn": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "srv_test": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "ssl_context": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "ssl_context_with_verify": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "ssl_context_without_verify": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "ssl_keys_dir": {
+   "repos": 1,
+   "files": 3,
+   "kinds": [
+    "method"
+   ]
+  },
+  "stable_children": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "stable_stanza": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "stable_stanza?": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "stanza": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "stanza?": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "stanza_anywhere?": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "stanza_successor": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "stanza_text": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "stanzas": {
+   "repos": 1,
+   "files": 2,
+   "kinds": [
+    "method"
+   ]
+  },
+  "start": {
+   "repos": 2,
+   "files": 2,
+   "kinds": [
+    "method"
+   ]
+  },
+  "start_producing": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "start_server": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "start_smtp_session": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "stop_thread": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "store_session": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "structMethod": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "stub_request": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "stub_users": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "style_exceptions": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "suggest_command": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "supported_color?": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "supported_device?": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "supported_platform?": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "suspend": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "symbol_key": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "synced_versions_formulae": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "tabulate": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "tagged": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "tap": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "tap_failed!": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "tap_migrations": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "tap_or_untap_core_taps_if_necessary": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "teardown": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "testException": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "testInsanity": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "testMapMap": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "testMulti": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "testMultiException": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "testOneway": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "testVoid": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "test_binary": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "test_bool": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "test_byte": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "test_different_data_types": {
+   "repos": 1,
+   "files": 2,
+   "kinds": [
+    "method"
+   ]
+  },
+  "test_double": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "test_enum": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "test_exception": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "test_has_accessible_message": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "test_i32": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "test_i64": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "test_insanity": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "test_list": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "test_map": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "test_map_map": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "test_multi": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "test_multi_exception": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "test_multiplexed": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "test_nest": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "test_oneway": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "test_set": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "test_string": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "test_string_map": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "test_struct": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "test_typedef": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "test_uuid": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "test_void": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "timestamp": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "tls_certificates": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "tls_private_key": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "to_h": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "to_io": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "to_json": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "to_param": {
+   "repos": 1,
+   "files": 2,
+   "kinds": [
+    "method"
+   ]
+  },
+  "to_s": {
+   "repos": 2,
+   "files": 12,
+   "kinds": [
+    "method"
+   ]
+  },
+  "to_smtp_plain": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "toggle_ssl": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "top_level_bare_depends_on_macos_argument": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "top_level_depends_on_macos_pair": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "top_level_linux_depends_on?": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "top_level_macos_depends_on?": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "top_level_stanzas": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "toplevel_stanzas": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "trace_fuzz_target": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "trans": {
+   "repos": 1,
+   "files": 2,
+   "kinds": [
+    "method"
+   ]
+  },
+  "translate_output": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "type": {
+   "repos": 2,
+   "files": 4,
+   "kinds": [
+    "method"
+   ]
+  },
+  "unblock": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "unframed_message": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "uninstall": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "unlisten": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "unpin": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "unsupported_reason": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "unsuspend": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "up": {
+   "repos": 1,
+   "files": 10,
+   "kinds": [
+    "method"
+   ]
+  },
+  "update": {
+   "repos": 2,
+   "files": 8,
+   "kinds": [
+    "method"
+   ]
+  },
+  "update_depends_on_macos_minimum!": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "update_request_headers": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "update_statistics": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "upgrade_outdated_casks!": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "upgrade_outdated_formulae!": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "url_with_return_to": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "usage_type": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "use": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "use_default_protocol": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "validate_container_size": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "validate_domain_belongs_to_server": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "validate_endpoint_belongs_to_server": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "validate_key": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "validate_key_cannot_be_changed": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "validate_key_for_smtp_ip": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "validate_max_string_size": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "validate_message_begin": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "validate_name_uniqueness": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "validate_no_additional_routes_on_non_endpoint_route": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "validate_return_path_route_endpoints": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "validate_route_is_routed": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "validate_values": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "version_specified?": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "versions_from_content": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "voidMethod": {
+   "repos": 1,
+   "files": 2,
+   "kinds": [
+    "method"
+   ]
+  },
+  "wait_for_appium_server": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "wait_until_listening": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "warm_up_scenarios": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "webhook_event": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "webhook_hash": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "where_is": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "which": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "whole_line_range": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "wildcard?": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "with_build_environment": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "with_env": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "with_homebrew_path": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "with_scenario_selected": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "work": {
+   "repos": 1,
+   "files": 2,
+   "kinds": [
+    "method"
+   ]
+  },
+  "write": {
+   "repos": 2,
+   "files": 8,
+   "kinds": [
+    "method"
+   ]
+  },
+  "write_binary": {
+   "repos": 1,
+   "files": 4,
+   "kinds": [
+    "method"
+   ]
+  },
+  "write_bool": {
+   "repos": 1,
+   "files": 4,
+   "kinds": [
+    "method"
+   ]
+  },
+  "write_byte": {
+   "repos": 1,
+   "files": 4,
+   "kinds": [
+    "method"
+   ]
+  },
+  "write_cask": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "write_container": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "write_data": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "write_double": {
+   "repos": 1,
+   "files": 4,
+   "kinds": [
+    "method"
+   ]
+  },
+  "write_field": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "write_field_begin": {
+   "repos": 1,
+   "files": 4,
+   "kinds": [
+    "method"
+   ]
+  },
+  "write_field_end": {
+   "repos": 1,
+   "files": 3,
+   "kinds": [
+    "method"
+   ]
+  },
+  "write_field_stop": {
+   "repos": 1,
+   "files": 4,
+   "kinds": [
+    "method"
+   ]
+  },
+  "write_formula": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "write_fuzz_test": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "write_i16": {
+   "repos": 1,
+   "files": 4,
+   "kinds": [
+    "method"
+   ]
+  },
+  "write_i32": {
+   "repos": 1,
+   "files": 4,
+   "kinds": [
+    "method"
+   ]
+  },
+  "write_i32_size": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "write_i64": {
+   "repos": 1,
+   "files": 4,
+   "kinds": [
+    "method"
+   ]
+  },
+  "write_list_begin": {
+   "repos": 1,
+   "files": 4,
+   "kinds": [
+    "method"
+   ]
+  },
+  "write_list_end": {
+   "repos": 1,
+   "files": 3,
+   "kinds": [
+    "method"
+   ]
+  },
+  "write_map_begin": {
+   "repos": 1,
+   "files": 4,
+   "kinds": [
+    "method"
+   ]
+  },
+  "write_map_end": {
+   "repos": 1,
+   "files": 3,
+   "kinds": [
+    "method"
+   ]
+  },
+  "write_message": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "write_message_begin": {
+   "repos": 1,
+   "files": 4,
+   "kinds": [
+    "method"
+   ]
+  },
+  "write_message_end": {
+   "repos": 1,
+   "files": 3,
+   "kinds": [
+    "method"
+   ]
+  },
+  "write_set_begin": {
+   "repos": 1,
+   "files": 4,
+   "kinds": [
+    "method"
+   ]
+  },
+  "write_set_end": {
+   "repos": 1,
+   "files": 3,
+   "kinds": [
+    "method"
+   ]
+  },
+  "write_string": {
+   "repos": 1,
+   "files": 4,
+   "kinds": [
+    "method"
+   ]
+  },
+  "write_struct_begin": {
+   "repos": 1,
+   "files": 4,
+   "kinds": [
+    "method"
+   ]
+  },
+  "write_struct_end": {
+   "repos": 1,
+   "files": 3,
+   "kinds": [
+    "method"
+   ]
+  },
+  "write_type": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "method"
+   ]
+  },
+  "write_uuid": {
+   "repos": 1,
+   "files": 4,
+   "kinds": [
+    "method"
+   ]
+  }
+ },
+ "builtAt": "2026-10-06T06:22:37.451Z"
+}

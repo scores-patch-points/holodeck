@@ -1,0 +1,5386 @@
+{
+ "schema": "CodeNamePrior@1",
+ "language": "typescript",
+ "provenance": {
+  "giver": "per-language TRAIN-only measurement of the CodeNamePrior@1: the manifest's typescript TRAIN split (a treebank-like corpus of 4 permissively licensed repositories); recipe identical to the family `js` recipe of scripts/build-code-name-prior-split.mjs and to the js recipes adapters/text/code-structure.js applies to .ts files; sum-checked entry for entry against the unmodified split builder run on the same files (762 (name, repo) attestations, equal to its blended tally) and against an independent per-repository partition",
+  "split": "train",
+  "family": "js",
+  "manifest": "/private/tmp/claude-501/code-corpus/manifest.json",
+  "manifestGeneratedAt": "2026-10-05T20:16:47Z",
+  "splitRule": "BY REPOSITORY: sha256(lower(owner/repo)) mod 4 -> {0,1:train, 2:dev, 3:test}",
+  "trainRepos": [
+   "TanStack/query",
+   "gradio-app/gradio",
+   "hoppscotch/hoppscotch",
+   "xyflow/xyflow"
+  ],
+  "trainRepoFiles": {
+   "TanStack/query": 60,
+   "gradio-app/gradio": 60,
+   "hoppscotch/hoppscotch": 60,
+   "xyflow/xyflow": 60
+  },
+  "trainRepoDetails": [
+   {
+    "repo": "TanStack/query",
+    "url": "https://github.com/TanStack/query",
+    "commit": "d169ee87786c250ccc791f5b22c40141a489ec88",
+    "license": "mit",
+    "fetched_at": "2026-10-05T19:27:50Z",
+    "files": 60
+   },
+   {
+    "repo": "gradio-app/gradio",
+    "url": "https://github.com/gradio-app/gradio",
+    "commit": "dea2bf33d79338b2e607689d4b77b9b37d31293b",
+    "license": "apache-2.0",
+    "fetched_at": "2026-10-05T19:27:39Z",
+    "files": 60
+   },
+   {
+    "repo": "hoppscotch/hoppscotch",
+    "url": "https://github.com/hoppscotch/hoppscotch",
+    "commit": "63273f8e599e73f0fb38c0739314e8d46b6bc83d",
+    "license": "mit",
+    "fetched_at": "2026-10-05T19:28:23Z",
+    "files": 60
+   },
+   {
+    "repo": "xyflow/xyflow",
+    "url": "https://github.com/xyflow/xyflow",
+    "commit": "3d35b57317576b0916c0bfeaaedd573aaacc2839",
+    "license": "mit",
+    "fetched_at": "2026-10-05T19:28:26Z",
+    "files": 60
+   }
+  ],
+  "trainFiles": 240,
+  "trainFilesDigestSha256": "854c79456dd313de11868ef2c671ee0983fbe3787275b7c69b16c1075558967a",
+  "filesExcluded": {
+   "restricted_licence": []
+  },
+  "recipe": {
+   "sources": [
+    {
+     "source": "^[ \\t]*(?:export\\s+)?(?:default\\s+)?(?:async\\s+)?function\\s*\\*?\\s+([A-Za-z_$][\\w$]*)",
+     "flags": "gm",
+     "kind": "function"
+    },
+    {
+     "source": "^[ \\t]*(?:export\\s+)?(?:default\\s+)?(?:abstract\\s+)?class\\s+([A-Za-z_$][\\w$]*)",
+     "flags": "gm",
+     "kind": "class"
+    },
+    {
+     "source": "^[ \\t]*(?:export\\s+)?const\\s+([A-Za-z_$][\\w$]*)\\s*=\\s*(?:async\\s*)?\\(?[^=]*?\\)?\\s*=>",
+     "flags": "gm",
+     "kind": "function"
+    }
+   ],
+   "note": "the three js-family recipes of the split builder, verbatim; ASCII identifiers only; sees function declarations, classes and const-arrow functions, NOT interfaces, type aliases, enums, namespaces or methods"
+  },
+  "builder": "eval/coding-competence/build-typescript-priors.mjs",
+  "builtOn": "2026-10-06",
+  "verdicts": {
+   "N1": "pass",
+   "N2": "pass",
+   "N3": "fail",
+   "N4": "fail",
+   "N6": "pass"
+  },
+  "failedChecks": [
+   "N3",
+   "N4"
+  ],
+  "status": "built and shipped WITH its failed checks recorded; read validity and genericityVsHeldOutRepo before relying on a genericity count",
+  "sumCheck": {
+   "reference": "scripts/build-code-name-prior-split.mjs (unmodified)",
+   "entryForEntryEqual": true,
+   "entries": 741,
+   "perRepoPartitionSum": 762,
+   "pooledAttestations": 762,
+   "referenceBlendedAttestations": 762
+  },
+  "validity": {
+   "recipeVsGrammar": {
+    "comparableKinds": [
+     "function",
+     "class"
+    ],
+    "precision": 0.5853018372703412,
+    "recall": 0.8138686131386861,
+    "regexPairs": 762,
+    "goldPairs": 548,
+    "controlPrecision": 0.006561679790026247,
+    "controlRecall": 0.009124087591240875,
+    "verdict": "fail"
+   },
+   "recipeBlindKinds": {
+    "goldCorePairs": 913,
+    "shareSeenByRecipe": 0.488499452354874,
+    "byKind": {
+     "function": {
+      "goldPairs": 485,
+      "seenByRecipe": 383,
+      "share": 0.7896907216494845
+     },
+     "interface": {
+      "goldPairs": 76,
+      "seenByRecipe": 2,
+      "share": 0.02631578947368421
+     },
+     "class": {
+      "goldPairs": 63,
+      "seenByRecipe": 63,
+      "share": 1
+     },
+     "method": {
+      "goldPairs": 139,
+      "seenByRecipe": 7,
+      "share": 0.050359712230215826
+     },
+     "type": {
+      "goldPairs": 164,
+      "seenByRecipe": 0,
+      "share": 0
+     },
+     "enum": {
+      "goldPairs": 2,
+      "seenByRecipe": 0,
+      "share": 0
+     }
+    }
+   }
+  },
+  "genericityVsHeldOutRepo": {
+   "design": "leave-one-repository-out inside TRAIN; names declared in >=2 of the other repos vs exactly 1, hit = declared in the held-out repo",
+   "pooledLift": 9.243697478991596,
+   "rateG": 0.14285714285714285,
+   "rateS": 0.015454545454545455,
+   "controlMedianLift": 0.9682291666666666,
+   "controlMaxLift": 1.4802972436865323,
+   "verdict": "fail"
+  },
+  "gaps": [
+   {
+    "gap": "recipe-blind-kinds",
+    "note": "interface, type alias, enum, namespace and method declarations are not counted: a name is generic here only as a function/class/const-arrow name",
+    "measured": {
+     "shareOfGoldCorePairsSeen": 0.488499452354874
+    }
+   },
+   {
+    "gap": "non-ascii-identifiers",
+    "nonAsciiDeclarations": 0,
+    "of": 1474
+   },
+   {
+    "gap": "four-train-repos",
+    "note": "genericity at floor 2 rests on 4 repositories; a name is generic here only if it recurs in 2 of 4"
+   },
+   {
+    "gap": "ts-only",
+    "note": "built from .ts files only; .tsx and .js repositories are separate manifest languages; the old blended code-name-js.json mixes ts/tsx/js/mjs/jsx and was built from the ethos tree (not held-out safe)"
+   }
+  ],
+  "note": "genericity is a fact about this language's own codebases: repos counts only the TRAIN repositories attesting the name through this recipe. A name never attested is admitted (null from genericityOf), never refused."
+ },
+ "counts": {
+  "files": 240,
+  "repos": 4,
+  "totalBytes": 1294708,
+  "distinctNames": 741,
+  "totalDeclarations": 1420,
+  "namesAtOrAboveGenericFloor": 19
+ },
+ "names": {
+  "AppTree": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "BUCKET_ID_RE": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "Command": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "CommandManager": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "CommandNode": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "Component": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "Consumer": {
+   "repos": 1,
+   "files": 3,
+   "kinds": [
+    "class"
+   ]
+  },
+  "CreateChildTeamCollectionArgs": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "CreateChildUserCollectionArgs": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "CreatePublishedDocsArgs": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "CreateRootTeamCollectionArgs": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "CreateRootUserCollectionArgs": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "DEFAULT_REQUEST": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "DeferredExplicitCombineQueriesHost": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "DeferredExplicitMutationHost": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "DeferredExplicitQueriesHost": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "DeferredFieldsQueriesHost": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "ENTITY_ID": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "EnableAndDisableSSOArgs": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "FetchPublishedDocsArgs": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "FileData": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "GetRootTeamCollectionsArgs": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "GetUserChildCollectionArgs": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "GistSource": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "Host": {
+   "repos": 1,
+   "files": 4,
+   "kinds": [
+    "class"
+   ]
+  },
+  "IFRAME_RESIZER_READY_EVENT": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "ImportUserCollectionsFromJSONArgs": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "InfraConfigArgs": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "InfraTokenResolver": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "InvalidExplicitCombineQueriesHost": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "Io": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "MemoryStorage": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "MicrosoftStrategy": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "MoveTeamCollectionArgs": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "MoveUserCollectionArgs": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "NAMESPACES": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "OffsetPaginationArgs": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "Page": {
+   "repos": 1,
+   "files": 2,
+   "kinds": [
+    "class"
+   ]
+  },
+  "PaginationArgs": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "PostComponent": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "Producer": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "ProjectsService": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "PublishedDocsService": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "Queries1": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "Queries2": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "QueryClient": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "QuickJSUnwrapError": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "RTJwtStrategy": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "RecordingController": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "RenameTeamCollectionArgs": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "RenameUserCollectionsArgs": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "SIOConnection": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "SSEConnection": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "ScrollService": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "SiteController": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "SvelteFlowStore": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "SwitchWorkspaceSpotlightSearcherService": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "TeamCollectionController": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "TeamEnvsTeamResolver": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "TestSearcherService": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "TestSearcherServiceB": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "TestSearcherServiceC": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "TestSearcherServiceD": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "TestSearcherServiceE": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "TestSearcherServiceF": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "URLMenuService": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "UpdatePublishedDocsArgs": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "UpdateTeamCollectionArgs": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "UpdateTeamCollectionOrderArgs": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "UpdateUserCollectionArgs": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "UpdateUserCollectionsArgs": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "V2_SCHEMA": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "V9_SCHEMA": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "WSConnection": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "WorkspaceSpotlightSearcherService": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "class"
+   ]
+  },
+  "XYPanZoom": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "XYResizer": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "_gather_initial_tabs": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "_subtree": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "_untrack": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "accessToken": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "active": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "activeVal": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "addSignalProperty": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "addZoomEffect": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "added_cell": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "adjacent": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "adjectiveLabels": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "admin": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "advance": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "again": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "allGlobals": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "allVars": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "alpha_at": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "ansiRegex": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "apiPrefix": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "append_external_button": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "applyNestedSetting": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "applySetting": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "applyTooltipOverflowStyles": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "apply_initial_tabs": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "apply_layout": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "apply_state_to_node": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "areSetsEqual": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "asset_url": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "attached_events": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "axis": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "b": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "badToken": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "baseURL": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "base_props": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "blob": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "blobData": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "blob_to_data_url": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "blur": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "bob_cell": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "body_rect": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "bounds": {
+   "repos": 1,
+   "files": 2,
+   "kinds": [
+    "function"
+   ]
+  },
+  "box": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "boxToRect": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "btn": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "bulkApplySettings": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "button_props": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "c": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "cacheAEntryAfterSwitch": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "calcAutoPanVelocity": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "calculateAppliedPaddings": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "calculateSnapOffset": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "calculateTooltipDimensions": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "call_args": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "callbackVersion": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "canvas": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "cases": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "cell": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "change": {
+   "repos": 1,
+   "files": 6,
+   "kinds": [
+    "function"
+   ]
+  },
+  "changeLocale": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "change_text": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "checkURL": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "check_and_wake_space": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "check_interval": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "check_space_status": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "checkbox": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "checkboxes": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "checked": {
+   "repos": 2,
+   "files": 2,
+   "kinds": [
+    "function"
+   ]
+  },
+  "clampPositionToParent": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "cleanup": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "clearPersistedAuthCookiesFromJar": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "clearRemoveSegment": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "clear_status": {
+   "repos": 1,
+   "files": 2,
+   "kinds": [
+    "function"
+   ]
+  },
+  "click_outside": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "cloneUnlessOtherwiseSpecified": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "collectionIDs": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "command": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "componentHasSignalInputProperty": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "component_map": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "components": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "config": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "connect": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "connect_bucket": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "connectionExists": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "connections": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "consoleWarnMock": {
+   "repos": 1,
+   "files": 2,
+   "kinds": [
+    "function"
+   ]
+  },
+  "constrainTooltipToViewport": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "consumer": {
+   "repos": 1,
+   "files": 3,
+   "kinds": [
+    "function"
+   ]
+  },
+  "contents": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "controller": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "copyInterface": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "copyResponse": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "copyToClipboard": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "count": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "countBAfterSecond": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "counter": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "counter_output": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "createAmbiguousQueryClientError": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "createChildCollection": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "createContext": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "createDevWarn": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "createDuplicateEnvironment": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "createElements": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "createHoppNamespaceMethods": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "createMarkerIds": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "createMissingQueryClientError": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "createMockPersister": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "createNewRootCollection": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "createQueryFnContext": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "createQueue": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "createSpyPersister": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "createTeamEnvironment": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "createTooltipValueRow": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "create_props_shared_props": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "create_resize_state": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "ctx": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "custom": {
+   "repos": 1,
+   "files": 3,
+   "kinds": [
+    "function"
+   ]
+  },
+  "d3DblClickZoomHandler": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "d3ZoomInstance": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "data": {
+   "repos": 3,
+   "files": 7,
+   "kinds": [
+    "function"
+   ]
+  },
+  "dataTransfer": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "datasetOperator": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "deepmerge": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "defaultArrayMerge": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "default_props": {
+   "repos": 1,
+   "files": 3,
+   "kinds": [
+    "function"
+   ]
+  },
+  "default_storage": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "delay": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "deleteCollection": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "deleteTeamEnvironment": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "deleteUpdateManyCall": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "demo_file": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "dependencyIndex": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "dependentQueryFn": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "described_by": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "destroy": {
+   "repos": 1,
+   "files": 2,
+   "kinds": [
+    "function"
+   ]
+  },
+  "didSnapshotChange": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "discussions_enabled": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "doSleep": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "doc": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "docsToDelete": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "double_click": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "downloadResponse": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "dragHandler": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "drag_over": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "drop_csv": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "drop_target": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "duplicateTeamCollection": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "edge": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "edgeBox": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "edit": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "editor": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "el": {
+   "repos": 1,
+   "files": 2,
+   "kinds": [
+    "function"
+   ]
+  },
+  "emptyTarget": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "empty_dynamic_props": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "enabled": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "enabledRef": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "encoded": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "encoded_path": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "entry": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "environment": {
+   "repos": 2,
+   "files": 2,
+   "kinds": [
+    "function"
+   ]
+  },
+  "error": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "errorMutationFn": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "errorPromise": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "evaluateAbsolutePosition": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "evaluateSignals": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "existingCollectionIDs": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "expandBtn": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "expectSignals": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "expect_button_under_header": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "experimental_useOnNodesChangeMiddleware": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "extractErrorDetails": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "extractTestcaseFromTitle": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "extract_layout": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "fake_media": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "fetchFn": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "fetchGistFromUrl": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "fetchMovie": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "fetchMovies": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "fetchPage": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "fetchPost": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "file_label": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "filesize": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "filter_input": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "find_node_by_id": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "find_parent": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "first": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "firstQuery": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "firstResult": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "first_cell": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "fitViewResolver": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "fixed_props": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "fixture": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "flushPromises": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "fn": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "focus": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "formatTooltipValue": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "foundEdge": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "gather_initial_tabs": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "gather_props": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "generalHelper": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "getBoundsOfBoxes": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "getBoundsOfRects": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "getControlDirection": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "getCookieJarService": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "getDefaultQueryClient": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "getDefaultSettings": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "getDimensionsAfterResize": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "getDragItems": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "getEdgeCenter": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "getEdgeId": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "getEdgeParams": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "getEdgePosition": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "getElevatedEdgeZIndex": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "getEnumerableOwnPropertySymbols": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "getErrorCode": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "getEventHandlerParams": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "getInitialStore": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "getInitialUserDetails": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "getInitialViewport": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "getKeys": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "getLayoutedEdges": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "getLowerExtentClamp": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "getMarkerId": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "getMergeFunction": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "getNextPageParam": {
+   "repos": 1,
+   "files": 3,
+   "kinds": [
+    "function"
+   ]
+  },
+  "getNodeDimensions": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "getNodeIntersection": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "getNodeRect": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "getOverlappingArea": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "getPreviousPageParam": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "getQueries": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "getQueryClient": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "getQueryKey": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "getRectsOverlappingArea": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "getResizeDirection": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "getResponseBodyText": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "getSearchParams": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "getSelectedSnapshot": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "getSettingSubject": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "getSizeClamp": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "getStraightPath": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "getTestJsonFilePath": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "getUpperExtentClamp": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "getVideoExtensionFromMimeType": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "getViewport": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "getViewportForBounds": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "getVisibleNodes": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "get_api_url": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "get_cell": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "get_description": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "get_header": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "get_header_cells": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "get_header_checkbox": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "get_initial_locale": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "get_lang_from_preferred_locale": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "get_object": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "get_rows": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "get_search_input": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "get_space_hardware": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "get_table_wrap": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "get_text": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "get_type": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "get_zerogpu_origin": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "globalVal": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "go_to_testcase": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "gqlRequest": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "grace": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "grid": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "handleDataAvailable": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "handleError": {
+   "repos": 2,
+   "files": 2,
+   "kinds": [
+    "function"
+   ]
+  },
+  "handleRecordingComplete": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "handleStop": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "handle_click": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "handle_message": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "handle_playback": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "handle_visibility": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "hasNextPage": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "hasNonExisting": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "hasOverlap": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "hasPreviousPage": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "hasSelector": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "has_hidden_descendants": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "header": {
+   "repos": 2,
+   "files": 2,
+   "kinds": [
+    "function"
+   ]
+  },
+  "header_texts": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "host": {
+   "repos": 1,
+   "files": 3,
+   "kinds": [
+    "function"
+   ]
+  },
+  "i18n": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "id": {
+   "repos": 2,
+   "files": 2,
+   "kinds": [
+    "function"
+   ]
+  },
+  "idPrefix": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "ids": {
+   "repos": 2,
+   "files": 2,
+   "kinds": [
+    "function"
+   ]
+  },
+  "idsToDelete": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "importJSONToTeam": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "increment": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "infiniteQueryBehavior": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "infiniteQueryOptions": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "infraToken": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "initialize": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "initialize_zerogpu_handshake": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "injectInfiniteQuery": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "injector": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "input": {
+   "repos": 1,
+   "files": 4,
+   "kinds": [
+    "function"
+   ]
+  },
+  "interceptorService": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "isAttributionVisible": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "isCoordinateExtent": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "isCurrentlyRecording": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "isDangling": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "isEdgeVisible": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "isInitialized": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "isMacOs": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "isMergeableObject": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "isMutating": {
+   "repos": 1,
+   "files": 2,
+   "kinds": [
+    "function"
+   ]
+  },
+  "isNonNullObject": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "isNumeric": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "isParentSelected": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "isReactElement": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "isRectObject": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "isSpecial": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "isValidURL": {
+   "repos": 1,
+   "files": 2,
+   "kinds": [
+    "function"
+   ]
+  },
+  "is_file_like": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "is_node_layout": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "is_translation_metadata": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "is_valid_bucket_id": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "join_urls": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "jsonString": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "kept": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "key": {
+   "repos": 2,
+   "files": 6,
+   "kinds": [
+    "function"
+   ]
+  },
+  "key1": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "key2": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "key5": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "keys": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "killAndEvict": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "lastValid": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "last_cell": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "layout_is_unseen": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "layout_signature": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "layout_storage_key": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "lazy_langs": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "legacy": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "length": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "link": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "list_bucket_records": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "list_user_buckets": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "listener": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "live_region": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "loadFfmpeg": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "load_components": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "load_layout": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "load_translations": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "loaded": {
+   "repos": 2,
+   "files": 2,
+   "kinds": [
+    "function"
+   ]
+  },
+  "loadedReordered": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "locator": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "logout": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "ls": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "makeQueryClient": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "makeV2": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "make_config": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "make_half_transparent_texture": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "make_visible_if_not_rendered": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "map": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "map_nodes": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "markRemoveSegmentEnd": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "markRemoveSegmentStart": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "mark_component_invisible_if_visible": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "markerId": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "markup": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "mergeAriaLabelConfig": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "mergeObject": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "middle": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "minisearch": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "mockFunc": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "mock_ls": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "module": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "mount_css": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "moveRESTTeamCollection": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "moveSelectedNodes": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "movieKeys": {
+   "repos": 1,
+   "files": 2,
+   "kinds": [
+    "function"
+   ]
+  },
+  "movieQuery": {
+   "repos": 1,
+   "files": 2,
+   "kinds": [
+    "function"
+   ]
+  },
+  "mutate": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "mutatePromise": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "mutation": {
+   "repos": 1,
+   "files": 3,
+   "kinds": [
+    "function"
+   ]
+  },
+  "mutationFn": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "mutationState": {
+   "repos": 1,
+   "files": 2,
+   "kinds": [
+    "function"
+   ]
+  },
+  "navigation_props": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "newEdges": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "newNodes": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "newPages": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "new_data": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "new_selector": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "nextValue": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "next_cell": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "next_frame_height": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "noCookieJarMeta": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "node": {
+   "repos": 2,
+   "files": 2,
+   "kinds": [
+    "function"
+   ]
+  },
+  "nodeHasDimensions": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "nodeToChildExtent": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "nodesSelector": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "numberGenerator": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "number_input": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "objectFieldIncludes": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "onEdgesChangeReducer": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "onNodesChangeReducer": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "onScopeDisposeMock": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "onSessionEnd": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "options": {
+   "repos": 2,
+   "files": 5,
+   "kinds": [
+    "function"
+   ]
+  },
+  "orphanLoaded": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "oversized_files": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "parseErrorData": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "parsePadding": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "parsePaddings": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "parse_error": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "pending": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "performSettingsDataMigrations": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "placed": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "placeholderResult": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "planWithHeaders": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "planned": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "playable": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "pointerEvents": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "prefix_css": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "prepare_files": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "prettyBytes": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "previousData": {
+   "repos": 1,
+   "files": 2,
+   "kinds": [
+    "function"
+   ]
+  },
+  "probableUser": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "process_endpoint": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "process_langs": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "process_server_fn": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "promise": {
+   "repos": 2,
+   "files": 2,
+   "kinds": [
+    "function"
+   ]
+  },
+  "properCase": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "propertyIsOnObject": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "propertyIsUnsafe": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "prototypeMethods": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "provided_keys": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "providerTagName": {
+   "repos": 1,
+   "files": 3,
+   "kinds": [
+    "function"
+   ]
+  },
+  "queries": {
+   "repos": 1,
+   "files": 3,
+   "kinds": [
+    "function"
+   ]
+  },
+  "queries1List": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "queriesState": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "queriesWithQueryOptions": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "queriesWithQueryOptionsWithoutSelect": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "queriesWithoutSelect": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "query": {
+   "repos": 1,
+   "files": 2,
+   "kinds": [
+    "function"
+   ]
+  },
+  "query1": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "query2": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "query3": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "queryCache": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "queryClient": {
+   "repos": 1,
+   "files": 2,
+   "kinds": [
+    "function"
+   ]
+  },
+  "queryCombine": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "queryCombineWithoutSelect": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "queryFn": {
+   "repos": 1,
+   "files": 4,
+   "kinds": [
+    "function"
+   ]
+  },
+  "queryFn1": {
+   "repos": 1,
+   "files": 3,
+   "kinds": [
+    "function"
+   ]
+  },
+  "queryFn2": {
+   "repos": 1,
+   "files": 3,
+   "kinds": [
+    "function"
+   ]
+  },
+  "queryOptions": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "queueItems": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "range_input": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "rectToBox": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "refetch": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "refreshToken": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "registerDefaultQueryClient": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "release": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "removeButtons": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "renameCollection": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "renderToString": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "rendered": {
+   "repos": 1,
+   "files": 3,
+   "kinds": [
+    "function"
+   ]
+  },
+  "rendererPointToPoint": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "reorderUpdateManyCall": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "replacement_apps": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "request": {
+   "repos": 2,
+   "files": 2,
+   "kinds": [
+    "function"
+   ]
+  },
+  "res": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "reset_btn": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "reset_resize_growth": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "resizeObserverLoopErrRe": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "resolveQueryClient": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "resolved": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "respondWith": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "responseBodyText": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "restored": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "result": {
+   "repos": 3,
+   "files": 14,
+   "kinds": [
+    "function"
+   ]
+  },
+  "resultObj": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "resultPromise": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "results": {
+   "repos": 2,
+   "files": 2,
+   "kinds": [
+    "function"
+   ]
+  },
+  "retrieved": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "root": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "rootLoaded": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "rows": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "runEffect": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "runs": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "saveWithDownloadAttribute": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "save_layout": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "saw_core": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "scaleBy": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "scaleTo": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "scopeHandle": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "screenStream": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "search": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "search_input": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "search_props": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "second": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "second_header": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "select": {
+   "repos": 2,
+   "files": 6,
+   "kinds": [
+    "function"
+   ]
+  },
+  "selectedAndDraggable": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "selectedEdges": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "selectedId": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "selectedNodes": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "selector": {
+   "repos": 1,
+   "files": 2,
+   "kinds": [
+    "function"
+   ]
+  },
+  "sendMagicLink": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "service": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "setAuthCookies": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "setClickDistance": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "setEdgesReducer": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "setFixtureSignalInputs": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "setInitialUser": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "setNodesReducer": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "setScaleExtent": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "setSelectedNodesAndEdgesReducer": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "setSelectedNodesReducer": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "setSignalInputs": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "setTransform": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "setTranslateExtent": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "setUser": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "setViewport": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "setViewportConstrained": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "set_space_timeout": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "setup_iframe_resizer": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "setupi18n": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "shouldUpdatePreviewFrame": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "signInUserWithGithubFB": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "signInUserWithGoogleFB": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "signInUserWithMicrosoftFB": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "single_visit": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "snapshot": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "sortTeamCollections": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "sort_column": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "stabilizeTooltipHover": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "staleTime": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "startRecording": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "start_button": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "status_update": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "stepID": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "stop": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "stopRecording": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "store": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "stored": {
+   "repos": 2,
+   "files": 2,
+   "kinds": [
+    "function"
+   ]
+  },
+  "stripped": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "styleAfterDrag": {
+   "repos": 1,
+   "files": 3,
+   "kinds": [
+    "function"
+   ]
+  },
+  "styleAfterZoom": {
+   "repos": 1,
+   "files": 2,
+   "kinds": [
+    "function"
+   ]
+  },
+  "styleBeforeDrag": {
+   "repos": 1,
+   "files": 3,
+   "kinds": [
+    "function"
+   ]
+  },
+  "styleBeforeZoom": {
+   "repos": 1,
+   "files": 2,
+   "kinds": [
+    "function"
+   ]
+  },
+  "styler": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "subtree": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "successMutationFn": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "successPromise": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "summarize": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "supports_browser_handshake": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "suspensePromise": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "syncViewport": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "tab": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "tab_index": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "table_wrap": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "tabs": {
+   "repos": 1,
+   "files": 2,
+   "kinds": [
+    "function"
+   ]
+  },
+  "target": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "team2UpdateManyCall": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "teamID": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "testFunc": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "test_normal": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "tests": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "textNode": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "textarea": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "textbox": {
+   "repos": 1,
+   "files": 3,
+   "kinds": [
+    "function"
+   ]
+  },
+  "third_rect": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "throwOnError": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "to_example_value": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "toggle": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "toggleNestedSetting": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "togglePreview": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "toggleSetting": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "token": {
+   "repos": 2,
+   "files": 2,
+   "kinds": [
+    "function"
+   ]
+  },
+  "tokens": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "transform": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "transformAfterDragHandleMove": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "transformAfterMove": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "transformBeforeMove": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "transform_api_info": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "transform_type": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "trimAnsi": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "trimVideo": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "truncateText": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "unhandled": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "unlistenFn": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "unplaced_origin": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "unregisterDefaultQueryClient": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "unsubscribe": {
+   "repos": 2,
+   "files": 2,
+   "kinds": [
+    "function"
+   ]
+  },
+  "untrack_children_of_closed_accordions_or_inactive_tabs": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "untrack_children_of_invisible_parents": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "unwatch": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "update": {
+   "repos": 1,
+   "files": 2,
+   "kinds": [
+    "function"
+   ]
+  },
+  "updateManyCall": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "updateMovie": {
+   "repos": 1,
+   "files": 2,
+   "kinds": [
+    "function"
+   ]
+  },
+  "updateOrderRESTTeamCollection": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "updatePreviewFrame": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "updateTeamCollection": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "updateTeamEnvironment": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "update_status": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "updated": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "updates": {
+   "repos": 1,
+   "files": 2,
+   "kinds": [
+    "function"
+   ]
+  },
+  "updatesAfterDisconnect": {
+   "repos": 1,
+   "files": 3,
+   "kinds": [
+    "function"
+   ]
+  },
+  "upload": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "upload_container": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "url": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "useConnection": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "useCopyInterface": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "useCopyResponse": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "useCustomQueries": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "useDevtoolsSubscriptions": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "useDownloadResponse": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "useEdges": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "useEdgesState": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "useHydrate": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "useInfiniteQuery": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "useInternalNode": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "useIsFetching": {
+   "repos": 1,
+   "files": 2,
+   "kinds": [
+    "function"
+   ]
+  },
+  "useMoveSelectedNodes": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "useMovie": {
+   "repos": 1,
+   "files": 2,
+   "kinds": [
+    "function"
+   ]
+  },
+  "useMutation": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "useNodeConnections": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "useNodeOrEdgeTypesWarning": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "useNodes": {
+   "repos": 1,
+   "files": 2,
+   "kinds": [
+    "function"
+   ]
+  },
+  "useNodesInitialized": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "useNodesState": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "useOnInitHandler": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "useOnlineManager": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "usePreview": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "useQuery": {
+   "repos": 1,
+   "files": 3,
+   "kinds": [
+    "function"
+   ]
+  },
+  "useQueryClient": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "useQueue": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "useReactFlow": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "useRefreshOnFocus": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "useResizeObserver": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "useResponseBody": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "useStore": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "useStoreApi": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "useStylesLoadedWarning": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "useSyncExternalStore": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "useSyncExternalStoreWithSelector": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "useThing": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "useTodos": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "useViewport": {
+   "repos": 1,
+   "files": 2,
+   "kinds": [
+    "function"
+   ]
+  },
+  "useViewportInitialized": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "v2_baseCollectionSchema": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "val": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "validDocs": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "value": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "valueIncludes": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "values": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "viewport": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "viewportSelector": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "virtual_body": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "visibleNodes": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "wait": {
+   "repos": 1,
+   "files": 2,
+   "kinds": [
+    "function"
+   ]
+  },
+  "waitForChart": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "warnIfDeeplyReactive": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "watchChanges": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "wf": {
+   "repos": 1,
+   "files": 2,
+   "kinds": [
+    "function"
+   ]
+  },
+  "withResolvers": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "wrapExperimental": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "x_axis_labels": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "xor": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  },
+  "zoom": {
+   "repos": 1,
+   "files": 1,
+   "kinds": [
+    "function"
+   ]
+  }
+ },
+ "builtAt": "2026-10-06T06:03:26.197Z"
+}

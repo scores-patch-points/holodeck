@@ -1,0 +1,771 @@
+{
+ "schema": "LanguageLawPrior@1",
+ "language": "wenyan",
+ "languageName": "文言 (Wenyan, classical Chinese)",
+ "giver": {
+  "resource": "wenyan-lang/wenyan (the Wenyan compiler's own reserved-word table)",
+  "engine": {
+   "source": "src/keywords.ts",
+   "url": "https://github.com/wenyan-lang/wenyan"
+  },
+  "note": "Wenyan's reserved words, fetched from the language's own compiler source (src/keywords.ts) and grouped by the token type the parser assigns each — never hand-typed. Keywords are classical-Chinese characters (若 if, 為是 while, 加 +, 書之 print, 術 function), so this prior is the non-Western proof that the LanguageLawPrior@1 mechanism is script-agnostic: the law is fetched from the engine the same way as Python's, the tokens just are not Latin. Identifier law: the engine tokenizes CJK by its own NUMBER_KEYWORDS and keyword table, not by an [A-Za-z] rule."
+ },
+ "lexical": {
+  "keywords": [
+   "不大於",
+   "不小於",
+   "不復存矣",
+   "不知何禍歟",
+   "不等於",
+   "中",
+   "中之",
+   "中有陽乎",
+   "中無陰乎",
+   "乃作罷",
+   "乃得",
+   "乃得矣",
+   "乃止",
+   "乃止是遍",
+   "乃歸空無",
+   "乃行是術曰",
+   "之",
+   "之書",
+   "之物也",
+   "之禍",
+   "之禍歟",
+   "之義",
+   "之術也",
+   "之長",
+   "乘",
+   "也",
+   "云云",
+   "今",
+   "今有",
+   "以",
+   "以施",
+   "元",
+   "充",
+   "其",
+   "其物如是",
+   "其餘",
+   "凡",
+   "列",
+   "加",
+   "取",
+   "名之曰",
+   "吾嘗觀",
+   "吾有",
+   "嗚呼",
+   "噫",
+   "大於",
+   "夫",
+   "如事不諧",
+   "姑妄行此",
+   "小於",
+   "必先得",
+   "恆為是",
+   "或云",
+   "或若",
+   "所餘幾何",
+   "批曰",
+   "數",
+   "方悟",
+   "於",
+   "施",
+   "昔之",
+   "是矣",
+   "是術曰",
+   "是謂",
+   "曰",
+   "書之",
+   "有",
+   "欲行是術",
+   "注曰",
+   "減",
+   "為是",
+   "爻",
+   "物",
+   "物之",
+   "疏曰",
+   "等於",
+   "者",
+   "若",
+   "若其不然者",
+   "若其然者",
+   "若非",
+   "蓋謂",
+   "術",
+   "言",
+   "變",
+   "豈",
+   "遍",
+   "銜",
+   "除",
+   "陰",
+   "陽"
+  ],
+  "numeralCharacters": [
+   "負",
+   "·",
+   "又",
+   "零",
+   "〇",
+   "一",
+   "二",
+   "三",
+   "四",
+   "五",
+   "六",
+   "七",
+   "八",
+   "九",
+   "十",
+   "百",
+   "千",
+   "萬",
+   "億",
+   "兆",
+   "京",
+   "垓",
+   "秭",
+   "穰",
+   "溝",
+   "澗",
+   "正",
+   "載",
+   "極",
+   "分",
+   "釐",
+   "毫",
+   "絲",
+   "忽",
+   "微",
+   "纖",
+   "沙",
+   "塵",
+   "埃",
+   "渺",
+   "漠"
+  ],
+  "keywordTable": {
+   "吾有": {
+    "type": "decl",
+    "value": "uninit"
+   },
+   "今有": {
+    "type": "decl",
+    "value": "public"
+   },
+   "物之": {
+    "type": "decl",
+    "value": "prop"
+   },
+   "有": {
+    "type": "decl",
+    "value": "init"
+   },
+   "數": {
+    "type": "type",
+    "value": "num"
+   },
+   "列": {
+    "type": "type",
+    "value": "arr"
+   },
+   "言": {
+    "type": "type",
+    "value": "str"
+   },
+   "術": {
+    "type": "type",
+    "value": "fun"
+   },
+   "爻": {
+    "type": "type",
+    "value": "bol"
+   },
+   "物": {
+    "type": "type",
+    "value": "obj"
+   },
+   "元": {
+    "type": "type",
+    "value": "any"
+   },
+   "書之": {
+    "type": "print",
+    "value": null
+   },
+   "名之曰": {
+    "type": "name",
+    "value": null
+   },
+   "施": {
+    "type": "call",
+    "value": "r"
+   },
+   "以施": {
+    "type": "call",
+    "value": "l"
+   },
+   "曰": {
+    "type": "assgn",
+    "value": null
+   },
+   "噫": {
+    "type": "discard",
+    "value": null
+   },
+   "取": {
+    "type": "take",
+    "value": null
+   },
+   "昔之": {
+    "type": "rassgn",
+    "value": "a"
+   },
+   "今": {
+    "type": "rassgn",
+    "value": "b"
+   },
+   "是矣": {
+    "type": "rassgn",
+    "value": "c"
+   },
+   "不復存矣": {
+    "type": "rassgn",
+    "value": "delete"
+   },
+   "其": {
+    "type": "ans",
+    "value": null
+   },
+   "乃得": {
+    "type": "ctrl",
+    "value": "ret"
+   },
+   "乃得矣": {
+    "type": "ctrl",
+    "value": "retprev"
+   },
+   "乃歸空無": {
+    "type": "ctrl",
+    "value": "retvoid"
+   },
+   "是謂": {
+    "type": "ctrl",
+    "value": "bigend"
+   },
+   "之術也": {
+    "type": "ctrl",
+    "value": "funend"
+   },
+   "必先得": {
+    "type": "ctrl",
+    "value": "funarg"
+   },
+   "是術曰": {
+    "type": "ctrl",
+    "value": "funbody"
+   },
+   "乃行是術曰": {
+    "type": "ctrl",
+    "value": "funbody"
+   },
+   "欲行是術": {
+    "type": "ctrl",
+    "value": "funstart"
+   },
+   "也": {
+    "type": "ctrl",
+    "value": "end"
+   },
+   "云云": {
+    "type": "ctrl",
+    "value": "end"
+   },
+   "凡": {
+    "type": "ctrl",
+    "value": "for"
+   },
+   "中之": {
+    "type": "ctrl",
+    "value": "forin"
+   },
+   "恆為是": {
+    "type": "ctrl",
+    "value": "whiletrue"
+   },
+   "為是": {
+    "type": "ctrl",
+    "value": "whilen0"
+   },
+   "遍": {
+    "type": "ctrl",
+    "value": "whilen1"
+   },
+   "乃止": {
+    "type": "ctrl",
+    "value": "break"
+   },
+   "乃止是遍": {
+    "type": "ctrl",
+    "value": "continue"
+   },
+   "若非": {
+    "type": "ctrl",
+    "value": "else"
+   },
+   "若": {
+    "type": "ctrl",
+    "value": "if"
+   },
+   "者": {
+    "type": "ctrl",
+    "value": "conj"
+   },
+   "若其然者": {
+    "type": "ctrl",
+    "value": "iftrue"
+   },
+   "若其不然者": {
+    "type": "ctrl",
+    "value": "iffalse"
+   },
+   "或若": {
+    "type": "ctrl",
+    "value": "elseif"
+   },
+   "其物如是": {
+    "type": "ctrl",
+    "value": "objbody"
+   },
+   "之物也": {
+    "type": "ctrl",
+    "value": "objend"
+   },
+   "夫": {
+    "type": "expr",
+    "value": null
+   },
+   "等於": {
+    "type": "cmp",
+    "value": "=="
+   },
+   "不等於": {
+    "type": "cmp",
+    "value": "!="
+   },
+   "不大於": {
+    "type": "cmp",
+    "value": "<="
+   },
+   "不小於": {
+    "type": "cmp",
+    "value": ">="
+   },
+   "大於": {
+    "type": "cmp",
+    "value": ">"
+   },
+   "小於": {
+    "type": "cmp",
+    "value": "<"
+   },
+   "加": {
+    "type": "op",
+    "value": "+"
+   },
+   "減": {
+    "type": "op",
+    "value": "-"
+   },
+   "乘": {
+    "type": "op",
+    "value": "*"
+   },
+   "除": {
+    "type": "op",
+    "value": "/"
+   },
+   "中有陽乎": {
+    "type": "lop",
+    "value": "||"
+   },
+   "中無陰乎": {
+    "type": "lop",
+    "value": "&&"
+   },
+   "變": {
+    "type": "not",
+    "value": null
+   },
+   "所餘幾何": {
+    "type": "mod",
+    "value": null
+   },
+   "以": {
+    "type": "opord",
+    "value": "l"
+   },
+   "於": {
+    "type": "opord",
+    "value": "r"
+   },
+   "之長": {
+    "type": "ctnr",
+    "value": "len"
+   },
+   "之": {
+    "type": "ctnr",
+    "value": "subs"
+   },
+   "充": {
+    "type": "ctnr",
+    "value": "push"
+   },
+   "銜": {
+    "type": "ctnr",
+    "value": "cat"
+   },
+   "其餘": {
+    "type": "ctnr",
+    "value": "rest"
+   },
+   "陰": {
+    "type": "bool",
+    "value": "false"
+   },
+   "陽": {
+    "type": "bool",
+    "value": "true"
+   },
+   "吾嘗觀": {
+    "type": "import",
+    "value": "file"
+   },
+   "中": {
+    "type": "import",
+    "value": "in"
+   },
+   "之書": {
+    "type": "import",
+    "value": "fileend"
+   },
+   "方悟": {
+    "type": "import",
+    "value": "iden"
+   },
+   "之義": {
+    "type": "import",
+    "value": "idenend"
+   },
+   "嗚呼": {
+    "type": "throw",
+    "value": "a"
+   },
+   "之禍": {
+    "type": "throw",
+    "value": "b"
+   },
+   "姑妄行此": {
+    "type": "try",
+    "value": "try"
+   },
+   "如事不諧": {
+    "type": "try",
+    "value": "catch"
+   },
+   "豈": {
+    "type": "try",
+    "value": "catcherr0"
+   },
+   "之禍歟": {
+    "type": "try",
+    "value": "catcherr1"
+   },
+   "不知何禍歟": {
+    "type": "try",
+    "value": "catchall"
+   },
+   "乃作罷": {
+    "type": "try",
+    "value": "end"
+   },
+   "或云": {
+    "type": "macro",
+    "value": "from"
+   },
+   "蓋謂": {
+    "type": "macro",
+    "value": "to"
+   },
+   "注曰": {
+    "type": "comment",
+    "value": null
+   },
+   "疏曰": {
+    "type": "comment",
+    "value": null
+   },
+   "批曰": {
+    "type": "comment",
+    "value": null
+   }
+  }
+ },
+ "grammar": {
+  "byTokenType": {
+   "decl": [
+    "今有",
+    "吾有",
+    "有",
+    "物之"
+   ],
+   "type": [
+    "元",
+    "列",
+    "數",
+    "爻",
+    "物",
+    "術",
+    "言"
+   ],
+   "print": [
+    "書之"
+   ],
+   "name": [
+    "名之曰"
+   ],
+   "call": [
+    "以施",
+    "施"
+   ],
+   "assgn": [
+    "曰"
+   ],
+   "discard": [
+    "噫"
+   ],
+   "take": [
+    "取"
+   ],
+   "rassgn": [
+    "不復存矣",
+    "今",
+    "昔之",
+    "是矣"
+   ],
+   "ans": [
+    "其"
+   ],
+   "ctrl": [
+    "中之",
+    "乃得",
+    "乃得矣",
+    "乃止",
+    "乃止是遍",
+    "乃歸空無",
+    "乃行是術曰",
+    "之物也",
+    "之術也",
+    "也",
+    "云云",
+    "其物如是",
+    "凡",
+    "必先得",
+    "恆為是",
+    "或若",
+    "是術曰",
+    "是謂",
+    "欲行是術",
+    "為是",
+    "者",
+    "若",
+    "若其不然者",
+    "若其然者",
+    "若非",
+    "遍"
+   ],
+   "expr": [
+    "夫"
+   ],
+   "cmp": [
+    "不大於",
+    "不小於",
+    "不等於",
+    "大於",
+    "小於",
+    "等於"
+   ],
+   "op": [
+    "乘",
+    "加",
+    "減",
+    "除"
+   ],
+   "lop": [
+    "中有陽乎",
+    "中無陰乎"
+   ],
+   "not": [
+    "變"
+   ],
+   "mod": [
+    "所餘幾何"
+   ],
+   "opord": [
+    "以",
+    "於"
+   ],
+   "ctnr": [
+    "之",
+    "之長",
+    "充",
+    "其餘",
+    "銜"
+   ],
+   "bool": [
+    "陰",
+    "陽"
+   ],
+   "import": [
+    "中",
+    "之書",
+    "之義",
+    "吾嘗觀",
+    "方悟"
+   ],
+   "throw": [
+    "之禍",
+    "嗚呼"
+   ],
+   "try": [
+    "不知何禍歟",
+    "乃作罷",
+    "之禍歟",
+    "如事不諧",
+    "姑妄行此",
+    "豈"
+   ],
+   "macro": [
+    "或云",
+    "蓋謂"
+   ],
+   "comment": [
+    "批曰",
+    "注曰",
+    "疏曰"
+   ]
+  },
+  "byFace": {
+   "existence": [
+    "不復存矣",
+    "今",
+    "今有",
+    "元",
+    "其",
+    "列",
+    "名之曰",
+    "吾有",
+    "噫",
+    "數",
+    "昔之",
+    "是矣",
+    "曰",
+    "有",
+    "爻",
+    "物",
+    "物之",
+    "術",
+    "言"
+   ],
+   "structure": [
+    "中",
+    "中之",
+    "乃得",
+    "乃得矣",
+    "乃止",
+    "乃止是遍",
+    "乃歸空無",
+    "乃行是術曰",
+    "之",
+    "之書",
+    "之物也",
+    "之義",
+    "之術也",
+    "之長",
+    "也",
+    "云云",
+    "以",
+    "以施",
+    "充",
+    "其物如是",
+    "其餘",
+    "凡",
+    "吾嘗觀",
+    "必先得",
+    "恆為是",
+    "或若",
+    "方悟",
+    "於",
+    "施",
+    "是術曰",
+    "是謂",
+    "欲行是術",
+    "為是",
+    "者",
+    "若",
+    "若其不然者",
+    "若其然者",
+    "若非",
+    "遍",
+    "銜"
+   ],
+   "interpretation": [
+    "不大於",
+    "不小於",
+    "不知何禍歟",
+    "不等於",
+    "中有陽乎",
+    "中無陰乎",
+    "乃作罷",
+    "之禍",
+    "之禍歟",
+    "乘",
+    "加",
+    "取",
+    "嗚呼",
+    "大於",
+    "夫",
+    "如事不諧",
+    "姑妄行此",
+    "小於",
+    "或云",
+    "所餘幾何",
+    "批曰",
+    "書之",
+    "注曰",
+    "減",
+    "疏曰",
+    "等於",
+    "蓋謂",
+    "變",
+    "豈",
+    "除",
+    "陰",
+    "陽"
+   ]
+  },
+  "faceNote": "existence = declarations/types/naming; structure = control flow, import, call ordering, containers; interpretation = operators, comparison, booleans, I/O, exceptions, macros"
+ },
+ "counts": {
+  "keywords": 91,
+  "tokenTypes": 25,
+  "numeralCharacters": 41,
+  "existence": 19,
+  "structure": 40,
+  "interpretation": 32
+ },
+ "builtAt": "2026-09-15T02:23:31.797Z"
+}

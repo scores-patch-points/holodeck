@@ -1,0 +1,97 @@
+{
+ "schema": "EOReadingGolden@1",
+ "specimen": "quran-2-37-en",
+ "path": "14-holy-texts/tanzil-quran/quran_en_pickthall.txt",
+ "rule": "goldens/reading/RULE.md",
+ "window": {
+  "start": 5962,
+  "startText": "Then Adam received from his Lord words",
+  "end": 6084,
+  "endText": "the relenting, the Merciful.",
+  "coordinates": "normalized body (container-stripped, CRLF-normalized); spans in RAW file coordinates"
+ },
+ "notes": "Quran 2:37 in Pickthall's English — the same three propositions as the Arabic specimen, sharing its quran: prop keys: the cross-language join now spans a fourth document family. Pickthall's 'relented toward him' words the tawba exactly as the re-zero.",
+ "revisions": [],
+ "rows": [
+  {
+   "subject": "Adam",
+   "relation": "received",
+   "object": "from his Lord words (of revelation)",
+   "polarity": "+",
+   "phasepost": {
+    "op": "EVA",
+    "grain": "Figure"
+   },
+   "clause": "main",
+   "prop": "quran:adam-received-words",
+   "ground": "quran-2.37.1",
+   "role": "declared",
+   "because": "the receiving of words into a holder's keeping — content held, Relate·Interpretation at figure grain, matching the Arabic row's تَلَقَّىٰ",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "CON",
+    "grain": "Figure",
+    "because": "receiving readable as the transfer-arrangement itself"
+   },
+   "span": {
+    "start": 394,
+    "end": 6284
+   },
+   "anchor": "Then Adam received from his Lord words (of revelation)"
+  },
+  {
+   "subject": "his Lord",
+   "relation": "relented toward",
+   "object": "him",
+   "polarity": "+",
+   "phasepost": {
+    "op": "REC",
+    "grain": "Figure"
+   },
+   "clause": "coordinate",
+   "prop": "quran:god-relented",
+   "ground": "quran-2.37.2",
+   "role": "declared",
+   "because": "'relented toward him' — the standing re-grounded: wrath conceded, mercy begun, the re-zero on one bond — Generate·Interpretation at figure grain; Pickthall's verb choice renders the tawba as exactly this act",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "'He' → his Lord; 'him' → Adam",
+   "alternate": {
+    "op": "EVA",
+    "grain": "Figure",
+    "because": "readable as mercy held toward him"
+   },
+   "span": {
+    "start": 394,
+    "end": 6284
+   },
+   "anchor": "and He relented toward him"
+  },
+  {
+   "subject": "He",
+   "relation": "is",
+   "object": "the relenting, the Merciful",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Figure"
+   },
+   "clause": "main",
+   "prop": "quran:he-is-relenting",
+   "ground": "quran-2.37.3",
+   "role": "declared",
+   "because": "copula rule 3 — definite unique epithets (THE relenting, THE Merciful): identificational",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "'He' → the Lord of the previous clause",
+   "alternate": null,
+   "span": {
+    "start": 394,
+    "end": 6284
+   },
+   "anchor": "Lo! He is the relenting, the Merciful."
+  }
+ ]
+}

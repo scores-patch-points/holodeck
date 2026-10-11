@@ -1,0 +1,43 @@
+{
+  "schema": "RoleConfig@1",
+  "language": "por",
+  "provenance": {
+    "builder": "eoreader7 native/scripts/build-role-config.mjs",
+    "source": "/private/tmp/claude-501/tb/por/train.conllu",
+    "min_volume": 20,
+    "null_draws": 200,
+    "null_alpha": 0.05,
+    "null_seed": 1,
+    "note": "position stats and marker candidates are both derived mechanically from this treebank's own gold dependency annotations — never hand-typed or asserted from general linguistic knowledge. A marker candidate is admitted only when its real precision beats the (1-alpha) quantile of a within-sentence role-label shuffle (II.23), never a fixed ratio — and (S122) that quantile is the MAX-STATISTIC across every eligible closed-class candidate tried, not a per-candidate null, so the admitted marker is significant against the whole search, not merely against itself."
+  },
+  "object": {
+    "total": 9423,
+    "before": 783,
+    "after": 8640,
+    "dominantSide": "after",
+    "reliability": 0.9169054441260746,
+    "usable": true,
+    "marker": {
+      "form": "muita",
+      "precision": 0.5333333333333333,
+      "nullCeiling": 0.2,
+      "volume": 30,
+      "recall": 0.0016979730446779156
+    }
+  },
+  "subject": {
+    "total": 13188,
+    "before": 11946,
+    "after": 1242,
+    "dominantSide": "before",
+    "reliability": 0.9058234758871702,
+    "usable": true,
+    "marker": {
+      "form": "possa",
+      "hits": 13,
+      "total": 22,
+      "precision": 0.5909090909090909,
+      "nullCeiling": 0.23333333333333334
+    }
+  }
+}

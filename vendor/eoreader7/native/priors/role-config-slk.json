@@ -1,0 +1,43 @@
+{
+  "schema": "RoleConfig@1",
+  "language": "slk",
+  "provenance": {
+    "builder": "eoreader7 native/scripts/build-role-config.mjs",
+    "source": "/private/tmp/claude-501/tb/slk/train.conllu",
+    "min_volume": 20,
+    "null_draws": 200,
+    "null_alpha": 0.05,
+    "null_seed": 1,
+    "note": "position stats and marker candidates are both derived mechanically from this treebank's own gold dependency annotations — never hand-typed or asserted from general linguistic knowledge. A marker candidate is admitted only when its real precision beats the (1-alpha) quantile of a within-sentence role-label shuffle (II.23), never a fixed ratio — and (S122) that quantile is the MAX-STATISTIC across every eligible closed-class candidate tried, not a per-candidate null, so the admitted marker is significant against the whole search, not merely against itself."
+  },
+  "object": {
+    "total": 4315,
+    "before": 1396,
+    "after": 2919,
+    "dominantSide": "after",
+    "reliability": 0.6764774044032444,
+    "usable": true,
+    "marker": {
+      "form": "svoje",
+      "precision": 0.7083333333333334,
+      "nullCeiling": 0.25,
+      "volume": 24,
+      "recall": 0.0039397450753186555
+    }
+  },
+  "subject": {
+    "total": 5622,
+    "before": 3765,
+    "after": 1857,
+    "dominantSide": "before",
+    "reliability": 0.6696905016008537,
+    "usable": true,
+    "marker": {
+      "form": "bude",
+      "hits": 61,
+      "total": 120,
+      "precision": 0.5083333333333333,
+      "nullCeiling": 0.2727272727272727
+    }
+  }
+}

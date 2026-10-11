@@ -1,0 +1,2378 @@
+{
+ "schema": "CodeLexPrior@1",
+ "language": "ruby",
+ "grammar": "ruby",
+ "provenance": {
+  "giver": "tree-sitter grammar `ruby` (tree-sitter-language-pack via eval/coding-competence/gold.py, gold-1), TRAIN repositories only",
+  "goldVersion": "gold-1",
+  "trainRepos": [
+   {
+    "repo": "Homebrew/brew",
+    "url": "https://github.com/Homebrew/brew",
+    "commit": "8e124cf27a52937b721566fec9c43da55ba9ab7c",
+    "license": "bsd-2-clause",
+    "license_text_family": "bsd-2-clause"
+   },
+   {
+    "repo": "apache/thrift",
+    "url": "https://github.com/apache/thrift",
+    "commit": "50bbda109593a0b5c7634ac21c5d98eee97fe7ec",
+    "license": "apache-2.0",
+    "license_text_family": "apache-2.0"
+   },
+   {
+    "repo": "fastlane/fastlane",
+    "url": "https://github.com/fastlane/fastlane",
+    "commit": "596db349d17c3bdda6db9a6d9c5e4aa71bfab7cb",
+    "license": "mit",
+    "license_text_family": "mit"
+   },
+   {
+    "repo": "postalserver/postal",
+    "url": "https://github.com/postalserver/postal",
+    "commit": "d96eddbadeda600595d6247486f9ceb8e99cbc15",
+    "license": "mit",
+    "license_text_family": "mit"
+   },
+   {
+    "repo": "rails/rails",
+    "url": "https://github.com/rails/rails",
+    "commit": null,
+    "license": "mit"
+   }
+  ],
+  "trainFiles": [
+   {
+    "rel": "Library/Homebrew/livecheck/strategy/sparkle.rb",
+    "repo": "Homebrew/brew",
+    "sha256": "00bd33979d8418622238dd3dbc01996bcba5f6f6fb2e20e40bff0c95de64ebb4",
+    "bytes": 9345
+   },
+   {
+    "rel": "lib/rb/lib/thrift/transport/io_stream_transport.rb",
+    "repo": "apache/thrift",
+    "sha256": "026a80a99be0ede84c108e38e7133546c789e5b3840ef7eaa55dff483cbfa7c2",
+    "bytes": 1590
+   },
+   {
+    "rel": "spec/plugin_scores_spec.rb",
+    "repo": "fastlane/fastlane",
+    "sha256": "061822da6bb58c06fd9a46b4e8a05adcf8e4c1c53a03fd5bc06a1d637f02d4df",
+    "bytes": 1837
+   },
+   {
+    "rel": "lib/postal/message_db/migrations/18_add_endpoints_to_messages.rb",
+    "repo": "postalserver/postal",
+    "sha256": "02dab890a8534df5ed44386a3843ba6f5c0a2f820829462c2e80f5d98399890b",
+    "bytes": 364
+   },
+   {
+    "rel": "railties_lib_rails_application.rb",
+    "repo": "rails/rails",
+    "sha256": "4b846d0ceca1c06c86bdf17609afd71f6bdfac9bd0d799826c965eb8daff855f",
+    "bytes": 30694
+   },
+   {
+    "rel": "Library/Homebrew/test/upgrade_spec.rb",
+    "repo": "Homebrew/brew",
+    "sha256": "08bab0ccca1065812922cf98606cb657876395496b072bb686d0ea95f7370edc",
+    "bytes": 11760
+   },
+   {
+    "rel": "lib/rb/spec/binary_protocol_spec_shared.rb",
+    "repo": "apache/thrift",
+    "sha256": "047e24e93bd0aff8e8a68460625b5550dc63a28de6a0d344de6c07a3d2deecad",
+    "bytes": 18846
+   },
+   {
+    "rel": "spaceship/spec/portal/website_push_spec.rb",
+    "repo": "fastlane/fastlane",
+    "sha256": "12f6bde460b288f38298d2bbedc82b964772aa997acf07cecb6a489e6f0d985e",
+    "bytes": 3340
+   },
+   {
+    "rel": "app/scheduled_tasks/action_deletions_scheduled_task.rb",
+    "repo": "postalserver/postal",
+    "sha256": "0864f8e72fca223b64b53d7ef480853ce96f56a8adabcd3d27e0e94fd4d0f578",
+    "bytes": 418
+   },
+   {
+    "rel": "Library/Homebrew/utils/ast.rb",
+    "repo": "Homebrew/brew",
+    "sha256": "0b231a952a1c6a046a98e76f9f57d277a8b084d2aa643cacc7eb907b365ed792",
+    "bytes": 33343
+   },
+   {
+    "rel": "lib/rb/ext/extconf.rb",
+    "repo": "apache/thrift",
+    "sha256": "0574c2df60bd55d4d7c95811e3ecebdc90a6f65750d84ef0b9d84378ee55d619",
+    "bytes": 1770
+   },
+   {
+    "rel": "frameit/spec/device_spec.rb",
+    "repo": "fastlane/fastlane",
+    "sha256": "146bb0c2a3fd0ad6753da5c964bf6d196de7a0231f28a1b3c25adc09e0915ffc",
+    "bytes": 8424
+   },
+   {
+    "rel": "spec/factories/ip_pool_rule_factory.rb",
+    "repo": "postalserver/postal",
+    "sha256": "0f39d1a1d68c778d08bbe581917fe215a6b89e5c26ef0f9b7580f068110ae38f",
+    "bytes": 724
+   },
+   {
+    "rel": "Library/Homebrew/extend/os/mac/cleaner.rb",
+    "repo": "Homebrew/brew",
+    "sha256": "0b4e96ceb2885634e68adb7fc561c6159dd69166e285817baa510e1582b994f9",
+    "bytes": 390
+   },
+   {
+    "rel": "lib/rb/lib/thrift/protocol/base_protocol.rb",
+    "repo": "apache/thrift",
+    "sha256": "061e2861dbb637e7359dc4f49ee713d9683db79105c4e53c9e2a51e9d40d19b7",
+    "bytes": 11633
+   },
+   {
+    "rel": "fastlane/lib/fastlane/actions/xctool.rb",
+    "repo": "fastlane/fastlane",
+    "sha256": "148aca2a2c5b03e844b6608283e13cb4bc36d5a88e557a7cfdec0612beda825b",
+    "bytes": 1653
+   },
+   {
+    "rel": "app/controllers/track_domains_controller.rb",
+    "repo": "postalserver/postal",
+    "sha256": "13390e749334d22e95fa88031c4cfd36413059a5ff5a0b2d825596489f5702b5",
+    "bytes": 1829
+   },
+   {
+    "rel": "Library/Homebrew/cmd/setup-ruby.rb",
+    "repo": "Homebrew/brew",
+    "sha256": "11185ddceea00ee9656f1abf524b4ede8893c2d7fb2b9b67506e9cfb4d70aaba",
+    "bytes": 439
+   },
+   {
+    "rel": "lib/rb/test/fuzz/fuzz_parse_json_protocol.rb",
+    "repo": "apache/thrift",
+    "sha256": "07d9c900acf8754a6dc4329b7cc0e9f6a962c4ccd6df4f0b33ca3fe84e7e09bf",
+    "bytes": 876
+   },
+   {
+    "rel": "match/spec/profile_includes_spec.rb",
+    "repo": "fastlane/fastlane",
+    "sha256": "1a74f6305f35e6bf15f7fe38a666a8ef35377549dfd59c636b91ba67af6cd467",
+    "bytes": 6875
+   },
+   {
+    "rel": "spec/lib/smtp_server/client/mail_from_spec.rb",
+    "repo": "postalserver/postal",
+    "sha256": "14b35d9dfd4070e0f7d7fa40c40a61b199dcf3a6973a8ac140f72d561e83ab3f",
+    "bytes": 1057
+   },
+   {
+    "rel": "Library/Homebrew/cmd/tap.rb",
+    "repo": "Homebrew/brew",
+    "sha256": "143f2c4f9054ea6afc7222a58de85ffcc07db18835314fe2b4066cb7be4f4d64",
+    "bytes": 2735
+   },
+   {
+    "rel": "lib/rb/test/fuzz/fuzz_roundtrip_binary_protocol.rb",
+    "repo": "apache/thrift",
+    "sha256": "07d9c900acf8754a6dc4329b7cc0e9f6a962c4ccd6df4f0b33ca3fe84e7e09bf",
+    "bytes": 876
+   },
+   {
+    "rel": "fastlane/spec/actions_specs/set_pod_key_spec.rb",
+    "repo": "fastlane/fastlane",
+    "sha256": "1c9ce7fde7e73195517ac9545aa73c4a1200c2803629187a51120a953ad9b891",
+    "bytes": 1905
+   },
+   {
+    "rel": "app/controllers/legacy_api/send_controller.rb",
+    "repo": "postalserver/postal",
+    "sha256": "180463be3d2aa172281200083de037df87464fc42bc801e1e8919384be820bee",
+    "bytes": 5923
+   },
+   {
+    "rel": "Library/Homebrew/formula_pin.rb",
+    "repo": "Homebrew/brew",
+    "sha256": "1915b2ffc66f6b1424814749b491d813bc44fc399e5af0d42044a8d2bb7219a4",
+    "bytes": 1111
+   },
+   {
+    "rel": "lib/rb/test/fuzz/fuzz_roundtrip_binary_protocol_accelerated.rb",
+    "repo": "apache/thrift",
+    "sha256": "07d9c900acf8754a6dc4329b7cc0e9f6a962c4ccd6df4f0b33ca3fe84e7e09bf",
+    "bytes": 876
+   },
+   {
+    "rel": "spaceship/lib/spaceship/tunes/b2b_user.rb",
+    "repo": "fastlane/fastlane",
+    "sha256": "1fe9d433e3fa748a88618787bdde94ebc1b251f8d31e38c4e64e7b173ec3e22e",
+    "bytes": 811
+   },
+   {
+    "rel": "lib/postal/message_inspection.rb",
+    "repo": "postalserver/postal",
+    "sha256": "1ce90fcb6fa406e01967098992d1319456228ad7929a9e041f64c4046a3978f3",
+    "bytes": 735
+   },
+   {
+    "rel": "Library/Homebrew/extend/ENV.rb",
+    "repo": "Homebrew/brew",
+    "sha256": "204171e377d8fad78bbc31886e8f993c60c44e66d995c7b3539ec4099428666d",
+    "bytes": 1559
+   },
+   {
+    "rel": "lib/rb/test/fuzz/fuzz_roundtrip_json_protocol.rb",
+    "repo": "apache/thrift",
+    "sha256": "07d9c900acf8754a6dc4329b7cc0e9f6a962c4ccd6df4f0b33ca3fe84e7e09bf",
+    "bytes": 876
+   },
+   {
+    "rel": "frameit/lib/frameit/config_parser.rb",
+    "repo": "fastlane/fastlane",
+    "sha256": "209316d5a623e0ddff94c6959adebefa00bbe5977dd07110d235aa77d29da7e5",
+    "bytes": 4983
+   },
+   {
+    "rel": "spec/lib/postal/message_parser_spec.rb",
+    "repo": "postalserver/postal",
+    "sha256": "1ed24c5e2d1928acbabc68b13016679f2336a394704f6566286e887d181927c4",
+    "bytes": 959
+   },
+   {
+    "rel": "Library/Homebrew/sorbet/tapioca/require.rb",
+    "repo": "Homebrew/brew",
+    "sha256": "21088e2b95f2d09c2ca1c8587469485a8dc1c9680c53ae85e8e6ee74a4f35375",
+    "bytes": 953
+   },
+   {
+    "rel": "test/rb/core/protocol/test_compact_protocol.rb",
+    "repo": "apache/thrift",
+    "sha256": "0b0977fa59910c025eb586d465b24502357089ed674d87df20c89aa581a89abc",
+    "bytes": 5434
+   },
+   {
+    "rel": "spaceship/spec/connect_api/users/users_stubbing.rb",
+    "repo": "fastlane/fastlane",
+    "sha256": "26e05d5f1159fc012913a951835874a66e71b28816e69aebcfbea2d6d091b0b9",
+    "bytes": 758
+   },
+   {
+    "rel": "app/lib/message_dequeuer/initial_processor.rb",
+    "repo": "postalserver/postal",
+    "sha256": "24c5fd9666a80e102c7251ad4bd8e639f337235bde1874db15a4f3e72e3f18f1",
+    "bytes": 2075
+   },
+   {
+    "rel": "Library/Homebrew/test/cask/artifact/pkg_spec.rb",
+    "repo": "Homebrew/brew",
+    "sha256": "2f21fed306761aabe3f51f640e5e5e11e99b4d3dfc258129bff16e1bdc9eecab",
+    "bytes": 3840
+   },
+   {
+    "rel": "lib/rb/lib/thrift/protocol/header_protocol.rb",
+    "repo": "apache/thrift",
+    "sha256": "0f972b7e52e5eae3fe3e6f71df32d7eb030a9e0ec757e43846024b0141790457",
+    "bytes": 8249
+   },
+   {
+    "rel": "fastlane/lib/fastlane/server/socket_server.rb",
+    "repo": "fastlane/fastlane",
+    "sha256": "278b79e0faff5490c3d7f4741354fd39fe824e8de437ba57935bf9ae48283e12",
+    "bytes": 7443
+   },
+   {
+    "rel": "app/lib/smtp_server/server.rb",
+    "repo": "postalserver/postal",
+    "sha256": "255060b5fbf80eaeda6b0943dc00f1ad358fc5743d5548976d198eb613d08448",
+    "bytes": 12210
+   },
+   {
+    "rel": "Library/Homebrew/tab.rb",
+    "repo": "Homebrew/brew",
+    "sha256": "33760c128a96d1f9fd1f3f43f9a0bd72848a9840239af243f4c4e1aeec01d9d9",
+    "bytes": 6743
+   },
+   {
+    "rel": "lib/rb/spec/server_spec.rb",
+    "repo": "apache/thrift",
+    "sha256": "10af7f8bbcab7fea82844c8de1f42a1aac36f2b0fab976c10368d82923c1d697",
+    "bytes": 18822
+   },
+   {
+    "rel": "spaceship/lib/spaceship/connect_api/models/app_store_version_phased_release.rb",
+    "repo": "fastlane/fastlane",
+    "sha256": "2cfb2236a6915576f1ccb187eef98ff9f9f7a34a9c20c40a20a59fd98819077b",
+    "bytes": 1450
+   },
+   {
+    "rel": "app/controllers/ip_pool_rules_controller.rb",
+    "repo": "postalserver/postal",
+    "sha256": "3a858f2efb9b7cf3bf6f7059e357d777a290eb02573512be9349c4bc683fc1ba",
+    "bytes": 1417
+   },
+   {
+    "rel": "Library/Homebrew/rubocops/no_command_literal.rb",
+    "repo": "Homebrew/brew",
+    "sha256": "35727eab845bff8b3c002378fd3521ac857367816c78f37c8823017f0f7a86f6",
+    "bytes": 692
+   },
+   {
+    "rel": "lib/rb/lib/thrift/transport/memory_buffer_transport.rb",
+    "repo": "apache/thrift",
+    "sha256": "1635c3d06d64b4476bfd0372c37afb16f0b64e2a02b41249fdb8c07f03a0dd3c",
+    "bytes": 3359
+   },
+   {
+    "rel": "fastlane/lib/fastlane/actions/make_changelog_from_jenkins.rb",
+    "repo": "fastlane/fastlane",
+    "sha256": "3009768ebfb701f539893f1a550c8a590f5b689fc2bf933f704a1f22e402ba5e",
+    "bytes": 2719
+   },
+   {
+    "rel": "app/controllers/servers_controller.rb",
+    "repo": "postalserver/postal",
+    "sha256": "4393ad2249d48cdc711085fb0f2fcab5d929d0e60acb5067158befaad2163ffb",
+    "bytes": 3201
+   },
+   {
+    "rel": "Library/Homebrew/rubocops/cask/ast/cask_block.rb",
+    "repo": "Homebrew/brew",
+    "sha256": "37a8867b9523bde7c85eea48ec3576bbaafa66aeed0b5cc0ce4c5952425eee72",
+    "bytes": 2878
+   },
+   {
+    "rel": "tutorial/rb/RubyClient.rb",
+    "repo": "apache/thrift",
+    "sha256": "1692bf92666d3cc62d5fbe42d5132b3a50dd3b6c370f212a1e890e4d651ebca0",
+    "bytes": 1866
+   },
+   {
+    "rel": "fastlane/lib/fastlane.rb",
+    "repo": "fastlane/fastlane",
+    "sha256": "3761d812ef15d3a5d410b43e34cafcd344cdc45f7170436da03a4c3bd5961057",
+    "bytes": 1739
+   },
+   {
+    "rel": "db/migrate/20170418200606_initial_schema.rb",
+    "repo": "postalserver/postal",
+    "sha256": "555c1c90f8f18b12533aa7f576f40b579e448083b6b0940cfb2e27972072dc64",
+    "bytes": 15060
+   },
+   {
+    "rel": "Library/Homebrew/test/rubocops/lines/full_dependency_check_spec.rb",
+    "repo": "Homebrew/brew",
+    "sha256": "3a916c539fceeb567359f6eb04b3641f5c6f913920733b53a152398a8e3c45e4",
+    "bytes": 1450
+   },
+   {
+    "rel": "lib/rb/spec/ssl_server_socket_spec.rb",
+    "repo": "apache/thrift",
+    "sha256": "23d608d2dca4e2dd6c725646985694882de62c3205398f68ddcdc178695327c4",
+    "bytes": 11604
+   },
+   {
+    "rel": "fastlane/lib/fastlane/actions/git_pull.rb",
+    "repo": "fastlane/fastlane",
+    "sha256": "3f046e7fa117c8b44ef3129c81834fdaf20d57de550459073a0173b04987259e",
+    "bytes": 1637
+   },
+   {
+    "rel": "app/lib/received_header.rb",
+    "repo": "postalserver/postal",
+    "sha256": "5635fd32c628f7b7856d9e6bc5fdcdea4d3437e254efa7c5b3eb15a904063672",
+    "bytes": 736
+   },
+   {
+    "rel": "Library/Homebrew/unpack_strategy/generic_unar.rb",
+    "repo": "Homebrew/brew",
+    "sha256": "3f08b4c3bb549ac8cea4d31ed30ec98f99167d893698ae95596642f14b79c283",
+    "bytes": 1031
+   },
+   {
+    "rel": "lib/rb/test/fuzz/fuzz_common.rb",
+    "repo": "apache/thrift",
+    "sha256": "26baed9cfe4b9e8b02e4fc9fa6e45c44b943def12724a51cdb527259a9ddeb7a",
+    "bytes": 3066
+   },
+   {
+    "rel": "snapshot/lib/snapshot/reset_simulators.rb",
+    "repo": "fastlane/fastlane",
+    "sha256": "41cfd69725cc7e9aff34f8ed96c7b27d05e87592e2dfd08f76bdc97796bfa586",
+    "bytes": 5229
+   },
+   {
+    "rel": "spec/lib/message_dequeuer/outgoing_message_processor_spec.rb",
+    "repo": "postalserver/postal",
+    "sha256": "58c18fca5870cb020a9b1c5b0fc94c98c363d08c116a62340670d34d4eb12e62",
+    "bytes": 18705
+   },
+   {
+    "rel": "Library/Homebrew/test/bump_spec.rb",
+    "repo": "Homebrew/brew",
+    "sha256": "46b0c607f1e08913bcda7308bc1d129de35e5400a488668f959b1a8bf1799e56",
+    "bytes": 794
+   },
+   {
+    "rel": "lib/rb/spec/binary_protocol_spec.rb",
+    "repo": "apache/thrift",
+    "sha256": "315b5a824b83ca446cbf5802a487273955fe95d7e85fd481354ef81934f696fa",
+    "bytes": 2831
+   },
+   {
+    "rel": "snapshot/lib/snapshot/simulator_launchers/launcher_configuration.rb",
+    "repo": "fastlane/fastlane",
+    "sha256": "45d744c8d5c670df69bb3d8fa05f99a2b03430875fc7a695660c32c4a798f7b5",
+    "bytes": 2433
+   },
+   {
+    "rel": "spec/lib/message_dequeuer_spec.rb",
+    "repo": "postalserver/postal",
+    "sha256": "5f4d4001b1b67edb17ddbe1b993fe34495c8f757bf94cd7c0f231248f5f93cd9",
+    "bytes": 537
+   },
+   {
+    "rel": "Library/Homebrew/bundle/skipper.rb",
+    "repo": "Homebrew/brew",
+    "sha256": "49b29c212d739688c93ab0b218737df2d035c6fd7e38034a457830d9e988a2ee",
+    "bytes": 2522
+   },
+   {
+    "rel": "lib/rb/spec/header_transport_spec.rb",
+    "repo": "apache/thrift",
+    "sha256": "3188a597c3a543403d366bc4e7e64337283b4d9aaa2c3510d1f3a7599970779b",
+    "bytes": 34549
+   },
+   {
+    "rel": "fastlane/spec/tools_spec.rb",
+    "repo": "fastlane/fastlane",
+    "sha256": "468b558b7cf09b374a19b2b4f73f14b32a1e04d393315a79f00bc4c8cfef2fa9",
+    "bytes": 912
+   },
+   {
+    "rel": "config/initializers/inflections.rb",
+    "repo": "postalserver/postal",
+    "sha256": "6101c9d0f7d15c96d6ae324a5fbba26a8587440307eab224b68f41c95fe5203c",
+    "bytes": 961
+   },
+   {
+    "rel": "Library/Homebrew/cmd/update-report.rb",
+    "repo": "Homebrew/brew",
+    "sha256": "4c8fde8d8b721284d5908111fff535fb15bfa7dc82cfb5006f227d2830a41a1e",
+    "bytes": 17721
+   },
+   {
+    "rel": "lib/rb/spec/json_protocol_spec.rb",
+    "repo": "apache/thrift",
+    "sha256": "4138ba5885758f10cf9d3c5456b190176d4c99f01df9cd1be1f887e36da2df19",
+    "bytes": 24236
+   },
+   {
+    "rel": "spaceship/lib/spaceship/portal/passbook.rb",
+    "repo": "fastlane/fastlane",
+    "sha256": "473ad3e0ba07eb72a5bf9672252ff3ba332277773138f9bff18d68a1095821fb",
+    "bytes": 2248
+   },
+   {
+    "rel": "config/application.rb",
+    "repo": "postalserver/postal",
+    "sha256": "62ab6b3c85b105918f43873bf054c674982aab3b89727d640f40f0b3de4e912a",
+    "bytes": 1309
+   },
+   {
+    "rel": "Library/Homebrew/unpack_strategy/lua_rock.rb",
+    "repo": "Homebrew/brew",
+    "sha256": "4f09b6e849ee26f91dfb0ee8a9fc23020a8813994cce81db136fe3104f655a76",
+    "bytes": 543
+   },
+   {
+    "rel": "lib/rb/lib/thrift/bytes.rb",
+    "repo": "apache/thrift",
+    "sha256": "421e019bcb24c1540ecedb400625cc0a0a01aff9eb8383a4c8e4ea30db1559a0",
+    "bytes": 3478
+   },
+   {
+    "rel": "fastlane_core/spec/env_spec.rb",
+    "repo": "fastlane/fastlane",
+    "sha256": "5e99402794d8445b943728c0ed1294a68eb79782892ae0f94aa626f1e33a07d2",
+    "bytes": 979
+   },
+   {
+    "rel": "app/scheduled_tasks/prune_webhook_requests_scheduled_task.rb",
+    "repo": "postalserver/postal",
+    "sha256": "630d14c87d64a275773ea59db79a36e5331d0bd6baba379968ed79c1ebce6572",
+    "bytes": 312
+   },
+   {
+    "rel": "Library/Homebrew/install/check.rb",
+    "repo": "Homebrew/brew",
+    "sha256": "4f0d8edb2d7e40cca56f5a24a10e37bed57cda7aa6bd4b3360acab118bbdec94",
+    "bytes": 7872
+   },
+   {
+    "rel": "lib/rb/benchmark/server.rb",
+    "repo": "apache/thrift",
+    "sha256": "42fc5c6f14a82a308f4228499a58ce88149dac037dc51de916ba18753c0ad0f8",
+    "bytes": 4000
+   },
+   {
+    "rel": "fastlane/lib/fastlane/actions/appium.rb",
+    "repo": "fastlane/fastlane",
+    "sha256": "609fd27a55db4c8aecc04db477bcde70fe74a881e26dbe6c810804327b2b7e8b",
+    "bytes": 6403
+   },
+   {
+    "rel": "spec/factories/organization_factory.rb",
+    "repo": "postalserver/postal",
+    "sha256": "63e5547f04903702f035e31047c13f86277dd3c0e1af3c46f303dae3267b8fa6",
+    "bytes": 877
+   },
+   {
+    "rel": "Library/Homebrew/cmd/pyenv-sync.rb",
+    "repo": "Homebrew/brew",
+    "sha256": "50d66f7a4cb0879199b7522f09a4c75f6fb2995eaf69fb53542647ba40b80177",
+    "bytes": 3405
+   },
+   {
+    "rel": "lib/rb/spec/socket_spec_shared.rb",
+    "repo": "apache/thrift",
+    "sha256": "43c571d64d304f2808636fdd92740b564d77e3520931bb381afb6d6e7f563e24",
+    "bytes": 8211
+   },
+   {
+    "rel": "spaceship/lib/spaceship/playground.rb",
+    "repo": "fastlane/fastlane",
+    "sha256": "651883f344704d16967c11f9012e1637bfa2b5207252ba2c5fdf041fa6bb1cb0",
+    "bytes": 2338
+   },
+   {
+    "rel": "app/models/user.rb",
+    "repo": "postalserver/postal",
+    "sha256": "69c45b87c6d5c5e80c4fb3e87e52aca0a2536b659d47bd075547a0dbf4877135",
+    "bytes": 4049
+   },
+   {
+    "rel": "Library/Homebrew/messages.rb",
+    "repo": "Homebrew/brew",
+    "sha256": "56542cdd11af0ede59d40dd324262d788f3515574100e6af70516997941c7de6",
+    "bytes": 2231
+   },
+   {
+    "rel": "lib/rb/spec/base_transport_spec.rb",
+    "repo": "apache/thrift",
+    "sha256": "452195b8eb9056e720e1f3d83e464a5899ff8e2f12791e3e2d2f25442853ba8f",
+    "bytes": 24686
+   },
+   {
+    "rel": "fastlane/spec/fast_file_spec.rb",
+    "repo": "fastlane/fastlane",
+    "sha256": "68c2218f3d1d251e51a55fe6b2c96392c5443efc3aebb1babeb4498cfa61b703",
+    "bytes": 26831
+   },
+   {
+    "rel": "app/controllers/organization_ip_pools_controller.rb",
+    "repo": "postalserver/postal",
+    "sha256": "7c41a9eb2c55c1ddc4c508db7188dffdaf99c89a397fadeade8f922bdd9025fc",
+    "bytes": 453
+   },
+   {
+    "rel": "Library/Homebrew/tap/abstract_core_tap.rb",
+    "repo": "Homebrew/brew",
+    "sha256": "580fa663435dc5caa04afbd1db4948924431943de0253139165456869cf35fb0",
+    "bytes": 1181
+   },
+   {
+    "rel": "lib/rb/spec/processor_spec.rb",
+    "repo": "apache/thrift",
+    "sha256": "539a5c14bdb061638ac27eba35deb1ec0a38973c5615740b208b4057a7a1285e",
+    "bytes": 9162
+   },
+   {
+    "rel": "deliver/spec/app_screenshot_iterator_spec.rb",
+    "repo": "fastlane/fastlane",
+    "sha256": "69b63323133bcb55de40645c2f07107e3baa4fd166e3c697aacab8c08c0e6466",
+    "bytes": 9775
+   },
+   {
+    "rel": "spec/lib/query_string_spec.rb",
+    "repo": "postalserver/postal",
+    "sha256": "7dd9af2fe62d426a8d0e7354f0c29cef0dcb94c2f8375b42847de56ef91ee9b9",
+    "bytes": 1425
+   },
+   {
+    "rel": "Library/Homebrew/test/formula_versions_spec.rb",
+    "repo": "Homebrew/brew",
+    "sha256": "5fe1d0e0486f34d87edef4e1a76a4802c6a215622b51826ce1ddb108095b372a",
+    "bytes": 33666
+   },
+   {
+    "rel": "lib/rb/benchmark/benchmark.rb",
+    "repo": "apache/thrift",
+    "sha256": "579f2c53d2cfb229d7b603c7b4f3cfff0afaba1a92b8e0e6ea68801e95b91568",
+    "bytes": 9125
+   },
+   {
+    "rel": "fastlane/spec/helper/s3_client_helper_spec.rb",
+    "repo": "fastlane/fastlane",
+    "sha256": "6ae49c7613e0674e64d71b2cf345dd119cb3d3e9daf10df368fe5fb3e3aaee5b",
+    "bytes": 2738
+   },
+   {
+    "rel": "spec/factories/http_endpoint_factory.rb",
+    "repo": "postalserver/postal",
+    "sha256": "7e37e446e42d1b82cd1322d9c61f59fb9bf91703157b79f76168e22bef57cd44",
+    "bytes": 870
+   },
+   {
+    "rel": "Library/Homebrew/rubocops/caveats.rb",
+    "repo": "Homebrew/brew",
+    "sha256": "66ef73f4582e01db3596cb0428abcdaa2f921430fbfda54d51d02dfa69303840",
+    "bytes": 1867
+   },
+   {
+    "rel": "lib/rb/lib/thrift/protocol/binary_protocol.rb",
+    "repo": "apache/thrift",
+    "sha256": "589f86de6704114adf9537d438a3afd41dac7a416e258260e6f3b777179a4275",
+    "bytes": 7997
+   },
+   {
+    "rel": "spaceship/lib/spaceship/tunes/spaceship.rb",
+    "repo": "fastlane/fastlane",
+    "sha256": "6f5b4b803a63dd38e9f01e13dc0e6ab63f982c438ec2a0c43c280f93c04d933a",
+    "bytes": 1538
+   },
+   {
+    "rel": "lib/postal/message_db/migrations/05_create_raw_message_sizes.rb",
+    "repo": "postalserver/postal",
+    "sha256": "7e705884704a8f803bec09c877155e8081be1f2e0747e0ca39b3dae5b58ad515",
+    "bytes": 811
+   },
+   {
+    "rel": "Library/Homebrew/extend/os/mac/missing_formula.rb",
+    "repo": "Homebrew/brew",
+    "sha256": "697f69ae4a168c0dfa250116ea7ea426c885ea610907e5729c442d992d050c15",
+    "bytes": 1820
+   },
+   {
+    "rel": "lib/rb/lib/thrift/transport/base_server_transport.rb",
+    "repo": "apache/thrift",
+    "sha256": "61177e1d99901f1804fe4c29585247a2cab360166f59726c19266bd4e29e2ede",
+    "bytes": 1116
+   },
+   {
+    "rel": "fastlane/spec/actions_specs/oclint_spec.rb",
+    "repo": "fastlane/fastlane",
+    "sha256": "7101cdd8514834b645e179e223f4582fcc109160a288db2bd8dc1b928d7a659d",
+    "bytes": 6652
+   },
+   {
+    "rel": "spec/lib/smtp_client/server_spec.rb",
+    "repo": "postalserver/postal",
+    "sha256": "82fa81b369a004b7b11dd0d96971d01d3a1937db91628c6eb3ab7a6149788c6b",
+    "bytes": 2230
+   },
+   {
+    "rel": "Library/Homebrew/test/cmd/tap-info_spec.rb",
+    "repo": "Homebrew/brew",
+    "sha256": "6a361f5086d2f8bcdaa91f3777a0e50ef41ffb10f5d6759cb687f11d45e8d055",
+    "bytes": 13981
+   },
+   {
+    "rel": "lib/rb/lib/thrift/thrift_native.rb",
+    "repo": "apache/thrift",
+    "sha256": "6b564d38d9886ef3cb8404c696472af2086d9c9738bbc1bbc72b22f3ac416185",
+    "bytes": 953
+   },
+   {
+    "rel": "fastlane/spec/junit_spec.rb",
+    "repo": "fastlane/fastlane",
+    "sha256": "71ea95a6cd4c46c1303884c0b2d0c18cee1eb4b932565ea5b75ae0952f253770",
+    "bytes": 976
+   },
+   {
+    "rel": "app/controllers/sessions_controller.rb",
+    "repo": "postalserver/postal",
+    "sha256": "86025e512fd8cc5ecaee4255e2bbe6e2178b4335b8e63c7f1d8762c9e877efa6",
+    "bytes": 3206
+   },
+   {
+    "rel": "Library/Homebrew/test/sandbox_operation_spec.rb",
+    "repo": "Homebrew/brew",
+    "sha256": "6da578de1bfced63dc81b4f77b3a3ebb225f6ffd5feb0dcda177dfb6984d1c0f",
+    "bytes": 4970
+   },
+   {
+    "rel": "test/rb/core/test_exceptions.rb",
+    "repo": "apache/thrift",
+    "sha256": "6cd0188a44257ca12bc463784a0dde65883b55d65ccf7fd5a59f449c4fdc9943",
+    "bytes": 1067
+   },
+   {
+    "rel": "spaceship/lib/spaceship/hashcash.rb",
+    "repo": "fastlane/fastlane",
+    "sha256": "7206e51c27d66d041ae5c757e43d52d72f98cc1886ec8f005390bd7ae7076569",
+    "bytes": 2033
+   },
+   {
+    "rel": "spec/factories/queued_message_factory.rb",
+    "repo": "postalserver/postal",
+    "sha256": "874cf4cf5cc21d26d73df5213049df5606e5dea8a2924f97137fff1e7717ee6c",
+    "bytes": 1488
+   },
+   {
+    "rel": "Library/Homebrew/rubocops/cask/sha256_arch_order.rb",
+    "repo": "Homebrew/brew",
+    "sha256": "6e153d6bc59e99fd0fc8822534d2a387dfb45d8d73447cf6a259ac996faf97bc",
+    "bytes": 2391
+   },
+   {
+    "rel": "lib/rb/spec/recursion_depth_spec.rb",
+    "repo": "apache/thrift",
+    "sha256": "6d92bbc87f764f92307bd5b9322de459173a9be063db28023500c938e7ad0470",
+    "bytes": 13301
+   },
+   {
+    "rel": "fastlane/spec/actions_specs/spaceship_logs_spec.rb",
+    "repo": "fastlane/fastlane",
+    "sha256": "72d6d82627fbfafe6e7b4894141825f604d54236c802f80488dcb7bb72e16223",
+    "bytes": 930
+   },
+   {
+    "rel": "config/environments/test.rb",
+    "repo": "postalserver/postal",
+    "sha256": "889fd693aac19ac3505d7c47d8db0402b313469e0e4d03146e10dd9225bd7d43",
+    "bytes": 1783
+   },
+   {
+    "rel": "Library/Homebrew/test/rubocops/install_steps_spec.rb",
+    "repo": "Homebrew/brew",
+    "sha256": "7769b56ce3fa440ff113e586693c4328f2059ebc7b068ae7905a3f17c090847e",
+    "bytes": 32090
+   },
+   {
+    "rel": "test/rb/core/protocol/test_json_protocol.rb",
+    "repo": "apache/thrift",
+    "sha256": "6fc53f82a750b1fd19e34587189f22df80ed951c6097260e4cd604758d1f40e8",
+    "bytes": 7241
+   },
+   {
+    "rel": "scan/lib/scan/module.rb",
+    "repo": "fastlane/fastlane",
+    "sha256": "76b7cc8d65c6b691343506041e195128c7d9e35c9640ebc10a0d9fc111c170a5",
+    "bytes": 889
+   },
+   {
+    "rel": "app/lib/smtp_client/endpoint.rb",
+    "repo": "postalserver/postal",
+    "sha256": "9378dc365b2f233dff86611b6863ae97599abe919ae4fe99de1ff29aeb0d7adf",
+    "bytes": 4967
+   },
+   {
+    "rel": "Library/Homebrew/test/dev-cmd/update-python-resources_spec.rb",
+    "repo": "Homebrew/brew",
+    "sha256": "7e7e64ff0877966d95e872d54577965fd4579deb4501717869b84d18430bc904",
+    "bytes": 542
+   },
+   {
+    "rel": "test/rb/integration/TestServer.rb",
+    "repo": "apache/thrift",
+    "sha256": "7a83a87bf3c084a18248c6794d8794f4a0a43fb7c0f3ee5a4cae72defacdd8bf",
+    "bytes": 10573
+   },
+   {
+    "rel": "fastlane/spec/actions_specs/push_to_git_remote_spec.rb",
+    "repo": "fastlane/fastlane",
+    "sha256": "84ba64b78a2ffa6d98f3e4d5bec14afccf0aa4fd17164c25d2e16344610e9207",
+    "bytes": 8920
+   },
+   {
+    "rel": "lib/postal/message_db/migrations/20_increase_links_url_size.rb",
+    "repo": "postalserver/postal",
+    "sha256": "9402b988c83502c23c98eabab39ba1a01659b147bf18253da6a1179bb3d4657d",
+    "bytes": 303
+   },
+   {
+    "rel": "Library/Homebrew/bundle/extensions/vscode_extension.rb",
+    "repo": "Homebrew/brew",
+    "sha256": "8052b4563e5f0464c2c2b7f8a9c0fca5387282703120a8c4ea4807e7e64172e6",
+    "bytes": 6383
+   },
+   {
+    "rel": "lib/rb/lib/thrift/transport/unix_socket.rb",
+    "repo": "apache/thrift",
+    "sha256": "7b7011daa3f95afbe7bca76f5f459f69a15c94a9da3593c0385e14c03d6612f0",
+    "bytes": 1303
+   },
+   {
+    "rel": "precheck/spec/rules/other_platforms_rule_spec.rb",
+    "repo": "fastlane/fastlane",
+    "sha256": "874ec2ebf256e33ca8b99fa80f5b2c88a9ad0d074215a60be9478efed5e8d89f",
+    "bytes": 779
+   },
+   {
+    "rel": "app/util/has_prometheus_metrics.rb",
+    "repo": "postalserver/postal",
+    "sha256": "94beb2882e40078ed6922a250328d1d38d55fcccd8e41574a3377c68dbd5a586",
+    "bytes": 771
+   },
+   {
+    "rel": "Library/Homebrew/test/language/node_spec.rb",
+    "repo": "Homebrew/brew",
+    "sha256": "8220a73cec1c7acaa6021e8222c59ef4f846a0aec98ba5ce30ac42096fa58e48",
+    "bytes": 3562
+   },
+   {
+    "rel": "lib/rb/spec/nonblocking_server_spec.rb",
+    "repo": "apache/thrift",
+    "sha256": "7ff9b2ffeff1051d30435007795ab5d9a9fac5695770a358fdd6a388ea500485",
+    "bytes": 18704
+   },
+   {
+    "rel": "gym/lib/gym/manager.rb",
+    "repo": "fastlane/fastlane",
+    "sha256": "8764c0dd8741b0c95dcabbf2cb84b253b2135ce13485227f443dec7b6c8b29f2",
+    "bytes": 679
+   },
+   {
+    "rel": "lib/postal/message_db/migrations/10_create_spam_checks.rb",
+    "repo": "postalserver/postal",
+    "sha256": "9c7b3739f8245a5f78f41eeb2d1419e96fa56cc63e9a1af886cbe50f16e9a092",
+    "bytes": 1038
+   },
+   {
+    "rel": "Library/Homebrew/rubocops/cask/variables.rb",
+    "repo": "Homebrew/brew",
+    "sha256": "84760dab26b1fc578b9f44e925cde8f3e1cc3e18a0337a79f2187117173ef22f",
+    "bytes": 2313
+   },
+   {
+    "rel": "lib/rb/test/fuzz/fuzz_parse_compact_protocol_harness.rb",
+    "repo": "apache/thrift",
+    "sha256": "81aadaaef16e89cff6c02093633c6b1f24677196841b2f6c8054f02dd6e0e852",
+    "bytes": 913
+   },
+   {
+    "rel": "fastlane/lib/fastlane/actions/get_info_plist_value.rb",
+    "repo": "fastlane/fastlane",
+    "sha256": "87930616dddf76d1c21c11c5a55d5125dbe3250ae974b9696130886f2a3d46aa",
+    "bytes": 2278
+   },
+   {
+    "rel": "lib/postal/message_db/delivery.rb",
+    "repo": "postalserver/postal",
+    "sha256": "a1a83143b59967db6eab04bdbdd05bd16a39861645dabdd1e9a7ac634e73bb2a",
+    "bytes": 2596
+   },
+   {
+    "rel": "Library/Homebrew/rubocops/shared/homepage_helper.rb",
+    "repo": "Homebrew/brew",
+    "sha256": "87ee1a2801b8eddfbd5df217b869e5d887278b8ad0930e99f85cb7d8e64f899c",
+    "bytes": 4833
+   },
+   {
+    "rel": "lib/rb/spec/ssl_socket_spec.rb",
+    "repo": "apache/thrift",
+    "sha256": "82c9c6016caff82f0470f9c3e08a2e544b42c8128824c1eb9816089a7e497774",
+    "bytes": 19098
+   },
+   {
+    "rel": "spaceship/lib/spaceship/portal/certificate.rb",
+    "repo": "fastlane/fastlane",
+    "sha256": "8d0a55b11510c38c6ff50d918f51e646530e2c7a46b0d97ef2adebd9b69e7a0f",
+    "bytes": 13662
+   },
+   {
+    "rel": "lib/postal/message_db/migrations/01_create_migrations.rb",
+    "repo": "postalserver/postal",
+    "sha256": "a59ad951a89eb939930513038ff7e62baae51f87c9a00ed16dc624f54a026eab",
+    "bytes": 511
+   },
+   {
+    "rel": "Library/Homebrew/completions/subcommand.rb",
+    "repo": "Homebrew/brew",
+    "sha256": "8de75153308af57ff9608ce856e7248535b9dc67e07a67657ecf7b5e9a90a937",
+    "bytes": 855
+   },
+   {
+    "rel": "lib/rb/spec/flat_spec.rb",
+    "repo": "apache/thrift",
+    "sha256": "87c4d7500bad4dafcaa9a2a331782c41e32e770d1d48e112c4ec426593b10722",
+    "bytes": 2197
+   },
+   {
+    "rel": "snapshot/lib/snapshot/fixes/hardware_keyboard_fix.rb",
+    "repo": "fastlane/fastlane",
+    "sha256": "95240d4ab25b559d3b0233ded50d8e55a0b327261f6466c0c307c45f6dab3765",
+    "bytes": 1418
+   },
+   {
+    "rel": "app/controllers/application_controller.rb",
+    "repo": "postalserver/postal",
+    "sha256": "acbbd06d3d69407d5d7f3de0778a3253b1536111cdf206e46f6cac3932e15421",
+    "bytes": 2921
+   },
+   {
+    "rel": "Library/Homebrew/rubocops/cask/mixin/on_url_stanza.rb",
+    "repo": "Homebrew/brew",
+    "sha256": "92ed3ad1b67766ebcea09ed91c52837b97f617acd71ea25c19a7f976b3251239",
+    "bytes": 773
+   },
+   {
+    "rel": "lib/rb/lib/thrift/union.rb",
+    "repo": "apache/thrift",
+    "sha256": "8bc6380cd51ca14f02bcf836384b2120ecaa22e8417e2541bd6c32b96f64f86e",
+    "bytes": 5942
+   },
+   {
+    "rel": "spaceship/lib/spaceship/connect_api/models/build_upload.rb",
+    "repo": "fastlane/fastlane",
+    "sha256": "98dabfbfeb18b17070e3c5886b2f4d0de9e15324625aa581f687b88a35adcac8",
+    "bytes": 1121
+   },
+   {
+    "rel": "app/controllers/address_endpoints_controller.rb",
+    "repo": "postalserver/postal",
+    "sha256": "b4d038e487f3a35e457aa77f58a845d00cdbd0850db0f8aee45992a0e89a6dbf",
+    "bytes": 1264
+   },
+   {
+    "rel": "Library/Homebrew/test/cask/artifact/uninstall_no_zap_spec.rb",
+    "repo": "Homebrew/brew",
+    "sha256": "94a4e74bd41e6c61c103dbaedb31296aa4610ba43bf9a758ce7b2c1ed65d186e",
+    "bytes": 381
+   },
+   {
+    "rel": "lib/rb/benchmark/client.rb",
+    "repo": "apache/thrift",
+    "sha256": "928f1342ca25b17b2ebea4c7983171c62ab8d8b0263a8cadec5939d7c26233a1",
+    "bytes": 4192
+   },
+   {
+    "rel": "spaceship/lib/spaceship/two_step_or_factor_client.rb",
+    "repo": "fastlane/fastlane",
+    "sha256": "9b14bdc0a9e57f0cc7514e7fe62634528c32ed8340a768fdd3f2bc3482d1cf14",
+    "bytes": 16376
+   },
+   {
+    "rel": "lib/postal/message_db/migrations/06_create_clicks.rb",
+    "repo": "postalserver/postal",
+    "sha256": "b780daecd6ea68fccb8e5943048aa0501cf978b61ca98cb3125a3638eada3576",
+    "bytes": 1289
+   },
+   {
+    "rel": "Library/Homebrew/cmd/upgrade.rb",
+    "repo": "Homebrew/brew",
+    "sha256": "95574aef8f66d122993757af8aefd152d2139d12a4c7c548b1f28b23d43f6b7f",
+    "bytes": 44780
+   },
+   {
+    "rel": "lib/rb/lib/thrift/struct.rb",
+    "repo": "apache/thrift",
+    "sha256": "9420b387ad929839abff67dc80c211fe189547afad5a6d5fc171948f23a2d91a",
+    "bytes": 8546
+   },
+   {
+    "rel": "spaceship/lib/spaceship/tunes/display_family.rb",
+    "repo": "fastlane/fastlane",
+    "sha256": "9d9bb4ba2e9b23fc88ab46226e8350d8abf45a95c6869d24c275b4285cde98f5",
+    "bytes": 3006
+   },
+   {
+    "rel": "app/models/webhook_event.rb",
+    "repo": "postalserver/postal",
+    "sha256": "b9acb2094036c475604bdaf76545d8548842fda487497335f267bda223156cf2",
+    "bytes": 571
+   },
+   {
+    "rel": "Library/Homebrew/test/utils/string_inreplace_extension_spec.rb",
+    "repo": "Homebrew/brew",
+    "sha256": "99227434de734809903d4ecf3406a1e6fb44b4b953890ec51357c698b8e9dd51",
+    "bytes": 7275
+   },
+   {
+    "rel": "lib/rb/lib/thrift/transport/ssl_socket.rb",
+    "repo": "apache/thrift",
+    "sha256": "9487a566d5947b4a3da4e37583fa2cb6603d6108af0f6fb818305cfaacff0ba3",
+    "bytes": 3812
+   },
+   {
+    "rel": "frameit/lib/frameit/mac_editor.rb",
+    "repo": "fastlane/fastlane",
+    "sha256": "9ffe500d72e8843ebb4c640da2fd5e3b177c4062338d6f261db42711784140e8",
+    "bytes": 851
+   },
+   {
+    "rel": "app/scheduled_tasks/check_all_dns_scheduled_task.rb",
+    "repo": "postalserver/postal",
+    "sha256": "bc2fcb2f29438ac0ed737fd265ee0d6257a8cd8a16fbe1de7d8fe7b4bac8f2d0",
+    "bytes": 531
+   },
+   {
+    "rel": "Library/Homebrew/test/rubocops/resource_requires_dependencies_spec.rb",
+    "repo": "Homebrew/brew",
+    "sha256": "a359825c1e612a93379d7effbfaea8cd34511e84bca1464984f7b858250d19da",
+    "bytes": 7040
+   },
+   {
+    "rel": "lib/rb/spec/multiplexed_protocol_spec.rb",
+    "repo": "apache/thrift",
+    "sha256": "a4ecfc7f62f9d00fde3487c2c6b1f1f4555a43da5005f5795d140947c28cc1a9",
+    "bytes": 1482
+   },
+   {
+    "rel": "fastlane/spec/actions_list_spec.rb",
+    "repo": "fastlane/fastlane",
+    "sha256": "a72831feaf441e78296a01f45379de1aa32ec4f282a6bd79798b2ef19d1d0423",
+    "bytes": 1587
+   },
+   {
+    "rel": "app/controllers/credentials_controller.rb",
+    "repo": "postalserver/postal",
+    "sha256": "c24af70574af15f9c8338df04470d86730dcaaad7afc9cd8846c3fd50830b542",
+    "bytes": 1067
+   },
+   {
+    "rel": "Library/Homebrew/cask/staged.rb",
+    "repo": "Homebrew/brew",
+    "sha256": "ad4880eed2d647dac935402ba35a4c74539504bd3693dd7e2e94531702cbe65c",
+    "bytes": 2533
+   },
+   {
+    "rel": "lib/rb/benchmark/thin_server.rb",
+    "repo": "apache/thrift",
+    "sha256": "ab096151092cbf8d466c11d10b3fc5ea7480326987f9882ab3482f490a69f851",
+    "bytes": 1591
+   },
+   {
+    "rel": "produce/lib/produce/manager.rb",
+    "repo": "fastlane/fastlane",
+    "sha256": "a74411a97e0e57072f328252bee46b5019351a6f724043b0e0ffb8c53e7de43e",
+    "bytes": 531
+   },
+   {
+    "rel": "spec/helpers/test_logger.rb",
+    "repo": "postalserver/postal",
+    "sha256": "cd898d25b654e53f5d3b8364ab21c5ae14d574147276ac9b7441da23403fa6ab",
+    "bytes": 940
+   },
+   {
+    "rel": "Library/Homebrew/requirements/macos_requirement.rb",
+    "repo": "Homebrew/brew",
+    "sha256": "af8e61e838e5d6cf9b01207b3ecc25e9271738d61ff1961692830a7505641230",
+    "bytes": 5747
+   },
+   {
+    "rel": "lib/rb/lib/thrift/exceptions.rb",
+    "repo": "apache/thrift",
+    "sha256": "afe06185f84ba149bd264529bde2498d848dedbc8ee8f45917f51f583a7ff1e8",
+    "bytes": 2719
+   },
+   {
+    "rel": "fastlane/lib/fastlane/documentation/markdown_docs_generator.rb",
+    "repo": "fastlane/fastlane",
+    "sha256": "a9cd2322cffad11e4dc21aa34fd0e764a3c7d91f40382e878e0eb425f32906c5",
+    "bytes": 9378
+   },
+   {
+    "rel": "lib/postal/message_db/migrations/08_create_stats.rb",
+    "repo": "postalserver/postal",
+    "sha256": "d37357ec498c5fb9c72f2a8a7ca07d462f04dbefe27a158eb19047f629102857",
+    "bytes": 1207
+   },
+   {
+    "rel": "Library/Homebrew/cache_store/cache_store.rb",
+    "repo": "Homebrew/brew",
+    "sha256": "b46f639b36b1d8f45e201a9d3ec54eaf835aef011f4c61d16a0c1bfa79adc4b3",
+    "bytes": 475
+   },
+   {
+    "rel": "lib/rb/lib/thrift/server/threaded_server.rb",
+    "repo": "apache/thrift",
+    "sha256": "b0fcc4ec6b944cfa6b6b7f213a7e2aa18f3dd7d3dbd2e3e7e5a8a51375c91b84",
+    "bytes": 1650
+   },
+   {
+    "rel": "spaceship/spec/tunes/pricing_tier.spec.rb",
+    "repo": "fastlane/fastlane",
+    "sha256": "b2a7bb675a227820dd1413e6cfd20bdec297698f79ca22ec1e7677e4815092d7",
+    "bytes": 1539
+   },
+   {
+    "rel": "app/lib/smtp_client/server.rb",
+    "repo": "postalserver/postal",
+    "sha256": "d5c8f5d45913a383cb30c706a6a681f484dd5e063892fcd3812198c69c87d73a",
+    "bytes": 721
+   },
+   {
+    "rel": "Library/Homebrew/test/rubocop_spec.rb",
+    "repo": "Homebrew/brew",
+    "sha256": "b4c7fe5c18a9cb993ec5e4490f2b5b908436af7db1e0bc9dcd3a88fdaa134b8e",
+    "bytes": 1781
+   },
+   {
+    "rel": "lib/rb/lib/thrift/serializer/serializer.rb",
+    "repo": "apache/thrift",
+    "sha256": "ba5c65672d039efb4a762d0f234321ff92271b8c6b66612e92adcd9e036cd3ca",
+    "bytes": 1351
+   },
+   {
+    "rel": "match/spec/generator_spec.rb",
+    "repo": "fastlane/fastlane",
+    "sha256": "b2c1ae4a086f295c15fea52116990fc7e3cc4f0dc658d99ef93c4d42e76589fc",
+    "bytes": 7943
+   },
+   {
+    "rel": "config/initializers/new_framework_defaults_7_0.rb",
+    "repo": "postalserver/postal",
+    "sha256": "d6bbedb2055ab7f27685c144bd6b1d699394e7fbdcbce54e535172d8f6181c2c",
+    "bytes": 7609
+   },
+   {
+    "rel": "Library/Homebrew/test/cmd/info_spec.rb",
+    "repo": "Homebrew/brew",
+    "sha256": "b7eea73f9fd17b0027f8e12399e389f8719d21c21d266f085475f7d8064d29e7",
+    "bytes": 63406
+   },
+   {
+    "rel": "lib/rb/spec/multiplexed_processor_spec.rb",
+    "repo": "apache/thrift",
+    "sha256": "bf14dc52d0191c7fdf0f027f8c1532348a826a195727ad9451b114e0f2506d5e",
+    "bytes": 3047
+   },
+   {
+    "rel": "fastlane/lib/fastlane/actions/dotgpg_environment.rb",
+    "repo": "fastlane/fastlane",
+    "sha256": "b6f5d6e9c327403e7d65407b5592eebbc3ed4b2250133c548052f931189de286",
+    "bytes": 1732
+   },
+   {
+    "rel": "lib/postal/message_db/migrations/19_convert_database_to_utf8mb4.rb",
+    "repo": "postalserver/postal",
+    "sha256": "d9528d49269dcc7ffa4e41e0d7bbf7e6b5df6604c54b92f46ed2324b4611a757",
+    "bytes": 2486
+   },
+   {
+    "rel": "Library/Homebrew/test/extend/blank/pathname_spec.rb",
+    "repo": "Homebrew/brew",
+    "sha256": "bc1e17633b4e4a7d9fe54edaa49872bf79296da8c0887ea9d5308f14da36c4a5",
+    "bytes": 1858
+   },
+   {
+    "rel": "lib/rb/lib/thrift/struct_union.rb",
+    "repo": "apache/thrift",
+    "sha256": "c1c7adae2102eeb90c6a284d098be2db504480834ecfbf94197ab902a365682d",
+    "bytes": 6649
+   },
+   {
+    "rel": "spaceship/lib/spaceship/portal/cloud_container.rb",
+    "repo": "fastlane/fastlane",
+    "sha256": "b73c6b5a7939c39369b632954dce02f8af84f665f2f7d4061b89a4f417d03334",
+    "bytes": 2305
+   },
+   {
+    "rel": "spec/lib/postal/http_spec.rb",
+    "repo": "postalserver/postal",
+    "sha256": "db21b5f35da14152632266071f1787c99e2a349540bc4d6279e3f64aff50875e",
+    "bytes": 3170
+   },
+   {
+    "rel": "Library/Homebrew/test/rubocops/deprecate_disable/reason_spec.rb",
+    "repo": "Homebrew/brew",
+    "sha256": "c1d9008b06a4e5becdcf5a6cb4dde58c978bc15c0a6c8f1862a7b56d35a31555",
+    "bytes": 10616
+   },
+   {
+    "rel": "lib/rb/lib/thrift/client.rb",
+    "repo": "apache/thrift",
+    "sha256": "c66a7f6026c5f49e7d75d8f10d70f94a4e7ba69503e5e19495562b8890e8c75b",
+    "bytes": 3535
+   },
+   {
+    "rel": "fastlane/spec/update_app_age_rating_spec.rb",
+    "repo": "fastlane/fastlane",
+    "sha256": "b7ef0d295d268ee69de247c6fffe160f02e284c63cdb1402e491037c99db3f77",
+    "bytes": 7917
+   },
+   {
+    "rel": "spec/lib/postal/signer_spec.rb",
+    "repo": "postalserver/postal",
+    "sha256": "e0717000800873d0515b5ae70d2c8ef57c5c25c1ad9add0faf46ac73d79ba337",
+    "bytes": 2682
+   },
+   {
+    "rel": "Library/Homebrew/livecheck/skip_conditions.rb",
+    "repo": "Homebrew/brew",
+    "sha256": "c6338804d9844a71d6a83660bca970d265db1699b43132e14d485369df679348",
+    "bytes": 11930
+   },
+   {
+    "rel": "test/rb/test_suite.rb",
+    "repo": "apache/thrift",
+    "sha256": "d597f40f00dc9602594cbe92132d96540c47d62b7a842fea2999a86e3455c63d",
+    "bytes": 872
+   },
+   {
+    "rel": "internal/docs/tool_name_formatting.rb",
+    "repo": "fastlane/fastlane",
+    "sha256": "c780c1ee233f512a8dae1dad74669aabc3a4a5fbdaa036ffb53b4cce04bd76fa",
+    "bytes": 2913
+   },
+   {
+    "rel": "lib/postal/message_db/migrations/09_create_links.rb",
+    "repo": "postalserver/postal",
+    "sha256": "e0c9d6ad0089de8b7217ffcf15b026fb1777ecd535d5a215f7e4f2b8e9a7f0ac",
+    "bytes": 1109
+   },
+   {
+    "rel": "Library/Homebrew/rubocops/os_depends_on.rb",
+    "repo": "Homebrew/brew",
+    "sha256": "cd0a8f508ecf6c59ec7da46330a05d90e29593354d9e90e22c5b37b71c491537",
+    "bytes": 13088
+   },
+   {
+    "rel": "lib/rb/lib/thrift.rb",
+    "repo": "apache/thrift",
+    "sha256": "d786ca460d24339b8c92d367e674f20b395257fb97d4c9541921ca2ca3631841",
+    "bytes": 2545
+   },
+   {
+    "rel": "fastlane/spec/actions_specs/set_github_release_spec.rb",
+    "repo": "fastlane/fastlane",
+    "sha256": "ce6caf5399188042c6400aaa70065457bf6317e4179b1c8e5d96fb600a3ab946",
+    "bytes": 8164
+   },
+   {
+    "rel": "spec/helpers/general_helpers.rb",
+    "repo": "postalserver/postal",
+    "sha256": "e0ed8e5729ecd22dacb5b69f03f9bb3f9a78ab97b5d8bcc6f189e84e621bfc0b",
+    "bytes": 550
+   },
+   {
+    "rel": "Library/Homebrew/test/cask/artifact/relocated_spec.rb",
+    "repo": "Homebrew/brew",
+    "sha256": "cd414619ba8e11807b109b17640cfbabe91dbed6661139c3def1f4b515399d1f",
+    "bytes": 1772
+   },
+   {
+    "rel": "lib/rb/lib/thrift/server/simple_server.rb",
+    "repo": "apache/thrift",
+    "sha256": "dcd0446f8442e509780cabdcb7c77903926b9018032f6397e5f1e267a121878c",
+    "bytes": 2008
+   },
+   {
+    "rel": "fastlane/spec/actions_specs/apteligent_spec.rb",
+    "repo": "fastlane/fastlane",
+    "sha256": "d3c8c06883d03e15b6bd8586e1e47547269d8f84d8d95f8c2aef55876f969997",
+    "bytes": 1383
+   },
+   {
+    "rel": "script/generate_tls_certificate.rb",
+    "repo": "postalserver/postal",
+    "sha256": "e38ec29012dd1485140231999b07ad555fc33c9e9ca8d0e8274d28474da5f5bf",
+    "bytes": 968
+   },
+   {
+    "rel": "Library/Homebrew/test/utils/editor_spec.rb",
+    "repo": "Homebrew/brew",
+    "sha256": "cdb29a8f4fbc87d6e69c8205c20f4db75169830bea95b96578679c67774f3f32",
+    "bytes": 854
+   },
+   {
+    "rel": "lib/rb/test/fuzz/fuzz_roundtrip_compact_protocol_harness.rb",
+    "repo": "apache/thrift",
+    "sha256": "ddeb73a2120e24a6de2394dc6abc85a5b99c135af521f8445e2aeee341c5a22c",
+    "bytes": 916
+   },
+   {
+    "rel": "precheck/spec/rules/unreachable_urls_rule_spec.rb",
+    "repo": "fastlane/fastlane",
+    "sha256": "d5133fc60c847e318b585344e66aad2f2769364723929c345875a31e9feb1456",
+    "bytes": 3605
+   },
+   {
+    "rel": "spec/lib/message_dequeuer/incoming_message_processor_spec.rb",
+    "repo": "postalserver/postal",
+    "sha256": "e6536acef59562c12a99003833bb32134aa5d705320e7ce152028174fc9e1cda",
+    "bytes": 22669
+   },
+   {
+    "rel": "Library/Homebrew/unpack_strategy/self_extracting_executable.rb",
+    "repo": "Homebrew/brew",
+    "sha256": "cfe43835087fc52670985d0961f871be09f2f557e554d3b447838461a071953a",
+    "bytes": 506
+   },
+   {
+    "rel": "lib/rb/lib/thrift/protocol/protocol_decorator.rb",
+    "repo": "apache/thrift",
+    "sha256": "de0a56ffbbdbb2b272c75262367dd93508a4fe76210228a9b27f00bc42dafba2",
+    "bytes": 3920
+   },
+   {
+    "rel": "spaceship/lib/spaceship/connect_api/models/app_clip_app_store_review_detail.rb",
+    "repo": "fastlane/fastlane",
+    "sha256": "d74f7d8bf0f48e576231e153996b7613a7010a80a7170f9f047c53b5b80a25f9",
+    "bytes": 989
+   },
+   {
+    "rel": "app/models/route.rb",
+    "repo": "postalserver/postal",
+    "sha256": "e81f51304633b0d383e45417c48989e2cabe74f8bf6862d8df602c00cac4fa64",
+    "bytes": 6415
+   },
+   {
+    "rel": "Library/Homebrew/utils/shell.rb",
+    "repo": "Homebrew/brew",
+    "sha256": "d87a56809b9eeb00ffa85d95bfdd13f5e68560f8ac3448f5aea335b3ef345c46",
+    "bytes": 8442
+   },
+   {
+    "rel": "lib/rb/spec/header_protocol_spec.rb",
+    "repo": "apache/thrift",
+    "sha256": "e3d3fb4a746d4a2e1a94fc0cb34b556cf76cde958e3a0591736920d27df03844",
+    "bytes": 19230
+   },
+   {
+    "rel": "fastlane/spec/private_public_fastfile_spec.rb",
+    "repo": "fastlane/fastlane",
+    "sha256": "d9a58b2152414c6923c72944435e305b1c8d173168c606d829ead5e2078b08ee",
+    "bytes": 1750
+   },
+   {
+    "rel": "config/routes.rb",
+    "repo": "postalserver/postal",
+    "sha256": "ea347df26a99d5004998c685b32a0f4df668fd3b5983d2c9d8b31d85b1d9bc31",
+    "bytes": 3717
+   },
+   {
+    "rel": "Library/Homebrew/test/tap_auditor_spec.rb",
+    "repo": "Homebrew/brew",
+    "sha256": "e5a1f3c41cbc5dfb48128eb634d1fe4044d690ef163ad2345f5193922728a157",
+    "bytes": 9337
+   },
+   {
+    "rel": "test/rb/benchmarks/protocol_benchmark.rb",
+    "repo": "apache/thrift",
+    "sha256": "f3ec97901906a9adad35be85c6eb583969d7f9520b53141ce30fe08a071e9a39",
+    "bytes": 16813
+   },
+   {
+    "rel": "fastlane/lib/fastlane/actions/match_nuke.rb",
+    "repo": "fastlane/fastlane",
+    "sha256": "e6debdf97dd4e9752cd36546f21affd1b176ea33c613aa075addafaacddd63a9",
+    "bytes": 1998
+   },
+   {
+    "rel": "lib/postal/signer.rb",
+    "repo": "postalserver/postal",
+    "sha256": "f118874814b177090bfb864387ba8f6f0585cd082466ab1d94c3dd93ad7212be",
+    "bytes": 1642
+   },
+   {
+    "rel": "Library/Homebrew/test/dev-cmd/generate-internal-api_spec.rb",
+    "repo": "Homebrew/brew",
+    "sha256": "e5aea8657e6832c53feb808ceadf7fcb04c92be97b9aa35e8f53419b7947ab41",
+    "bytes": 2860
+   },
+   {
+    "rel": "lib/rb/lib/thrift/protocol/binary_protocol_accelerated.rb",
+    "repo": "apache/thrift",
+    "sha256": "f61a52f1ba37a968c9057b2a7378ce849598fa57814845cf04124454fb49460d",
+    "bytes": 1828
+   },
+   {
+    "rel": "fastlane/lib/fastlane/actions/get_github_release.rb",
+    "repo": "fastlane/fastlane",
+    "sha256": "eae6ea45ca33a111597444e3f78d26eaebb94e39f685024595ee86e29d481e33",
+    "bytes": 8004
+   },
+   {
+    "rel": "spec/views/domains/index.html.haml_spec.rb",
+    "repo": "postalserver/postal",
+    "sha256": "f1aad60bb3d34e4abd22dd3c7e239c9324317704e08a3a26c071ccb242bf9fb3",
+    "bytes": 1391
+   },
+   {
+    "rel": "Library/Homebrew/tap/core_tap.rb",
+    "repo": "Homebrew/brew",
+    "sha256": "f0e949e1abe43801324639370088d19a950027525b9d4ddb9c2a7a50c5a7e970",
+    "bytes": 6208
+   },
+   {
+    "rel": "test/rb/integration/TestClient.rb",
+    "repo": "apache/thrift",
+    "sha256": "f975f54ca3616dc78441fd179df302250106bc05a6ba309261ce283706ff5e20",
+    "bytes": 14976
+   },
+   {
+    "rel": "snapshot/lib/snapshot/update.rb",
+    "repo": "fastlane/fastlane",
+    "sha256": "eb2c7ee47d75360f938e8a3ce20f9ccc5ee00a6386d57cd6dc8ca92dde791248",
+    "bytes": 1436
+   },
+   {
+    "rel": "app/models/credential.rb",
+    "repo": "postalserver/postal",
+    "sha256": "f248f70da85ba47383e799ce4f657967d7f9a730301f684d1368feb56e580418",
+    "bytes": 1923
+   },
+   {
+    "rel": "Library/Homebrew/test/cmd/alias_spec.rb",
+    "repo": "Homebrew/brew",
+    "sha256": "fc5db9caeaf0b3be2eea835c269a6675fa859e48889d6d9ab933747ee19a832e",
+    "bytes": 560
+   },
+   {
+    "rel": "lib/rb/test/fuzz/fuzz_tracer.rb",
+    "repo": "apache/thrift",
+    "sha256": "fc21abc40d90a6539645a7b7c5c4462df5bcc84c84be3e07ad7252d989a397a8",
+    "bytes": 1025
+   },
+   {
+    "rel": "fastlane/spec/actions_specs/clipboard_spec.rb",
+    "repo": "fastlane/fastlane",
+    "sha256": "ef02bce3ea7c51c355bc758711d49c0efec0662e700a69ebb6b4d41e36fd5dda",
+    "bytes": 1303
+   },
+   {
+    "rel": "spec/lib/postal/message_db/database_spec.rb",
+    "repo": "postalserver/postal",
+    "sha256": "f3152d658e5fcd16ea49cd46bd2547547d19fb816e079922e14be8180d6259d0",
+    "bytes": 2753
+   },
+   {
+    "rel": "Library/Homebrew/dev-cmd/lgtm.rb",
+    "repo": "Homebrew/brew",
+    "sha256": "fd4e60cb638e19edafc956bd311c71705d87c376752ff396567f511e8fe10164",
+    "bytes": 4562
+   },
+   {
+    "rel": "lib/rb/test/fuzz/fuzz_parse_binary_protocol_harness.rb",
+    "repo": "apache/thrift",
+    "sha256": "fd25557138e13f2cd3414c4a87be762aea59cdbfe1cc2bb9ba0e46f6107378e7",
+    "bytes": 912
+   },
+   {
+    "rel": "fastlane/lib/fastlane/actions/last_git_commit.rb",
+    "repo": "fastlane/fastlane",
+    "sha256": "ef43e12487616b04b941d946e667239da48c97020a9a0e159d159b1c27ef14a0",
+    "bytes": 1610
+   },
+   {
+    "rel": "app/models/bounce_message.rb",
+    "repo": "postalserver/postal",
+    "sha256": "f571202043147a035848010f13c78a8846291bfa17e3f13fd29704df87534360",
+    "bytes": 1703
+   },
+   {
+    "rel": "Library/Homebrew/missing.rb",
+    "repo": "Homebrew/brew",
+    "sha256": "fe06bead14f7c91dc58e7841cd0121a33ad551fa0caf82ac4d7978297e300e9f",
+    "bytes": 2056
+   },
+   {
+    "rel": "lib/rb/lib/thrift/server/thread_pool_server.rb",
+    "repo": "apache/thrift",
+    "sha256": "fd2672b9cd3acfce52aa2ba55a87d6fb9c5a300df2fb0940b8d81709f035c9e8",
+    "bytes": 2666
+   },
+   {
+    "rel": "fastlane_core/spec/ios_app_identifier_guesser_spec.rb",
+    "repo": "fastlane/fastlane",
+    "sha256": "f56b0e5877e8284a33b9b92ecdefe3eef56a025d57c0ba2d5c3f7b1a6dd41496",
+    "bytes": 5703
+   },
+   {
+    "rel": "spec/senders/smtp_sender_spec.rb",
+    "repo": "postalserver/postal",
+    "sha256": "fde88eaa19d3207e600d38908c5784ae4de70bc116a240d255bac59ce4fc823f",
+    "bytes": 20765
+   }
+  ],
+  "trainTokens": 163792,
+  "builder": "eval/coding-competence/build-lex-prior.mjs",
+  "derive": {
+   "MIN_WORD_COUNT": 3,
+   "MIN_WORD_REPOS": 2,
+   "MIN_SYMBOL_COUNT": 1,
+   "MUNCH_PRECISION": 0.5,
+   "OPENER_MIN_COUNT": 5,
+   "OPENER1_PRECISION": 0.95,
+   "OPENER2_PRECISION": 0.99,
+   "LCP_SHARE": 0.99,
+   "STRING_MIN_COUNT": 5,
+   "STRING_OPEN_PRECISION": 0.95,
+   "MATCH_MIN": 0.9,
+   "EXTRA_MIN_COUNT": 20,
+   "EXTRA_PRECISION": 0.9,
+   "PREFIX_MIN_COUNT": 20,
+   "PREFIX_ATTACH": 0.5,
+   "SUFFIX_MIN_COUNT": 20,
+   "SUFFIX_ATTACH": 0.5,
+   "COND_MIN_COUNT": 5,
+   "COND_PRECISION": 0.95,
+   "INTERP_MIN_COUNT": 20,
+   "INTERP_MIN_SHARE": 0.02,
+   "STRPREFIX_MIN_COUNT": 3,
+   "SAMPLE": 400,
+   "IDENT_SAMPLE_MIN": 300
+  },
+  "note": "Derived from TRAIN gold only (split by repository). Every threshold is in provenance.derive. A prior nominates and refuses; it never admits an identity.",
+  "selection": {
+   "split": "train",
+   "maxFiles": 100000,
+   "maxBytes": 200000,
+   "goldErrTol": 0.02,
+   "eligible": 241,
+   "excluded": {
+    "restricted": 0,
+    "tooBig": 0
+   },
+   "gaps": [],
+   "builtAt": "2026-10-05"
+  }
+ },
+ "words": {
+  "keyword": [
+   "alias",
+   "begin",
+   "break",
+   "case",
+   "class",
+   "def",
+   "defined?",
+   "do",
+   "else",
+   "elsif",
+   "end",
+   "ensure",
+   "if",
+   "module",
+   "next",
+   "rescue",
+   "return",
+   "self",
+   "super",
+   "then",
+   "unless",
+   "when",
+   "while",
+   "yield"
+  ],
+  "literal": [
+   "false",
+   "nil",
+   "true"
+  ],
+  "counts": {
+   "module": 203,
+   "class": 246,
+   "def": 1199,
+   "self": 387,
+   "end": 4752,
+   "do": 2600,
+   "if": 773,
+   "begin": 78,
+   "rescue": 102,
+   "nil": 475,
+   "then": 18,
+   "next": 78,
+   "false": 489,
+   "true": 534,
+   "return": 287,
+   "case": 44,
+   "when": 189,
+   "yield": 12,
+   "else": 187,
+   "unless": 227,
+   "super": 53,
+   "elsif": 89,
+   "defined?": 21,
+   "alias": 3,
+   "ensure": 32,
+   "break": 14,
+   "while": 9,
+   "to": 2620,
+   "expect": 2169,
+   "new": 1322,
+   "it": 1229,
+   "Thrift": 993,
+   "eq": 954,
+   "T": 924,
+   "receive": 917,
+   "and_return": 565,
+   "with": 507,
+   "formula": 457,
+   "allow": 455,
+   "@trans": 401,
+   "require": 388,
+   "name": 378,
+   "params": 334,
+   "result": 324,
+   "protocol": 321,
+   "@prot": 319,
+   "sig": 316,
+   "message": 312,
+   "t": 307,
+   "read": 305,
+   "File": 296,
+   "write": 294,
+   "let": 274,
+   "String": 272,
+   "value": 271,
+   "type": 264,
+   "describe": 263,
+   "context": 257,
+   "described_class": 244,
+   "args": 238,
+   "returns": 233,
+   "@protocol": 229,
+   "Fastlane": 218,
+   "raise_error": 218,
+   "raise": 211,
+   "server": 205,
+   "each": 190,
+   "processor": 185,
+   "info": 183,
+   "node": 183,
+   "Array": 180,
+   "Types": 178,
+   "to_s": 174,
+   "Formula": 172,
+   "process": 170,
+   "transport": 170,
+   "error": 164,
+   "url": 157,
+   "double": 156,
+   "Boolean": 154,
+   "e": 151,
+   "path": 149,
+   "nilable": 145,
+   "available": 144,
+   "client": 140,
+   "Cask": 138,
+   "trans": 137,
+   "@server": 136,
+   "OpenSSL": 132,
+   "join": 129,
+   "puts": 129,
+   "ProtocolException": 127,
+   "before": 125,
+   "Symbol": 122,
+   "@handle": 119,
+   "Homebrew": 118,
+   "TransportException": 115,
+   "output": 114,
+   "size": 112,
+   "MemoryBufferTransport": 109,
+   "UI": 109,
+   "bind": 108,
+   "string": 108,
+   "versions": 108,
+   "@buffer": 107,
+   "class_of": 107,
+   "current": 106,
+   "FastlaneCore": 104,
+   "status": 104,
+   "tab": 103,
+   "key": 102,
+   "nil?": 100,
+   "options": 99,
+   "and": 98,
+   "tap": 98,
+   "logger": 97,
+   "read_trans": 97,
+   "attr_accessor": 96,
+   "config": 96,
+   "version": 96,
+   "FastFile": 94,
+   "include": 94,
+   "@socket": 92,
+   "flush": 92,
+   "data": 91,
+   "close": 90,
+   "to_stdout": 89,
+   "void": 88,
+   "cask": 86,
+   "not_to": 85,
+   "pack": 85,
+   "Actions": 83,
+   "SSL": 83,
+   "be": 83,
+   "ENV": 82,
+   "ordered": 82,
+   "Hash": 79,
+   "create": 79,
+   "description": 79,
+   "empty?": 79,
+   "field_info": 79,
+   "not_to_output": 79,
+   "runner": 79,
+   "Postal": 78,
+   "RuboCop": 78,
+   "include?": 78,
+   "verbose": 78,
+   "exist?": 77,
+   "count": 76,
+   "execute": 76,
+   "map": 76,
+   "SpecNamespace": 74,
+   "datetime": 74,
+   "fetch": 74,
+   "parse": 74,
+   "is_a?": 73,
+   "@client": 72,
+   "Spaceship": 71,
+   "keg_path": 71,
+   "open": 71,
+   "HeaderTransport": 69,
+   "a": 69,
+   "body": 69,
+   "first": 69,
+   "reload": 69,
+   "endpoint": 67,
+   "results": 67,
+   "match": 66,
+   "read_protocol": 66,
+   "run": 66,
+   "assert_equal": 65,
+   "full_name": 65,
+   "instance_double": 65,
+   "tabfile": 65,
+   "val": 65,
+   "AST": 64,
+   "present?": 64,
+   "item": 63,
+   "to_stderr": 63,
+   "MessageTypes": 62,
+   "Socket": 62,
+   "payload": 62,
+   "buffer": 61,
+   "have_attributes": 61,
+   "override": 61,
+   "Tab": 60,
+   "frame": 60,
+   "id": 60,
+   "Utils": 59,
+   "delivery": 58,
+   "force": 58,
+   "Pathname": 57,
+   "index": 57,
+   "times": 57,
+   "ff": 56,
+   "sender": 56,
+   "command": 55,
+   "timeout": 55,
+   "initialize": 54,
+   "oprot": 54,
+   "p": 54,
+   ":new": 53,
+   "ctx": 53,
+   "iprot": 53,
+   "mkpath": 53,
+   "port": 53,
+   "attributes": 52,
+   "expect_offense": 52,
+   "on": 52,
+   "stanza_node": 51,
+   ":test": 50,
+   "AbstractTab": 50,
+   "FILENAME": 50,
+   "any": 50,
+   "length": 50,
+   "blank?": 49,
+   "precision": 49,
+   "proc": 49,
+   "last": 48,
+   "stanza": 48,
+   ":github_info": 47,
+   "HOMEBREW_CELLAR": 47,
+   "details": 47,
+   "remaining_depth": 47,
+   "any?": 46,
+   "empty": 46,
+   "read_message_begin": 46,
+   "receive_messages": 46,
+   ":close": 45,
+   "CALL": 45,
+   "block": 45,
+   "info_formula": 45,
+   "once": 45,
+   "other": 45,
+   "response": 45,
+   "socket": 45,
+   ":name": 44,
+   "ftrans": 44,
+   "main_formula": 44,
+   "source_range": 44,
+   "Tap": 43,
+   "children": 43,
+   "i": 43,
+   "integer": 43,
+   "organization": 43,
+   "pair": 43,
+   "Devices": 42,
+   "field": 42,
+   "find": 42,
+   "queued_message": 42,
+   "StandardError": 41,
+   "default": 41,
+   "get": 41,
+   "headers": 41,
+   "io_manager": 41,
+   "ret": 41,
+   "@transport": 40,
+   "SendNode": 40,
+   "Test": 40,
+   "require_relative": 40,
+   "@simple_socket_handle": 39,
+   "NotImplementedError": 39,
+   "domain": 39,
+   "errors": 39,
+   "file": 39,
+   "freeze": 39,
+   "old": 39,
+   "untyped": 39,
+   "BlockNode": 38,
+   "Time": 38,
+   "be_a": 38,
+   "call": 38,
+   "seqid": 38,
+   "@processor": 37,
+   "BinaryProtocol": 37,
+   "Process": 37,
+   "be_nil": 37,
+   "formula_at_revision": 37,
+   "r": 37,
+   "select": 37,
+   "send": 37,
+   "server_results": 37,
+   "string_extension": 37,
+   "ConnectAPI": 36,
+   "Platform": 36,
+   "deliveries": 36,
+   "formulae": 36,
+   "method_name": 36,
+   "source": 36,
+   "time": 36,
+   "write_field_begin": 36,
+   "write_message_begin": 36,
+   "Config": 35,
+   "Thread": 35,
+   "attr_reader": 35,
+   "fid": 35,
+   "io": 35,
+   "subject": 35,
+   "@ff": 34,
+   "Node": 34,
+   "RSpec": 34,
+   "desc": 34,
+   "dry_run": 34,
+   "line": 34,
+   "read_transport": 34,
+   "user": 34,
+   ":member": 33,
+   "Encoding": 33,
+   "FramedTransport": 33,
+   "Integer": 33,
+   "and_raise": 33,
+   "c": 33,
+   "entry": 33,
+   "handler": 33,
+   "have_logged": 33,
+   "json": 33,
+   "opts": 33,
+   "private": 33,
+   "read_field_begin": 33,
+   "req": 33,
+   ":server": 32,
+   ":type": 32,
+   "SSLSocket": 32,
+   "content": 32,
+   "depth": 32,
+   "exception": 32,
+   "hash": 32
+  },
+  "identifierSample": [
+   "to",
+   "expect",
+   "new",
+   "it",
+   "Thrift",
+   "eq",
+   "T",
+   "receive",
+   "and_return",
+   "with",
+   "formula",
+   "allow",
+   "@trans",
+   "require",
+   "name",
+   "params",
+   "result",
+   "protocol",
+   "@prot",
+   "sig",
+   "message",
+   "t",
+   "read",
+   "File",
+   "write",
+   "let",
+   "String",
+   "value",
+   "type",
+   "describe",
+   "context",
+   "described_class",
+   "args",
+   "returns",
+   "@protocol",
+   "Fastlane",
+   "raise_error",
+   "raise",
+   "server",
+   "each",
+   "processor",
+   "info",
+   "node",
+   "Array",
+   "Types",
+   "to_s",
+   "Formula",
+   "process",
+   "transport",
+   "error",
+   "url",
+   "double",
+   "Boolean",
+   "e",
+   "path",
+   "nilable",
+   "available",
+   "client",
+   "Cask",
+   "trans",
+   "@server",
+   "OpenSSL",
+   "join",
+   "puts",
+   "ProtocolException",
+   "before",
+   "Symbol",
+   "@handle",
+   "Homebrew",
+   "TransportException",
+   "output",
+   "size",
+   "MemoryBufferTransport",
+   "UI",
+   "bind",
+   "string",
+   "versions",
+   "@buffer",
+   "class_of",
+   "current",
+   "FastlaneCore",
+   "status",
+   "tab",
+   "key",
+   "nil?",
+   "options",
+   "and",
+   "tap",
+   "logger",
+   "read_trans",
+   "attr_accessor",
+   "config",
+   "version",
+   "FastFile",
+   "include",
+   "@socket",
+   "flush",
+   "data",
+   "close",
+   "to_stdout",
+   "void",
+   "cask",
+   "not_to",
+   "pack",
+   "Actions",
+   "SSL",
+   "be",
+   "ENV",
+   "ordered",
+   "Hash",
+   "create",
+   "description",
+   "empty?",
+   "field_info",
+   "not_to_output",
+   "runner",
+   "Postal",
+   "RuboCop",
+   "include?",
+   "verbose",
+   "exist?",
+   "count",
+   "execute",
+   "map",
+   "SpecNamespace",
+   "datetime",
+   "fetch",
+   "parse",
+   "is_a?",
+   "@client",
+   "Spaceship",
+   "keg_path",
+   "open",
+   "HeaderTransport",
+   "a",
+   "body",
+   "first",
+   "reload",
+   "endpoint",
+   "results",
+   "match",
+   "read_protocol",
+   "run",
+   "assert_equal",
+   "full_name",
+   "instance_double",
+   "tabfile",
+   "val",
+   "AST",
+   "present?",
+   "item",
+   "to_stderr",
+   "MessageTypes",
+   "Socket",
+   "payload",
+   "buffer",
+   "have_attributes",
+   "override",
+   "Tab",
+   "frame",
+   "id",
+   "Utils",
+   "delivery",
+   "force",
+   "Pathname",
+   "index",
+   "times",
+   "ff",
+   "sender",
+   "command",
+   "timeout",
+   "initialize",
+   "oprot",
+   "p",
+   ":new",
+   "ctx",
+   "iprot",
+   "mkpath",
+   "port",
+   "attributes",
+   "expect_offense",
+   "on",
+   "stanza_node",
+   ":test",
+   "AbstractTab",
+   "FILENAME",
+   "any",
+   "length",
+   "blank?",
+   "precision",
+   "proc",
+   "last",
+   "stanza",
+   ":github_info",
+   "HOMEBREW_CELLAR",
+   "details",
+   "remaining_depth",
+   "any?",
+   "empty",
+   "read_message_begin",
+   "receive_messages",
+   ":close",
+   "CALL",
+   "block",
+   "info_formula",
+   "once",
+   "other",
+   "response",
+   "socket",
+   ":name",
+   "ftrans",
+   "main_formula",
+   "source_range",
+   "Tap",
+   "children",
+   "i",
+   "integer",
+   "organization",
+   "pair",
+   "Devices",
+   "field",
+   "find",
+   "queued_message",
+   "StandardError",
+   "default",
+   "get",
+   "headers",
+   "io_manager",
+   "ret",
+   "@transport",
+   "SendNode",
+   "Test",
+   "require_relative",
+   "@simple_socket_handle",
+   "NotImplementedError",
+   "domain",
+   "errors",
+   "file",
+   "freeze",
+   "old",
+   "untyped",
+   "BlockNode",
+   "Time",
+   "be_a",
+   "call",
+   "seqid",
+   "@processor",
+   "BinaryProtocol",
+   "Process",
+   "be_nil",
+   "formula_at_revision",
+   "r",
+   "select",
+   "send",
+   "server_results",
+   "string_extension",
+   "ConnectAPI",
+   "Platform",
+   "deliveries",
+   "formulae",
+   "method_name",
+   "source",
+   "time",
+   "write_field_begin",
+   "write_message_begin",
+   "Config",
+   "Thread",
+   "attr_reader",
+   "fid",
+   "io",
+   "subject",
+   "@ff",
+   "Node",
+   "RSpec",
+   "desc",
+   "dry_run",
+   "line",
+   "read_transport",
+   "user",
+   ":member",
+   "Encoding",
+   "FramedTransport",
+   "Integer",
+   "and_raise",
+   "c",
+   "entry",
+   "handler",
+   "have_logged",
+   "json",
+   "opts",
+   "private",
+   "read_field_begin",
+   "req",
+   ":server",
+   ":type",
+   "SSLSocket",
+   "content",
+   "depth",
+   "exception",
+   "hash"
+  ]
+ },
+ "wordChars": {
+  "extra": [
+   "$",
+   "@"
+  ],
+  "prefixes": [
+   ":"
+  ],
+  "suffix": [
+   {
+    "c": "?",
+    "attach": {
+     "_": 1,
+     "(": 1,
+     "ws": 1,
+     ":": 1,
+     ")": 1,
+     ",": 1
+    }
+   },
+   {
+    "c": "!",
+    "attach": {
+     "_": 1,
+     "(": 1,
+     "ws": 1
+    }
+   }
+  ]
+ },
+ "shape": {
+  "number": "literal",
+  "unknownWord": "identifier",
+  "unknownSymbol": "operator"
+ },
+ "comments": [
+  {
+   "open": "#",
+   "close": null,
+   "matchRate": 1,
+   "n": 3499
+  }
+ ],
+ "strings": [
+  {
+   "open": "\"",
+   "close": "\"",
+   "escape": "\\",
+   "multiline": true,
+   "trailing": false,
+   "interp": [
+    "#{"
+   ],
+   "interpQuotes": [
+    "\"",
+    "'"
+   ],
+   "prefixes": [],
+   "class": "string",
+   "matchRate": 1,
+   "n": 7523
+  },
+  {
+   "open": "'",
+   "close": "'",
+   "escape": "\\",
+   "multiline": true,
+   "trailing": false,
+   "interp": [],
+   "interpQuotes": [],
+   "prefixes": [],
+   "class": "string",
+   "matchRate": 1,
+   "n": 768
+  }
+ ],
+ "conditional": [
+  {
+   "kind": "string",
+   "open": "%",
+   "close": "}",
+   "escape": null,
+   "multiline": false,
+   "trailing": false,
+   "class": "string",
+   "afterText": [
+    ","
+   ],
+   "afterClass": [],
+   "matchRate": 0.9286,
+   "n": 14
+  },
+  {
+   "kind": "string",
+   "open": "/",
+   "close": "/",
+   "escape": "\\",
+   "multiline": false,
+   "trailing": true,
+   "class": "string",
+   "afterText": [
+    "(",
+    ",",
+    ":",
+    "="
+   ],
+   "afterClass": [
+    "operator",
+    "punctuation"
+   ],
+   "matchRate": 0.9953,
+   "n": 213
+  }
+ ],
+ "symbols": {
+  "table": {
+   "=": "operator",
+   "[": "punctuation",
+   ",": "punctuation",
+   "]": "punctuation",
+   ".": "punctuation",
+   "{": "punctuation",
+   "(": "punctuation",
+   ":": "punctuation",
+   ")": "punctuation",
+   "::": "punctuation",
+   "}": "punctuation",
+   "&.": "operator",
+   "|": "operator",
+   "||=": "operator",
+   "||": "operator",
+   "**": "operator",
+   "&&": "operator",
+   "&": "operator",
+   "?": "operator",
+   "!": "operator",
+   "<": "operator",
+   ";": "punctuation",
+   "==": "operator",
+   "<<": "operator",
+   "=>": "operator",
+   "+": "operator",
+   "-": "operator",
+   "+=": "operator",
+   "*": "operator",
+   "/": "operator",
+   "%w[": "operator",
+   "..": "operator",
+   ">>": "operator",
+   "\"": "punctuation",
+   ">": "operator",
+   "!=": "operator",
+   "...": "punctuation",
+   "<=": "operator",
+   ">=": "operator",
+   "'": "punctuation",
+   "->": "operator",
+   "`": "punctuation",
+   "%w(": "operator",
+   "%": "operator",
+   "===": "operator",
+   "^": "operator",
+   "^=": "operator",
+   "<=>": "operator",
+   "=~": "operator",
+   "-=": "operator",
+   "\\": "operator"
+  },
+  "maxLen": 3
+ },
+ "classShare": {
+  "comment": 0.02144,
+  "identifier": 0.3874,
+  "string": 0.0548,
+  "keyword": 0.07082,
+  "operator": 0.0494,
+  "literal": 0.02111,
+  "punctuation": 0.39503
+ }
+}

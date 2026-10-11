@@ -1,0 +1,201 @@
+{
+ "schema": "EOReadingGolden@1",
+ "specimen": "lear-disclaim",
+ "path": "01-literature-books/gutenberg/pg100_Complete_Works_of_Shakespeare.txt",
+ "rule": "goldens/reading/RULE.md",
+ "window": {
+  "start": 2371588,
+  "startText": "Let it be so, thy truth then be thy dower:",
+  "end": 2372102,
+  "endText": "As thou my sometime daughter.",
+  "coordinates": "normalized body (container-stripped, CRLF-normalized); spans in RAW file coordinates"
+ },
+ "notes": "King Lear 1.1, the disclaiming of Cordelia: REC·Figure ('Here I disclaim all my paternal care' — a held bond formally recanted, the exact contrast faith-reaffirmed's because draws), with the oath's own cosmology (we exist and cease to be — SIG and NUL at pattern grain) asserted inside it.",
+ "revisions": [],
+ "rows": [
+  {
+   "subject": "thy truth",
+   "relation": "be",
+   "object": "thy dower",
+   "polarity": "+",
+   "phasepost": {
+    "op": "DEF",
+    "grain": "Figure"
+   },
+   "clause": "main",
+   "prop": "lear:truth-dower",
+   "ground": "lear-1-1.1.1",
+   "role": "declared",
+   "because": "a performative jussive assignment — her truth DECREED to be her (only) dowry: a bounded standing assigned to one person, the proclaims-as family, Differentiate·Interpretation at figure grain (a main-line jussive is the assertion itself, R11's deontic rule)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "'thy' → Cordelia, the addressed daughter",
+   "alternate": {
+    "op": "SIG",
+    "grain": "Figure",
+    "because": "readable as the identificational copula alone"
+   },
+   "span": {
+    "start": 2456719,
+    "end": 2457252
+   },
+   "anchor": "Let it be so, thy truth then be thy dower:"
+  },
+  {
+   "subject": "we",
+   "relation": "do exist",
+   "object": "From whom",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "relative",
+   "prop": "lear:exist-from-orbs",
+   "ground": "lear-1-1.1.2.1",
+   "role": "declared",
+   "because": "existence held from the orbs' operation — presence as a lawlike condition of the kind (mortals): Relate·Existence at pattern grain; the oath-invocation PPs ('by the sacred radiance of the sun…') are the swearing-frame, folded (A2), but this relative asserts indicative cosmology and rows",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "'whom' → the orbs of the invocation; 'we' → mortals generally",
+   "alternate": {
+    "op": "INS",
+    "grain": "Pattern",
+    "because": "readable as derivation — being brought forth from them"
+   },
+   "span": {
+    "start": 2456719,
+    "end": 2457252
+   },
+   "anchor": "From whom we do exist"
+  },
+  {
+   "subject": "we",
+   "relation": "cease to be",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "NUL",
+    "grain": "Pattern"
+   },
+   "clause": "relative",
+   "prop": "lear:cease-to-be",
+   "ground": "lear-1-1.1.2.2",
+   "role": "declared",
+   "because": "ceasing-to-be — the absence coming about as a law of the kind: A4's family at pattern grain, polarity + (the ceasing IS the act)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "coordinated relative predicate shares 'we' → mortals generally",
+   "alternate": null,
+   "span": {
+    "start": 2456719,
+    "end": 2457252
+   },
+   "anchor": "and cease to be"
+  },
+  {
+   "subject": "I",
+   "relation": "disclaim",
+   "object": "all my paternal care, Propinquity and property of blood",
+   "polarity": "+",
+   "phasepost": {
+    "op": "REC",
+    "grain": "Figure"
+   },
+   "clause": "main",
+   "prop": "lear:disclaim-care",
+   "ground": "lear-1-1.1.2",
+   "role": "declared",
+   "because": "disclaiming formally RECANTS one's own established holding — the held bond with one person conceded, a prior ground given up: the re-zero on a single standing, Generate·Interpretation at figure grain. The exact contrast the UDHR's faith-reaffirmed row draws: reaffirmation concedes nothing, disclaiming concedes everything; 'Here' marks the performative",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "'I' → Lear; the care/propinquity/blood are his standing toward Cordelia",
+   "alternate": {
+    "op": "SEG",
+    "grain": "Figure",
+    "because": "readable as the tie severed rather than the standing recanted"
+   },
+   "span": {
+    "start": 2456719,
+    "end": 2457252
+   },
+   "anchor": "Here I disclaim all my paternal care,\nPropinquity and property of blood,"
+  },
+  {
+   "subject": "I",
+   "relation": "Hold thee from",
+   "object": "this for ever",
+   "polarity": "+",
+   "phasepost": {
+    "op": "CON",
+    "grain": "Figure"
+   },
+   "clause": "coordinate",
+   "prop": "lear:hold-from-heart",
+   "ground": "lear-1-1.1.3",
+   "role": "declared",
+   "because": "holding-from institutes a standing DISTANCE-arrangement — estrangement as a maintained relation: Relate·Structure at figure grain; 'as a stranger to my heart and me' is a manner adjunct (A2)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "coordinated predicate shares 'I' → Lear; 'thee' → Cordelia",
+   "alternate": {
+    "op": "SEG",
+    "grain": "Figure",
+    "because": "readable as the severing itself"
+   },
+   "span": {
+    "start": 2456719,
+    "end": 2457252
+   },
+   "anchor": "And as a stranger to my heart and me\nHold thee from this for ever."
+  },
+  {
+   "subject": "The barbarous Scythian",
+   "relation": "Be as well neighbour’d, pitied, and reliev’d",
+   "object": "As thou my sometime daughter",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Figure"
+   },
+   "clause": "main",
+   "prop": "lear:scythian-as-daughter",
+   "ground": "lear-1-1.1.4",
+   "role": "declared",
+   "because": "copula + comparative standing: the cannibal's nearness to his bosom DECLARED equal to hers — a condition held, stated as comparison: Relate·Existence at figure grain; 'my sometime daughter' (former daughter) carries the disclaiming forward, noted",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 2456719,
+    "end": 2457252
+   },
+   "anchor": "shall to my bosom\nBe as well neighbour’d, pitied, and reliev’d,\nAs thou my sometime daughter."
+  },
+  {
+   "subject": "he",
+   "relation": "makes",
+   "object": "his generation messes",
+   "polarity": "+",
+   "phasepost": {
+    "op": "INS",
+    "grain": "Pattern"
+   },
+   "clause": "restrictive-relative",
+   "prop": "lear:cannibal-makes-messes",
+   "ground": "lear-1-1.1.4.1",
+   "role": "declared",
+   "because": "makes-his-offspring-INTO-meals — the making-into causative, the same family as the UDHR's zh/sw enslavement verbs (使为 / asifanywe): Generate·Existence, pattern grain for the generic cannibal-kind; 'To gorge his appetite' is a purpose adjunct (A2)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "generic 'he' — the kind the relative restricts",
+   "alternate": null,
+   "span": {
+    "start": 2456719,
+    "end": 2457252
+   },
+   "anchor": "Or he that makes his generation messes\nTo gorge his appetite"
+  }
+ ]
+}

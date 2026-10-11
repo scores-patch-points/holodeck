@@ -1,0 +1,119 @@
+{
+ "schema": "ContractionPrior@1",
+ "language": "ell",
+ "provenance": {
+  "giver": "Universal Dependencies treebank (train split), human-annotated gold — multi-word tokens and glued tokens",
+  "builder": "khora native/scripts/build-contraction-prior.mjs",
+  "basis": "type-level splits (>= 2 splits and >= 0.5 of the surface's writings); bound affixes whose peel rule, simulated by the ear's applyAffixes over every surface word the splits do not cover, is right >= 0.5 of the times it fires",
+  "arrivals_floor": 2,
+  "settle_share": 0.5,
+  "key_alpha": 0.05,
+  "surface_words": 36752,
+  "split_surface_types": 7,
+  "simulated_surface_words": 36752,
+  "simulation_rounds": 1
+ },
+ "splits": {
+  "στα": [
+   "σ",
+   "τα"
+  ],
+  "στο": [
+   "σ",
+   "το"
+  ],
+  "στις": [
+   "σ",
+   "τις"
+  ],
+  "στον": [
+   "σ",
+   "τον"
+  ],
+  "στη": [
+   "σ",
+   "τη"
+  ],
+  "στους": [
+   "σ",
+   "τους"
+  ],
+  "στην": [
+   "σ",
+   "την"
+  ]
+ },
+ "suffixes": [
+  {
+   "affix": "την",
+   "marked": false,
+   "hosts": [
+    "ADP"
+   ],
+   "n_gold": 351,
+   "fires": 351,
+   "precision": 1
+  },
+  {
+   "affix": "το",
+   "marked": false,
+   "hosts": [
+    "ADP"
+   ],
+   "n_gold": 282,
+   "fires": 282,
+   "precision": 1
+  },
+  {
+   "affix": "τη",
+   "marked": false,
+   "hosts": [
+    "ADP"
+   ],
+   "n_gold": 160,
+   "fires": 160,
+   "precision": 1
+  },
+  {
+   "affix": "τις",
+   "marked": false,
+   "hosts": [
+    "ADP"
+   ],
+   "n_gold": 128,
+   "fires": 128,
+   "precision": 1
+  },
+  {
+   "affix": "τον",
+   "marked": false,
+   "hosts": [
+    "ADP"
+   ],
+   "n_gold": 80,
+   "fires": 80,
+   "precision": 1
+  },
+  {
+   "affix": "τα",
+   "marked": false,
+   "hosts": [
+    "ADP"
+   ],
+   "n_gold": 65,
+   "fires": 65,
+   "precision": 1
+  },
+  {
+   "affix": "τους",
+   "marked": false,
+   "hosts": [
+    "ADP"
+   ],
+   "n_gold": 48,
+   "fires": 48,
+   "precision": 1
+  }
+ ],
+ "prefixes": []
+}

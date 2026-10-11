@@ -1,0 +1,72 @@
+{
+  "source": "TwitterAAE (SLANG Lab, UMass Amherst)",
+  "url": "https://slanglab.cs.umass.edu/TwitterAAE/",
+  "status": "gated -- staged as metadata-only pending confirmed rights to redistribute raw tweet text",
+  "access": "This pocket does NOT include the actual TwitterAAE-full-v1.zip (5.5 GB), TwitterAAE-deps-v1.zip, or TwitterAAE-UD-v1.zip files. Those were never downloaded, decompressed, or inspected. What is staged is a from-scratch description of the dataset and its demographic-alignment methodology, written by reading the introducing paper (Blodgett, Green & O'Connor, EMNLP 2016, via its ACL Anthology PDF, https://aclweb.org/anthology/D16-1120.pdf) and the project's own site (slanglab.cs.umass.edu/TwitterAAE, fetched directly) -- not reconstructed from training-data memory.",
+  "license": "UNVERIFIED FOR RAW TWEET TEXT -- gated. The dataset's own site states, verbatim, twice (once per corpus it hosts): 'This dataset is made available for research purposes only.' No CC license, no public-domain grant, and no redistribution license of any kind accompanies that statement. The GitHub code repository (github.com/slanglab/twitteraae) carries an MIT license, but that covers the demographic-classifier CODE only -- the tweet DATA is a separately hosted zip on the lab's own site, outside the GitHub repo and its license file. The introducing paper's own release plan for the underlying tweets was IDs-only, stated directly in its own text: 'Our two resulting user corpora contain 830,000 and 7.3 million tweets, for which we are making their message IDs available for further research (in conformance with the Twitter API's Terms of Service).' A live check of X's current (2026) developer terms confirms redistribution of full tweet text/objects is not permitted outside X's own API, and even ID-only redistribution for research now requires X-approved academic-research status rather than being an open grant -- i.e. the restriction the 2016 paper was already working around has tightened, not loosened, since. This is exactly the 'genuinely ambiguous, err toward gated' case named in this repo's staging rules for scraped social-media text against a platform's own ToS.",
+  "license_verification": {
+    "checked_at": "2026-08-19",
+    "sources_checked": [
+      "https://slanglab.cs.umass.edu/TwitterAAE/ (fetched directly; the page's exact license sentence quoted above was read from the raw HTML, not paraphrased from a summary)",
+      "https://github.com/slanglab/twitteraae (README and repo metadata; MIT license found and confirmed to cover the code, not the separately-hosted dataset zip)",
+      "https://aclanthology.org/D16-1120.pdf (introducing paper, EMNLP 2016, read in full via PyMuPDF text extraction of the actual PDF fetched from the ACL Anthology -- the paper's own stated IDs-only release plan and its exact wording quoted above come from this direct read, not a secondary summary)",
+      "web search on X/Twitter's current (2025-2026) developer terms regarding redistribution of tweet text and tweet IDs for research, to check whether the ToS concern named in the pocket brief is still live"
+    ],
+    "result": "No open license found for the raw tweet data at any source checked. The dataset's own site names a research-only restriction with no formal license grant; the introducing paper's own text states an IDs-only redistribution plan citing Twitter ToS compliance as the reason; current X developer terms confirm full-text tweet redistribution remains restricted and tightened relative to 2016. Staged as metadata-only rather than guessed in either direction, per this repo's rule 2."
+  },
+  "fetched_at": "2026-08-19",
+  "coverage": "Zero raw tweets staged (0% of either the 830,000-tweet AA-aligned corpus or the 7.3-million-tweet white-aligned corpus the introducing paper describes, and 0% of whatever record count the currently-hosted TwitterAAE-full-v1.zip actually contains, which was not independently verified here). What is staged instead is 100% of what this pass judged safely redistributable: an original, fully-sourced description of the dataset's construction, methodology, released-corpus statistics as stated in the paper's own text, its validation results, and its citation requirement -- two documents, real prose written from real primary sources (the paper's PDF and the project site's raw HTML), containing no tweet text and no tweet identifiers.",
+  "not_staged": [
+    {
+      "item": "TwitterAAE-full-v1.zip (5.5 GB) -- raw tweet text/messages plus the demographic model's per-tweet inferences",
+      "reason": "gated -- 'research purposes only' with no open license, on scraped Twitter/X content whose redistribution the platform's own current ToS restricts; the introducing paper's own release plan was IDs-only for exactly this reason. Never downloaded."
+    },
+    {
+      "item": "Tweet IDs for later re-hydration (the pocket brief's own suggested metadata-only fallback)",
+      "reason": "unavailable_without_gated_fetch -- the paper states message IDs were made available 'for further research,' but obtaining that ID list requires downloading TwitterAAE-full-v1.zip from the lab's site, the same file this pocket declined to fetch. No ID list is republished here on a guess or from memory; this is a disclosed gap, not a silent omission. A future pass with an approved research-data agreement could revisit this."
+    },
+    {
+      "item": "TwitterAAE-deps-v1.zip (older Stanford Dependencies-style syntactic annotations, 200 messages, superseded by the UD dataset)",
+      "reason": "gated -- same 'research purposes only' restriction stated on the same page, same reasoning as the main corpus; also explicitly superseded by the UD dataset below, so lower priority even if it were staged."
+    },
+    {
+      "item": "TwitterAAE-UD-v1.zip (Universal Dependencies 2.0 annotations, 250 AAE + 250 Mainstream American English tweets, from the ACL 2018 follow-on paper)",
+      "reason": "gated -- the site states this dataset too is 'made available for research purposes only,' with no separate open license; not fetched, same reasoning as the main corpus."
+    },
+    {
+      "item": "The demographic classifier model itself (model/vocab.txt, model/model_count_table.txt from github.com/slanglab/twitteraae)",
+      "reason": "out_of_scope_for_this_pass -- this is genuinely MIT-licensed code/model-parameter data, not gated, but it is a vocabulary/count-table artifact rather than source-text prose and falls outside what this text-priors repo's category (11-multi-language dialects/pidgins/creoles) collects; noted here rather than silently skipped. Could be staged in 09-source-code by a future pass if wanted."
+    }
+  ],
+  "entries": [
+    {
+      "title": "TwitterAAE — dataset and methodology description",
+      "type": "metadata_description",
+      "derived_from": [
+        "Blodgett, Green & O'Connor, EMNLP 2016, 'Demographic Dialectal Variation in Social Media: A Case Study of African-American English' (aclanthology.org/D16-1120, read in full via direct PDF text extraction)",
+        "slanglab.cs.umass.edu/TwitterAAE/ (fetched directly, raw HTML read)",
+        "github.com/slanglab/twitteraae README (fetched directly)"
+      ],
+      "contains_raw_tweet_text": false,
+      "contains_tweet_ids": false,
+      "words": 1442,
+      "chars": 10562,
+      "file": "11-multi-language/dialects-pidgins-creoles/twitteraae/dataset-description.txt"
+    },
+    {
+      "title": "TwitterAAE — gating rationale and pocket README",
+      "type": "manifest_readme",
+      "contains_raw_tweet_text": false,
+      "contains_tweet_ids": false,
+      "words": 669,
+      "chars": 4656,
+      "file": "11-multi-language/dialects-pidgins-creoles/twitteraae/README.md"
+    }
+  ],
+  "totals": {
+    "documents": 2,
+    "total_words": 2111,
+    "total_chars": 15218,
+    "raw_tweets_staged": 0
+  }
+}

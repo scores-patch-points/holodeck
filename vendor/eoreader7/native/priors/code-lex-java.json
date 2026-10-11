@@ -1,0 +1,2095 @@
+{
+ "schema": "CodeLexPrior@1",
+ "language": "java",
+ "grammar": "java",
+ "provenance": {
+  "giver": "tree-sitter grammar `java` (tree-sitter-language-pack via eval/coding-competence/gold.py, gold-1), TRAIN repositories only",
+  "goldVersion": "gold-1",
+  "trainRepos": [
+   {
+    "repo": "conductor-oss/conductor",
+    "url": "https://github.com/conductor-oss/conductor",
+    "commit": "ab2de6da6c7b5935e6c6d09da29953b8d4cfe291",
+    "license": "apache-2.0",
+    "license_text_family": "apache-2.0"
+   },
+   {
+    "repo": "eugenp/tutorials",
+    "url": "https://github.com/eugenp/tutorials",
+    "commit": "56094ee565405202dab6c7cfbfecaee32882d06d",
+    "license": "mit",
+    "license_text_family": "mit"
+   },
+   {
+    "repo": "google/flatbuffers",
+    "url": "https://github.com/google/flatbuffers",
+    "commit": "b8431fbcd7a5c71817f314e18b332c0648554efa",
+    "license": "apache-2.0",
+    "license_text_family": "apache-2.0"
+   },
+   {
+    "repo": "xai-org/x-algorithm",
+    "url": "https://github.com/xai-org/x-algorithm",
+    "commit": "b412112d03f27acbfd668e0cc040abcafa1080c1",
+    "license": "apache-2.0",
+    "license_text_family": "apache-2.0"
+   }
+  ],
+  "trainFiles": [
+   {
+    "rel": "scheduler/core/src/main/java/io/orkes/conductor/scheduler/model/CronSchedule.java",
+    "repo": "conductor-oss/conductor",
+    "sha256": "0154ea4b3c37df2e57efbdc6c327921a7a3756f0397a90a91f6f4b3820ecd24b",
+    "bytes": 1050
+   },
+   {
+    "rel": "spring-boot-modules/spring-boot-5/src/main/java/com/baeldung/apiversions/header/WebConfig.java",
+    "repo": "eugenp/tutorials",
+    "sha256": "06a1562f3813ce7369ef17424f2411a73326bb1e726ca47bc77aa1a8cfe83003",
+    "bytes": 563
+   },
+   {
+    "rel": "java/src/test/java/JavaTest.java",
+    "repo": "google/flatbuffers",
+    "sha256": "00dc5fba67d8b5a0346d7a294b63a4610c9952892b8c13abce2b9a4f6529f615",
+    "bytes": 60213
+   },
+   {
+    "rel": "botmaker/src/java/com/twitter/botmaker/function/FunctionNode3.java",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "05fa00818fc58f8a1bf5d99f66f8ae01f27479002da6013522e8fcf484fbb72e",
+    "bytes": 2728
+   },
+   {
+    "rel": "rest/src/main/java/com/netflix/conductor/rest/controllers/ValidationExceptionMapper.java",
+    "repo": "conductor-oss/conductor",
+    "sha256": "02b61c257dba9edaf2cfc1458aae69fa08c2b107a72dd911419e0bc894a615b4",
+    "bytes": 6637
+   },
+   {
+    "rel": "core-java-modules/core-java-lang-oop-types-2/src/main/java/com/baeldung/staticenum/Outer.java",
+    "repo": "eugenp/tutorials",
+    "sha256": "0bac55a0571272d6cdcd904be10e1d5887367bf3b31b1d3ed33934dde2186d52",
+    "bytes": 320
+   },
+   {
+    "rel": "java/src/main/java/com/google/flatbuffers/FlexBuffersBuilder.java",
+    "repo": "google/flatbuffers",
+    "sha256": "07a59dd621176ac1257fbc526b2d4a8bc9e8f7206c50c16851fe8d7c63b26bdb",
+    "bytes": 24829
+   },
+   {
+    "rel": "botmaker/src/java/com/twitter/botmaker/function/collection/MapKeys.java",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "090e107cbe53a9ce502e6f448232408096ae179e14db3762250089c05d50aa0d",
+    "bytes": 1675
+   },
+   {
+    "rel": "ai/src/main/java/org/conductoross/conductor/ai/providers/openai/api/OpenAIImageGenApi.java",
+    "repo": "conductor-oss/conductor",
+    "sha256": "081a9896a1dad27a5ba75abc55a45281b91845243587c95fb6c030213757863f",
+    "bytes": 5502
+   },
+   {
+    "rel": "core-java-modules/core-java-string-conversions-4/src/main/java/com/baeldung/blobstringconverter/BlobStringConverter.java",
+    "repo": "eugenp/tutorials",
+    "sha256": "129972ec62e111a65242280b357384e8b0fee7a6c3383c8fdd913877c1dbe860",
+    "bytes": 1941
+   },
+   {
+    "rel": "java/src/main/java/com/google/flatbuffers/Struct.java",
+    "repo": "google/flatbuffers",
+    "sha256": "0bb3c0f982e29d5f5bb51982d0adfc5d9f438dfa2cc04ecf30cc25ae99b6d78b",
+    "bytes": 1867
+   },
+   {
+    "rel": "botmaker/src/java/com/twitter/botmaker/function/feature/Exists.java",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "0b768fe3cdaa17228dc955a8344a59be08684ed68d3e7b3056e303a7081734f2",
+    "bytes": 1863
+   },
+   {
+    "rel": "core/src/main/java/com/netflix/conductor/core/execution/mapper/UserDefinedTaskMapper.java",
+    "repo": "conductor-oss/conductor",
+    "sha256": "0918453f4eb33b05af5b75f9c3409ad32d5074ef637ca1a9154638da57489f5a",
+    "bytes": 5095
+   },
+   {
+    "rel": "feign/src/main/java/com/baeldung/core/exception/BadRequestException.java",
+    "repo": "eugenp/tutorials",
+    "sha256": "16f5b3f5953021ec7f8a09462be6dca93de8e33095ebb6a36873decfe301fe71",
+    "bytes": 400
+   },
+   {
+    "rel": "java/src/main/java/com/google/flatbuffers/ByteBufferReadWriteBuf.java",
+    "repo": "google/flatbuffers",
+    "sha256": "142d9361f0e4d0a31dde869eeacb8b7cca374e4a7c909fb583920ac628a1865d",
+    "bytes": 3277
+   },
+   {
+    "rel": "botmaker/src/java/com/twitter/botmaker/function/conversion/ToBase64.java",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "1052810fc197108a49465f50f604df6001f4c787fdbb299ae7a6573c56816739",
+    "bytes": 1698
+   },
+   {
+    "rel": "common/src/main/java/org/conductoross/conductor/common/metadata/agent/CompileResponse.java",
+    "repo": "conductor-oss/conductor",
+    "sha256": "10c912a4b898da8ea63dd09fce38562a920dc6348fceb792180721a4b56a9575",
+    "bytes": 1261
+   },
+   {
+    "rel": "core-java-modules/core-java-io-3/src/test/java/com/baeldung/existence/ExistenceUnitTest.java",
+    "repo": "eugenp/tutorials",
+    "sha256": "1c5dc0e87a4d4699ad150bcab7876b0625c39755957dba4bc0b433f7b2a0f611",
+    "bytes": 3527
+   },
+   {
+    "rel": "samples/SampleBinary.java",
+    "repo": "google/flatbuffers",
+    "sha256": "211971a90334f40324abd915d8e0a85df6cb1319b0d73f706e402038cd041ea4",
+    "bytes": 4308
+   },
+   {
+    "rel": "botmaker/scarecrow_features/src/main/java/com/twitter/scarecrow/features/FeaturesOfTweet.java",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "11dd5ec392fa45fbe307f10ee82a1c340aa741f28fe7188f37a5955716f1bb4c",
+    "bytes": 12476
+   },
+   {
+    "rel": "core/src/main/java/com/netflix/conductor/metrics/MetricsCollector.java",
+    "repo": "conductor-oss/conductor",
+    "sha256": "17daf6310498098e56745ff784e19f933ed9a156d876de05730ae327d106e536",
+    "bytes": 1793
+   },
+   {
+    "rel": "libraries-5/src/test/java/com/baeldung/r/RenjinMeanUnitTest.java",
+    "repo": "eugenp/tutorials",
+    "sha256": "1d18d6f300bff9ac37eaf26e6b343b2896a732a8a189cbfe69612a0ef2802717",
+    "bytes": 876
+   },
+   {
+    "rel": "grpc/tests/JavaGrpcTest.java",
+    "repo": "google/flatbuffers",
+    "sha256": "3eb6b7df7c2bb9e3bf8bce0484efa90641490fdedaeed7c08ac2357097b4f0a8",
+    "bytes": 9880
+   },
+   {
+    "rel": "botmaker/scarecrow_features/src/main/java/com/twitter/scarecrow/features/FeaturesOfCommunityTweetHideData.java",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "13c0dbcbd0ab7bf20c79c61781c1db03ce9a3b9819295364fead1584d9b7e7a8",
+    "bytes": 1060
+   },
+   {
+    "rel": "core/src/main/java/com/netflix/conductor/core/execution/tasks/Join.java",
+    "repo": "conductor-oss/conductor",
+    "sha256": "1ad338c638e54fd84c30b553a96b8d547f0c39fa8e7108c832f5ac1ffc484cdc",
+    "bytes": 11172
+   },
+   {
+    "rel": "persistence-modules/hibernate-jpa/src/main/java/com/baeldung/hibernate/transaction/PostService.java",
+    "repo": "eugenp/tutorials",
+    "sha256": "1e575fabb68c12553e44ec623a4af4ffa8404d40eca0157036c86c2fa1e0ab17",
+    "bytes": 713
+   },
+   {
+    "rel": "java/src/main/java/com/google/flatbuffers/BooleanVector.java",
+    "repo": "google/flatbuffers",
+    "sha256": "485148f075cba8966e235abbddbcd8a7de86948ac3b490648e8077af997b4740",
+    "bytes": 1484
+   },
+   {
+    "rel": "botmaker/scarecrow_features/src/main/java/com/twitter/scarecrow/features/FeaturesOfPublishedTicket.java",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "17cea9a02b3b95cf978b3dd7e6e6c3d6cd3ba4078b03725205f77d3474003104",
+    "bytes": 2145
+   },
+   {
+    "rel": "core/src/main/java/com/netflix/conductor/core/execution/mapper/HumanTaskMapper.java",
+    "repo": "conductor-oss/conductor",
+    "sha256": "292634fe7ac32a427d200e0fb5785f4f2a5bca78a761adbd05a1efa0e6c9dc65",
+    "bytes": 2769
+   },
+   {
+    "rel": "persistence-modules/spring-boot-persistence-mongodb-4/src/main/java/com/baeldung/mongodb/dbref/DbRefApplication.java",
+    "repo": "eugenp/tutorials",
+    "sha256": "2433603e28c43e58c40b630403b2bcbfa4afa46777eeefde58ed1b9e87772c47",
+    "bytes": 473
+   },
+   {
+    "rel": "java/src/main/java/com/google/flatbuffers/ByteVector.java",
+    "repo": "google/flatbuffers",
+    "sha256": "4fcc7a950ee32664ec9a505af56ebf0ef10dd784bb48c69a62bcc00892d52e5d",
+    "bytes": 1824
+   },
+   {
+    "rel": "botmaker/src/java/com/twitter/botmaker/function/conversion/ToPair.java",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "18cc318b85c06901cce39e7ca79f19f8e7a63805c510f4cc6aead222cdbd320e",
+    "bytes": 2830
+   },
+   {
+    "rel": "common/src/main/java/com/netflix/conductor/common/run/WorkflowSummary.java",
+    "repo": "conductor-oss/conductor",
+    "sha256": "2b9ab28ac8a4b1f80c59e2be3eb854d1d27ca53052d577f6a7b18f1e132b6c34",
+    "bytes": 13425
+   },
+   {
+    "rel": "core-java-modules/core-java-os-2/src/main/java/com/baeldung/java9/process/ProcessAPIEnhancements.java",
+    "repo": "eugenp/tutorials",
+    "sha256": "278c27b1024b48dfdd7ac2a53c7d6b45e9d9f3e79841d21f5f6c912b443f7237",
+    "bytes": 3965
+   },
+   {
+    "rel": "java/src/main/java/com/google/flatbuffers/ReadWriteBuf.java",
+    "repo": "google/flatbuffers",
+    "sha256": "5c27ab5e772113a099cd4f21a63cc67402969563ad08a17fffc545133515133f",
+    "bytes": 3879
+   },
+   {
+    "rel": "botmaker/src/java/com/twitter/botmaker/function/collection/ToStructTuple.java",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "191121fa3679c619a1060f540f0c4577143eecb74e038d487a27b7fd0a49c068",
+    "bytes": 2511
+   },
+   {
+    "rel": "es7-persistence/src/main/java/com/netflix/conductor/es7/dao/index/BulkRequestWrapper.java",
+    "repo": "conductor-oss/conductor",
+    "sha256": "2f75ffe3a974080c8b0bf542354a66f92bcf9ff7c4d6e73df1625136ef6f7de8",
+    "bytes": 1640
+   },
+   {
+    "rel": "persistence-modules/spring-data-jpa-annotations/src/test/java/com/baeldung/tx/ManualTransactionIntegrationTest.java",
+    "repo": "eugenp/tutorials",
+    "sha256": "282cc6a2ef27dea2bc23d4431ca1c158b910b1be94122e7eb7b42425bc8c9d20",
+    "bytes": 5188
+   },
+   {
+    "rel": "java/src/main/java/com/google/flatbuffers/LongVector.java",
+    "repo": "google/flatbuffers",
+    "sha256": "64c839b33ac1838875a45decc002915467bb9afb0bde1796212f849cbd7b872d",
+    "bytes": 1489
+   },
+   {
+    "rel": "botmaker/src/java/com/twitter/botmaker/compiler/thrift/TEnumMetaData.java",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "1c4a3bfbe394c6e69a10637395b491cd2cf592e4a2ee81f54f2526155138eb95",
+    "bytes": 528
+   },
+   {
+    "rel": "redis-configuration/src/test/java/com/netflix/conductor/redis/config/RedisStandaloneConfigurationTest.java",
+    "repo": "conductor-oss/conductor",
+    "sha256": "395186aabbf948d74209c3a092d20f3bd44580d444e0d6c8936942544244444b",
+    "bytes": 3980
+   },
+   {
+    "rel": "core-java-modules/core-java-arrays-operations-advanced-3/src/main/java/com/baeldung/restoreipaddress/Iterative.java",
+    "repo": "eugenp/tutorials",
+    "sha256": "2c7874f26414a3a08de596ee95e07797cf2fd260024a55fd7a9abe6b6150632c",
+    "bytes": 1213
+   },
+   {
+    "rel": "grpc/tests/GameFactory.java",
+    "repo": "google/flatbuffers",
+    "sha256": "8b1c815e681c36b05915a4e53610fcf4791dafbe8cda8552baa57b72a04978d5",
+    "bytes": 1616
+   },
+   {
+    "rel": "botmaker/src/java/com/twitter/botmaker/function/conversion/ToBinary.java",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "2250165725f82067abd3aa3bcd02994624ee227355ba39b74b037ca62eb0138e",
+    "bytes": 1561
+   },
+   {
+    "rel": "kafka/src/test/java/com/netflix/conductor/contribs/tasks/kafka/KafkaPublishTaskTest.java",
+    "repo": "conductor-oss/conductor",
+    "sha256": "3e121a1ca928629b48b95174b95f8f3ff1f44c04ed7d4714eca0a4a350bdf158",
+    "bytes": 8808
+   },
+   {
+    "rel": "spring-boot-modules/spring-boot-properties/src/main/java/com/baeldung/value/PriorityProvider.java",
+    "repo": "eugenp/tutorials",
+    "sha256": "30b3917e7e5e86e6828043d39f95a435ff5de26c610cb5ea7888e1817a6222f0",
+    "bytes": 589
+   },
+   {
+    "rel": "java/src/main/java/com/google/flatbuffers/Utf8Old.java",
+    "repo": "google/flatbuffers",
+    "sha256": "9f135b73d9bd3fed113d4cfdc95e468c619df5233e98d52b331bb9fd5f9255c1",
+    "bytes": 3410
+   },
+   {
+    "rel": "botmaker/scarecrow_features/src/main/java/com/twitter/scarecrow/features/FeaturesOfHmlSignupPredictionEvent.java",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "2a7cd9f85783668a48de8438f0cee9df48a7c5ce0824c8779563187bcbe3f672",
+    "bytes": 1068
+   },
+   {
+    "rel": "ai/src/main/java/org/conductoross/conductor/ai/recording/LLMRecordingConfiguration.java",
+    "repo": "conductor-oss/conductor",
+    "sha256": "459fb0f6c35385c6b70fa977c03a5701924d1acf8f6284c47e2c81359f97476c",
+    "bytes": 1495
+   },
+   {
+    "rel": "spring-boot-modules/spring-boot-libraries-2/src/main/java/com/baeldung/annotation/scanner/AnnotationScannerApp.java",
+    "repo": "eugenp/tutorials",
+    "sha256": "40fae30c17299d59b1d21e6ad13a4fd5a707226186b3fc329a7dbee579728ed8",
+    "bytes": 438
+   },
+   {
+    "rel": "java/src/main/java/com/google/flatbuffers/Utf8.java",
+    "repo": "google/flatbuffers",
+    "sha256": "a37d6996aad9aec5f4b2176eabf9aa497960e2a7898db21747ba9cce2c50ae2a",
+    "bytes": 9002
+   },
+   {
+    "rel": "botmaker/src/java/com/twitter/botmaker/function/datetime/TimeMsToString.java",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "2dbcdce1ee5b8777ebf05dfb5161cc4f46be98cf562154cc66fa301621278a19",
+    "bytes": 2604
+   },
+   {
+    "rel": "core/src/main/java/com/netflix/conductor/core/execution/tasks/Lambda.java",
+    "repo": "conductor-oss/conductor",
+    "sha256": "4ff32021bb44dba42d8d4f20fa39614ab91b4e14ccb6fb0baac9ba78c0087aea",
+    "bytes": 4150
+   },
+   {
+    "rel": "core-java-modules/core-java-io-3/src/test/java/com/baeldung/filenamewithoutextension/FileNameDelExtensionUnitTest.java",
+    "repo": "eugenp/tutorials",
+    "sha256": "427dbbaa578e6bf872794d13ef04cd5dcdbcc503425760a44cdcd34bbc9d5eca",
+    "bytes": 2975
+   },
+   {
+    "rel": "java/src/main/java/com/google/flatbuffers/ByteBufferUtil.java",
+    "repo": "google/flatbuffers",
+    "sha256": "a7b34013dd0735e1d26b20648e6149ea114ef99183a24899e38c4e8a8a384b4c",
+    "bytes": 1545
+   },
+   {
+    "rel": "botmaker/src/java/com/twitter/botmaker/function/collection/MapMerge.java",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "2fdb96f951c8dccb3a717571f1fe36ef69714a9f09cf08cebc736abc0a9f4d00",
+    "bytes": 2086
+   },
+   {
+    "rel": "scheduler/core/src/main/java/io/orkes/conductor/dao/scheduler/NoOpSchedulerCacheDAO.java",
+    "repo": "conductor-oss/conductor",
+    "sha256": "5030588f6fe198711b487b4296146e60a55d1d332e32f56df3595bd0769a5f29",
+    "bytes": 1495
+   },
+   {
+    "rel": "spring-boot-modules/spring-boot-nashorn/src/main/java/com/baeldung/nashorn/Application.java",
+    "repo": "eugenp/tutorials",
+    "sha256": "4749104a50b34c5ef162f1880d9e523680f8ed04fa38f42e06d7ac61d6f2f363",
+    "bytes": 680
+   },
+   {
+    "rel": "java/src/main/java/com/google/flatbuffers/ReadBuf.java",
+    "repo": "google/flatbuffers",
+    "sha256": "b3893eb4062ca6e871637a4db932d74c02fdc2da31ecbed396f7dd3d982d4422",
+    "bytes": 2059
+   },
+   {
+    "rel": "botmaker/scarecrow_features/src/main/java/com/twitter/scarecrow/features/FeaturesOfCommunityJoinRequestsAutoEnrollData.java",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "32e3882db4745bb3c80be7069980c231eb2bfbda87e106b624c287d505859e10",
+    "bytes": 1187
+   },
+   {
+    "rel": "es8-persistence/src/test/java/org/conductoross/conductor/es8/dao/index/Es8BulkIngestionSupportTest.java",
+    "repo": "conductor-oss/conductor",
+    "sha256": "582985ac88b691aafcb2aa08d676b7a6ee9065a55315182e5eaa5e5a1ab289bc",
+    "bytes": 3594
+   },
+   {
+    "rel": "core-java-modules/core-java-concurrency-basic-2/src/main/java/com/baeldung/concurrent/stopexecution/FixedTimeTask.java",
+    "repo": "eugenp/tutorials",
+    "sha256": "48cc2b4c4882157ca3c9a4f051ed0d781af87bf0e905fd9a868434b814320e95",
+    "bytes": 699
+   },
+   {
+    "rel": "java/src/main/java/com/google/flatbuffers/ShortVector.java",
+    "repo": "google/flatbuffers",
+    "sha256": "b9feae36577af264431430f8157ec63f1d7ecad433eaf11edbeb45f5d9d9a636",
+    "bytes": 1868
+   },
+   {
+    "rel": "botmaker/src/java/com/twitter/botmaker/function/exception/TryOrElse.java",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "41814e51deea5f7711a9404442b7230d98c7c0f06b202c94cdc425bb9dc3a1d8",
+    "bytes": 3105
+   },
+   {
+    "rel": "e2e/src/test/java/io/conductor/e2e/task/RetryPolicyTests.java",
+    "repo": "conductor-oss/conductor",
+    "sha256": "6103ceb3acc05117afa164691ca08ad0cc7f3b68fc75d612b8d935b1c05b161c",
+    "bytes": 52729
+   },
+   {
+    "rel": "spring-boot-modules/spring-boot-testing/src/test/java/com/baeldung/overridebean/primary/PrimaryIntegrationTest.java",
+    "repo": "eugenp/tutorials",
+    "sha256": "4bfb0f8d1e405f7bb4a895d80cd7edc5a81e655f35e2d8c7d05d6a932cd4e219",
+    "bytes": 1265
+   },
+   {
+    "rel": "java/src/main/java/com/google/flatbuffers/Utf8Safe.java",
+    "repo": "google/flatbuffers",
+    "sha256": "bc9f497f604c7308ce79a716c328c6168efb7dcd1679beb7745cf7337540ee6e",
+    "bytes": 16038
+   },
+   {
+    "rel": "botmaker/src/java/com/twitter/botmaker/function/bitwise/BitwiseOr.java",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "434f1ce90dd630b63fcc185a536523a9b2b23ed1781510c7be4418a1f1afe269",
+    "bytes": 940
+   },
+   {
+    "rel": "core/src/main/java/org/conductoross/conductor/core/execution/ExecutorUtils.java",
+    "repo": "conductor-oss/conductor",
+    "sha256": "63eb90debb6ba4dd720da80b00d019a03a7edf640b4579f63411d24fedd3e9f4",
+    "bytes": 10166
+   },
+   {
+    "rel": "core-java-modules/core-java-numbers-8/src/test/java/com/baeldung/arbitrarylengthbinaryintegers/BigIntegerExampleUnitTest.java",
+    "repo": "eugenp/tutorials",
+    "sha256": "5220b8633ca9564b9659b51c1577ec47ff7b3fd2fa15f4fcc4e2370c199b4f4d",
+    "bytes": 2130
+   },
+   {
+    "rel": "grpc/flatbuffers-java-grpc/src/main/java/com/google/flatbuffers/grpc/FlatbuffersUtils.java",
+    "repo": "google/flatbuffers",
+    "sha256": "cf3cd98efe5387969a93c2132a4d925b04685a44ee3f9ba16ed361bd1aaeb97f",
+    "bytes": 3570
+   },
+   {
+    "rel": "botmaker/src/java/com/twitter/botmaker/function/collection/SetDiff.java",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "46fb7b59f0af53c1907fb7bf5fc342f1e176c036d09df567251e65feaae364f9",
+    "bytes": 1635
+   },
+   {
+    "rel": "ai/src/main/java/org/conductoross/conductor/ai/tasks/mapper/AudioGenerationTaskMapper.java",
+    "repo": "conductor-oss/conductor",
+    "sha256": "665a039fdbde217a81e39f182d8482fca8f112f250204a1f112e81b717f285ab",
+    "bytes": 1210
+   },
+   {
+    "rel": "core-java-modules/core-java-lang-oop-patterns-2/src/test/java/com/baeldung/inheritancecomposition/InheritanceUnitTest.java",
+    "repo": "eugenp/tutorials",
+    "sha256": "545f73cf80200efdb4b138f4a9586bd2fe4e44f6b67b718671057bf46e3a93da",
+    "bytes": 728
+   },
+   {
+    "rel": "java/src/main/java/com/google/flatbuffers/FlatBufferBuilder.java",
+    "repo": "google/flatbuffers",
+    "sha256": "de56abcc8702f2f5c110fb88b68e18f64a254590d1169e0e56ba1f8d7758f714",
+    "bytes": 38920
+   },
+   {
+    "rel": "botmaker/src/java/com/twitter/botmaker/function/math/Round.java",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "48b9b3514119fa5de7ccec2b6d814c9d8c4f675475f1d2e47a1b083e04a04a85",
+    "bytes": 1358
+   },
+   {
+    "rel": "ai/src/test/java/org/conductoross/conductor/ai/sql/JDBCInstanceConfigTest.java",
+    "repo": "conductor-oss/conductor",
+    "sha256": "6af1aefa7ac4a423eeab26700cff94417153c4748c8b172fc08d389af2a326c7",
+    "bytes": 10709
+   },
+   {
+    "rel": "mapstruct-2/src/main/java/com/baeldung/list/entity/CarDto.java",
+    "repo": "eugenp/tutorials",
+    "sha256": "58cb5c9ad1b42b48a26c6b128399e7145cd732846ce8df33fc65ca7fc655b899",
+    "bytes": 1308
+   },
+   {
+    "rel": "tests/MyGame/Example/MonsterStorageGrpc.java",
+    "repo": "google/flatbuffers",
+    "sha256": "e0757624f92c6cdaa0aa508130e0d1e7e63fec39355afa4f587c27c8f4b3737c",
+    "bytes": 19909
+   },
+   {
+    "rel": "botmaker/src/java/com/twitter/botmaker/function/string/ToUpper.java",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "4a0c07d9e208848daec6e3012052b44e6fa0531b5e8b0b01cd3bbc0b538ea6ad",
+    "bytes": 1363
+   },
+   {
+    "rel": "agentspan/src/test/java/org/conductoross/conductor/ai/agentspan/a2a/A2ANativeAgentFacadeTest.java",
+    "repo": "conductor-oss/conductor",
+    "sha256": "6bbd812434b091e39af0e9dbf603885c23bddfcf106e778608c280eb77c5d0d3",
+    "bytes": 21518
+   },
+   {
+    "rel": "core-java-modules/core-java-11-3/src/main/java/com/baeldung/filewriter/FileWriterExample.java",
+    "repo": "eugenp/tutorials",
+    "sha256": "5bc376430d40761093045edd0205ace6c5bd477d0700cb4fb1dfcf691f1d947d",
+    "bytes": 562
+   },
+   {
+    "rel": "java/src/main/java/com/google/flatbuffers/BaseVector.java",
+    "repo": "google/flatbuffers",
+    "sha256": "e26dd6748142d670479d774038f5c8461bb62ee2d112431bcff22ad12abac7c3",
+    "bytes": 2709
+   },
+   {
+    "rel": "botmaker/src/java/com/twitter/botmaker/function/collection/First.java",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "4c6e12fc276d627bb6ee3f2189b147292b201627f4a83dcca2f0879c7bcdc081",
+    "bytes": 1425
+   },
+   {
+    "rel": "agentspan/src/test/java/org/conductoross/conductor/ai/agentspan/runtime/normalizer/VercelAINormalizerTest.java",
+    "repo": "conductor-oss/conductor",
+    "sha256": "6c49ab057445cb79bddf9510111c3c1f7ee18773f72f9c07b44d603cdbf53ca1",
+    "bytes": 10813
+   },
+   {
+    "rel": "jackson-modules/jackson-custom-conversions/src/test/java/com/baeldung/constructordetector/ConstructorDetectorUnitTest.java",
+    "repo": "eugenp/tutorials",
+    "sha256": "5d31da517484a6f756e384752064a6fc4d1a94bd61d48b9e0599f9cb419f1753",
+    "bytes": 2324
+   },
+   {
+    "rel": "java/src/main/java/com/google/flatbuffers/IntVector.java",
+    "repo": "google/flatbuffers",
+    "sha256": "e4103ad8fef5299e56204e61a5e8a7d4ce3fc70679c172e3fd29689c8e0203c3",
+    "bytes": 1861
+   },
+   {
+    "rel": "botmaker/src/java/com/twitter/botmaker/function/FunctionNode1.java",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "6f7c0463dc2dc0c9a3aa0fc6491c4007849d5ebb396dd70e4984bafa0fca13cd",
+    "bytes": 2429
+   },
+   {
+    "rel": "test-harness/src/test/java/com/netflix/conductor/test/utils/UserTask.java",
+    "repo": "conductor-oss/conductor",
+    "sha256": "6dbdf4c3a8e32578069e28ad8c619ae45ea591a3c8f4094ea830ca0ad4ffdaa5",
+    "bytes": 2903
+   },
+   {
+    "rel": "spring-boot-modules/spring-boot-mvc-2/src/test/java/com/baeldung/mime/XStreamMarshaller.java",
+    "repo": "eugenp/tutorials",
+    "sha256": "6245a308a66bd2ad6b67e19f8bf50d858e89b02cd249a076b7f7af69119b667f",
+    "bytes": 1084
+   },
+   {
+    "rel": "java/src/main/java/com/google/flatbuffers/ArrayReadWriteBuf.java",
+    "repo": "google/flatbuffers",
+    "sha256": "f2482af204f045291fa7b404589ea0009b4b2318b2a41670119e7a5b6c87112b",
+    "bytes": 6231
+   },
+   {
+    "rel": "botmaker/src/java/com/twitter/botmaker/compiler/thrift/TType.java",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "766ede016efbdb763eb75b464623992fd83cb304fc645a8643801d66cab0a2c7",
+    "bytes": 1167
+   },
+   {
+    "rel": "ai/src/main/java/org/conductoross/conductor/ai/agent/ConductorAgentResults.java",
+    "repo": "conductor-oss/conductor",
+    "sha256": "6ee390f9a20bcad9b7d22ccf8b738416333a7c8287ba44c9986797ae83bcbd01",
+    "bytes": 9080
+   },
+   {
+    "rel": "lombok-modules/lombok-2/src/test/java/com/baeldung/lombok/accessors/AccessorsUnitTest.java",
+    "repo": "eugenp/tutorials",
+    "sha256": "674f4587e95eacb6e0505e62fcce21d4622d07536b25cbb7cefea424574826f0",
+    "bytes": 4359
+   },
+   {
+    "rel": "java/src/main/java/com/google/flatbuffers/DoubleVector.java",
+    "repo": "google/flatbuffers",
+    "sha256": "fefc956c6468762ce74d5cbc3e7d7139f32f37021a89fd32e1c8bb0dc84b1d89",
+    "bytes": 1498
+   },
+   {
+    "rel": "botmaker/src/java/com/twitter/botmaker/function/collection/FirstN.java",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "7d885264c566679563c9d7b47e9d6de79429a04dc0c7e1a3bf03cb445534745b",
+    "bytes": 1651
+   },
+   {
+    "rel": "os-persistence-v3/src/main/java/org/conductoross/conductor/os3/dao/query/parser/internal/BooleanOp.java",
+    "repo": "conductor-oss/conductor",
+    "sha256": "71e87dd4b9748d2cf1409352c5e65ad26990066e3cea90b199d1d80e5ee2c851",
+    "bytes": 1652
+   },
+   {
+    "rel": "spring-ai-modules/spring-ai-mcp-logging/src/main/java/com/baeldung/mcp/logging/server/PasswordStrengthService.java",
+    "repo": "eugenp/tutorials",
+    "sha256": "67995834165d0e4a18d0772b8c19bfccb0a0e3ff5ae58eea699c3feea19f9d6d",
+    "bytes": 1850
+   },
+   {
+    "rel": "botmaker/scarecrow_features/src/main/java/com/twitter/scarecrow/features/FeaturesOfUserModification.java",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "81600340a0ec1cef8d411a6ba9f012936644f30b84d7adb15f4be7e734c43709",
+    "bytes": 3143
+   },
+   {
+    "rel": "common-persistence/src/test/java/com/netflix/conductor/dao/TestBase.java",
+    "repo": "conductor-oss/conductor",
+    "sha256": "7289c6654584f13b78fdbb1981ec06293f0bfa03fd2782660ecf66a9ba0f043b",
+    "bytes": 662
+   },
+   {
+    "rel": "spring-cloud-modules/spring-cloud-netflix-feign/src/test/java/com/baeldung/cloud/netflix/feign/NetflixFeignIntegrationTest.java",
+    "repo": "eugenp/tutorials",
+    "sha256": "6df052ffaed13465be45c9cbe097bbe85d3815b178d3e737eef334c07b703097",
+    "bytes": 3673
+   },
+   {
+    "rel": "botmaker/src/java/com/twitter/botmaker/compiler/exceptions/FunctionFailure.java",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "8210c4792605751f54bece697903963f899090987bbd257d815c0a6e00b78327",
+    "bytes": 1443
+   },
+   {
+    "rel": "core/src/main/java/org/conductoross/conductor/core/execution/mapper/TaskMapperValidator.java",
+    "repo": "conductor-oss/conductor",
+    "sha256": "75d705b28c60565f85ca0aad631ab7b9c8603066f30b02aeb8ba4b60624b40c8",
+    "bytes": 1024
+   },
+   {
+    "rel": "core-java-modules/core-java-collections-maps-8/src/main/java/com/baeldung/map/maptruevaluecheck/MapValuesCheck.java",
+    "repo": "eugenp/tutorials",
+    "sha256": "829ec401b98a7eb0931b4507531d307d9e0760629609fefa8b59b23aa835b904",
+    "bytes": 1289
+   },
+   {
+    "rel": "botmaker/src/java/com/twitter/botmaker/function/bitwise/BitwiseSignedRightShift.java",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "833d5877e2830954741cbf0926e4c475df9ce12cba2f3a219f5117034a3ee583",
+    "bytes": 903
+   },
+   {
+    "rel": "core/src/main/java/com/netflix/conductor/core/execution/tasks/Decision.java",
+    "repo": "conductor-oss/conductor",
+    "sha256": "78d55915f7b0039a29ccf08bc502e15869f53e6ec61051e8c97fd301047c4337",
+    "bytes": 1565
+   },
+   {
+    "rel": "algorithms-modules/algorithms-genetic/src/main/java/com/baeldung/algorithms/ga/annealing/SimulatedAnnealing.java",
+    "repo": "eugenp/tutorials",
+    "sha256": "83e5f85865650fc3e068cc16183f66f66689dcbc4be4d1fa8ef16ec913e9a54b",
+    "bytes": 1422
+   },
+   {
+    "rel": "botmaker/src/java/com/twitter/botmaker/function/misc/InstanceOf.java",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "83e4c2be8475f3ac1e7cc55cb309eddefd2f44fa981610d0d0f2ec7918008288",
+    "bytes": 1719
+   },
+   {
+    "rel": "awss3-storage/src/main/java/org/conductoross/conductor/s3/config/S3FileStorageConfiguration.java",
+    "repo": "conductor-oss/conductor",
+    "sha256": "7a23028a71d8ce7a8e4a52cff9e011686fa77b6b6595df26cac6d0a204eac60b",
+    "bytes": 2503
+   },
+   {
+    "rel": "apache-spark/src/main/java/com/baeldung/dataframes/DataFrameToCustomerConverterApp.java",
+    "repo": "eugenp/tutorials",
+    "sha256": "86d4d8ec5f1be6ab330f710bfa97666ef09810a5048ddb9b32f24ef9b3682675",
+    "bytes": 705
+   },
+   {
+    "rel": "botmaker/src/java/com/twitter/botmaker/function/datetime/CurrentTimeMs.java",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "85860ee551ab21fb81a1e1fde2ed861cc2375ac618240dac08b22b282b10201c",
+    "bytes": 1305
+   },
+   {
+    "rel": "ai/src/main/java/org/conductoross/conductor/ai/providers/openai/OpenAIHttpImageModel.java",
+    "repo": "conductor-oss/conductor",
+    "sha256": "7a744563e24e3aaf5d0905df1485c22dfcd883b6db32fde328e6f4266ccd5424",
+    "bytes": 3809
+   },
+   {
+    "rel": "spring-ai-modules/spring-ai/src/main/java/com/baeldung/springai/semanticsearch/BookSearchController.java",
+    "repo": "eugenp/tutorials",
+    "sha256": "881ce62dc3f25c9c525b224e292b50819bcde19624397e28cb785af3ac76b7cf",
+    "bytes": 1721
+   },
+   {
+    "rel": "botmaker/scarecrow_features/src/main/java/com/twitter/scarecrow/features/FeaturesOfSgsBlockGraphEvent.java",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "88d57b3b23e19e97d8dfda60f3912880bf09a31711000fa92e2678890fcd13f5",
+    "bytes": 2478
+   },
+   {
+    "rel": "agentspan/src/main/java/org/conductoross/conductor/ai/agentspan/runtime/controller/ProviderController.java",
+    "repo": "conductor-oss/conductor",
+    "sha256": "7e71894770414fdde498890a9b575854f64fe5172cd031634e67be3a7835de68",
+    "bytes": 5653
+   },
+   {
+    "rel": "core-java-modules/core-java-lang-oop-others/src/main/java/com/baeldung/parameterpassing/Primitives.java",
+    "repo": "eugenp/tutorials",
+    "sha256": "8aeee7ecda336d078ab2f4810f5b0d41f29cba05f2c667ae17859604b7ae6492",
+    "bytes": 430
+   },
+   {
+    "rel": "botmaker/scarecrow_features/src/main/java/com/twitter/scarecrow/features/FeaturesOfCommunityRuleUpdateData.java",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "8ac9e4eb6d1b72a36abab1d7acbbec267dc770408bad33d536078b49e6da049b",
+    "bytes": 1636
+   },
+   {
+    "rel": "es7-persistence/src/test/java/com/netflix/conductor/es7/dao/index/TestElasticSearchRestDAOV7Batch.java",
+    "repo": "conductor-oss/conductor",
+    "sha256": "815d24ff8cb6818ba4f27727f5c61209af7273945866c308381294021af46342",
+    "bytes": 3358
+   },
+   {
+    "rel": "core-java-modules/core-java-exceptions-3/src/test/java/com/baeldung/exceptions/localization/LocalizedExceptionUnitTest.java",
+    "repo": "eugenp/tutorials",
+    "sha256": "8f1f81ae2685700e682011694c7c55251cb9dba84f1034f0c39cb20a4f9dab11",
+    "bytes": 2279
+   },
+   {
+    "rel": "botmaker/src/java/com/twitter/botmaker/compiler/BotMakerDoc.java",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "8ccdb609595d856054fd021c23f7897ecf02cb490faec64b0ed7567915c8be37",
+    "bytes": 5416
+   },
+   {
+    "rel": "mysql-persistence/src/main/java/com/netflix/conductor/mysql/config/MySQLProperties.java",
+    "repo": "conductor-oss/conductor",
+    "sha256": "8c6137370e2bc464eb61c073975350df112e45284e2c95fbac4006f432c07a45",
+    "bytes": 1523
+   },
+   {
+    "rel": "apache-libraries/src/test/java/com/baeldung/apache/opennlp/LemmetizerUnitTest.java",
+    "repo": "eugenp/tutorials",
+    "sha256": "9aa212aa8bcf08c6ceab15388827c750528b1d9ede6179cc7bf5825a099b9b70",
+    "bytes": 1224
+   },
+   {
+    "rel": "botmaker/src/java/com/twitter/botmaker/function/FunctionNode2.java",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "8f27ae792b561bb129a6bdae6df48fd73b7b26ac1022ea7a22de36288f002b7c",
+    "bytes": 2549
+   },
+   {
+    "rel": "agentspan/src/test/java/org/conductoross/conductor/ai/agentspan/runtime/compiler/WorkerRuntimeMetadataTest.java",
+    "repo": "conductor-oss/conductor",
+    "sha256": "8c9d91c12670949f93cdf619bcc2b963797d76da8086d0beb0fdd135d130c4ea",
+    "bytes": 4245
+   },
+   {
+    "rel": "core-java-modules/core-java-string-operations-4/src/test/java/com/baeldung/equalsvscontentequals/StringEqualsVsContentEqualsUnitTest.java",
+    "repo": "eugenp/tutorials",
+    "sha256": "b120f50ee20d566e8d007412c29edde71f34bda25f770d45f219c80165f4e716",
+    "bytes": 1023
+   },
+   {
+    "rel": "botmaker/src/java/com/twitter/botmaker/function/collection/MapEntries.java",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "93b194a3d200442b3004ed9e9fc9ba4200e73b0bf8afd5f5896dc6c556293fb5",
+    "bytes": 1949
+   },
+   {
+    "rel": "common/src/test/java/com/netflix/conductor/common/config/TestObjectMapperConfiguration.java",
+    "repo": "conductor-oss/conductor",
+    "sha256": "907e6061c798f384aa603303e2e7144aa3bdb86c9f92aa0245381cc06482b297",
+    "bytes": 1085
+   },
+   {
+    "rel": "persistence-modules/spring-data-mongodb/src/test/java/com/baeldung/repository/UserRepositoryLiveTest.java",
+    "repo": "eugenp/tutorials",
+    "sha256": "b1c78fb8ff529fe4b28299af6cfde195db256dda6eb4f105cd35c1db6df6c5eb",
+    "bytes": 4817
+   },
+   {
+    "rel": "botmaker/src/java/com/twitter/botmaker/function/math/Random.java",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "99ae046bde01b7b41cd6e2ce808ab0673541f31187a3940decc82f42ab33ba77",
+    "bytes": 1262
+   },
+   {
+    "rel": "common/src/main/java/com/netflix/conductor/common/validation/ValidationError.java",
+    "repo": "conductor-oss/conductor",
+    "sha256": "99df997c4dfe9cfd4173b18885716fd8ffb9bb53cb4752f510fd3a3d308622b5",
+    "bytes": 1883
+   },
+   {
+    "rel": "spring-boot-modules/spring-boot-mvc-4/src/main/java/com/baeldung/utils/UtilsApplication.java",
+    "repo": "eugenp/tutorials",
+    "sha256": "b3204b08812a52deb6f2c01424fb0e07fd871885659d57809028e2ee2f681456",
+    "bytes": 507
+   },
+   {
+    "rel": "botmaker/scarecrow_features/src/main/java/com/twitter/scarecrow/features/FeaturesOfAudioSpaceUserBannedEvent.java",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "99daf91d82ba12ab19fd85c70704324c53784d367a126682a6fc648614a565ee",
+    "bytes": 2470
+   },
+   {
+    "rel": "e2e/src/test/java/io/conductor/e2e/workflow/SyncWorkflowExecutionTest.java",
+    "repo": "conductor-oss/conductor",
+    "sha256": "9ef32b6dfd5d00150c398cf0a60ed13770cc41bd789e15d2fcfa3e8f6228ed4e",
+    "bytes": 13903
+   },
+   {
+    "rel": "core-java-modules/core-java-date-operations/src/test/java/com/baeldung/datetime/LocalDateTimeExtractYearMonthDayIntegerValuesUnitTest.java",
+    "repo": "eugenp/tutorials",
+    "sha256": "b3c52a2d8c00add6c3da63a5f923329f8f395dcb76049436569f434b4164b8d5",
+    "bytes": 1106
+   },
+   {
+    "rel": "botmaker/src/java/com/twitter/botmaker/compiler/DerivedFeature.java",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "9a92f49a289d07ac98a1bc074f418b3afb6b746623ee07491a88c140985d1dcd",
+    "bytes": 4071
+   },
+   {
+    "rel": "postgres-persistence/src/main/java/com/netflix/conductor/postgres/dao/PostgresMetadataDAO.java",
+    "repo": "conductor-oss/conductor",
+    "sha256": "a352a916626d3b19a2a0297b2cb2f6e5f7b8eaa12f8b999eaf476340517cd7a7",
+    "bytes": 26725
+   },
+   {
+    "rel": "persistence-modules/orientdb/src/test/java/com/baeldung/orientdb/OrientDBObjectAPILiveTest.java",
+    "repo": "eugenp/tutorials",
+    "sha256": "b4a8a2c7ab2d8adea93cbdec0b1285baffa605b174d9f9ec68656d184e3946e7",
+    "bytes": 1702
+   },
+   {
+    "rel": "botmaker/src/java/com/twitter/botmaker/function/string/RegexMatch.java",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "a0df3eb0108f39858ca75bd95db06206003aa9fb5a4b05b11029dfb737b11f1f",
+    "bytes": 1299
+   },
+   {
+    "rel": "core/src/main/java/com/netflix/conductor/core/execution/mapper/LambdaTaskMapper.java",
+    "repo": "conductor-oss/conductor",
+    "sha256": "a7afb2afd2fa980c29ddb114f4c03afab053667e942ec11c0f2d79beb1db435b",
+    "bytes": 3224
+   },
+   {
+    "rel": "core-java-modules/core-java-jvm-2/src/test/java/com/baeldung/boolsize/BooleanSizeUnitTest.java",
+    "repo": "eugenp/tutorials",
+    "sha256": "b6c76af720942c73acb1c0afe4e0c18f4162e081a93e76a79a758d985534183a",
+    "bytes": 599
+   },
+   {
+    "rel": "botmaker/scarecrow_features/src/main/java/com/twitter/scarecrow/features/FeaturesOfUrlEvent.java",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "a77f7486d4f90296c699c017870226404288addc65dcc1b7eacdf63ca8fd098a",
+    "bytes": 6316
+   },
+   {
+    "rel": "core/src/main/java/org/conductoross/conductor/core/storage/FileStorage.java",
+    "repo": "conductor-oss/conductor",
+    "sha256": "a8b92b4ef5c96222096cb56e107af15f7f0a608ef69ab7d2d9b68339d97acb39",
+    "bytes": 3937
+   },
+   {
+    "rel": "disruptor/src/main/java/com/baeldung/disruptor/MultiEventPrintConsumer.java",
+    "repo": "eugenp/tutorials",
+    "sha256": "bddfdf7aa369591bd229b530bbb68b4a58af4a45642087e7d848b754f1fedc49",
+    "bytes": 862
+   },
+   {
+    "rel": "botmaker/src/java/com/twitter/botmaker/function/collection/MapContains.java",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "a87b1c4c45c305570da5bb848775f89ef4df174f1bc41fc71404d7ff46db5582",
+    "bytes": 1759
+   },
+   {
+    "rel": "ai/src/test/java/org/conductoross/conductor/ai/video/VideoModelTest.java",
+    "repo": "conductor-oss/conductor",
+    "sha256": "ab93edcb0dd4b3c058f0c3a792265c4df3f352bc91db0d0161105f603e32725f",
+    "bytes": 5273
+   },
+   {
+    "rel": "spring-boot-modules/spring-boot-groovy/src/main/java/com/baeldung/springgroovyconfig/Company.java",
+    "repo": "eugenp/tutorials",
+    "sha256": "be2b6378dc99c646fbd51a87edba3823c050640594b762f139d99b7f1c405e21",
+    "bytes": 669
+   },
+   {
+    "rel": "botmaker/scarecrow_features/src/main/java/com/twitter/scarecrow/features/FeaturesOfAudioSpaceUserUnbannedEvent.java",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "a9e03fdfa65f25bb526b7c4933812d0d4a6d575399b0969b8614db0eb88d52e1",
+    "bytes": 2323
+   },
+   {
+    "rel": "rest/src/test/java/org/conductoross/conductor/rest/controllers/FileResourceTest.java",
+    "repo": "conductor-oss/conductor",
+    "sha256": "afefd6a711998154d9865985e2fb1e5be01ae5af6caf93a02c229c80db82585c",
+    "bytes": 7222
+   },
+   {
+    "rel": "persistence-modules/couchbase/src/test/java/com/baeldung/couchbase/mapreduce/StudentGradeServiceLiveTest.java",
+    "repo": "eugenp/tutorials",
+    "sha256": "beb519af19c84fc6981dd980c8d2585017d97298ed0f252f9f6d62fc73ec1530",
+    "bytes": 5215
+   },
+   {
+    "rel": "botmaker/src/java/com/twitter/botmaker/function/string/IndexOf.java",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "ab76b88dab1866fef4f26d122571bd9e1bf11f75e38b23a1c8bb101ee88d01ba",
+    "bytes": 1888
+   },
+   {
+    "rel": "ai/src/main/java/org/conductoross/conductor/ai/vectordb/mongodb/MongoDBConfig.java",
+    "repo": "conductor-oss/conductor",
+    "sha256": "b611dcd43f1e3022b180b6fb7b00f5cbea6493bfbb386bdb3db867258314afa8",
+    "bytes": 1294
+   },
+   {
+    "rel": "httpclient-simple/src/test/java/com/baeldung/httpclient/sec/HttpClientAuthLiveTest.java",
+    "repo": "eugenp/tutorials",
+    "sha256": "bed2ff41f8e612c6edfb7c72618af577a6d7a3e71b028cbc47c90081c9c86fc2",
+    "bytes": 6084
+   },
+   {
+    "rel": "botmaker/src/java/com/twitter/botmaker/function/conversion/ToScript.java",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "ab7b3290c1369d19ec63e921fcf5b483c3d24f0ba2a869a8a7ba96d7bb56e817",
+    "bytes": 1384
+   },
+   {
+    "rel": "common/src/main/java/com/netflix/conductor/common/metadata/workflow/UpgradeWorkflowRequest.java",
+    "repo": "conductor-oss/conductor",
+    "sha256": "bbf0dd66628a43d1b71e7c6ef01c25ac18b7731c7ab808be789024403f4a6545",
+    "bytes": 1901
+   },
+   {
+    "rel": "server-modules/netty/src/main/java/com/baeldung/http/server/HttpServer.java",
+    "repo": "eugenp/tutorials",
+    "sha256": "bee6514672e0c9aa0e553d593530d6b6d77c708e9c2614f6d5f6024eb887d4aa",
+    "bytes": 2165
+   },
+   {
+    "rel": "botmaker/src/java/com/twitter/botmaker/function/bitwise/BitwiseAnd.java",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "ada31a94d917c435068183ca9fa89d5a6e212fa0e7bc9bc4a04e61a92098c9d6",
+    "bytes": 855
+   },
+   {
+    "rel": "es8-persistence/src/main/java/org/conductoross/conductor/es8/dao/query/parser/internal/Name.java",
+    "repo": "conductor-oss/conductor",
+    "sha256": "c263e944e03634917a8c23e73c8f792b96dfceceac9a625e21caa25c600f0ed9",
+    "bytes": 1167
+   },
+   {
+    "rel": "core-java-modules/core-java-11/src/main/java/com/baeldung/java11/httpclient/HttpClientExample.java",
+    "repo": "eugenp/tutorials",
+    "sha256": "c27bcecb1672e2e1aaac85e297cf5b41f0edd811c77423beae1b238420c6ea87",
+    "bytes": 5919
+   },
+   {
+    "rel": "botmaker/scarecrow_features/src/main/java/com/twitter/scarecrow/features/FeaturesOfTitleUpdatedEvent.java",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "b258a9f5dd31dad0b97b73c63b5d5a37ae6b70167d136fe7a1992d55ab16f0e3",
+    "bytes": 1071
+   },
+   {
+    "rel": "core/src/test/java/com/netflix/conductor/core/events/MockObservableQueue.java",
+    "repo": "conductor-oss/conductor",
+    "sha256": "c99a7bec1144076543b6aa0c74cf326311ed2a49d0a7028446a28e5a66548bd8",
+    "bytes": 2402
+   },
+   {
+    "rel": "jhipster-modules/jhipster-uaa/quotes/src/main/java/com/baeldung/jhipster/quotes/config/LocaleConfiguration.java",
+    "repo": "eugenp/tutorials",
+    "sha256": "c7f512500bcdcef570f54286069c328c5f6a04285cf7db7663f4ece9b9c9f009",
+    "bytes": 1071
+   },
+   {
+    "rel": "botmaker/src/java/com/twitter/botmaker/function/bitwise/ReverseBits.java",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "b6e108b148ff8ebbf98f905667aca9b2f1fde1118f4b2f0112d284f6ff62ef38",
+    "bytes": 1419
+   },
+   {
+    "rel": "test-harness/src/test/java/com/netflix/conductor/test/integration/grpc/TestHarnessAbstractGrpcEndToEndTest.java",
+    "repo": "conductor-oss/conductor",
+    "sha256": "ca2df4cdf96ae668b815b85460218950447a99abdba628501ad5890347c77402",
+    "bytes": 11506
+   },
+   {
+    "rel": "core-java-modules/core-java-17/src/main/java/com/baeldung/randomgenerators/BenchmarkRunner.java",
+    "repo": "eugenp/tutorials",
+    "sha256": "cac69d49dde27cdf047957a18d05e8e75ee6c4bf3b5cfe2db2b5db4ebf532135",
+    "bytes": 3519
+   },
+   {
+    "rel": "botmaker/scarecrow_features/src/main/java/com/twitter/scarecrow/features/FeaturesOfCommunityJoinEvent.java",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "b74cb91747bcdb5563f6956f5c7bf0d5b8ed89654b36999ddefeb6bb369d084a",
+    "bytes": 1235
+   },
+   {
+    "rel": "workflow-event-listener/src/main/java/com/netflix/conductor/contribs/listener/kafka/KafkaWorkflowStatusPublisherConfiguration.java",
+    "repo": "conductor-oss/conductor",
+    "sha256": "cf2089a53cbbf927446b71cad7c0bdb86910da4d9f8a06dc2dad15d91de7c147",
+    "bytes": 1545
+   },
+   {
+    "rel": "persistence-modules/spring-data-jpa-query/src/main/java/com/baeldung/persistence/dao/impl/FooAuditableDao.java",
+    "repo": "eugenp/tutorials",
+    "sha256": "d1961bd670bbdb940737bc0ff2c1157009840553c0830e6018d6679e525a6024",
+    "bytes": 418
+   },
+   {
+    "rel": "botmaker/scarecrow_features/src/main/java/com/twitter/scarecrow/features/FeaturesOfAudioSpaceReplayToggleOffEvent.java",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "b78bcabdfab5ca783773d587d9ccfbd2db02ddf2ca9c01649298d913f8e0fa31",
+    "bytes": 1209
+   },
+   {
+    "rel": "redis-persistence/src/test/java/org/conductoross/conductor/redis/dao/RedisSchemaDAOTest.java",
+    "repo": "conductor-oss/conductor",
+    "sha256": "d4d1ec03e6e1209d51c8918a98c1c53eb921152febcee8655f9e1ce99fcc9de1",
+    "bytes": 3627
+   },
+   {
+    "rel": "core-java-modules/core-java-collections-4/src/main/java/com/baeldung/collections/mulipletypesinmap/IntArrayTypeValue.java",
+    "repo": "eugenp/tutorials",
+    "sha256": "d34acdf15247a1863b25a992d2a52fa6b67c312155ea895ef95697938071b6e7",
+    "bytes": 499
+   },
+   {
+    "rel": "botmaker/src/java/com/twitter/botmaker/function/string/LastIndexOf.java",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "c86d0492f00eccd80be2295f9861902586c485d2dc111cd0d598a391e3cab4b6",
+    "bytes": 1903
+   },
+   {
+    "rel": "agentspan/src/main/java/org/conductoross/conductor/ai/agentspan/a2a/A2AAgentServerResource.java",
+    "repo": "conductor-oss/conductor",
+    "sha256": "d552ebfb86e43d88d31d1fbcc2c7e644a17b72e4425f0f05acda2cdceee5ad36",
+    "bytes": 5137
+   },
+   {
+    "rel": "logging-modules/log4j2/src/test/java/com/baeldung/logging/log4j2/setconfigurationfactory/SetConfigurationFactoryIntegrationTest.java",
+    "repo": "eugenp/tutorials",
+    "sha256": "d5c20b9cc6d69dd8502da49ec442c505af6d2e613e2c5723bf7ab6254282c488",
+    "bytes": 1472
+   },
+   {
+    "rel": "botmaker/src/java/com/twitter/botmaker/function/collection/Filter.java",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "d19d7f7f744b2a52f0fed817f496ab435add5c1aafa8102033fdc6656df660a0",
+    "bytes": 8100
+   },
+   {
+    "rel": "agentspan/src/test/java/org/conductoross/conductor/ai/agentspan/runtime/service/AgentEventListenerTest.java",
+    "repo": "conductor-oss/conductor",
+    "sha256": "d835ee2dc2ad1473a1a63bbe5c69c702f0c3a1ea3d40a3e6f3995e52b1cff8ce",
+    "bytes": 15963
+   },
+   {
+    "rel": "saas-modules/twilio-whatsapp/src/main/java/com/baeldung/twilio/whatsapp/TwilioInitializer.java",
+    "repo": "eugenp/tutorials",
+    "sha256": "db23f4c8176042c81e785f0ac4527dd8a22662536ccc1adb42049198ddc4a07a",
+    "bytes": 963
+   },
+   {
+    "rel": "botmaker/src/java/com/twitter/botmaker/function/conversion/StringFromBase64.java",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "d86cb95c210792ce49d47b51a4427804aad39f2bbd2334e8372c2b34b988425f",
+    "bytes": 1376
+   },
+   {
+    "rel": "core/src/main/java/org/conductoross/conductor/core/execution/tasks/annotated/WorkerTaskAnnotationScanner.java",
+    "repo": "conductor-oss/conductor",
+    "sha256": "e6afba128f865dabd7fb62fe4eddb5b519b402fd824069fa886f933c45bbf3a7",
+    "bytes": 5721
+   },
+   {
+    "rel": "core-java-modules/core-java-io-2/src/test/java/com/baeldung/blockingnonblocking/NonBlockingClientUnitTest.java",
+    "repo": "eugenp/tutorials",
+    "sha256": "e55fb9bb5ff317ce91efbc6f6135c50d09f9b0e34efef893dee19fa6f7b7b6e6",
+    "bytes": 3855
+   },
+   {
+    "rel": "botmaker/src/java/com/twitter/botmaker/function/conversion/StringToBase64.java",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "e0103d160e9a966fbd8631761706abf09e30d3ee78a8530a305ccd8d45e21d99",
+    "bytes": 1381
+   },
+   {
+    "rel": "ai/src/main/java/org/conductoross/conductor/ai/model/ToolCall.java",
+    "repo": "conductor-oss/conductor",
+    "sha256": "f022db79f9d1a8306272cf82f0112e3164fedb31288ef7bf1c3a841aba5d31b2",
+    "bytes": 1178
+   },
+   {
+    "rel": "core-java-modules/core-java-numbers-10/src/test/java/com/baeldung/samesign/SameSignIntegersUnitTest.java",
+    "repo": "eugenp/tutorials",
+    "sha256": "ee2a31b7336410a31d8919f6ce7dda4542cd0881e393d4b86368c46a3c89877d",
+    "bytes": 2144
+   },
+   {
+    "rel": "botmaker/src/java/com/twitter/botmaker/compiler/types/TypeCompiler.java",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "e991d64f6afd7c11457bb94f948a1071591f2bc765ccdd2e0adb5de115eb3c1f",
+    "bytes": 3997
+   },
+   {
+    "rel": "ai/src/main/java/org/conductoross/conductor/ai/providers/openai/OpenAIVideoModel.java",
+    "repo": "conductor-oss/conductor",
+    "sha256": "f10260cc83a97c62f24246b77b054c23584672416684010df29ff53b5ad4cd62",
+    "bytes": 8601
+   },
+   {
+    "rel": "drools/src/main/java/com/baeldung/drools/backward_chaining/BackwardChaining.java",
+    "repo": "eugenp/tutorials",
+    "sha256": "ef7c8577bfdf309eab26069ff229f552fa7cccccd1088ea5754eab167887a683",
+    "bytes": 926
+   },
+   {
+    "rel": "botmaker/src/java/com/twitter/botmaker/compiler/thrift/ListMetaData.java",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "ebf1437cf069e409a801e62c729b7987a7dc09713bda8489423205464a1f1614",
+    "bytes": 608
+   },
+   {
+    "rel": "es8-persistence/src/main/java/org/conductoross/conductor/es8/config/ElasticSearchConditions.java",
+    "repo": "conductor-oss/conductor",
+    "sha256": "f1e4b21e90447ccd76500ef2760d052857058db18a7554bebd547a8615c31830",
+    "bytes": 1857
+   },
+   {
+    "rel": "spring-cloud-modules/spring-cloud-openfeign-2/src/main/java/com/baeldung/cloud/openfeign/fileupload/controller/FileController.java",
+    "repo": "eugenp/tutorials",
+    "sha256": "f0a04b5af00b248bfbb4008f4f23b15dd2f4fa2a3cac6cdfd66888d12e32decd",
+    "bytes": 1174
+   },
+   {
+    "rel": "botmaker/src/java/com/twitter/botmaker/function/collection/Slice.java",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "eeda87ed88b57b4f8e0c037a83d32f4cd3dd270b0bac25a44498aa9e8cb32138",
+    "bytes": 3434
+   },
+   {
+    "rel": "awss3-storage/src/main/java/com/netflix/conductor/s3/config/S3Configuration.java",
+    "repo": "conductor-oss/conductor",
+    "sha256": "f1fb18f0c5a098d1e5775760ac212f31c81551b5f75e4bc1fb7f850717d7cf01",
+    "bytes": 2259
+   },
+   {
+    "rel": "libraries-security-2/src/test/java/com/baeldung/jasypt/JasyptUnitTest.java",
+    "repo": "eugenp/tutorials",
+    "sha256": "f46b126f09cade9e0c2a8c3fde832d766e81fd1032c75733bfef59417fa8a506",
+    "bytes": 3360
+   },
+   {
+    "rel": "botmaker/src/java/com/twitter/botmaker/compiler/DerivedFeatureProvider.java",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "f550b0474759421755d75eedb353f4082d689e446da56278d0907bbae89b85a3",
+    "bytes": 2589
+   },
+   {
+    "rel": "common/src/main/java/com/netflix/conductor/common/metadata/tasks/TaskResult.java",
+    "repo": "conductor-oss/conductor",
+    "sha256": "f88bbabec48022a6c856c807861e0f87156d7432febf31ca2c473d67afa7e7f1",
+    "bytes": 11636
+   },
+   {
+    "rel": "spring-boot-modules/spring-boot-autoconfiguration/src/main/java/com/baeldung/autoconfiguration/example/MyUser.java",
+    "repo": "eugenp/tutorials",
+    "sha256": "f493a50d46db6d9b3f655cea178086554136cacce04267426c50e22b59618565",
+    "bytes": 434
+   },
+   {
+    "rel": "botmaker/src/java/com/twitter/botmaker/function/collection/SetUnion.java",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "f69e6209621fbdc7ae4e348d49365791a3021d108ff816d40656c440addecf34",
+    "bytes": 1731
+   },
+   {
+    "rel": "annotations-processor/src/main/java/com/netflix/conductor/annotationsprocessor/protogen/Message.java",
+    "repo": "conductor-oss/conductor",
+    "sha256": "f8a95f815160e39c615b0210f7a2b39543babf5b417811f0cc33d8721566839e",
+    "bytes": 5013
+   },
+   {
+    "rel": "core-java-modules/core-java-io-apis/src/main/java/com/baeldung/bufferedreader/BufferedReaderExample.java",
+    "repo": "eugenp/tutorials",
+    "sha256": "f6bf10af7a855bf9871656a1c0c7871ad3ad120f991bfe9b901cb2ae97b71f7f",
+    "bytes": 2350
+   },
+   {
+    "rel": "botmaker/src/java/com/twitter/botmaker/compiler/CompilerContext.java",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "facf81796f91719dd101a46603f0ea5cf496e640d6e6522c4fb347dd441117a6",
+    "bytes": 15653
+   },
+   {
+    "rel": "ai/src/test/java/org/conductoross/conductor/ai/tasks/worker/A2AWorkersTest.java",
+    "repo": "conductor-oss/conductor",
+    "sha256": "fa0afe9ba9633c5bd0d039a66c47f4410c88a5fddb3a3bbc755db1e4042b5354",
+    "bytes": 7544
+   },
+   {
+    "rel": "mapstruct-3/src/main/java/com/baeldung/setnullproperty/dto/ReviewableDTO.java",
+    "repo": "eugenp/tutorials",
+    "sha256": "fab60710d82dc807e447a685ac725d65e6eda3d7486c3de8f72060a44ceb1e34",
+    "bytes": 713
+   },
+   {
+    "rel": "botmaker/src/java/com/twitter/botmaker/compiler/tuples/Tuple.java",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "fbc826d427bc97bddfe469b1ba87cfcb3d43891e8b7dde9a4cbb0dd853919833",
+    "bytes": 2372
+   },
+   {
+    "rel": "test-harness/src/test/java/com/netflix/conductor/test/integration/agent/AgentSpanRegistrationEndToEndTest.java",
+    "repo": "conductor-oss/conductor",
+    "sha256": "fc54c29136ac3062c04bcd4b52eb8549a379f965a022d482e377310ad743a965",
+    "bytes": 38202
+   },
+   {
+    "rel": "core-java-modules/core-java-streams-3/src/main/java/com/baeldung/streams/primitivestreams/PrimitiveStreams.java",
+    "repo": "eugenp/tutorials",
+    "sha256": "fd0887a1fb9ae50570ecc7994ad3a718604a1b2685d1e14f62c0f1c61932e278",
+    "bytes": 511
+   },
+   {
+    "rel": "botmaker/src/java/com/twitter/botmaker/compiler/Serializer.java",
+    "repo": "xai-org/x-algorithm",
+    "sha256": "fd00a5efcc376f3b744a285ceae9aca7cb5ca75b90c4a689a4cd55c5a9addd57",
+    "bytes": 60812
+   }
+  ],
+  "trainTokens": 144360,
+  "builder": "eval/coding-competence/build-lex-prior.mjs",
+  "derive": {
+   "MIN_WORD_COUNT": 3,
+   "MIN_WORD_REPOS": 2,
+   "MIN_SYMBOL_COUNT": 1,
+   "MUNCH_PRECISION": 0.5,
+   "OPENER_MIN_COUNT": 5,
+   "OPENER1_PRECISION": 0.95,
+   "OPENER2_PRECISION": 0.99,
+   "LCP_SHARE": 0.99,
+   "STRING_MIN_COUNT": 5,
+   "STRING_OPEN_PRECISION": 0.95,
+   "MATCH_MIN": 0.9,
+   "EXTRA_MIN_COUNT": 20,
+   "EXTRA_PRECISION": 0.9,
+   "PREFIX_MIN_COUNT": 20,
+   "PREFIX_ATTACH": 0.5,
+   "SUFFIX_MIN_COUNT": 20,
+   "SUFFIX_ATTACH": 0.5,
+   "COND_MIN_COUNT": 5,
+   "COND_PRECISION": 0.95,
+   "INTERP_MIN_COUNT": 20,
+   "INTERP_MIN_SHARE": 0.02,
+   "STRPREFIX_MIN_COUNT": 3,
+   "SAMPLE": 400,
+   "IDENT_SAMPLE_MIN": 300
+  },
+  "note": "Derived from TRAIN gold only (split by repository). Every threshold is in provenance.derive. A prior nominates and refuses; it never admits an identity.",
+  "selection": {
+   "split": "train",
+   "maxFiles": 100000,
+   "maxBytes": 200000,
+   "goldErrTol": 0.02,
+   "eligible": 204,
+   "excluded": {
+    "restricted": 0,
+    "tooBig": 0
+   },
+   "gaps": [],
+   "builtAt": "2026-10-05"
+  }
+ },
+ "words": {
+  "keyword": [
+   "abstract",
+   "break",
+   "case",
+   "catch",
+   "class",
+   "continue",
+   "default",
+   "else",
+   "extends",
+   "final",
+   "finally",
+   "for",
+   "if",
+   "implements",
+   "import",
+   "instanceof",
+   "interface",
+   "new",
+   "package",
+   "private",
+   "protected",
+   "public",
+   "return",
+   "static",
+   "super",
+   "switch",
+   "synchronized",
+   "this",
+   "throw",
+   "throws",
+   "try",
+   "while"
+  ],
+  "literal": [
+   "false",
+   "null",
+   "true"
+  ],
+  "counts": {
+   "package": 200,
+   "import": 1858,
+   "public": 1361,
+   "class": 444,
+   "private": 542,
+   "implements": 24,
+   "static": 584,
+   "new": 859,
+   "throws": 302,
+   "true": 125,
+   "false": 132,
+   "null": 285,
+   "for": 175,
+   "while": 30,
+   "final": 463,
+   "extends": 131,
+   "try": 63,
+   "catch": 56,
+   "return": 899,
+   "if": 568,
+   "else": 209,
+   "abstract": 25,
+   "super": 66,
+   "this": 347,
+   "protected": 184,
+   "throw": 124,
+   "instanceof": 108,
+   "switch": 8,
+   "case": 42,
+   "break": 23,
+   "default": 9,
+   "continue": 7,
+   "interface": 8,
+   "synchronized": 11,
+   "finally": 7,
+   "String": 1117,
+   "com": 995,
+   "void": 796,
+   "int": 764,
+   "org": 612,
+   "value": 534,
+   "builder": 528,
+   "Override": 527,
+   "twitter": 504,
+   "assertThat": 499,
+   "java": 394,
+   "get": 393,
+   "isEqualTo": 386,
+   "botmaker": 368,
+   "i": 359,
+   "Test": 330,
+   "conductor": 325,
+   "Map": 306,
+   "List": 292,
+   "Object": 283,
+   "util": 272,
+   "byte": 270,
+   "assertEquals": 269,
+   "put": 269,
+   "of": 257,
+   "Type": 242,
+   "index": 241,
+   "Monster": 234,
+   "script": 223,
+   "def": 222,
+   "netflix": 222,
+   "fbb": 216,
+   "size": 208,
+   "compiler": 189,
+   "common": 187,
+   "name": 182,
+   "prot": 182,
+   "context": 177,
+   "junit": 177,
+   "springframework": 176,
+   "io": 172,
+   "length": 170,
+   "task": 170,
+   "ByteBuffer": 167,
+   "ImmutableList": 166,
+   "buffer": 164,
+   "bb": 160,
+   "long": 159,
+   "boolean": 157,
+   "workflow": 152,
+   "b": 151,
+   "Exception": 143,
+   "result": 143,
+   "config": 140,
+   "google": 135,
+   "hasher": 134,
+   "BotMakerFeatures": 133,
+   "append": 129,
+   "wfId": 129,
+   "ASTNode": 125,
+   "tt": 120,
+   "SemanticCheckFailure": 119,
+   "grpc": 116,
+   "monster": 115,
+   "add": 114,
+   "key": 111,
+   "map": 109,
+   "MyGame": 106,
+   "Runtime": 105,
+   "putValue": 105,
+   "assertTrue": 102,
+   "getName": 102,
+   "Example": 101,
+   "conductoross": 99,
+   "out": 99,
+   "OPTIONAL": 98,
+   "System": 98,
+   "model": 98,
+   "scalarStuff": 98,
+   "start": 97,
+   "Context": 96,
+   "e": 96,
+   "TaskModel": 95,
+   "wf": 94,
+   "when": 94,
+   "offset": 93,
+   "Serializer": 91,
+   "children": 91,
+   "T": 90,
+   "annotation": 90,
+   "apply": 90,
+   "baeldung": 90,
+   "metadata": 89,
+   "stream": 89,
+   "type": 89,
+   "Signature": 88,
+   "FlexBuffers": 86,
+   "build": 86,
+   "toString": 86,
+   "core": 85,
+   "thenReturn": 85,
+   "serializer": 84,
+   "exprText": 81,
+   "Long": 80,
+   "id": 80,
+   "Integer": 79,
+   "request": 79,
+   "Stat": 77,
+   "Task": 75,
+   "api": 74,
+   "collect": 73,
+   "getStatus": 73,
+   "Set": 71,
+   "function": 71,
+   "ai": 70,
+   "a": 69,
+   "execution": 69,
+   "Value": 68,
+   "Workflow": 68,
+   "short": 68,
+   "status": 68,
+   "c": 67,
+   "putInt": 67,
+   "ActionLevel": 66,
+   "apache": 66,
+   "input": 66,
+   "getTaskId": 65,
+   "x": 64,
+   "TException": 63,
+   "properties": 63,
+   "CacheLevel": 61,
+   "FlexBuffersBuilder": 61,
+   "IOException": 59,
+   "Status": 59,
+   "serialize": 58,
+   "BotMakerFunction": 57,
+   "SIGNATURE": 57,
+   "TimeUnit": 57,
+   "description": 57,
+   "info": 56,
+   "deserialize": 55,
+   "event": 55,
+   "jupiter": 55,
+   "E": 54,
+   "t": 54,
+   "Future": 53,
+   "clazz": 53,
+   "equals": 53,
+   "j": 53,
+   "registry": 53,
+   "FlatBufferBuilder": 52,
+   "WorkflowStatus": 52,
+   "computeFingerprint": 52,
+   "pollTask": 52,
+   "args": 51,
+   "env": 51,
+   "http": 51,
+   "mock": 51,
+   "Class": 50,
+   "HashMap": 50,
+   "d": 50,
+   "q": 50,
+   "thrift": 50,
+   "Builder": 49,
+   "GenScript": 49,
+   "setName": 49,
+   "thriftjava": 49,
+   "TProtocol": 48,
+   "assertNotNull": 48,
+   "flatbuffers": 48,
+   "stack": 48,
+   "val": 48,
+   "workflowClient": 48,
+   "Optional": 47,
+   "ProtoField": 47,
+   "exceptions": 47,
+   "OBJECT": 46,
+   "botmaker_features": 46,
+   "nio": 46,
+   "spam": 46,
+   "tasks": 46,
+   "user": 46,
+   "workflowId": 46,
+   "println": 45,
+   "Assert": 44,
+   "ScalarStuff": 44,
+   "stub": 44,
+   "types": 44,
+   "FeatureMapBuilder": 43,
+   "isTrue": 43,
+   "m": 43,
+   "returnType": 43,
+   "values": 43,
+   "Tuple": 42,
+   "arguments": 42,
+   "client": 42,
+   "concurrent": 42,
+   "currentTimeMillis": 42,
+   "listener": 42,
+   "r": 42,
+   "response": 42,
+   "Extractor": 41,
+   "REQUIRED": 41,
+   "WorkflowDef": 41,
+   "pos": 41,
+   "set": 41,
+   "str": 41,
+   "objectMapper": 40,
+   "options": 40,
+   "s": 40,
+   "web": 40,
+   "ArrayList": 39,
+   "actionLevel": 39,
+   "format": 39,
+   "log": 39,
+   "run": 39,
+   "runtime": 39,
+   "Pair": 38,
+   "argTypes": 38,
+   "COMPLETED": 37,
+   "StreamObserver": 37,
+   "WorkflowModel": 37,
+   "account": 37,
+   "agentService": 37,
+   "channel": 37,
+   "finish": 37,
+   "genScript": 37,
+   "item": 37,
+   "lombok": 37,
+   "test": 37,
+   "tx": 37,
+   "Arrays": 36,
+   "TaskDef": 36,
+   "TaskResult": 36,
+   "double": 36,
+   "getClass": 36,
+   "o": 36,
+   "output": 36,
+   "responseObserver": 36,
+   "startWorkflowRequest": 36,
+   "typeParams": 36,
+   "FeatureMapExtractor": 35,
+   "FeatureModifier": 35,
+   "KafkaPublishTask": 35,
+   "User": 35,
+   "byteWidth": 35,
+   "in": 35,
+   "limit": 35,
+   "position": 35,
+   "taskDef": 35,
+   "vec": 35,
+   "boot": 34,
+   "getWorkflowId": 34,
+   "method": 34,
+   "setStatus": 34,
+   "DisplayName": 33,
+   "capacity": 33,
+   "data": 33,
+   "dataBuffer": 33,
+   "failTask": 33,
+   "tuple": 33,
+   "Constants": 32,
+   "JDBCInstanceConfig": 32,
+   "awaitScheduledRetry": 32,
+   "exception": 32,
+   "isEmpty": 32,
+   "startWorkflow": 32,
+   "tweet": 32,
+   "AgentConfig": 31,
+   "STRING": 31,
+   "addParameter": 31,
+   "char": 31,
+   "funcName": 31,
+   "invalidValue": 31,
+   "lang": 31,
+   "nullable": 31,
+   "space": 31,
+   "timeTaken": 31,
+   "workflowRun": 31,
+   "Files": 30,
+   "IllegalArgumentException": 30,
+   "T1": 30,
+   "Tree": 30,
+   "WorkflowTask": 30,
+   "any": 30,
+   "clear": 30,
+   "entry": 30,
+   "facade": 30,
+   "getCacheLevel": 30,
+   "getProperty": 30,
+   "getType": 30,
+   "slf4j": 30,
+   "Assertions": 29,
+   "Hasher": 29,
+   "Math": 29,
+   "Objects": 29,
+   "bitWidth": 29,
+   "createString": 29,
+   "getCallbackAfterSeconds": 29,
+   "getSignature": 29
+  },
+  "identifierSample": [
+   "String",
+   "com",
+   "void",
+   "int",
+   "org",
+   "value",
+   "builder",
+   "Override",
+   "twitter",
+   "assertThat",
+   "java",
+   "get",
+   "isEqualTo",
+   "botmaker",
+   "i",
+   "Test",
+   "conductor",
+   "Map",
+   "List",
+   "Object",
+   "util",
+   "byte",
+   "assertEquals",
+   "put",
+   "of",
+   "Type",
+   "index",
+   "Monster",
+   "script",
+   "def",
+   "netflix",
+   "fbb",
+   "size",
+   "compiler",
+   "common",
+   "name",
+   "prot",
+   "context",
+   "junit",
+   "springframework",
+   "io",
+   "length",
+   "task",
+   "ByteBuffer",
+   "ImmutableList",
+   "buffer",
+   "bb",
+   "long",
+   "boolean",
+   "workflow",
+   "b",
+   "Exception",
+   "result",
+   "config",
+   "google",
+   "hasher",
+   "BotMakerFeatures",
+   "append",
+   "wfId",
+   "ASTNode",
+   "tt",
+   "SemanticCheckFailure",
+   "grpc",
+   "monster",
+   "add",
+   "key",
+   "map",
+   "MyGame",
+   "Runtime",
+   "putValue",
+   "assertTrue",
+   "getName",
+   "Example",
+   "conductoross",
+   "out",
+   "OPTIONAL",
+   "System",
+   "model",
+   "scalarStuff",
+   "start",
+   "Context",
+   "e",
+   "TaskModel",
+   "wf",
+   "when",
+   "offset",
+   "Serializer",
+   "children",
+   "T",
+   "annotation",
+   "apply",
+   "baeldung",
+   "metadata",
+   "stream",
+   "type",
+   "Signature",
+   "FlexBuffers",
+   "build",
+   "toString",
+   "core",
+   "thenReturn",
+   "serializer",
+   "exprText",
+   "Long",
+   "id",
+   "Integer",
+   "request",
+   "Stat",
+   "Task",
+   "api",
+   "collect",
+   "getStatus",
+   "Set",
+   "function",
+   "ai",
+   "a",
+   "execution",
+   "Value",
+   "Workflow",
+   "short",
+   "status",
+   "c",
+   "putInt",
+   "ActionLevel",
+   "apache",
+   "input",
+   "getTaskId",
+   "x",
+   "TException",
+   "properties",
+   "CacheLevel",
+   "FlexBuffersBuilder",
+   "IOException",
+   "Status",
+   "serialize",
+   "BotMakerFunction",
+   "SIGNATURE",
+   "TimeUnit",
+   "description",
+   "info",
+   "deserialize",
+   "event",
+   "jupiter",
+   "E",
+   "t",
+   "Future",
+   "clazz",
+   "equals",
+   "j",
+   "registry",
+   "FlatBufferBuilder",
+   "WorkflowStatus",
+   "computeFingerprint",
+   "pollTask",
+   "args",
+   "env",
+   "http",
+   "mock",
+   "Class",
+   "HashMap",
+   "d",
+   "q",
+   "thrift",
+   "Builder",
+   "GenScript",
+   "setName",
+   "thriftjava",
+   "TProtocol",
+   "assertNotNull",
+   "flatbuffers",
+   "stack",
+   "val",
+   "workflowClient",
+   "Optional",
+   "ProtoField",
+   "exceptions",
+   "OBJECT",
+   "botmaker_features",
+   "nio",
+   "spam",
+   "tasks",
+   "user",
+   "workflowId",
+   "println",
+   "Assert",
+   "ScalarStuff",
+   "stub",
+   "types",
+   "FeatureMapBuilder",
+   "isTrue",
+   "m",
+   "returnType",
+   "values",
+   "Tuple",
+   "arguments",
+   "client",
+   "concurrent",
+   "currentTimeMillis",
+   "listener",
+   "r",
+   "response",
+   "Extractor",
+   "REQUIRED",
+   "WorkflowDef",
+   "pos",
+   "set",
+   "str",
+   "objectMapper",
+   "options",
+   "s",
+   "web",
+   "ArrayList",
+   "actionLevel",
+   "format",
+   "log",
+   "run",
+   "runtime",
+   "Pair",
+   "argTypes",
+   "COMPLETED",
+   "StreamObserver",
+   "WorkflowModel",
+   "account",
+   "agentService",
+   "channel",
+   "finish",
+   "genScript",
+   "item",
+   "lombok",
+   "test",
+   "tx",
+   "Arrays",
+   "TaskDef",
+   "TaskResult",
+   "double",
+   "getClass",
+   "o",
+   "output",
+   "responseObserver",
+   "startWorkflowRequest",
+   "typeParams",
+   "FeatureMapExtractor",
+   "FeatureModifier",
+   "KafkaPublishTask",
+   "User",
+   "byteWidth",
+   "in",
+   "limit",
+   "position",
+   "taskDef",
+   "vec",
+   "boot",
+   "getWorkflowId",
+   "method",
+   "setStatus",
+   "DisplayName",
+   "capacity",
+   "data",
+   "dataBuffer",
+   "failTask",
+   "tuple",
+   "Constants",
+   "JDBCInstanceConfig",
+   "awaitScheduledRetry",
+   "exception",
+   "isEmpty",
+   "startWorkflow",
+   "tweet",
+   "AgentConfig",
+   "STRING",
+   "addParameter",
+   "char",
+   "funcName",
+   "invalidValue",
+   "lang",
+   "nullable",
+   "space",
+   "timeTaken",
+   "workflowRun",
+   "Files",
+   "IllegalArgumentException",
+   "T1",
+   "Tree",
+   "WorkflowTask",
+   "any",
+   "clear",
+   "entry",
+   "facade",
+   "getCacheLevel",
+   "getProperty",
+   "getType",
+   "slf4j",
+   "Assertions",
+   "Hasher",
+   "Math",
+   "Objects",
+   "bitWidth",
+   "createString",
+   "getCallbackAfterSeconds",
+   "getSignature"
+  ]
+ },
+ "wordChars": {
+  "extra": [],
+  "prefixes": [],
+  "suffix": []
+ },
+ "shape": {
+  "number": "literal",
+  "unknownWord": "identifier",
+  "unknownSymbol": "operator"
+ },
+ "comments": [
+  {
+   "open": "/*",
+   "close": "*/",
+   "matchRate": 1,
+   "n": 450
+  },
+  {
+   "open": "//",
+   "close": null,
+   "matchRate": 1,
+   "n": 620
+  }
+ ],
+ "strings": [
+  {
+   "open": "\"",
+   "close": "\"",
+   "escape": "\\",
+   "multiline": false,
+   "trailing": false,
+   "interp": [],
+   "interpQuotes": [],
+   "prefixes": [],
+   "class": "string",
+   "matchRate": 1,
+   "n": 2685
+  },
+  {
+   "open": "'",
+   "close": "'",
+   "escape": "\\",
+   "multiline": false,
+   "trailing": false,
+   "interp": [],
+   "interpQuotes": [],
+   "prefixes": [],
+   "class": "string",
+   "matchRate": 1,
+   "n": 22
+  }
+ ],
+ "conditional": [],
+ "symbols": {
+  "table": {
+   ".": "punctuation",
+   ";": "punctuation",
+   "@": "operator",
+   "{": "punctuation",
+   "=": "operator",
+   "}": "punctuation",
+   "(": "punctuation",
+   ")": "punctuation",
+   ",": "punctuation",
+   "*": "operator",
+   "[": "punctuation",
+   "]": "punctuation",
+   "!=": "operator",
+   "<": "punctuation",
+   "++": "operator",
+   "+=": "operator",
+   "+": "operator",
+   ":": "punctuation",
+   "-": "operator",
+   "&&": "operator",
+   "?": "operator",
+   "<=": "operator",
+   "<<": "operator",
+   "%": "operator",
+   ">": "punctuation",
+   "==": "operator",
+   "*=": "operator",
+   "||": "operator",
+   "->": "operator",
+   "!": "operator",
+   "&": "operator",
+   "--": "operator",
+   "|": "operator",
+   "~": "operator",
+   "...": "punctuation",
+   "::": "punctuation",
+   ">=": "operator",
+   ">>>": "operator",
+   "/": "operator",
+   "-=": "operator",
+   "^": "operator"
+  },
+  "maxLen": 3
+ },
+ "classShare": {
+  "comment": 0.00741,
+  "keyword": 0.06774,
+  "identifier": 0.35701,
+  "punctuation": 0.48699,
+  "operator": 0.04482,
+  "string": 0.01875,
+  "literal": 0.01728
+ }
+}

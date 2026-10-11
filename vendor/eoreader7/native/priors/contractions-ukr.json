@@ -1,0 +1,71 @@
+{
+ "schema": "ContractionPrior@1",
+ "language": "ukr",
+ "provenance": {
+  "giver": "Universal Dependencies treebank (train split), human-annotated gold — multi-word tokens and glued tokens",
+  "builder": "khora native/scripts/build-contraction-prior.mjs",
+  "basis": "type-level splits (>= 2 splits and >= 0.5 of the surface's writings); bound affixes whose peel rule, simulated by the ear's applyAffixes over every surface word the splits do not cover, is right >= 0.5 of the times it fires",
+  "arrivals_floor": 2,
+  "settle_share": 0.5,
+  "key_alpha": 0.05,
+  "surface_words": 74742,
+  "split_surface_types": 5,
+  "simulated_surface_words": 74742,
+  "simulation_rounds": 1
+ },
+ "splits": {
+  "нікуди": [
+   "немає",
+   "куди"
+  ],
+  "півроку": [
+   "пів",
+   "року"
+  ],
+  "півгодини": [
+   "пів",
+   "години"
+  ],
+  "нічим": [
+   "немає",
+   "чим"
+  ],
+  "півдороги": [
+   "пів",
+   "дороги"
+  ]
+ },
+ "suffixes": [
+  {
+   "affix": "години",
+   "marked": false,
+   "hosts": [
+    "NUM"
+   ],
+   "n_gold": 3,
+   "fires": 3,
+   "precision": 1
+  },
+  {
+   "affix": "року",
+   "marked": false,
+   "hosts": [
+    "NUM"
+   ],
+   "n_gold": 2,
+   "fires": 2,
+   "precision": 1
+  },
+  {
+   "affix": "дороги",
+   "marked": false,
+   "hosts": [
+    "NUM"
+   ],
+   "n_gold": 2,
+   "fires": 2,
+   "precision": 1
+  }
+ ],
+ "prefixes": []
+}

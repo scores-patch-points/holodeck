@@ -1,0 +1,168 @@
+{
+ "schema": "EOReadingGolden@1",
+ "specimen": "ripgrep",
+ "path": "09-source-code/BurntSushi_ripgrep/CHANGELOG.md.txt",
+ "rule": "goldens/reading/RULE.md",
+ "window": {
+  "start": 0,
+  "end": 1079,
+  "endText": "across multiple directories.",
+  "coordinates": "normalized body (container-stripped, CRLF-normalized); spans in RAW file coordinates"
+ },
+ "notes": "Window: the TBD header and the 15.2.0 section. Changelog register: header fragments carry no finite clause; bullets are often subjectless imperatives whose implied subject is the named change or ripgrep itself.",
+ "revisions": [],
+ "rows": [
+  {
+   "subject": "Release notes",
+   "relation": "have been written",
+   "object": null,
+   "polarity": "-",
+   "phasepost": {
+    "op": "SYN",
+    "grain": "Figure"
+   },
+   "because": "writing produces a document (Generate·Structure); negated (\"not yet\") — polarity carries it (R6); passive with no agent, null object recorded honestly",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 0,
+    "end": 68
+   },
+   "anchor": "Release notes have not yet been written."
+  },
+  {
+   "subject": "This release",
+   "relation": "fixes",
+   "object": "a number of bugs related to gitignore matching as well as some performance improvements in directory tree traversal",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SYN",
+    "grain": "Pattern"
+   },
+   "because": "repair follows the build-log precedent (a revision is SYN — A6) over a class of defects; the source's own zeugma (\"fixes…improvements\") kept whole in the object per R4",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Pattern",
+    "because": "readable as defects removed"
+   },
+   "span": {
+    "start": 71,
+    "end": 246
+   },
+   "anchor": "This release fixes a number of bugs related to gitignore matching"
+  },
+  {
+   "subject": "aarch64-unknown-linux-musl",
+   "relation": "is included in",
+   "object": "the release binaries for ripgrep",
+   "polarity": "+",
+   "phasepost": {
+    "op": "CON",
+    "grain": "Figure"
+   },
+   "because": "one target now inside the binaries set — containment, Relate·Structure at figure grain",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 267,
+    "end": 352
+   },
+   "anchor": "is now included in the release binaries for"
+  },
+  {
+   "subject": "the change PERF #3293",
+   "relation": "improves",
+   "object": "directory traversal time on very large corpora",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SYN",
+    "grain": "Ground"
+   },
+   "because": "a working characteristic re-made better across a whole regime (A6's revision precedent, ground grain); subjectless bullet resolved to its own labeled change",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "changelog convention: the bullet's bracketed label [PERF #3293] names the acting change",
+   "alternate": {
+    "op": "REC",
+    "grain": "Ground",
+    "because": "readable as re-grounding the performance regime"
+   },
+   "span": {
+    "start": 381,
+    "end": 506
+   },
+   "anchor": "Improves directory traversal time on very large corpora."
+  },
+  {
+   "subject": "ripgrep",
+   "relation": "respects",
+   "object": "GIT_CONFIG_GLOBAL and GIT_CONFIG_SYSTEM",
+   "polarity": "+",
+   "phasepost": {
+    "op": "EVA",
+    "grain": "Pattern"
+   },
+   "because": "deference: holds its own behavior against the named configs — Relate·Interpretation as a standing rule over kinds of configuration",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "CON",
+    "grain": "Pattern",
+    "because": "readable as a standing structural coupling to the configs"
+   },
+   "span": {
+    "start": 531,
+    "end": 668
+   },
+   "anchor": "ripgrep now respects"
+  },
+  {
+   "subject": "ripgrep",
+   "relation": "check for",
+   "object": "the existence of .jj",
+   "polarity": "-",
+   "phasepost": {
+    "op": "EVA",
+    "grain": "Figure"
+   },
+   "because": "checking is a test (Relate·Interpretation) on one thing, negated behavior; the when---no-ignore-is-used condition is adjunct (A2); imperative changelog register resolved to ripgrep",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "changelog imperative: the behaving subject is ripgrep itself",
+   "alternate": null,
+   "span": {
+    "start": 682,
+    "end": 1079
+   },
+   "anchor": "Don't check for the existence of"
+  },
+  {
+   "subject": "the changes BUG #3320, BUG #3376, BUG #3419",
+   "relation": "fix",
+   "object": "gitignore matching bug",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SYN",
+    "grain": "Figure"
+   },
+   "because": "one defect repaired (A6's revision precedent, figure grain); the when-searching condition is adjunct (A2); subjectless bullet resolved to its own labeled changes",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "changelog convention: the bullet's bracketed labels name the acting changes",
+   "alternate": null,
+   "span": {
+    "start": 682,
+    "end": 1079
+   },
+   "anchor": "Fix gitignore matching bug when searching across multiple directories."
+  }
+ ]
+}

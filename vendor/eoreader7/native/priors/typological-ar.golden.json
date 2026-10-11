@@ -1,0 +1,150 @@
+{
+ "schema": "EOReadingGolden@1",
+ "specimen": "typological-ar",
+ "path": "goldens/reading/typological/ar.txt",
+ "rule": "goldens/reading/RULE.md",
+ "language": "Arabic (ar)",
+ "handrolled": true,
+ "handrolledNote": "Composed directly for this golden by the authoring session from linguistic knowledge of the language, NOT fetched from an authoritative source (OHCHR or otherwise). Structural ground truth (what proposition each line asserts, its phasepost) is authored with the same intent-by-construction standing this project's other synthetic goldens use (asserted-eval.mjs, hl-acquire.test.mjs's invented chronicle). Grammaticality is NOT independently native-speaker-verified — treat as reviewed-in-good-faith, not certified.",
+ "window": {
+  "end": 284,
+  "coordinates": "raw file bytes (UTF-8) — no container to strip, no CRLF to normalize; each row's span is its whole source line"
+ },
+ "notes": "One proposition per line, by construction — six short single-clause declaratives loosely drawn from UDHR Articles 1, 3, 4, 15 and 18, simplified to one clause each rather than quoted from the dense legal-register original. See TYPOLOGICAL-FINDINGS.md for the cross-linguistic phasepost comparison across this file's three sibling specimens.",
+ "rows": [
+  {
+   "gloss": "All people are born free.",
+   "subject": "جميع الناس",
+   "relation": "يولدون",
+   "object": "أحرارًا",
+   "polarity": "+",
+   "phasepost": {
+    "op": "INS",
+    "grain": "Pattern"
+   },
+   "because": "birth stated as a law over the whole kind — Generate·Existence at pattern grain; matches udhr.golden.json row 10's classification of the identical proposition in English",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "anchor": "جميع الناس يولدون أحرارًا.",
+   "span": {
+    "start": 0,
+    "end": 48
+   }
+  },
+  {
+   "gloss": "All people are equal in dignity.",
+   "subject": "جميع الناس",
+   "relation": "ø (zero copula)",
+   "object": "متساوون في الكرامة",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Figure"
+   },
+   "because": "copula rule 4 (property adjective, zero-copula Arabic nominal sentence) — quality asserted of the class; Figure per the rule's literal text",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SIG",
+    "grain": "Pattern",
+    "because": "RULE.md names only habitual/iterative aspect as a Pattern-promotion trigger — whether a universally-quantified subject licenses the same promotion (as row 1's INS·Pattern implicitly assumes) is undecided by the rule's own text"
+   },
+   "anchor": "جميع الناس متساوون في الكرامة.",
+   "span": {
+    "start": 49,
+    "end": 104
+   }
+  },
+  {
+   "gloss": "Everyone has the right to life.",
+   "subject": "لكل إنسان",
+   "relation": "ø (li- existential-possessive, no verb)",
+   "object": "الحق في الحياة",
+   "polarity": "+",
+   "phasepost": {
+    "op": "CON",
+    "grain": "Pattern"
+   },
+   "because": "li- + noun is Arabic's ordinary 'X has Y' construction (no verb 'have' exists); matches udhr.golden.json row 11's CON·Pattern for the structurally identical 'endowed with' possession",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "anchor": "لكل إنسان الحق في الحياة.",
+   "span": {
+    "start": 105,
+    "end": 150
+   }
+  },
+  {
+   "gloss": "No one shall be held in slavery.",
+   "subject": "استرقاق أحد",
+   "relation": "يجوز",
+   "object": null,
+   "polarity": "-",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Figure"
+   },
+   "because": "yajūzu (is permitted) is a standing-as act (Relate·Existence) on one specific act (the nominalized 'enslavement of anyone'); R6: negation is polarity (−), never a different phasepost",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "DEF",
+    "grain": "Figure",
+    "because": "readable as a bounded prohibition drawn — the operator table's own 'denied that' example — rather than a permission-standing denied"
+   },
+   "anchor": "لا يجوز استرقاق أحد.",
+   "span": {
+    "start": 151,
+    "end": 187
+   }
+  },
+  {
+   "gloss": "Everyone has the right to a nationality.",
+   "subject": "لكل إنسان",
+   "relation": "ø (li- existential-possessive)",
+   "object": "الحق في جنسية",
+   "polarity": "+",
+   "phasepost": {
+    "op": "CON",
+    "grain": "Pattern"
+   },
+   "because": "identical construction to row 3 — CON·Pattern",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "anchor": "لكل إنسان الحق في جنسية.",
+   "span": {
+    "start": 188,
+    "end": 231
+   }
+  },
+  {
+   "gloss": "Everyone has the right to freedom of thought.",
+   "subject": "لكل إنسان",
+   "relation": "ø (li- existential-possessive)",
+   "object": "الحق في حرية الفكر",
+   "polarity": "+",
+   "phasepost": {
+    "op": "CON",
+    "grain": "Pattern"
+   },
+   "because": "identical construction to rows 3 and 5 — CON·Pattern",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "anchor": "لكل إنسان الحق في حرية الفكر.",
+   "span": {
+    "start": 232,
+    "end": 284
+   }
+  }
+ ]
+}

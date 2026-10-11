@@ -1,0 +1,312 @@
+[
+ {
+  "id": "c01",
+  "label": "clean",
+  "kind": null,
+  "code": "import os\ndef count_py(d):\n    n = 0\n    for name in os.listdir(d):\n        if name.endswith('.py'):\n            n += 1\n    return n\nprint(count_py(os.getcwd()))",
+  "static_problems": [],
+  "run_error": null
+ },
+ {
+  "id": "c02",
+  "label": "clean",
+  "kind": null,
+  "code": "import json\ndata = {'a': 1, 'b': [1, 2, 3]}\ntext = json.dumps(data, indent=2)\nback = json.loads(text)\nprint(back['b'])",
+  "static_problems": [],
+  "run_error": null
+ },
+ {
+  "id": "c03",
+  "label": "clean",
+  "kind": null,
+  "code": "import re\npat = re.compile(r'(\\d+)-(\\d+)')\nm = pat.match('12-34')\nprint(m.group(1), re.sub(r'\\s+', ' ', 'a   b'))",
+  "static_problems": [],
+  "run_error": null
+ },
+ {
+  "id": "c04",
+  "label": "clean",
+  "kind": null,
+  "code": "from collections import Counter, defaultdict\nwords = 'a b a c b a'.split()\nc = Counter(words)\nd = defaultdict(list)\nfor w in words:\n    d[w].append(len(w))\nprint(c.most_common(2), dict(d))",
+  "static_problems": [],
+  "run_error": null
+ },
+ {
+  "id": "c05",
+  "label": "clean",
+  "kind": null,
+  "code": "import math\ndef hyp(a, b):\n    return math.sqrt(a * a + b * b)\nprint(hyp(3, 4), math.floor(2.7), math.ceil(2.1), math.gcd(12, 18))",
+  "static_problems": [],
+  "run_error": null
+ },
+ {
+  "id": "c06",
+  "label": "clean",
+  "kind": null,
+  "code": "import random\nrandom.seed(1)\nxs = [random.randint(1, 6) for _ in range(5)]\nprint(random.choice(xs), random.sample(xs, 2))",
+  "static_problems": [],
+  "run_error": null
+ },
+ {
+  "id": "c07",
+  "label": "clean",
+  "kind": null,
+  "code": "from datetime import datetime, timedelta\nnow = datetime(2026, 1, 1)\nlater = now + timedelta(days=30)\nprint(later.strftime('%Y-%m-%d'), datetime.fromisoformat('2026-02-03').year)",
+  "static_problems": [],
+  "run_error": null
+ },
+ {
+  "id": "c08",
+  "label": "clean",
+  "kind": null,
+  "code": "import itertools\npairs = list(itertools.combinations([1, 2, 3], 2))\nflat = list(itertools.chain([1], [2, 3]))\nprint(pairs, flat, list(itertools.islice(itertools.count(5), 3)))",
+  "static_problems": [],
+  "run_error": null
+ },
+ {
+  "id": "c09",
+  "label": "clean",
+  "kind": null,
+  "code": "import argparse\np = argparse.ArgumentParser(description='demo')\np.add_argument('--n', type=int, default=3)\nargs = p.parse_args([])\nprint(args.n)",
+  "static_problems": [],
+  "run_error": null
+ },
+ {
+  "id": "c10",
+  "label": "clean",
+  "kind": null,
+  "code": "from pathlib import Path\np = Path('.')\nfiles = sorted(x.name for x in p.glob('*.py'))\nprint(len(files), p.resolve().name)",
+  "static_problems": [],
+  "run_error": null
+ },
+ {
+  "id": "c11",
+  "label": "clean",
+  "kind": null,
+  "code": "import functools\n@functools.lru_cache(maxsize=None)\ndef fib(n):\n    return n if n < 2 else fib(n - 1) + fib(n - 2)\nprint(fib(20), functools.reduce(lambda a, b: a + b, [1, 2, 3]))",
+  "static_problems": [],
+  "run_error": null
+ },
+ {
+  "id": "c12",
+  "label": "clean",
+  "kind": null,
+  "code": "import statistics\nvals = [2, 4, 4, 4, 5, 5, 7, 9]\nprint(statistics.mean(vals), statistics.median(vals), statistics.pstdev(vals))",
+  "static_problems": [],
+  "run_error": null
+ },
+ {
+  "id": "c13",
+  "label": "clean",
+  "kind": null,
+  "code": "import hashlib, base64\nh = hashlib.sha256(b'abc').hexdigest()\nprint(h[:8], base64.b64encode(b'abc'))",
+  "static_problems": [],
+  "run_error": null
+ },
+ {
+  "id": "c14",
+  "label": "clean",
+  "kind": null,
+  "code": "import textwrap, string\ns = textwrap.fill('the quick brown fox jumps over the lazy dog', width=20)\nprint(s, string.ascii_lowercase[:3], string.capwords('hello world'))",
+  "static_problems": [],
+  "run_error": null
+ },
+ {
+  "id": "c15",
+  "label": "clean",
+  "kind": null,
+  "code": "import csv, io\nbuf = io.StringIO('a,b\\n1,2\\n')\nrows = list(csv.DictReader(buf))\nout = io.StringIO()\nw = csv.writer(out)\nw.writerow(['x', 'y'])\nprint(rows, out.getvalue())",
+  "static_problems": [],
+  "run_error": null
+ },
+ {
+  "id": "f01",
+  "label": "fake",
+  "kind": "modattr",
+  "code": "import math\ndef volume(r):\n    return math.cube(r) * 4 / 3 * math.pi\nprint(volume(2))",
+  "static_problems": [
+   [
+    "missing-attr",
+    "math.cube"
+   ]
+  ],
+  "run_error": null
+ },
+ {
+  "id": "f02",
+  "label": "fake",
+  "kind": "modattr",
+  "code": "import os\ndef files_in(d):\n    return os.listfiles(d)\nprint(files_in('.'))",
+  "static_problems": [
+   [
+    "missing-attr",
+    "os.listfiles"
+   ]
+  ],
+  "run_error": null
+ },
+ {
+  "id": "f03",
+  "label": "fake",
+  "kind": "modattr",
+  "code": "import json\ndoc = json.parse('{\"a\": 1}')\nprint(doc['a'])",
+  "static_problems": [
+   [
+    "missing-attr",
+    "json.parse"
+   ]
+  ],
+  "run_error": null
+ },
+ {
+  "id": "f04",
+  "label": "fake",
+  "kind": "modattr",
+  "code": "import re\nif re.matches(r'\\d+', '123'):\n    print('digits')",
+  "static_problems": [
+   [
+    "missing-attr",
+    "re.matches"
+   ]
+  ],
+  "run_error": null
+ },
+ {
+  "id": "f05",
+  "label": "fake",
+  "kind": "modattr",
+  "code": "import random\nwinner = random.pick(['a', 'b', 'c'])\nprint(winner)",
+  "static_problems": [
+   [
+    "missing-attr",
+    "random.pick"
+   ]
+  ],
+  "run_error": null
+ },
+ {
+  "id": "f06",
+  "label": "fake",
+  "kind": "modattr",
+  "code": "import datetime\ntoday = datetime.now()\nprint(today.year)",
+  "static_problems": [
+   [
+    "missing-attr",
+    "datetime.now"
+   ]
+  ],
+  "run_error": null
+ },
+ {
+  "id": "f07",
+  "label": "fake",
+  "kind": "modattr",
+  "code": "import itertools\nflat = list(itertools.flatten([[1], [2, 3]]))\nprint(flat)",
+  "static_problems": [
+   [
+    "missing-attr",
+    "itertools.flatten"
+   ]
+  ],
+  "run_error": null
+ },
+ {
+  "id": "f08",
+  "label": "fake",
+  "kind": "modattr",
+  "code": "import statistics\nprint(statistics.average([1, 2, 3]))",
+  "static_problems": [
+   [
+    "missing-attr",
+    "statistics.average"
+   ]
+  ],
+  "run_error": null
+ },
+ {
+  "id": "f09",
+  "label": "fake",
+  "kind": "modattr",
+  "code": "import time\ntime.sleep_ms(100)\nprint('done')",
+  "static_problems": [
+   [
+    "missing-attr",
+    "time.sleep_ms"
+   ]
+  ],
+  "run_error": null
+ },
+ {
+  "id": "f10",
+  "label": "fake",
+  "kind": "modattr",
+  "code": "from collections import OrderedList\nq = OrderedList()\nq.append(1)",
+  "static_problems": [
+   [
+    "missing-name",
+    "collections.OrderedList"
+   ]
+  ],
+  "run_error": null
+ },
+ {
+  "id": "f11",
+  "label": "fake",
+  "kind": "bare",
+  "code": "nums = [3, 1, 2]\nprint(sum_list(nums))",
+  "static_problems": [
+   [
+    "undefined-name",
+    "sum_list"
+   ]
+  ],
+  "run_error": null
+ },
+ {
+  "id": "f12",
+  "label": "fake",
+  "kind": "bare",
+  "code": "def avg(xs):\n    return total(xs) / len(xs)\nprint(avg([1, 2, 3]))",
+  "static_problems": [
+   [
+    "undefined-name",
+    "total"
+   ]
+  ],
+  "run_error": null
+ },
+ {
+  "id": "f13",
+  "label": "fake",
+  "kind": "bare",
+  "code": "name = 'world'\nprint_line('hello ' + name)",
+  "static_problems": [
+   [
+    "undefined-name",
+    "print_line"
+   ]
+  ],
+  "run_error": null
+ },
+ {
+  "id": "f14",
+  "label": "fake",
+  "kind": "module",
+  "code": "import jsonparser\nprint(jsonparser.load('{}'))",
+  "static_problems": [
+   [
+    "missing-module",
+    "jsonparser"
+   ]
+  ],
+  "run_error": null
+ },
+ {
+  "id": "f15",
+  "label": "fake",
+  "kind": "method",
+  "code": "s = 'hello'\nprint(s.reverse())",
+  "static_problems": [],
+  "run_error": "AttributeError: 'str' object has no attribute 'reverse'"
+ }
+]

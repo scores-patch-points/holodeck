@@ -1,0 +1,305 @@
+{
+ "schema": "NotationRulesPrior@1",
+ "family": "chess_pgn",
+ "kind": "rules",
+ "built": "2026-10-06",
+ "built_by": "eval/notation-competence/chess_pgn-priors.mjs",
+ "givers": [
+  {
+   "name": "FIDE Laws of Chess, effective 1 January 2023",
+   "url": "https://handbook.fide.com/chapter/E012023",
+   "sections": [
+    "Art. 2 the chessboard",
+    "Art. 3 the moves of the pieces",
+    "Appendix C algebraic notation"
+   ],
+   "licence_note": "FIDE text is copyrighted; only the rules as facts are encoded"
+  },
+  {
+   "name": "PGN Standard 1.1 (Edwards 1994, community-revised 2026-04-18)",
+   "url": "https://github.com/fsmosca/PGN-Standard/blob/master/PGN-Standard.txt",
+   "sections": [
+    "§7 tokens",
+    "§8.2.3 SAN",
+    "§8.2.3.8 suffix annotations",
+    "§8.2.4 NAG",
+    "§9.1 tag roster",
+    "§16.1 FEN",
+    "§17 alternative piece letters"
+   ],
+   "licence_note": "repo carries no licence field; only facts (grammar, letter table) are encoded"
+  }
+ ],
+ "semantics": "REFUSES: a move the table does not allow is not carried out. The table is a standard, not a corpus statistic.",
+ "counts_from_train": null,
+ "board": {
+  "files": "abcdefgh",
+  "ranks": "12345678",
+  "squares": 64
+ },
+ "initial": {
+  "back_rank": "RNBQKBNR",
+  "white_back_rank": 1,
+  "black_back_rank": 8,
+  "white_pawn_rank": 2,
+  "black_pawn_rank": 7
+ },
+ "moves": {
+  "N": {
+   "kind": "leaper",
+   "deltas": [
+    [
+     1,
+     2
+    ],
+    [
+     2,
+     1
+    ],
+    [
+     2,
+     -1
+    ],
+    [
+     1,
+     -2
+    ],
+    [
+     -1,
+     -2
+    ],
+    [
+     -2,
+     -1
+    ],
+    [
+     -2,
+     1
+    ],
+    [
+     -1,
+     2
+    ]
+   ]
+  },
+  "K": {
+   "kind": "leaper",
+   "deltas": [
+    [
+     1,
+     0
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     -1,
+     1
+    ],
+    [
+     -1,
+     0
+    ],
+    [
+     -1,
+     -1
+    ],
+    [
+     0,
+     -1
+    ],
+    [
+     1,
+     -1
+    ]
+   ]
+  },
+  "B": {
+   "kind": "slider",
+   "dirs": [
+    [
+     1,
+     1
+    ],
+    [
+     1,
+     -1
+    ],
+    [
+     -1,
+     1
+    ],
+    [
+     -1,
+     -1
+    ]
+   ]
+  },
+  "R": {
+   "kind": "slider",
+   "dirs": [
+    [
+     1,
+     0
+    ],
+    [
+     -1,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     0,
+     -1
+    ]
+   ]
+  },
+  "Q": {
+   "kind": "slider",
+   "dirs": [
+    [
+     1,
+     1
+    ],
+    [
+     1,
+     -1
+    ],
+    [
+     -1,
+     1
+    ],
+    [
+     -1,
+     -1
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     -1,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     0,
+     -1
+    ]
+   ]
+  },
+  "P": {
+   "kind": "pawn",
+   "push": 1,
+   "double_from_rank": {
+    "w": 2,
+    "b": 7
+   },
+   "promotion_rank": {
+    "w": 8,
+    "b": 1
+   },
+   "capture_files": [
+    -1,
+    1
+   ],
+   "en_passant_capture_rank": {
+    "w": 5,
+    "b": 4
+   }
+  }
+ },
+ "castling": {
+  "w": {
+   "K": {
+    "king": "e1",
+    "king_to": "g1",
+    "rook": "h1",
+    "rook_to": "f1",
+    "between": [
+     "f1",
+     "g1"
+    ],
+    "king_path": [
+     "e1",
+     "f1",
+     "g1"
+    ]
+   },
+   "Q": {
+    "king": "e1",
+    "king_to": "c1",
+    "rook": "a1",
+    "rook_to": "d1",
+    "between": [
+     "b1",
+     "c1",
+     "d1"
+    ],
+    "king_path": [
+     "e1",
+     "d1",
+     "c1"
+    ]
+   }
+  },
+  "b": {
+   "K": {
+    "king": "e8",
+    "king_to": "g8",
+    "rook": "h8",
+    "rook_to": "f8",
+    "between": [
+     "f8",
+     "g8"
+    ],
+    "king_path": [
+     "e8",
+     "f8",
+     "g8"
+    ]
+   },
+   "Q": {
+    "king": "e8",
+    "king_to": "c8",
+    "rook": "a8",
+    "rook_to": "d8",
+    "between": [
+     "b8",
+     "c8",
+     "d8"
+    ],
+    "king_path": [
+     "e8",
+     "d8",
+     "c8"
+    ]
+   }
+  },
+  "conditions": [
+   "king and rook unmoved (rights)",
+   "squares between empty",
+   "king not in check and not crossing or landing on an attacked square"
+  ]
+ },
+ "promotion_pieces": [
+  "N",
+  "B",
+  "R",
+  "Q"
+ ],
+ "fen": {
+  "fields": 6,
+  "placement_order": "rank 8 to rank 1, file a to h, digits count empty squares"
+ }
+}

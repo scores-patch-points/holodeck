@@ -1,0 +1,3304 @@
+{
+ "schema": "EOReadingGolden@1",
+ "specimen": "udhr-arb",
+ "path": "06-government-legal/un-udhr/udhr-arb.txt",
+ "rule": "goldens/reading/RULE.md",
+ "window": {
+  "start": 0,
+  "end": 8728,
+  "endText": "الحقوق والحريات الواردة فيه.",
+  "coordinates": "normalized body (container-stripped, CRLF-normalized); spans in RAW file coordinates"
+ },
+ "notes": "Whole document: Preamble + Articles 1-30 (R8-R12). This file's Preamble genuinely omits the friendly-relations recital (verified against its own bytes; grep for ودية finds nothing) — visible in the prop matrix as the absence of udhr:friendly-relations-essential; and its Article 29(3) drops the لا its own NPI idiom requires (flagged on that row). Preamble+Article 1 re-adjudicated 2026-08-31 verb-first; Articles 2-30 added the same day.",
+ "revisions": [],
+ "rows": [
+  {
+   "subject": null,
+   "relation": "الديباجة",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-preamble",
+   "ground": "preamble",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens — Relate·Existence at Ground grain",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 263,
+    "end": 277
+   },
+   "anchor": "الديباجة"
+  },
+  {
+   "subject": "الاعتراف بالكرامة المتأصلة في جميع أعضاء الأسرة البشرية وبحقوقهم المتساوية الثابتة",
+   "relation": "هو",
+   "object": "أساس الحرية والعدل والسلام في العالم",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Figure"
+   },
+   "clause": "main",
+   "prop": "udhr:recognition-foundation",
+   "ground": "preamble.1.1",
+   "role": "premise",
+   "because": "copula rule 3 — overt copula pronoun 'هو' (huwa) + unique predicate role (THE foundation)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 279,
+    "end": 417
+   },
+   "anchor": "هو أساس الحرية والعدل والسلام في العالم"
+  },
+  {
+   "subject": "تناسي حقوق الإنسان وازدراؤها",
+   "relation": "أفضيا إلى",
+   "object": "أعمال همجية آذت الضمير الإنساني",
+   "polarity": "+",
+   "phasepost": {
+    "op": "INS",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:disregard-acts",
+   "ground": "preamble.2.1",
+   "role": "premise",
+   "because": "causation brings a class of acts into being — Generate·Existence at pattern grain; object kept whole per R4",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 419,
+    "end": 616
+   },
+   "anchor": "أفضيا إلى أعمال همجية"
+  },
+  {
+   "subject": "أعمال همجية",
+   "relation": "آذت",
+   "object": "الضمير الإنساني",
+   "polarity": "+",
+   "phasepost": {
+    "op": "DEF",
+    "grain": "Figure"
+   },
+   "clause": "restrictive-relative",
+   "prop": "udhr:acts-outrage-conscience",
+   "ground": "preamble.2.1.1",
+   "role": "premise",
+   "because": "injuring a conscience diminishes a moral standing — Differentiate·Interpretation on one identified standing",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "the relative verb 'آذت' agrees with 'أعمال همجية', the head it restricts",
+   "alternate": {
+    "op": "SEG",
+    "grain": "Figure",
+    "because": "readable as marring an arrangement rather than a meaning"
+   },
+   "span": {
+    "start": 419,
+    "end": 616
+   },
+   "anchor": "آذت الضمير الإنساني"
+  },
+  {
+   "subject": "انبثاق عالم يتمتع فيه الفرد بحرية القول والعقيدة ويتحرر من الفزع والفاقة",
+   "relation": "كان",
+   "object": "غاية ما يرنو إليه عامة البشر",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Figure"
+   },
+   "clause": "main",
+   "prop": "udhr:advent-aspiration",
+   "ground": "preamble.2.2",
+   "role": "premise",
+   "because": "copula rule 3 — overt 'كان' (kāna, was) + unique predicate role (THE utmost aspiration); a genuine COPULA in Arabic where English uses the declaring verb 'has been proclaimed as' — the source verbs differ, so the cells differ, and normalising them would type the topic instead of the act",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "DEF",
+    "grain": "Figure",
+    "because": "if 'kāna...ghāyata' reads as an assertive stance rather than a bare copula"
+   },
+   "span": {
+    "start": 419,
+    "end": 616
+   },
+   "anchor": "وكان غاية ما يرنو إليه عامة البشر انبثاق عالم"
+  },
+  {
+   "subject": "عامة البشر",
+   "relation": "يرنو إليه",
+   "object": "انبثاق عالم",
+   "polarity": "+",
+   "phasepost": {
+    "op": "EVA",
+    "grain": "Pattern"
+   },
+   "clause": "relative",
+   "prop": "udhr:humanity-aspires",
+   "ground": "preamble.2.2.1",
+   "role": "premise",
+   "because": "aspiring-to is a valuation held by a holder — Relate·Interpretation; a standing disposition of the kind, hence Pattern. Arabic alone verbs this holder-relation finitely — a language-unique proposition, visible as such in the prop matrix",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 419,
+    "end": 616
+   },
+   "anchor": "ما يرنو إليه عامة البشر"
+  },
+  {
+   "subject": "الفرد",
+   "relation": "يتمتع",
+   "object": "بحرية القول والعقيدة",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "relative",
+   "prop": "udhr:enjoy-freedoms",
+   "ground": "preamble.2.2.2",
+   "role": "premise",
+   "because": "RE-TYPED 2026-08-31 (was CON·Pattern, assigned by bucket): 'يتمتع بحرية' — the object names a CONDITION present to the kind, the verbal form of a property predication: Relate·Existence at pattern grain. Contrast 'وهبوا عقلاً' (endowed with a constituent faculty → CON)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "CON",
+    "grain": "Pattern",
+    "because": "the prior reading: possession as arrangement"
+   },
+   "span": {
+    "start": 419,
+    "end": 616
+   },
+   "anchor": "يتمتع فيه الفرد بحرية القول والعقيدة"
+  },
+  {
+   "subject": "الفرد",
+   "relation": "يتحرر",
+   "object": "من الفزع والفاقة",
+   "polarity": "+",
+   "phasepost": {
+    "op": "NUL",
+    "grain": "Pattern"
+   },
+   "clause": "relative",
+   "prop": "udhr:freed-from-want",
+   "ground": "preamble.2.2.3",
+   "role": "premise",
+   "because": "becoming free FROM something is an absence brought about — Differentiate·Existence; A4's rule, the absence IS the act, polarity stays +",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "coordinated relative predicate shares 'الفرد'",
+   "alternate": null,
+   "span": {
+    "start": 419,
+    "end": 616
+   },
+   "anchor": "ويتحرر من الفزع والفاقة"
+  },
+  {
+   "subject": "أن يتولى القانون حماية حقوق الإنسان",
+   "relation": "كان",
+   "object": "من الضروري",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Figure"
+   },
+   "clause": "main",
+   "prop": "udhr:legal-protection-essential",
+   "ground": "preamble.3.1",
+   "role": "premise",
+   "because": "extraposed subject clause + property predicate ('الضروري') — copula rule 4, overt 'كان'",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 618,
+    "end": 739
+   },
+   "anchor": "ولما كان من الضروري أن يتولى القانون حماية حقوق الإنسان"
+  },
+  {
+   "subject": "القانون",
+   "relation": "يتولى",
+   "object": "حماية حقوق الإنسان",
+   "polarity": "+",
+   "phasepost": {
+    "op": "CON",
+    "grain": "Pattern"
+   },
+   "clause": "complement",
+   "prop": "udhr:law-protects-rights",
+   "ground": "preamble.3.1.1",
+   "role": "premise",
+   "because": "'يتولى' (assumes the charge of): the law is placed into the standing guard-arrangement over the rights — Relate·Structure at pattern grain, this language asserting the arrangement through its assumption",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 618,
+    "end": 739
+   },
+   "anchor": "أن يتولى القانون حماية حقوق الإنسان"
+  },
+  {
+   "subject": "المرء",
+   "relation": "يضطر",
+   "object": "التمرد على الاستبداد والظلم",
+   "polarity": "-",
+   "phasepost": {
+    "op": "INS",
+    "grain": "Pattern"
+   },
+   "clause": "conditional-adjunct",
+   "prop": "udhr:compelled-to-rebellion",
+   "ground": "preamble.3.1.2",
+   "role": "premise",
+   "because": "RE-TYPED 2026-08-31 (was CON·Pattern, justified circularly). 'يضطر إلى' is causative — unnegated, man driven into rebellion, the same causation shape as 'أفضيا إلى أعمال همجية': Generate·Existence at pattern grain. Negated by 'لكيلا' (lest): polarity − per R6",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "CON",
+    "grain": "Pattern",
+    "because": "the prior reading: a binding force-relation"
+   },
+   "span": {
+    "start": 618,
+    "end": 739
+   },
+   "anchor": "لكيلا يضطر المرء آخر الأمر إلى التمرد على الاستبداد والظلم"
+  },
+  {
+   "subject": "شعوب الأمم المتحدة",
+   "relation": "أكدت",
+   "object": "إيمانها بحقوق الإنسان الأساسية وبكرامة الفرد وقدره وبما للرجال والنساء من حقوق متساوية",
+   "polarity": "+",
+   "phasepost": {
+    "op": "EVA",
+    "grain": "Figure"
+   },
+   "clause": "main",
+   "prop": "udhr:faith-reaffirmed",
+   "ground": "preamble.4.1",
+   "role": "premise",
+   "because": "a held commitment restated ('إيمانها', their faith), not a frame replaced — Relate·Interpretation at figure grain; REC is the re-zero and concedes a prior ground, which reaffirmation does not. 'في الميثاق' is adjunct (A2). NOTE: the friendly-relations recital that precedes this one in the four sibling files is ABSENT from this file — this paragraph is Preamble ¶4 here where its content is ¶5 elsewhere",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "REC",
+    "grain": "Figure",
+    "because": "the prior reading: 'من جديد' (anew) read as a re-grounding act"
+   },
+   "span": {
+    "start": 741,
+    "end": 980
+   },
+   "anchor": "أكدت في الميثاق من جديد إيمانها"
+  },
+  {
+   "subject": "شعوب الأمم المتحدة",
+   "relation": "حزمت أمرها",
+   "object": "أن تدفع بالرقي الاجتماعي قدمًا وأن ترفع مستوى الحياة في جو من الحرية أفسح",
+   "polarity": "+",
+   "phasepost": {
+    "op": "DEF",
+    "grain": "Figure"
+   },
+   "clause": "main",
+   "prop": "udhr:progress-determined",
+   "ground": "preamble.4.2",
+   "role": "premise",
+   "because": "'حزمت أمرها' (resolved firmly) bounds a course of action, cutting off the others — Differentiate·Interpretation on one resolve; complement stays inside the object (A1)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "coordinated predicate shares 'شعوب الأمم المتحدة'",
+   "alternate": {
+    "op": "REC",
+    "grain": "Figure",
+    "because": "readable as generating a new commitment"
+   },
+   "span": {
+    "start": 741,
+    "end": 980
+   },
+   "anchor": "وحزمت أمرها على أن تدفع بالرقي الاجتماعي قدمًا"
+  },
+  {
+   "subject": "الدول الأعضاء",
+   "relation": "تعهدت",
+   "object": "ضمان إطراد مراعاة حقوق الإنسان والحريات الأساسية واحترامها",
+   "polarity": "+",
+   "phasepost": {
+    "op": "CON",
+    "grain": "Figure"
+   },
+   "clause": "main",
+   "prop": "udhr:states-pledged",
+   "ground": "preamble.5.1",
+   "role": "premise",
+   "because": "a pledge places the pledger and an undertaking into one standing link — Relate·Structure at figure grain (one specific commitment); 'بالتعاون مع الأمم المتحدة' is adjunct (A2)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 982,
+    "end": 1110
+   },
+   "anchor": "تعهدت بالتعاون مع الأمم المتحدة على ضمان إطراد مراعاة حقوق الإنسان"
+  },
+  {
+   "subject": "للإدراك العام لهذه الحقوق والحريات",
+   "relation": "كان",
+   "object": "الأهمية الكبرى للوفاء التام بهذا التعهد",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Figure"
+   },
+   "clause": "main",
+   "prop": "udhr:understanding-importance",
+   "ground": "preamble.6.1",
+   "role": "premise",
+   "because": "'li-X kāna Y' possessive-existential ('to X was Y' = X had Y) read as copula rule 4's property predication; subject keeps the 'لـ' the construction requires",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 1112,
+    "end": 1202
+   },
+   "anchor": "ولما كان للإدراك العام لهذه الحقوق والحريات الأهمية الكبرى"
+  },
+  {
+   "subject": "الجمعية العامة",
+   "relation": "تنادي",
+   "object": "هذا الإعلان العالمي لحقوق الإنسان",
+   "polarity": "+",
+   "phasepost": {
+    "op": "DEF",
+    "grain": "Figure"
+   },
+   "clause": "main",
+   "prop": "udhr:assembly-proclaims",
+   "ground": "preamble.8.1",
+   "role": "operative",
+   "because": "proclaiming the Declaration's standing — a bounded public act of definition, the operative act the whereas-premises support; this file sets subject (¶7), verb (¶8), and the predicate-nominal continuation (¶9) on three separate blank-line paragraphs — addressed at the verb's paragraph, the continuation's sub-clauses nested under it",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "subject 'الجمعية العامة' stands in its own preceding one-line paragraph — this file's own layout, not a pronoun",
+   "alternate": null,
+   "span": {
+    "start": 1230,
+    "end": 1276
+   },
+   "anchor": "تنادي بهذا الإعلان العالمي لحقوق الإنسان"
+  },
+  {
+   "subject": "كافة الشعوب والأمم",
+   "relation": "ينبغي أن تستهدفه",
+   "object": "المستوى المشترك",
+   "polarity": "+",
+   "phasepost": {
+    "op": "INS",
+    "grain": "Pattern"
+   },
+   "clause": "relative",
+   "prop": "udhr:standard-to-strive",
+   "ground": "preamble.8.1.1",
+   "role": "operative",
+   "because": "RE-TYPED 2026-08-31 (was CON·Pattern, typed off the deontic wrapper against A3). 'تستهدفه' — to take the standard as the aim of one's labour is to work toward REALIZING it: the product is a state of affairs in which the standard is actual, Generate·Existence at pattern grain (all peoples, standing labour); deontic 'ينبغي' noted, not typed (A3)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "CON",
+    "grain": "Pattern",
+    "because": "the prior reading: prescribed standing conduct toward the standard"
+   },
+   "span": {
+    "start": 1278,
+    "end": 1626
+   },
+   "anchor": "المستوى المشترك الذي ينبغي أن تستهدفه كافة الشعوب والأمم"
+  },
+  {
+   "subject": "كل فرد وهيئة في المجتمع",
+   "relation": "يسعى",
+   "object": "توطيد احترام هذه الحقوق والحريات عن طريق التعليم والتربية",
+   "polarity": "+",
+   "phasepost": {
+    "op": "REC",
+    "grain": "Pattern"
+   },
+   "clause": "purpose-adjunct",
+   "prop": "udhr:promote-respect",
+   "ground": "preamble.8.1.2",
+   "role": "operative",
+   "because": "RE-TYPED 2026-08-31 (was CON·Pattern, typed off the deontic frame). Verb-first: the conative 'يسعى' wraps 'توطيد احترام' — consolidating RESPECT, by teaching and upbringing: fostering a valuation in others, an interpretive product — Generate·Interpretation at pattern grain. Typed from the verb; re-occupying an empty cell is a consequence, not a reason",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "CON",
+    "grain": "Pattern",
+    "because": "the prior reading: prescribed standing conduct"
+   },
+   "span": {
+    "start": 1278,
+    "end": 1626
+   },
+   "anchor": "حتى يسعى كل فرد وهيئة في المجتمع"
+  },
+  {
+   "subject": "كل فرد وهيئة في المجتمع",
+   "relation": "واضعين",
+   "object": "هذا الإعلان نصب أعينهم",
+   "polarity": "+",
+   "phasepost": {
+    "op": "EVA",
+    "grain": "Pattern"
+   },
+   "clause": "participial-adjunct",
+   "prop": "udhr:keep-in-mind",
+   "ground": "preamble.8.1.2.1",
+   "role": "operative",
+   "because": "a content held before the eyes of a holder — Relate·Interpretation; 'على الدوام' (constantly) makes it habitual, hence Pattern",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "circumstantial participle 'واضعين' agrees with 'كل فرد وهيئة في المجتمع'",
+   "alternate": null,
+   "span": {
+    "start": 1278,
+    "end": 1626
+   },
+   "anchor": "واضعين على الدوام هذا الإعلان نصب أعينهم"
+  },
+  {
+   "subject": null,
+   "relation": "المادة 1",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-1",
+   "ground": "article-1",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens — Relate·Existence at Ground grain",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 1631,
+    "end": 1645
+   },
+   "anchor": "المادة 1"
+  },
+  {
+   "subject": "جميع الناس",
+   "relation": "يولد",
+   "object": "أحرارًا متساوين في الكرامة والحقوق",
+   "polarity": "+",
+   "phasepost": {
+    "op": "INS",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:born-free",
+   "ground": "article-1.1.1",
+   "role": "declared",
+   "because": "birth stated as a law over the whole kind — Generate·Existence at pattern grain",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 1647,
+    "end": 1769
+   },
+   "anchor": "يولد جميع الناس أحرارًا متساوين في الكرامة والحقوق"
+  },
+  {
+   "subject": "جميع الناس",
+   "relation": "وهبوا",
+   "object": "عقلاً وضميرًا",
+   "polarity": "+",
+   "phasepost": {
+    "op": "CON",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:endowed-reason",
+   "ground": "article-1.1.2",
+   "role": "declared",
+   "because": "intellect and conscience are constituent faculties — a part-whole arrangement stated as a law of the kind: Relate·Structure at pattern grain",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "implicit pronominal subject (verb agreement 'وهبوا', 3pl) → جميع الناس",
+   "alternate": null,
+   "span": {
+    "start": 1647,
+    "end": 1769
+   },
+   "anchor": "وقد وهبوا عقلاً وضميرًا"
+  },
+  {
+   "subject": "جميع الناس",
+   "relation": "عليهم أن يعامل",
+   "object": "بعضهم بعضًا بروح الإخاء",
+   "polarity": "+",
+   "phasepost": {
+    "op": "CON",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:act-brotherhood",
+   "ground": "article-1.1.3",
+   "role": "declared",
+   "because": "a standing mutual relation among members of the kind ('بعضهم بعضًا', one another) — Relate·Structure at pattern grain; deontic 'عليهم أن' noted (A3)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "pronominal 'عليهم' → جميع الناس",
+   "alternate": null,
+   "span": {
+    "start": 1647,
+    "end": 1769
+   },
+   "anchor": "وعليهم أن يعامل بعضهم بعضًا بروح الإخاء."
+  },
+  {
+   "subject": null,
+   "relation": "المادة 2",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-2",
+   "ground": "article-2",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 1774,
+    "end": 1788
+   },
+   "anchor": "المادة 2"
+  },
+  {
+   "subject": "لكل إنسان",
+   "relation": "حق التمتع",
+   "object": "بكافة الحقوق والحريات الواردة في هذا الإعلان",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:entitled-to-rights",
+   "ground": "article-2.1.1",
+   "role": "declared",
+   "because": "'li-kulli insān ḥaqq…' — the possessive-existential (to every person is the right): a normative standing present to the kind, Relate·Existence at pattern grain — this file's right-holding frame throughout the operative articles; the 'دون أي تمييز…' phrase is a verbless adjunct (A2)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 1790,
+    "end": 2063
+   },
+   "anchor": "لكل إنسان حق التمتع بكافة الحقوق والحريات الواردة في هذا الإعلان"
+  },
+  {
+   "subject": "أي تمييز أساسه الوضع السياسي أو القانوني أو الدولي",
+   "relation": "لن يكون هناك",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "NUL",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:no-distinction-status",
+   "ground": "article-2.2.1",
+   "role": "declared",
+   "because": "Arabic states this as a negative EXISTENTIAL — 'there shall not be any distinction' — which is A4's exact shape: the absence IS the asserted act, Differentiate·Existence at pattern grain, polarity +. The other four languages negate the making-verb instead (SEG·Pattern, polarity −): one proposition, two constructions, mirror-disclosed in both directions. The 'سواء كان هذا البلد…' tail is a concessive alternative-list (folded, noted)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Pattern",
+    "because": "the sibling construction: distinction-making negated, polarity −"
+   },
+   "span": {
+    "start": 2065,
+    "end": 2312
+   },
+   "anchor": "فلن يكون هناك أي تمييز أساسه الوضع السياسي"
+  },
+  {
+   "subject": "الفرد",
+   "relation": "ينتمي إليها",
+   "object": "البقعة",
+   "polarity": "+",
+   "phasepost": {
+    "op": "CON",
+    "grain": "Pattern"
+   },
+   "clause": "restrictive-relative",
+   "prop": "udhr:person-belongs-territory",
+   "ground": "article-2.2.1.1",
+   "role": "declared",
+   "because": "belonging is a standing membership arrangement between a person and a polity — Relate·Structure at pattern grain",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "'إليها' → البقعة, the head the relative restricts",
+   "alternate": null,
+   "span": {
+    "start": 2065,
+    "end": 2312
+   },
+   "anchor": "التي ينتمي إليها الفرد"
+  },
+  {
+   "subject": null,
+   "relation": "المادة 3",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-3",
+   "ground": "article-3",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 2317,
+    "end": 2331
+   },
+   "anchor": "المادة 3"
+  },
+  {
+   "subject": "لكل فرد",
+   "relation": "الحق في",
+   "object": "الحياة والحرية وسلامة شخصه",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:life-liberty-security",
+   "ground": "article-3.1.1",
+   "role": "declared",
+   "because": "the possessive-existential right-holding frame (see udhr:entitled-to-rights); three coordinated right-objects, kept whole (R4)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 2333,
+    "end": 2382
+   },
+   "anchor": "لكل فرد الحق في الحياة والحرية وسلامة شخصه."
+  },
+  {
+   "subject": null,
+   "relation": "المادة 4",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-4",
+   "ground": "article-4",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 2387,
+    "end": 2401
+   },
+   "anchor": "المادة 4"
+  },
+  {
+   "subject": "أي شخص",
+   "relation": "لا يجوز إسترقاق أو إستعباد",
+   "object": null,
+   "polarity": "-",
+   "phasepost": {
+    "op": "CON",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:no-slavery",
+   "ground": "article-4.1.1",
+   "role": "declared",
+   "because": "the impersonal deontic frame: the acts are maṣdar-nominals (إسترقاق, enslaving; إستعباد, enservement) under 'لا يجوز' (it is not permitted) — the deontic matrix carries the negation (A3 noted), the typed act is the binding-into-bondage: Relate·Structure at pattern grain, polarity − per R6",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 2403,
+    "end": 2489
+   },
+   "anchor": "لا يجوز إسترقاق أو إستعباد أي شخص"
+  },
+  {
+   "subject": "الإسترقاق وتجارة الرقيق",
+   "relation": "يحظر",
+   "object": "بكافة أوضاعهما",
+   "polarity": "+",
+   "phasepost": {
+    "op": "DEF",
+    "grain": "Pattern"
+   },
+   "clause": "coordinate",
+   "prop": "udhr:slavery-prohibited",
+   "ground": "article-4.1.2",
+   "role": "declared",
+   "because": "'يحظر' (is prohibited) DRAWS AN EXCLUSION BOUNDARY around the practice-kind — Differentiate·Interpretation at pattern grain; the prohibition itself is asserted: polarity +",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 2403,
+    "end": 2489
+   },
+   "anchor": "ويحظر الإسترقاق وتجارة الرقيق بكافة أوضاعهما"
+  },
+  {
+   "subject": null,
+   "relation": "المادة 5",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-5",
+   "ground": "article-5",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 2494,
+    "end": 2508
+   },
+   "anchor": "المادة 5"
+  },
+  {
+   "subject": "أي إنسان",
+   "relation": "لا يعرض",
+   "object": "للتعذيب ولا للعقوبات أو المعاملات القاسية أو الوحشية أو الحاطة بالكرامة",
+   "polarity": "-",
+   "phasepost": {
+    "op": "CON",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:no-torture",
+   "ground": "article-5.1.1",
+   "role": "declared",
+   "because": "'يعرض لـ' (be exposed/subjected to) — standing UNDER an infliction, the coverage-arrangement family from the suffering side: Relate·Structure at pattern grain, negated: polarity − per R6 (aligning with English/Spanish subjection; Mandarin and Swahili verb the inflicting itself)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 2510,
+    "end": 2605
+   },
+   "anchor": "لا يعرض أي إنسان للتعذيب ولا للعقوبات أو المعاملات القاسية"
+  },
+  {
+   "subject": null,
+   "relation": "المادة 6",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-6",
+   "ground": "article-6",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 2610,
+    "end": 2624
+   },
+   "anchor": "المادة 6"
+  },
+  {
+   "subject": "لكل إنسان",
+   "relation": "الحق في",
+   "object": "أن يعترف بشخصيته القانونية",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:recognition-before-law",
+   "ground": "article-6.1.1",
+   "role": "declared",
+   "because": "the possessive-existential right-holding frame; the recognition stays inside the right-object (A1); 'أينما وجد' (wherever he is found) is a micro-clause, folded (R1)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 2626,
+    "end": 2687
+   },
+   "anchor": "لكل إنسان أينما وجد الحق في أن يعترف بشخصيته القانونية"
+  },
+  {
+   "subject": null,
+   "relation": "المادة 7",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-7",
+   "ground": "article-7",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 2692,
+    "end": 2706
+   },
+   "anchor": "المادة 7"
+  },
+  {
+   "subject": "كل الناس",
+   "relation": "سواسية",
+   "object": "أمام القانون",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:equal-before-law",
+   "ground": "article-7.1.1",
+   "role": "declared",
+   "because": "a verbless nominal sentence — subject + property predicate ('سواسية', equal), copula rule 4's shape with the copula unexpressed: a condition held by the kind, Relate·Existence at pattern grain",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 2708,
+    "end": 2895
+   },
+   "anchor": "كل الناس سواسية أمام القانون"
+  },
+  {
+   "subject": "كل الناس",
+   "relation": "لهم الحق في",
+   "object": "التمتع بحماية متكافئة عنه",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "coordinate",
+   "prop": "udhr:equal-protection",
+   "ground": "article-7.1.2",
+   "role": "declared",
+   "because": "the possessive right-holding frame; 'دون أية تفرقة' is a verbless adjunct (A2)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "pronominal 'لهم' → كل الناس",
+   "alternate": null,
+   "span": {
+    "start": 2708,
+    "end": 2895
+   },
+   "anchor": "ولهم الحق في التمتع بحماية متكافئة عنه دون أية تفرقة"
+  },
+  {
+   "subject": "كل الناس",
+   "relation": "لهم جميعاً الحق في",
+   "object": "حماية متساوية ضد أي تمييز يُخل بهذا الإعلان وضد أي تحريض على تمييز كهذا",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:protection-against-discrimination",
+   "ground": "article-7.1.3",
+   "role": "declared",
+   "because": "the possessive right-holding frame; the relative 'يُخل بهذا الإعلان' (violates this Declaration) characterizes the discrimination inside the right-object and folds (A1/R1) — English words the same content verblessly",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "pronominal 'لهم' → كل الناس",
+   "alternate": null,
+   "span": {
+    "start": 2708,
+    "end": 2895
+   },
+   "anchor": "كما أن لهم جميعاً الحق في حماية متساوية ضد أي تمييز"
+  },
+  {
+   "subject": null,
+   "relation": "المادة 8",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-8",
+   "ground": "article-8",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 2900,
+    "end": 2914
+   },
+   "anchor": "المادة 8"
+  },
+  {
+   "subject": "لكل شخص",
+   "relation": "الحق في",
+   "object": "أن يلجأ إلى المحاكم الوطنية لإنصافه عن أعمال فيها اعتداء على الحقوق الأساسية",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:effective-remedy",
+   "ground": "article-8.1.1",
+   "role": "declared",
+   "because": "the possessive right-holding frame; the resort-to-tribunals and the rights-granting relative ('التي يمنحها له القانون') stay inside the right-object (A1/R1, folded)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 2916,
+    "end": 3038
+   },
+   "anchor": "لكل شخص الحق في أن يلجأ إلى المحاكم الوطنية لإنصافه"
+  },
+  {
+   "subject": null,
+   "relation": "المادة 9",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-9",
+   "ground": "article-9",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 3043,
+    "end": 3057
+   },
+   "anchor": "المادة 9"
+  },
+  {
+   "subject": "أي إنسان",
+   "relation": "لا يجوز القبض على",
+   "object": "أو حجزه أو نفيه تعسفاً",
+   "polarity": "-",
+   "phasepost": {
+    "op": "CON",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:no-arbitrary-arrest",
+   "ground": "article-9.1.1",
+   "role": "declared",
+   "because": "the impersonal deontic frame again (لا يجوز + maṣdar): seizing, confining and exiling are takings-into-custody — the coverage-arrangement family: Relate·Structure at pattern grain, polarity − per R6; the coordinated remainder rides in the object slot",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 3059,
+    "end": 3115
+   },
+   "anchor": "لا يجوز القبض على أي إنسان أو حجزه أو نفيه تعسفاً"
+  },
+  {
+   "subject": null,
+   "relation": "المادة 10",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-10",
+   "ground": "article-10",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 3120,
+    "end": 3135
+   },
+   "anchor": "المادة 10"
+  },
+  {
+   "subject": "لكل إنسان",
+   "relation": "الحق في",
+   "object": "أن تنظر قضيته أمام محكمة مستقلة نزيهة نظراً عادلاً علنياً",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:fair-hearing",
+   "ground": "article-10.1.1",
+   "role": "declared",
+   "because": "the possessive right-holding frame; 'على قدم المساواة التامة مع الآخرين' is a verbless parenthetical (A2, folded); the hearing stays inside the right-object (A1)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 3137,
+    "end": 3307
+   },
+   "anchor": "لكل إنسان الحق، على قدم المساواة التامة مع الآخرين، في أن تنظر قضيته"
+  },
+  {
+   "subject": null,
+   "relation": "المادة 11",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-11",
+   "ground": "article-11",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 3312,
+    "end": 3327
+   },
+   "anchor": "المادة 11"
+  },
+  {
+   "subject": "كل شخص متهم بجريمة",
+   "relation": "يعتبر",
+   "object": "بريئاً",
+   "polarity": "+",
+   "phasepost": {
+    "op": "EVA",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:presumed-innocent",
+   "ground": "article-11.1.1",
+   "role": "declared",
+   "because": "Arabic verbs the DEEMING directly — 'يعتبر بريئاً' (is considered innocent): a judgment held over the kind, Relate·Interpretation at pattern grain — where the four siblings wrap it in a right-frame (SIG). Source-verb divergence, mirror-disclosed; 'إلى أن تثبت إدانته' is the temporal boundary and the trial-guarantees relative characterizes it — both folded (A2/A1)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SIG",
+    "grain": "Pattern",
+    "because": "the siblings' construction: the presumption held as a right-standing"
+   },
+   "span": {
+    "start": 3331,
+    "end": 3456
+   },
+   "anchor": "كل شخص متهم بجريمة يعتبر بريئاً إلى أن تثبت إدانته قانوناً"
+  },
+  {
+   "subject": "أي شخص",
+   "relation": "لا يدان",
+   "object": "من جراء أداء عمل أو الإمتناع عن أداء عمل",
+   "polarity": "-",
+   "phasepost": {
+    "op": "EVA",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:no-retroactive-guilt",
+   "ground": "article-11.2.1",
+   "role": "declared",
+   "because": "'يدان' (be convicted) — a judgment rendered over a person: Relate·Interpretation at pattern grain, negated: polarity − per R6; the unless-clause has its own row (R8)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 3460,
+    "end": 3676
+   },
+   "anchor": "لا يدان أي شخص من جراء أداء عمل أو الإمتناع عن أداء عمل"
+  },
+  {
+   "subject": "ذلك",
+   "relation": "يعتبر",
+   "object": "جرماً وفقاً للقانون الوطني أو الدولي",
+   "polarity": "+",
+   "phasepost": {
+    "op": "EVA",
+    "grain": "Pattern"
+   },
+   "clause": "conditional-adjunct",
+   "prop": "udhr:act-not-offence-then",
+   "ground": "article-11.2.1.1",
+   "role": "declared",
+   "because": "the nullum crimen condition, worded as an UNLESS-exception with a positive deeming verb — 'إلاّ إذا كان ذلك يعتبر جرماً' (unless it was considered an offence): Relate·Interpretation, polarity + inside the exception where English/Spanish/Mandarin negate their relative (constitute/delictivos/构成, SIG −) and Swahili negates contravention (CON −) — a four-way construction split on one proposition, the matrix's richest",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "'ذلك' → the performing or omitting of the act (the matrix clause's own content); 'وقت الارتكاب' is the temporal boundary, folded (A2)",
+   "alternate": null,
+   "span": {
+    "start": 3460,
+    "end": 3676
+   },
+   "anchor": "إلاّ إذا كان ذلك يعتبر جرماً وفقاً للقانون الوطني أو الدولي وقت الارتكاب"
+  },
+  {
+   "subject": "عقوبة أشد",
+   "relation": "لا توقع",
+   "object": "من تلك التي كان يجوز توقيعها وقت ارتكاب الجريمة",
+   "polarity": "-",
+   "phasepost": {
+    "op": "INS",
+    "grain": "Pattern"
+   },
+   "clause": "coordinate",
+   "prop": "udhr:no-heavier-penalty",
+   "ground": "article-11.2.2",
+   "role": "declared",
+   "because": "'توقع' (be imposed/inflicted) brings the penalty into force — Generate·Existence at pattern grain, negated: polarity −; the comparative standard's relative folds (R1)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "CON",
+    "grain": "Pattern",
+    "because": "readable as the penalty laid onto the person as an arrangement"
+   },
+   "span": {
+    "start": 3460,
+    "end": 3676
+   },
+   "anchor": "كذلك لا توقع عليه عقوبة أشد من تلك التي كان يجوز توقيعها"
+  },
+  {
+   "subject": null,
+   "relation": "المادة 12",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-12",
+   "ground": "article-12",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 3683,
+    "end": 3698
+   },
+   "anchor": "المادة 12"
+  },
+  {
+   "subject": "أحد",
+   "relation": "لا يعرض",
+   "object": "لتدخل تعسفي في حياته الخاصة أو أسرته أو مسكنه أو مراسلاته أو لحملات على شرفه وسمعته",
+   "polarity": "-",
+   "phasepost": {
+    "op": "CON",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:no-arbitrary-interference",
+   "ground": "article-12.1.1",
+   "role": "declared",
+   "because": "'يعرض لـ' subjection again, negated: polarity −; like English, one verb folds the attacks-on-honour content into its coordinated object ('أو لحملات على شرفه وسمعته') — prop udhr:no-attacks-honour absent here by fold (Mandarin and Swahili verb it separately)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 3700,
+    "end": 3867
+   },
+   "anchor": "لا يعرض أحد لتدخل تعسفي في حياته الخاصة أو أسرته أو مسكنه أو مراسلاته"
+  },
+  {
+   "subject": "لكل شخص",
+   "relation": "الحق في",
+   "object": "حماية القانون من مثل هذا التدخل أو تلك الحملات",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:protection-of-law",
+   "ground": "article-12.1.2",
+   "role": "declared",
+   "because": "the possessive right-holding frame; the protection arrangement stays inside the right-object (A1)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 3700,
+    "end": 3867
+   },
+   "anchor": "ولكل شخص الحق في حماية القانون من مثل هذا التدخل أو تلك الحملات"
+  },
+  {
+   "subject": null,
+   "relation": "المادة 13",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-13",
+   "ground": "article-13",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 3872,
+    "end": 3887
+   },
+   "anchor": "المادة 13"
+  },
+  {
+   "subject": "لكل فرد",
+   "relation": "حرية النقل واختيار",
+   "object": "محل إقامته داخل حدود كل دولة",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:freedom-of-movement",
+   "ground": "article-13.1.1",
+   "role": "declared",
+   "because": "the possessive-existential with the FREEDOM itself as the possessed standing (no 'right' word here — 'to every person is the freedom of movement'): the same condition-holding shape, Relate·Existence at pattern grain",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 3891,
+    "end": 3957
+   },
+   "anchor": "لكل فرد حرية النقل واختيار محل إقامته داخل حدود كل دولة"
+  },
+  {
+   "subject": "لكل فرد",
+   "relation": "يحق",
+   "object": "أن يغادر أية بلاد بما في ذلك بلده",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:leave-and-return",
+   "ground": "article-13.2.1",
+   "role": "declared",
+   "because": "'يحق لـ' (it is the right of) — the right-holding frame as an impersonal verb; Arabic REPEATS the right-verb for the return half (كما يحق له), so this prop carries two rows here where English folds both under one verb (R9's multi-row rule)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 3961,
+    "end": 4040
+   },
+   "anchor": "يحق لكل فرد أن يغادر أية بلاد بما في ذلك بلده"
+  },
+  {
+   "subject": "لكل فرد",
+   "relation": "يحق له",
+   "object": "العودة إليه",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "coordinate",
+   "prop": "udhr:leave-and-return",
+   "ground": "article-13.2.2",
+   "role": "declared",
+   "because": "the second right-verb of the pair (see the previous row); same frame, same prop",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "pronominal 'له' → كل فرد; 'إليه' → بلده",
+   "alternate": null,
+   "span": {
+    "start": 3961,
+    "end": 4040
+   },
+   "anchor": "كما يحق له العودة إليه"
+  },
+  {
+   "subject": null,
+   "relation": "المادة 14",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-14",
+   "ground": "article-14",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 4047,
+    "end": 4062
+   },
+   "anchor": "المادة 14"
+  },
+  {
+   "subject": "لكل فرد",
+   "relation": "الحق أن",
+   "object": "يلجأ إلى بلاد أخرى أو يحاول الالتجاء إليها هربا من الاضطهاد",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:seek-asylum",
+   "ground": "article-14.1.1",
+   "role": "declared",
+   "because": "the possessive right-holding frame; two coordinated act-complements (resort, attempt resort) inside the right-object (A1)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 4066,
+    "end": 4152
+   },
+   "anchor": "لكل فرد الحق أن يلجأ إلى بلاد أخرى أو يحاول الالتجاء إليها هربا من الاضطهاد"
+  },
+  {
+   "subject": "من قدم للمحاكمة في جرائم غير سياسية أو لأعمال تناقض أغراض الأمم المتحدة ومبادئها",
+   "relation": "لا ينتفع بهذا الحق",
+   "object": null,
+   "polarity": "-",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:asylum-not-invoked",
+   "ground": "article-14.2.1",
+   "role": "declared",
+   "because": "'ينتفع بـ' (avail oneself of / benefit from) — drawing on the standing, the standing-use family (English invokes, Swahili asks): Relate·Existence at pattern grain, negated for the named class: polarity − per R6; the subject is a headless relative (he who has been brought to trial…), kept whole (R4)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "'بهذا الحق' → the asylum right (article-14.1.1)",
+   "alternate": {
+    "op": "DEF",
+    "grain": "Pattern",
+    "because": "readable by effect: the right's scope bounded to exclude the case-class"
+   },
+   "span": {
+    "start": 4156,
+    "end": 4266
+   },
+   "anchor": "لا ينتفع بهذا الحق من قدم للمحاكمة في جرائم غير سياسية"
+  },
+  {
+   "subject": null,
+   "relation": "المادة 15",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-15",
+   "ground": "article-15",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 4273,
+    "end": 4288
+   },
+   "anchor": "المادة 15"
+  },
+  {
+   "subject": "لكل فرد",
+   "relation": "حق التمتع",
+   "object": "بجنسية ما",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:right-to-nationality",
+   "ground": "article-15.1.1",
+   "role": "declared",
+   "because": "the possessive-existential right-holding frame",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 4292,
+    "end": 4330
+   },
+   "anchor": "لكل فرد حق التمتع بجنسية ما"
+  },
+  {
+   "subject": "شخص",
+   "relation": "لا يجوز حرمان",
+   "object": "من جنسيته تعسفا",
+   "polarity": "-",
+   "phasepost": {
+    "op": "SEG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:no-deprive-nationality",
+   "ground": "article-15.2.1",
+   "role": "declared",
+   "because": "'حرمان' (deprivation) SEVERS the person-nationality tie — Differentiate·Structure at pattern grain, the deontic matrix carrying the negation (لا يجوز): polarity − per R6",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 4334,
+    "end": 4402
+   },
+   "anchor": "لا يجوز حرمان شخص من جنسيته تعسفا"
+  },
+  {
+   "subject": "شخص",
+   "relation": "إنكار",
+   "object": "حقه في تغييرها",
+   "polarity": "-",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "coordinate",
+   "prop": "udhr:no-deny-change-nationality",
+   "ground": "article-15.2.2",
+   "role": "declared",
+   "because": "'إنكار' (denial) WITHHOLDS the standing — the right-holding frame under refusal: Relate·Existence at pattern grain, sharing the matrix negation: polarity −; the change-content stays inside the denied right-object (A1)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "coordinated maṣdar shares the deontic matrix and its patient 'شخص'; 'ها' in 'تغييرها' → جنسيته",
+   "alternate": {
+    "op": "EVA",
+    "grain": "Pattern",
+    "because": "denial readable as an adverse judgment rendered"
+   },
+   "span": {
+    "start": 4334,
+    "end": 4402
+   },
+   "anchor": "أو إنكار حقه في تغييرها"
+  },
+  {
+   "subject": null,
+   "relation": "المادة 16",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-16",
+   "ground": "article-16",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 4409,
+    "end": 4424
+   },
+   "anchor": "المادة 16"
+  },
+  {
+   "subject": "للرجل والمرأة",
+   "relation": "حق التزوج وتأسيس",
+   "object": "أسرة",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:marry-found-family",
+   "ground": "article-16.1.1",
+   "role": "declared",
+   "because": "the possessive right-holding frame; 'متا بلغا سن الزواج' (once they reach marriageable age) is a micro-conditional, folded (R1); 'دون أي قيد بسبب الجنس أو الدين' is a verbless adjunct (A2) — NOTE its list has TWO grounds where the siblings have three (race, nationality, religion): a translation compression, disclosed not repaired",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 4428,
+    "end": 4581
+   },
+   "anchor": "للرجل والمرأة متا بلغا سن الزواج حق التزوج وتأسيس أسرة"
+  },
+  {
+   "subject": "الرجل والمرأة",
+   "relation": "لهما حقوق متساوية",
+   "object": "عند الزواج وأثناء قيامه وعند انحلاله",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "coordinate",
+   "prop": "udhr:equal-rights-marriage",
+   "ground": "article-16.1.2",
+   "role": "declared",
+   "because": "the possessive right-holding frame (to the two of them are equal rights)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "pronominal 'لهما' (dual) → الرجل والمرأة",
+   "alternate": null,
+   "span": {
+    "start": 4428,
+    "end": 4581
+   },
+   "anchor": "ولهما حقوق متساوية عند الزواج وأثناء قيامه وعند انحلاله"
+  },
+  {
+   "subject": "عقد الزواج",
+   "relation": "لا يبرم",
+   "object": "إلا برضى الطرفين الراغبين في الزواج رضى كاملا لا إكراه فيه",
+   "polarity": "-",
+   "phasepost": {
+    "op": "CON",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:marriage-consent",
+   "ground": "article-16.2.1",
+   "role": "declared",
+   "because": "'يبرم عقد' (the contract is concluded) JOINS the parties into the arrangement — Relate·Structure at pattern grain. Arabic words the only-with-consent restriction as negation-plus-exception (لا…إلا), so its verb IS negated: polarity − per R6 — where English/Mandarin/Swahili use an unnegated restrictor ('only with', 只有…才, tu) and carry polarity +: one proposition, two constructions, disclosed both ways",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "INS",
+    "grain": "Pattern",
+    "because": "readable as the marriage brought into being"
+   },
+   "span": {
+    "start": 4585,
+    "end": 4673
+   },
+   "anchor": "لا يبرم عقد الزواج إلا برضى الطرفين الراغبين في الزواج"
+  },
+  {
+   "subject": "الأسرة",
+   "relation": "هي",
+   "object": "الوحدة الطبيعية الأساسية للمجتمع",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Figure"
+   },
+   "clause": "main",
+   "prop": "udhr:family-unit-society",
+   "ground": "article-16.3.1",
+   "role": "declared",
+   "because": "copula rule 3 — overt 'هي' + definite unique role (THE natural fundamental unit): the identificational shape, like English and Spanish; the article-less languages land elsewhere (see the en row's Rosetta note)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "CON",
+    "grain": "Pattern",
+    "because": "the mereological reading: the family as constituent unit OF society"
+   },
+   "span": {
+    "start": 4677,
+    "end": 4768
+   },
+   "anchor": "الأسرة هي الوحدة الطبيعية الأساسية للمجتمع"
+  },
+  {
+   "subject": "الأسرة",
+   "relation": "لها حق التمتع",
+   "object": "بحماية المجتمع والدولة",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "coordinate",
+   "prop": "udhr:family-protected",
+   "ground": "article-16.3.2",
+   "role": "declared",
+   "because": "the possessive right-holding frame over the kind 'family'",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "pronominal 'لها' → الأسرة",
+   "alternate": null,
+   "span": {
+    "start": 4677,
+    "end": 4768
+   },
+   "anchor": "ولها حق التمتع بحماية المجتمع والدولة"
+  },
+  {
+   "subject": null,
+   "relation": "المادة 17",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-17",
+   "ground": "article-17",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 4775,
+    "end": 4790
+   },
+   "anchor": "المادة 17"
+  },
+  {
+   "subject": "لكل شخص",
+   "relation": "حق التملك",
+   "object": "بمفرده أو بالاشتراك مع غيره",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:own-property",
+   "ground": "article-17.1.1",
+   "role": "declared",
+   "because": "the possessive-existential right-holding frame; the owning stays inside the right-object (A1)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 4794,
+    "end": 4850
+   },
+   "anchor": "لكل شخص حق التملك بمفرده أو بالاشتراك مع غيره"
+  },
+  {
+   "subject": "أحد",
+   "relation": "لا يجوز تجريد",
+   "object": "من ملكه تعسفا",
+   "polarity": "-",
+   "phasepost": {
+    "op": "SEG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:no-deprive-property",
+   "ground": "article-17.2.1",
+   "role": "declared",
+   "because": "'تجريد' (stripping) — the deprivation frame: the person-property tie severed, Differentiate·Structure at pattern grain, deontic negation: polarity −",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 4854,
+    "end": 4896
+   },
+   "anchor": "لا يجوز تجريد أحد من ملكه تعسفا"
+  },
+  {
+   "subject": null,
+   "relation": "المادة 18",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-18",
+   "ground": "article-18",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 4903,
+    "end": 4918
+   },
+   "anchor": "المادة 18"
+  },
+  {
+   "subject": "لكل شخص",
+   "relation": "الحق في",
+   "object": "حرية التفكير والضمير والدين",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:freedom-of-thought",
+   "ground": "article-18.1.1",
+   "role": "declared",
+   "because": "the possessive right-holding frame",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 4920,
+    "end": 5111
+   },
+   "anchor": "لكل شخص الحق في حرية التفكير والضمير والدين"
+  },
+  {
+   "subject": "هذا الحق",
+   "relation": "يشمل",
+   "object": "حرية تغيير ديانته أو عقيدته، وحرية الإعراب عنهما بالتعليم والممارسة وإقامة الشعائر ومراعاتها",
+   "polarity": "+",
+   "phasepost": {
+    "op": "CON",
+    "grain": "Pattern"
+   },
+   "clause": "coordinate",
+   "prop": "udhr:thought-right-includes",
+   "ground": "article-18.1.2",
+   "role": "declared",
+   "because": "'يشمل' (includes) is CONTAINMENT — the right holds these freedoms as parts: Relate·Structure at pattern grain; 'سواء أكان ذلك سرا أم مع الجماعة' is a concessive alternative-list, folded (A2)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "'هذا الحق' → the right to freedom of thought, conscience and religion (article-18.1.1)",
+   "alternate": null,
+   "span": {
+    "start": 4920,
+    "end": 5111
+   },
+   "anchor": "ويشمل هذا الحق حرية تغيير ديانته أو عقيدته"
+  },
+  {
+   "subject": null,
+   "relation": "المادة 19",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-19",
+   "ground": "article-19",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 5116,
+    "end": 5131
+   },
+   "anchor": "المادة 19"
+  },
+  {
+   "subject": "لكل شخص",
+   "relation": "الحق في",
+   "object": "حرية الرأي والتعبير",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:freedom-of-opinion",
+   "ground": "article-19.1.1",
+   "role": "declared",
+   "because": "the possessive right-holding frame",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 5133,
+    "end": 5308
+   },
+   "anchor": "لكل شخص الحق في حرية الرأي والتعبير"
+  },
+  {
+   "subject": "هذا الحق",
+   "relation": "يشمل",
+   "object": "حرية اعتناق الآراء دون أي تدخل، واستقاء الأنباء والأفكار وتلقيها وإذاعتها بأية وسيلة كانت",
+   "polarity": "+",
+   "phasepost": {
+    "op": "CON",
+    "grain": "Pattern"
+   },
+   "clause": "coordinate",
+   "prop": "udhr:opinion-right-includes",
+   "ground": "article-19.1.2",
+   "role": "declared",
+   "because": "the inclusion frame (see udhr:thought-right-includes): containment — Relate·Structure at pattern grain",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "'هذا الحق' → the right to freedom of opinion and expression (article-19.1.1)",
+   "alternate": null,
+   "span": {
+    "start": 5133,
+    "end": 5308
+   },
+   "anchor": "ويشمل هذا الحق حرية اعتناق الآراء دون أي تدخل"
+  },
+  {
+   "subject": null,
+   "relation": "المادة 20",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-20",
+   "ground": "article-20",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 5313,
+    "end": 5328
+   },
+   "anchor": "المادة 20"
+  },
+  {
+   "subject": "لكل شخص",
+   "relation": "الحق في",
+   "object": "حرية الاشتراك في الجمعيات والجماعات السلمية",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:freedom-of-assembly",
+   "ground": "article-20.1.1",
+   "role": "declared",
+   "because": "the possessive right-holding frame",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 5332,
+    "end": 5402
+   },
+   "anchor": "لكل شخص الحق في حرية الاشتراك في الجمعيات والجماعات السلمية"
+  },
+  {
+   "subject": "أحد",
+   "relation": "لا يجوز إرغام",
+   "object": "على الانضمام إلى جمعية ما",
+   "polarity": "-",
+   "phasepost": {
+    "op": "INS",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:no-compelled-association",
+   "ground": "article-20.2.1",
+   "role": "declared",
+   "because": "'إرغام' (compelling) is CAUSATIVE — the compulsion frame (see udhr:compelled-to-rebellion): forcing the membership into being, Generate·Existence at pattern grain, deontic negation: polarity −; the belonging stays inside the compelled content (A1). All five languages verb compulsion here — the matrix's cleanest five-way alignment",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "CON",
+    "grain": "Pattern",
+    "because": "readable as the forced-membership arrangement negated"
+   },
+   "span": {
+    "start": 5406,
+    "end": 5460
+   },
+   "anchor": "لا يجوز إرغام أحد على الانضمام إلى جمعية ما"
+  },
+  {
+   "subject": null,
+   "relation": "المادة 21",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-21",
+   "ground": "article-21",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 5467,
+    "end": 5482
+   },
+   "anchor": "المادة 21"
+  },
+  {
+   "subject": "لكل فرد",
+   "relation": "الحق في",
+   "object": "الاشتراك في إدارة الشؤون العامة لبلاده ما مباشرة وإما بواسطة ممثلين يختارون اختيارا حرا",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:take-part-government",
+   "ground": "article-21.1.1",
+   "role": "declared",
+   "because": "the possessive right-holding frame; the directly-or-through alternative is a verbless adjunct (A2); the representatives' relative ('يختارون اختيارا حرا') characterizes and folds (R1)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 5486,
+    "end": 5600
+   },
+   "anchor": "لكل فرد الحق في الاشتراك في إدارة الشؤون العامة لبلاده"
+  },
+  {
+   "subject": "لكل شخص",
+   "relation": "نفس الحق الذي لغيره في",
+   "object": "تقلد الوظائف العامة في البلاد",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:equal-access-service",
+   "ground": "article-21.2.1",
+   "role": "declared",
+   "because": "the possessive right-holding frame, equality worded as 'the same right as others' — the micro-relative 'الذي لغيره' folds into the right-NP (R1)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 5604,
+    "end": 5675
+   },
+   "anchor": "لكل شخص نفس الحق الذي لغيره في تقلد الوظائف العامة في البلاد"
+  },
+  {
+   "subject": "إرادة الشعب",
+   "relation": "هي",
+   "object": "مصدر سلطة الحكومة",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Figure"
+   },
+   "clause": "main",
+   "prop": "udhr:will-basis-authority",
+   "ground": "article-21.3.1",
+   "role": "declared",
+   "because": "copula rule 3 — overt 'هي' + definite unique role: Arabic words the role as 'مصدر' (THE SOURCE of authority) where English words 'the basis' — same identificational frame, different role-noun, noted",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "CON",
+    "grain": "Pattern",
+    "because": "source-of readable as structural support"
+   },
+   "span": {
+    "start": 5679,
+    "end": 5867
+   },
+   "anchor": "إن إرادة الشعب هي مصدر سلطة الحكومة"
+  },
+  {
+   "subject": "هذه الإرادة",
+   "relation": "يعبر عن",
+   "object": "بانتخابات نزيهة دورية",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "coordinate",
+   "prop": "udhr:will-expressed-elections",
+   "ground": "article-21.3.2",
+   "role": "declared",
+   "because": "expression MAKES the will present as a sign in the elections — impersonal passive 'يعبر عن': Relate·Existence at pattern grain",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "'هذه الإرادة' → إرادة الشعب (article-21.3.1)",
+   "alternate": null,
+   "span": {
+    "start": 5679,
+    "end": 5867
+   },
+   "anchor": "ويعبر عن هذه الإرادة بانتخابات نزيهة دورية"
+  },
+  {
+   "subject": "انتخابات نزيهة دورية",
+   "relation": "تجري",
+   "object": "على أساس الاقتراع السري وعلى قدم المساواة بين الجميع",
+   "polarity": "+",
+   "phasepost": {
+    "op": "INS",
+    "grain": "Pattern"
+   },
+   "clause": "restrictive-relative",
+   "prop": "udhr:elections-secret-vote",
+   "ground": "article-21.3.2.1",
+   "role": "declared",
+   "because": "'تجري' (are conducted) brings the event about under the named procedure — Generate·Existence at pattern grain; ONE conduct verb covers both secret ballot and equal footing, so prop udhr:elections-suffrage is folded here (English gives suffrage its own copula); the alternative-procedure relative ('يضمن حرية التصويت') characterizes an indefinite and folds (R1)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "the relative verb 'تجري' agrees with 'انتخابات', the head it restricts",
+   "alternate": null,
+   "span": {
+    "start": 5679,
+    "end": 5867
+   },
+   "anchor": "تجري على أساس الاقتراع السري وعلى قدم المساواة بين الجميع"
+  },
+  {
+   "subject": null,
+   "relation": "المادة 22",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-22",
+   "ground": "article-22",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 5874,
+    "end": 5889
+   },
+   "anchor": "المادة 22"
+  },
+  {
+   "subject": "لكل شخص",
+   "relation": "الحق في",
+   "object": "الضمانة الاجتماعية وفي أن تحقق بوساطة المجهود القومي والتعاون الدولي وبما يتفق ونظم كل دولة ومواردها الحقوق الاقتصادية والاجتماعية والتربوية التي لا غنى عنها لكرامته وللنمو الحر لشخصيته",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:right-social-security",
+   "ground": "article-22.1.1",
+   "role": "declared",
+   "because": "the possessive right-holding frame; ONE right spans both complements (الحق في X وفي أن Y), so prop udhr:entitled-realization is folded here — English gives the realization half its own verb; 'بصفته عضوا في المجتمع' is an appositive parenthetical (A2, presupposed not asserted); the realization stays inside the right-object (A1)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 5891,
+    "end": 6121
+   },
+   "anchor": "لكل شخص بصفته عضوا في المجتمع الحق في الضمانة الاجتماعية"
+  },
+  {
+   "subject": null,
+   "relation": "المادة 23",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-23",
+   "ground": "article-23",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 6126,
+    "end": 6141
+   },
+   "anchor": "المادة 23"
+  },
+  {
+   "subject": "لكل شخص",
+   "relation": "الحق في",
+   "object": "العمل",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:right-to-work",
+   "ground": "article-23.1.1",
+   "role": "declared",
+   "because": "the possessive right-holding frame; Arabic SPLITS the four-part work bundle English folds under one verb across three possessive predications — three rows share this prop (R9's multi-row rule)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 6145,
+    "end": 6245
+   },
+   "anchor": "لكل شخص الحق في العمل"
+  },
+  {
+   "subject": "كل شخص",
+   "relation": "له حرية اختياره",
+   "object": "بشروط عادلة مرضية",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "coordinate",
+   "prop": "udhr:right-to-work",
+   "ground": "article-23.1.2",
+   "role": "declared",
+   "because": "the second possessive of the split bundle: the freedom of choosing it, under just and satisfying conditions",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "pronominal 'له' → كل شخص",
+   "alternate": null,
+   "span": {
+    "start": 6145,
+    "end": 6245
+   },
+   "anchor": "وله حرية اختياره بشروط عادلة مرضية"
+  },
+  {
+   "subject": "كل شخص",
+   "relation": "له حق الحماية",
+   "object": "من البطالة",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "coordinate",
+   "prop": "udhr:right-to-work",
+   "ground": "article-23.1.3",
+   "role": "declared",
+   "because": "the third possessive of the split bundle: the right of protection from unemployment",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "pronominal 'له' → كل شخص",
+   "alternate": null,
+   "span": {
+    "start": 6145,
+    "end": 6245
+   },
+   "anchor": "كما أن له حق الحماية من البطالة"
+  },
+  {
+   "subject": "لكل فرد",
+   "relation": "الحق في",
+   "object": "أجر متساو للعمل",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:equal-pay",
+   "ground": "article-23.2.1",
+   "role": "declared",
+   "because": "the possessive right-holding frame; 'دون أي تمييز' is a verbless parenthetical (A2, folded)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 6249,
+    "end": 6304
+   },
+   "anchor": "لكل فرد دون أي تمييز الحق في أجر متساو للعمل"
+  },
+  {
+   "subject": "لكل فرد يقوم بعمل",
+   "relation": "الحق في",
+   "object": "أجر عادل مرض يكفل له ولأسرته عيشة لائقة بكرامة الإنسان",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:just-remuneration",
+   "ground": "article-23.3.1",
+   "role": "declared",
+   "because": "the possessive right-holding frame; the subject's own micro-relative ('يقوم بعمل', who performs work) stays inside the subject NP (R4), and the remuneration's characterizing relatives ('يكفل…', 'تضاف إليه…') stay inside the sought right-object (A1, folded)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 6308,
+    "end": 6452
+   },
+   "anchor": "لكل فرد يقوم بعمل الحق في أجر عادل مرض"
+  },
+  {
+   "subject": "لكل شخص",
+   "relation": "الحق في",
+   "object": "أن ينشأ وينضم إلى نقابات حماية لمصلحته",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:form-join-unions",
+   "ground": "article-23.4.1",
+   "role": "declared",
+   "because": "the possessive right-holding frame; two coordinated acts inside the right-object (A1)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 6456,
+    "end": 6521
+   },
+   "anchor": "لكل شخص الحق في أن ينشأ وينضم إلى نقابات حماية لمصلحته"
+  },
+  {
+   "subject": null,
+   "relation": "المادة 24",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-24",
+   "ground": "article-24",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 6528,
+    "end": 6543
+   },
+   "anchor": "المادة 24"
+  },
+  {
+   "subject": "لكل شخص",
+   "relation": "الحق في",
+   "object": "الراحة، أو في أوقات الفراغ، ولا سيما في تحديد معقول لساعات العمل وفي عطلات دورية بأجر",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:rest-leisure",
+   "ground": "article-24.1.1",
+   "role": "declared",
+   "because": "the possessive right-holding frame; the especially-list ('ولا سيما…') elaborates inside the object (A2, folded)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 6545,
+    "end": 6653
+   },
+   "anchor": "لكل شخص الحق في الراحة، أو في أوقات الفراغ"
+  },
+  {
+   "subject": null,
+   "relation": "المادة 25",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-25",
+   "ground": "article-25",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 6658,
+    "end": 6673
+   },
+   "anchor": "المادة 25"
+  },
+  {
+   "subject": "لكل شخص",
+   "relation": "الحق في",
+   "object": "مستوى من المعيشة كاف للمحافظة على الصحة والرفاهية له ولأسرته",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:standard-of-living",
+   "ground": "article-25.1.1",
+   "role": "declared",
+   "because": "the possessive right-holding frame; Arabic then VERBS the elaboration and the security right separately (next two rows) where English folds both into this one object",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 6677,
+    "end": 6982
+   },
+   "anchor": "لكل شخص الحق في مستوى من المعيشة كاف للمحافظة على الصحة والرفاهية له ولأسرته"
+  },
+  {
+   "subject": "ذلك",
+   "relation": "يتضمن",
+   "object": "التغذية والملبس والمسكن والعناية الطبية وكذلك الخدمات الاجتماعية اللازمة",
+   "polarity": "+",
+   "phasepost": {
+    "op": "CON",
+    "grain": "Pattern"
+   },
+   "clause": "coordinate",
+   "prop": "udhr:standard-of-living",
+   "ground": "article-25.1.2",
+   "role": "declared",
+   "because": "'يتضمن' (comprises) is CONTAINMENT — the standard holds these as parts: Relate·Structure at pattern grain; Arabic alone gives the including its own finite verb, so this prop carries a second row here with a different cell — the construction split IS the datum (R9)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "'ذلك' → the standard of living (article-25.1.1's object)",
+   "alternate": null,
+   "span": {
+    "start": 6677,
+    "end": 6982
+   },
+   "anchor": "ويتضمن ذلك التغذية والملبس والمسكن والعناية الطبية"
+  },
+  {
+   "subject": "كل شخص",
+   "relation": "له الحق في",
+   "object": "تأمين معيشته في حالات البطالة والمرض والعجز والترمل والشيخوخة",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "coordinate",
+   "prop": "udhr:security-in-adversity",
+   "ground": "article-25.1.3",
+   "role": "declared",
+   "because": "the possessive right-holding frame; a right-verb of its own here (with Spanish, Mandarin and Swahili) where English folds this into article 25's first object — the four-language prop the en row notes",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "pronominal 'له' → كل شخص",
+   "alternate": null,
+   "span": {
+    "start": 6677,
+    "end": 6982
+   },
+   "anchor": "وله الحق في تأمين معيشته في حالات البطالة والمرض والعجز والترمل والشيخوخة"
+  },
+  {
+   "subject": "للأمومة والطفولة",
+   "relation": "الحق في",
+   "object": "مساعدة ورعاية خاصتين",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:motherhood-childhood-care",
+   "ground": "article-25.2.1",
+   "role": "declared",
+   "because": "the possessive right-holding frame over abstract kinds (motherhood, childhood — like English and Spanish; Mandarin and Swahili name the persons)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 6986,
+    "end": 7142
+   },
+   "anchor": "للأمومة والطفولة الحق في مساعدة ورعاية خاصتين"
+  },
+  {
+   "subject": "كل الأطفال",
+   "relation": "ينعم",
+   "object": "بنفس الحماية الاجتماعية",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "coordinate",
+   "prop": "udhr:children-protection",
+   "ground": "article-25.2.2",
+   "role": "declared",
+   "because": "'ينعم بـ' (enjoy) — the enjoy-frame: a condition held by the kind, Relate·Existence at pattern grain; the born-in-or-out-of-wedlock concessive ('سواء أكانت ولادتهم…') folds (A2)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 6986,
+    "end": 7142
+   },
+   "anchor": "وينعم كل الأطفال بنفس الحماية الاجتماعية"
+  },
+  {
+   "subject": null,
+   "relation": "المادة 26",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-26",
+   "ground": "article-26",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 7149,
+    "end": 7164
+   },
+   "anchor": "المادة 26"
+  },
+  {
+   "subject": "لكل شخص",
+   "relation": "الحق في",
+   "object": "التعلم",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:right-to-education",
+   "ground": "article-26.1.1",
+   "role": "declared",
+   "because": "the possessive right-holding frame",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 7168,
+    "end": 7419
+   },
+   "anchor": "لكل شخص الحق في التعلم"
+  },
+  {
+   "subject": "التعليم",
+   "relation": "يكون",
+   "object": "بالمجان",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:education-free",
+   "ground": "article-26.1.2",
+   "role": "declared",
+   "because": "overt copula 'يكون' + property (بالمجان, gratis) — rule 4 over the kind; the stage-restriction ('في مراحله الأولى والأساسية على الأقل') is an adjunct (A2); deontic 'يجب' noted (A3)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 7168,
+    "end": 7419
+   },
+   "anchor": "ويجب أن يكون التعليم في مراحله الأولى والأساسية على الأقل بالمجان"
+  },
+  {
+   "subject": "التعليم الأولي",
+   "relation": "يكون",
+   "object": "إلزاميا",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "coordinate",
+   "prop": "udhr:elementary-compulsory",
+   "ground": "article-26.1.3",
+   "role": "declared",
+   "because": "copula + property (rule 4), the coordinated أن-clause sharing يجب's deontic matrix (A3)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 7168,
+    "end": 7419
+   },
+   "anchor": "وأن يكون التعليم الأولي إلزاميا"
+  },
+  {
+   "subject": "التعليم الفني والمهني",
+   "relation": "يعمم",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "INS",
+    "grain": "Pattern"
+   },
+   "clause": "coordinate",
+   "prop": "udhr:technical-available",
+   "ground": "article-26.1.4",
+   "role": "declared",
+   "because": "'يعمم' (be made universal/widespread) GENERATES the availability — a make-verb like English's 'made available': Generate·Existence at pattern grain; deontic 'ينبغي' noted (A3)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SIG",
+    "grain": "Pattern",
+    "because": "readable as the availability-condition itself"
+   },
+   "span": {
+    "start": 7168,
+    "end": 7419
+   },
+   "anchor": "وينبغي أن يعمم التعليم الفني والمهني"
+  },
+  {
+   "subject": "القبول للتعليم العالي",
+   "relation": "ييسر",
+   "object": "على قدم المساواة التامة للجميع وعلى أساس الكفاءة",
+   "polarity": "+",
+   "phasepost": {
+    "op": "INS",
+    "grain": "Pattern"
+   },
+   "clause": "coordinate",
+   "prop": "udhr:higher-accessible",
+   "ground": "article-26.1.5",
+   "role": "declared",
+   "because": "'ييسر' (be made easy, facilitated) — Arabic VERBS the easing of admission where English states a bare accessibility property: Generate·Existence at pattern grain, divergence disclosed",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SIG",
+    "grain": "Pattern",
+    "because": "the siblings' reading: accessibility as a property"
+   },
+   "span": {
+    "start": 7168,
+    "end": 7419
+   },
+   "anchor": "وأن ييسر القبول للتعليم العالي على قدم المساواة التامة للجميع"
+  },
+  {
+   "subject": "التربية",
+   "relation": "تهدف إلى",
+   "object": "إنماء شخصية الإنسان إنماء كاملا",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:education-directed",
+   "ground": "article-26.2.1",
+   "role": "declared",
+   "because": "'تهدف إلى' (aims at) ORIENTS the practice toward its ends — the pointing relation, Relate·Existence at pattern grain; deontic 'يجب' noted (A3). Arabic folds ALL the aim-content under this one verb — strengthening respect, growing understanding/tolerance/friendship, increasing UN efforts ride as coordinated aim-objects (وإلى…وتنمية…وإلى زيادة) — so props udhr:promote-understanding and udhr:further-un-activities are absent here by fold, present in the siblings that verb them",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "REC",
+    "grain": "Pattern",
+    "because": "readable as setting the practice's interpretive frame — its telos"
+   },
+   "span": {
+    "start": 7423,
+    "end": 7657
+   },
+   "anchor": "يجب أن تهدف التربية إلى إنماء شخصية الإنسان إنماء كاملا"
+  },
+  {
+   "subject": "للآباء",
+   "relation": "الحق الأول في",
+   "object": "اختيار نوع تربية أولادهم",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:parents-prior-right",
+   "ground": "article-26.3.1",
+   "role": "declared",
+   "because": "the possessive right-holding frame; the choosing stays inside the right-object (A1)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 7661,
+    "end": 7717
+   },
+   "anchor": "للآباء الحق الأول في اختيار نوع تربية أولادهم"
+  },
+  {
+   "subject": null,
+   "relation": "المادة 27",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-27",
+   "ground": "article-27",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 7724,
+    "end": 7739
+   },
+   "anchor": "المادة 27"
+  },
+  {
+   "subject": "لكل فرد",
+   "relation": "الحق في",
+   "object": "أن يشترك اشتراكا حرا في حياة المجتمع الثقافي وفي الاستمتاع بالفنون والمساهمة في التقدم العلمي والاستفادة من نتائجه",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:participate-cultural-life",
+   "ground": "article-27.1.1",
+   "role": "declared",
+   "because": "the possessive right-holding frame; four coordinated act-complements inside the right-object (A1), kept whole (R4)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 7743,
+    "end": 7884
+   },
+   "anchor": "لكل فرد الحق في أن يشترك اشتراكا حرا في حياة المجتمع الثقافي"
+  },
+  {
+   "subject": "لكل فرد",
+   "relation": "الحق في",
+   "object": "حماية المصالح الأدبية والمادية المترتبة على إنتاجه العلمي أو الأدبي أو الفني",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:protection-author-interests",
+   "ground": "article-27.2.1",
+   "role": "declared",
+   "because": "the possessive right-holding frame; 'المترتبة على…' is a participial modifier inside the right-object (A1/R1, folded)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 7888,
+    "end": 7991
+   },
+   "anchor": "لكل فرد الحق في حماية المصالح الأدبية والمادية المترتبة على إنتاجه العلمي أو الأدبي أو الفني"
+  },
+  {
+   "subject": null,
+   "relation": "المادة 28",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-28",
+   "ground": "article-28",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 7998,
+    "end": 8013
+   },
+   "anchor": "المادة 28"
+  },
+  {
+   "subject": "لكل فرد",
+   "relation": "الحق في",
+   "object": "التمتع بنظام اجتماعي دولي تتحقق بمقتضاه الحقوق والحريات المنصوص عليها في هذا الإعلان تحققا تاما",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:entitled-to-order",
+   "ground": "article-28.1.1",
+   "role": "declared",
+   "because": "the possessive right-holding frame; the order's realization relative ('تتحقق بمقتضاه…') characterizes the SOUGHT order inside the right-object and folds (A1) — see the en row's reasoning; only Mandarin asserts the realization at clause level",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 8015,
+    "end": 8133
+   },
+   "anchor": "لكل فرد الحق في التمتع بنظام اجتماعي دولي تتحقق بمقتضاه الحقوق والحريات"
+  },
+  {
+   "subject": null,
+   "relation": "المادة 29",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-29",
+   "ground": "article-29",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 8138,
+    "end": 8153
+   },
+   "anchor": "المادة 29"
+  },
+  {
+   "subject": "على كل فرد",
+   "relation": "واجبات نحو",
+   "object": "المجتمع",
+   "polarity": "+",
+   "phasepost": {
+    "op": "CON",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:duties-to-community",
+   "ground": "article-29.1.1",
+   "role": "declared",
+   "because": "'ʿalā X wājibāt' — the obligation-existential (upon every person are duties toward…): a standing bond directed at the community, Relate·Structure at pattern grain; verbless nominal sentence, the predicate carried by the على-phrase",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 8157,
+    "end": 8247
+   },
+   "anchor": "على كل فرد واجبات نحو المجتمع"
+  },
+  {
+   "subject": "لشخصيته",
+   "relation": "يتاح",
+   "object": "أن تنمو نموا حرا كاملا",
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Pattern"
+   },
+   "clause": "restrictive-relative",
+   "prop": "udhr:development-in-community",
+   "ground": "article-29.1.1.1",
+   "role": "declared",
+   "because": "'يتاح' (is made available/possible) — availability as a lawlike condition of the kind's growth, Relate·Existence at pattern grain; 'فيه وحده' binds it exclusively to the communal ground, noted",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 8157,
+    "end": 8247
+   },
+   "anchor": "الذي يتاح فيه وحده لشخصيته أن تنمو نموا حرا كاملا"
+  },
+  {
+   "subject": "الفرد",
+   "relation": "يخضع",
+   "object": "لتلك القيود التي يقررها القانون فقط",
+   "polarity": "+",
+   "phasepost": {
+    "op": "CON",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:subject-to-limitations",
+   "ground": "article-29.2.1",
+   "role": "declared",
+   "because": "'يخضع لـ' (is subject to) — standing UNDER a constraint, the coverage-arrangement family, Relate·Structure at pattern grain; 'في ممارسته حقوقه' is a temporal adjunct (A2)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 8251,
+    "end": 8453
+   },
+   "anchor": "يخضع الفرد في ممارسته حقوقه لتلك القيود التي يقررها القانون فقط"
+  },
+  {
+   "subject": "القانون",
+   "relation": "يقررها",
+   "object": "تلك القيود",
+   "polarity": "+",
+   "phasepost": {
+    "op": "DEF",
+    "grain": "Pattern"
+   },
+   "clause": "restrictive-relative",
+   "prop": "udhr:limitations-by-law",
+   "ground": "article-29.2.1.1",
+   "role": "declared",
+   "because": "'يقرر' (decides/fixes) — the law draws the bounds of the class of admissible restrictions, Differentiate·Interpretation at pattern grain; 'فقط' (alone) reinforces the exclusivity",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "'ها' in 'يقررها' → تلك القيود, the head the relative restricts",
+   "alternate": {
+    "op": "INS",
+    "grain": "Pattern",
+    "because": "readable as the restrictions brought into being by statute"
+   },
+   "span": {
+    "start": 8251,
+    "end": 8453
+   },
+   "anchor": "التي يقررها القانون فقط"
+  },
+  {
+   "subject": "تلك القيود",
+   "relation": "لضمان",
+   "object": "الاعتراف بحقوق الغير وحرياته واحترامها",
+   "polarity": "+",
+   "phasepost": {
+    "op": "REC",
+    "grain": "Pattern"
+   },
+   "clause": "purpose-adjunct",
+   "prop": "udhr:limitation-purpose",
+   "ground": "article-29.2.1.2",
+   "role": "declared",
+   "because": "'ضمان الاعتراف' — guaranteeing recognition of others' rights generates an interpretive standing across the kind, Generate·Interpretation at pattern grain; the coordinated 'ولتحقيق المقتضيات العادلة…' second purpose is folded into this one (noted)",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": "the purpose belongs to the restrictions, the matrix clause's own object",
+   "alternate": {
+    "op": "CON",
+    "grain": "Pattern",
+    "because": "the meeting-requirements half read as standing-in-accord"
+   },
+   "span": {
+    "start": 8251,
+    "end": 8453
+   },
+   "anchor": "لضمان الاعتراف بحقوق الغير وحرياته واحترامها"
+  },
+  {
+   "subject": "هذه الحقوق",
+   "relation": "تمارس",
+   "object": "ممارسة تتناقض مع أغراض الأمم المتحدة ومبادئها",
+   "polarity": "-",
+   "phasepost": {
+    "op": "CON",
+    "grain": "Pattern"
+   },
+   "clause": "main",
+   "prop": "udhr:no-contrary-exercise",
+   "ground": "article-29.3.1",
+   "role": "declared",
+   "because": "exercising-in-contradiction-with is conduct STANDING AGAINST — Relate·Structure at pattern grain, polarity −. SOURCE DEFECT, FLAGGED NOT REPAIRED: this file's bytes read 'يصح بحال من الأحوال' with no لا before يصح, but 'بحال من الأحوال' is a negative-polarity idiom that is ungrammatical without the negation, and all four sibling translations negate this clause — read under the only grammatical parse (a dropped لا, suspected transcription loss), which the prop matrix is what caught",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": null,
+   "span": {
+    "start": 8457,
+    "end": 8553
+   },
+   "anchor": "أن تمارس هذه الحقوق ممارسة تتناقض مع أغراض الأمم المتحدة ومبادئها"
+  },
+  {
+   "subject": null,
+   "relation": "المادة 30",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "SIG",
+    "grain": "Ground"
+   },
+   "clause": "heading",
+   "prop": "udhr:heading-article-30",
+   "ground": "article-30",
+   "role": null,
+   "because": "a heading is a sign held over the region it opens",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "SEG",
+    "grain": "Ground",
+    "because": "readable as the cut that divides the document here"
+   },
+   "span": {
+    "start": 8560,
+    "end": 8575
+   },
+   "anchor": "المادة 30"
+  },
+  {
+   "subject": "نص يجوز تأويله على أنه يخول لدولة أو جماعة أو فرد أي حق",
+   "relation": "ليس في هذا الإعلان",
+   "object": null,
+   "polarity": "+",
+   "phasepost": {
+    "op": "NUL",
+    "grain": "Ground"
+   },
+   "clause": "main",
+   "prop": "udhr:no-destructive-interpretation",
+   "ground": "article-30.1.1",
+   "role": "declared",
+   "because": "Arabic states the interpretive wall as a negative EXISTENTIAL — 'there is NOT in this Declaration a text whose construal as licensing destruction is permitted' — A4's exact shape at GROUND grain: the absence, over the document's whole meaning-space, IS the asserted act; Differentiate·Existence, polarity +. The second time this file reaches for the negative-existential where en/es/zh negate the verb (see no-distinction-status): a systematic construction preference the matrix now shows twice",
+   "embedded": false,
+   "unresolved": false,
+   "resolution": null,
+   "alternate": {
+    "op": "DEF",
+    "grain": "Ground",
+    "because": "the sibling construction: the interpretive field bounded by exclusion, polarity −"
+   },
+   "span": {
+    "start": 8577,
+    "end": 8728
+   },
+   "anchor": "ليس في هذا الإعلان نص يجوز تأويله"
+  }
+ ]
+}

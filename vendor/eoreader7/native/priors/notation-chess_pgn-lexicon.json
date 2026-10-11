@@ -1,0 +1,186 @@
+{
+ "schema": "NotationLexiconPrior@1",
+ "family": "chess_pgn",
+ "kind": "lexicon",
+ "built": "2026-10-06",
+ "built_by": "eval/notation-competence/chess_pgn-priors.mjs",
+ "givers": [
+  {
+   "name": "PGN Standard 1.1 (Edwards 1994, community-revised 2026-04-18)",
+   "url": "https://github.com/fsmosca/PGN-Standard/blob/master/PGN-Standard.txt",
+   "sections": [
+    "§7 tokens",
+    "§8.2.3 SAN",
+    "§8.2.3.8 suffix annotations",
+    "§8.2.4 NAG",
+    "§9.1 tag roster",
+    "§16.1 FEN",
+    "§17 alternative piece letters"
+   ],
+   "licence_note": "repo carries no licence field; only facts (grammar, letter table) are encoded"
+  },
+  {
+   "name": "FIDE Laws of Chess, effective 1 January 2023",
+   "url": "https://handbook.fide.com/chapter/E012023",
+   "sections": [
+    "Art. 2 the chessboard",
+    "Art. 3 the moves of the pieces",
+    "Appendix C algebraic notation"
+   ],
+   "licence_note": "FIDE text is copyrighted; only the rules as facts are encoded"
+  },
+  {
+   "name": "Unicode Standard, Miscellaneous Symbols U+2654..U+265F (chess figurines)",
+   "url": "https://www.unicode.org/charts/PDF/U2600.pdf",
+   "licence_note": "character repertoire"
+  }
+ ],
+ "semantics": "NOMINATES token classes and piece letters; admits nothing: a SAN-shaped word is a candidate until the board replays it.",
+ "pieces": {
+  "order": "PNBRQK",
+  "english": {
+   "P": "pawn",
+   "N": "knight",
+   "B": "bishop",
+   "R": "rook",
+   "Q": "queen",
+   "K": "king"
+  }
+ },
+ "letter_sets": {
+  "cs": "PJSVDK",
+  "da": "BSLTDK",
+  "nl": "OPLTDK",
+  "en": "PNBRQK",
+  "et": "PROVLK",
+  "fi": "PRLTDK",
+  "fr": "PCFTDR",
+  "de": "BSLTDK",
+  "hu": "GHFBVK",
+  "is": "PRBHDK",
+  "it": "PCATDR",
+  "no": "BSLTDK",
+  "pl": "PSGWHK",
+  "pt": "PCBTDR",
+  "ro": "PCNTDR",
+  "es": "PCATDR",
+  "sv": "BSLTDK"
+ },
+ "figurines": {
+  "white": "♙♘♗♖♕♔",
+  "black": "♟♞♝♜♛♚",
+  "order": "PNBRQK"
+ },
+ "files": "abcdefgh",
+ "ranks": "12345678",
+ "results": [
+  "1-0",
+  "0-1",
+  "1/2-1/2",
+  "*"
+ ],
+ "castling": {
+  "short": "O-O",
+  "long": "O-O-O",
+  "tolerated_variants": [
+   "0-0",
+   "0-0-0"
+  ],
+  "note": "PGN §8.2.3.3 prescribes the letter O; the digit zero is read as a nonstandard glyph and recorded as a gap"
+ },
+ "glyph_suffixes": [
+  "!",
+  "?",
+  "!!",
+  "!?",
+  "?!",
+  "??"
+ ],
+ "nag": {
+  "min": 0,
+  "max": 255
+ },
+ "tag_roster": [
+  "Event",
+  "Site",
+  "Date",
+  "Round",
+  "White",
+  "Black",
+  "Result"
+ ],
+ "check_marks": [
+  "+",
+  "#"
+ ],
+ "train": {
+  "marker": "COUNTS BELOW COME FROM TRAIN ONLY (Lichess standard rated, online, CC0); the grammar tables above come from the standards",
+  "sources": [
+   "lichess_standard_rated_2013-01",
+   "lichess_standard_rated_2020-01(head 10 MiB)"
+  ],
+  "games": 24272,
+  "built": "2026-10-06",
+  "tag_name_games": {
+   "Event": 24272,
+   "Site": 24272,
+   "White": 24272,
+   "Black": 24272,
+   "Result": 24272,
+   "UTCDate": 24272,
+   "UTCTime": 24272,
+   "WhiteElo": 24272,
+   "BlackElo": 24272,
+   "ECO": 24272,
+   "Opening": 24272,
+   "TimeControl": 24272,
+   "Termination": 24272,
+   "WhiteRatingDiff": 24235,
+   "BlackRatingDiff": 24235,
+   "Date": 3978,
+   "Round": 3978,
+   "WhiteTitle": 20,
+   "BlackTitle": 18
+  },
+  "token_class_counts": {
+   "tag_name": 372000,
+   "tag_value": 372000,
+   "move_number": 825355,
+   "san": 1620445,
+   "result": 24272,
+   "comment": 271723,
+   "glyph": 4274
+  },
+  "san": {
+   "total": 1620445,
+   "forms": {
+    "short": 1582274,
+    "long": 2133,
+    "castle": 36038
+   },
+   "capture_marked": 377242,
+   "check_marked": 119228,
+   "mate_marked": 6703,
+   "promotions": 4391,
+   "by_piece": {
+    "P": 456881,
+    "B": 245901,
+    "N": 279991,
+    "Q": 199489,
+    "K": 214756,
+    "R": 223427
+   }
+  },
+  "glyph_counts": {
+   "?!": 1697,
+   "?": 1533,
+   "??": 1044
+  },
+  "result_counts": {
+   "1-0": 12293,
+   "1/2-1/2": 818,
+   "0-1": 11161
+  },
+  "games_with_brace_comments": 4063
+ }
+}

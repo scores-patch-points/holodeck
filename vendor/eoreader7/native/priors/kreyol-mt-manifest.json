@@ -1,0 +1,129 @@
+{
+  "source": "Kreyol-MT (JHU-CLSP)",
+  "url": "https://github.com/JHU-CLSP/Kreyol-MT",
+  "hf_dataset_url": "https://huggingface.co/datasets/jhu-clsp/kreyol-mt",
+  "paper": "Robinson, Nathaniel R. et al. 2024. \"Kreyol-MT: Building MT for Latin American, Caribbean and Colonial African Creole Languages.\" arXiv:2405.05376.",
+  "license": "MIXED, verified per-source rather than assumed for the whole pocket -- see license_verification below. The GitHub repository's own code/docs are MIT (repo/LICENSE, copied verbatim from the clone). The full aggregated bitext hosted on HuggingFace carries a top-level dataset license of \"other\" (not a recognized open license) and is NOT staged here for that reason. What IS staged is fetched directly from two independently-verified open upstream sources Kreyol-MT itself documents using: OPUS bible-uedin (CC0 1.0 Universal, per that package's own bundled LICENSE file) for djk-eng, and Tatoeba (CC BY 2.0 FR by default, per Tatoeba's own terms of use) for hat-eng, gcf-fra, tpi-eng, crs-fra.",
+  "license_verification": {
+    "checked_at": "2026-08-19",
+    "method": "git clone --depth 1 of the real JHU-CLSP/Kreyol-MT GitHub repository, then LICENSE and README.md read directly from the clone; every per-source README.md under data-documentation/ (344 files) grepped and sample-read directly (not summarized from memory); the live HuggingFace dataset card fetched via https://huggingface.co/datasets/jhu-clsp/kreyol-mt/raw/main/README.md and the HF datasets API (https://huggingface.co/api/datasets/jhu-clsp/kreyol-mt); the actual OPUS bible-uedin djk-en package downloaded and its bundled LICENSE file read directly; Tatoeba's live terms-of-use page fetched and read directly (https://tatoeba.org/en/terms_of_use#section-6).",
+    "github_repo_finding": "MIT License, stated in full in the repo's own LICENSE file. This governs the repository's code, scripts, and documentation only -- the repo contains no bitext data files itself.",
+    "huggingface_dataset_finding": "cardData license field is literally \"other\". The dataset card's own README states: \"Documentation of all our data, including license and release information for data from individual sources, is available at our GitHub repo\" -- i.e. the aggregate dataset explicitly defers to per-source licensing rather than asserting one license for itself. The card also states the currently-hosted parquet lacks per-row source metadata (\"Metadata indicating which aligned sentences came from which sources\" is listed as a future addition), so a downloaded parquet cannot be filtered to public-only sentences after the fact.",
+    "per_source_documentation_finding": "Across data-documentation/ (344 source READMEs, one per language-pair-source triple), grep of the 'release:' frontmatter field found 3 values: public (144), online (50), private (131). 'private' is dominated by a single source: 'JHU Bible' (112 of 344 entries, by far the largest single documented source in the whole project), plus CreoleVal (17) and AfricaNLP-2023 (2). The project's own scripts/count/count.py computes its 'public' sentence counts by checking release == 'public' exactly, meaning even the 'online' (OPUS-hosted) tier is excluded from what the project's own tooling treats as public data. Several 'public'-tagged sources still carry restrictive licenses when read individually, e.g. FLORES-200 is release:\"public\" but licensed CC-BY-NC-SA 4.0 (noncommercial) per its own per-source README.",
+    "decision": "Because the HuggingFace-hosted bitext is an unlabeled blend of public/online/private-marked sentences with no license of its own and no way to separate a private-marked majority source after the fact, this pocket does NOT stage that blended data. Instead it fetches real bitext directly from two upstream sources Kreyol-MT's own documentation names as feeding several of its language pairs, at the point each source states its own clean license: OPUS bible-uedin (djk-en package's own LICENSE file: CC0 1.0 Universal) and Tatoeba (terms of use: CC BY 2.0 FR default for text sentences). Both confirmed independently, not inferred from Kreyol-MT's characterization of them.",
+    "result": "Clean, verified, per-source licenses for everything actually staged (CC0 for djk-eng; CC BY 2.0 FR for the four Tatoeba-built pairs; MIT for the repo/ code mirror). The much larger blended HuggingFace release is explicitly gated/skipped, named and reasoned about rather than silently omitted."
+  },
+  "fetched_at": "2026-08-19",
+  "fetch_method": "git clone --depth 1 of https://github.com/JHU-CLSP/Kreyol-MT.git for the repo's own LICENSE/README/data-documentation tree (used for verification, not as a bitext source); direct curl download of the real OPUS bible-uedin djk-en Moses-format package from https://object.pouta.csc.fi/OPUS-bible-uedin/v1/moses/djk-en.txt.zip (found via the live OPUS REST API at https://opus.nlpl.eu/opusapi/); direct curl download of Tatoeba's real per-language sentence exports and translation-link exports from https://downloads.tatoeba.org/exports/per_language/, joined locally by sentence ID into aligned bitext TSVs (join script logic: for each (src_id, tgt_id) pair in the *_links.tsv export, look up src_id in the source language's *_sentences.tsv and tgt_id in the target language's *_sentences.tsv; write the row only if both lookups succeed). No content was reconstructed from memory anywhere in this pocket.",
+  "coverage": "A small, deliberately bounded, honestly partial slice: 5 of the ~74 language-pair configs Kreyol-MT tracks (and 5 of its ~40 target creole languages), chosen to span the three regional groups Kreyol-MT's own README organizes its target list into (African-diaspora Creoles of the Americas: djk, hat, gcf; Creoles of Africa/Indian Ocean: crs; other Creoles: tpi, Pacific) -- and chosen specifically because each is drawn from a source independently verified as openly licensed, not because it is a representative sample of Kreyol-MT's overall data composition (which is dominated by the private-marked JHU Bible source this pocket excludes). 18,163 real aligned sentence pairs total across the 5 pairs. Of Kreyol-MT's ~40 target creole languages, only 10 (hat, jam, pap, tpi, srn, mfe, gcf, crs, sag, lou) appear in Tatoeba's per-language export listing at all; of those, gcf/hat/tpi/crs had a usable (non-trivial) sentence count fetched. Only 1 Kreyol-MT language (djk) appears in OPUS bible-uedin's language list, checked directly against the live OPUS API's full bible-uedin language set.",
+  "not_staged": [
+    {
+      "item": "The HuggingFace jhu-clsp/kreyol-mt aggregated parquet bitext, all ~74 configs / ~40 languages",
+      "reason": "gated -- license field \"other\", blends a 131-of-344-entries private-marked majority source (chiefly JHU Bible) with public/online sources at the row level with no way to separate them; see license_verification.decision above."
+    },
+    {
+      "item": "JHU Bible-sourced sentences specifically (112 documented entries, the single largest source in the whole project)",
+      "reason": "gated -- explicitly marked release: \"private\" in Kreyol-MT's own per-source documentation, and excluded from the project's own public-data counting script."
+    },
+    {
+      "item": "CreoleVal-sourced sentences (17 entries) and AfricaNLP-2023-sourced sentences (2 entries)",
+      "reason": "gated -- also explicitly marked release: \"private\"."
+    },
+    {
+      "item": "FLORES-200-sourced sentences (5 documented entries)",
+      "reason": "out_of_scope_this_pass -- marked release: \"public\" in Kreyol-MT's documentation but individually licensed CC-BY-NC-SA 4.0 (noncommercial); named here so \"public\" release status is not later conflated with an unrestricted license."
+    },
+    {
+      "item": "CJCLDS (Church of Jesus Christ of Latter-day Saints) materials",
+      "reason": "not_available -- the HuggingFace dataset card states this data was removed from the current public release, pending a separate LDC release; nothing to fetch."
+    },
+    {
+      "item": "The remaining ~30 Kreyol-MT target languages not covered by OPUS bible-uedin or a usable Tatoeba export (aoa, bah, brc, bzj, bzk, cri, dcr, fab, fng, fpe, gcr, gpe, gul, gyn, icr, jam (trivial 39-sentence Tatoeba count), kea, kri, ktu, lou (trivial 22-sentence count), mfe (trivial 6-sentence count), mue, pap (trivial 89-sentence count), pcm, pov, pre, rcf, sag (trivial 12-sentence count), srm, srn (198 sentences, viable but not fetched this pass), svc, trf, wes, mart1259)",
+      "reason": "out_of_scope_this_pass -- bounded single-session fetch; a future pass could extend to srn (198 Tatoeba sentences, next-largest viable set not yet fetched) and the smaller Tatoeba sets, or pursue additional OPUS corpora (QED/NLLB/Ubuntu/TED2020/MultiCCAligned/XLent) that Kreyol-MT documents as sourcing some of these languages via OPUS but which were not individually checked for Kreyol-MT-language coverage this pass beyond bible-uedin."
+    },
+    {
+      "item": "APICS-sourced material (43 documented Kreyol-MT source entries, CC BY 4.0)",
+      "reason": "out_of_scope_this_pass -- already staged in full as its own separate pocket at 11-multi-language/dialects-pidgins-creoles/apics/ in this repo (see manifests/apics-manifest.json); not duplicated here to avoid lumping two pockets' content together."
+    }
+  ],
+  "totals": {
+    "total_files": 9,
+    "approx_total_size_bytes": 4878488,
+    "bitext_pairs_total": 18163,
+    "language_pairs_staged": 5
+  },
+  "entries": [
+    {
+      "pair": "djk-eng",
+      "src_lang": "djk",
+      "src_lang_name": "Ndyuka / Aukan (Suriname)",
+      "tgt_lang": "eng",
+      "upstream_source": "OPUS bible-uedin v1",
+      "upstream_source_url": "https://opus.nlpl.eu/bible-uedin-v1.php",
+      "license": "CC0 1.0 Universal -- confirmed by reading the LICENSE file bundled directly in the downloaded package (also mirrored at bitexts/djk-eng/OPUS-LICENSE.txt).",
+      "pair_count": 15743,
+      "file": "11-multi-language/dialects-pidgins-creoles/kreyol-mt/bitexts/djk-eng/djk-eng.tsv",
+      "supporting_files": [
+        "11-multi-language/dialects-pidgins-creoles/kreyol-mt/bitexts/djk-eng/OPUS-LICENSE.txt",
+        "11-multi-language/dialects-pidgins-creoles/kreyol-mt/bitexts/djk-eng/OPUS-README.txt"
+      ],
+      "bytes": 4744827
+    },
+    {
+      "pair": "hat-eng",
+      "src_lang": "hat",
+      "src_lang_name": "Haitian Creole",
+      "tgt_lang": "eng",
+      "upstream_source": "Tatoeba",
+      "upstream_source_url": "https://downloads.tatoeba.org/exports/per_language/hat/",
+      "license": "CC BY 2.0 FR (default text-sentence license per Tatoeba's own terms of use, https://tatoeba.org/en/terms_of_use#section-6). Attribution required; individual sentences may carry a different Tatoeba-compatible CC license, disclosed per-sentence on tatoeba.org.",
+      "pair_count": 177,
+      "file": "11-multi-language/dialects-pidgins-creoles/kreyol-mt/bitexts/hat-eng/hat-eng.tsv",
+      "bytes": 11669
+    },
+    {
+      "pair": "gcf-fra",
+      "src_lang": "gcf",
+      "src_lang_name": "Guadeloupean Creole",
+      "tgt_lang": "fra",
+      "upstream_source": "Tatoeba",
+      "upstream_source_url": "https://downloads.tatoeba.org/exports/per_language/gcf/",
+      "license": "CC BY 2.0 FR (default text-sentence license per Tatoeba's own terms of use).",
+      "pair_count": 1694,
+      "file": "11-multi-language/dialects-pidgins-creoles/kreyol-mt/bitexts/gcf-fra/gcf-fra.tsv",
+      "bytes": 102446
+    },
+    {
+      "pair": "tpi-eng",
+      "src_lang": "tpi",
+      "src_lang_name": "Tok Pisin (Papua New Guinea)",
+      "tgt_lang": "eng",
+      "upstream_source": "Tatoeba",
+      "upstream_source_url": "https://downloads.tatoeba.org/exports/per_language/tpi/",
+      "license": "CC BY 2.0 FR (default text-sentence license per Tatoeba's own terms of use).",
+      "pair_count": 90,
+      "file": "11-multi-language/dialects-pidgins-creoles/kreyol-mt/bitexts/tpi-eng/tpi-eng.tsv",
+      "bytes": 5588
+    },
+    {
+      "pair": "crs-fra",
+      "src_lang": "crs",
+      "src_lang_name": "Seychellois Creole",
+      "tgt_lang": "fra",
+      "upstream_source": "Tatoeba",
+      "upstream_source_url": "https://downloads.tatoeba.org/exports/per_language/crs/",
+      "license": "CC BY 2.0 FR (default text-sentence license per Tatoeba's own terms of use).",
+      "pair_count": 59,
+      "file": "11-multi-language/dialects-pidgins-creoles/kreyol-mt/bitexts/crs-fra/crs-fra.tsv",
+      "bytes": 2791
+    }
+  ],
+  "repo_mirror": {
+    "description": "The upstream GitHub repository's own LICENSE and README.md, copied verbatim for reference/verification -- not bitext data.",
+    "license": "MIT License, Copyright (c) 2024 JHU Center for Language and Speech Processing",
+    "files": [
+      "11-multi-language/dialects-pidgins-creoles/kreyol-mt/repo/LICENSE",
+      "11-multi-language/dialects-pidgins-creoles/kreyol-mt/repo/README.md"
+    ]
+  }
+}

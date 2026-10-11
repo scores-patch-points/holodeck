@@ -1,0 +1,1041 @@
+{
+ "schema": "CodeKeywordPrior@1",
+ "language": "rust",
+ "provenance": {
+  "giver": "tree-sitter grammar for rust (tree-sitter-language-pack 1.21.0) for the word tokens, arbitrated by two declared authorities read as text (the Rust Reference keywords.md @ a286e1e and rustc's keyword table symbol.rs @ b57eb9a; no rust toolchain is available, so no engine is run) for which words are reserved; hard = grammar words INTERSECT reserved-in-every-edition by BOTH authorities",
+  "giverNote": "Derived, never hand-typed (rust_kw_giver.py): hard = (grammar word tokens U `macro_rules!`-style bang tokens U `_` U dedicated named terminals) INTERSECT the words the Rust Reference AND rustc's own table both reserve with no edition condition; soft = the rest of the grammar words (edition-conditional async/await/dyn/try/gen, weak default/macro_rules/raw/union, macro fragment specifiers); builtins = grammar-probed primitive types U the stable std prelude names; stdlibModules = STDLIB_STABLE_CRATES. Hard words refuse BARE names only: the raw identifier `r#match` legally names a being. Semantics stay in the engine.",
+  "source": "/private/tmp/claude-501/coding-competence/rust-priors/rust-law-prior.json",
+  "builder": "eoreader7 native/scripts/build-code-keyword-prior.mjs",
+  "keywords_read": 36,
+  "soft_keywords_read": 24,
+  "builtins_read": 106,
+  "stdlib_modules_read": 4,
+  "stdlib_modules_projected": 4,
+  "note": "hard keywords refuse (cannot name a being); soft keywords and builtins are recorded but never refuse (legally declarable — shadowing is a fact about the material, not a parse failure)",
+  "grammar": {
+   "name": "tree-sitter-rust (the `rust` grammar of the language pack)",
+   "language": "rust",
+   "package": "tree-sitter-language-pack",
+   "packageVersion": "1.21.0",
+   "packageLicense": "MIT",
+   "packageSource": "https://github.com/xberg-io/tree-sitter-language-pack",
+   "upstream": "https://github.com/tree-sitter/tree-sitter-rust",
+   "upstreamLicense": "MIT",
+   "upstreamCommit": null,
+   "upstreamCommitNote": "not recorded by the installed pack (Language.semantic_version is None); typed gap, not guessed",
+   "abi": 14,
+   "nodeKindCount": 355,
+   "nodeKindFingerprintSha256": "38590388dd937d0b88f1b1977e755a00f4ca39ac2ca99a840366d4310820a5b1",
+   "compiledLibrary": "libtree_sitter_rust.dylib",
+   "compiledLibrarySha256": "a82f1e1eb96e426ef944ece9a624444a4691d67bd23571fa79d2a1995eaf7aad",
+   "releaseBundle": "macos-arm64-cad37e5ebb7b818e5d1e106cbc54604ed3389cf69e08732a8f567f4d4e442195.tar.zst",
+   "releaseUrl": "https://github.com/xberg-io/tree-sitter-language-pack/releases/download/v1.21.0/parsers-macos-arm64.tar.zst",
+   "anonymousWordKinds": [
+    "as",
+    "async",
+    "await",
+    "block",
+    "break",
+    "const",
+    "continue",
+    "default",
+    "dyn",
+    "else",
+    "enum",
+    "expr",
+    "expr_2021",
+    "extern",
+    "false",
+    "fn",
+    "for",
+    "gen",
+    "ident",
+    "if",
+    "impl",
+    "in",
+    "item",
+    "let",
+    "lifetime",
+    "literal",
+    "loop",
+    "match",
+    "meta",
+    "mod",
+    "move",
+    "pat",
+    "pat_param",
+    "path",
+    "pub",
+    "raw",
+    "ref",
+    "return",
+    "static",
+    "stmt",
+    "struct",
+    "trait",
+    "true",
+    "try",
+    "tt",
+    "ty",
+    "type",
+    "union",
+    "unsafe",
+    "use",
+    "vis",
+    "where",
+    "while",
+    "yield"
+   ],
+   "bangTokens": {
+    "macro_rules": "macro_rules!"
+   },
+   "underscoreToken": [
+    "_"
+   ],
+   "dedicatedTerminals": {
+    "crate": "crate",
+    "mutable_specifier": "mut",
+    "self": "self",
+    "super": "super"
+   },
+   "rule": "anonymous visible node kinds matching /^[#@]?[A-Za-z][A-Za-z0-9_]*$/ (c0_grammar_keywords.py rule) + R+1 word-bang anonymous kinds + R+2 the anonymous `_` + R+3 dedicated named terminals (kind == text, or classified @keyword/@variable.builtin by the pack's highlights.scm; single fixed text over the authored probe library)",
+   "highlightsScm": {
+    "source": "tree-sitter-language-pack get_highlights_query('rust') (tree-sitter-rust queries/highlights.scm)",
+    "sha256": "0f0343107f14a7690157f51090a979eb8f8bfe4eada7c61763ddb4c54b1311d1",
+    "keywordLiterals": [
+     "as",
+     "async",
+     "await",
+     "break",
+     "const",
+     "continue",
+     "default",
+     "dyn",
+     "else",
+     "enum",
+     "extern",
+     "fn",
+     "for",
+     "gen",
+     "if",
+     "impl",
+     "in",
+     "let",
+     "loop",
+     "macro_rules",
+     "match",
+     "mod",
+     "move",
+     "pub",
+     "raw",
+     "ref",
+     "return",
+     "static",
+     "struct",
+     "trait",
+     "type",
+     "union",
+     "unsafe",
+     "use",
+     "where",
+     "while",
+     "yield"
+    ],
+    "keywordNamedKinds": [
+     "crate",
+     "mutable_specifier",
+     "self",
+     "super"
+    ]
+   }
+  },
+  "engine": {
+   "implementation": "rustc keyword table (rust-lang/rust compiler/rustc_span/src/symbol.rs), READ AS TEXT",
+   "commit": "b57eb9a5fd94f30697f51fc88fbe898e67c7aae6",
+   "mode": "no compile probe: no rust toolchain locally (a typed gap; an engine arbiter like V8 for javascript is the unmeasured upgrade)"
+  },
+  "authorities": {
+   "reference": {
+    "source": "The Rust Reference, src/keywords.md and src/identifiers.md",
+    "repo": "rust-lang/reference",
+    "commit": "a286e1ecb8ce193d50056e4bb042eea9b23876ef",
+    "commit_date": "2026-09-29T19:01:58Z",
+    "url": "https://raw.githubusercontent.com/rust-lang/reference/a286e1ecb8ce193d50056e4bb042eea9b23876ef/src/keywords.md",
+    "sha256": "e18178becd8aeb02c9dab1599551959778b62a48c0b01975df337fd7641f042f",
+    "licence": "MIT OR Apache-2.0"
+   },
+   "rustc": {
+    "source": "compiler/rustc_span/src/symbol.rs (symbols! Keywords block, is_* predicates, can_be_raw, STDLIB_STABLE_CRATES, Symbols vocabulary)",
+    "repo": "rust-lang/rust",
+    "commit": "b57eb9a5fd94f30697f51fc88fbe898e67c7aae6",
+    "commit_date": "2026-10-06T01:07:36Z",
+    "url": "https://raw.githubusercontent.com/rust-lang/rust/b57eb9a5fd94f30697f51fc88fbe898e67c7aae6/compiler/rustc_span/src/symbol.rs",
+    "sha256": "f189f8eb732c3bdb5399e2642904f5f5fd286eaee2642c2ff1f6e7996ca48300",
+    "licence": "MIT OR Apache-2.0"
+   },
+   "prelude": {
+    "rust-library_core_src_prelude_v1.rs": {
+     "url": "https://raw.githubusercontent.com/rust-lang/rust/b57eb9a5fd94f30697f51fc88fbe898e67c7aae6/library/core/src/prelude/v1.rs",
+     "commit": "b57eb9a5fd94f30697f51fc88fbe898e67c7aae6",
+     "sha256": "b57d120c6762622bd33114f46267dab8ba6c88be38f1433adb62d4ba36cd3a68"
+    },
+    "rust-library_std_src_prelude_v1.rs": {
+     "url": "https://raw.githubusercontent.com/rust-lang/rust/b57eb9a5fd94f30697f51fc88fbe898e67c7aae6/library/std/src/prelude/v1.rs",
+     "commit": "b57eb9a5fd94f30697f51fc88fbe898e67c7aae6",
+     "sha256": "393900118db4000a0bd90f7c8f50fcb55475939586f24285ecca70925d6a6a2c"
+    }
+   },
+   "fetchedAt": "2026-10-06T06:06:19Z (reference keywords/identifiers, symbol.rs, licences) and 2026-10-06T06:08Z (prelude files)",
+   "provenanceNote": "/private/tmp/claude-501/coding-competence/rust-priors/giver-sources/PROVENANCE.md (fetched 2026-10-06 with curl; sha256 verified before every read)"
+  },
+  "derivation": {
+   "script": "eval/coding-competence/rust_kw_giver.py",
+   "projection": "scripts/build-code-keyword-prior.mjs (unmodified)",
+   "reservedInEveryEdition": {
+    "reference": [
+     "Self",
+     "_",
+     "abstract",
+     "as",
+     "become",
+     "box",
+     "break",
+     "const",
+     "continue",
+     "crate",
+     "do",
+     "else",
+     "enum",
+     "extern",
+     "false",
+     "final",
+     "fn",
+     "for",
+     "if",
+     "impl",
+     "in",
+     "let",
+     "loop",
+     "macro",
+     "match",
+     "mod",
+     "move",
+     "mut",
+     "override",
+     "priv",
+     "pub",
+     "ref",
+     "return",
+     "self",
+     "static",
+     "struct",
+     "super",
+     "trait",
+     "true",
+     "type",
+     "typeof",
+     "unsafe",
+     "unsized",
+     "use",
+     "virtual",
+     "where",
+     "while",
+     "yield"
+    ],
+    "rustc": [
+     "Self",
+     "_",
+     "abstract",
+     "as",
+     "become",
+     "box",
+     "break",
+     "const",
+     "continue",
+     "crate",
+     "do",
+     "else",
+     "enum",
+     "extern",
+     "false",
+     "final",
+     "fn",
+     "for",
+     "if",
+     "impl",
+     "in",
+     "let",
+     "loop",
+     "macro",
+     "match",
+     "mod",
+     "move",
+     "mut",
+     "override",
+     "priv",
+     "pub",
+     "ref",
+     "return",
+     "self",
+     "static",
+     "struct",
+     "super",
+     "trait",
+     "true",
+     "type",
+     "typeof",
+     "unsafe",
+     "unsized",
+     "use",
+     "virtual",
+     "where",
+     "while",
+     "yield"
+    ]
+   },
+   "editionConditional": {
+    "reference": {
+     "async": 2018,
+     "await": 2018,
+     "dyn": 2018,
+     "try": 2018,
+     "gen": 2024
+    },
+    "rustc": {
+     "async": 2018,
+     "await": 2018,
+     "dyn": 2018,
+     "gen": 2024,
+     "try": 2018
+    },
+    "note": "reserved only from the edition on (async/await/dyn/try 2018, gen 2024): legally declarable in an older edition, therefore SOFT, never refused"
+   },
+   "hardSources": {
+    "_": [
+     "grammar:anonymous-token:_",
+     "reference:strict",
+     "rustc:special"
+    ],
+    "as": [
+     "grammar:anonymous-word-token",
+     "reference:strict",
+     "rustc:used_always"
+    ],
+    "break": [
+     "grammar:anonymous-word-token",
+     "reference:strict",
+     "rustc:used_always"
+    ],
+    "const": [
+     "grammar:anonymous-word-token",
+     "reference:strict",
+     "rustc:used_always"
+    ],
+    "continue": [
+     "grammar:anonymous-word-token",
+     "reference:strict",
+     "rustc:used_always"
+    ],
+    "crate": [
+     "grammar:dedicated-terminal:crate",
+     "reference:strict",
+     "rustc:used_always"
+    ],
+    "else": [
+     "grammar:anonymous-word-token",
+     "reference:strict",
+     "rustc:used_always"
+    ],
+    "enum": [
+     "grammar:anonymous-word-token",
+     "reference:strict",
+     "rustc:used_always"
+    ],
+    "extern": [
+     "grammar:anonymous-word-token",
+     "reference:strict",
+     "rustc:used_always"
+    ],
+    "false": [
+     "grammar:anonymous-word-token",
+     "reference:strict",
+     "rustc:used_always"
+    ],
+    "fn": [
+     "grammar:anonymous-word-token",
+     "reference:strict",
+     "rustc:used_always"
+    ],
+    "for": [
+     "grammar:anonymous-word-token",
+     "reference:strict",
+     "rustc:used_always"
+    ],
+    "if": [
+     "grammar:anonymous-word-token",
+     "reference:strict",
+     "rustc:used_always"
+    ],
+    "impl": [
+     "grammar:anonymous-word-token",
+     "reference:strict",
+     "rustc:used_always"
+    ],
+    "in": [
+     "grammar:anonymous-word-token",
+     "reference:strict",
+     "rustc:used_always"
+    ],
+    "let": [
+     "grammar:anonymous-word-token",
+     "reference:strict",
+     "rustc:used_always"
+    ],
+    "loop": [
+     "grammar:anonymous-word-token",
+     "reference:strict",
+     "rustc:used_always"
+    ],
+    "match": [
+     "grammar:anonymous-word-token",
+     "reference:strict",
+     "rustc:used_always"
+    ],
+    "mod": [
+     "grammar:anonymous-word-token",
+     "reference:strict",
+     "rustc:used_always"
+    ],
+    "move": [
+     "grammar:anonymous-word-token",
+     "reference:strict",
+     "rustc:used_always"
+    ],
+    "mut": [
+     "grammar:dedicated-terminal:mutable_specifier",
+     "reference:strict",
+     "rustc:used_always"
+    ],
+    "pub": [
+     "grammar:anonymous-word-token",
+     "reference:strict",
+     "rustc:used_always"
+    ],
+    "ref": [
+     "grammar:anonymous-word-token",
+     "reference:strict",
+     "rustc:used_always"
+    ],
+    "return": [
+     "grammar:anonymous-word-token",
+     "reference:strict",
+     "rustc:used_always"
+    ],
+    "self": [
+     "grammar:dedicated-terminal:self",
+     "reference:strict",
+     "rustc:used_always"
+    ],
+    "static": [
+     "grammar:anonymous-word-token",
+     "reference:strict",
+     "rustc:used_always"
+    ],
+    "struct": [
+     "grammar:anonymous-word-token",
+     "reference:strict",
+     "rustc:used_always"
+    ],
+    "super": [
+     "grammar:dedicated-terminal:super",
+     "reference:strict",
+     "rustc:used_always"
+    ],
+    "trait": [
+     "grammar:anonymous-word-token",
+     "reference:strict",
+     "rustc:used_always"
+    ],
+    "true": [
+     "grammar:anonymous-word-token",
+     "reference:strict",
+     "rustc:used_always"
+    ],
+    "type": [
+     "grammar:anonymous-word-token",
+     "reference:strict",
+     "rustc:used_always"
+    ],
+    "unsafe": [
+     "grammar:anonymous-word-token",
+     "reference:strict",
+     "rustc:used_always"
+    ],
+    "use": [
+     "grammar:anonymous-word-token",
+     "reference:strict",
+     "rustc:used_always"
+    ],
+    "where": [
+     "grammar:anonymous-word-token",
+     "reference:strict",
+     "rustc:used_always"
+    ],
+    "while": [
+     "grammar:anonymous-word-token",
+     "reference:strict",
+     "rustc:used_always"
+    ],
+    "yield": [
+     "grammar:anonymous-word-token",
+     "reference:reserved",
+     "rustc:unused_always"
+    ]
+   },
+   "softSources": {
+    "async": [
+     "grammar:anonymous-word-token",
+     "authority:edition-conditional:2018"
+    ],
+    "await": [
+     "grammar:anonymous-word-token",
+     "authority:edition-conditional:2018"
+    ],
+    "block": [
+     "grammar:anonymous-word-token",
+     "authority:macro-fragment-specifier"
+    ],
+    "default": [
+     "grammar:anonymous-word-token",
+     "authority:weak:rustc"
+    ],
+    "dyn": [
+     "grammar:anonymous-word-token",
+     "authority:edition-conditional:2018"
+    ],
+    "expr": [
+     "grammar:anonymous-word-token",
+     "authority:macro-fragment-specifier"
+    ],
+    "expr_2021": [
+     "grammar:anonymous-word-token",
+     "authority:macro-fragment-specifier"
+    ],
+    "gen": [
+     "grammar:anonymous-word-token",
+     "authority:edition-conditional:2024"
+    ],
+    "ident": [
+     "grammar:anonymous-word-token",
+     "authority:macro-fragment-specifier"
+    ],
+    "item": [
+     "grammar:anonymous-word-token",
+     "authority:macro-fragment-specifier"
+    ],
+    "lifetime": [
+     "grammar:anonymous-word-token",
+     "authority:macro-fragment-specifier"
+    ],
+    "literal": [
+     "grammar:anonymous-word-token",
+     "authority:macro-fragment-specifier"
+    ],
+    "macro_rules": [
+     "grammar:anonymous-token:macro_rules!",
+     "authority:weak:reference+rustc"
+    ],
+    "meta": [
+     "grammar:anonymous-word-token",
+     "authority:macro-fragment-specifier"
+    ],
+    "pat": [
+     "grammar:anonymous-word-token",
+     "authority:macro-fragment-specifier"
+    ],
+    "pat_param": [
+     "grammar:anonymous-word-token",
+     "authority:macro-fragment-specifier"
+    ],
+    "path": [
+     "grammar:anonymous-word-token",
+     "authority:macro-fragment-specifier"
+    ],
+    "raw": [
+     "grammar:anonymous-word-token",
+     "authority:weak:reference+rustc"
+    ],
+    "stmt": [
+     "grammar:anonymous-word-token",
+     "authority:macro-fragment-specifier"
+    ],
+    "try": [
+     "grammar:anonymous-word-token",
+     "authority:edition-conditional:2018"
+    ],
+    "tt": [
+     "grammar:anonymous-word-token",
+     "authority:macro-fragment-specifier"
+    ],
+    "ty": [
+     "grammar:anonymous-word-token",
+     "authority:macro-fragment-specifier"
+    ],
+    "union": [
+     "grammar:anonymous-word-token",
+     "authority:weak:reference+rustc"
+    ],
+    "vis": [
+     "grammar:anonymous-word-token",
+     "authority:macro-fragment-specifier"
+    ]
+   },
+   "macroFragmentSpecifiers": [
+    "block",
+    "expr",
+    "expr_2021",
+    "ident",
+    "item",
+    "lifetime",
+    "literal",
+    "meta",
+    "pat",
+    "pat_param",
+    "path",
+    "stmt",
+    "tt",
+    "ty",
+    "vis"
+   ],
+   "reservedButNotGrammarToken": [
+    "Self",
+    "abstract",
+    "become",
+    "box",
+    "do",
+    "final",
+    "macro",
+    "override",
+    "priv",
+    "typeof",
+    "unsized",
+    "virtual"
+   ],
+   "reservedButNotGrammarTokenNote": "settled by BOTH authorities but the grammar has no token for them (Self is a type_identifier; the others are unused reserved words): derived, kept out of the hard set so that hard is a subset of the grammar's own words; a consumer MAY refuse them too",
+   "primitiveTypes": [
+    "bool",
+    "char",
+    "f32",
+    "f64",
+    "i128",
+    "i16",
+    "i32",
+    "i64",
+    "i8",
+    "isize",
+    "str",
+    "u128",
+    "u16",
+    "u32",
+    "u64",
+    "u8",
+    "usize"
+   ],
+   "preludeNames": [
+    "AsMut",
+    "AsRef",
+    "AsyncFn",
+    "AsyncFnMut",
+    "AsyncFnOnce",
+    "Box",
+    "Clone",
+    "Copy",
+    "Debug",
+    "Default",
+    "DoubleEndedIterator",
+    "Drop",
+    "Eq",
+    "Err",
+    "ExactSizeIterator",
+    "Extend",
+    "Fn",
+    "FnMut",
+    "FnOnce",
+    "From",
+    "Hash",
+    "Into",
+    "IntoIterator",
+    "Iterator",
+    "None",
+    "Ok",
+    "Option",
+    "Ord",
+    "PartialEq",
+    "PartialOrd",
+    "Result",
+    "Send",
+    "Sized",
+    "Some",
+    "String",
+    "Sync",
+    "ToOwned",
+    "ToString",
+    "Unpin",
+    "Vec",
+    "align_of",
+    "align_of_val",
+    "alloc_error_handler",
+    "assert",
+    "assert_eq",
+    "assert_ne",
+    "bench",
+    "cfg",
+    "cfg_select",
+    "column",
+    "compile_error",
+    "concat",
+    "dbg",
+    "debug_assert",
+    "debug_assert_eq",
+    "debug_assert_ne",
+    "derive",
+    "drop",
+    "env",
+    "eprint",
+    "eprintln",
+    "file",
+    "format",
+    "format_args",
+    "global_allocator",
+    "include",
+    "include_bytes",
+    "include_str",
+    "is_x86_feature_detected",
+    "line",
+    "matches",
+    "module_path",
+    "option_env",
+    "panic",
+    "print",
+    "println",
+    "r#try",
+    "size_of",
+    "size_of_val",
+    "stringify",
+    "test",
+    "test_case",
+    "thread_local",
+    "todo",
+    "unimplemented",
+    "unreachable",
+    "vec",
+    "write",
+    "writeln"
+   ],
+   "preludeUnstableSkipped": [
+    "cfg_accessible",
+    "cfg_eval",
+    "concat_bytes",
+    "const_format_args",
+    "define_opaque",
+    "deref",
+    "derive_const",
+    "eii",
+    "eii_declaration",
+    "log_syntax",
+    "pattern_type",
+    "trace_macros",
+    "type_ascribe",
+    "unsafe_eii"
+   ],
+   "builtinsNote": "primitive types by grammar probe over rustc's interned-symbol vocabulary + the stable names of std::prelude::v1 / core::prelude::v1 (items and macros together; `r#try` keeps its raw spelling). Library names beyond the prelude (HashMap, Rc, ...) are NOT read: a typed gap, harmless because builtins never refuse",
+   "stdlibModules": {
+    "status": "ok",
+    "giver": "rustc STDLIB_STABLE_CRATES",
+    "crates": [
+     "alloc",
+     "core",
+     "proc_macro",
+     "std"
+    ],
+    "note": "crate roots of the standard distribution; a use of any other crate is a Cargo question, not a language one"
+   },
+   "bindingOnly": "a hard keyword cannot name a being as a BARE word; the raw identifier `r#word` (the grammar lexes it as one identifier whose text keeps `r#`) can, for every hard word except `_`, `crate`, `self`, `super`",
+   "checks": {
+    "K1": "pass",
+    "K2": "pass",
+    "K3": "pass",
+    "K4": "pass",
+    "K5": "pass",
+    "K6": "pass",
+    "K7": "pass",
+    "K8": "pass"
+   }
+  },
+  "assembledBy": "eval/coding-competence/build-rust-priors.mjs (adds the grammar, authority, derivation and TRAIN-witness provenance to the unmodified builder's output; the keyword lists are the builder's, untouched)",
+  "noCorpusRead": "the keyword set is derived from the grammar and the two authorities only; no corpus file is read to derive it",
+  "postHoc": {
+   "post_hoc": true,
+   "writtenAfter": "the first run's R4a fail (187 leaves, all `_`) and R6 not-zero (642 leaves, all `Self`) were seen",
+   "script": "eval/coding-competence/rust-priors-posthoc.py",
+   "files": 239,
+   "underscore": {
+    "leaves": 187,
+    "declaringPositions": 0,
+    "byParent": {
+     "type_arguments": 186,
+     "use_as_clause": 1
+    }
+   },
+   "Self": {
+    "leaves": 642,
+    "declaringPositions": 0,
+    "byParent": {
+     "scoped_type_identifier": 175,
+     "scoped_identifier": 156,
+     "function_item": 145,
+     "struct_expression": 94,
+     "type_arguments": 52,
+     "call_expression": 7,
+     "type_item": 5,
+     "array_type": 4
+    }
+   },
+   "note": "R4a counted identifier-typed leaves spelled `_` (type-argument placeholders and `use .. as _`): uses, never declarations; `Self` is lexed as a type_identifier by the grammar in every use and is declared by nothing. Nothing in the prior changed because of this."
+  },
+  "polarity": "hard keywords refuse BARE names only: the raw identifier `r#match` (one identifier whose text keeps `r#`) legally names a being, for every hard word except `_`, `crate`, `self`, `super`; soft keywords (async await dyn try gen: reserved only from an edition on; default macro_rules raw union: weak; block expr ident item lifetime literal meta pat pat_param path stmt tt ty vis expr_2021: macro fragment specifiers) and builtins (primitive types and the stable prelude) are recorded and NEVER refuse",
+  "builtAt": "2026-10-06",
+  "trainWitness": {
+   "split": "train",
+   "files": 239,
+   "repos": 4,
+   "tokens": 526194,
+   "hardKeywordsAttested": 35,
+   "hardKeywordsUnattested": [
+    "yield"
+   ],
+   "keywordTokenCoverage": 1,
+   "hardKeywordsDeclaredAsDefinitionNames": 0,
+   "hardSpelledIdentifierLeavesInGrammarPositions": 187,
+   "hardSpelledIdentifierLeavesInTokenSpace": 74,
+   "hardSpelledIdentifierLeavesInLifetimes": 226,
+   "reservedButNotGrammarTokenDefs": 0,
+   "verdicts": {
+    "R1": "pass",
+    "R2": "pass",
+    "R3": "pass",
+    "R4a": "fail"
+   }
+  }
+ },
+ "keywords": [
+  "_",
+  "as",
+  "break",
+  "const",
+  "continue",
+  "crate",
+  "else",
+  "enum",
+  "extern",
+  "false",
+  "fn",
+  "for",
+  "if",
+  "impl",
+  "in",
+  "let",
+  "loop",
+  "match",
+  "mod",
+  "move",
+  "mut",
+  "pub",
+  "ref",
+  "return",
+  "self",
+  "static",
+  "struct",
+  "super",
+  "trait",
+  "true",
+  "type",
+  "unsafe",
+  "use",
+  "where",
+  "while",
+  "yield"
+ ],
+ "softKeywords": [
+  "async",
+  "await",
+  "block",
+  "default",
+  "dyn",
+  "expr",
+  "expr_2021",
+  "gen",
+  "ident",
+  "item",
+  "lifetime",
+  "literal",
+  "macro_rules",
+  "meta",
+  "pat",
+  "pat_param",
+  "path",
+  "raw",
+  "stmt",
+  "try",
+  "tt",
+  "ty",
+  "union",
+  "vis"
+ ],
+ "builtins": [
+  "AsMut",
+  "AsRef",
+  "AsyncFn",
+  "AsyncFnMut",
+  "AsyncFnOnce",
+  "Box",
+  "Clone",
+  "Copy",
+  "Debug",
+  "Default",
+  "DoubleEndedIterator",
+  "Drop",
+  "Eq",
+  "Err",
+  "ExactSizeIterator",
+  "Extend",
+  "Fn",
+  "FnMut",
+  "FnOnce",
+  "From",
+  "Hash",
+  "Into",
+  "IntoIterator",
+  "Iterator",
+  "None",
+  "Ok",
+  "Option",
+  "Ord",
+  "PartialEq",
+  "PartialOrd",
+  "Result",
+  "Send",
+  "Sized",
+  "Some",
+  "String",
+  "Sync",
+  "ToOwned",
+  "ToString",
+  "Unpin",
+  "Vec",
+  "align_of",
+  "align_of_val",
+  "alloc_error_handler",
+  "assert",
+  "assert_eq",
+  "assert_ne",
+  "bench",
+  "bool",
+  "cfg",
+  "cfg_select",
+  "char",
+  "column",
+  "compile_error",
+  "concat",
+  "dbg",
+  "debug_assert",
+  "debug_assert_eq",
+  "debug_assert_ne",
+  "derive",
+  "drop",
+  "env",
+  "eprint",
+  "eprintln",
+  "f32",
+  "f64",
+  "file",
+  "format",
+  "format_args",
+  "global_allocator",
+  "i128",
+  "i16",
+  "i32",
+  "i64",
+  "i8",
+  "include",
+  "include_bytes",
+  "include_str",
+  "is_x86_feature_detected",
+  "isize",
+  "line",
+  "matches",
+  "module_path",
+  "option_env",
+  "panic",
+  "print",
+  "println",
+  "r#try",
+  "size_of",
+  "size_of_val",
+  "str",
+  "stringify",
+  "test",
+  "test_case",
+  "thread_local",
+  "todo",
+  "u128",
+  "u16",
+  "u32",
+  "u64",
+  "u8",
+  "unimplemented",
+  "unreachable",
+  "usize",
+  "vec",
+  "write",
+  "writeln"
+ ],
+ "stdlibModules": [
+  "alloc",
+  "core",
+  "proc_macro",
+  "std"
+ ],
+ "refusalScope": {
+  "note": "hard refuses the bare word in a grammar position; token-space (macro token trees, attributes) and lifetimes are not binding positions; the raw identifier escape is legal",
+  "rawIdentifierEscape": true,
+  "cannotBeRaw": [
+   "_",
+   "crate",
+   "self",
+   "super"
+  ],
+  "editionConditional": {
+   "async": 2018,
+   "await": 2018,
+   "dyn": 2018,
+   "try": 2018,
+   "gen": 2024
+  },
+  "reservedButNotGrammarToken": [
+   "Self",
+   "abstract",
+   "become",
+   "box",
+   "do",
+   "final",
+   "macro",
+   "override",
+   "priv",
+   "typeof",
+   "unsized",
+   "virtual"
+  ],
+  "reservedButNotGrammarTokenNote": "settled by both authorities (the Reference and rustc) but not tokens of the grammar, so not in `keywords`; a consumer MAY refuse them as bare names too (measured on TRAIN: R6)"
+ }
+}

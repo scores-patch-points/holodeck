@@ -1,0 +1,37 @@
+{
+  "schema": "RoleConfig@1",
+  "language": "cmn-hans",
+  "provenance": {
+    "builder": "eoreader7 native/scripts/build-role-config.mjs",
+    "source": "/private/tmp/claude-501/tb/cmn-hans/train.conllu",
+    "min_volume": 20,
+    "null_draws": 200,
+    "null_alpha": 0.05,
+    "null_seed": 1,
+    "note": "position stats and marker candidates are both derived mechanically from this treebank's own gold dependency annotations — never hand-typed or asserted from general linguistic knowledge. A marker candidate is admitted only when its real precision beats the (1-alpha) quantile of a within-sentence role-label shuffle (II.23), never a fixed ratio — and (S122) that quantile is the MAX-STATISTIC across every eligible closed-class candidate tried, not a per-candidate null, so the admitted marker is significant against the whole search, not merely against itself."
+  },
+  "object": {
+    "total": 6236,
+    "before": 16,
+    "after": 6220,
+    "dominantSide": "after",
+    "reliability": 0.9974342527261065,
+    "usable": true,
+    "marker": null
+  },
+  "subject": {
+    "total": 7682,
+    "before": 7677,
+    "after": 5,
+    "dominantSide": "before",
+    "reliability": 0.9993491278312939,
+    "usable": true,
+    "marker": {
+      "form": "则",
+      "hits": 56,
+      "total": 100,
+      "precision": 0.56,
+      "nullCeiling": 0.2903225806451613
+    }
+  }
+}

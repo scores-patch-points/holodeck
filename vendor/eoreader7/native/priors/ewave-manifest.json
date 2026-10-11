@@ -1,0 +1,414 @@
+{
+  "source": "eWAVE (The Electronic World Atlas of Varieties of English)",
+  "url": "https://ewave-atlas.org",
+  "cldf_repo": "https://github.com/cldf-datasets/ewave",
+  "zenodo_doi": [
+    "10.5281/zenodo.3712132",
+    "10.5281/zenodo.17433568 (v3.0)"
+  ],
+  "citation": "Kortmann, Bernd & Lunkenheimer, Kerstin & Ehret, Katharina (eds.) 2020. The Electronic World Atlas of Varieties of English. Leipzig: Max Planck Institute for Evolutionary Anthropology. Available online at https://ewave-atlas.org/",
+  "license": "CC BY 3.0 (Attribution 3.0 Unported) -- open, attribution-only.",
+  "license_verification": {
+    "checked_at": "2026-08-19",
+    "method": "git clone of https://github.com/cldf-datasets/ewave (real clone, not a fetch of a cached page), then LICENSE file, README.md, metadata.json and .zenodo.json all read directly from the cloned repository.",
+    "sources_checked": [
+      "cldf/../LICENSE in the cloned repo -- the full, verbatim Creative Commons Attribution 3.0 Unported legal code",
+      "README.md -- 'This dataset is licensed under a CC-BY-3.0 license'",
+      "metadata.json -- \"license\": \"CC-BY-3.0\"",
+      "cldf/../.zenodo.json -- \"license\": {\"id\": \"CC-BY-3.0\"}"
+    ],
+    "result": "CC BY 3.0, confirmed identically across all four independent statements in the repository itself. No ambiguity or conflict found. Fully open -- staged generously per this repo's shared staging rules."
+  },
+  "fetched_at": "2026-08-19",
+  "fetch_method": "git clone --depth 1 https://github.com/cldf-datasets/ewave.git (real git clone of the canonical CLDF dataset repository named in the pocket description).",
+  "coverage": "The complete current eWAVE CLDF dataset is staged in full in cldf/ -- all 77 rated varieties (languages.csv), all 235 morphosyntactic features (parameters.csv), the complete 18,095-cell variety-by-feature rating matrix (values.csv, 77 x 235), every rating code definition (codes.csv), all 4,200 recorded illustrative example sentences (examples.csv), the full contributor list (80+ names, contributors.csv), and the atlas's own introductory essays -- because the whole structured release is small (about 1.1MB of CSV/text, not gigabytes) and is itself the natural bounded, single-session-fetchable unit; filtering the raw tables to a subset of varieties would have discarded the cross-variety comparison that is the actual point of an atlas. On top of that complete raw dataset, this pocket additionally renders 29 curated, readable prose documents in varieties/ -- one per variety eWAVE itself types as an English-based Pidgin (7) or English-based Creole (19), plus the 3 High-contact L1 varieties explicitly named for African American Vernacular English (Urban/Rural/Earlier AAVE) -- per this batch's pidgin/creole/AAVE theme. Those 29 rendered documents are a curated subset (29 of 77 varieties get a dedicated prose document); the other 48 varieties' data is present in the raw cldf/ tables but was not additionally rendered into its own document. Not staged: map.svg (1.7MB image, out of scope for a text-priors repo), ewave-1.0.zip (legacy bundle, redundant with the canonical cldf/ tables already staged in full), and WAVEquestionnaire.pdf (the contributor questionnaire form -- methodological/procedural content, not corpus data).",
+  "structure": {
+    "cldf/": "Complete CLDF core release, copied verbatim from the cloned repository: languages.csv (77 varieties incl. Type_ID P/Cr/L1c/L1t/L2, region, Glottocode, ISO 639-3, and the atlas's own prose description of each variety), parameters.csv (235 features), codes.csv (the six-point A/B/C/D/X/? rating scale, defined per feature), values.csv (18,095 ratings), examples.csv (4,200 illustrative example sentences), contributors.csv (80+ chapter contributors), featurecategories.csv (the 12 feature categories), varietytypes.csv (the 5 variety-type definitions: L1t, L1c, L2, P, Cr), regions.csv (8 macro-regions), history.csv (version history), media.csv, sources.bib (bibliography), introduction.md and home.md (the atlas's own descriptive essays), LICENSE, README.md.",
+    "feature-catalog.txt": "All 235 features rendered as readable prose, grouped by the atlas's 12 categories, each with its name, illustrative gloss (where given), source citation, and cross-variety attestation/pervasiveness statistics. 9,117 words.",
+    "varieties/": "29 rendered per-variety documents (all 19 Creoles + all 7 Pidgins + the 3 AAVE-named High-contact L1 varieties): metadata, the atlas's own prose description, every recorded example sentence for that variety, and the full 235-feature rating profile with per-category breakdown. 2,103-4,539 words each; all clear this repo's 600-word floor without padding."
+  },
+  "totals": {
+    "total_files": 47,
+    "approx_total_size_bytes": 1726944,
+    "cldf_raw_files": 16,
+    "cldf_raw_bytes": 1117405,
+    "feature_catalog_words": 9117,
+    "variety_documents": 29,
+    "variety_documents_total_words": 77338,
+    "variety_documents_total_example_sentences": 1785,
+    "full_dataset_varieties": 77,
+    "full_dataset_features": 235,
+    "full_dataset_rating_cells": 18095,
+    "full_dataset_example_sentences_total": 4200,
+    "pidgin_creole_varieties_in_full_dataset": 26,
+    "aave_varieties_rendered": 3
+  },
+  "entries": [
+    {
+      "id": "11",
+      "name": "British Creole",
+      "type": "Cr",
+      "type_label": "English-based Creoles",
+      "region": "British Isles",
+      "file": "11-multi-language/dialects-pidgins-creoles/ewave/varieties/11_British_Creole.txt",
+      "words": 2188,
+      "chars": 15767,
+      "examples_count": 0,
+      "features_rated": 222
+    },
+    {
+      "id": "15",
+      "name": "Urban African American Vernacular English",
+      "type": "L1c",
+      "type_label": "High-contact L1 varieties",
+      "region": "America",
+      "file": "11-multi-language/dialects-pidgins-creoles/ewave/varieties/15_Urban_African_American_Vernacular_English.txt",
+      "words": 2233,
+      "chars": 16172,
+      "examples_count": 0,
+      "features_rated": 235
+    },
+    {
+      "id": "16",
+      "name": "Rural African American Vernacular English",
+      "type": "L1c",
+      "type_label": "High-contact L1 varieties",
+      "region": "America",
+      "file": "11-multi-language/dialects-pidgins-creoles/ewave/varieties/16_Rural_African_American_Vernacular_English.txt",
+      "words": 2216,
+      "chars": 16201,
+      "examples_count": 0,
+      "features_rated": 234
+    },
+    {
+      "id": "17",
+      "name": "Earlier African American Vernacular English",
+      "type": "L1c",
+      "type_label": "High-contact L1 varieties",
+      "region": "America",
+      "file": "11-multi-language/dialects-pidgins-creoles/ewave/varieties/17_Earlier_African_American_Vernacular_English.txt",
+      "words": 4539,
+      "chars": 30735,
+      "examples_count": 114,
+      "features_rated": 220
+    },
+    {
+      "id": "21",
+      "name": "Gullah",
+      "type": "Cr",
+      "type_label": "English-based Creoles",
+      "region": "America",
+      "file": "11-multi-language/dialects-pidgins-creoles/ewave/varieties/21_Gullah.txt",
+      "words": 2602,
+      "chars": 18156,
+      "examples_count": 66,
+      "features_rated": 207
+    },
+    {
+      "id": "24",
+      "name": "Bahamian Creole",
+      "type": "Cr",
+      "type_label": "English-based Creoles",
+      "region": "Caribbean",
+      "file": "11-multi-language/dialects-pidgins-creoles/ewave/varieties/24_Bahamian_Creole.txt",
+      "words": 3887,
+      "chars": 25369,
+      "examples_count": 122,
+      "features_rated": 224
+    },
+    {
+      "id": "25",
+      "name": "Barbadian Creole (Bajan)",
+      "type": "Cr",
+      "type_label": "English-based Creoles",
+      "region": "Caribbean",
+      "file": "11-multi-language/dialects-pidgins-creoles/ewave/varieties/25_Barbadian_Creole_(Bajan).txt",
+      "words": 2748,
+      "chars": 18842,
+      "examples_count": 95,
+      "features_rated": 196
+    },
+    {
+      "id": "27",
+      "name": "Jamaican Creole",
+      "type": "Cr",
+      "type_label": "English-based Creoles",
+      "region": "Caribbean",
+      "file": "11-multi-language/dialects-pidgins-creoles/ewave/varieties/27_Jamaican_Creole.txt",
+      "words": 2904,
+      "chars": 19300,
+      "examples_count": 120,
+      "features_rated": 211
+    },
+    {
+      "id": "28",
+      "name": "San Andrés Creole",
+      "type": "Cr",
+      "type_label": "English-based Creoles",
+      "region": "Caribbean",
+      "file": "11-multi-language/dialects-pidgins-creoles/ewave/varieties/28_San_Andrés_Creole.txt",
+      "words": 2742,
+      "chars": 19967,
+      "examples_count": 68,
+      "features_rated": 232
+    },
+    {
+      "id": "29",
+      "name": "Belizean Creole",
+      "type": "Cr",
+      "type_label": "English-based Creoles",
+      "region": "Caribbean",
+      "file": "11-multi-language/dialects-pidgins-creoles/ewave/varieties/29_Belizean_Creole.txt",
+      "words": 2914,
+      "chars": 19196,
+      "examples_count": 78,
+      "features_rated": 210
+    },
+    {
+      "id": "30",
+      "name": "Guyanese Creole (Creolese)",
+      "type": "Cr",
+      "type_label": "English-based Creoles",
+      "region": "Caribbean",
+      "file": "11-multi-language/dialects-pidgins-creoles/ewave/varieties/30_Guyanese_Creole_(Creolese).txt",
+      "words": 2143,
+      "chars": 15528,
+      "examples_count": 0,
+      "features_rated": 220
+    },
+    {
+      "id": "31",
+      "name": "Eastern Maroon Creole",
+      "type": "Cr",
+      "type_label": "English-based Creoles",
+      "region": "Caribbean",
+      "file": "11-multi-language/dialects-pidgins-creoles/ewave/varieties/31_Eastern_Maroon_Creole.txt",
+      "words": 3005,
+      "chars": 19977,
+      "examples_count": 78,
+      "features_rated": 51
+    },
+    {
+      "id": "32",
+      "name": "Saramaccan",
+      "type": "Cr",
+      "type_label": "English-based Creoles",
+      "region": "Caribbean",
+      "file": "11-multi-language/dialects-pidgins-creoles/ewave/varieties/32_Saramaccan.txt",
+      "words": 2363,
+      "chars": 16643,
+      "examples_count": 58,
+      "features_rated": 200
+    },
+    {
+      "id": "33",
+      "name": "Sranan",
+      "type": "Cr",
+      "type_label": "English-based Creoles",
+      "region": "Caribbean",
+      "file": "11-multi-language/dialects-pidgins-creoles/ewave/varieties/33_Sranan.txt",
+      "words": 2494,
+      "chars": 17377,
+      "examples_count": 60,
+      "features_rated": 202
+    },
+    {
+      "id": "34",
+      "name": "Trinidadian Creole",
+      "type": "Cr",
+      "type_label": "English-based Creoles",
+      "region": "Caribbean",
+      "file": "11-multi-language/dialects-pidgins-creoles/ewave/varieties/34_Trinidadian_Creole.txt",
+      "words": 2940,
+      "chars": 19863,
+      "examples_count": 129,
+      "features_rated": 231
+    },
+    {
+      "id": "35",
+      "name": "Vincentian Creole",
+      "type": "Cr",
+      "type_label": "English-based Creoles",
+      "region": "Caribbean",
+      "file": "11-multi-language/dialects-pidgins-creoles/ewave/varieties/35_Vincentian_Creole.txt",
+      "words": 2868,
+      "chars": 19373,
+      "examples_count": 110,
+      "features_rated": 224
+    },
+    {
+      "id": "36",
+      "name": "Krio (Sierra Leone Creole)",
+      "type": "Cr",
+      "type_label": "English-based Creoles",
+      "region": "Africa",
+      "file": "11-multi-language/dialects-pidgins-creoles/ewave/varieties/36_Krio_(Sierra_Leone_Creole).txt",
+      "words": 2571,
+      "chars": 17906,
+      "examples_count": 63,
+      "features_rated": 189
+    },
+    {
+      "id": "38",
+      "name": "Vernacular Liberian English",
+      "type": "P",
+      "type_label": "English-based Pidgins",
+      "region": "Africa",
+      "file": "11-multi-language/dialects-pidgins-creoles/ewave/varieties/38_Vernacular_Liberian_English.txt",
+      "words": 3339,
+      "chars": 21797,
+      "examples_count": 107,
+      "features_rated": 230
+    },
+    {
+      "id": "40",
+      "name": "Ghanaian Pidgin",
+      "type": "P",
+      "type_label": "English-based Pidgins",
+      "region": "Africa",
+      "file": "11-multi-language/dialects-pidgins-creoles/ewave/varieties/40_Ghanaian_Pidgin.txt",
+      "words": 2560,
+      "chars": 17461,
+      "examples_count": 69,
+      "features_rated": 155
+    },
+    {
+      "id": "42",
+      "name": "Nigerian Pidgin",
+      "type": "P",
+      "type_label": "English-based Pidgins",
+      "region": "Africa",
+      "file": "11-multi-language/dialects-pidgins-creoles/ewave/varieties/42_Nigerian_Pidgin.txt",
+      "words": 2567,
+      "chars": 17588,
+      "examples_count": 87,
+      "features_rated": 190
+    },
+    {
+      "id": "44",
+      "name": "Cameroon Pidgin",
+      "type": "P",
+      "type_label": "English-based Pidgins",
+      "region": "Africa",
+      "file": "11-multi-language/dialects-pidgins-creoles/ewave/varieties/44_Cameroon_Pidgin.txt",
+      "words": 2483,
+      "chars": 17259,
+      "examples_count": 85,
+      "features_rated": 154
+    },
+    {
+      "id": "54",
+      "name": "Butler English",
+      "type": "P",
+      "type_label": "English-based Pidgins",
+      "region": "South and Southeast Asia",
+      "file": "11-multi-language/dialects-pidgins-creoles/ewave/varieties/54_Butler_English.txt",
+      "words": 2165,
+      "chars": 15612,
+      "examples_count": 0,
+      "features_rated": 156
+    },
+    {
+      "id": "62",
+      "name": "Roper River Creole (Kriol)",
+      "type": "Cr",
+      "type_label": "English-based Creoles",
+      "region": "Australia",
+      "file": "11-multi-language/dialects-pidgins-creoles/ewave/varieties/62_Roper_River_Creole_(Kriol).txt",
+      "words": 2130,
+      "chars": 15338,
+      "examples_count": 0,
+      "features_rated": 185
+    },
+    {
+      "id": "63",
+      "name": "Torres Strait Creole",
+      "type": "Cr",
+      "type_label": "English-based Creoles",
+      "region": "Australia",
+      "file": "11-multi-language/dialects-pidgins-creoles/ewave/varieties/63_Torres_Strait_Creole.txt",
+      "words": 2114,
+      "chars": 15240,
+      "examples_count": 0,
+      "features_rated": 187
+    },
+    {
+      "id": "65",
+      "name": "Norfolk Island/ Pitcairn English",
+      "type": "P",
+      "type_label": "English-based Pidgins",
+      "region": "Pacific",
+      "file": "11-multi-language/dialects-pidgins-creoles/ewave/varieties/65_Norfolk_Island__Pitcairn_English.txt",
+      "words": 2722,
+      "chars": 19061,
+      "examples_count": 98,
+      "features_rated": 176
+    },
+    {
+      "id": "66",
+      "name": "Palmerston English",
+      "type": "Cr",
+      "type_label": "English-based Creoles",
+      "region": "Pacific",
+      "file": "11-multi-language/dialects-pidgins-creoles/ewave/varieties/66_Palmerston_English.txt",
+      "words": 2788,
+      "chars": 19050,
+      "examples_count": 83,
+      "features_rated": 113
+    },
+    {
+      "id": "69",
+      "name": "Bislama",
+      "type": "Cr",
+      "type_label": "English-based Creoles",
+      "region": "Pacific",
+      "file": "11-multi-language/dialects-pidgins-creoles/ewave/varieties/69_Bislama.txt",
+      "words": 2103,
+      "chars": 15179,
+      "examples_count": 0,
+      "features_rated": 117
+    },
+    {
+      "id": "70",
+      "name": "Tok Pisin",
+      "type": "P",
+      "type_label": "English-based Pidgins",
+      "region": "Pacific",
+      "file": "11-multi-language/dialects-pidgins-creoles/ewave/varieties/70_Tok_Pisin.txt",
+      "words": 2121,
+      "chars": 15275,
+      "examples_count": 0,
+      "features_rated": 24
+    },
+    {
+      "id": "71",
+      "name": "Hawaiʼi Creole",
+      "type": "Cr",
+      "type_label": "English-based Creoles",
+      "region": "Pacific",
+      "file": "11-multi-language/dialects-pidgins-creoles/ewave/varieties/71_Hawaiʼi_Creole.txt",
+      "words": 2889,
+      "chars": 19748,
+      "examples_count": 95,
+      "features_rated": 216
+    }
+  ],
+  "not_staged": [
+    {
+      "item": "map.svg",
+      "reason": "out_of_scope -- a 1.7MB SVG world map image; this repo holds text priors, not cartographic media."
+    },
+    {
+      "item": "ewave-1.0.zip",
+      "reason": "already_included -- a legacy bundled archive of an older release format; the current canonical CLDF tables (values.csv, languages.csv, parameters.csv, etc.) are already staged in full in cldf/, so re-staging the older zip would only duplicate the same content in a stale format."
+    },
+    {
+      "item": "WAVEquestionnaire.pdf",
+      "reason": "out_of_scope -- the blank contributor questionnaire form used to collect the ratings; methodological/procedural document, not corpus content."
+    },
+    {
+      "item": "The remaining 48 of 77 varieties (traditional L1, indigenized L2, and non-AAVE high-contact L1 varieties, e.g. Scottish English, Indian English, Singapore English)",
+      "reason": "already_included -- not a gap: their full metadata, descriptions, 235-feature ratings, and example sentences are all present in the raw cldf/ tables staged in full. They were not additionally rendered into their own curated prose document because this pocket's own instructions specifically prioritize the pidgin/creole/AAVE theme for the curated per-variety renderings; the full data for all 77 is real and staged, just not duplicated into a second prose format for the 48 outside this batch's theme."
+    }
+  ]
+}
