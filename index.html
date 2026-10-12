@@ -508,7 +508,15 @@ button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visi
                     </sc-if>
                     <button onClick="{{ d.onRead }}" style="background:none;border:1px solid var(--line2);border-radius:8px;padding:5px 12px;cursor:pointer;font:500 14px var(--sans);color:var(--ink2)" style-hover="border-color:var(--acc)">{{ d.readLabel }}</button>
                     <sc-if value="{{ d.canProcess }}" hint-placeholder-val="{{ false }}"><button onClick="{{ d.onProcess }}" title="Run the eyes you have switched on over its pixels, read in the browser" style="background:{{ d.needsRead ? 'var(--acc2)' : 'none' }};border:1px solid {{ d.needsRead ? 'var(--acc2)' : 'var(--line2)' }};border-radius:8px;padding:5px 12px;cursor:pointer;font:500 14px var(--sans);color:{{ d.needsRead ? '#fff' : 'var(--ink2)' }};white-space:nowrap" style-hover="border-color:var(--acc)">Read the pixels (eyes)</button></sc-if>
-                    <sc-if value="{{ d.canTranscribe }}" hint-placeholder-val="{{ false }}"><button onClick="{{ d.onTranscribe }}" title="Transcribe this recording — local service if set, else in this browser" style="background:none;border:1px solid var(--line2);border-radius:8px;padding:5px 12px;cursor:pointer;font:500 14px var(--sans);color:var(--ink2);white-space:nowrap" style-hover="border-color:var(--acc)">Transcribe it</button></sc-if>
+                    <sc-if value="{{ d.canTranscribe }}" hint-placeholder-val="{{ false }}">
+                      <div style="display:flex;flex-direction:column;gap:5px;min-width:0">
+                        <sc-if value="{{ d.txRun }}" hint-placeholder-val="{{ false }}">
+                          <div class="hd-tx-track"><div class="{{ d.txT.barClass }}" style="width:{{ d.txT.bar }}"></div></div>
+                          <span style="font:500 12px var(--mono);color:var(--acc);white-space:nowrap">{{ d.txT.label }}<sc-if value="{{ d.txT.hasMeta }}" hint-placeholder-val="{{ false }}"> · <span style="color:var(--mut)">{{ d.txT.meta }}</span></sc-if></span>
+                        </sc-if>
+                        <button onClick="{{ d.onTranscribe }}" title="Transcribe this recording — local service if set, else in this browser" style="background:none;border:1px solid var(--line2);border-radius:8px;padding:5px 12px;cursor:pointer;font:500 14px var(--sans);color:{{ d.txRun ? 'var(--mut)' : 'var(--ink2)' }};white-space:nowrap" style-hover="border-color:var(--acc)">{{ d.txRun ? 'Transcribing…' : 'Transcribe it' }}</button>
+                      </div>
+                    </sc-if>
                     <button onClick="{{ d.onSolo }}" title="Solo — fade the other sources; solo several; click again to bring them back" style="background:{{ d.soloOn ? 'var(--sel)' : 'none' }};border:1px solid {{ d.soloOn ? 'var(--acc)' : 'var(--line2)' }};border-radius:8px;padding:5px 12px;cursor:pointer;font:500 14px var(--sans);color:{{ d.soloOn ? 'var(--ink)' : 'var(--ink2)' }};white-space:nowrap" style-hover="border-color:var(--acc)">{{ d.soloLabel }}</button>
                   </div>
                   <details class="hd-disclosure" style="padding:8px 0 0;margin-top:auto">
@@ -5468,10 +5476,10 @@ class Component extends DCLogic {
   // surface reports one live line: the stage, the chunk, the percent, and how
   // long it has been going (with an estimate once there is a percent to pace
   // against). The bar is indeterminate until the recognizer reports a percent.
-  txReset() {
+  txReset(docId) {
     if (this._txTick) clearInterval(this._txTick);
     this._txStart = Date.now();
-    this.setState({ txBusy: true, txProgress: { stage: 'starting' } });
+    this.setState({ txBusy: true, txProgress: { stage: 'starting', docId: docId || null } });
     this._txTick = setInterval(() => { if (!this.state.txBusy) { clearInterval(this._txTick); this._txTick = null; return; } this.forceUpdate(); }, 1000);
   }
   txOnProgress(p) {
@@ -5499,15 +5507,26 @@ class Component extends DCLogic {
     const meta = (elapsed >= 1 ? fmtT(elapsed) + ' elapsed' : '') + eta;
     return { busy: true, tp: { label: base + chunk + pctS, meta, hasMeta: !!meta, bar: pr.pct != null ? pr.pct + '%' : '100%', barClass: pr.pct != null ? 'hd-tx-fill' : 'hd-tx-fill hd-tx-indet' } };
   }
-  async transcribeFile(file, forDoc) { return this.netDo('Transcribe', async N => { this.txReset(); try { const r = await this.transcribeAny(file, p => { this._net.asr = p; this.txOnProgress(p); }); const title = forDoc ? forDoc.title : file.name.replace(/\.[^.]+$/, ''); const html = ohsSegmentsHtml(r.segments, title);
+  async transcribeFile(file, forDoc) { return this.netDo('Transcribe', async N => { this.txReset(forDoc ? forDoc.id : ('file:' + (file.name || 'audio'))); try { const r = await this.transcribeAny(file, p => { this._net.asr = p; this.txOnProgress(p); }); const title = forDoc ? forDoc.title : file.name.replace(/\.[^.]+$/, ''); const html = ohsSegmentsHtml(r.segments, title);
     const extra = { format: 'html', media: forDoc && forDoc.media ? { ...forDoc.media, segN: r.segments.length, model: r.model } : null, kind: 'Meeting recording', medium: forDoc && forDoc.media ? 'Video' : 'Audio', transcribed: true };
     this.addDocs([{ title: title + (forDoc ? '' : ''), html, format: 'html', text: htmlToText(html), url: forDoc ? forDoc.url : null, extra }]); this.ilog('Transcribed ' + plural(r.segments.length, 'segment') + ' via ' + (r.source === 'local-mlx-whisper' ? 'the local transcriber' : 'the in-browser recognizer') + ' (' + r.model.split('/').pop() + ').');
     const bytes = JSON.stringify({ source: r.source, model: r.model, video_id: forDoc && forDoc.media ? forDoc.media.id : null, segments: r.segments });
     if (this._net.s && !this._net.s.guest && this.wsRooms().pub) await this.publish({ bytes, meta: { kind: 'transcript', title, url: forDoc ? forDoc.url : null, ytid: forDoc && forDoc.media ? forDoc.media.id : null, mime: 'application/json', filename: (title || 'transcript').replace(/[^\w-]+/g, '-').slice(0, 60) + '.segments.json' } }); } finally { this.txDone(); } }); }
+  async transcribeCard(d) {
+    this.setState({ view: 'reader', readDoc: d.id, sel: { type: 'doc', id: d.id }, txAsk: d.id });
+    if (d.media && d.media.kind === 'youtube') { this.toast('YouTube audio isn’t stored in this browser — in the reader, choose the file you downloaded and it is transcribed here.'); return; }
+    const buf = await idbGet('media:' + d.id).catch(() => null);
+    if (!buf) { this.toast('The recording’s audio isn’t kept in this browser — transcribe it in the reader.'); return; }
+    this.transcribeLocal(d);
+  }
   async transcribeLocal(d0) {
     const A = this.analysis(); const prior = this.state.txPrior || 'workspace';
     const buf = await idbGet('media:' + d0.id).catch(() => null);
-    if (!buf) { this.txDone(); this.setState({ txAsk: null, note: 'The recording’s bytes aren’t stored in this browser.' }); return; }
+    if (!buf) {
+      this.txDone();
+      if (d0.media && d0.media.kind === 'youtube') { this.setState({ view: 'reader', readDoc: d0.id, txAsk: d0.id, note: '' }); this.toast('YouTube audio isn’t stored in this browser — in the reader, choose the file you downloaded and it is transcribed here.'); return; }
+      this.setState({ txAsk: null, note: 'The recording’s bytes aren’t stored in this browser.' }); this.toast('The recording’s audio isn’t kept in this browser — nothing has been read from it yet.'); return;
+    }
     let prompt = null, priorNote = 'no vocabulary prior';
     if (prior !== 'none') {
       const names = [...new Set(A.sts.flatMap(s => s.names).filter(n => { const r = A.names[n]; return r && (r.type === 'person' || r.type === 'organisation' || r.type === 'place') && n.length <= 40; }))]
@@ -5518,7 +5537,7 @@ class Component extends DCLogic {
     if (terms) { prompt = prompt ? prompt + ', ' + terms : terms; priorNote = priorNote === 'no vocabulary prior' ? 'the terms you typed' : priorNote + ' and the terms you typed'; }
     const lang = this.state.txLang || 'en';
     const model = this.state.txModel === 'small' ? 'onnx-community/whisper-small' : this.state.txModel === 'smallen' ? 'onnx-community/whisper-small.en' : 'onnx-community/whisper-base';
-    this.txReset(); this.setState({ txAsk: null });
+    this.txReset(d0.id); this.setState({ txAsk: null });
     try {
       const r = await this.transcribeAny(buf, p => this.txOnProgress(p), model, { prompt, language: lang });
       const html = ohsSegmentsHtml(r.segments, d0.title);
@@ -5548,7 +5567,7 @@ class Component extends DCLogic {
     if (terms) { prompt = prompt ? prompt + ', ' + terms : terms; priorNote = priorNote === 'no vocabulary prior' ? 'the terms you typed' : priorNote + ' and the terms you typed'; }
     const lang = this.state.txLang || 'en';
     const model = this.state.txModel === 'small' ? 'onnx-community/whisper-small' : this.state.txModel === 'smallen' ? 'onnx-community/whisper-small.en' : 'onnx-community/whisper-base';
-    this.txReset(); this.setState({ txAsk: null });
+    this.txReset(d0.id); this.setState({ txAsk: null });
     try {
       const r = await this.transcribeAny(file, p => this.txOnProgress(p), model, { prompt, language: lang });
       const title = d0.title; const html = ohsSegmentsHtml(r.segments, title);
@@ -7513,7 +7532,7 @@ class Component extends DCLogic {
       const badges = [...(d.medium ? [{ label: d.medium === 'Video' || d.medium === 'Audio' ? d.medium + (d.transcribed ? ' · machine transcript' : ' · not transcribed') : d.medium, color: MEDIUM_C[d.medium] || 'var(--mut)' }] : []), ...(d.standing ? [{ label: d.standing, color: STANDING_C[d.standing] || 'var(--mut)' }] : []), ...((d.recordings || []).map(r => ({ label: 'Video linked · not transcribed', color: 'var(--date)' }))), ...(d.sameAs ? [{ label: 'Same bytes as ' + short(d.sameAsTitle || '', 36), color: 'var(--amber)' }] : []), ...(d.custodyStatus && d.custodyStatus !== 'captured' ? [{ label: d.custody, color: /missing|failed|not-located|no-text/.test(d.custodyStatus) ? 'var(--bad)' : 'var(--amber)' }] : [])];
       const vid = !!(d.media && d.media.kind === 'youtube');
       const tr = this.traceFor(d.id);
-      return { ...c, op: 1, isVid: vid, noVid: !vid, thumbBg: vid ? 'url(https://i.ytimg.com/vi/' + d.media.id + '/hqdefault.jpg)' : 'none', readLabel: 'Open source', ...(vid ? { onSelect: () => this.read(d.id) } : {}), badges, hasBadges: badges.length > 0, hasDistinct: !!dd, distinct: dd ? dd.label + ' · ' + pct(dd.a) + ' of its statements vs ' + pct(dd.b) + ' elsewhere' : '', hasFold: this._fold.length > 0, fold: inF + ' of ' + all.length + ' statements touch the topic', stats: (narrowed ? ((FbyDoc[d.id] || []).length).toLocaleString() + ' of ' + plural(all.length, 'statement') + ' in this selection' : plural(all.length, 'statement')) + ' · ' + plural(nm.size, 'name'), isSeen: m.status === 'seen', isKept: m.status !== 'seen', hasReplay: !!tr, onReplay: () => tr && import(new URL('holodeck-ingest-player.js', location.href).href).then(M => M.open(tr)), canUnkeep: m.status !== 'seen' && !this.baseDocs(this.corpusId()).some(x => x.id === d.id), needsRead: !!d.needsRead, onProcess: () => this.processRead(d.id), canProcess: !!(d.type === 'Image' || d.type === 'PDF' || d.format === 'pdf' || d.pdf || d.hasImg), ...(() => { const ec = (d.type === 'Image' || d.type === 'PDF' || d.format === 'pdf' || d.pdf || d.hasImg) ? this.eyesCard(d) : null; return { hasEyes: !!ec, eyesRows: ec ? ec.rows : [], eyesNote: ec ? ec.note : '' }; })(), canTranscribe: !!((d.medium === 'Audio' || d.medium === 'Video' || d.type === 'Audio' || d.type === 'Video') && !d.transcribed), onTranscribe: () => this.transcribeLocal(d), cardStyle: 'border-color:' + (c.bd || 'var(--line)') + ';opacity:' + ((S.solo && S.solo.length && !S.solo.includes(d.id)) ? '0.28' : '1') + ';transition:opacity .25s ease', soloOn: !!(S.solo && S.solo.includes(d.id)), soloLabel: (S.solo && S.solo.includes(d.id)) ? 'Showing only this source' : 'Only this source', onSolo: () => this.setState(s => { const cur = Array.isArray(s.solo) ? s.solo : []; return { solo: cur.includes(d.id) ? cur.filter(x => x !== d.id) : [...cur, d.id] }; }),
+      return { ...c, op: 1, isVid: vid, noVid: !vid, thumbBg: vid ? 'url(https://i.ytimg.com/vi/' + d.media.id + '/hqdefault.jpg)' : 'none', readLabel: 'Open source', ...(vid ? { onSelect: () => this.read(d.id) } : {}), badges, hasBadges: badges.length > 0, hasDistinct: !!dd, distinct: dd ? dd.label + ' · ' + pct(dd.a) + ' of its statements vs ' + pct(dd.b) + ' elsewhere' : '', hasFold: this._fold.length > 0, fold: inF + ' of ' + all.length + ' statements touch the topic', stats: (narrowed ? ((FbyDoc[d.id] || []).length).toLocaleString() + ' of ' + plural(all.length, 'statement') + ' in this selection' : plural(all.length, 'statement')) + ' · ' + plural(nm.size, 'name'), isSeen: m.status === 'seen', isKept: m.status !== 'seen', hasReplay: !!tr, onReplay: () => tr && import(new URL('holodeck-ingest-player.js', location.href).href).then(M => M.open(tr)), canUnkeep: m.status !== 'seen' && !this.baseDocs(this.corpusId()).some(x => x.id === d.id), needsRead: !!d.needsRead, onProcess: () => this.processRead(d.id), canProcess: !!(d.type === 'Image' || d.type === 'PDF' || d.format === 'pdf' || d.pdf || d.hasImg), ...(() => { const ec = (d.type === 'Image' || d.type === 'PDF' || d.format === 'pdf' || d.pdf || d.hasImg) ? this.eyesCard(d) : null; return { hasEyes: !!ec, eyesRows: ec ? ec.rows : [], eyesNote: ec ? ec.note : '' }; })(), canTranscribe: !!(d.media && (d.media.kind === 'local' || d.media.kind === 'youtube') && !d.transcribed), txRun: !!(S.txBusy && this.state.txProgress && this.state.txProgress.docId === d.id), txT: (S.txBusy && this.state.txProgress && this.state.txProgress.docId === d.id) ? this.txProgVals().tp : { label: '', meta: '', hasMeta: false, bar: '0%', barClass: 'hd-tx-fill' }, onTranscribe: () => this.transcribeCard(d), cardStyle: 'border-color:' + (c.bd || 'var(--line)') + ';opacity:' + ((S.solo && S.solo.length && !S.solo.includes(d.id)) ? '0.28' : '1') + ';transition:opacity .25s ease', soloOn: !!(S.solo && S.solo.includes(d.id)), soloLabel: (S.solo && S.solo.includes(d.id)) ? 'Showing only this source' : 'Only this source', onSolo: () => this.setState(s => { const cur = Array.isArray(s.solo) ? s.solo : []; return { solo: cur.includes(d.id) ? cur.filter(x => x !== d.id) : [...cur, d.id] }; }),
         ...(() => { const on = this._inf[d.id] || null;
           return { originText: on ? on.why + ' ' + short(A.docById[on.of].title, 40) : 'Independent · shares no claims or outlet with another source', originDep: !!on, originCol: on ? 'var(--amber)' : 'var(--mut)' }; })(),
         drawsX: 0, drawOptions: drawOpts,
@@ -8032,7 +8051,7 @@ class Component extends DCLogic {
             txTitle: d0.aboutOnly ? 'About this video' : timed ? 'Transcript · click a timecode to play from there' : 'Transcript',
             note: d0.aboutOnly ? 'Only the link was captured. No transcript exists in the record yet.' : timed ? 'Machine transcript (' + ((LZ && LZ.model) || m.model || 'Whisper').split('/').pop() + '), not checked by a person. Use it to find moments; quote from the recording, not the transcript.' : 'Auto-caption or machine transcript with no timestamps, so the transcript can’t follow the video. Quote from the recording, not the transcript.',
             canAsk: !timed && !d0.aboutOnly, ask: S.txAsk === d0.id, noAsk: !timed && !d0.aboutOnly && S.txAsk !== d0.id,
-            onAsk: () => this.setState({ txAsk: d0.id }), onCancelAsk: () => this.setState({ txAsk: null }),
+onAsk: () => { this.setState({ txAsk: d0.id }); this.pickYtFile(d0); }, onCancelAsk: () => this.setState({ txAsk: null }),
             prior: prior, pw: prior === 'workspace', pn: prior === 'none', pm: prior === 'mine', onPriorW: () => this.setState({ txPrior: 'workspace' }), onPriorN: () => this.setState({ txPrior: 'none' }), onPriorM: () => this.setState({ txPrior: 'mine' }),
             lang: S.txLang || 'en', onLang: e => this.setState({ txLang: e.target.value }), langs: [['en', 'English'], ['es', 'Spanish'], ['fr', 'French'], ['de', 'German'], ['pt', 'Portuguese'], ['it', 'Italian'], ['nl', 'Dutch'], ['pl', 'Polish'], ['ru', 'Russian'], ['uk', 'Ukrainian'], ['ar', 'Arabic'], ['hi', 'Hindi'], ['zh', 'Chinese'], ['ja', 'Japanese'], ['ko', 'Korean']].map(([v, l]) => ({ v, l })),
             model: S.txModel || 'base', onModel: e => this.setState({ txModel: e.target.value }), models: [['base', 'whisper-base · fast, multilingual'], ['small', 'whisper-small · slower, more accurate, multilingual'], ['smallen', 'whisper-small.en · English only, most accurate for English']].map(([v, l]) => ({ v, l })),
@@ -8046,7 +8065,7 @@ class Component extends DCLogic {
           txTitle: timed ? 'Transcript · click a timecode to play from there' : 'Transcript',
           note: timed ? 'Machine transcript (' + (m.model || 'Whisper').split('/').pop() + '), not checked by a person' + (m.priors ? ' · transcribed with the prior: ' + (PRIOR_LABEL[m.priors.prompt] || m.priors.prompt || 'none') + ', language ' + (m.priors.language || 'auto') : '') + '. Quote from the recording, not the transcript.' : 'The recording is kept in this browser; nothing in it has been read until it is transcribed. A transcript is a machine interpretation — the priors you choose (what it should listen for, and in which language) change what it hears, and they stay on the record.',
           canAsk: !timed, ask: S.txAsk === d0.id, noAsk: !timed && S.txAsk !== d0.id,
-          onAsk: () => this.setState({ txAsk: d0.id }), onCancelAsk: () => this.setState({ txAsk: null }),
+          onAsk: () => { this.setState({ txAsk: d0.id }); this.transcribeLocal(d0); }, onCancelAsk: () => this.setState({ txAsk: null }),
           prior: prior, pw: prior === 'workspace', pn: prior === 'none', pm: prior === 'mine', onPriorW: () => this.setState({ txPrior: 'workspace' }), onPriorN: () => this.setState({ txPrior: 'none' }), onPriorM: () => this.setState({ txPrior: 'mine' }),
           lang: S.txLang || 'en', onLang: e => this.setState({ txLang: e.target.value }), langs: [['en', 'English'], ['es', 'Spanish'], ['fr', 'French'], ['de', 'German'], ['pt', 'Portuguese'], ['it', 'Italian'], ['nl', 'Dutch'], ['pl', 'Polish'], ['ru', 'Russian'], ['uk', 'Ukrainian'], ['ar', 'Arabic'], ['hi', 'Hindi'], ['zh', 'Chinese'], ['ja', 'Japanese'], ['ko', 'Korean']].map(([v, l]) => ({ v, l })),
           model: S.txModel || 'base', onModel: e => this.setState({ txModel: e.target.value }), models: [['base', 'whisper-base · fast, multilingual'], ['small', 'whisper-small · slower, more accurate, multilingual'], ['smallen', 'whisper-small.en · English only, most accurate for English']].map(([v, l]) => ({ v, l })),
