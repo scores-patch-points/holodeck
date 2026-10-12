@@ -473,13 +473,14 @@ button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visi
           <span style="font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--dim)">Source options</span>
         <sc-if value="{{ svTabsOn }}" hint-placeholder-val="{{ true }}">
           <div style="display:flex;gap:2px 18px;flex-wrap:wrap;align-items:center;border-bottom:1px solid var(--line2)">
-            <sc-if value="{{ sourceKindsUseful }}"><sc-for list="{{ svTabs }}" as="t" hint-placeholder-count="5"><button onClick="{{ t.onClick }}" style="all:unset;cursor:pointer;display:flex;gap:6px;align-items:baseline;padding:8px 0;border-bottom:2px solid {{ t.bd }};margin-bottom:-1px;font:500 14px var(--sans);color:{{ t.col }};white-space:nowrap">{{ t.label }}<span style="font:500 12px var(--mono);color:var(--dim)">{{ t.n }}</span></button></sc-for></sc-if>
+            <sc-if value="{{ svKindTabs }}"><sc-for list="{{ svTabs }}" as="t" hint-placeholder-count="5"><button onClick="{{ t.onClick }}" style="all:unset;cursor:pointer;display:flex;gap:6px;align-items:baseline;padding:8px 0;border-bottom:2px solid {{ t.bd }};margin-bottom:-1px;font:500 14px var(--sans);color:{{ t.col }};white-space:nowrap">{{ t.label }}<span style="font:500 12px var(--mono);color:var(--dim)">{{ t.n }}</span></button></sc-for></sc-if>
             <span style="flex:1"></span>
             <div style="display:flex;border:1px solid var(--line2);border-radius:8px;overflow:hidden;margin:4px 0"><sc-for list="{{ svModes }}" as="k" hint-placeholder-count="2"><button onClick="{{ k.onClick }}" style="border:0;background:{{ k.bg }};color:{{ k.col }};padding:4px 12px;cursor:pointer;font:500 13px var(--sans);white-space:nowrap">{{ k.label }}</button></sc-for></div>
           </div>
           <sc-if value="{{ srcHiddenNote }}" hint-placeholder-val="{{ false }}"><span style="font:400 13px var(--sans);color:var(--dim);margin-top:6px">{{ srcHiddenNote }}</span></sc-if>
         </sc-if>
         </div>
+        <sc-if value="{{ svDrive }}" hint-placeholder-val="{{ true }}"><div id="drive-surface"></div></sc-if>
         <sc-if value="{{ svTable }}" hint-placeholder-val="{{ false }}">
           <sc-for list="{{ svTables }}" as="tb" hint-placeholder-count="1">
             <section style="display:flex;flex-direction:column;gap:6px">
@@ -529,7 +530,7 @@ button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visi
                   <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:2px">
                     <sc-if value="{{ d.isSeen }}" hint-placeholder-val="{{ false }}">
                       <button onClick="{{ d.onKeep }}" style="background:var(--acc2);border:0;color:#fff;border-radius:8px;padding:5px 12px;cursor:pointer;font:600 14px var(--sans)">Keep as a source</button>
-                      <button onClick="{{ d.onDiscard }}" style="background:none;border:1px solid var(--line2);border-radius:8px;padding:5px 12px;cursor:pointer;font:500 14px var(--sans);color:var(--ink2)" style-hover="border-color:var(--bad)">Discard</button>
+                      <button onClick="{{ d.onDiscard }}" style="background:none;border:1px solid var(--line2);border-radius:8px;padding:5px 12px;cursor:pointer;font:500 14px var(--sans);color:var(--ink2)" style-hover="border-color:var(--bad)" title="Moves it to Trash — restore it from Sources → Trash">Move to Trash</button>
                     </sc-if>
                     <button onClick="{{ d.onRead }}" style="background:none;border:1px solid var(--line2);border-radius:8px;padding:5px 12px;cursor:pointer;font:500 14px var(--sans);color:var(--ink2)" style-hover="border-color:var(--acc)">{{ d.readLabel }}</button>
                     <sc-if value="{{ d.canProcess }}" hint-placeholder-val="{{ false }}"><button onClick="{{ d.onProcess }}" title="Run the eyes you have switched on over its pixels, read in the browser" style="background:{{ d.needsRead ? 'var(--acc2)' : 'none' }};border:1px solid {{ d.needsRead ? 'var(--acc2)' : 'var(--line2)' }};border-radius:8px;padding:5px 12px;cursor:pointer;font:500 14px var(--sans);color:{{ d.needsRead ? '#fff' : 'var(--ink2)' }};white-space:nowrap" style-hover="border-color:var(--acc)">Read the pixels (eyes)</button></sc-if>
@@ -2219,7 +2220,7 @@ button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visi
             <span style="flex:1 1 300px;font:400 15px/1.45 var(--sans);color:var(--ink)">You opened this link. It isn't counted as a source yet.{{ readerFold }}</span>
             
             <button onClick="{{ readerKeep }}" style="background:var(--acc2);border:0;color:#fff;border-radius:8px;padding:6px 14px;cursor:pointer;font:600 14px var(--sans)">Keep as a source</button>
-            <button onClick="{{ readerDiscard }}" style="background:none;border:1px solid var(--line2);border-radius:8px;padding:5px 12px;cursor:pointer;font:500 14px var(--sans);color:var(--ink2)" style-hover="border-color:var(--bad)">Discard</button>
+            <button onClick="{{ readerDiscard }}" style="background:none;border:1px solid var(--line2);border-radius:8px;padding:5px 12px;cursor:pointer;font:500 14px var(--sans);color:var(--ink2)" style-hover="border-color:var(--bad)" title="Moves it to Trash — restore it from Sources → Trash">Move to Trash</button>
           </div>
         </sc-if>
         <div style="background:var(--s1);border:1px solid var(--line);border-radius:14px">
@@ -4789,6 +4790,61 @@ function mdRuns(text) {
 }
 
 class Component extends DCLogic {
+  // ── Drive-style Sources (holodeck-drive-*.js): this is all the page knows of it ──
+  driveCtl() { return this._drive && this._driveFor === this.corpusId() ? this._drive : null; }
+  driveTrashed(cid) { const dc = this._drive && this._driveFor === cid ? this._drive : null; if (dc) return dc.trashedIds(); try { return new Set(JSON.parse(localStorage.getItem('hd:drive:' + cid + ':trashed') || '[]')); } catch (e) { return new Set(); } }
+  trashSource(id) { const dc = this.driveCtl(); if (!dc) { this.discard(id); return; } dc.trash([id]); this.toast('Moved to Trash — it is out of the reading until you restore it (Sources → Trash).'); this.setState({ view: this.state.view === 'reader' ? 'summary' : this.state.view, readDoc: this.state.view === 'reader' ? null : this.state.readDoc, sel: null }); }
+  syncDrive() {
+    const cid = this.corpusId();
+    const run = C => {
+      if (this._driveFor !== cid || !this._drive) {
+        if (this._driveUn) this._driveUn();
+        this._drive = C.createDrive({ storage: localStorage, workspaceId: cid }); this._driveFor = cid; this._driveRoot = null;
+        this._driveUn = this._drive.subscribe(() => this.forceUpdate());
+      }
+      const raw = this.baseDocs(cid).concat(this.state.added[cid] || []);
+      let ptr = false; try { const a = JSON.parse(localStorage.getItem('fold-explorer-added') || 'null'); ptr = !!(a && a[cid] && !Array.isArray(a[cid]) && a[cid].__idb); } catch (e) {}
+      this._drive.refresh(raw.map(d => String(d.id)), { ready: !(ptr && !(this.state.added[cid] || []).length) });
+      const root = document.getElementById('drive-surface'); if (!root) return;
+      const A = this.analysis(); const gone = this._drive.trashedIds();
+      if (this._driveAdded !== this.state.added || this._driveA !== A) { this._driveAdded = this.state.added; this._driveA = A; this._driveRevN = (this._driveRevN || 0) + 1; }
+      const rev = [this._driveRevN, this.state.htmlVer, gone.size, this.state.metaVer || 0, (this.state.just && this.state.just.ids.length) || 0, this.state.txBusy ? 1 : 0].join('.');
+      const docs = A.docs.concat(raw.filter(d => gone.has(String(d.id))));
+      const props = {
+        drive: this._drive, rev, docs, base: new Set(this.baseDocs(cid).map(d => String(d.id))),
+        counts: (() => { if (this._driveCnt && this._driveCnt.A === A) return this._driveCnt.v; const v = {}; A.docs.forEach(d => { const ss = A.stsByDoc[d.id] || []; v[d.id] = { statements: ss.length, names: new Set(ss.flatMap(x => x.names)).size }; }); this._driveCnt = { A, v }; return v; })(),
+        isNew: new Set((this.state.just && this.state.just.ids) || []), transcribing: new Set(this.state.txBusy && this.state.readDoc ? [this.state.readDoc] : []),
+        notKept: new Set(A.docs.filter(d => this.mOf(d).status === 'seen').map(d => String(d.id))), openedAt: this.readLog(),
+        on: {
+          open: id => this.read(id), details: id => this.setState({ sel: id ? { type: 'doc', id } : null }),
+          rename: (id, name) => this.renameDocTitle(id, name), keep: id => this.setMeta(id, { status: 'source' }),
+          readPixels: id => this.processRead(id), transcribe: id => { const d = A.docById[id]; if (d) this.transcribeCard(d); },
+          openOriginal: id => { const d = A.docById[id]; if (d && d.url) window.open(d.url, '_blank', 'noopener'); },
+          deleteForever: id => this.discard(id), scope: fid => this.setState({ folder: fid }),
+          addSource: () => { this._add = null; this.addState().baseAdded = (this.state.added[cid] || []).length; this.setState({ showAdd: true }); },
+        },
+        getBytes: async (id, kind) => {
+          try {
+            if (kind === 'pdf') { const b = await idbGet('pdf:' + id); if (b) return b; const d = A.docById[id]; if (d && d.pdfSrc) { const r = await fetch(d.pdfSrc); if (r.ok) return await r.arrayBuffer(); } return null; }
+            if (kind === 'image') { const d = A.docById[id] || raw.find(x => String(x.id) === id) || {}; const u = (this._html && this._html['img:' + id]) || d.imgSrc || await idbGet('img:' + id); if (!u) return null; if (typeof u === 'string') return await (await fetch(u)).arrayBuffer(); return u instanceof Blob ? await u.arrayBuffer() : u; }
+          } catch (e) { return null; }
+          return null;
+        },
+        pdfLib,
+      };
+      if (this._driveRoot === root && this._driveMount) { this._driveMount.update(props); return; }
+      if (this._driveLoadingUi === root) return;
+      this._driveLoadingUi = root;
+      import(new URL('holodeck-drive-ui.js', location.href).href).then(M => {
+        this._driveLoadingUi = null; if (!root.isConnected) return;
+        this._driveRoot = root; this._driveMount = M.mountDrive(root, props);
+      }).catch(e => { this._driveLoadingUi = null; root.textContent = 'Sources view unavailable: ' + e.message; });
+    };
+    if (this._driveC) { run(this._driveC); return; }
+    if (this._driveLoading) return;
+    this._driveLoading = true;
+    import(new URL('holodeck-drive-controller.js', location.href).href).then(C => { this._driveC = C; this._driveLoading = false; run(C); this.forceUpdate(); }).catch(e => { this._driveLoading = false; try { console.warn('drive module unavailable', e); } catch (x) {} });
+  }
   syncOverview() {
     const root = document.getElementById('overview-surface');
     if (!root) return;
@@ -4833,7 +4889,7 @@ class Component extends DCLogic {
     window.addEventListener('dragenter', this._h.enter); window.addEventListener('dragleave', this._h.leave); window.addEventListener('dragover', this._h.over); window.addEventListener('drop', this._h.drop); window.addEventListener('paste', this._h.paste);
   }
   componentWillUnmount() { window.removeEventListener('keydown', this._onFocusKey); window.removeEventListener('resize', this._onRz); if (this._pdfRo) { try { this._pdfRo.disconnect(); } catch (e) {} } window.removeEventListener('message', this._onYt); document.removeEventListener('selectionchange', this._onSelCh); window.removeEventListener('scroll', this._onSelCh, true); window.removeEventListener('message', this._onMsg); const h = this._h; window.removeEventListener('dragenter', h.enter); window.removeEventListener('dragleave', h.leave); window.removeEventListener('dragover', h.over); window.removeEventListener('drop', h.drop); window.removeEventListener('paste', h.paste); }
-  componentDidUpdate() { this.syncOverview(); this.applyTheme(); this.measureHdr(); try { const ff = document.getElementById('fold-folder-input'); if (ff && !ff.multiple) { ff.webkitdirectory = true; ff.setAttribute('webkitdirectory', ''); ff.multiple = true; ff.setAttribute('multiple', ''); } } catch (e) {} if (this._prevCorpus !== this.state.corpus || this._prevAdded !== this.state.added) { this._prevCorpus = this.state.corpus; this._prevAdded = this.state.added; this.loadHtml(); this.akAutoLoad(); } const rd0 = this.state.readDoc && this.analysis().docById[this.state.readDoc]; if (rd0 && rd0.media && rd0.media.kind === 'local') { this.ensureMediaUrl(rd0);
+  componentDidUpdate() { this.syncOverview(); this.syncDrive(); this.applyTheme(); this.measureHdr(); try { const ff = document.getElementById('fold-folder-input'); if (ff && !ff.multiple) { ff.webkitdirectory = true; ff.setAttribute('webkitdirectory', ''); ff.multiple = true; ff.setAttribute('multiple', ''); } } catch (e) {} if (this._prevCorpus !== this.state.corpus || this._prevAdded !== this.state.added) { this._prevCorpus = this.state.corpus; this._prevAdded = this.state.added; this.loadHtml(); this.akAutoLoad(); } const rd0 = this.state.readDoc && this.analysis().docById[this.state.readDoc]; if (rd0 && rd0.media && rd0.media.kind === 'local') { this.ensureMediaUrl(rd0);
       // A recording opened but never classified gets its sound map on first sight (an
       // older stored recording, or one added before the classifier existed); the work
       // is the same in-browser rung, guarded so it happens once until it lands.
@@ -6657,6 +6713,7 @@ class Component extends DCLogic {
     const added = { ...this.state.added }; delete added[id]; this.saveAdded(added);
     try { const rooms = JSON.parse(localStorage.getItem('fold-ws-rooms') || '{}'); delete rooms[id]; localStorage.setItem('fold-ws-rooms', JSON.stringify(rooms)); } catch (e) {}
     try { const folds = JSON.parse(localStorage.getItem('fold-explorer-folders') || '{}'); delete folds[id]; localStorage.setItem('fold-explorer-folders', JSON.stringify(folds)); } catch (e) {}
+    try { ['', ':trashed'].forEach(k => localStorage.removeItem('hd:drive:' + id + k)); localStorage.removeItem('hd:drive-prefs:' + id); } catch (e) {}
     const wasCurrent = this.corpusId() === id; const next = wasCurrent ? (Object.keys(added).find(k => added[k] && added[k].length) || 'custom') : this.corpusId();
     const nextName = loadWorkspaceNames()[next] || (next === 'custom' ? 'Your content' : next);
     this.setState({ added, ...(wasCurrent ? { corpus: next, view: 'summary', sel: null, f: {}, readDoc: null, folder: null } : {}) });
@@ -6670,6 +6727,7 @@ class Component extends DCLogic {
   }
   renameFolder(id, name) {
     name = String(name == null ? '' : name).trim().slice(0, 60); if (!name) return;
+    const dc = this.driveCtl(); if (dc) { dc.renameFolder(id, name); return; }
     this.saveFolders(this.foldersFor().map(f => f.id === id ? { ...f, name } : f));
   }
   finishFolderRename(id) { const nm = (this.state.folderNameDraft || '').trim(); if (nm) this.renameFolder(id, nm); this.setState({ folderRename: null, folderNameDraft: '' }); }
@@ -7259,7 +7317,7 @@ class Component extends DCLogic {
   corpusId() { return this.state.corpus || 'custom'; }
   baseDocs(id) { return SAMPLES[id] ? SAMPLES[id].docs : []; }
   analysis() {
-    const id = this.corpusId(); const seenU = new Set(); const docs = this.baseDocs(id).concat(this.state.added[id] || []).filter(d => { const u = d.url && d.url.replace(/^https?:\/\/(www\.)?/, '').replace(/[#?].*$/, '').replace(/\/$/, '').toLowerCase(); if (!u || d.ohsId) { if (u) seenU.add(u); return true; } if (seenU.has(u)) return false; seenU.add(u); return true; });
+    const id = this.corpusId(); const seenU = new Set(); const inTrash = this.driveTrashed(id); const docs = this.baseDocs(id).concat(this.state.added[id] || []).filter(d => !inTrash.has(String(d.id))).filter(d => { const u = d.url && d.url.replace(/^https?:\/\/(www\.)?/, '').replace(/[#?].*$/, '').replace(/\/$/, '').toLowerCase(); if (!u || d.ohsId) { if (u) seenU.add(u); return true; } if (seenU.has(u)) return false; seenU.add(u); return true; });
     // Progressive ingest: while sources are staged (stored, not yet folded), analyze only the folded set and return
     // their graph with the staged docs appended as bare sources — Sources renders the moment a file lands, and the
     // app stays responsive instead of blocking on one giant analyze over the whole batch.
@@ -7344,13 +7402,13 @@ class Component extends DCLogic {
   counted(d) { const cid = this.corpusId(); const raw = (this.state.added[cid] || []).find(x => x.id === d.id) || d; if (this.isLiveDoc(raw)) return false; if (this.state.folder && !this.folderDocs(this.state.folder).has(d.id)) return false; return this.mOf(d).status !== 'seen'; }
   // ── Folders: group the sources of one workspace, in the rail ──────────────
   rawFolders() { if (!this._foldersAll) { try { this._foldersAll = JSON.parse(localStorage.getItem('fold-explorer-folders') || '{}') || {}; } catch (e) { this._foldersAll = {}; } } return this._foldersAll; }
-  foldersFor() { const R = this.rawFolders(); if (!R[this.corpusId()]) R[this.corpusId()] = []; return R[this.corpusId()]; }
+  foldersFor() { const dc = this.driveCtl(); if (dc) return dc.folderList(); const R = this.rawFolders(); if (!R[this.corpusId()]) R[this.corpusId()] = []; return R[this.corpusId()]; }
   saveFolders(arr) { const R = this.rawFolders(); R[this.corpusId()] = arr; try { localStorage.setItem('fold-explorer-folders', JSON.stringify(R)); } catch (e) {} this.forceUpdate(); }
-  addFolder(name) { name = String(name == null ? '' : name).trim(); if (!name) return; const arr = this.foldersFor().map(f => ({ ...f, docs: [...(f.docs || [])] })); arr.push({ id: 'fo-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), name: name.slice(0, 60), docs: [] }); this.saveFolders(arr); }
-  removeFolder(id) { this.saveFolders(this.foldersFor().filter(f => f.id !== id).map(f => ({ ...f, docs: [...(f.docs || [])] }))); if (this.state.folder === id) this.setState({ folder: null }); }
-  setDocFolder(docId, folderId) { const arr = this.foldersFor().map(f => ({ ...f, docs: (f.docs || []).filter(x => x !== docId) })); if (folderId) { const f = arr.find(x => x.id === folderId); if (f) f.docs.push(docId); } this.saveFolders(arr); }
-  folderDocs(id) { const f = this.foldersFor().find(x => x.id === id); return new Set(f ? f.docs : []); }
-  folderOfDoc(docId) { const f = this.foldersFor().find(x => (x.docs || []).includes(docId)); return f ? f.id : ''; }
+  addFolder(name) { name = String(name == null ? '' : name).trim(); if (!name) return; const dc = this.driveCtl(); if (dc) { dc.createFolder(name.slice(0, 60)); return; } const arr = this.foldersFor().map(f => ({ ...f, docs: [...(f.docs || [])] })); arr.push({ id: 'fo-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), name: name.slice(0, 60), docs: [] }); this.saveFolders(arr); }
+  removeFolder(id) { const dc = this.driveCtl(); if (dc) { dc.trashFolder(id, { withContents: false }); if (this.state.folder === id) this.setState({ folder: null }); return; } this.saveFolders(this.foldersFor().filter(f => f.id !== id).map(f => ({ ...f, docs: [...(f.docs || [])] }))); if (this.state.folder === id) this.setState({ folder: null }); }
+  setDocFolder(docId, folderId) { const dc = this.driveCtl(); if (dc) { dc.place([docId], folderId || null); return; } const arr = this.foldersFor().map(f => ({ ...f, docs: (f.docs || []).filter(x => x !== docId) })); if (folderId) { const f = arr.find(x => x.id === folderId); if (f) f.docs.push(docId); } this.saveFolders(arr); }
+  folderDocs(id) { const dc = this.driveCtl(); if (dc) return dc.folderDocs(id); const f = this.foldersFor().find(x => x.id === id); return new Set(f ? f.docs : []); }
+  folderOfDoc(docId) { const dc = this.driveCtl(); if (dc) return dc.folderOfDoc(docId); const f = this.foldersFor().find(x => (x.docs || []).includes(docId)); return f ? f.id : ''; }
   inFold(st) { const t = this._fold; if (!t || !t.length) return true; const x = st.text.toLowerCase(); return t.some(w => x.includes(w)); }
   setMeta(docId, patch) { const cid = this.corpusId(); const all = { ...this.metaAll() }; const w = { ...(all[cid] || {}) }; w[docId] = typeof patch === 'string' ? patch : { ...(w[docId] || {}), ...patch }; all[cid] = w; this._meta = all; try { localStorage.setItem('fold-explorer-srcmeta', JSON.stringify(all)); } catch (e) {} this.setState({ metaVer: (this.state.metaVer || 0) + 1 }); }
   // manually-created folds: a snapshot of whatever filter (f/q) was active when saved, not a typed label --
@@ -7892,7 +7950,7 @@ class Component extends DCLogic {
           return { originText: on ? on.why + ' ' + short(A.docById[on.of].title, 40) : 'Independent · shares no claims or outlet with another source', originDep: !!on, originCol: on ? 'var(--amber)' : 'var(--mut)' }; })(),
         drawsX: 0, drawOptions: drawOpts,
         onDraws: e => this.setMeta(d.id, { drawsOn: e.target.value }),
-        onKeep: () => this.setMeta(d.id, { status: 'source' }), onUnkeep: () => this.setMeta(d.id, { status: 'seen' }), onDiscard: () => this.discard(d.id), onRename: () => { this.read(d.id); setTimeout(() => this.setState({ readerRename: true, readerNameDraft: d.title }), 40); } }; };
+        onKeep: () => this.setMeta(d.id, { status: 'source' }), onUnkeep: () => this.setMeta(d.id, { status: 'seen' }), onDiscard: () => this.trashSource(d.id), onRename: () => { this.read(d.id); setTimeout(() => this.setState({ readerRename: true, readerNameDraft: d.title }), 40); } }; };
     const seenDocs = A.docs.filter(d => this.mOf(d).status === 'seen');
     const keptDocs = A.docs.filter(d => this.mOf(d).status !== 'seen');
     const stsOf = d => A.stsByDoc[d.id] || [];
@@ -7928,7 +7986,7 @@ class Component extends DCLogic {
       ...(seenDocs.length ? [{ label: 'Seen, not kept', n: String(seenDocs.length), desc: 'Opened, but not counted.', items: seenDocs.map(cardOf) }] : []),
       ...(hasKinds ? Object.entries(kmap).sort((a, b) => KIND_ORDER.indexOf(a[0]) - KIND_ORDER.indexOf(b[0])).map(([k, ds]) => ({ label: k, n: String(ds.length), desc: KIND_DESC[k] || '', items: ds.slice().sort((x, y) => pubMsD(x) - pubMsD(y)).map(cardOf) })) : Object.entries(gmap).sort((x, y) => (x[0] === '_') - (y[0] === '_') || y[1].docs.length - x[1].docs.length).map(([k, g]) => ({ label: g.label, n: String(g.docs.length), desc: k === '_' ? (Object.keys(distinctOf).length ? 'No difference from the rest is large enough to matter.' : keptDocs.length < 2 ? '' : 'No difference between them is large enough to matter yet.') : '', items: g.docs.map(cardOf) }))),
     ];
-    const svMode = S.svMode || 'cards', svGroup = 'tabs'; const allSrcItems = srcGroups.flatMap(g => g.items.map(it => ({ it, g: g.label })));
+    const svMode = S.svMode || 'drive', svGroup = 'tabs'; const allSrcItems = srcGroups.flatMap(g => g.items.map(it => ({ it, g: g.label })));
     const docOfCard = it => A.docs.find(d => d.title === it.title) || null;
     const isVid = it => { const d = docByTitle.get(it.title); return !!(d && (d.medium === 'Video' || d.medium === 'Audio' || d.media)); }; const vidItems = allSrcItems.filter(x => isVid(x.it));
     const FAM = k => /^(Audit or report|Legislation|Letter|Meeting record|Contract)$/.test(k) ? 'Documents' : /^(Meeting recording|Video|Podcast|Recording)$/.test(k) ? 'Video & audio' : /^(Government page|Organisation page)$/.test(k) ? 'Official pages' : /^(News|Blog|Own article)$/.test(k) ? 'Press and commentary' : 'Other';
@@ -7949,8 +8007,8 @@ class Component extends DCLogic {
       : srcGroups.map(g => ({ label: g.label + ' · ' + g.n, hasLabel: true, rows: mkRows(rowsAll.filter(r => r.group === g.label)) }));
     const seg = on => ({ bg: on ? 'var(--sel2)' : 'transparent', col: on ? 'var(--ink)' : 'var(--mut)' });
     const meetVals = {};
-    const svVals = { ...meetVals, srcHiddenNote: this._srcHidden ? plural(this._srcHidden, 'other source') + ' with nothing in this selection ' + (this._srcHidden === 1 ? 'is' : 'are') + ' hidden' : '', svCards: svMode === 'cards', svTable: svMode === 'table', svTabsOn: svGroup === 'tabs',
-      svModes: [['cards', 'Cards'], ['table', 'Table']].map(([k, l]) => ({ label: l, ...seg(svMode === k), onClick: () => this.setState({ svMode: k }) })),
+    const svVals = { ...meetVals, srcHiddenNote: this._srcHidden ? plural(this._srcHidden, 'other source') + ' with nothing in this selection ' + (this._srcHidden === 1 ? 'is' : 'are') + ' hidden' : '', svCards: svMode === 'cards', svTable: svMode === 'table', svDrive: svMode === 'drive', svKindTabs: svMode !== 'drive' && tabs.length > 2, svTabsOn: svGroup === 'tabs',
+      svModes: [['drive', 'Files'], ['cards', 'Cards'], ['table', 'Table']].map(([k, l]) => ({ label: l, ...seg(svMode === k), onClick: () => this.setState({ svMode: k }) })),
       svTabs: tabs.map(t => ({ label: t.label, n: t.n, bd: t.id === svTab ? 'var(--acc2)' : 'transparent', col: t.id === svTab ? 'var(--ink)' : 'var(--mut)', onClick: () => this.setState({ svTab: t.id }) })),
       svCols: tCols.map(([k, l]) => ({ label: l + (svSort === k ? (svDir > 0 ? ' ↑' : ' ↓') : ''), onClick: () => this.setState({ svSort: k, svDir: svSort === k ? -svDir : (k === 'title' || k === 'publisher' ? 1 : -1) }) })),
       svTables: tables, svCardGroups: svGroup === 'one' ? [{ label: 'All sources', n: String(allSrcItems.length), desc: '', items: allSrcItems.map(x => x.it), hasMore: false }] : svGroup === 'tabs' ? (svTab === '__all' ? srcGroups : svTab === 'Recordings' ? (() => { const vg = srcGroups.filter(g => /^(Video|Meeting recording)$/.test(g.label)); const items = vg.flatMap(g => g.items).map(it => ({ it, d: docByTitle.get(it.title) || {} })).sort((x, y) => (y.d.published || String(y.d.year || '')).localeCompare(x.d.published || String(x.d.year || ''))).map(x => x.it); return [...(items.length ? [{ label: 'Video', n: String(items.length), desc: 'Meetings and other recordings. Open one to watch it with its transcript beside it.', items, hasMore: false }] : []), ...srcGroups.filter(g => FAM(g.label) === 'Recordings' && !/^(Video|Meeting recording)$/.test(g.label))]; })() : srcGroups.filter(g => FAM(g.label) === svTab)) : srcGroups };
@@ -8360,7 +8418,7 @@ class Component extends DCLogic {
       hasPairsHidden: D.edgeHidden > 0, pairsHidden: plural(D.edgeHidden, 'other pair') + ' share a statement only once, or no more often than chance would give, so ' + (D.edgeHidden === 1 ? 'it is' : 'they are') + ' left out.',
       readerSeen: !!(S.readDoc && A.docById[S.readDoc] && this.mOf(A.docById[S.readDoc]).status === 'seen'),
       readerFold: S.readDoc && this._fold.length ? ' ' + (A.stsByDoc[S.readDoc] || []).filter(s => this.inFold(s)).length + ' of its statements touch the topic.' : '',
-      readerKeep: () => this.setMeta(S.readDoc, { status: 'source' }), readerDiscard: () => this.discard(S.readDoc),
+      readerKeep: () => this.setMeta(S.readDoc, { status: 'source' }), readerDiscard: () => this.trashSource(S.readDoc),
       readerRenaming: S.readerRename, readerNotRenaming: !S.readerRename, readerNameDraft: S.readerNameDraft != null ? S.readerNameDraft : (S.readDoc && A.docById[S.readDoc] ? A.docById[S.readDoc].title : ''), onReaderRenameStart: () => { const d = S.readDoc && A.docById[S.readDoc]; if (d) this.setState({ readerRename: true, readerNameDraft: d.title }); }, onReaderNameDraft: e => this.setState({ readerNameDraft: e.target.value }), onReaderNameKey: e => { if (e.key === 'Enter') this.onReaderRenameSave(); if (e.key === 'Escape') this.setState({ readerRename: false, readerNameDraft: '' }); }, onReaderRenameCancel: () => this.setState({ readerRename: false, readerNameDraft: '' }), onReaderRenameSave: () => { const d = S.readDoc; const nm = (this.state.readerNameDraft || '').trim(); if (d && nm) this.renameDocTitle(d, nm); this.setState({ readerRename: false, readerNameDraft: '' }); },
       corpusId: cid, corpusOptions: opts, q: S.q, corpusName: this.corpusName(), segList, hasSegments, segOpen, segToggleLabel, segCount, toggleSegOpen, addAsFold, navTop, navRead, navExplore, navRest,
       topicsList, hasTopics, topicsNote, hasTopicsNote, topicsStrayN, showTopicsStray, onTopicsStray, scope,

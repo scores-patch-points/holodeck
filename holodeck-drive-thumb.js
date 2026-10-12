@@ -50,12 +50,24 @@ export function planOf(entry, have = {}) {
   return plan;
 }
 
+// The only time constant here, declared once: a render that has produced no
+// pixels after this long is treated as failed, so one hung file (a PDF whose
+// fonts never arrive, a stalled decode) cannot hold the queue for every other
+// preview. 10 s is the point at which a person watching a spinner assumes it
+// has failed (Nielsen's attention limit); it is not tuned to any file.
+export const RENDER_TIMEOUT_MS = 10_000;
+const withTimeout = (p, ms) => new Promise((res, rej) => { const t = setTimeout(() => rej(new Error('timeout')), ms); p.then(v => { clearTimeout(t); res(v); }, e => { clearTimeout(t); rej(e); }); });
+
 // in-memory front over an injected persistent store { get(key), put(key, rec) }
 export function createCache(store = null) {
   const mem = new Map();
   return {
     async get(key) { if (mem.has(key)) return mem.get(key); const r = store ? await store.get(key).catch(() => null) : null; if (r) mem.set(key, r); return r || null; },
     async put(key, rec) { mem.set(key, rec); if (store) await store.put(key, rec).catch(() => {}); },
+    // this session only: a failure is remembered so a bad file is not retried
+    // on every scroll, but never persisted — it may be a network or font that
+    // is back next time, and a stored "icon" would hide a preview that works
+    putSession(key, rec) { mem.set(key, rec); },
     peek(key) { return mem.get(key) || null; },
     size() { return mem.size; },
   };
@@ -66,7 +78,7 @@ export function createCache(store = null) {
 //   renderImage(bytes, bucket) → {blob,w,h}          renderPdf(bytes, bucket) → {blob,w,h}
 // Returns { kind, key, ...} where kind ∈ youtube | image | pdf | text | icon.
 // `icon` carries `reason` (why nothing better), so the page can say it.
-export async function resolvePreview({ entry, cache, getBytes, getText, renderImage, renderPdf, bucket, budget }) {
+export async function resolvePreview({ entry, cache, getBytes, getText, renderImage, renderPdf, bucket, budget, timeoutMs = RENDER_TIMEOUT_MS }) {
   const have = { image: entry.type === 'image', pdf: entry.type === 'pdf' };
   const plan = planOf(entry, have);
   let reason = 'no preview could be made from this source';
@@ -88,13 +100,14 @@ export async function resolvePreview({ entry, cache, getBytes, getText, renderIm
     const hit = await cache.get(key);
     if (hit) return hit.kind === 'icon' ? (reason = hit.reason || reason, { kind: 'icon', key: null, reason }) : hit;
     try {
-      const out = await (step.kind === 'image' ? renderImage : renderPdf)(bytes, bucket);
+      const out = await withTimeout(Promise.resolve((step.kind === 'image' ? renderImage : renderPdf)(bytes, bucket)), timeoutMs);
       if (!out || !out.blob) throw new Error('nothing rendered');
       const rec = { kind: step.kind, key, blob: out.blob, w: out.w, h: out.h, from: step.kind === 'pdf' ? 'its first page' : 'the image itself' };
       await cache.put(key, rec); return rec;
     } catch (e) {
-      reason = (step.kind === 'pdf' ? 'its first page could not be drawn here' : 'the image could not be decoded');
-      await cache.put(key, { kind: 'icon', key, reason }); // remembered, so a bad file is not retried on every scroll
+      const slow = e && e.message === 'timeout';
+      reason = step.kind === 'pdf' ? (slow ? 'its first page took too long to draw' : 'its first page could not be drawn here') : (slow ? 'the image took too long to decode' : 'the image could not be decoded');
+      cache.putSession(key, { kind: 'icon', key, reason });
     }
   }
   return { kind: 'icon', key: null, reason };

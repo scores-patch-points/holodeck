@@ -15,9 +15,9 @@ export const DECLARED = Object.freeze({
   // the 60 Hz display's frame period: the budget one interaction's derivation
   // must fit inside so the page never drops a frame because of it
   FRAME_MS: 1000 / 60,
-  // narrowest tile at which a two-line title is still legible at 14 px; the
+  // narrowest tile that still holds a two-line 14 px title beside the 28 px action button; the
   // column count is derived from the container width and this floor
-  MIN_TILE_PX: 168,
+  MIN_TILE_PX: 160,
   // a single grid gap / list row height are layout facts of the stylesheet, not
   // tuned: the DOM module reads them back from computed style and passes them in
   // (these defaults are only used by tests that have no stylesheet)
@@ -206,9 +206,25 @@ export function windowOf({ count, rowH, viewportH, scrollTop, perRow = 1, oversc
   const rows = Math.ceil(count / perRow);
   const vis = Math.max(1, Math.ceil(viewportH / rowH));
   const over = overscan == null ? vis : overscan; // one page each side: derived, not tuned
-  const first = Math.max(0, Math.floor(scrollTop / rowH));
-  const r0 = Math.max(0, first - over), r1 = Math.min(rows, first + vis + over);
-  return { rows, r0, r1, start: r0 * perRow, end: Math.min(count, r1 * perRow), padTop: r0 * rowH, padBottom: Math.max(0, (rows - r1) * rowH), total: rows * rowH };
+  const first = Math.floor(scrollTop / rowH); // negative when this block starts below the viewport's top
+  const r0 = Math.min(rows, Math.max(0, first - over));
+  const r1 = Math.min(rows, Math.max(r0, first + vis + over));
+  return { rows, r0, r1, start: Math.min(count, r0 * perRow), end: Math.min(count, r1 * perRow), padTop: r0 * rowH, padBottom: Math.max(0, (rows - r1) * rowH), total: rows * rowH };
+}
+
+// Several stacked blocks (folders, then files), each with its own row height and
+// an optional header. One call, each block windowed against the same viewport.
+// Cost is bounded by the viewport, never by the number of items.
+export function windowBlocks({ blocks, viewportH, scrollTop }) {
+  let top = 0; const out = [];
+  for (const b of blocks) {
+    if (!b.count) { out.push({ ...b, w: windowOf({ count: 0, rowH: b.rowH, viewportH, scrollTop: 0, perRow: b.perRow }), top, header: 0 }); continue; }
+    const header = b.header || 0;
+    const w = windowOf({ count: b.count, rowH: b.rowH, viewportH, scrollTop: scrollTop - top - header, perRow: b.perRow });
+    out.push({ ...b, w, top, header });
+    top += header + w.total;
+  }
+  return { blocks: out, total: top };
 }
 
 // ── menus (the model; the DOM module draws it) ─────────────────────────────

@@ -69,3 +69,106 @@ Recorded in `holodeck-drive-view.js` as `DECLARED`, nowhere else:
 ## Results
 
 (appended below, never edited above)
+
+### Run 1 — measured on branch `holodeck-drive-sources`
+
+Environment: node 24 for the pure tiers; the browser pane (Chromium, over
+`http://localhost:8841/`, served from the worktree) at 1134 px and 375 px, with
+a synthetic workspace seeded into localStorage/IndexedDB (24 sources; then
+2,000). Existing tests: 34 passing names / 8 failing names before and after,
+identical by name (the 8 are the four files that fail to load because
+`vendor/fold-chat` is a partial closure in git — pre-existing).
+
+**Predictions that held**
+
+| # | Result |
+|---|---|
+| E2 | Pure: keyed by content — same id with new bytes misses, same bytes under another id shares one entry, text previews are verbatim prefixes; the id-keyed control serves the stale picture. Live: replaced the image bytes under the same id; the thumbnail changed (`590f79885afa` → `a0416ab8c83f`) while the old cache entry was still present. |
+| E3 | 300 randomised legacy stores: every folder and every membership is adopted or itemised; the legacy key is byte-identical afterwards (pure and live: 3 folders / 5 memberships appeared as 3 folders with 2/0/3 sources). The "copy only the first folder" control fails the same invariant. |
+| E4 | 400 randomised op sequences × every step: apply then undo returns the exact state. Controls (undo of last item only) fail. Live: drag-drop of one source onto a folder (Press 3→4) and the toast's Undo button (→3). |
+| E7 | "Last modified" shows the time added; a source present before the log reads "Earlier" with no invented time; the added time never changes. Live, hydration is not mistaken for arrival (`ready:false` stamps nothing). |
+| E8 | Live: Move to Trash took the page's header from "22 documents · 88 statements" to "21 · 84"; the source is listed in Trash; Restore returned it to its place and "22 · 88". The card-level Discard button now reads "Move to Trash". |
+| E9 | Cycle refused at write time, ignored at fold time; the guard terminates the unchecked-cycle control. |
+| E10 | One tab stop in the surface (pure and live, including after the focused item re-sorted out of the window); arrows/Home/End/PageUp/PageDown/Space/Enter/Delete/F2/Esc/⌘A/⌘Z mapped; roles grid/row/gridcell (list), listbox/option (grid), menu/menuitem. |
+| E11 | Range selection is over the displayed order; the insertion-order control gives a different set. |
+| E12 | String lint passes; its control (a canon string) is caught. |
+| E14 | `scrollWidth === innerWidth` at 1134 and 375 px (list and grid). |
+| E1 (partial) | Click-select, shift-range, drop on a folder, context-menu open: `scrollY` and the top of the first tile unchanged. See "not established" for native pointer drag. |
+| P-scale / P-budget (derivation) | `rowsFor` for all six sorts, search and the top level: n=500 ≤ 1.7 ms, n=2,000 ≤ 3.6 ms (median of 15); the test asserts ≤ one frame (16.7 ms) and passes. The window is 48 nodes at most at 2,000 sources (control that mounts everything: 26,000 nodes, 670 ms). |
+
+**Predictions that did not hold, or held only partly**
+
+* *P-budget, whole interaction.* A sort or a search keystroke is a full redraw of
+  chrome + rows + window: 11–22 ms at 1,751 analysed sources (one of six sorts
+  above the 16.7 ms frame on its first run, 21.6 ms; JIT-cold). A 100 px wheel
+  step costs a median 2.7 ms; a 600 px jump a median 9.9 ms of script plus 4.5 ms
+  of layout with a ~28 ms tail (about a dozen new tiles at ~0.8 ms each). So the
+  derivation fits one frame; a large jump does not always.
+* *Preview coverage.* The page's pdf.js import hung rendering one test PDF in
+  this environment (a handcrafted file with different glyphs; likely a font
+  that never arrives). The first version had no timeout and a hung render held
+  the queue. Fixed after seeing it: a declared 10 s `RENDER_TIMEOUT_MS`, the
+  tile falls back to the source's own words when it has them, the failure is
+  remembered for the session only. Unit-tested; also seen live.
+
+**Defects found by the live run and fixed before this record (each has a test or a live re-check)**
+
+1. The stylesheet constant was named `CSS` and shadowed `window.CSS`; every
+   keyboard move threw. Renamed.
+2. Arrow-key moves selected in state but did not redraw the tiles. Fixed.
+3. After a rename re-sorted the focused tile out of the window nothing had
+   `tabindex=0` (no tab stop). The stop now falls to the first drawn item.
+4. With **Details** on, `syncDetails()` called the page's `setState` on every
+   render → React update-depth error #185 loop. It now mirrors only when the
+   selected id changes.
+5. The bulk-actions bar pushed the tiles down on first selection (a layout
+   shift under the pointer). It now overlays the toolbar row; the first tile's
+   top is unchanged by selecting (357.2 px before, after one, after a range).
+6. A grid-mode probe for tile height measured the wrong thing for folders
+   (folders were stretched to file-tile height). Folders are their own block
+   with their own measured row height.
+7. Test-expectation mistakes of mine (not product changes): a time-zone
+   dependent "Yesterday" case, and one sort-order expectation. Corrected.
+
+**Existing behaviour seen on the way, not changed**
+
+* `analysis()` de-duplicates sources by URL with the query string stripped, so
+  two YouTube sources whose URLs differ only in `?v=` collapse to one in the
+  reading (seed sources 11 and 19 were dropped in the synthetic run). Not
+  verified against how real YouTube sources are stored (they may carry
+  `media.id` only).
+* Renaming a source in a 2,000-source workspace re-analyses the whole
+  workspace (several seconds, main thread) — the page's `renameDocTitle` path.
+
+### What is not established
+
+* **Native pointer drag-and-drop.** The pane's synthetic drag did not start an
+  HTML5 drag; the handlers were exercised with dispatched `DragEvent`s carrying
+  a real `DataTransfer`. A real mouse drag, and touch (HTML5 DnD does not exist
+  on touch; **Move to…** is the touch path), are not tested.
+* **Screen readers.** Roles, labels, `aria-selected`, `aria-sort`, live regions
+  are set and unit-checked; no assistive technology was run.
+* **Type-ahead** (typing a name to jump) is not built.
+* **Preview cache has no size bound or eviction** (IndexedDB database
+  `holodeck-drive-previews`; 1,550 entries after the 2,000-source run).
+* **Recent** is "added or first opened": the page's read log stores only the
+  first open, so a source opened again does not move up.
+* **Added by** is "You" or "This workspace" — the page has no per-source author;
+  the sharing branch can fill `sender` on the events.
+* **Added time** exists only from the first load of this version; everything
+  earlier reads "Earlier".
+* **Sharing**: folders/places/stars/trash are events shaped for a store room,
+  but no sharing path was run (that branch is unmerged). Whether two writers'
+  interleaved events fold to the same state on both sides is true by
+  construction (the fold is a function of the timestamp-ordered log) but not
+  tested with a second writer.
+* **A hung render in an offline browser**: first pages need the page's existing
+  pdf.js CDN import; offline, PDFs show their own words or the icon. Not tested
+  offline.
+* **Large first load**: the first draw of a 2,000-source workspace took ~13.8 s
+  from navigation in this pane, almost all of it the page's own analysis
+  (existing); the Drive module's first render was 17 ms. Not separated further.
+* **Light theme** not visually checked.
+* **The 2,000-source numbers are from a hidden-pane run** (requestAnimationFrame
+  does not fire there, so scrolling was driven by calling the redraw
+  synchronously); they are script and layout costs, not measured frame times.

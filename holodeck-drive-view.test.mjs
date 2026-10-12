@@ -154,8 +154,20 @@ test('E5 the drawn window is bounded by the viewport, not by the number of sourc
   assert.equal(w.padTop + (w.end - w.start) * 44 + w.padBottom, 2000 * 44);
 });
 
+test('E5 stacked blocks: folders then files, each windowed against the same viewport, node count bounded', () => {
+  const run = (nFiles, scrollTop) => V.windowBlocks({ blocks: [{ id: 'f', count: 30, rowH: 70, perRow: 6, header: 28 }, { id: 'x', count: nFiles, rowH: 220, perRow: 6, header: 28 }], viewportH: 800, scrollTop });
+  const drawn = r => r.blocks.reduce((n, b) => n + (b.w.end - b.w.start), 0);
+  assert.ok(drawn(run(2000, 5000)) <= 6 * (Math.ceil(800 / 220) * 3) + 6 * (Math.ceil(800 / 70) * 3));
+  assert.equal(drawn(run(2000, 5000)), drawn(run(20000, 5000)), 'independent of how many files there are');
+  const top = run(2000, 0);
+  assert.equal(top.blocks[0].w.start, 0); assert.ok(top.blocks[1].w.end > 0, 'the files block starts inside the first viewport');
+  const deep = run(2000, 30000);
+  assert.equal(deep.blocks[0].w.end - deep.blocks[0].w.start, 0, 'folders far above draw nothing');
+  assert.equal(deep.total, 28 + 5 * 70 + 28 + Math.ceil(2000 / 6) * 220);
+});
+
 test('grid metrics derive columns from the container and the declared minimum tile', () => {
-  const g = w => V.gridMetrics(w, { minTile: 168, gap: 12 });
+  const g = w => V.gridMetrics(w, { minTile: V.DECLARED.MIN_TILE_PX, gap: 12 });
   assert.equal(g(375).cols, 2); assert.equal(g(1134).cols, 6);
   assert.ok(g(1134).tileW >= 168); assert.equal(g(100).cols, 1);
   const w = V.windowOf({ count: 100, rowH: 200, viewportH: 600, scrollTop: 0, perRow: 6 });

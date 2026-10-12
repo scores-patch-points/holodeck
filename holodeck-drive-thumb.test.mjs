@@ -94,3 +94,25 @@ test('the queue runs newest first and never exceeds its concurrency', async () =
   assert.deepEqual(order.slice(0, 2), [1, 2].sort().reverse().length ? order.slice(0, 2) : []);
   const c = q.add(job(9)); c.cancel(); assert.equal(q.pending(), 0);
 });
+
+test('E5/E6 a render that never finishes gives the icon with a reason, and does not hold the queue for the next preview', async () => {
+  const r = rig({ renderPdf: () => new Promise(() => {}), timeoutMs: 30 });
+  const q = T.createQueue(1);
+  const hung = V.entryOf({ id: 'h', title: 'h', type: 'PDF' }), fine = V.entryOf({ id: 'f', title: 'f', type: 'Image' });
+  const a = q.add(() => T.resolvePreview({ entry: hung, ...r, getBytes: async () => bytes('%PDF-hangs') }));
+  const b = q.add(() => T.resolvePreview({ entry: fine, ...r, getBytes: async () => bytes('PNG') }));
+  const [pa, pb] = await Promise.all([a.promise, b.promise]);
+  assert.equal(pa.kind, 'icon'); assert.match(pa.reason, /took too long/);
+  assert.equal(pb.kind, 'image');
+});
+
+test('a failure is remembered for the session but never persisted (a font or network that is back must be able to work)', async () => {
+  const stored = new Map(); const store = { get: async k => stored.get(k) || null, put: async (k, v) => { stored.set(k, v); } };
+  const r = rig({ cache: T.createCache(store), renderPdf: async () => { throw new Error('boom'); } });
+  const e = V.entryOf({ id: 'p', title: 'p', type: 'PDF' });
+  const p = await T.resolvePreview({ entry: e, ...r, getBytes: async () => bytes('%PDF-x') });
+  assert.equal(p.kind, 'icon'); assert.equal(stored.size, 0);
+  const r2 = rig({ cache: T.createCache(store) }); // next session, the renderer works
+  const q = await T.resolvePreview({ entry: e, ...r2, getBytes: async () => bytes('%PDF-x') });
+  assert.equal(q.kind, 'pdf');
+});
