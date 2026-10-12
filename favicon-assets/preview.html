@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>The Operator Helix — favicon · SYN</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="icon" href="favicon-32.png">
+<style>
+  body { font: 13px/1.55 -apple-system, system-ui, sans-serif; background: #0e0e0e; color: #c9c5b8; margin: 44px auto; max-width: 760px; padding: 0 20px; }
+  h1 { font-size: 15px; color: #e8e4d8; margin: 0 0 4px; }
+  .sub { color: #777; margin: 0 0 30px; }
+  h2 { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: #5c5c54; margin: 34px 0 12px; font-weight: 600; }
+  .row { display: flex; gap: 24px; flex-wrap: wrap; align-items: flex-end; }
+  figure { margin: 0; text-align: center; }
+  figcaption { font-size: 10.5px; color: #8a8a80; margin-top: 8px; }
+  .card { background: #141410; border: 0.5px solid #2a2a24; border-radius: 12px; padding: 18px; }
+  .white { background: #fff; border-radius: 12px; }
+  .white figcaption { color: #999; }
+  .tabbar { display: flex; gap: 2px; align-items: flex-end; background: #1c1c1c; border: 0.5px solid #2a2a24; border-radius: 10px 10px 0 0; padding: 8px 12px 0; }
+  .tab { display: inline-flex; align-items: center; gap: 7px; background: #242420; border: 0.5px solid #2a2a24; border-radius: 8px 8px 0 0; padding: 7px 14px; font: 12px -apple-system, system-ui; color: #ddd8c8; border-bottom: none; }
+  .tab.inactive { background: #141410; color: #5c5c54; }
+  .tab.inactive img { filter: grayscale(.6); opacity: .5; }
+  .notebox { margin-top: 22px; font-size: 12px; color: #8a8a80; background: #141410; border: 0.5px solid #2a2a24; border-radius: 10px; padding: 12px 14px; }
+  code { font: 11px ui-monospace, Menlo, monospace; color: #e0a24e; background: #1c1c18; padding: 1px 5px; border-radius: 4px; }
+</style>
+</head>
+<body>
+
+<h1>SYN favicon — the Operator Helix</h1>
+<p class="sub">Pythagorean moment of the helix animation · amber triangle with its three squares. This page's tab wears the real favicon.</p>
+
+<h2>size ladder (dark tile / white)</h2>
+<div class="row">
+  <div class="card">
+    <figure><img src="favicon.svg" width="64" height="64" alt=""><figcaption>64 · svg</figcaption></figure>
+    <figure><img src="favicon.svg" width="32" height="32" alt=""><figcaption>32</figcaption></figure>
+    <figure><img src="favicon.svg" width="16" height="16" alt=""><figcaption>16</figcaption></figure>
+  </div>
+  <div class="white">
+    <figure><img src="favicon.svg" width="64" height="64" alt=""><figcaption>on white</figcaption></figure>
+    <figure><img src="favicon.svg" width="16" height="16" alt=""><figcaption>16</figcaption></figure>
+  </div>
+</div>
+
+<h2>in the chrome</h2>
+<div class="card">
+  <div class="tabbar">
+    <span class="tab"><img src="favicon.svg" width="16" height="16" alt="">mikelacy.site</span>
+    <span class="tab inactive"><img src="favicon.svg" width="16" height="16" alt="">github</span>
+  </div>
+</div>
+
+<h2>faithful frame composite (PNG pack)</h2>
+<p style="color:#777;font-size:12px">The actual rendered frame from the animation, on the site's <code>#1c1c1c</code> rounded tile — for 180 (apple-touch), 512, and as the fallback PNGs.</p>
+<div class="row">
+  <div class="card">
+    <figure><img src="favicon-180.png" width="180" height="180" alt=""><figcaption>180</figcaption></figure>
+    <figure><img src="favicon-64.png" width="64" height="64" alt=""><figcaption>64</figcaption></figure>
+  </div>
+  <div class="card">
+    <figure><img src="favicon-32.png" width="32" height="32" alt=""><figcaption>32</figcaption></figure>
+    <figure><img src="favicon-16.png" width="16" height="16" alt=""><figcaption>16</figcaption></figure>
+  </div>
+</div>
+<p style="color:#777;font-size:12px"><span style="color:#47c9a4">note:</span> the 32/16 PNG fallbacks are rendered from the tuned SVG (a faithful downsample of the thin frame lines turns to a smudge at tab size). The SVG itself is the primary asset for all modern browsers.</p>
+
+<h2>before · after</h2>
+<div class="row">
+  <div class="card">
+    <figure>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+        <rect width="64" height="64" rx="12" fill="#1c1c1c"/>
+        <circle cx="32" cy="32" r="18" fill="none" stroke="#f3f1ec" stroke-width="5"/>
+        <line x1="16" y1="48" x2="48" y2="16" stroke="#f3f1ec" stroke-width="5" stroke-linecap="round"/>
+      </svg>
+      <figcaption>before — the ∅ (NUL)</figcaption>
+    </figure>
+    <figure><img src="favicon.svg" width="64" height="64" alt=""><figcaption>after — SYN (amber)</figcaption></figure>
+  </div>
+</div>
+
+</body>
+</html>
