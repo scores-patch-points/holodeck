@@ -5135,6 +5135,14 @@ class Component extends DCLogic {
     this._research = slim; this._resT = null; this._resV = null;
     try { await idbPut('research:' + this.corpusId(), slim); } catch (e) {}
     if (!docIds.length) { this.setState({ busy: '' }); return; }   // nothing kept: the record stays in this panel, with every reason
+    // lay the corpus out once, here, behind a visible message — not inside the first render of the Research view
+    try {
+      this.setState({ busy: 'Laying ' + plural(docIds.length, 'source') + ' out by who, what and how they connect…' });
+      await new Promise(r => setTimeout(r, 30));
+      const M = this._resM || await hdRes(); const A3 = this.analysis();
+      const input = M.T.readingOfAnalysis(A3, docIds, (rec.gaps || []).filter(g => ['unread', 'turned-away', 'off-topic-when-read', 'not-prose'].includes(g.kind)));
+      this._resT = { key: rec.startedAt + '|' + docIds.join(',') + '|' + this._key, input, T: M.T.terrainOf(input, { key: rec.question }) };
+    } catch (e) { console.warn('research terrain', e); this._resT = null; }
     const q = rec.question;
     this.setState(s => ({ busy: '', showAdd: false, view: 'research', readDoc: null, sel: null, f: { ...s.f, topicGroup: { label: 'Research: ' + short(q, 40), docs: docIds } }, rsDoc: null, rsFrame: null, rsGroup: null, rsLog: false }));
     if (A.answerAfter) {
@@ -7590,7 +7598,7 @@ class Component extends DCLogic {
     }
     const key = id + ':' + docs.map(d => d.id).join(',') + ':' + this.state.htmlVer + ':' + this.corrKey(id);
     if (this._key !== key) { this._key = key; this._A = analyze({ docs }, this._html); this.applyCorrections(this._A, id); }
-    try { window.__holodeckA = this._A; } catch (e) {}
+    try { window.__holodeckA = this._A; window.__holodeckApp = this; window.__holodeckRef = HD_REF; } catch (e) {}   // read-only handles for the falsification runs
     return this._A;
   }
   // Corrections: filing, revising (retract/restore), and enforcement. Entries are append-only;

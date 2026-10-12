@@ -155,19 +155,22 @@ export function terrainOf(input, { key = '' } = {}) {
   echoes.sort((a, b) => b.sim - a.sim);
   const linkRows = sts.map(st => ({ ...addr(st), text: st.text, names: (st.names || []).slice(0, 12), frame: st.frame || 'fact', echoedIn: [...new Set((echoOf.get(st.id) || []).map(o => o.doc))] }));
 
-  // ── network: ties kept only when they beat every random overlap ────────────────────────────────────────────────
+  // ── network: ties kept only when they beat every random overlap AND two independent sources witness them ────────
+  // Only names several sources say can form a tie worth drawing (a name heard once cannot be tied by two witnesses),
+  // so pairs are formed among those alone — which is also what keeps this tractable on a corpus of thousands of statements.
   const N = sts.length, tieNullCache = new Map();
   const pairs = new Map();
   for (const st of sts) {
-    const ks = [...new Set((st.names || []).map(referentKey).filter(k => k && ref.has(k)))].slice(0, 30);
-    for (let i = 0; i < ks.length; i++) for (let j = i + 1; j < ks.length; j++) { const a = ks[i] < ks[j] ? ks[i] : ks[j], b = ks[i] < ks[j] ? ks[j] : ks[i]; const k = a + '\u0001' + b; const x = pairs.get(k) || pairs.set(k, { a, b, sts: [] }).get(k); x.sts.push(st); }
+    const ks = [...new Set((st.names || []).map(referentKey).filter(k => k && ref.has(k) && ref.get(k).docs.size >= 2))].slice(0, 24);
+    for (let i = 0; i < ks.length; i++) for (let j = i + 1; j < ks.length; j++) { const a = ks[i] < ks[j] ? ks[i] : ks[j], b = ks[i] < ks[j] ? ks[j] : ks[i]; const k = a + '\u0001' + b; const x = pairs.get(k) || pairs.set(k, { a, b, sts: [], docs: new Set() }).get(k); x.sts.push(st); x.docs.add(st.doc); }
   }
   const edges = [];
+  let tiesBeatingChance = 0;
   for (const x of pairs.values()) {
     const na = ref.get(x.a).sts.length, nb = ref.get(x.b).sts.length, k = x.sts.length;
     const ck = Math.min(na, nb) + ':' + Math.max(na, nb); let hi = tieNullCache.get(ck);
     if (hi === undefined) { hi = overlapNullMax(na, nb, N, r); tieNullCache.set(ck, hi); }
-    if (k > hi) edges.push({ a: ref.get(x.a).name, b: ref.get(x.b).name, k, nullMax: hi, at: x.sts.slice(0, 12).map(addr) });
+    if (k > hi) { tiesBeatingChance++; if (x.docs.size >= 2) edges.push({ a: ref.get(x.a).name, b: ref.get(x.b).name, k, nullMax: hi, witnesses: x.docs.size, at: x.sts.slice(0, 12).map(addr) }); }
   }
   edges.sort((p, q) => q.k - p.k || (p.a < q.a ? -1 : 1));
   const networkNodes = new Set(); edges.forEach(e => { networkNodes.add(e.a); networkNodes.add(e.b); });
@@ -254,7 +257,7 @@ export function terrainOf(input, { key = '' } = {}) {
       kind: { kinds: kindRows, statements: Object.fromEntries([...stKinds]) },
       field: { units: fieldRows },
       link: { statements: linkRows, echoes },
-      network: { edges, nodes: [...networkNodes].sort(), draws: DRAWS },
+      network: { edges, nodes: [...networkNodes].sort(), draws: DRAWS, beatChance: tiesBeatingChance, earned: edges.length },
     },
     seeing: { atmosphere: { frames: frameIds, bySource: frameBySource }, lens, paradigm },
     perSource, gaps,

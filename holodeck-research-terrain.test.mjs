@@ -67,15 +67,23 @@ test('the same wording said in two sources is an echo; unrelated sentences are n
   assert.equal(none.seen.link.echoes.length, 0);
 });
 
-test('a tie between two names is kept only when its shared statements exceed every random overlap', () => {
-  // 40 statements; "Mara Quill" and "Ivo Harlow" always together (10); "Kessel Bay" scattered among the rest
-  const lines = [];
-  for (let i = 0; i < 10; i++) lines.push('That morning Mara Quill met Ivo Harlow near the old dock number ' + i + ' on a grey morning.');
-  for (let i = 0; i < 30; i++) lines.push('That evening ' + (i % 2 ? 'Ruth Okafor' : 'Ruth Okafor and Kessel Bay') + ' walked past the quiet market stall number ' + i + ' alone.');
-  const t = terrain([{ text: lines.join('\n') }]);
+test('a tie is kept only when its shared statements beat every random overlap and two independent sources witness it', () => {
+  // 40 statements over two sources; "Mara Quill" and "Ivo Harlow" always together (10, five in each); "Kessel Bay" scattered
+  const mk = off => { const lines = [];
+    for (let i = 0; i < 5; i++) lines.push('That morning Mara Quill met Ivo Harlow near the old dock number ' + (off + i) + ' on a grey morning.');
+    for (let i = 0; i < 15; i++) lines.push('That evening ' + (i % 2 ? 'Ruth Okafor' : 'Ruth Okafor and Kessel Bay') + ' walked past the quiet market stall number ' + (off + i) + ' alone.');
+    return lines.join('\n'); };
+  const t = terrain([{ text: mk(0) }, { text: mk(100) }]);
   const mi = t.seen.network.edges.find(e => [e.a, e.b].sort().join('|') === 'Ivo Harlow|Mara Quill');
-  assert.ok(mi && mi.k === 10 && mi.k > mi.nullMax, JSON.stringify(t.seen.network.edges));
+  assert.ok(mi && mi.k === 10 && mi.k > mi.nullMax && mi.witnesses === 2, JSON.stringify(t.seen.network.edges));
   assert.ok(!t.seen.network.edges.some(e => [e.a, e.b].includes('Kessel Bay') && [e.a, e.b].includes('Mara Quill')));
+});
+
+test('a tie that only one source witnesses is not drawn, however many times that source says it', () => {
+  const lines = []; for (let i = 0; i < 12; i++) lines.push('That morning Mara Quill met Ivo Harlow near the old dock number ' + i + ' on a grey morning.');
+  for (let i = 0; i < 30; i++) lines.push('Bakers sold warm bread at the quiet market stall number ' + i + ' to the crowd.');
+  const t = terrain([{ text: lines.join('\n') }, { text: 'Mara Quill wrote letters in the harbour town. Ivo Harlow read them aloud on the pier at dusk.' }]);
+  assert.equal(t.seen.network.edges.length, 0);
 });
 
 test('sources that hold the same ground beyond chance are grouped; a stranger is stray', () => {

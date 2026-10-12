@@ -35,12 +35,32 @@ export const stemOf = w => (w.length > 5 ? w.slice(0, 5) : w);
 export const stemsOf = text => wordsOf(text).map(stemOf);
 
 /** The question's terms: distinct stems, minus any the caller marks function-only (a closed-class word is not about
- *  anything). `isFunction(word)` is optional — the page injects the vendored POS prior; with none, the one-sided
- *  statistic already gives a function word ~nothing (its observed rate IS the background rate). */
+ *  anything). `isFunction(word)` is optional — the page injects the vendored POS prior. */
 export function termsOf(question, isFunction = null) {
   const out = new Map();   // stem -> first word
   for (const w of wordsOf(question)) { if (isFunction && isFunction(w)) continue; const s = stemOf(w); if (!out.has(s)) out.set(s, w); }
   return [...out.keys()];
+}
+
+/** The units a question is measured by: single stems and the stem sequences of its named things.
+ *  - a word counts only if it is rarer in ordinary English than a word drawn uniformly from the vocabulary
+ *    (p < 1/V — derived from the prior's own size, not typed): "a", "how", "start" can be satisfied by any page in any
+ *    register (a math page says "a" a hundred times), so they measure nothing;
+ *  - a named thing (`entities`: the capitalised runs of the question) is a unit even when its words are common, and as a
+ *    PHRASE: "Tennessee Valley Authority" is said or it is not — "valley" and "authority" alone are everywhere;
+ *  - those named things are also the ANCHOR: a text is about the question only if at least one of them clears its own null.
+ *  Without a background nothing can be filtered, and every non-function stem is a unit. */
+export function termUnits(question, { isFunction = null, bg = null, entities = [] } = {}) {
+  const seen = new Set(), units = [], anchors = [];
+  const add = (seq, list) => { const k = seq.join(' '); if (!k || seen.has(k)) return; seen.add(k); list.push(seq); };
+  for (const e of entities) { const seq = stemsOf(e); if (seq.length) { add(seq, units); anchors.push(seq); } }
+  for (const w of wordsOf(question)) {
+    if (isFunction && isFunction(w)) continue;
+    const st = stemOf(w);
+    if (bg && bg.ok && !(bg.p(st) < 1 / bg.v)) continue;
+    add([st], units);
+  }
+  return { units, anchors: anchors.filter((a, i) => anchors.findIndex(b => b.join(' ') === a.join(' ')) === i) };
 }
 
 // ── the background: ordinary English, by stem ───────────────────────────────────────────────────────────────────
@@ -66,27 +86,54 @@ function poisson(lambda, r) {
   return Math.max(0, Math.round(lambda + Math.sqrt(lambda) * z));
 }
 
-/** G of a text for a set of question stems against the background. `counts` is Map stem -> count, L the token count. */
-export function keyness(terms, counts, L, bg) {
+const asUnit = u => (typeof u === 'string' ? [u] : u);
+const countSeq = (toks, seq, uni) => {
+  if (seq.length === 1) return uni.get(seq[0]) || 0;
+  let c = 0;
+  for (let i = 0; i + seq.length <= toks.length; i++) { if (toks[i] !== seq[0]) continue; let k = 1; while (k < seq.length && toks[i + k] === seq[k]) k++; if (k === seq.length) c++; }
+  return c;
+};
+const expectedOf = (seq, L, bg) => { let E = L; for (const w of seq) E *= bg.p(w); return E; };
+
+/** G of a text for a set of question units against the background. `counts` is Map stem -> count, `toks` the stems in order. */
+export function keyness(units, counts, L, bg, toks = null) {
   let G = 0; const matched = [];
-  for (const t of terms) { const c = counts.get(t) || 0; if (!c) continue; const E = L * bg.p(t); const g = g2(c, E); if (g > 0) { G += g; matched.push({ stem: t, count: c, expected: +E.toFixed(4), g: +g.toFixed(2) }); } }
+  for (const raw of units) {
+    const u = asUnit(raw); const c = countSeq(toks || [], u, counts); if (!c) continue;
+    const E = expectedOf(u, L, bg); const g = g2(c, E);
+    if (g > 0) { G += g; matched.push({ stem: u.join(' '), count: c, expected: +E.toFixed(6), g: +g.toFixed(2) }); }
+  }
   matched.sort((a, b) => b.g - a.g);
   return { g: G, matched };
 }
 
-/** The relevance verdict for one text. `key` seeds the null (use question + address + stage). Returns
- *  { ok, g, nullMax, nullMedian, outside, p, matched, L, draws } or { ok:false, why } when it cannot be decided. */
-export function relevance(terms, text, bg, { key = '', draws = DRAWS } = {}) {
+/** The relevance verdict for one text. `key` seeds the null (use question + address + stage). `anchors` (optional) are
+ *  the question's named things: when given, at least one must itself be outside its own null, or the text is not about
+ *  the question however many of its other words it shares. Returns { ok, g, nullMax, nullMedian, outside, anchored, p,
+ *  matched, L, draws } or { ok:false, why } when it cannot be decided. */
+export function relevance(units, text, bg, { key = '', draws = DRAWS, anchors = [] } = {}) {
   if (!bg || !bg.ok) return { ok: false, why: 'no ordinary-English background is loaded, so there is nothing to measure chance against' };
-  if (!terms.length) return { ok: false, why: 'the question has no content terms to measure' };
+  if (!units.length) return { ok: false, why: 'the question has no content terms to measure' };
   const toks = typeof text === 'string' ? stemsOf(text) : text, L = toks.length;
   const counts = new Map(); for (const t of toks) counts.set(t, (counts.get(t) || 0) + 1);
-  const obs = keyness(terms, counts, L, bg);
+  const U = units.map(asUnit), A = anchors.map(asUnit);
+  const obs = keyness(U, counts, L, bg, toks);
   const r = rng(hash32(key + '|' + L)); const nul = [];
-  for (let d = 0; d < draws; d++) { let G = 0; for (const t of terms) { const E = L * bg.p(t); G += g2(poisson(E, r), E); } nul.push(G); }
+  const Es = U.map(u => expectedOf(u, L, bg));
+  for (let d = 0; d < draws; d++) { let G = 0; for (const E of Es) G += g2(poisson(E, r), E); nul.push(G); }
   nul.sort((a, b) => a - b);
   const nullMax = nul[nul.length - 1] || 0, ge = nul.filter(x => x >= obs.g).length;
-  return { ok: true, g: +obs.g.toFixed(3), nullMax: +nullMax.toFixed(3), nullMedian: +nul[nul.length >> 1].toFixed(3), outside: obs.g > nullMax, p: (1 + ge) / (draws + 1), matched: obs.matched, L, draws };
+  let anchored = true, anchorG = null;
+  if (A.length) {
+    anchored = false; const r2 = rng(hash32(key + '|anchor|' + L));
+    for (const u of A) {
+      const E = expectedOf(u, L, bg), c = countSeq(toks, u, counts), g = g2(c, E); let hi = 0;
+      for (let d = 0; d < draws; d++) { const x = g2(poisson(E, r2), E); if (x > hi) hi = x; }
+      if (c > 0 && g > hi) { anchored = true; }
+      anchorG = Math.max(anchorG || 0, g);
+    }
+  }
+  return { ok: true, g: +obs.g.toFixed(3), nullMax: +nullMax.toFixed(3), nullMedian: +nul[nul.length >> 1].toFixed(3), outside: obs.g > nullMax && anchored, anchored, p: (1 + ge) / (draws + 1), matched: obs.matched, L, draws };
 }
 
 // ── saturation ──────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -152,4 +199,25 @@ export function proseTest(text, peers, { key = '', draws = DRAWS } = {}) {
     const x = structureRate(src.slice(at, at + w)); if (x > hi) hi = x;
   }
   return { testable: true, obs: +obs.toFixed(5), nullMax: +hi.toFixed(5), outside: obs > hi, draws };
+}
+
+// ── which earned name is worth following? ───────────────────────────────────────────────────────────────────────────
+// A name two sources say is not necessarily a name about anything: "References", "See", "AD" are said by every page. A
+// name is worth following only when the corpus says it far more than ordinary English would — the same keyness, the
+// same 199-draw null, applied to the name's stem sequence over the whole corpus's words.
+export function corpusIndex(texts) {
+  const tokens = texts.map(t => stemsOf(t)), counts = new Map(); let L = 0;
+  for (const arr of tokens) { L += arr.length; for (const w of arr) counts.set(w, (counts.get(w) || 0) + 1); }
+  return { tokens, counts, L };
+}
+export function phraseKeyness(name, idx, bg, { key = '', draws = DRAWS } = {}) {
+  const seq = stemsOf(name); if (!seq.length || !idx.L || !bg || !bg.ok) return { ok: false };
+  let c = 0;
+  if (seq.length === 1) c = idx.counts.get(seq[0]) || 0;
+  else if (seq.every(w => idx.counts.has(w))) for (const arr of idx.tokens) for (let i = 0; i + seq.length <= arr.length; i++) { if (arr[i] !== seq[0]) continue; let k = 1; while (k < seq.length && arr[i + k] === seq[k]) k++; if (k === seq.length) c++; }
+  let E = idx.L; for (const w of seq) E *= bg.p(w);
+  const g = g2(c, E);
+  const r = rng(hash32(key + '|' + name)); let hi = 0;
+  for (let d = 0; d < draws; d++) { const x = g2(poisson(E, r), E); if (x > hi) hi = x; }
+  return { ok: true, count: c, expected: E, g: +g.toFixed(2), nullMax: +hi.toFixed(2), outside: g > hi };
 }

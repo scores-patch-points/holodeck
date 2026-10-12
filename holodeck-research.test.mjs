@@ -374,3 +374,54 @@ test('the loop refuses a record that mentions the question and says so with the 
   assert.ok(g && /structure/.test(g.why), JSON.stringify(run.gaps.map(x => x.kind)));
   assert.deepEqual(run.sources.map(s => s.url).sort(), ['https://a.example/z1', 'https://a.example/z2']);
 });
+
+import { corpusIndex, phraseKeyness } from './holodeck-research-null.js';
+test('a name the corpus says beyond ordinary English is keyed; an ordinary word that is capitalised is not', () => {
+  const texts = [rep('See the Zorblatt lighthouse and Mara Quill. References follow the history of the city.', 12), rep('See also the Zorblatt lighthouse; the people of the city and the river. References.', 12)];
+  const idx = corpusIndex(texts);
+  const bgx = makeBackground([...bgEntries, ['see', 16000]]);
+  assert.equal(phraseKeyness('Zorblatt lighthouse', idx, bgx, { key: 'a' }).outside, true);
+  assert.equal(phraseKeyness('Mara Quill', idx, bgx, { key: 'a' }).outside, true);
+  assert.equal(phraseKeyness('See', idx, bgx, { key: 'a' }).outside, false);
+});
+
+test('frontier prefers the most keyed name, and skips a name the null does not carry', () => {
+  const support = new Map([['references', 9], ['mara quill', 4], ['port venn', 3]]);
+  const surface = new Map([['references', 'References'], ['mara quill', 'Mara Quill'], ['port venn', 'Port Venn']]);
+  const keyed = new Map([['references', { outside: false, g: 0 }], ['mara quill', { outside: true, g: 40 }], ['port venn', { outside: true, g: 90 }]]);
+  assert.equal(frontier(support, surface, [], new Set(), keyed).surface, 'Port Venn');
+  assert.equal(frontier(support, surface, [], new Set(['port venn']), keyed).surface, 'Mara Quill');
+  assert.equal(frontier(support, surface, [], new Set(['port venn', 'mara quill']), keyed), null);
+});
+
+import { termUnits } from './holodeck-research-null.js';
+// a background with the real shape: many rare words, a few very common ones
+const WIDE = makeBackground([...bgEntries, ...Array.from({ length: 4000 }, (_, i) => ['rareword' + i, 3]), ['valley', 900], ['authority', 1200], ['tennessee', 40], ['pythagorean', 6], ['webgpu', 1], ['sourdough', 2], ['starter', 300], ['start', 4000], ['feed', 500], ['how', 3000], ['do', 5000], ['i', 8000], ['a', 9000]]);
+
+test('words any page can say are not units: "a", "how", "start" measure nothing; named things are units as phrases', () => {
+  const q = 'How do I feed a sourdough starter?';
+  const u = termUnits(q, { bg: WIDE, entities: [] });
+  const flat = u.units.map(x => x.join(' '));
+  assert.ok(flat.includes('sourd'));
+  for (const w of ['how', 'do', 'i', 'a', 'start']) assert.ok(!flat.includes(w), w + ' should not be a unit');
+  const t = termUnits('Tennessee Valley Authority', { bg: WIDE, entities: ['Tennessee Valley Authority'] });
+  assert.deepEqual(t.anchors, [['tenne', 'valle', 'autho']]);
+  assert.ok(t.units.some(x => x.length === 3));
+});
+
+test('FALSIFIER — a math page that says "a" a hundred times does not clear a question about something else', () => {
+  const math = rep('Let a and b be the legs and c the hypotenuse, so that a squared plus b squared equals c squared for a right triangle and any a.', 40);
+  const q = 'How do I feed a sourdough starter?';
+  const { units, anchors } = termUnits(q, { bg: WIDE, entities: [] });
+  const r = relevance(units, math, WIDE, { key: 'm', anchors });
+  assert.equal(r.outside, false);
+});
+
+test('the named thing anchors: a page about the state that never says the agency is not about the agency', () => {
+  const q = 'Tennessee Valley Authority';
+  const { units, anchors } = termUnits(q, { bg: WIDE, entities: [q] });
+  const geo = rep('Tennessee is a state in the southeastern region and the valley of the river is long and the people of Tennessee farm the valley land.', 30);
+  const tva = rep('The Tennessee Valley Authority built the dams and the Tennessee Valley Authority sold power to the people of the valley.', 12) + ' ' + rep('The water was cold and the people came from the city.', 10);
+  assert.equal(relevance(units, geo, WIDE, { key: 'g', anchors }).outside, false);
+  assert.equal(relevance(units, tva, WIDE, { key: 't', anchors }).outside, true);
+});

@@ -23,8 +23,8 @@
 //
 // The only constants are resource ones (how many pages are fetched at once) and the null's DRAWS; they are declared.
 
-import { DRAWS, termsOf, relevance, earnedGain, saturationTest, hash32, stemsOf, proseTest } from './holodeck-research-null.js';
-import { readSource, referentKey } from './holodeck-research-read.js';
+import { DRAWS, termsOf, termUnits, relevance, earnedGain, saturationTest, hash32, stemsOf, proseTest, corpusIndex, phraseKeyness } from './holodeck-research-null.js';
+import { readSource, referentKey, namesIn } from './holodeck-research-read.js';
 
 export const SCHEMA = 'HolodeckResearchRun@1';
 /** Pages fetched at once. A resource limit (each read parses a document in the tab), not a statistical one; it is also
@@ -43,10 +43,14 @@ export function normUrl(u) {
 }
 
 /** The strongest earned referent not yet followed and not already in the question: the next thing worth asking about.
- *  `support`: Map referent -> number of sources; `surface`: Map referent -> a written form. */
-export function frontier(support, surface, questionStems, used) {
+ *  `support`: Map referent -> number of sources; `surface`: Map referent -> a written form. `keyed` (optional): Map
+ *  referent -> { outside, g } — when given, only a name the corpus says beyond what ordinary English would (outside the
+ *  null) is a candidate, and the most keyed comes first. */
+export function frontier(support, surface, questionStems, used, keyed = null) {
   const qs = new Set(questionStems);
-  const list = [...support].filter(([r, n]) => n >= 2 && !used.has(r) && !stemsOf(r).every(s => qs.has(s))).sort((a, b) => b[1] - a[1] || (a[0] < b[0] ? -1 : 1));
+  let list = [...support].filter(([r, n]) => n >= 2 && !used.has(r) && !stemsOf(r).every(s => qs.has(s)));
+  if (keyed) list = list.filter(([r]) => keyed.has(r) && keyed.get(r).outside);
+  list.sort((a, b) => (keyed ? keyed.get(b[0]).g - keyed.get(a[0]).g : 0) || b[1] - a[1] || (a[0] < b[0] ? -1 : 1));
   return list.length ? { referent: list[0][0], surface: surface.get(list[0][0]) || list[0][0], support: list[0][1] } : null;
 }
 
@@ -80,9 +84,11 @@ export async function research(question, deps) {
   const emit = ev => { try { D.emit(ev); } catch (e) {} };
   const aborted = () => !!(D.signal && D.signal.aborted);
   const bg = D.background && D.background.ok ? D.background : null;
-  const terms = termsOf(q, D.isFunction);
   const qStems = stemsOf(q);
-  const rec = { schema: SCHEMA, question: q, startedAt: new Date(D.now()).toISOString(), draws: DRAWS, terms, background: bg ? { tokens: bg.n, vocabulary: bg.v } : null,
+  // the question's named things: capitalised runs that do not merely open the sentence
+  const entities = namesIn(q, null).map(n => n.name);
+  const { units: terms, anchors } = termUnits(q, { isFunction: D.isFunction, bg, entities });
+  const rec = { schema: SCHEMA, question: q, startedAt: new Date(D.now()).toISOString(), draws: DRAWS, terms: terms.map(u => u.join(' ')), anchors: anchors.map(u => u.join(' ')), background: bg ? { tokens: bg.n, vocabulary: bg.v } : null,
     lanes: [], searches: [], candidates: [], sources: [], gaps: [], rounds: [], batches: [], curve: [], stop: null, notAsked: [] };
   const key0 = D.keySalt + '|' + q;
 
@@ -106,7 +112,7 @@ export async function research(question, deps) {
   const gate = c => {
     const text = c.title + ' . ' + c.snippet + ' . ' + c.url.replace(/^https?:\/\//, '').replace(/[\/_\-.?=&%+]+/g, ' ');
     if (!bg || !terms.length) return { ok: false, why: !bg ? 'relevance is not measured (no background)' : 'no content terms' };
-    return relevance(terms, text, bg, { key: key0 + '|' + c.key + '|snippet' });
+    return relevance(terms, text, bg, { key: key0 + '|' + c.key + '|snippet', anchors });
   };
 
   // ── 1. search ───────────────────────────────────────────────────────────────────────────────────────────────────
@@ -168,7 +174,7 @@ export async function research(question, deps) {
       return;
     }
     const text = String(rd.text);
-    const rel = bg && terms.length ? relevance(terms, text, bg, { key: key0 + '|' + c.key + '|text' }) : { ok: false, why: 'not measured' };
+    const rel = bg && terms.length ? relevance(terms, text, bg, { key: key0 + '|' + c.key + '|text', anchors }) : { ok: false, why: 'not measured' };
     c.textRel = rel.ok ? { g: rel.g, nullMax: rel.nullMax, p: rel.p, matched: rel.matched.slice(0, 6), L: rel.L } : { ok: false, why: rel.why };
     if (rel.ok && !rel.outside) {
       c.state = 'off-topic'; c.why = 'read (' + rel.L.toLocaleString() + ' words) but it is not about the question: ' + rel.g + ' against the null’s highest ' + rel.nullMax;
@@ -232,6 +238,14 @@ export async function research(question, deps) {
   // ── rounds ──────────────────────────────────────────────────────────────────────────────────────────────────────
   const baseQueries = [...new Set([q, ...(D.queriesFor(q) || [])].map(clean).filter(Boolean))];
   let stop = null;
+  // earned names the corpus says beyond ordinary English (computed only when a name is about to be followed)
+  const keyedNames = () => {
+    if (!bg) return null;
+    const earned = [...support].filter(([, n]) => n >= 2).map(([r]) => r);
+    if (!earned.length) return new Map();
+    const idx = corpusIndex([...cands.values()].filter(c => c.state === 'kept').map(c => c.text));
+    return new Map(earned.map(r => { const k = phraseKeyness(surface.get(r) || r, idx, bg, { key: key0 }); return [r, k.ok ? k : { outside: false, g: 0 }]; }));
+  };
   rec.rounds.push({ round: 0, kind: 'asked', scopes: [...routed.scopes], queries: baseQueries });
   emit({ t: 'round', round: 0, kind: 'asked', scopes: routed.scopes, queries: baseQueries });
   await searchRound(routed.scopes, baseQueries, 0);
@@ -249,7 +263,7 @@ export async function research(question, deps) {
     let scopes, queries, kind, why = '';
     if (widen.length) { scopes = widen; queries = baseQueries; kind = 'widened'; why = [...cands.values()].some(c => c.state === 'kept') ? 'the corpus was still learning when the routed lanes ran out' : 'nothing could be kept from the routed lanes, so it looked in the ones the router had held back'; for (const s of widen) rec.lanes.push({ scope: s, why: (pr.why && pr.why[s]) || 'held back by the router; reached for because the corpus was still learning', round }); }
     else {
-      const f = frontier(support, surface, qStems, followed);
+      const f = frontier(support, surface, qStems, followed, keyedNames());
       if (!f) { stop = 'candidates-exhausted'; break; }
       followed.add(f.referent);
       const productive = [...laneTally].filter(([, v]) => v.kept > 0).map(([s]) => s);
@@ -263,7 +277,7 @@ export async function research(question, deps) {
     webHits = webHits.concat(fresh.filter(c => c.found.some(f => f.scope === 'web')).map(c => ({ url: c.url, title: c.title })));
     const admitted = fresh.filter(c => c.verdict === 'admitted').length;
     // following a name that surfaced nothing new to read ends the search: there is no further direction the corpus itself points
-    if (!admitted && kind === 'followed') { stop = 'candidates-exhausted'; break; }
+    if (!admitted && kind === 'followed') { stop = 'candidates-exhausted'; break; }   // a followed name that surfaces nothing clearing the null ends the search
     stop = await drain();
   }
   if (aborted()) stop = 'aborted';
