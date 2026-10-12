@@ -4072,6 +4072,11 @@ const PDF_MAX_PAGES = 300;
 function idbOpen() { return new Promise((res, rej) => { const r = indexedDB.open('fold-explorer', 2); r.onupgradeneeded = () => { const db = r.result; if (!db.objectStoreNames.contains('blobs')) db.createObjectStore('blobs'); }; r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); }); }
 async function idbPut(k, v) { const db = await idbOpen(); return new Promise((res, rej) => { const tx = db.transaction('blobs', 'readwrite'); tx.objectStore('blobs').put(v, k); tx.oncomplete = () => res(); tx.onerror = () => rej(tx.error); }); }
 async function idbGet(k) { const db = await idbOpen(); return new Promise((res, rej) => { const q = db.transaction('blobs', 'readonly').objectStore('blobs').get(k); q.onsuccess = () => res(q.result); q.onerror = () => rej(q.error); }); }
+// A recording's bytes live in OPFS (durable, ample quota) with the IndexedDB blob
+// as the fast path. Transcription and playback read whichever rung actually holds
+// them — the IDB write is best-effort and can fail silently (quota), so the OPFS
+// copy is what guarantees the audio is still there to be transcribed.
+async function mediaBytes(id) { try { const b = await idbGet('media:' + id); if (b) return b; } catch (e) {} return opfsRead('media/' + id); }
 // Content is kept small and binary: a corpus too big for localStorage is gzipped
 // into IndexedDB (binary), and localStorage holds only a pointer. Always through
 // the async store, never the raw tree in a string, so the workspace quota holds.
@@ -5507,13 +5512,13 @@ class Component extends DCLogic {
   async transcribeCard(d) {
     this.setState({ view: 'reader', readDoc: d.id, sel: { type: 'doc', id: d.id }, txAsk: d.id });
     if (d.media && d.media.kind === 'youtube') { this.toast('YouTube audio isn’t stored in this browser — in the reader, choose the file you downloaded and it is transcribed here.'); return; }
-    const buf = await idbGet('media:' + d.id).catch(() => null);
+    const buf = await mediaBytes(d.id);
     if (!buf) { this.toast('The recording’s audio isn’t kept in this browser — transcribe it in the reader.'); return; }
     this.transcribeLocal(d);
   }
   async transcribeLocal(d0) {
     const A = this.analysis(); const prior = this.state.txPrior || 'workspace';
-    const buf = await idbGet('media:' + d0.id).catch(() => null);
+    const buf = await mediaBytes(d0.id);
     if (!buf) {
       this.txDone();
       if (d0.media && d0.media.kind === 'youtube') { this.setState({ view: 'reader', readDoc: d0.id, txAsk: d0.id, note: '' }); this.toast('YouTube audio isn’t stored in this browser — in the reader, choose the file you downloaded and it is transcribed here.'); return; }
@@ -5613,7 +5618,7 @@ class Component extends DCLogic {
         let bmp = null;
         const du = (this._html && this._html['img:' + id]) || (typeof HD_PENDING_IMG !== 'undefined' && HD_PENDING_IMG['img:' + d.title]);
         if (du) { const blob = await (await fetch(du)).blob(); bmp = await createImageBitmap(blob).catch(() => null); }
-        if (!bmp) { const buf = await idbGet('media:' + id).catch(() => null); if (buf) bmp = await createImageBitmap(new Blob([buf])).catch(() => null); }
+        if (!bmp) { const buf = await mediaBytes(id); if (buf) bmp = await createImageBitmap(new Blob([buf])).catch(() => null); }
         if (!bmp) throw new Error('this image’s bytes aren’t stored in this browser');
         const read = await hdImageReading(bmp, d.title); text = read.text || read.raw || '';
       }
@@ -5658,7 +5663,7 @@ class Component extends DCLogic {
   async ensureMediaUrl(d) {
     if (!d || !d.media || d.media.kind !== 'local' || (this._mediaUrl || {})[d.id] !== undefined) return;
     this._mediaUrl = this._mediaUrl || {};
-    const buf = await idbGet('media:' + d.id).catch(() => null);
+    const buf = await mediaBytes(d.id);
     this._mediaUrl[d.id] = buf ? URL.createObjectURL(new Blob([buf], { type: d.media.mime || 'application/octet-stream' })) : null;
     this.setState({});
   }
@@ -7168,7 +7173,7 @@ class Component extends DCLogic {
     // with no readable text still stays uncounted — isLiveDoc, below — so a blocked link is not counted either.)
     nd.forEach(d => { d.status = 'source'; });
     if (!(T.focus instanceof Set)) T.focus = new Set(T.focus || []); nd.forEach(d => T.focus.add(d.id)); nd.forEach(d => hdT('store', 'mint', 'Stored \u201c' + hdCut(d.title, 60) + '\u201d as ' + d.id + (list[nd.indexOf(d)].html ? ' \u00b7 full page kept; ' + d.text.length.toLocaleString() + ' characters indexed for search' + (d.text.length >= 60000 ? ' (the cap; the reading below uses the whole page)' : '') : ' \u00b7 ' + d.text.length.toLocaleString() + ' characters kept'), { doc: d.id }));
-    nd.forEach((d, i) => { const x = list[i]; if (x.html) { this._html[d.id] = x.html; idbPut('html:' + d.id, x.html).catch(() => {}); } if (x.pdf) idbPut('pdf:' + d.id, x.pdf).catch(() => {}); if (x.ocr) idbPut('ocr:' + d.id, x.ocr).catch(() => {}); if (x.eyesDetail) idbPut('eyes:' + d.id, x.eyesDetail).catch(() => {}); if (x.buf) idbPut('media:' + d.id, x.buf).catch(() => {}); if (d.hasImg && HD_PENDING_IMG['img:' + d.title]) { const u = HD_PENDING_IMG['img:' + d.title]; this._html['img:' + d.id] = u; idbPut('img:' + d.id, u).catch(() => {}); delete HD_PENDING_IMG['img:' + d.title]; } });
+    nd.forEach((d, i) => { const x = list[i]; if (x.html) { this._html[d.id] = x.html; idbPut('html:' + d.id, x.html).catch(() => {}); } if (x.pdf) idbPut('pdf:' + d.id, x.pdf).catch(() => {}); if (x.ocr) idbPut('ocr:' + d.id, x.ocr).catch(() => {}); if (x.eyesDetail) idbPut('eyes:' + d.id, x.eyesDetail).catch(() => {}); if (x.buf) { idbPut('media:' + d.id, x.buf).catch(() => {}); opfsWrite('media/' + d.id, x.buf); } if (d.hasImg && HD_PENDING_IMG['img:' + d.title]) { const u = HD_PENDING_IMG['img:' + d.title]; this._html['img:' + d.id] = u; idbPut('img:' + d.id, u).catch(() => {}); delete HD_PENDING_IMG['img:' + d.title]; } });
     // Store first, then paint: each source lands in the workspace (and its bytes in IndexedDB) before the read and
     // the fold, so Sources fills in as the files arrive instead of freezing until the whole batch is done.
     const added = { ...this.state.added, [id]: [...(this.state.added[id] || []), ...nd] };

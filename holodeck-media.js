@@ -67,7 +67,7 @@ export async function readImage(file, bytes, tr = noop) {
 export async function readSound(file, bytes, tr = noop, kind = 'Audio') {
   const title = file.name.replace(/\.[^.]+$/, '');
   let ab; try { const AC = window.OfflineAudioContext || window.webkitOfflineAudioContext; const ctx = new AC(1, 1, 44100); ab = await ctx.decodeAudioData(bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength)); }
-  catch (e) { tr('decode', 'fail', 'The browser could not decode a sound track (' + (e && e.message || 'unsupported codec') + ')'); return { type: kind, text: '', note: title + ' has no sound track this browser can decode, so it is listed but nothing in it can be linked.' }; }
+  catch (e) { tr('decode', 'fail', 'The browser could not decode a sound track (' + (e && e.message || 'unsupported codec') + ')'); return { type: kind, text: '', buf: bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength), media: { kind: 'local' }, extra: { media: { kind: 'local', mime: file.type || '', size: bytes.byteLength }, kind: 'Recording', medium: kind, transcribed: false }, note: title + ' has no sound track this browser can decode, so it is listed but nothing in it can be linked.' }; }
   const sr = ab.sampleRate, ch = ab.numberOfChannels, dur = ab.duration; tr('decode', 'audio', 'Decoded ' + mmss(dur) + ' of sound, ' + ch + ' channel' + (ch > 1 ? 's' : '') + ' at ' + sr + ' Hz', { dur, sr, ch });
   const d = ab.getChannelData(0), win = Math.max(1, Math.floor(sr / 4)), n = Math.floor(d.length / win), rms = new Float32Array(n); let peak = 0;
   for (let i = 0; i < n; i++) { let s = 0; for (let j = i * win; j < (i + 1) * win; j++) { const v = d[j]; s += v * v; if (Math.abs(v) > peak) peak = Math.abs(v); } rms[i] = Math.sqrt(s / win); }
@@ -89,7 +89,7 @@ export async function readSound(file, bytes, tr = noop, kind = 'Audio') {
     steady ? 'Its level is steady from start to end, with no silences.' : S.length ? 'It has ' + S.length + ' sounding section' + (S.length === 1 ? '' : 's') + ' separated by silence.' : 'It has no silence long enough to divide it into sections.',
     ...S.map(s => 'Section ' + s.i + ' is heard from ' + mmss(s.from) + ' to ' + mmss(s.to) + ' at an average level of ' + db(s.level) + ' decibels' + (s === loudest ? ', the loudest section' : '') + '.'),
   ];
-  return { type: kind, measured: true, format: 'html', html: para(lines), note: title + ' is ' + (kind === 'Video' ? 'a video; its sound track' : 'a sound file; it') + ' was measured for length, loudness and silences. No speech was transcribed.' };
+  return { type: kind, measured: true, format: 'html', html: para(lines), buf: bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength), media: { kind: 'local', dur: dur, sr: sr, ch: ch }, extra: { media: { kind: 'local', mime: file.type || '', size: bytes.byteLength, dur: dur, sr: sr, ch: ch }, kind: 'Recording', medium: kind, transcribed: false }, note: title + ' is ' + (kind === 'Video' ? 'a video; its sound track' : 'a sound file; it') + ' was measured for length, loudness and silences. No speech was transcribed.' };
 }
 
 // ---------- MIDI ----------
