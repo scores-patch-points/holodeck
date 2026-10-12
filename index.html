@@ -2698,6 +2698,8 @@ button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visi
         <div style="display:flex;justify-content:space-between;align-items:center"><h2 style="margin:0;font:500 24px var(--serif)">Settings</h2><button onClick="{{ closeSettings }}" style="background:none;border:0;color:var(--mut);cursor:pointer;font-size:16px">✕</button></div>
           <section style="background:var(--s1);border:1px solid var(--line);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:10px">
             <span style="font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mut)">Account &amp; sync</span>
+            <button onClick="{{ ing.onShareRepo }}" style="align-self:flex-start;background:var(--acc2);border:0;color:#fff;border-radius:8px;padding:7px 16px;cursor:pointer;font:600 14px var(--sans)">Share this repo — encrypted…</button>
+            <span style="font:400 13px/1.45 var(--sans);color:var(--mut);text-wrap:pretty">Invite people to read or edit this workspace through encrypted Matrix rooms. The server cannot read the content; it can see who is a member and when.</span>
             <sc-if value="{{ ing.notSignedIn }}" hint-placeholder-val="{{ true }}">
               <span style="font:400 14px/1.5 var(--sans);color:var(--mut)">Your work stays in this browser until you sign in. Sign in with your own Matrix account to sync it and share it.</span>
               <div style="display:flex;gap:8px;flex-wrap:wrap">
@@ -5578,7 +5580,9 @@ class Component extends DCLogic {
   setNetCfg(p) { const c = { ...this.netCfg(), ...p }; try { localStorage.setItem('fold-net-cfg', JSON.stringify(c)); } catch (e) {} this.forceUpdate(); }
   ilog(msg, kind) { const L = (this._ilog = this._ilog || []); L.unshift({ t: new Date().toLocaleTimeString(), msg, kind: kind || 'info' }); if (L.length > 60) L.length = 60; this.forceUpdate(); }
   async netDo(label, fn) { this.setState({ netBusy: label }); try { return await fn(await this.net()); } catch (e) { this.ilog(label + ' failed: ' + (e.message || e), 'bad'); } finally { this.setState({ netBusy: '' }); } }
+  openShareRepo(code) { import(new URL('holodeck-share-panel.js', location.href).href).then(M => M.openSharePanel({ corpusId: () => this.corpusId(), corpusName: () => this.corpusName(), wsRooms: () => this.wsRooms(), analysis: () => this.analysis(), redeemCode: code || null })).catch(e => this.ilog('Share panel could not open: ' + ((e && e.message) || e), 'bad')); }
   async netInit() { if (this._netInit) return; this._netInit = true; const N = await this.net();
+    if (/#join=/.test(location.hash)) { const c = (location.hash.match(/join=([a-z0-9]{5})/i) || [])[1]; history.replaceState(null, '', location.pathname + location.search); this.openShareRepo(c); }
     if (/fx-share=/.test(location.hash)) { try { const r = await N.consumeShare(); if (r) { this.setWsRooms({ priv: r.rooms[0] || null, pub: r.rooms[1] || this.wsRooms().pub || null }); this._net = { ...(this._net || {}), s: r.pending || r.s, shareTemp: r.pending ? r.s : null }; this.toast('Opened a workspace shared by ' + (r.from || 'someone')); if (!r.pending) { try { const d = await N.loadPrivate(r.s, r.rooms[0], 'work'); if (d && d.pins) this.savePins(d.pins); } catch (e) {} } } } catch (e) { this.ilog('Shared link could not be opened: ' + e.message, 'bad'); } }
     if (/fx-mail=/.test(location.hash)) this.consumeEmailShare();
     const s = (this._net && this._net.s) || N.loadSession(); this._net = { ...(this._net || {}), s }; const R = this.wsRooms(); if (s && R.pub) { this.refreshRoom().catch(() => {}); } this.forceUpdate(); }
@@ -6605,7 +6609,7 @@ class Component extends DCLogic {
       onShare: () => this.makeShare(), share: n.share || '', hasShare: !!n.share, server: cfg.server || 'hyphae.social',
       onShareEmail: e => { this._shareEmail = e.target.value; }, onShareMail: () => this.mailShare(this._shareEmail), shareMailLabel: (n.mailBusy ? 'Sending…' : 'Send invite'), mailBusy: !!n.mailBusy, hasMailShare: !!this._mailShareNote, mailShareNote: this._mailShareNote || '',
       onServer: e => this.setNetCfg({ server: e.target.value.trim() }), onUser: e => { this._mxU = e.target.value; }, onPass: e => { this._mxP = e.target.value; },
-      onLogin: () => this.openLogin(), onGuest: () => this.doGuest(), onLogout: () => this.signOut(),
+      onLogin: () => this.openLogin(), onGuest: () => this.doGuest(), onLogout: () => this.signOut(), onShareRepo: () => this.openShareRepo(),
       hasPub: !!R.pub, noPub: !R.pub, pub: R.pub || '', onCreatePub: () => this.createPublic(), onJoinAlias: e => { this._mxA = e.target.value; }, onJoin: () => this._mxA && this.joinPublic(this._mxA),
       hasPriv: !!R.priv, noPriv: !R.priv, priv: R.priv || '', onCreatePriv: () => this.createPrivate(), onInviteId: e => { this._mxI = e.target.value; }, onInvite: () => this._mxI && this.invitePriv(this._mxI), onLoadPriv: () => this.loadPrivateWork(), privAt: n.privAt ? 'Last synced ' + n.privAt : 'Syncs pins, drafts, filters and reading history a few seconds after each change.',
       hd: this._hd || {}, hasHd: !!(this._hd && this._hd.link), hdLink: (this._hd && this._hd.link) || '', hdNote: (this._hd && this._hd.note) || '', hdBusy: S.netBusy === 'Heimdall invite' || S.netBusy === 'Record code', onHdMint: () => this.heimdallMint(), onHdCopy: () => this.heimdallCopy(), onHdCode: e => { this._hdCode = e.target.value; }, onHdRecord: () => this.heimdallRecord(),

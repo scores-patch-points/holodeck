@@ -538,6 +538,40 @@ test('an attachment is encrypted before upload: the server holds ciphertext, the
   assert.equal(sealed.upload, undefined, 'the sealed transport has no raw upload');
 });
 
+// ---------------------------------------------------------------- batching and large bodies
+
+test('batch: many operators travel in few sealed events, each still gated by its own sender', async () => {
+  const w = world();
+  const repo = await w.S.owner.createRepo({ title: 't' });
+  const j = await join(w, 'alice', repo, { role: 'editor' });
+  const jb = await join(w, 'bob', repo, { role: 'reader' });
+  const entries = [];
+  for (let i = 0; i < 60; i++) { entries.push({ op: 'ins', content: ins('st:' + i, 'Statements') }); entries.push({ op: 'def', content: def('st:' + i, 'body', 'statement number ' + i + ' '.repeat(80)) }); }
+  const r = await w.S.alice.writeBatch(j.repo, entries, { limit: 4000 });
+  assert.equal(r.ops, 120);
+  assert.ok(r.events > 1 && r.events < 120, `fewer events than operators (${r.events})`);
+  const st = await w.S.owner.readState(repo, { fold });
+  assert.equal(Object.keys(st.state.entities).length, 60);
+  assert.equal(st.state.entities['st:7']._sender, U.alice, 'the nested operators carry the real sender');
+  // a reader who smuggles operators inside a batch event is refused op by op, in the fold
+  const raw = { v: 1, ops: [{ op: 'ins', content: ins('evil:1', 'Statements') }] };
+  await w.mxs.owner.sendEvent(repo.rooms.records, 'io.holodeck.batch', raw);     // the owner's, fine
+  await assert.rejects(() => w.S.bob.writeBatch(jb.repo, [{ op: 'ins', content: ins('b:1', 'Statements') }]), (e) => e.code === REFUSE.ReaderCannotWrite);
+  assert.equal(w.server.scan('statement number'), 0, 'batched content is sealed like any other');
+});
+
+test('large bodies: a big source text is hoisted into an encrypted attachment and comes back whole', async () => {
+  const w = world();
+  const repo = await w.S.owner.createRepo({ title: 't' });
+  const big = ('lorem ' + CANARY + ' ').repeat(4000);
+  await w.S.owner.write(repo, 'ins', ins('src:big', 'Sources', { title: 'big' }));
+  await w.S.owner.write(repo, 'def', def('src:big', 'text', big));
+  assert.equal(w.server.scan(CANARY), 0, 'neither the event nor the media store holds the body in the clear');
+  assert.ok(w.server.media.size >= 1, 'it went through the attachment path');
+  const st = await w.S.owner.readState(repo, { fold });
+  assert.equal(st.state.entities['src:big'].text, big);
+});
+
 // ---------------------------------------------------------------- history, devices
 
 test('F8 — "can read past" is claimed only when it is real, and what the invitee reads matches the claim', async () => {

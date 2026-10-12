@@ -198,9 +198,16 @@ export async function connect({
       return { historySharing: hasApi, ownDeviceCrossSigned: cross };
     },
 
+    // Straight from the server, every time. client.getAccountDataFromServer() answers from the LOCAL
+    // store once the first sync is done, and that store can lag a write made moments (or a reload) ago —
+    // a read-modify-write registry must never start from a stale or empty read.
     async getAccountData(type) {
-      try { return (await client.getAccountDataFromServer(type)) || null; }
-      catch (e) { if (e && (e.errcode === 'M_NOT_FOUND' || e.httpStatus === 404)) return null; throw e; }   // any other failure THROWS
+      try {
+        return await client.http.authedRequest('GET', `/user/${encodeURIComponent(userId)}/account_data/${encodeURIComponent(type)}`);
+      } catch (e) {
+        if (e && (e.errcode === 'M_NOT_FOUND' || e.httpStatus === 404 || (e.data && e.data.errcode === 'M_NOT_FOUND'))) return null;
+        throw e;                                          // any other failure THROWS: never write back from a failed read
+      }
     },
     async setAccountData(type, c) { await client.setAccountData(type, c); },
 

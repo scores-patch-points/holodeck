@@ -1,0 +1,22 @@
+{
+ "built": "2026-10-12T14:23:04.936Z",
+ "toolchain": {
+  "vite": "6.4.2",
+  "wasmPlugin": "3.6.0",
+  "topLevelAwait": "1.6.0"
+ },
+ "matrixJsSdk": "41.5.0",
+ "cryptoWasm": "18.3.0",
+ "inputs": {
+  "vendor/eodb/src/media.js": "0129c45588e88b401dbffd62978f8d31a7dd6c7797123873d70729cff0983910",
+  "tools/matrix-sdk-entry.js": "596770a1be326edadf925acf34eaf965e472ddab5fc7d97b57b9c691af5a0ccb"
+ },
+ "shims": [
+  "tools/matrix-sdk-shims/client.js",
+  "tools/matrix-sdk-shims/vault.js"
+ ],
+ "note": "eodb's media.js is bundled with ./client.js and ./vault.js resolved to inert shims; eodb's client.js (global IDBFactory patch, password vault) is not in this bundle.",
+ "outputs": {
+  "matrix-sdk.js": "89200e2aeaebc34695be578b3c08c3c1f70227a220b4c219b52ae1714c8353bb"
+ }
+}

@@ -202,6 +202,15 @@ export function foldRepo({ dataEvents, ledgerEvents, owner, fold, ns = NS_DEFAUL
   return { state, ledger, refused: g.refused.concat(ledger.refused), accepted: g.accepted.length };
 }
 
+/** Same path, with an async step between the gate and the fold (resolving attachment references for accepted events only). */
+export async function foldRepoAsync({ dataEvents, ledgerEvents, owner, fold, ns = NS_DEFAULT, transform = null }) {
+  const ledger = ledgerFromEvents(ledgerEvents, { owner });
+  const g = gate(dataEvents, ledger, { ns });
+  const events = transform ? await transform(g.accepted) : g.accepted;
+  const state = fold(events);
+  return { state, ledger, refused: g.refused.concat(ledger.refused), accepted: g.accepted.length };
+}
+
 /**
  * Defence in depth: after a fold, every entity's recorded sender must have been
  * able to write. A non-empty result means something reached `fold` without the gate.

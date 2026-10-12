@@ -28,8 +28,8 @@
 //   upload(bytes,{type,name}) -> mxc              (only reachable through sealAttachment)
 
 import { shortCode, SHORT_ALPHABET, INVITE_TTL_MS, sha256Hex } from './holodeck-heimdall.js';
-import { MEGOLM, REPO_MARKER, SealRefusal, REFUSAL, sealTransport, assertEncrypted } from './holodeck-seal.js';
-import { ROLE, POWER, LEDGER, WRITE_OPS, powerLevelsFor, foldRepo, ledgerFromEvents, roleAt, trustedDevices } from './holodeck-roles.js';
+import { MEGOLM, REPO_MARKER, SealRefusal, REFUSAL, sealTransport, assertEncrypted, sealAttachment } from './holodeck-seal.js';
+import { ROLE, POWER, LEDGER, WRITE_OPS, powerLevelsFor, foldRepoAsync, ledgerFromEvents, roleAt, trustedDevices } from './holodeck-roles.js';
 
 export { INVITE_TTL_MS, SHORT_ALPHABET };
 export const NS = 'io.holodeck';
@@ -44,6 +44,11 @@ export const EVT = Object.freeze({
   device: LEDGER.device,
 });
 export const DOOR_MARKER = 'io.holodeck.repo.door';
+export const BATCH = 'io.holodeck.batch';
+// A Matrix event is capped at 64 KiB on the wire; this is eodb's own working size for content
+// after large fields are hoisted into encrypted attachments (media.js CONTENT_SIZE_LIMIT).
+export const CONTENT_LIMIT = 24 * 1024;
+export const HOIST_LIMIT = 16 * 1024;
 export const REGISTRY = Object.freeze({ invites: 'io.holodeck.invites', repos: 'io.holodeck.repos' });
 export const STORES = Object.freeze(['sources', 'records', 'log']);
 
@@ -583,26 +588,101 @@ export function makeShare({ mx, attach = null, now = () => Date.now(), onRefuse 
   }
 
   // -------------------------------------------------------------- data
-  async function write(repo, op, content, { store = null } = {}) {
-    if (!WRITE_OPS.includes(op)) throw refuse('not-a-stored-operator', `${op} is not a stored operator`, { op });
+  const storeOfOp = (op, c, store) => store || (op === 'ins' ? storeFor(c.entity_type) : (typeof c.anchor === 'string' && c.anchor.startsWith('src:') ? 'sources' : 'records'));
+
+  async function canWrite(repo) {
     await syncTrust(repo);
     const led = await ledgerOf(repo);
     const role = roleAt(led, mx.userId, now()) || repo.role;
     if (role !== ROLE.owner && role !== ROLE.editor) {
       throw refuse(REFUSE.ReaderCannotWrite, 'readers can read but cannot change anything in this repo', { role });
     }
-    const c = content || {};
-    const into = store || (op === 'ins' ? storeFor(c.entity_type) : (typeof c.anchor === 'string' && c.anchor.startsWith('src:') ? 'sources' : 'records'));
-    return sealed.sendEvent(repo.rooms[into], `${ns}.${op}`, c);
+    return role;
   }
 
-  /** ledger → gate → fold over what this device can read; undecryptable items are counted, not hidden. */
+  /** Large string fields travel as encrypted attachments; the reference rides in the sealed event. */
+  async function hoist(c) {
+    const out = { ...c };
+    const big = (v) => typeof v === 'string' && v.length >= HOIST_LIMIT;
+    if (big(out.value)) out.value = await sealAttachment({ mx, attach }, new TextEncoder().encode(out.value), { mime: 'text/plain', name: 'value.txt' });
+    if (out.payload && typeof out.payload === 'object') {
+      const p = { ...out.payload };
+      for (const [k, v] of Object.entries(p)) if (big(v)) p[k] = await sealAttachment({ mx, attach }, new TextEncoder().encode(v), { mime: 'text/plain', name: k + '.txt' });
+      out.payload = p;
+    }
+    return out;
+  }
+  async function unhoistValue(v) {
+    if (v && typeof v === 'object' && v.__media === 2 && v.mxc && v.file && attach && attach.decrypt) {
+      const bytes = await mx.download(v.mxc);
+      return new TextDecoder().decode(await attach.decrypt(bytes, v.file));
+    }
+    return v;
+  }
+  async function unhoist(c) {
+    const out = { ...c };
+    out.value = await unhoistValue(out.value);
+    if (out.payload && typeof out.payload === 'object') {
+      const p = { ...out.payload };
+      for (const [k, v] of Object.entries(p)) p[k] = await unhoistValue(v);
+      out.payload = p;
+    }
+    return out;
+  }
+
+  async function write(repo, op, content, { store = null } = {}) {
+    if (!WRITE_OPS.includes(op)) throw refuse('not-a-stored-operator', `${op} is not a stored operator`, { op });
+    await canWrite(repo);
+    const c = await hoist(content || {});
+    return sealed.sendEvent(repo.rooms[storeOfOp(op, c, store)], `${ns}.${op}`, c);
+  }
+
+  /**
+   * Write many operators in few events: ops are grouped per store into batch events no larger
+   * than CONTENT_LIMIT. The fold sees them as the individual operators they are, each gated by
+   * its own sender (a batch is a transport, not a way around the gate).
+   *   entries: [{ op, content }]   returns { events, ops, stores }
+   */
+  async function writeBatch(repo, entries, { limit = CONTENT_LIMIT } = {}) {
+    await canWrite(repo);
+    const groups = new Map();
+    for (const e of entries) {
+      if (!WRITE_OPS.includes(e.op)) throw refuse('not-a-stored-operator', `${e.op} is not a stored operator`, { op: e.op });
+      const c = await hoist(e.content || {});
+      const st = storeOfOp(e.op, c, e.store || null);
+      (groups.get(st) || groups.set(st, []).get(st)).push({ op: e.op, content: c });
+    }
+    let events = 0;
+    for (const [st, list] of groups) {
+      let cur = [], size = 0;
+      const flush = async () => { if (!cur.length) return; await sealed.sendEvent(repo.rooms[st], BATCH, { v: 1, ops: cur }); events++; cur = []; size = 0; };
+      for (const o of list) {
+        const n = JSON.stringify(o).length;
+        if (cur.length && size + n > limit) await flush();
+        cur.push(o); size += n;
+      }
+      await flush();
+    }
+    return { events, ops: entries.length, stores: [...groups.keys()] };
+  }
+
+  const expandBatch = (e) => {
+    if (e.type !== BATCH || !e.decrypted) return [e];
+    const ops = Array.isArray(e.content && e.content.ops) ? e.content.ops : [];
+    return ops.filter((o) => o && WRITE_OPS.includes(o.op)).map((o, i) => ({ ...e, type: `${ns}.${o.op}`, content: o.content, event_id: `${e.event_id}#${i}` }));
+  };
+
+  /** ledger → gate → resolve attachments → fold, over what this device can read; undecryptable items are counted, not hidden. */
   async function readState(repo, { fold }) {
     const asEvent = (e) => (e.decrypted ? e : { type: 'm.room.encrypted', sender: e.sender, origin_server_ts: e.origin_server_ts, event_id: e.event_id, content: {} });
+    await syncTrust(repo).catch(() => null);
     const data = [];
-    for (const s of ['sources', 'records']) for (const e of await mx.readEvents(repo.rooms[s])) data.push(asEvent(e));
+    for (const s of ['sources', 'records']) for (const e of await mx.readEvents(repo.rooms[s])) for (const x of expandBatch(e)) data.push(asEvent(x));
     const ledger = [...seedEvents(repo), ...(await mx.readEvents(repo.rooms.log)).filter((e) => e.decrypted)];
-    return foldRepo({ dataEvents: data, ledgerEvents: ledger, owner: repo.owner, fold, ns });
+    return foldRepoAsync({
+      dataEvents: data, ledgerEvents: ledger, owner: repo.owner, fold, ns,
+      transform: async (evs) => { const out = []; for (const e of evs) out.push(e.content && (e.content.value || e.content.payload) ? { ...e, content: await unhoist(e.content) } : e); return out; },
+    });
   }
 
   return {
@@ -611,7 +691,7 @@ export function makeShare({ mx, attach = null, now = () => Date.now(), onRefuse 
     mintInvite, listInvites, pendingRequests, confirm, revoke, reject, closeDoor,
     redeem, acceptGrant,
     people, setRole, removeMember, leave, sweepDoors, trustOwner, syncTrust, confirmDevice,
-    write, readState, ledgerOf,
+    write, writeBatch, readState, ledgerOf,
   };
 }
 

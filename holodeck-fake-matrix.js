@@ -308,4 +308,10 @@ export const fakeAttach = {
     const digest = new Uint8Array(await crypto.subtle.digest('SHA-256', data));
     return { data, info: { v: 'v2', key: { kty: 'oct', alg: 'A256CTR', ext: true, k: b64(key), key_ops: ['encrypt', 'decrypt'] }, iv: b64(iv), hashes: { sha256: b64(digest) } } };
   },
+  async decrypt(data, info) {
+    const digest = new Uint8Array(await crypto.subtle.digest('SHA-256', data));
+    if (b64(digest) !== info.hashes.sha256) throw new Error('Hash mismatch — corrupt or tampered attachment');
+    const k = await crypto.subtle.importKey('raw', unb64(info.key.k), 'AES-CTR', false, ['decrypt']);
+    return new Uint8Array(await crypto.subtle.decrypt({ name: 'AES-CTR', counter: unb64(info.iv), length: 64 }, k, data));
+  },
 };
