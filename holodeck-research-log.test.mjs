@@ -15,9 +15,9 @@ const page = (extra = '') => rep('The Zorblatt lighthouse at Port Venn was kept 
 
 async function aRun() {
   const pages = {
-    'https://a.example/z1': { title: 'Zorblatt lighthouse 1', text: page() },
-    'https://a.example/z2': { title: 'Zorblatt lighthouse 2', text: page() },
-    'https://a.example/z3': { title: 'Zorblatt lighthouse 3', text: page() },
+    'https://a.example/z1': { title: 'Zorblatt lighthouse 1', text: page('Ivo Harlow signed the register at Kessel Bay in the winter, and Teodora Finch mapped the reef beyond Cape Orrin.') },
+    'https://a.example/z2': { title: 'Zorblatt lighthouse 2', text: page('Ruth Okafor repaired the lens at Dunmore Quay while Silas Brandt kept the fog signal beside Hollis Rock.') },
+    'https://a.example/z3': { title: 'Zorblatt lighthouse 3', text: page('Anselm Vogt surveyed the headland near Marrow Sound and Perpetua Lund recorded the storms of Aldous Point.') },
     'https://b.example/bread': { title: 'Sourdough bread', text: rep('Mix flour and water and let the dough rest for a long time in a warm place.', 8) },
     'https://js.example/app': { title: 'Zorblatt lighthouse app', snippet: 'Zorblatt lighthouse history of the Zorblatt keepers', text: '', bad: 'no text without scripts' },
   };
@@ -57,7 +57,7 @@ test('the stop row carries the reason in words and the numbers behind it', async
   assert.equal(stop.line, run.stop.detail);
   const batch = log.rows().filter(r => r.key.startsWith('batch:'));
   assert.ok(batch.length >= 1);
-  assert.ok(batch.some(b => /by chance|nothing to compare/.test(b.title)));
+  assert.ok(batch.some(b => /newly confirmed/.test(b.title)));
 });
 
 test('a page that could not be read says why, in the row', async () => {

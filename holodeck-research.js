@@ -13,16 +13,17 @@
 //               Turned-away candidates are listed with the numbers, never dropped silently.
 //   3. READ     in order of that evidence, a few at a time. A page that cannot be read is a typed gap with the lanes
 //               that were tried; a page that was read but is not about the question is a typed refusal.
-//   4. STOP     after each batch: did it carry referents across the earned line (two independent sources) beyond
-//               what re-sampling the corpus would? Outside the null -> keep reading; inside -> the corpus has
-//               stopped learning, stop. When the gated pool runs out while still learning, widen to the lanes the
-//               router held back, then follow the strongest earned referent. No page cap, no source count.
+//   4. STOP     after each batch: is another source still expected to bring even one name or word nobody in the
+//               corpus has said (Good–Turing, leave-one-out)? Yes → keep reading; no → saturated, stop. When the
+//               relevance-cleared pool runs out first, widen to the lanes the router held back, then follow the
+//               strongest earned referent; a followed name that surfaces nothing that clears the null ends it.
+//               No page cap, no source count.
 //   5. RECORD   one HolodeckResearchRun@1: lanes, searches, every candidate with its verdict, every source with its
 //               text hash and the lane that read it, the null numbers behind every decision, and the typed gaps.
 //
 // The only constants are resource ones (how many pages are fetched at once) and the null's DRAWS; they are declared.
 
-import { DRAWS, termsOf, relevance, earnedGainTest, hash32, stemsOf, proseTest } from './holodeck-research-null.js';
+import { DRAWS, termsOf, relevance, earnedGain, saturationTest, hash32, stemsOf, proseTest } from './holodeck-research-null.js';
 import { readSource, referentKey } from './holodeck-research-read.js';
 
 export const SCHEMA = 'HolodeckResearchRun@1';
@@ -208,17 +209,22 @@ export async function research(question, deps) {
         for (const f of c.found) tally(f.scope).kept++;
       }
       if (!kept.length) { emit({ t: 'batch', n: batchNo, round, sources: batch.map(c => c.id), kept: 0, test: null }); rec.batches.push({ n: batchNo, round, ids: batch.map(c => c.id), kept: 0, test: null }); continue; }
-      const test = earnedGainTest(support, kept.map(c => c.referents), { key: key0 + '|batch' + batchNo });
+      // what this batch added, in the corpus's own terms
+      const gain = earnedGain(support, kept.map(c => c.referents));
       for (const c of kept) for (const r of c.referents) { support.set(r, (support.get(r) || 0) + 1); }
       for (const c of kept) for (const st of c.sts) for (const n of st.names) { const k = referentKey(n); if (k && !surface.has(k)) surface.set(k, n); }
       const earned = [...support.values()].filter(n => n >= 2).length;
-      lastTest = test;
-      const b = { n: batchNo, round, ids: batch.map(c => c.id), kept: kept.length, test: test.testable ? { observed: test.observed, nullMax: test.nullMax, nullMedian: test.nullMedian, p: test.p, outside: test.outside, viaCorpus: test.viaCorpus, viaBatch: test.viaBatch } : { testable: false, why: test.why } };
-      rec.batches.push(b); rec.curve.push({ batch: batchNo, sources: [...cands.values()].filter(c => c.state === 'kept').length, referents: support.size, earned, singletons: support.size - earned });
-      emit({ t: 'batch', ...b, referents: support.size, earned, sources: [...cands.values()].filter(c => c.state === 'kept').length });
-      if (test.testable && !test.outside) {
+      const keptAll = [...cands.values()].filter(c => c.state === 'kept');
+      // novelty: names and words of 4+ letters, per source (a corpus of mirrors has none to give)
+      const sat = saturationTest(keptAll.map(c => new Set([...c.referents, ...stemsOf(c.text).filter(w => w.length >= 4)])));
+      lastTest = sat;
+      const b = { n: batchNo, round, ids: batch.map(c => c.id), kept: kept.length, newlyConfirmed: gain.delta,
+        test: sat.testable ? { expected: sat.expected, looMax: sat.looMax, f1: sat.f1, n: sat.n, saturated: sat.saturated } : { testable: false, why: sat.why } };
+      rec.batches.push(b); rec.curve.push({ batch: batchNo, sources: keptAll.length, referents: support.size, earned, singletons: support.size - earned });
+      emit({ t: 'batch', ...b, referents: support.size, earned, sources: keptAll.length });
+      if (sat.testable && sat.saturated) {
         if (rec.wouldStopAt == null) rec.wouldStopAt = batchNo;   // recorded even for a control run that reads on, so the stop can be audited
-        if (!D.noStop) return 'inside-the-null';
+        if (!D.noStop) return 'saturated';
       }
     }
   }
@@ -234,8 +240,8 @@ export async function research(question, deps) {
 
   while (!stop && !aborted()) {
     // the pool is exhausted and the last tested batch (if any) was still learning: reach further
-    const stillLearning = D.noStop || !lastTest || !lastTest.testable || lastTest.outside;
-    if (!stillLearning) { stop = 'inside-the-null'; break; }
+    const stillLearning = D.noStop || !lastTest || !lastTest.testable || !lastTest.saturated;
+    if (!stillLearning) { stop = 'saturated'; break; }
     round++;
     // widen first: lanes the router held back, plus any the web hits vote for
     const pr = D.probe(webHits, [...used]) || { add: [], why: {} };
@@ -263,15 +269,20 @@ export async function research(question, deps) {
   if (aborted()) stop = 'aborted';
 
   // ── the record ──────────────────────────────────────────────────────────────────────────────────────────────────
-  for (const s of routed.rest) if (!used.has(s)) rec.notAsked.push({ scope: s, why: stop === 'inside-the-null' ? 'the corpus had stopped learning before this lane was needed' : 'not reached' });
   const all = [...cands.values()];
+  for (const s of routed.rest) if (!used.has(s)) rec.notAsked.push({ scope: s, why: stop === 'saturated' ? 'the corpus had saturated before this lane was needed' : 'not reached' });
+  // admitted candidates left unread are listed, never silently dropped
+  for (const c of all) if (c.verdict === 'admitted' && c.state === 'pending') {
+    c.state = 'held'; c.why = stop === 'saturated' ? 'cleared the relevance null but was not read: the corpus had saturated' : stop === 'aborted' ? 'cleared the relevance null but was not read: you stopped the run' : 'cleared the relevance null but was not read';
+    rec.gaps.push({ kind: 'held', id: c.id, url: c.url, title: c.title, why: c.why, found: c.found.map(f => f.scope) });
+  }
   rec.sources = all.filter(c => c.state === 'kept').map(c => ({ id: c.id, url: c.url, title: c.readTitle, via: c.via, chars: c.text.length, sha256: c.sha256, found: c.found, snippetRel: c.snippetRel, textRel: c.textRel, reading: c.reading, referents: [...c.referents], text: c.text }));
   rec.candidates = all.map(c => ({ id: c.id, url: c.url, title: c.title, kind: c.kind, state: c.state, verdict: c.verdict, why: c.why || '', found: c.found, snippetRel: c.snippetRel, textRel: c.textRel || null }));
   const earned = [...support].filter(([, n]) => n >= 2);
   rec.corpus = { sources: rec.sources.length, referents: support.size, earned: earned.length, heardOnce: support.size - earned.length };
   rec.lanesTally = Object.fromEntries(laneTally);
-  rec.stop = { reason: !all.length ? 'no-candidates' : stop || 'candidates-exhausted', test: lastTest && lastTest.testable ? { observed: lastTest.observed, nullMax: lastTest.nullMax, p: lastTest.p, draws: lastTest.draws } : null,
-    detail: stop === 'inside-the-null' && lastTest ? 'the last batch carried ' + lastTest.observed + ' referent' + (lastTest.observed === 1 ? '' : 's') + ' across the earned line; re-sampling this corpus carried up to ' + lastTest.nullMax + ' (p ≥ ' + lastTest.p.toFixed(3) + ' over ' + lastTest.draws + ' draws), so reading more would not have taught it more than chance'
+  rec.stop = { reason: !all.length ? 'no-candidates' : stop || 'candidates-exhausted', test: lastTest && lastTest.testable ? { expected: lastTest.expected, looMax: lastTest.looMax, f1: lastTest.f1, n: lastTest.n } : null,
+    detail: stop === 'saturated' && lastTest ? 'another source is expected to bring ' + lastTest.expected + ' name or word the ' + lastTest.n + ' read have not used (at most ' + lastTest.looMax + ' with any one source set aside) — under the floor of one, so reading more would not have taught it anything it lacks'
       : !all.length ? 'no lane returned a result (' + rec.searches.filter(x => !x.ok).length + ' of ' + rec.searches.length + ' searches failed or were cooling down)'
       : stop === 'aborted' ? 'you stopped it' : 'every candidate that cleared the relevance null was read, and no further lane or followed name produced a new one' };
   rec.endedAt = new Date(D.now()).toISOString();

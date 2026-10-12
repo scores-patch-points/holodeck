@@ -17,12 +17,33 @@ statistical, and each is "outside every one of 199 draws" (`holodeck-region.js`'
 | Decision | Statistic | Null |
 |---|---|---|
 | Is this candidate / page about the question? | G² keyness of the question's terms against General English (the `live_priors` prior the Holodeck already loads) | the same-length stretch of ordinary English, 199 draws, each term's count ~ Poisson(L·p) |
-| Has reading more stopped teaching it anything? | referents carried across the earned line (two independent sources) by the latest batch of 3 | the same batch with each source's already-known referents re-drawn popularity-proportionally from the corpus so far, 199 draws |
+| Has reading more stopped teaching it anything? | *(superseded — see Amendment 1)* referents carried across the earned line by the latest batch of 3 | *(superseded)* a popularity-weighted re-draw of the corpus, 199 draws |
 | Is a tie / echo / source grouping real? | shared statements / shared wording / shared earned referents | same-size random overlap (uniform for statements, popularity-weighted for referents), 199 draws |
 
 Constants that are not statistical, declared: **199** draws; **3** pages fetched at once (a memory limit — each read
 parses a document in the tab; also the unit of the stopping test). There is **no** source cap, page cap, time cap or
 "top N". The person's own Stop is the only other way a run ends.
+
+## Amendment 1 — the stopping rule, changed after a shakedown and BEFORE any registered run
+
+Recorded 2026-10-12. The instrument named at the top (`33a870a`) stopped on *corroboration gain against a re-sampling
+null*. A shakedown run on a question that is **not** one of the three registered topics (`Who built the Eiffel Tower
+and why?`, the browser pane, Wikipedia + Crossref lanes) showed that rule to be biased: it read 6 sources, stopped
+with 33 admitted candidates unread ("the last batch carried 20 referents across the earned line; re-sampling carried
+up to 26"). In a heavy-tailed corpus ~90 % of names are heard once, so a popularity-weighted redraw lands mostly on
+that tail, while real on-topic sources hit the core — so "inside the null" was the answer almost by construction.
+
+Replaced by **saturation**: with f1 = the names and 4+-letter words said by exactly one source and n = sources read, one
+more source is expected to bring about f1/n items nobody has said (Good–Turing); the run stops only when the largest of
+the n leave-one-out estimates is **below one item** (the floor of a count), and is untestable below three sources. This is
+a one-unit floor, not a drawn null — said so plainly in the README. A corpus of mirrors saturates at once; a diverse one
+essentially never does, and the run then ends where the relevance null ends the pool, listing every cleared-but-unread
+candidate as `held`.
+
+Nothing in Part 2 is edited. What changes in how it is read: P6's `inside-the-null` is now the reason `saturated`;
+P7 (batches before the stop) and P10 (stop not premature) apply only to runs where the stop fires, and I predict it will
+fire for **none** of the three (a diverse corpus does not saturate) — so P6 is expected to **fail**, and that is the
+honest outcome the record should show. The registered runs use the commit that follows this amendment.
 
 ## Part 2 — Predictions (frozen)
 

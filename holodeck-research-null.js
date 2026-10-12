@@ -14,14 +14,12 @@
 //      So a stray mention of a common word, or one mention of a rare word in a long page, is inside the null; a page
 //      that says the question's rare words again and again is far outside it.
 //
-//   2. CORROBORATION GAIN — did this batch of sources earn anything beyond chance?
-//      A referent is "earned" when two independent sources witness it (the lineage's earned-only standing). The
-//      batch's gain is how many referents it carried across that line. The null re-draws each batch source's
-//      already-known referents popularity-proportionally from the corpus read so far (same count, same fresh
-//      referents kept) — "this batch is just another sample of what we already have". Gain outside every draw means
-//      the batch consolidated something new; inside means the corpus has stopped learning from reading more.
+//   2. SATURATION — is another source still expected to bring anything the corpus lacks?
+//      f1/n, leave-one-out, below one item (see the section below). A floor of one indivisible unit, not a tuned
+//      constant — and not a drawn null: the drawn alternative (re-sampling the corpus's own referents) was tried on a
+//      shakedown run and is biased toward "inside" in any heavy-tailed corpus, so it is not used to stop anything.
 //
-// A corpus with no earlier sources has no baseline, so it has no null: `testable:false`, never a made-up verdict.
+// A corpus too small to measure is `testable:false`, never a made-up verdict.
 
 export const DRAWS = 199;   // declared in holodeck-region.js (1/DRAWS is the resolution of "more extreme than chance")
 
@@ -91,9 +89,39 @@ export function relevance(terms, text, bg, { key = '', draws = DRAWS } = {}) {
   return { ok: true, g: +obs.g.toFixed(3), nullMax: +nullMax.toFixed(3), nullMedian: +nul[nul.length >> 1].toFixed(3), outside: obs.g > nullMax, p: (1 + ge) / (draws + 1), matched: obs.matched, L, draws };
 }
 
-// ── corroboration gain ──────────────────────────────────────────────────────────────────────────────────────────
+// ── saturation ──────────────────────────────────────────────────────────────────────────────────────────────────────
+// When has reading more stopped being worth it? Not "when it has stopped confirming names": a real topic's long tail
+// keeps confirming moderately common names for a long time (measured on a shakedown run — a corpus of 6 sources still
+// confirmed ~20 names per batch). What DOES saturate is novelty. The Good–Turing / Chao argument: if f1 of the items
+// (names and words) seen so far were said by exactly one source, then one more source is expected to bring about
+// f1/n items nobody has said yet (n = sources read). Below ONE item, reading another source is expected to turn up not
+// even a single thing the corpus lacks — the unit of a count is the floor of what can be told from nothing.
+//
+// To be robust it is leave-one-out: the largest of the n estimates, each with one source set aside, must be below one.
+// With fewer than three sources, setting one aside leaves no overlap to measure, so it is untestable — and reading goes on.
+// A corpus of mirrors or syndicated copies saturates at once; a diverse one essentially never does, and then the run
+// ends where the relevance null ends the pool (and says so).
+export function supportOf(sets) {
+  const m = new Map();
+  for (const S of sets) for (const r of S) m.set(r, (m.get(r) || 0) + 1);
+  return m;
+}
+export function unseenExpectation(sets) {
+  const n = sets.length; let f1 = 0;
+  for (const c of supportOf(sets).values()) if (c === 1) f1++;
+  return { n, f1, expected: n ? f1 / n : 0 };
+}
+export function saturationTest(sets) {
+  const n = sets.length;
+  if (n < 3) return { testable: false, why: 'fewer than three sources: setting one aside would leave no overlap to measure' };
+  const pt = unseenExpectation(sets);
+  const loo = sets.map((_, j) => unseenExpectation(sets.filter((__, i) => i !== j)).expected);
+  const looMax = Math.max(...loo);
+  return { testable: true, n, f1: pt.f1, expected: +pt.expected.toFixed(2), looMax: +looMax.toFixed(2), saturated: looMax < 1 };
+}
+
 /** How many referents a batch carried across the earned line (support >= 2), given `prior` (Map ref -> number of
- *  sources that witness it so far) and `batch` (an array of Set of refs, one per source). */
+ *  sources that witness it so far) and `batch` (an array of Set of refs, one per source). Reported, never a stop. */
 export function earnedGain(prior, batch) {
   const inBatch = new Map();
   for (const S of batch) for (const r of S) inBatch.set(r, (inBatch.get(r) || 0) + 1);
@@ -103,28 +131,6 @@ export function earnedGain(prior, batch) {
     if (before < 2 && before + k >= 2) { delta++; if (before > 0) viaCorpus++; else viaBatch++; }
   }
   return { delta, viaCorpus, viaBatch };
-}
-
-/** The null for that gain: each batch source's already-known referents are re-drawn from the corpus read so far,
- *  weighted by how many sources witness each (what a typical new sample of this same population would carry), same
- *  count per source, its fresh referents untouched. Returns { testable, observed, nullMax, nullMedian, outside, p }. */
-export function earnedGainTest(prior, batch, { key = '', draws = DRAWS } = {}) {
-  const observed = earnedGain(prior, batch);
-  if (!prior.size) return { testable: false, why: 'no sources were read before this batch, so there is no baseline to be unsurprised by', observed: observed.delta, draws };
-  const universe = [...prior.keys()].sort(), w = universe.map(r => prior.get(r)), cum = []; let tot = 0; for (const x of w) cum.push(tot += x);
-  const kinds = batch.map(S => { const known = [], fresh = []; for (const r of S) (prior.has(r) ? known : fresh).push(r); return { n: known.length, fresh }; });
-  const r = rng(hash32(key + '|' + universe.length + '|' + batch.length));
-  const pick = () => { const x = r() * tot; let lo = 0, hi = cum.length - 1; while (lo < hi) { const mid = (lo + hi) >> 1; if (cum[mid] > x) hi = mid; else lo = mid + 1; } return universe[lo]; };
-  const nul = [];
-  for (let d = 0; d < draws; d++) {
-    const sets = kinds.map(k => { const S = new Set(k.fresh); const room = Math.min(k.n, universe.length); let guard = 0; let got = 0;
-      while (got < room && guard++ < room * 40 + 40) { const x = pick(); if (!S.has(x)) { S.add(x); got++; } }
-      return S; });
-    nul.push(earnedGain(prior, sets).delta);
-  }
-  nul.sort((a, b) => a - b);
-  const nullMax = nul[nul.length - 1], ge = nul.filter(x => x >= observed.delta).length;
-  return { testable: true, observed: observed.delta, viaCorpus: observed.viaCorpus, viaBatch: observed.viaBatch, nullMax, nullMedian: nul[nul.length >> 1], outside: observed.delta > nullMax, p: (1 + ge) / (draws + 1), draws };
 }
 
 // ── is it prose? ────────────────────────────────────────────────────────────────────────────────────────────────────

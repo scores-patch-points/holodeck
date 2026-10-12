@@ -52,15 +52,14 @@ export function makeLog({ label = s => s } = {}) {
           break; }
         case 'batch': {
           S.batches = ev.n;
+          const t = ev.test;
           if (!ev.kept) put('batch:' + ev.n, { chip: 'Checked', tone: 'mut', title: 'Batch ' + ev.n + ': none of these could be kept', line: '' });
-          else if (!ev.test || ev.test.testable === false) put('batch:' + ev.n, { chip: 'Checked', tone: 'mut', title: 'Batch ' + ev.n + ': ' + n(ev.sources, 'source') + ' read so far — nothing to compare against yet, so reading on', line: n(ev.referents, 'name') + ' so far' });
-          else put('batch:' + ev.n, { chip: 'Checked', tone: ev.test.outside ? 'ok' : 'warn',
-            title: 'Batch ' + ev.n + ': ' + n(ev.test.observed, 'name') + ' newly confirmed by two sources; re-sampling what was already read confirms up to ' + ev.test.nullMax + ' by chance',
-            line: ev.test.outside ? 'More than chance — still learning, reading on.' : 'No more than chance — more reading would not teach it more.' });
+          else put('batch:' + ev.n, { chip: 'Checked', tone: 'ok', title: 'Batch ' + ev.n + ': ' + n(ev.sources, 'source') + ' read so far, ' + n(ev.newlyConfirmed || 0, 'name') + ' newly confirmed by two sources',
+            line: !t || t.testable === false ? 'Too few sources to tell yet — reading on.' : t.saturated ? 'Another source is expected to bring ' + t.expected + ' new name or word — under one. Saturated.' : 'Another source is expected to bring about ' + t.expected + ' name or word nobody has used yet — reading on.' });
           break; }
         case 'stop': {
           S.stopped = ev.stop;
-          put('stop', { chip: 'Stopped', tone: ev.stop.reason === 'inside-the-null' ? 'ok' : ev.stop.reason === 'no-candidates' ? 'bad' : 'mut', title: STOP_WORDS[ev.stop.reason] || ev.stop.reason, line: ev.stop.detail });
+          put('stop', { chip: 'Stopped', tone: ev.stop.reason === 'saturated' ? 'ok' : ev.stop.reason === 'no-candidates' ? 'bad' : 'mut', title: STOP_WORDS[ev.stop.reason] || ev.stop.reason, line: ev.stop.detail });
           break; }
       }
     },
@@ -75,7 +74,7 @@ export function makeLog({ label = s => s } = {}) {
 }
 
 export const STOP_WORDS = {
-  'inside-the-null': 'It stopped because reading more would not have taught it more than chance',
+  saturated: 'It stopped because another source would not have taught it anything it lacks',
   'candidates-exhausted': 'It stopped because there was nothing further to read',
   'no-candidates': 'It found nothing to read',
   aborted: 'You stopped it',
@@ -107,7 +106,7 @@ export function rowsOfRecord(rec, label = s => s) {
     let k = 0;
     for (const b of batches.filter(b => (b.round || 0) === r)) {
       const cv = b.kept ? curve.find(x => x.batch === b.n) : null;
-      log.push({ t: 'batch', n: b.n, kept: b.kept, test: b.test, sources: cv ? cv.sources : b.kept, referents: cv ? cv.referents : 0, earned: cv ? cv.earned : 0 }); k++;
+      log.push({ t: 'batch', n: b.n, kept: b.kept, newlyConfirmed: b.newlyConfirmed, test: b.test, sources: cv ? cv.sources : b.kept, referents: cv ? cv.referents : 0, earned: cv ? cv.earned : 0 }); k++;
     }
   }
   if (rec.stop) log.push({ t: 'stop', stop: rec.stop, corpus: rec.corpus });

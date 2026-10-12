@@ -3,7 +3,7 @@
 //   node --test holodeck-research.test.mjs
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { DRAWS, makeBackground, termsOf, relevance, keyness, earnedGain, earnedGainTest, wordsOf, stemOf, rng } from './holodeck-research-null.js';
+import { DRAWS, makeBackground, termsOf, relevance, keyness, earnedGain, saturationTest, unseenExpectation, wordsOf, stemOf, rng } from './holodeck-research-null.js';
 import { readSource, splitStatements, figuresIn, namesIn, referentKey } from './holodeck-research-read.js';
 import { research, normUrl, frontier, CONCURRENCY } from './holodeck-research.js';
 
@@ -91,35 +91,38 @@ test('earnedGain counts only referents that cross support 2, via the corpus or v
   assert.equal(g.viaCorpus, 1); assert.equal(g.viaBatch, 1);
 });
 
-test('no earlier sources, no null: the first batch is untestable, with the reason', () => {
-  const t = earnedGainTest(new Map(), [S('a', 'b'), S('a')], { key: 'k' });
-  assert.equal(t.testable, false); assert.match(t.why, /baseline/);
+test('fewer than three sources cannot be tested for saturation, and reading goes on', () => {
+  const t = saturationTest([S('a', 'b'), S('a', 'c')]);
+  assert.equal(t.testable, false); assert.match(t.why, /three sources/);
 });
 
-test('a batch that only re-witnesses already-earned referents is inside the null (the corpus has stopped learning)', () => {
-  const prior = new Map(); for (const n of ['alpha', 'beta', 'gamma', 'delta', 'epsilon']) prior.set(n, 3);
-  for (let i = 0; i < 8; i++) prior.set('single' + i, 1);
-  const batch = [S('alpha', 'beta', 'gamma'), S('beta', 'delta'), S('alpha', 'epsilon', 'delta')];
-  const t = earnedGainTest(prior, batch, { key: 'sat' });
-  assert.equal(t.testable, true); assert.equal(t.observed, 0);
-  assert.equal(t.outside, false);
+test('a corpus of mirrors is saturated: another source is expected to bring under one new item', () => {
+  const same = () => S('mara quill', 'port venn', 'zorblatt', 'lighthouse', 'keeper');
+  const t = saturationTest([same(), same(), same(), same()]);
+  assert.equal(t.testable, true); assert.equal(t.saturated, true); assert.equal(t.expected, 0);
 });
 
-test('a batch that carries what was heard once across the line beats re-sampling the corpus', () => {
-  const prior = new Map(); for (const n of ['alpha', 'beta', 'gamma']) prior.set(n, 6);
-  for (let i = 0; i < 10; i++) prior.set('rare' + i, 1);
-  // each batch source says some of the once-heard names — a sub-region the corpus had barely touched
-  const batch = [S('rare0', 'rare1', 'rare2', 'alpha'), S('rare3', 'rare4', 'rare5', 'beta'), S('rare6', 'rare7', 'rare8', 'gamma')];
-  const t = earnedGainTest(prior, batch, { key: 'learn' });
-  assert.equal(t.observed, 9);
-  assert.equal(t.outside, true, JSON.stringify(t));
-  assert.ok(t.p <= 1 / DRAWS + 1e-9 + 0.005);
+test('a diverse corpus is not saturated: each source brings things nobody else said', () => {
+  const mk = i => S('shared', 'only' + i + 'a', 'only' + i + 'b', 'only' + i + 'c');
+  const t = saturationTest([mk(1), mk(2), mk(3), mk(4)]);
+  assert.equal(t.saturated, false); assert.ok(t.looMax >= 3);
 });
 
-test('the gain null is deterministic for its key', () => {
-  const prior = new Map([['a', 2], ['b', 1], ['c', 1], ['d', 1], ['e', 4]]);
-  const batch = [S('b', 'c', 'a'), S('d', 'e')];
-  assert.deepEqual(earnedGainTest(prior, batch, { key: 'z' }), earnedGainTest(prior, batch, { key: 'z' }));
+test('FALSIFIER — sources that share nothing are NOT called saturated (no overlap is not redundancy)', () => {
+  const t = saturationTest([S('a1', 'a2'), S('b1', 'b2'), S('c1', 'c2')]);
+  assert.equal(t.saturated, false);
+});
+
+test('property — setting a source aside never makes a corpus look more novel than the worst case reported', () => {
+  const r = rng(3);
+  for (let k = 0; k < 40; k++) {
+    const sets = Array.from({ length: 3 + Math.floor(r() * 4) }, () => new Set(Array.from({ length: 5 }, () => 'w' + Math.floor(r() * 12))));
+    const t = saturationTest(sets);
+    const pt = unseenExpectation(sets).expected;
+    assert.ok(t.looMax >= 0);
+    // the leave-one-out maximum is at least the point estimate rescaled to n-1 sources' worth of evidence
+    assert.ok(t.looMax * (sets.length - 1) >= pt * sets.length - sets.length, JSON.stringify({ looMax: t.looMax, pt }));
+  }
 });
 
 test('property — the gain does not depend on the order of the batch’s sources', () => {
@@ -127,8 +130,7 @@ test('property — the gain does not depend on the order of the batch’s source
   for (let t = 0; t < 30; t++) {
     const prior = new Map(); for (let i = 0; i < 12; i++) prior.set('p' + i, 1 + Math.floor(r() * 3));
     const batch = Array.from({ length: 3 }, () => new Set(Array.from({ length: 4 }, () => 'p' + Math.floor(r() * 16))));
-    const a = earnedGain(prior, batch).delta, b = earnedGain(prior, [...batch].reverse()).delta;
-    assert.equal(a, b);
+    assert.equal(earnedGain(prior, batch).delta, earnedGain(prior, [...batch].reverse()).delta);
   }
 });
 
@@ -241,17 +243,22 @@ test('a page that is read but is not about the question is refused with its numb
   assert.deepEqual(run.sources.map(s => s.url), ['https://a.example/zorblatt']);
 });
 
-test('reading stops when a batch is inside the null, and the stop carries the numbers', async () => {
+test('reading stops when the corpus is saturated, and the stop carries the numbers', async () => {
   const pages = {}, urls = [];
   // two batches of three on-topic pages that say the same thing: the second adds nothing the first did not earn
   for (let i = 0; i < 6; i++) { const u = 'https://s' + i + '.example/z'; urls.push(u); pages[u] = P('Zorblatt lighthouse ' + i, onTopic('', ['Mara Quill', 'Port Venn'])); }
   const web = fakeWeb({ lanes: { web: urls, wikipedia: [] }, pages });
   const run = await research('history of the Zorblatt lighthouse', base(web, { route: () => ({ scopes: ['web'], why: {}, rest: [] }) }));
-  assert.equal(run.stop.reason, 'inside-the-null');
-  assert.ok(run.stop.test && typeof run.stop.test.nullMax === 'number' && run.stop.test.observed <= run.stop.test.nullMax);
-  assert.match(run.stop.detail, /across the earned line/);
-  assert.equal(run.batches.length, 2);
-  assert.equal(run.sources.length, CONCURRENCY * 2);
+  assert.equal(run.stop.reason, 'saturated');
+  assert.ok(run.stop.test && run.stop.test.looMax < 1);
+  assert.match(run.stop.detail, /under the floor of one/);
+  assert.equal(run.batches.length, 1);   // three mirrors are enough to tell
+  assert.equal(run.sources.length, CONCURRENCY);
+  // the pages that cleared the null but were not read are listed, with why — never silently dropped
+  const held = run.gaps.filter(g => g.kind === 'held');
+  assert.equal(held.length, 3);
+  assert.ok(held.every(g => /saturated/.test(g.why)));
+  assert.equal(run.candidates.filter(c => c.state === 'held').length, 3);
 });
 
 test('when the gated pool runs out while the corpus is still learning, it widens to the lanes the router held back', async () => {
@@ -330,7 +337,7 @@ test('a control run that ignores the stop reads on, and still records where the 
   const route = () => ({ scopes: ['web'], why: {}, rest: [] });
   const stopped = await research('history of the Zorblatt lighthouse', base(mk(), { route }));
   const control = await research('history of the Zorblatt lighthouse', base(mk(), { route, noStop: true }));
-  assert.equal(stopped.stop.reason, 'inside-the-null');
+  assert.equal(stopped.stop.reason, 'saturated');
   assert.equal(control.sources.length, 9);
   assert.equal(control.wouldStopAt, stopped.batches.length);
   assert.ok(stopped.sources.length < control.sources.length);
