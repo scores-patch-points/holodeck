@@ -95,12 +95,141 @@ or a page that cannot be read being shown as read.
 
 ## Part 3 — Results
 
-*(appended after the runs; the run records are attached under `docs/research-runs/`)*
+### 3a. The registered runs (instrument: `0b1dace`; one click each, nothing re-run to improve a number)
+
+Run in the browser pane, one fresh workspace per topic, through the real UI (the question entered in the empty
+workspace's own box → "Find sources for this question" / the panel → the one button). Run records, with every
+candidate's verdict and the numbers behind it, are `docs/research-runs/T1-run.json`, `T2-run.json`, `T3-run.json`.
+Pane: `127.0.0.1:8841`, this machine's network; the fold relay's web lane answered 502 during T1 (a typed gap), and
+answered in T2 and T3.
+
+| # | Prediction | T1 Pythagoras | T2 TVA | T3 WebGPU | Held? |
+|---|---|---|---|---|---|
+| P1 | candidates 25–90 | 74 | 209 | 121 | **T2, T3 failed** |
+| P2 | cleared the snippet null 25–75 % | 92 % (68) | 87 % (181) | 83 % (101) | **failed all** — the gate admits nearly everything it is shown |
+| P3 | kept T1 6–20, T2 6–25, T3 5–18 | 46 | 125 | 52 | **failed all** |
+| P4 | read success ≥ 60 % (T3 ≥ 40 %) | 75 % | 78 % | 57 % | held |
+| P5 | refused when read ≤ 15 % | 10 % (5 of 51) | 12 % (17 of 142) | 10 % (6 of 58) | held |
+| P6 | stop = inside-the-null for ≥ 2 of 3 | candidates-exhausted | candidates-exhausted | candidates-exhausted | **failed** (0 of 3; expected, Amendment 1) |
+| P7 | 2–5 batches before the stop | 26 | 65 | 37 | **failed** (the stop never fired) |
+| P8 | precision ≥ 85 % | ≈ 22 % (about 10 of 46 clearly on the question; ≈ 40 % counting history-of-mathematics survey pages) | ≈ 45–60 % | ≈ 75 % (39 of 52) | **failed all** |
+| P9 | cross-topic false-admit ≤ 5 % per pair | → T2 4 %, → T3 **50 %**, → C0 **39 %** | → T1 7 %, → T3 7 %, → C0 4 % | → T1 **15 %**, → T2 0 %, → C0 **33 %** | **failed** (T1→T3 50 % ≫ the 15 % failure line) |
+| P10 | stop not premature | vacuous: the stop never fired (`wouldStopAt` = null) | vacuous | vacuous | holds only vacuously |
+| P11 | ≥ 5 of 6 SEEN registers non-empty | 6 of 6 | 6 of 6 | 6 of 6 | held |
+| P12 | earned ≥ 10, heard-once the larger share | 641 earned, 79 % heard once | 1,107 · 81 % | 485 · 86 % | held |
+| P13 | ≥ 1 tie beyond the null | 5,077 | 14,500 | 6,629 | held — but see P13 below |
+| P14 | T2 has a group of ≥ 2 sources | (35 sources, not predicted) | **107 sources** in one group | (38) | held |
+| P15 | every row addressed, span in range | 22,637 rows, 0 out of range | 45,656 · 0 | 24,608 · 0 | held; 1.9 % of T1's statements (93 of 4,774) carry text the Holodeck joined across fragments inside their span |
+| P16 | every gap has a `why` | 0 without | 0 | 0 | held |
+| P17 | click → stop ≤ 150 s | acquisition 25 s; ≈ 3.5 min with the ingest | acquisition 143 s; **402 s** | acquisition 88 s; **≈ 232 s** | **failed** — the Holodeck's engine read of every source (≈ 2.5 s each) is the cost |
+| P18 | no request leaves before the click | none (network panel) | not verifiable: the pane's request buffer was full | none (resource timing; +1 localhost probe) | held for T1, T3; T2 unverified |
+
+**What the P9 failure was.** The cross-topic clearances were not the null being fooled by topical overlap: the
+question's *function words* were being counted as terms. `a`, `how`, `does`, `let`, `start` survived the part-of-speech
+filter (each also has a noun/adverb reading), and a different register keys them — a mathematics page says "a" a hundred
+times as a variable. The null assumes ordinary English; those pages are not. P8 failed for the related reason: with
+`theorem` and `proved` as terms, any mathematics page is "about" the Pythagorean theorem.
+
+**P13.** 5,077 / 14,500 / 6,629 "ties beyond the null" is not a discriminating result: the null (statement-set
+overlap) treats statements as exchangeable, and they are not. A tie that beats it carries little.
+
+**The stop.** It never fired. That is the finding the rule's own derivation predicted (a diverse corpus does not
+saturate) and the shakedown showed for the earlier rule; it means that in practice a run ends where the relevance null
+ends the pool, so *the relevance null is the only thing standing between the person and "everything the engines
+returned"* — and P2 says it admitted 83–92 %.
+
+### 3b. Round 2 — post-hoc, labelled as such (instrument: `c800580`)
+
+Made *after* seeing 3a, to the failures 3a names; **none of it is a registered result.** The changes:
+
+1. a question word is a unit only when it is rarer than a word drawn uniformly from the vocabulary (p < 1/V, V = the
+   prior's own size): `a`, `how`, `start` are out;
+2. the question's named things (capitalised runs that do not merely open the sentence) are units *as phrases* and are
+   the **anchor**: a text is about the question only if at least one of them clears its own null;
+3. a followed name must itself be said by the corpus beyond what ordinary English would (the same keyness + null), so
+   `References`, `See`, `BC` are no longer followed;
+4. a tie must be witnessed by two independent sources; pairs are formed among names several sources say (tractable);
+5. the terrain is laid out once, at the end of the ingest, behind a visible message.
+
+**Offline, on the registered runs' own texts (no network):** cross-topic false-admit with the new gate is **0 %** for
+every pair (T1, T2, T3 against each other and against C0: 0 of 46, 125 and 52 in every cell). Own-topic retention:
+T1 80 % (37 of 46; rejected: *Theorem*, *List of mathematical proofs*, *Stewart's theorem*, *Legendre's…*, *Mathematical
+proof*), T2 93 % (116 of 125; rejected: county and river pages that never say the agency), T3 77 % (40 of 52; rejected:
+*Google Chrome*, *Julia*, *HCL Notes*, *Silverlight*, *History of video games*, *Stadia* — the pages I had judged off
+topic).
+
+
+**Round 2 live runs** (same three questions, fresh workspaces, same UI path; `docs/research-runs/R2-T*-run.json`):
+
+| # | Prediction | R2 T1 | R2 T2 | R2 T3 |
+|---|---|---|---|---|
+| P1 | candidates 25–90 | 114 | 512 | 105 |
+| P2 | cleared the snippet null 25–75 % | 65 % (74) | 53 % (273) | 54 % (57) |
+| P3 | kept 6–20 / 6–25 / 5–18 | 45 ✗ | 148 ✗ | 35 ✗ |
+| P4 | read success ≥ 60 % (T3 ≥ 40 %) | 80 % | 68 % | 63 % |
+| P5 | refused when read ≤ 15 % | 24 % ✗ | 21 % ✗ | 3 % |
+| P6 | stop = inside-the-null (now: saturated) | candidates-exhausted ✗ | **you stopped it** at 9.6 min — it had not ended on its own ✗ | candidates-exhausted ✗ |
+| P8 | precision ≥ 85 % | ≈ 76–82 % (34–37 of 45) ✗ | ≈ 70 % (first 60 of 148 judged) ✗ | **≈ 94 % (33 of 35)** ✓ |
+| P9 | cross-topic false-admit ≤ 5 % | 0 % (offline, registered texts) | 0 % | 0 % |
+| P11 | ≥ 5 of 6 SEEN registers | 6 of 6 | 6 of 6 | 6 of 6 |
+| P12 | earned ≥ 10; heard-once the larger share | 380 · 80 % | 1,064 · 82 % | 289 · 79 % |
+| P13 | ≥ 1 tie (now: beyond the null *and* two witnesses) | 441 (708 beat the null) | 1,174 (2,177) | 325 (463) |
+| P15 | rows addressed, spans in range | 12,786 · 0 bad | 29,035 · 0 | 9,406 · 0 |
+| P16 | gaps have a `why` | 0 without | 0 | 0 |
+| P17 | click → done ≤ 150 s | 345 s ✗ | 843 s ✗ | 277 s ✗ |
+
+What moved: cross-topic false-admission fell from 4–50 % to 0 %; the pages I had called off-topic in T3 are gone
+(precision ≈ 75 % → ≈ 94 %); 5,077 → 441, 14,500 → 1,174, 6,629 → 325 ties; the Research view opens instantly (the
+terrain is laid out once, behind a message, instead of a 33 s blocking compute on first render). What did not: **the
+run still ends only when the pool does** — T2 would have gone on (21 rounds, 512 candidates found, and still finding
+admissible pages when stopped) — and the Holodeck's own ingest (≈ 2.5 s a source through the engine) dominates the clock.
 
 ## Part 4 — What failed
 
-*(appended after the runs)*
+1. **The relevance gate was permissive (P2), and the registered precision (P8) was far under the line.** Cause: units
+   like `a`, `how`, `let`, `start` and the question's generic nouns (`theorem`, `proved`) measure nothing, and a
+   different register (mathematics) keys them. Round 2's floor (p < 1/V) and the entity anchor fix most of it, post hoc.
+2. **P9 failed outright** (T1→T3 50 %, T1→C0 39 %). The one-sided keyness test is only as good as the "ordinary English"
+   assumption; a page whose register is not ordinary English keys common words.
+3. **The stopping rule never fired on a real topic.** First version (corroboration gain vs a re-sampling null) was
+   biased toward "inside" and was replaced before the registered runs (Amendment 1); the replacement (Good–Turing f1/n
+   < 1) does not saturate on a heavy-tailed corpus, so it is a guard against mirrors, not a stop in practice. **There is
+   no null-derived "enough" for open-ended topics in this system yet** — only "the relevance-cleared pool is read".
+4. **Snowballing drifts and has no end.** Round-1 followed `References`, `See`, `BC`, `AD`; Round 2 follows genuinely
+   keyed names but still leaves the topic (`Knoxvillians`, `East Tennesseans`, rivers) and, uncapped, ran 9.6 minutes
+   on a bare entity and was stopped by hand.
+5. **Ties were not discriminating** (5,077 / 14,500 / 6,629): statements are not exchangeable.
+6. **Time (P17).** Every topic missed 150 s; the ingest through the engine is most of it, and cannot be stopped.
+7. **Papers lanes returned almost no full text**: OpenAlex answered 400 in registered T1 and T3 (not investigated) and
+   returned 18 unreadable records in T2; Crossref DOIs mostly landed on pages that need scripts or a subscription —
+   typed unread, 0 kept in T1 and T2, 2 in T3.
+8. **The fold relay's web lane answered 502 during registered T1** — T1's corpus is therefore Wikipedia-only (46 of 46),
+   which is also why its precision was the worst. Lanes vary run to run; runs are not reproducible bit for bit.
+9. **The heimdall bridge could not be used from the pane**: it answers, but not with CORS headers for
+   `127.0.0.1:8841`; only the relay path was exercised live.
+10. **P18 was not verifiable for registered T2** (the pane's request buffer was already full).
 
 ## Part 5 — What is not established
 
-*(appended after the runs; the standing list is kept in the README's "Research assistant" section)*
+* **Precision is one grader's judgement from titles and addresses** (me, scores hidden but the task known), not a blind
+  panel; no inter-rater agreement; T2's "on the topic" depends on whether a river or a county that the agency shaped
+  counts. Round 2's numbers were measured on the same three topics the fixes were made against — **no held-out topics**.
+* **Relevance is lexical.** Paraphrase and synonym are invisible; a question made only of common words has no units
+  (undecided, read unscreened, said so). English-only prior, 5-letter stems; non-English and unspaced scripts untested.
+* **"Enough" is not null-derived** (see Part 4.3). The drawn null for it was tried and rejected as biased.
+* **The null assumes ordinary English.** Code, mathematics, legal and tabular pages are not; the floor and anchor
+  reduce, not remove, register artefacts. The General English prior is eight books, 31 encyclopedia articles and 27
+  statutes (fetched from a third-party static host at boot, as the Holodeck's hygiene already does).
+* **Unread reasons are coarse**: JavaScript-rendered vs bot-walled vs 4xx are not told apart (the vendored read pool
+  swallows its own reasons); both are listed as "every door was tried and none returned text".
+* **Acquisition-time names come from the Holodeck's finder without its hygiene** (no workspace-normal prior yet), so
+  the stopping/follow-up referents differ from the names the person finally sees.
+* **Terrain**: "other" is 75–90 % of kinds; paradigm groups are by shared names (one group holds ≈ 75–85 % of sources);
+  tie nulls treat statements as exchangeable; `echoes` are the Holodeck's own.
+* **Not exercised live**: the 360 px right panel at desktop width (the pane was 479 px wide, so the Holodeck used its
+  bottom sheet; click → open → document does not move was verified); the heimdall bridge lane; the Ask answer path
+  after a run (`answerAfter`) with a model loaded; PDFs through the file reader; a second browser.
+* **The ingest cost is unbounded by design** (no source cap): 148 sources ≈ 4.5 minutes of engine reads, uninterruptible.
+* **Consent**: verified before the click for T1 and T3 (network panel / resource timing) and by construction
+  (`autoResearch` only opens the panel); a localhost probe of the bridge (`/api/tags`, carries no question) happens when
+  the panel opens.

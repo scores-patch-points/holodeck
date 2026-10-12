@@ -166,7 +166,12 @@ real run ends where the relevance null ends the pool (`candidates-exhausted`), a
 was not read is listed as `held`. There is no page cap and no source count; the person's Stop is the only other end.
 
 **Results and failures** are in `docs/RESEARCH-ASSISTANT-PREREG.md` (predictions frozen, then results, then what
-failed, then what is not established). Run records: `docs/research-runs/`.
+failed, then what is not established). Run records: `docs/research-runs/`. In short: on three live topics the
+registered instrument failed most of its quantitative predictions — the relevance gate admitted 83–92 % of what it was
+shown and cross-topic false-admission reached 50 %. A labelled post-hoc round 2 (informative-term floor + entity-phrase
+anchor) brought cross-topic false-admission to 0 % and precision to ≈ 70–94 %, but was tuned on the same three topics,
+the stop still never fires on a real topic, and a run only ends when the relevance-cleared pool does (a bare entity ran
+9.6 minutes and was stopped by hand). Read the "what is not established" list before relying on any number here.
 
 Tests: `node --test holodeck-research.test.mjs holodeck-research-terrain.test.mjs holodeck-research-lanes.test.mjs holodeck-research-log.test.mjs`
 
