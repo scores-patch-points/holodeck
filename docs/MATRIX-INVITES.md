@@ -55,6 +55,7 @@ holodeck-seal.js      encryption assertions: a store room is encrypted or nothin
 holodeck-share.js     the invite state machine + stores/rooms + removal + leave (pure)
 holodeck-legacy.js    detect unencrypted workspaces; plan the migration (pure)
 holodeck-matrix.js    the one crossing: matrix-js-sdk behind the interface share.js injects
+vendor-eodb.mjs       byte-identical copy of eodb's attachment envelope (media.js) + hash record
 holodeck-share-panel.js   "Share this repo" panel (DOM; a thin client of share.js)
 holodeck-fake-matrix.js   faithful fake homeserver+client for tests and the simulated demo
 tools/vendor-matrix-sdk.mjs   reproducible, hash-recorded SDK bundle (same-origin, never a CDN)
@@ -118,7 +119,9 @@ are flagged, never blocked"), so the gate sits in front of it and
   allow-listed to structural types; a content-bearing state write throws
   `ContentInState` — the exact bug in the legacy private room.
 * Large bodies go through encrypted upload (eodb's attachment envelope: AES-CTR
-  per blob, key in the Megolm-encrypted event, `__media: 2`).
+  per blob, key in the Megolm-encrypted event, `__media: 2`). Many operators are
+  written as sealed batch events (`io.holodeck.batch`); the fold sees them as the
+  individual operators they are, each gated by its real sender.
 
 ## 4. The invite flow
 
@@ -183,9 +186,21 @@ back.* The server also keeps the old events.
 **(c) Unverified devices.** Policy `confirmed-only`: keys are shared only to
 devices the owner confirmed by fingerprint (`setDeviceVerified`), enforced with
 `room.setBlacklistUnverifiedDevices(true)` on every store room in every Holodeck
-client. A person's *new* device is unconfirmed and gets nothing until confirmed
-(surfaced in the people list). Limit, stated: another Matrix client in these
-rooms follows its own policy; the setting is per-client, not per-room-on-server.
+client. Trust is per client in Matrix, so for more than two people the owner's
+confirmations travel in the owner-authored ledger (each role entry and each
+`share.device` event names the confirmed device and its key) and every client
+applies them locally, withdrawing a removed person's. The invitee in turn types
+the owner's six digits, so the owner's device is trusted on their side and what
+they write reaches the owner. A person's *new* device is unconfirmed and gets
+nothing until the owner confirms it (surfaced in the people list). Limit, stated:
+another Matrix client in these rooms follows its own policy; the setting is
+per-client, not per-room-on-server.
+
+**(c′) The ledger a late joiner can read.** A member who joins after earlier role
+entries were written cannot decrypt them. The grant therefore carries the owner's
+ledger as of the grant (authenticated by its sender, the door's creator), and
+every viewer folds seed + whatever their device can decrypt — one ledger for
+everyone, or people would see different repos.
 
 **(d) Metadata.** See §1; it is in the panel, the README, and the invite.
 
@@ -239,3 +254,12 @@ them for an encrypted repo.
 4. Counted invites (N uses) — single-use chosen on the heimdall precedent.
 5. Passphrase-encrypted crypto store.
 6. Remove `fx-share` and the email door for encrypted repos.
+
+## 10. What was verified, and where
+
+See the results section of `MATRIX-INVITES-PREREG.md`: unit tier (42 tests, a
+control per falsifier), live tier (34 checks, real Megolm against a local
+Synapse), and one end-to-end run in the browser pane (create → invite → typed
+confirm → role-limited write → read through the gate → removal with disclosure).
+Ten defects were found by running it that the pure tier could not find; they are
+listed there with the test that now holds each.

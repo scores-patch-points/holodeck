@@ -215,6 +215,27 @@ test('an invitee refuses a grant naming a room that is not encrypted', async () 
   assert.notEqual((await w.mxs.alice.roomState(bad)).members[U.alice], 'join', 'and it did not stay in the plaintext room');
 });
 
+test('a reload loses nothing: a fresh instance with only the registry confirms an invite, and a half-failed confirm can simply be run again', async () => {
+  const w = world();
+  const repo = await w.S.owner.createRepo({ title: 't' });
+  const m = await w.S.owner.mintInvite(repo, { role: 'editor', base: BASE });
+  const red = await w.S.alice.redeem({ input: m.link });
+  // "reload": a new instance on the same account that knows nothing but what the account's registry says
+  const again = makeShare({ mx: w.mxs.owner, attach: fakeAttach, now: w.now });
+  const repos = await again.listRepos();
+  await again.adoptFromRegistry(repos[0].repoId);
+  // the first attempt dies after the invites (the grant send fails once)
+  const real = w.mxs.owner.sendEvent;
+  let failed = false;
+  w.mxs.owner.sendEvent = async (room, type, c) => { if (type === EVT.grant && !failed) { failed = true; throw new Error('network went away'); } return real(room, type, c); };
+  await assert.rejects(() => again.confirm(repos[0], { door: m.door, entered: red.myCode }), /network went away/);
+  assert.equal((await w.mxs.owner.roomState(repo.rooms.records)).members[U.alice], 'invite', 'half done');
+  const conf = await again.confirm(repos[0], { door: m.door, entered: red.myCode });   // run it again
+  assert.equal(conf.user, U.alice);
+  const acc = await w.S.alice.acceptGrant({ door: red.door, ownerCode: red.ownerCodes[0].code });
+  assert.equal(acc.repo.role, 'editor');
+});
+
 // ---------------------------------------------------------------- F1: plaintext reaches the transport
 
 test('F1 — nothing the server holds contains the canary: source text, statement, attachment, ledger note', async () => {

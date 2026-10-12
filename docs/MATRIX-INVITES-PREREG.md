@@ -135,3 +135,65 @@ persistence across a real reload for the crypto store.
 ## Results
 
 (appended below this line; nothing above is edited)
+
+### Run of 2026-10-12 — unit tier (`node --test holodeck-share.test.mjs`) and live tier
+
+Environment, stated plainly: Synapse 1.143.0 from PyPI in a throwaway venv, one
+process, sqlite, bound to 127.0.0.1:18008, federation off, registration open **on
+that server only**; matrix-js-sdk 41.5.0 (Rust crypto 18.3.0) from the sibling
+eodb checkout; Node 24. Browser run: the Browser pane, two origins
+(`127.0.0.1` owner, `localhost` invitee), the real SDK bundle. No public
+homeserver was contacted. Attachments in the live Node tier used a WebCrypto
+stand-in with eodb's envelope shape (`media.js` does not import under Node:
+`window is not defined`); the vendored `media.js` itself was exercised in the
+browser bundle (round trip + tamper detection, no IDBFactory patch).
+
+| ID | Prediction | Result |
+|---|---|---|
+| F1 | canary 0 on the real path in both tiers; >0 for all controls; the legacy private room leaks in the live tier | **Held.** unit: 0 in everything the fake server holds; controls (a) unencrypted room, (b) legacy state write: >0. live: canary 0 in 3 sqlite files (db, wal, shm) + 0 media files; workspace title 0; **positive control: 1 hit** (legacy `savePrivate`-style state event is readable in the server database). Every non-state timeline event of all three stores is `m.room.encrypted`; every state event is structural. |
+| F2 | invitee reads 0/N before confirm; control reads N/N | **Held.** unit and live: 0 events fetchable by the invitee (403), no grant; live control (owner trusts + invites on request): invitee decrypts. |
+| F3 | removed member reads A, not B; control reads B | **Held, with one correction to the predicted control.** live: reads A, cannot decrypt B. The first control I wrote (ledger-only removal) did **not** let them read B: every client withdraws trust from a ledger-revoked person's devices, so a ledger entry alone already cuts key flow. I kept that as its own test (defence in depth) and made the control a removal attempted by a non-owner. |
+| F4 | gate refuses reader/stranger/demoted/forged; control accepts | **Held.** unit; plus the server refuses the reader's raw send (live, `M_FORBIDDEN` power level 0 < 50). |
+| F5 | new code 0 hits; legacy token found by whole-page localStorage scan | **Prediction partly wrong.** New modules: 0 hits in links, log lines and a recording localStorage; share modules reference no localStorage/sessionStorage/cookie (grep). Whole-page scan in the browser: **no access token, password or recovery key** — the panel keeps its session in IndexedDB, so the legacy `fold-matrix-session` entry did not exist in this run (it would, for a page already signed in the old way). What it **did** find that I did not predict: the SDK itself writes `mxjssdk_memory_filter_FILTER_SYNC_<user id>` to localStorage (a user id in a key name, written by the library), and the crypto IndexedDB is named with user id and device id. Neither is a secret; both are personal identifiers in browser storage. Reported, not claimed away. |
+| F6 | four typed refusals, zero transport calls; control passes all | **Held** (unit). The create→sync race was real in the browser: the first adapter read room state from the local sync cache and saw "no encryption yet" — the seal refused, correctly; the adapter now reads state from the server and asks the crypto layer separately. |
+| F7 | reader refused by server | **Held** (live). |
+| F8 | claim == observation | **Held**, and better than hedged: with both accounts cross-signed on Synapse 1.143 + SDK 41.5 the MSC4268 bundle was delivered (claimed yes, observed yes); `history = no` invites read nothing earlier (6 undecryptable counted); owner/invitee not cross-signed → typed gap and observed no. In the browser the invitee was not cross-signed, the invite said so after confirm, and the invitee was told "2 items were written before you joined". |
+| F9 | door closes; second redeem refused; expiry | **Held** (unit; live alias 404 after confirm). |
+| F10 | no regressions by name | **Held.** 38 baseline results (4 test files already failing before this branch: falsify-battery, inquiry-integration, inquiry, release-gate) all present with identical status; +42 new, all ok. |
+| F11 | no account literal | **Held** — see the report's grep. |
+
+### Defects the live and browser runs found that the unit tier could not
+
+Each is now a regression test or a typed behaviour:
+1. Room state read from the local sync cache looked unencrypted for a moment after create/join → state is read from the server.
+2. An alias is `#code:<server name>`; the server name is the user id's domain, not the URL host.
+3. A member who joined after earlier role entries were written could not decrypt them, so *their own fold* refused everyone's writes and a different person saw different state → the owner's ledger travels in the grant (authenticated by its sender); every viewer folds the same ledger.
+4. Device trust is per client in Matrix. "Keys only to devices the owner confirmed" worked for two people and silently broke at three (an editor's client withheld keys from a reader the owner had confirmed, not they) → every client applies the owner's confirmations from the owner-authored ledger, and withdraws a removed person's.
+5. The invitee's writes were withheld from the owner (the invitee had not trusted the owner's device) → mutual code: the invitee types the owner's digits; joining waits for them.
+6. `client.getAccountDataFromServer()` answers from the local store after the first sync and returned nothing after a reload → account data is read from the server directly.
+7. `client.invite()` always shares history in this SDK (the option is a deprecated no-op) → a "no history" invite uses the raw invite request.
+8. A selector built from a room id (`!…:server`) threw in the panel; the confirm click did nothing → `getElementById`.
+9. After a reload a new instance did not know the door rooms were its own → refusals as `unknown-room`; now adopted from the account's own registry; a half-failed confirm is idempotent.
+10. A prefilled invite was overwritten by the redraw's "keep what was typed" restore.
+
+### Not established (final list)
+
+Federation (one homeserver; role-at-timestamp ordering under clock skew;
+cross-server alias resolution); multi-device beyond one extra device of one
+member in the live tier; key backup and recovery (none set up, none
+restored — a person who clears site data loses their keys and must be
+re-confirmed as a new device); large rooms and 1M-record workspaces (single-digit
+members; the batch path was tested at 120 operators); homeservers other than
+Synapse and SDK versions other than 41.5.0; cross-signing on an account that
+already has keys (needs the password — typed gap, not exercised); a hostile
+homeserver (withholding or reordering); a compromised invitee; the 20-bit pairing
+code against an eavesdropper on the out-of-band channel (the full fingerprint is
+shown for comparison, the typed six digits are the gate); the reader flow in the
+browser pane (covered unit + live, not driven in the pane); history bundle
+delivery in the browser (the invitee there was not cross-signed — the typed gap
+path was what ran); attachments through the vendored `media.js` against a real
+server (exercised against the fake and in the bundle in isolation; the live Node
+tier used a stand-in); persistence of the crypto store across a reload was seen to
+work (the same device re-opened its store and decrypted a request received before
+the reload) but not exercised across a browser restart; mobile width was seen
+once at 800 px wide, not systematically.

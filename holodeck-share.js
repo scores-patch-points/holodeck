@@ -345,9 +345,11 @@ export function makeShare({ mx, attach = null, now = () => Date.now(), onRefuse 
     const caps = await mx.capabilities();
     const hist = historyCapability({ want: inv.history.want, caps, inviteeCrossSigned: match.crossSigned, visibility: 'shared' });
     for (const s of STORES) {
-      await mx.invite(repo.rooms[s], user, { shareHistory: hist.can });
+      // idempotent: a confirm that failed half-way is simply run again
+      const cur = await mx.roomState(repo.rooms[s]);
+      if (cur.members[user] !== 'invite' && cur.members[user] !== 'join') await mx.invite(repo.rooms[s], user, { shareHistory: hist.can });
       if (inv.role === ROLE.editor) {
-        const st = await mx.roomState(repo.rooms[s]);
+        const st = cur;
         const pl = JSON.parse(JSON.stringify(st.powerLevels || {}));
         pl.users = { ...(pl.users || {}), [user]: POWER.editor };
         await mx.setPowerLevels(repo.rooms[s], pl);
@@ -685,7 +687,14 @@ export function makeShare({ mx, attach = null, now = () => Date.now(), onRefuse 
     });
   }
 
-  return {
+  // A new instance (a reload) knows nothing until it is told: any call that names a repo adopts that repo's
+  // rooms, and any door in this account's own registry is trusted as a door. Nothing else is ever added.
+  const withRepo = (f) => async (repo, ...a) => {
+    if (repo && repo.rooms) adopt(repo);
+    try { for (const i of await invitesRead()) known.add(i.door); } catch { /* the call below reads again and throws honestly */ }
+    return f(repo, ...a);
+  };
+  const api = {
     mx, sealed, known, WORDS,
     createRepo, adoptFromRegistry, listRepos,
     mintInvite, listInvites, pendingRequests, confirm, revoke, reject, closeDoor,
@@ -693,6 +702,8 @@ export function makeShare({ mx, attach = null, now = () => Date.now(), onRefuse 
     people, setRole, removeMember, leave, sweepDoors, trustOwner, syncTrust, confirmDevice,
     write, writeBatch, readState, ledgerOf,
   };
+  for (const k of ['mintInvite', 'listInvites', 'confirm', 'revoke', 'reject', 'removeMember', 'leave', 'people', 'setRole', 'confirmDevice', 'trustOwner', 'syncTrust', 'write', 'writeBatch', 'readState', 'ledgerOf']) api[k] = withRepo(api[k]);
+  return api;
 }
 
 /** Scrub known secrets out of a line before it is shown or stored. */

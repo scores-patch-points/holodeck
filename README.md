@@ -143,6 +143,47 @@ The roster filters reasoning models out of **both** lanes, by name (`isThinkingM
 
 Settings → **Compute workers · Heimdall**: mint a heimdall compute invite under your own Matrix account. The fleet room is born with a short local alias, so the invite link is just `?r=<code>` — something you can actually type by hand on a remote computer (`scores-patch-points.github.io/heimdall/?r=h7q2x`). Record the worker's 6-digit pairing code into the account's `org.heimdall.codes` registry — the same registry the heimdall site confirms acceptance against, so an invite minted here is confirmable there and vice versa. Pure logic in `holodeck-heimdall.js` (the fold's `heimdall-invite.js` pattern); the crossings live in `fold-net.js`.
 
+## Encrypted repos — inviting people (2026-10-12)
+
+Settings → **Share this repo — encrypted…** (or open an invite link,
+`<this page>#join=<code>`). A *repo* is a workspace; making it one creates three
+Matrix rooms (sources, records, log), end-to-end encrypted with Megolm at creation,
+invite-only, with owner / editor / reader mapped onto power levels and enforced
+again in the fold. Invites are single-use, seven days, revocable; the invitee reads
+six digits to the owner, the owner types them and confirms the device, and only then
+is anyone let in. Details and the pre-registered falsification record:
+`docs/MATRIX-INVITES.md`, `docs/MATRIX-INVITES-PREREG.md`.
+
+**What is and is not private.** The server cannot read the content: source text and
+bytes, names, statements, figures, ties, the workspace title, notes. It can still
+see that the rooms exist and their ids, who is a member and when they joined or
+left, when each item was sent and how large it was, and the short invite code while
+an invite is open. "Private" always means that, and only that.
+
+* **History.** A new member reads earlier items only if both devices are
+  cross-signed and the invite asked for it; the invite says "can read past: yes/no"
+  and, when no, why. Otherwise they read from when they joined.
+* **Removal** stops new items reaching the person (they are banned, the sessions
+  are replaced, every client withdraws trust from their devices). It cannot take
+  back what their device already holds, and the server keeps the old items.
+* **Devices.** Keys go only to devices the owner confirmed by fingerprint; a
+  member's new device gets nothing until the owner confirms it. Another Matrix app
+  in these rooms follows its own setting.
+* **Keys** live in this browser's IndexedDB, protected by the browser profile, not
+  by a passphrase. Clearing site data loses them; the device must then be confirmed
+  again. Key backup is not set up.
+* **Older share links** (`fx-share`, email) put a throwaway account's password in
+  the address or mint disposable accounts, and do not open these stores. The
+  workspace's existing "private room" is **not encrypted** and keeps its work in a
+  state event the server reads; the panel detects it and offers a three-step,
+  operator-confirmed, reversible copy — it never moves anything on its own.
+
+The encrypted-repo library is loaded from this site, never from a CDN. Build it with
+`node vendor-eodb.mjs && node tools/vendor-matrix-sdk.mjs --toolchain ../eodb`
+(hashes recorded in `vendor/matrix-sdk/MATRIX-SDK-VENDOR.json`; the artifact is not
+committed). Tests: `node --test holodeck-share.test.mjs`; live, against a local
+homeserver: `node tests/matrix-invites.live.mjs`.
+
 ## Full-screen Chat · Fold · Notebook
 
 Open **Ask**, then choose **Chat**, **Fold**, or **Notebook**. **Full screen** hides the workspace navigation and reading controls; Escape restores them. The workspace name and source count remain visible. Switching modes preserves the conversation, artifacts and notebook edits. Direct entry: `?work=chat`, `?work=fold`, or `?work=notebook`; add `&fullscreen=1` for a focused workspace.

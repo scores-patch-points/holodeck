@@ -186,6 +186,7 @@ async function refresh() {
     const base = baseUrl();
     try {
       S.people = await S.share.people(S.repo);
+      if (S.repo.owner !== S.mx.userId) S.ownerTrusted = (await S.mx.deviceKeysOf(S.repo.owner)).some((d) => d.verified);
       if (S.repo.owner === S.mx.userId) {
         S.invites = await S.share.listInvites(S.repo, { base });
         const pend = {};
@@ -194,7 +195,7 @@ async function refresh() {
       }
     } catch (e) { S.error = e.why || e.message; }
   }
-  const snap = JSON.stringify([S.people, S.invites, S.pending, S.redeem && S.redeem.state, S.error]);
+  const snap = JSON.stringify([S.people, S.invites, S.pending, S.redeem && S.redeem.state, S.error, S.ownerTrusted]);
   if (snap !== S._snap) { S._snap = snap; draw(); }
 }
 
@@ -209,7 +210,8 @@ async function act(label, fn) {
   try { await fn(); } catch (e) { S.error = (e && (e.why || e.message)) || String(e); say('bad', S.error); }
   S.busy = ''; await refresh().catch(() => {}); draw();
 }
-const val = (id) => { const n = root && root.querySelector('#' + id); return n ? String(n.value || '').trim() : ''; };
+// getElementById, not a selector: door ids are room ids and carry '!' and ':'
+const val = (id) => { const n = root && root.ownerDocument.getElementById(id); return n ? String(n.value || '').trim() : ''; };
 
 async function doSignIn() {
   await act('Signing in…', async () => {
@@ -268,6 +270,10 @@ async function doConfirmDevice(user, deviceId) {
   await act('Confirming that device…', async () => { await S.share.confirmDevice(S.repo, { user, deviceId, entered: val('hds-dev-' + deviceId) }); });
 }
 
+async function doTrustOwner() {
+  await act('Checking their digits…', async () => { await S.share.trustOwner(S.repo, { entered: val('hds-trust-owner') }); S.notice = ''; S.ownerTrusted = true; });
+}
+
 async function doRedeem() {
   const input = val('hds-invite');
   await act('Asking to join…', async () => {
@@ -282,6 +288,9 @@ function pollGrant() {
   grantTimer = setInterval(async () => {
     if (!S || !S.redeem || S.busy) return;
     const typed = val('hds-owner-code');
+    // joining waits for the owner's digits: without them this device would not trust the owner's, and what
+    // the person writes would be withheld from the owner. Reading needs nothing; being read needs this.
+    if (!/^\d{6}$/.test(typed)) return;
     try {
       const r = await S.share.acceptGrant({ door: S.redeem.door, ownerCode: typed });
       clearInterval(grantTimer);
@@ -289,7 +298,6 @@ function pollGrant() {
       setRepoIdFor(ctxRef.corpusId ? ctxRef.corpusId() : 'default', r.repo.repoId);
       S.repos = await S.share.listRepos();
       S.notice = r.ownerTrusted ? '' : r.note;
-      say('ok', `Joined as ${r.repo.role}.`);
       await refresh(); draw();
     } catch (e) {
       if (e.code === REFUSE.NoGrantYet) return;                  // still waiting — that is a state, not an error
@@ -377,7 +385,7 @@ function body() {
   if (S.phase === 'gap') return out;
   if (S.phase === 'signin') { out.push(signInCard()); return out; }
   out.push(el('div', { class: 'hds-between' }, el('span', { class: 'hds-mut' }, 'Signed in as ', el('b', {}, S.mx.userId)), S.session && !S.session.fromPage && !S.sim ? el('button', { class: 'hds-quiet', type: 'button', onClick: doSignOut }, 'Sign out') : null));
-  if (!S.repo) out.push(createCard()); else { out.push(repoCard()); if (S.repo.owner === S.mx.userId) { out.push(peopleCard()); out.push(inviteCard()); } else out.push(peopleCard()); out.push(contentCard()); }
+  if (!S.repo) out.push(createCard()); else { out.push(repoCard()); if (S.repo.owner !== S.mx.userId && S.ownerTrusted === false && S.repo.role !== 'reader') out.push(trustOwnerCard()); if (S.repo.owner === S.mx.userId) { out.push(peopleCard()); out.push(inviteCard()); } else out.push(peopleCard()); out.push(contentCard()); }
   out.push(redeemCard());
   if (S.legacy.some((r) => r.needsAttention)) out.push(legacyCard());
   out.push(policyCard());
@@ -401,6 +409,13 @@ function createCard() {
     el('h3', {}, 'This workspace'),
     el('p', {}, 'It is not an encrypted repo yet. Making it one creates three encrypted stores (sources, records, log) that only people you confirm can read.'),
     el('div', { class: 'hds-row' }, el('button', { class: 'hds-go', type: 'button', onClick: doCreate }, 'Make this an encrypted repo')));
+}
+
+function trustOwnerCard() {
+  return el('div', { class: 'hds-card hds-note' },
+    el('h3', {}, 'One more step'),
+    el('p', {}, `Have ${S.repo.owner} read you the six digits shown in their Share panel. Until you type them, what you write is withheld from them.`),
+    el('div', { class: 'hds-row' }, el('input', { id: 'hds-trust-owner', class: 'hds-grow', inputmode: 'numeric', maxlength: '6', placeholder: 'their six digits' }), el('button', { class: 'hds-go', type: 'button', onClick: doTrustOwner }, 'Confirm')));
 }
 
 function repoCard() {
@@ -497,7 +512,7 @@ function redeemCard() {
       el('h3', {}, 'Joining'),
       el('p', {}, `Waiting for ${r.owner} to confirm your device. Read them these six digits:`),
       el('div', { class: 'hds-code', 'data-mycode': r.myCode }, r.myCode),
-      el('p', { class: 'hds-mut' }, 'Then have them read you theirs, so you know it is really them:'),
+      el('p', { class: 'hds-mut' }, 'Then have them read you theirs, so you know it is really them. Joining finishes when you have typed them:'),
       el('input', { id: 'hds-owner-code', inputmode: 'numeric', maxlength: '6', placeholder: 'their six digits', autocomplete: 'off' }),
       el('div', { class: 'hds-fp' }, 'Your device: ' + r.myFingerprint.join(' ')),
       el('div', { class: 'hds-row' }, el('button', { class: 'hds-quiet', type: 'button', onClick: () => { clearInterval(grantTimer); S.redeem = null; draw(); } }, 'Stop waiting')));
