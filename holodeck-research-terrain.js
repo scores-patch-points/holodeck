@@ -133,7 +133,18 @@ export function terrainOf(input, { key = '' } = {}) {
   };
   let echoFloor = 0;   // the highest null any tested pair had to beat (reported)
   const echoes = []; const echoOf = new Map();
-  { const seenPair = new Set();
+  // The page hands over the Holodeck's own echoes (analyze() already measures them against a shuffled null); then
+  // none are recomputed here. Without them this module measures its own, against the null above.
+  const given = input.echoes || null, stById = new Map(sts.map(st => [st.id, st]));
+  if (given) {
+    const seenPair = new Set();
+    for (const [id, list] of Object.entries(given)) { const a = stById.get(id); if (!a) continue;
+      for (const o of list) { const b = stById.get(o.id); if (!b || a.doc === b.doc) continue;
+        const k = a.id < b.id ? a.id + '|' + b.id : b.id + '|' + a.id; if (seenPair.has(k)) continue; seenPair.add(k);
+        echoes.push({ a: addr(a), b: addr(b), sim: +(+o.sim || 0).toFixed(3), nullMax: null, via: null });
+        (echoOf.get(a.id) || echoOf.set(a.id, []).get(a.id)).push(b); (echoOf.get(b.id) || echoOf.set(b.id, []).get(b.id)).push(a); } }
+  }
+  if (!given) { const seenPair = new Set();
     for (const x of ref.values()) { if (x.docs.size < 2) continue;
       for (let i = 0; i < x.sts.length; i++) for (let j = i + 1; j < x.sts.length; j++) {
         const a = x.sts[i], b = x.sts[j]; if (a.doc === b.doc) continue;
@@ -261,4 +272,18 @@ export function readingOf(run, parse) {
   }
   const gaps = (run.gaps || []).filter(g => g.kind === 'unread' || g.kind === 'turned-away' || g.kind === 'off-topic-when-read');
   return { docs, sts, gaps };
+}
+
+/** The reading shape from the Holodeck's own analysis (index.html's analyze() result `A`): its docs, its statements
+ *  (page furniture — `st.ref` — left out, as the Holodeck's own views leave it), its induced name kinds and its
+ *  echoes. This is what the research view lays out, so a row's id is the id the reader and the side panel already use.
+ *  `docIds` is the set of sources the research run ingested. Pure: A is read, never written. */
+export function readingOfAnalysis(A, docIds, gaps = []) {
+  const keep = new Set(docIds);
+  const docs = (A.docs || []).filter(d => keep.has(d.id)).map(d => ({ id: d.id, title: d.title, url: d.url || null, via: (d.research && d.research.via) || null, year: d.year || null, kind: d.type || null, found: (d.research && d.research.found) || [] }));
+  const sts = (A.sts || []).filter(st => keep.has(st.doc) && !st.ref).map(st => ({ id: st.id, doc: st.doc, s: st.s, e: st.e, text: st.text, names: st.names || [], figs: st.figs || [], dates: st.dates || [], frame: st.frame || 'fact' }));
+  const ids = new Set(sts.map(st => st.id));
+  const types = {}; for (const n of Object.values(A.names || {})) if (n && n.name) types[n.name] = n.type;
+  const echoes = {}; for (const [id, list] of Object.entries(A.echoes || {})) if (ids.has(id)) { const l = (list || []).filter(o => ids.has(o.id)); if (l.length) echoes[id] = l; }
+  return { docs, sts, types, echoes, gaps };
 }
