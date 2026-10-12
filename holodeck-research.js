@@ -69,6 +69,7 @@ const sha256hex = async text => {
  *   emit(event)                 streaming: lane / search / candidate / read / source / batch / round / stop
  *   signal                      AbortSignal
  *   concurrency, now, sha256, keySalt
+ *   noStop                      CONTROL ONLY: read every admitted candidate whatever the null says (the stop is still recorded in `wouldStopAt`)
  * }
  */
 export async function research(question, deps) {
@@ -99,7 +100,7 @@ export async function research(question, deps) {
   const laneTally = new Map();                      // scope -> { found, admitted, read, kept }
   const tally = s => laneTally.get(s) || (laneTally.set(s, { found: 0, admitted: 0, read: 0, kept: 0 }), laneTally.get(s));
   const followed = new Set();
-  let batchNo = 0, lastTest = null;
+  let batchNo = 0, lastTest = null; rec.wouldStopAt = null;
 
   const gate = c => {
     const text = c.title + ' . ' + c.snippet + ' . ' + c.url.replace(/^https?:\/\//, '').replace(/[\/_\-.?=&%+]+/g, ' ');
@@ -204,7 +205,10 @@ export async function research(question, deps) {
       const b = { n: batchNo, ids: batch.map(c => c.id), kept: kept.length, test: test.testable ? { observed: test.observed, nullMax: test.nullMax, nullMedian: test.nullMedian, p: test.p, outside: test.outside, viaCorpus: test.viaCorpus, viaBatch: test.viaBatch } : { testable: false, why: test.why } };
       rec.batches.push(b); rec.curve.push({ batch: batchNo, sources: [...cands.values()].filter(c => c.state === 'kept').length, referents: support.size, earned, singletons: support.size - earned });
       emit({ t: 'batch', ...b, referents: support.size, earned, sources: [...cands.values()].filter(c => c.state === 'kept').length });
-      if (test.testable && !test.outside) return 'inside-the-null';
+      if (test.testable && !test.outside) {
+        if (rec.wouldStopAt == null) rec.wouldStopAt = batchNo;   // recorded even for a control run that reads on, so the stop can be audited
+        if (!D.noStop) return 'inside-the-null';
+      }
     }
   }
 
@@ -219,7 +223,7 @@ export async function research(question, deps) {
 
   while (!stop && !aborted()) {
     // the pool is exhausted and the last tested batch (if any) was still learning: reach further
-    const stillLearning = !lastTest || !lastTest.testable || lastTest.outside;
+    const stillLearning = D.noStop || !lastTest || !lastTest.testable || lastTest.outside;
     if (!stillLearning) { stop = 'inside-the-null'; break; }
     round++;
     // widen first: lanes the router held back, plus any the web hits vote for

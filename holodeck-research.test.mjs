@@ -322,3 +322,16 @@ test('frontier names the strongest earned referent that is not already in the qu
   assert.equal(frontier(support, surface, qs, new Set(['mara quill'])).surface, 'Port Venn');
   assert.equal(frontier(support, surface, qs, new Set(['mara quill', 'port venn'])), null);
 });
+
+test('a control run that ignores the stop reads on, and still records where the null would have stopped it', async () => {
+  const pages = {}, urls = [];
+  for (let i = 0; i < 9; i++) { const u = 'https://s' + i + '.example/z'; urls.push(u); pages[u] = P('Zorblatt lighthouse ' + i, onTopic('', ['Mara Quill', 'Port Venn'])); }
+  const mk = () => fakeWeb({ lanes: { web: urls }, pages });
+  const route = () => ({ scopes: ['web'], why: {}, rest: [] });
+  const stopped = await research('history of the Zorblatt lighthouse', base(mk(), { route }));
+  const control = await research('history of the Zorblatt lighthouse', base(mk(), { route, noStop: true }));
+  assert.equal(stopped.stop.reason, 'inside-the-null');
+  assert.equal(control.sources.length, 9);
+  assert.equal(control.wouldStopAt, stopped.batches.length);
+  assert.ok(stopped.sources.length < control.sources.length);
+});
