@@ -46,6 +46,7 @@ export function makeLog({ label = s => s } = {}) {
         case 'read': {
           if (ev.state === 'reading') { move(ev.id, 'reading'); put('c:' + ev.id, { chip: 'Reading…', tone: 'mut' }); break; }
           if (ev.state === 'read') { move(ev.id, 'read'); put('c:' + ev.id, { chip: 'Read', tone: 'ok', title: ev.title, line: host(ev.url) + ' · ' + (ev.via || 'direct') + ' · ' + n(ev.statements || 0, 'statement') + ', ' + n(ev.referents || 0, 'name') + ' · about the question (' + ev.g + ' vs ' + ev.nullMax + ' by chance)', url: ev.url }); }
+          else if (ev.state === 'not-prose') { move(ev.id, 'notAbout'); put('c:' + ev.id, { chip: 'Not prose', tone: 'warn', title: ev.title, line: host(ev.url) + ' · ' + ev.why, url: ev.url }); }
           else if (ev.state === 'off-topic') { move(ev.id, 'notAbout'); put('c:' + ev.id, { chip: 'Not about it', tone: 'warn', title: ev.title, line: host(ev.url) + ' · ' + ev.why, url: ev.url }); }
           else { move(ev.id, 'unread'); put('c:' + ev.id, { chip: 'Couldn’t read', tone: 'bad', title: ev.title, line: host(ev.url) + ' · ' + ev.why, url: ev.url }); }
           break; }
@@ -79,3 +80,36 @@ export const STOP_WORDS = {
   'no-candidates': 'It found nothing to read',
   aborted: 'You stopped it',
 };
+
+/** The same rows, rebuilt from a stored run record (the live stream is gone after a reload): the record's lanes,
+ *  searches, candidates, reads, batches and stop are replayed as events through the same log. */
+export function rowsOfRecord(rec, label = s => s) {
+  const log = makeLog({ label });
+  const byRound = r => (x => x.round === r || (r === 0 && x.round == null));
+  const lanes0 = (rec.lanes || []).filter(byRound(0));
+  log.push({ t: 'lanes', lanes: lanes0, held: (rec.notAsked || []).map(x => x.scope) });
+  const rounds = new Map((rec.rounds || []).map(r => [r.round, r]));
+  const maxR = Math.max(0, ...(rec.rounds || []).map(r => r.round), ...(rec.batches || []).map(b => b.round || 0));
+  const cands = rec.candidates || [], batches = rec.batches || [], curve = rec.curve || [];
+  let ci = 0;
+  for (let r = 0; r <= maxR; r++) {
+    const R = rounds.get(r); if (r > 0 && R) log.push({ t: 'round', round: r, kind: R.kind, scopes: R.scopes, queries: R.queries, why: R.why || '' });
+    for (const s of (rec.searches || []).filter(x => (x.round || 0) === r)) log.push(s.ok ? { t: 'search', scope: s.scope, q: s.q, state: 'found', n: s.n, engine: s.engine } : { t: 'search', scope: s.scope, q: s.q, state: 'failed', why: s.why });
+    for (const c of cands.filter(c => ((c.found[0] || {}).round || 0) === r)) {
+      const sr = c.snippetRel || {}, scope = (c.found[0] || {}).scope;
+      log.push({ t: 'candidate', id: c.id, url: c.url, title: c.title, scope, verdict: c.verdict, g: sr.g, nullMax: sr.nullMax, ungated: sr.ok === false, why: c.verdict === 'admitted' ? '' : c.why });
+      if (c.state === 'kept') log.push({ t: 'read', id: c.id, url: c.url, title: c.title, state: 'read', via: '', chars: 0, g: (c.textRel || {}).g, nullMax: (c.textRel || {}).nullMax, statements: 0, referents: 0 });
+      else if (c.state === 'unread') log.push({ t: 'read', id: c.id, url: c.url, title: c.title, state: 'unread', why: c.why });
+      else if (c.state === 'off-topic') log.push({ t: 'read', id: c.id, url: c.url, title: c.title, state: 'off-topic', why: c.why });
+      else if (c.state === 'not-prose') log.push({ t: 'read', id: c.id, url: c.url, title: c.title, state: 'not-prose', why: c.why });
+      ci++;
+    }
+    let k = 0;
+    for (const b of batches.filter(b => (b.round || 0) === r)) {
+      const cv = b.kept ? curve.find(x => x.batch === b.n) : null;
+      log.push({ t: 'batch', n: b.n, kept: b.kept, test: b.test, sources: cv ? cv.sources : b.kept, referents: cv ? cv.referents : 0, earned: cv ? cv.earned : 0 }); k++;
+    }
+  }
+  if (rec.stop) log.push({ t: 'stop', stop: rec.stop, corpus: rec.corpus });
+  return log.rows();
+}

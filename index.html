@@ -467,6 +467,103 @@ button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visi
         </sc-if>
       </sc-if>
 
+      <sc-if value="{{ v.research }}" hint-placeholder-val="{{ false }}">
+        <sc-if value="{{ res.loading }}" hint-placeholder-val="{{ false }}"><span style="font:500 14px var(--mono);color:var(--mut)">Opening the research…</span></sc-if>
+        <sc-if value="{{ res.none }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:12px;align-items:flex-start;background:var(--s1);border:1px solid var(--line);border-radius:12px;padding:18px 20px">
+            <span style="font:500 15px/1.5 var(--sans);color:var(--ink2);max-width:640px;text-wrap:pretty">No research has been run in this workspace. Ask a question or name a topic: the assistant looks in several places, reads what is about it, and lays the result out here.</span>
+            <button onClick="{{ res.onAsk }}" style="background:var(--acc2);border:0;color:#fff;border-radius:8px;padding:9px 18px;cursor:pointer;font:600 14px var(--sans)">Research a question</button>
+          </div>
+        </sc-if>
+        <sc-if value="{{ res.has }}" hint-placeholder-val="{{ true }}">
+          <section style="background:var(--s1);border:1px solid var(--line);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:8px">
+            <span style="font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mut)">What it was asked</span>
+            <span style="font:500 20px/1.35 var(--serif);color:var(--ink);text-wrap:pretty">{{ res.question }}</span>
+            <span style="font:400 14px/1.5 var(--sans);color:var(--ink2)">{{ res.lead }}</span>
+            <span style="font:600 14px/1.5 var(--sans);color:var(--ink)">{{ res.stopTitle }}</span>
+            <span style="font:400 13px/1.5 var(--sans);color:var(--mut);text-wrap:pretty">{{ res.stopLine }} <span style="color:var(--dim)">{{ res.ms }}</span></span>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <button onClick="{{ res.onLog }}" style="background:none;border:1px solid var(--line2);border-radius:8px;padding:6px 12px;cursor:pointer;font:500 13px var(--sans);color:var(--ink)" style-hover="border-color:var(--acc)">{{ res.logLabel }}</button>
+              <button onClick="{{ res.onAsk }}" style="background:none;border:1px solid var(--line2);border-radius:8px;padding:6px 12px;cursor:pointer;font:500 13px var(--sans);color:var(--ink)" style-hover="border-color:var(--acc)">Research something else</button>
+            </div>
+            <sc-if value="{{ res.logOpen }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;flex-direction:column;border:1px solid var(--line);border-radius:10px;max-height:420px;overflow:auto;margin-top:6px">
+                <sc-for list="{{ res.log }}" as="lr" hint-placeholder-count="6">
+                  <div style="display:flex;gap:10px;align-items:baseline;padding:7px 12px;border-top:1px solid var(--line)">
+                    <span style="flex:none;min-width:92px;font:600 11px var(--mono);letter-spacing:.04em;text-transform:uppercase;color:{{ lr.col }}">{{ lr.chip }}</span>
+                    <div style="min-width:0;display:flex;flex-direction:column;gap:1px"><span style="font:500 13px/1.4 var(--sans);color:var(--ink);text-wrap:pretty">{{ lr.title }}</span><span style="font:400 12px/1.4 var(--sans);color:var(--mut);text-wrap:pretty">{{ lr.line }}</span></div>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+          </section>
+          <section style="display:flex;flex-direction:column;gap:8px;background:var(--s1);border:1px solid var(--line);border-radius:12px;padding:12px 16px">
+            <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><span style="font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mut)">Look at it by</span><span style="font:500 13px var(--sans);color:var(--ink2)">{{ res.scopeLine }}</span><sc-if value="{{ res.hasScope }}" hint-placeholder-val="{{ false }}"><button onClick="{{ res.onClear }}" style="background:none;border:0;color:var(--acc);cursor:pointer;font:500 13px var(--sans)">Show everything</button></sc-if></div>
+            <sc-if value="{{ res.hasFrames }}" hint-placeholder-val="{{ true }}"><div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center"><span style="font:500 12px var(--mono);color:var(--dim);min-width:96px">How firmly said</span><sc-for list="{{ res.frameChips }}" as="fc" hint-placeholder-count="3"><button onClick="{{ fc.onClick }}" style="display:flex;align-items:baseline;gap:6px;background:{{ fc.bg }};border:1px solid {{ fc.bd }};border-radius:999px;padding:3px 11px;cursor:pointer;font:{{ fc.weight }} 13px var(--sans);color:var(--ink)">{{ fc.label }}<span style="font:400 11px var(--mono);color:var(--mut)">{{ fc.n }}</span></button></sc-for></div></sc-if>
+            <sc-if value="{{ res.hasGroups }}" hint-placeholder-val="{{ false }}"><div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center"><span style="font:500 12px var(--mono);color:var(--dim);min-width:96px">Sources that agree</span><sc-for list="{{ res.groupChips }}" as="gc" hint-placeholder-count="2"><button onClick="{{ gc.onClick }}" style="display:flex;align-items:baseline;gap:6px;background:{{ gc.bg }};border:1px solid {{ gc.bd }};border-radius:999px;padding:3px 11px;cursor:pointer;font:{{ gc.weight }} 13px var(--sans);color:var(--ink)">{{ gc.label }}<span style="font:400 11px var(--mono);color:var(--mut)">{{ gc.n }}</span></button></sc-for></div></sc-if>
+            <sc-if value="{{ res.yearLine }}" hint-placeholder-val="{{ false }}"><span style="font:400 12px var(--mono);color:var(--dim)">{{ res.yearLine }}</span></sc-if>
+          </section>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:14px;align-items:start">
+            <section style="background:var(--s1);border:1px solid var(--line);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:8px">
+              <span style="font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mut)">Sources</span>
+              <span style="font:400 13px/1.45 var(--sans);color:var(--mut)">What it read, and where each came from. Choose one to see only what that source says.</span>
+              <sc-for list="{{ res.sources }}" as="sr1" hint-placeholder-count="3">
+                <div style="display:flex;flex-direction:column;gap:4px;border:1px solid {{ sr1.bd }};background:{{ sr1.bg }};border-radius:8px;padding:8px 10px">
+                  <span style="font:600 14px/1.35 var(--sans);color:var(--ink);text-wrap:pretty">{{ sr1.title }}</span>
+                  <span style="font:400 12px/1.4 var(--sans);color:var(--mut)">{{ sr1.line }}</span>
+                  <div style="display:flex;gap:10px"><button onClick="{{ sr1.onFocus }}" style="all:unset;cursor:pointer;font:500 12px var(--sans);color:var(--acc)" style-hover="text-decoration:underline">{{ sr1.focusLabel }}</button><button onClick="{{ sr1.onOpen }}" style="all:unset;cursor:pointer;font:500 12px var(--sans);color:var(--acc)" style-hover="text-decoration:underline">Open it</button></div>
+                </div>
+              </sc-for>
+              <sc-if value="{{ res.hasGaps }}" hint-placeholder-val="{{ false }}">
+                <span style="font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mut);padding-top:6px">Not read, and why · {{ res.nGaps }}</span>
+                <sc-for list="{{ res.gaps }}" as="gp" hint-placeholder-count="3">
+                  <div style="display:flex;gap:10px;align-items:baseline;border-top:1px solid var(--line);padding-top:6px"><span style="flex:none;min-width:92px;font:600 11px var(--mono);letter-spacing:.04em;text-transform:uppercase;color:{{ gp.col }}">{{ gp.chip }}</span><div style="min-width:0;display:flex;flex-direction:column;gap:1px"><span style="font:500 13px/1.4 var(--sans);color:var(--ink);text-wrap:pretty">{{ gp.title }}</span><span style="font:400 12px/1.4 var(--sans);color:var(--mut);text-wrap:pretty">{{ gp.line }}</span></div></div>
+                </sc-for>
+              </sc-if>
+            </section>
+            <section style="background:var(--s1);border:1px solid var(--line);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:8px">
+              <span style="font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mut)">Names · {{ res.nNames }}</span>
+              <span style="font:400 13px/1.45 var(--sans);color:var(--mut)">Confirmed means two independent sources say it. Heard once is kept, but has not earned standing.</span>
+              <sc-for list="{{ res.names.items }}" as="nm1" hint-placeholder-count="6">
+                <button onClick="{{ nm1.onClick }}" style="all:unset;cursor:pointer;display:flex;flex-direction:column;gap:1px;border-top:1px solid var(--line);padding:6px 0" style-hover="background:var(--s2)"><span style="font:600 14px var(--sans);color:var(--ink)">{{ nm1.name }}</span><span style="font:400 12px var(--sans);color:{{ nm1.col }}">{{ nm1.line }}</span></button>
+              </sc-for>
+              <sc-if value="{{ res.names.hasMore }}" hint-placeholder-val="{{ false }}"><button onClick="{{ res.names.onMore }}" style="align-self:flex-start;background:none;border:1px solid var(--line2);border-radius:8px;padding:4px 12px;cursor:pointer;font:500 13px var(--sans);color:var(--ink)">{{ res.names.moreLabel }}</button></sc-if>
+            </section>
+            <sc-if value="{{ res.hasKinds }}" hint-placeholder-val="{{ false }}">
+              <section style="background:var(--s1);border:1px solid var(--line);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:6px">
+                <span style="font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mut)">Types</span>
+                <sc-for list="{{ res.kinds }}" as="kd" hint-placeholder-count="3"><div style="display:flex;gap:10px;align-items:baseline;border-top:1px solid var(--line);padding-top:6px"><span style="flex:none;min-width:34px;font:600 14px var(--mono);color:var(--ink)">{{ kd.n }}</span><div style="display:flex;flex-direction:column;gap:1px"><span style="font:500 14px var(--sans);color:var(--ink)">{{ kd.label }}</span><span style="font:400 12px var(--sans);color:var(--mut)">{{ kd.ex }}</span></div></div></sc-for>
+              </section>
+            </sc-if>
+            <sc-if value="{{ res.hasFigures }}" hint-placeholder-val="{{ false }}">
+              <section style="background:var(--s1);border:1px solid var(--line);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:6px">
+                <span style="font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mut)">Figures</span>
+                <sc-for list="{{ res.figures.items }}" as="fg" hint-placeholder-count="4">
+                  <button onClick="{{ fg.onClick }}" style="all:unset;cursor:pointer;display:flex;flex-direction:column;gap:1px;border-top:1px solid var(--line);padding:6px 0" style-hover="background:var(--s2)"><span style="font:600 14px var(--sans);color:var(--ink)">{{ fg.raw }} <span style="font:400 12px var(--mono);color:var(--dim)">{{ fg.unit }}</span></span><span style="font:400 12px var(--sans);color:var(--mut)">{{ fg.line }}</span><sc-if value="{{ fg.hasFlag }}" hint-placeholder-val="{{ false }}"><span style="font:500 12px var(--sans);color:var(--amber)">{{ fg.flag }}</span></sc-if></button>
+                </sc-for>
+                <sc-if value="{{ res.figures.hasMore }}" hint-placeholder-val="{{ false }}"><button onClick="{{ res.figures.onMore }}" style="align-self:flex-start;background:none;border:1px solid var(--line2);border-radius:8px;padding:4px 12px;cursor:pointer;font:500 13px var(--sans);color:var(--ink)">{{ res.figures.moreLabel }}</button></sc-if>
+              </section>
+            </sc-if>
+          </div>
+          <section style="background:var(--s1);border:1px solid var(--line);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:8px">
+            <span style="font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mut)">Statements · {{ res.nStatements }}</span>
+            <span style="font:400 13px/1.45 var(--sans);color:var(--mut)">What each source says. Said again elsewhere comes first. Click one to see who says it and where; the page does not move.</span>
+            <sc-for list="{{ res.statements.items }}" as="st1" hint-placeholder-count="4">
+              <div onClick="{{ st1.onClick }}" style="cursor:pointer;display:flex;flex-direction:column;gap:3px;border-top:1px solid var(--line);padding:8px 6px;border-radius:6px;background:{{ st1.bg }}" style-hover="background:var(--s2)">
+                <span style="font:400 14px/1.5 var(--serif);color:var(--ink);text-wrap:pretty">{{ st1.text }}</span>
+                <span style="display:flex;gap:10px;align-items:baseline;font:400 12px var(--sans);color:var(--mut)">{{ st1.line }} <button onClick="{{ st1.onOpen }}" style="all:unset;cursor:pointer;color:var(--acc)" style-hover="text-decoration:underline">Open in the source</button></span>
+              </div>
+            </sc-for>
+            <sc-if value="{{ res.statements.hasMore }}" hint-placeholder-val="{{ false }}"><button onClick="{{ res.statements.onMore }}" style="align-self:flex-start;background:none;border:1px solid var(--line2);border-radius:8px;padding:4px 12px;cursor:pointer;font:500 13px var(--sans);color:var(--ink)">{{ res.statements.moreLabel }}</button></sc-if>
+          </section>
+          <section style="background:var(--s1);border:1px solid var(--line);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:8px">
+            <span style="font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mut)">Connections</span>
+            <span style="font:400 13px/1.45 var(--sans);color:var(--mut);text-wrap:pretty">{{ res.mapNote }}</span>
+            <sc-if value="{{ res.hasGraph }}" hint-placeholder-val="{{ false }}"><div style="border-radius:10px;background:var(--bg);border:1px solid var(--line)">{{ res.graphEl }}</div></sc-if>
+          </section>
+        </sc-if>
+      </sc-if>
+
       <sc-if value="{{ v.overview }}" hint-placeholder-val="{{ false }}"><div id="overview-surface"></div></sc-if>
       <sc-if value="{{ v.summary }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:6px;padding-top:10px;border-top:1px solid var(--line);margin-top:10px">
@@ -2814,9 +2911,41 @@ button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visi
               <span style="position:absolute;right:11px;pointer-events:none;color:var(--mut);font-size:11px">⌄</span>
             </label>
             <span style="flex:1"></span>
-            <button onClick="{{ add.onSearch }}" title="Search — or paste a link and it is added" style="flex:none;background:none;border:0;color:var(--ink2);cursor:pointer;width:34px;height:34px;border-radius:999px;display:flex;align-items:center;justify-content:center" style-hover="background:var(--s1);color:var(--ink)">→</button>
+            <button onClick="{{ add.onSearch }}" title="Search — or paste a link and it is added" style="flex:none;background:none;border:0;color:var(--ink2);cursor:pointer;width:34px;height:34px;border-radius:999px;display:{{ add.arrowDisplay }};align-items:center;justify-content:center" style-hover="background:var(--s1);color:var(--ink)">→</button>
           </div>
         </div>
+        <sc-if value="{{ add.isResearch }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:12px;background:var(--s2);border:1px solid var(--line);border-radius:12px;padding:14px 16px">
+            <span style="font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mut)">Research assistant</span>
+            <span style="font:400 14px/1.5 var(--sans);color:var(--ink2);text-wrap:pretty">It looks in several places, reads what is about the question, and stops when reading more would not teach it more than chance. What it read is laid out by who and what, what kind, and how they connect — every row points back to the words it came from, and anything it could not read is listed with why. No model reads anything.</span>
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <span style="font:500 12px var(--mono);color:var(--dim)">Where it may look — the router picks from these by what the question needs</span>
+              <sc-for list="{{ add.rs.lanes }}" as="ln" hint-placeholder-count="6">
+                <label style="display:flex;align-items:baseline;gap:8px;cursor:pointer;flex-wrap:wrap"><input type="checkbox" checked="{{ ln.on }}" onChange="{{ ln.onToggle }}"><span style="font:500 14px var(--sans);color:var(--ink)">{{ ln.label }}</span><span style="font:400 12px var(--mono);color:var(--mut)">{{ ln.hosts }}</span></label>
+              </sc-for>
+            </div>
+            <label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer"><input type="checkbox" checked="{{ add.rs.third }}" onChange="{{ add.rs.onThird }}" style="margin-top:3px"><span style="font:400 13px/1.45 var(--sans);color:var(--ink2)">Let third-party readers fetch a page its site refuses. <span style="color:var(--mut)">{{ add.rs.thirdLine }}</span></span></label>
+            <div style="border-left:2px solid var(--acc2);padding:2px 0 2px 10px;font:400 13px/1.5 var(--sans);color:var(--ink);text-wrap:pretty">{{ add.rs.sendLine }}</div>
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+              <sc-if value="{{ add.rs.notRunning }}" hint-placeholder-val="{{ true }}"><button onClick="{{ add.rs.onSend }}" style="background:var(--acc2);border:0;color:#fff;border-radius:8px;padding:9px 18px;cursor:pointer;font:600 14px var(--sans)" style-hover="background:var(--acc3)">Send the question and search</button></sc-if>
+              <sc-if value="{{ add.rs.running }}" hint-placeholder-val="{{ false }}"><button onClick="{{ add.rs.onStop }}" style="background:none;border:1px solid var(--bad);color:var(--bad);border-radius:8px;padding:8px 16px;cursor:pointer;font:600 14px var(--sans)">Stop</button><span style="font:500 13px var(--mono);color:var(--mut)">{{ add.rs.progress }}</span></sc-if>
+            </div>
+          </div>
+          <sc-if value="{{ add.rs.hasLog }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <div style="display:flex;flex-direction:column;border:1px solid var(--line);border-radius:10px;max-height:340px;overflow:auto">
+                <sc-for list="{{ add.rs.rows }}" as="lr" hint-placeholder-count="6">
+                  <div style="display:flex;gap:10px;align-items:baseline;padding:7px 12px;border-top:1px solid var(--line)">
+                    <span style="flex:none;min-width:92px;font:600 11px var(--mono);letter-spacing:.04em;text-transform:uppercase;color:{{ lr.col }}">{{ lr.chip }}</span>
+                    <div style="min-width:0;display:flex;flex-direction:column;gap:1px"><span style="font:500 13px/1.4 var(--sans);color:var(--ink);text-wrap:pretty">{{ lr.title }}</span><span style="font:400 12px/1.4 var(--sans);color:var(--mut);text-wrap:pretty">{{ lr.line }}</span></div>
+                  </div>
+                </sc-for>
+              </div>
+              <span style="font:500 13px/1.45 var(--sans);color:var(--ink2)">{{ add.rs.summary }}</span>
+            </div>
+          </sc-if>
+          <sc-if value="{{ add.rs.hasError }}" hint-placeholder-val="{{ false }}"><span style="font:400 14px/1.45 var(--sans);color:var(--bad)">{{ add.rs.error }}</span></sc-if>
+        </sc-if>
         <sc-if value="{{ add.hasPanel }}" hint-placeholder-val="{{ false }}">
           <div style="display:flex;flex-direction:column;gap:8px">
             <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
@@ -2896,7 +3025,7 @@ button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visi
 function digammaH(x) { let r = 0; while (x < 6) { r -= 1 / x; x += 1; } const f = 1 / (x * x); return r + Math.log(x) - 0.5 / x - f * (1 / 12 - f * (1 / 120 - f * (1 / 252 - f * (1 / 240 - f / 132)))); }
 const klAdmitH = (bv, B) => Math.max(0, Math.log(B) - Math.log(bv) + digammaH(bv + 1) - digammaH(B + 1));
 const holoTokens = t => [...new Set((clean(t).toLowerCase().replace(/[\u2019']/g, '').match(/[a-z][a-z-]{2,}/g) || []).filter(w => !STOP.has(w) && !/^-|-$/.test(w)))];
-const VIEW_LABEL = { overview: 'Evidence overview', summary: 'Overview', search: 'Search', names: 'Names', types: 'Types', figures: 'Figures', statements: 'Statements', connections: 'Connections', framing: 'Framing', views: 'Views', patterns: 'Patterns', surprise: 'Surprise', reader: 'Sources', profile: 'Names', draft: 'Draft', records: 'Records', ask: 'Ask the Fold', ingest: 'Add & publish' };
+const VIEW_LABEL = { overview: 'Evidence overview', summary: 'Overview', search: 'Search', names: 'Names', types: 'Types', figures: 'Figures', statements: 'Statements', connections: 'Connections', framing: 'Framing', views: 'Views', patterns: 'Patterns', surprise: 'Surprise', reader: 'Sources', profile: 'Names', draft: 'Draft', records: 'Records', ask: 'Ask the Fold', ingest: 'Add & publish', research: 'Research' };
 const SU_CURSORS = [
   { id: 'loo', label: 'Everything else', desc: 'Each statement against normal text plus everything the other sources in this view say, regardless of date: what this source says that nothing else in view, and nothing normal, prepares you for.' },
   { id: 'pub', label: 'When published', desc: 'Sources in the order they were published: what a reader following the story would have learned, and when.' },
@@ -4369,7 +4498,9 @@ function loadScript(src) { return new Promise((res, rej) => { if (document.query
 // "✦ Explore this page" bookmarklet — so no third party learns what is being read. GitHub, Wikipedia,
 // the Internet Archive, and the open scholarly graph (OpenAlex, Crossref) answer a browser directly
 // with no key, so only those can be searched.
+const TONE_COL = { ok: 'var(--ok)', mut: 'var(--mut)', warn: 'var(--amber)', bad: 'var(--bad)' };
 const SEARCH_SCOPES = [
+  { id: 'research', label: 'Research assistant', ask: 'Ask a question or name a topic — it finds, reads and lays out many sources' },
   { id: 'github', label: 'GitHub', ask: 'Search GitHub repositories' },
   { id: 'wikipedia', label: 'Wikipedia', ask: 'Search Wikipedia articles' },
   { id: 'archive', label: 'Internet Archive', ask: 'Search books, documents and recordings' },
@@ -4462,6 +4593,8 @@ let _hdFort = null; try { import(new URL('holodeck-fort.js', location.href).href
 // browser cannot read YouTube and Pyodide cannot either — its networking is the browser's fetch.
 let _hdYt = null; const hdYt = () => _hdYt || (_hdYt = import(new URL('holodeck-yt.js', location.href).href));
 let _hdClip = null; const hdClip = () => _hdClip || (_hdClip = import(new URL('holodeck-clip.js', location.href).href));
+// The research assistant (holodeck-research*.js): pure, tested, model-free modules, loaded together on first use.
+let _hdRes = null; const hdRes = () => _hdRes || (_hdRes = Promise.all(['holodeck-research.js', 'holodeck-research-null.js', 'holodeck-research-read.js', 'holodeck-research-terrain.js', 'holodeck-research-lanes.js', 'holodeck-research-log.js'].map(f => import(new URL(f, location.href).href))).then(([R, N, Rd, T, L, Log]) => ({ R, N, Rd, T, L, Log })));
 // Entity profiles (holodeck-profile.js): kind-induced key parameters per being,
 // built from the workspace's own relations. Loaded like the other modules.
 let _hdProf = null;
@@ -4910,39 +5043,199 @@ class Component extends DCLogic {
       if (opt.collect) opt.collect.push(shell); else this.addDocs([shell], { open: opt.open, keepOpen: opt.keepOpen });
     }
   }
+  // The one door. A question typed anywhere (the omni bar of an empty workspace, "Find sources" under a refused ask)
+  // lands in the research assistant's panel — never in a search that fires on its own: a question leaves this device,
+  // so the person sees where it goes and presses the one button that sends it (researchRun). Force never bypasses it.
   async autoResearch(q, opt) {
     opt = opt || {};
-    // A question is the whole brief: search Wikipedia and the Internet Archive directly (nothing is relayed), then read the best few.
-    const N = 6, say = m => this.setState({ busy: m });
-    say('Finding sources for “' + q.slice(0, 60) + '”…');
-    const found = await Promise.all(['wikipedia', 'archive'].map(sc => searchSources(sc, q, 0).then(r => r.results.slice(0, 5)).catch(e => { console.warn('research', sc, e && e.message); return []; })));
-    // interleave so one kind cannot crowd out the others; web first, since it answers most questions
-    const seen = new Set(), pick = [];
-    for (let k = 0; k < 5 && pick.length < N; k++) for (const list of found) { const x = list[k]; if (!x || !x.url || seen.has(x.url)) continue; seen.add(x.url); pick.push(x); if (pick.length >= N) break; }
-    const got = []; let i = 0;
-    for (const x of pick) { i++; say('Reading source ' + i + ' of ' + pick.length + ' — ' + hdCut(x.title || x.url, 50)); try { await this.ingestUrl(x.url, { title: x.title, collect: got }); } catch (e) {} }
-    // A source is usable only if text was actually read out of it. A page that answers with a
-    // JavaScript shell is not a source, however many bytes of markup it carried — it is reported,
-    // never admitted to stand in for one.
-    const readableOf = d => String(d.text || (d.html ? pageText(d.html, d.format) : '') || '').trim();
-    const usable = got.filter(d => readableOf(d).length > 40);
-    const unread = got.filter(d => readableOf(d).length <= 40);
-    if (usable.length) await this.addDocs(usable);
     clearTimeout(this._omniT); this._askLive = '';
-    if (!usable.length) {
-      const why = unread.length ? ' The search found ' + plural(unread.length, 'page') + ' but none could be read here (' + unread.slice(0, 3).map(x => short(x.title || x.url, 40)).join('; ') + ').' : '';
-      this.setState({ busy: '', note: 'No sources could be read for that question.' + why + ' Try rephrasing it, or add your own.' });
-      if (opt.answer) this.setState({ view: 'ask', akRefuse: { q }, busy: '' });
-      return;
+    this._add = null; const A = this.addState(); A.scope = 'research'; A.q = String(q || '').trim(); A.answerAfter = !!opt.answer;
+    A.baseAdded = (this.state.added[this.corpusId()] || []).length;
+    this.setState({ showAdd: true, akRefuse: null, q: opt.answer ? this.state.q : this.state.q });
+    this.researchProbe();
+  }
+  // ── The research assistant ────────────────────────────────────────────────────────────────────────────────────────
+  // A question → the lanes the fold's router picks → candidates gated by a relevance null → pages read → a stopping
+  // null after each batch → ONE ingest (one trace) → the corpus laid out by terrain. Every decision lives in
+  // holodeck-research*.js (pure, tested, model-free); this is wiring and display. A question LEAVES THIS DEVICE, so
+  // nothing here sends one except researchRun(), and researchRun() is reached only from the one button (or the Enter
+  // that presses it) beside the list of hosts it will go to. autoResearch() and "Find sources" open that panel; they
+  // never search on their own.
+  researchLaneIds() { return ['web', 'wikipedia', 'github', 'archive', 'openalex', 'crossref']; }
+  researchPrefs() { let p = {}; try { p = JSON.parse(localStorage.getItem('hd:research') || '{}') || {}; } catch (e) {} return { off: p.off || {}, third: p.third !== false }; }
+  researchSavePrefs(p) { try { localStorage.setItem('hd:research', JSON.stringify(p)); } catch (e) {} }
+  async researchDisclose() {
+    const rs = (this.addState().rs = this.addState().rs || {});
+    try { const M = await hdRes(); this._resM = M; rs.disc = await M.L.disclosure({ bridge: rs.bridge || null, directOnly: !this.researchPrefs().third }); } catch (e) { rs.discErr = String((e && e.message) || e); }
+    this.forceUpdate();
+  }
+  async researchProbe() {
+    const rs = (this.addState().rs = this.addState().rs || {});
+    if (rs.probing) return; rs.probing = true;
+    try { const H = await this.chatLaneMod(); const base = H.HEIMDALL; try { const r = await fetchT(base + '/api/tags', 1500); rs.bridge = r.ok ? base : null; } catch (e) { rs.bridge = null; } } catch (e) { rs.bridge = null; }
+    rs.probing = false; rs.probed = true; await this.researchDisclose();
+  }
+  async researchRun() {
+    const A = this.addState(), q = (A.q || '').trim(); const rs = (A.rs = A.rs || {});
+    if (!q || rs.running) return;
+    rs.running = true; rs.done = false; rs.error = ''; rs.record = null; rs.log = null; this.forceUpdate();
+    try {
+      const M = await hdRes(); this._resM = M;
+      if (!rs.probed) await this.researchProbe();
+      try { await hdLoadReference(); } catch (e) {}
+      const bg = HD_REF && HD_REF.casing ? M.N.makeBackground(HD_REF.casing) : null;
+      const P = this.researchPrefs(); const allowed = new Set(this.researchLaneIds().filter(s => !P.off[s]));
+      const fnOnly = w => { try { const c = hdPos(w); return !!c && Object.keys(c).every(x => ['ADP', 'CCONJ', 'SCONJ', 'DET', 'AUX', 'PART', 'PRON'].includes(x)); } catch (e) { return false; } };
+      // a PDF is read by the Holodeck's own file reader (its text layer); only the site's own answer, never a proxy
+      const readExtra = async url => { const r = await fetchT(url, 12000); if (!r.ok) return null; const b = await r.arrayBuffer(); let nm = 'paper.pdf'; try { nm = decodeURIComponent(new URL(url).pathname.split('/').pop() || nm); } catch (e) {}
+        const d = await readAny(new File([b], /\.pdf$/i.test(nm) ? nm : nm + '.pdf', { type: 'application/pdf' })); const text = String(d.text || '').trim();
+        return text.length > 40 ? { ok: true, text, title: d.title || '', via: 'direct (PDF text layer)', url } : null; };
+      const lanes = M.L.makeLanes({ bridge: rs.bridge || null, readExtra, directOnly: !P.third });
+      const keep = a => (a || []).filter(s => allowed.has(s));
+      // the Holodeck's OWN finder reads each page while it is being acquired, so the stopping rule and the terrain the
+      // person sees come from one reading
+      const parse = text => { const sts = [], refs = new Set();
+        for (const se of splitSentences(String(text || ''))) { const ns = findNames(se.t, null).map(n => n.name).filter(Boolean);
+          sts.push({ s: se.s, e: se.e, text: se.t, names: ns, figs: findFigures(se.t), dates: findDates(se.t), frame: frameOf(se.t) });
+          ns.forEach(n => { const k = M.Rd.referentKey(n); if (k) refs.add(k); }); }
+        return { sts, referents: [...refs] }; };
+      const log = rs.log = M.Log.makeLog({ label: M.L.labelOf });
+      rs.ctl = new AbortController(); rs.t0 = performance.now(); let raf = 0;
+      const tick = () => { if (!raf) raf = requestAnimationFrame(() => { raf = 0; this.forceUpdate(); }); };
+      const rec = await M.R.research(q, {
+        search: (s, query) => lanes.search(s, query), read: lanes.read, parse, background: bg, isFunction: fnOnly,
+        route: qq => { const r = lanes.route(qq); return { scopes: keep(r.scopes), why: r.why, rest: keep(r.rest) }; },
+        probe: (h, c) => { const r = lanes.probe(h, c); return { add: keep(r.add), why: r.why }; },
+        queriesFor: lanes.queriesFor, cooling: lanes.cooling, limited: lanes.limited,
+        emit: ev => { log.push(ev); tick(); }, signal: rs.ctl.signal, keySalt: 'holodeck', noStop: !!A.noStop,
+      });
+      rec.ms = Math.round(performance.now() - rs.t0); rec.bridge = rs.bridge || null; rec.directOnly = !P.third; rec.lanesAllowed = [...allowed];
+      rs.record = rec; try { window.__holodeckResearch = rec; } catch (e) {}
+      await this.researchIngest(rec, A);
+    } catch (e) { rs.error = 'The research stopped: ' + ((e && e.message) || e); console.warn('research', e); }
+    rs.running = false; rs.done = true; this.forceUpdate();
+  }
+  researchStop() { const rs = this.addState().rs; if (rs && rs.ctl) rs.ctl.abort(); }
+  async researchIngest(rec, A) {
+    const lanesOf = s => [...new Set((s.found || []).map(f => f.scope))];
+    const typeOf = s => { const k = lanesOf(s)[0]; return /wikipedia\.org\/wiki\//.test(s.url) ? 'Wikipedia article' : k === 'openalex' || k === 'crossref' ? 'Paper' : k === 'github' ? 'Code host page' : k === 'archive' ? 'Internet Archive item' : 'Web page'; };
+    const docs = rec.sources.map(s => ({ title: s.title, year: null, type: typeOf(s), format: 'text', text: s.text, url: s.url,
+      note: 'Found by ' + lanesOf(s).join(', ') + ' for “' + rec.question + '” · read ' + (s.via || 'direct') + ' · ' + s.chars.toLocaleString() + ' characters · sha-256 ' + String(s.sha256).slice(0, 12),
+      extra: { research: { question: rec.question, run: rec.startedAt, via: s.via || 'direct', found: lanesOf(s), sha256: s.sha256, chars: s.chars, g: s.textRel && s.textRel.g, nullMax: s.textRel && s.textRel.nullMax } } }));
+    if (docs.length) {
+      try { HD_KNOWN_NAMES = Object.keys(this.analysis().names || {}); } catch (e) {}
+      hdTraceStart('Research: ' + short(rec.question, 60));   // ONE trace for the whole run, as the old Wikipedia-top-2 path had
+      this.setState({ busy: 'Reading ' + plural(docs.length, 'source') + '…' });
+      await this.addDocs(docs, { keepOpen: true });
     }
-    if (opt.answer) {
-      // Gathering is a means, not the end: the question is answered from what was gathered.
+    const A2 = this.analysis(); const nu = u => String(u || '').replace(/^https?:\/\/(www\.)?/, '').replace(/[#?].*$/, '').replace(/\/$/, '').toLowerCase();
+    const byUrl = new Map(A2.docs.map(d => [nu(d.url), d.id]));
+    const docIds = [...new Set(rec.sources.map(s => byUrl.get(nu(s.url))).filter(Boolean))];
+    const slim = { ...rec, sources: rec.sources.map(({ text, referents, ...r }) => r), docIds, corpusId: this.corpusId() };
+    this._research = slim; this._resT = null; this._resV = null;
+    try { await idbPut('research:' + this.corpusId(), slim); } catch (e) {}
+    if (!docIds.length) { this.setState({ busy: '' }); return; }   // nothing kept: the record stays in this panel, with every reason
+    const q = rec.question;
+    this.setState(s => ({ busy: '', showAdd: false, view: 'research', readDoc: null, sel: null, f: { ...s.f, topicGroup: { label: 'Research: ' + short(q, 40), docs: docIds } }, rsDoc: null, rsFrame: null, rsGroup: null, rsLog: false }));
+    if (A.answerAfter) {
       this.setState({ q, qDraft: undefined, showAdd: false, readDoc: null, view: 'ask', akRefuse: null, akErr: '' });
       if (this.askReady()) setTimeout(() => this.askSend(q), 0);
-      else { this.setState({ akQ: q }); this.toast('Gathered ' + plural(usable.length, 'source') + ' for this question — load the model above, then send.'); }
-      return;
+      else { this.setState({ akQ: q }); this.toast('Gathered ' + plural(docIds.length, 'source') + ' for this question — load the model above, then send.'); }
     }
-    this.setState(s => ({ q, askVal: '', showAdd: false, qDraft: undefined, view: 'search', readDoc: null, srN: 25, qaN: 0, prevView: s.view === 'search' || s.view === 'reader' ? (s.prevView || 'summary') : s.view }));
+  }
+  // The Research view: the run's record, then the corpus by terrain. Everything computed is holodeck-research-terrain.js
+  // over the Holodeck's own analysis; the page only turns it into rows. SEEING registers are filters, never sections.
+  researchVals(A, view) {
+    if (view !== 'research') return { on: false };
+    const S = this.state, cid = this.corpusId();
+    if (this._research === undefined || (this._research && this._research.corpusId !== cid)) {
+      this._research = null; idbGet('research:' + cid).then(r => { this._research = r || false; this.forceUpdate(); }).catch(() => { this._research = false; this.forceUpdate(); });
+    }
+    if (!this._resM) { hdRes().then(M => { this._resM = M; this.forceUpdate(); }).catch(() => {}); return { on: true, loading: true, has: false, none: false }; }
+    const R = this._research;
+    if (R === null || R === undefined) return { on: true, loading: true, has: false, none: false };
+    const ask = () => this.autoResearch('');
+    if (!R) return { on: true, loading: false, has: false, none: true, onAsk: ask };
+    const M = this._resM, FRL = { fact: 'Stated as fact', attributed: 'Attributed', plan: 'Plan or expectation', uncertain: 'Uncertain' };
+    const docIds = (R.docIds || []).filter(id => A.docById[id]);
+    const tkey = R.startedAt + '|' + docIds.join(',') + '|' + this._key;
+    if (!this._resT || this._resT.key !== tkey) this._resT = { key: tkey, input: M.T.readingOfAnalysis(A, docIds, (R.gaps || []).filter(g => ['unread', 'turned-away', 'off-topic-when-read', 'not-prose'].includes(g.kind))), T: null };
+    const base = this._resT; if (!base.T) base.T = M.T.terrainOf(base.input, { key: R.question });
+    const T = base.T;
+    const doc = S.rsDoc && docIds.includes(S.rsDoc) ? S.rsDoc : null, frame = S.rsFrame || null, gi = S.rsGroup === undefined || S.rsGroup === null ? null : S.rsGroup;
+    const grp = gi === null ? null : gi === -1 ? T.seeing.paradigm.stray : ((T.seeing.paradigm.groups[gi] || {}).docs || []);
+    const active = !!(doc || frame || grp);
+    const inScope = st => (!doc || st.doc === doc) && (!frame || st.frame === frame) && (!grp || grp.includes(st.doc));
+    let Tv = T;
+    if (active) {
+      const key = tkey + '|' + doc + '|' + frame + '|' + gi;
+      if (!this._resV || this._resV.key !== key) {
+        const inp = base.input, sts = inp.sts.filter(inScope), ids = new Set(sts.map(s => s.id)), dset = new Set(sts.map(s => s.doc));
+        const ech = {}; for (const [k, l] of Object.entries(inp.echoes || {})) if (ids.has(k)) { const ll = l.filter(o => ids.has(o.id)); if (ll.length) ech[k] = ll; }
+        this._resV = { key, T: M.T.terrainOf({ ...inp, docs: inp.docs.filter(d => dset.has(d.id)), sts, echoes: ech }, { key: R.question + '|' + key }) };
+      }
+      Tv = this._resV.T;
+    }
+    const title = id => (A.docById[id] || {}).title || id;
+    const G = new Map(T.seen.entity.rows.map(r => [r.name, r]));
+    const sel = this.state.sel;
+    // — Sources (and what is missing)
+    const srcRows = T.seen.void.sources.map(s => { const on = doc === s.doc;
+      return { title: s.title, line: [s.via, 'found by ' + (s.found.join(', ') || 'the open web'), plural(s.statements, 'statement'), plural(s.referents, 'name')].filter(Boolean).join(' · '), bg: on ? 'var(--sel)' : 'transparent', bd: on ? 'var(--acc2)' : 'var(--line)',
+        focusLabel: on ? 'Showing only this' : 'Look at only this', onFocus: () => this.setState({ rsDoc: on ? null : s.doc }), onOpen: () => this.read(s.doc) }; });
+    const gapChip = { unread: ['Couldn’t read', 'var(--bad)'], 'turned-away': ['Set aside', 'var(--mut)'], 'off-topic-when-read': ['Not about it', 'var(--amber)'], 'not-prose': ['Not prose', 'var(--amber)'], 'lane-failed': ['No answer', 'var(--bad)'], 'lane-cooling': ['Resting', 'var(--mut)'] };
+    const gapRows = (R.gaps || []).map(g => ({ chip: (gapChip[g.kind] || [g.kind, 'var(--mut)'])[0], col: (gapChip[g.kind] || [0, 'var(--mut)'])[1], title: g.title || (g.scope ? M.L.labelOf(g.scope) : g.url || ''), line: g.why || '', url: g.url || '' }));
+    const notAsked = (R.notAsked || []).map(x => ({ chip: 'Not asked', col: 'var(--mut)', title: M.L.labelOf(x.scope), line: x.why, url: '' }));
+    // — Names
+    const nameCount = new Map(); Tv.seen.link.statements.forEach(st => st.names.forEach(n => nameCount.set(n, (nameCount.get(n) || 0) + 1)));
+    const nameRows = [...nameCount].map(([n, c]) => { const g = G.get(n); const srcs = g ? g.sources.length : 1;
+      return { name: n, c, srcs, earned: srcs >= 2, line: (srcs >= 2 ? 'Confirmed by ' + srcs + ' sources' : 'Heard once' + (g ? ' · ' + short(title(g.sources[0]), 36) : '')) + ' · ' + plural(c, 'statement') + (doc ? ' here' : ''),
+        col: srcs >= 2 ? 'var(--ok)' : 'var(--mut)', onClick: () => { if (A.names[n]) this.sel('name', n); } }; })
+      .sort((a, b) => b.srcs - a.srcs || b.c - a.c || (a.name < b.name ? -1 : 1));
+    // — Types
+    const kindRows = Tv.seen.kind.kinds.map(k => ({ label: (TYPE_L[k.kind] || k.kind), n: k.n, ex: k.examples.slice(0, 4).join(', ') }));
+    // — Figures
+    const gUnits = new Map(T.seen.field.units.map(u => [u.unit, u]));
+    const figRows = []; Tv.seen.field.units.forEach(u => u.values.slice(0, 4).forEach(v => { const gu = gUnits.get(u.unit);
+      figRows.push({ unit: u.unit, raw: v.raw, line: v.sources.map(s => short(title(s), 28)).join(' · '), flag: gu && gu.differs ? 'The sources give different values for this' : '', hasFlag: !!(gu && gu.differs), onClick: () => { const a = (v.at || [])[0]; if (a) this.sel('statement', a.id); } }); }));
+    // — Statements
+    const stRows = Tv.seen.link.statements.slice().sort((a, b) => b.echoedIn.length - a.echoedIn.length || b.names.length - a.names.length || (a.id < b.id ? -1 : 1))
+      .map(st => ({ text: short(clean(st.text), 230), line: short(title(st.doc), 34) + ' · ' + (FRL[st.frame] || st.frame) + (st.echoedIn.length ? ' · said again in ' + plural(st.echoedIn.length, 'other source') : ''), on: !!(sel && sel.type === 'statement' && sel.id === st.id), bg: (sel && sel.type === 'statement' && sel.id === st.id) ? 'var(--sel)' : 'transparent',
+        onClick: () => this.sel('statement', st.id), onOpen: e => { if (e && e.stopPropagation) e.stopPropagation(); this.read(st.doc, st.id); } }));
+    // — Connections: the Holodeck's own map engine over this corpus's ties (each beat every random overlap)
+    const top = [...nameCount].filter(([n]) => A.names[n]).sort((a, b) => b[1] - a[1] || (a[0] < b[0] ? -1 : 1)).slice(0, 160), topSet = new Set(top.map(x => x[0]));
+    const nodes = top.map(([n, c]) => ({ n, c, color: TYPE_C[(A.names[n] || {}).type] }));
+    const edges = Tv.seen.network.edges.filter(e => topSet.has(e.a) && topSet.has(e.b)).map(e => ({ a: e.a, b: e.b, c: e.k }));
+    const occ = new Map(top.map(([n]) => [n, Tv.seen.link.statements.filter(st => st.names.includes(n)).map(st => ({ doc: st.doc, id: st.id, t: short(clean(st.text), 240) }))]));
+    const mapDocs = [...new Set(Tv.seen.link.statements.map(st => st.doc))].map(id => ({ id, title: title(id) }));
+    const sig = tkey + '|' + (doc || '') + '|' + (frame || '') + '|' + gi + '|' + nodes.length + ':' + edges.length;
+    const graphEl = nodes.length ? React.createElement(MapView, { onWitness: o => this.read(o.doc, o.id), data: { sig, nodes, edges, docs: mapDocs, occ, sel: null },
+      onProfile: id => this.setState({ sel: { type: 'name', id }, selAll: false, pfIdx: 0, pfAll: false, view: 'profile', readDoc: null }) }) : null;
+    // — the SEEING chips: filters over everything above
+    const chipOf = (label, n, on, onClick) => ({ label, n: String(n), bg: on ? 'var(--sel)' : 'transparent', bd: on ? 'var(--acc2)' : 'var(--line2)', weight: on ? 600 : 500, onClick });
+    const frameChips = ['fact', 'attributed', 'plan', 'uncertain'].map(f => ({ f, n: (T.seeing.atmosphere.frames[f] || []).length })).filter(x => x.n).map(x => chipOf(FRL[x.f], x.n, frame === x.f, () => this.setState({ rsFrame: frame === x.f ? null : x.f })));
+    const grpChips = T.seeing.paradigm.groups.map((g, i) => chipOf((g.label || 'Group ' + (i + 1)), g.docs.length, gi === i, () => this.setState({ rsGroup: gi === i ? null : i })));
+    if (T.seeing.paradigm.groups.length && T.seeing.paradigm.stray.length) grpChips.push(chipOf('Stands alone', T.seeing.paradigm.stray.length, gi === -1, () => this.setState({ rsGroup: gi === -1 ? null : -1 })));
+    const years = T.seeing.lens.byYear;
+    const st = R.stop || {}, c = R.corpus || {};
+    const words = M.Log.STOP_WORDS;
+    const nFound = (R.candidates || []).length, nRead = (R.sources || []).length;
+    const cap = (k, arr, n) => this.capL('rs:' + k, arr, n);
+    const rowsLog = M.Log.rowsOfRecord ? M.Log.rowsOfRecord(R, M.L.labelOf) : [];
+    return { on: true, loading: false, has: true, none: false, onAsk: ask,
+      question: R.question, lead: 'Found ' + nFound + ' · read ' + nRead + ' · ' + plural(c.earned || 0, 'name') + ' confirmed by two or more sources, ' + plural(c.heardOnce || 0, 'name') + ' heard once',
+      stopTitle: words[st.reason] || st.reason, stopLine: st.detail || '', ms: R.ms ? (R.ms / 1000).toFixed(0) + ' s' : '',
+      logOpen: !!S.rsLog, logLabel: S.rsLog ? 'Hide how it went' : 'Show how it went', onLog: () => this.setState({ rsLog: !S.rsLog }), log: rowsLog.map(r => ({ ...r, col: TONE_COL[r.tone] || 'var(--mut)' })),
+      scopeLine: active ? 'Showing ' + [doc ? short(title(doc), 40) : '', frame ? FRL[frame].toLowerCase() : '', grp ? (gi === -1 ? 'sources that stand alone' : 'one group of sources') : ''].filter(Boolean).join(' · ') + ' — ' + plural(Tv.counts.statements, 'statement') : 'Showing all ' + plural(docIds.length, 'source'),
+      hasScope: active, onClear: () => this.setState({ rsDoc: null, rsFrame: null, rsGroup: null }),
+      frameChips, hasFrames: frameChips.length > 0, groupChips: grpChips, hasGroups: grpChips.length > 0,
+      yearLine: years.length ? 'Dated ' + years[0].year + (years.length > 1 ? '–' + years[years.length - 1].year : '') + ' in ' + plural(new Set(years.flatMap(y => y.statements)).size, 'statement') : '',
+      sources: srcRows, gaps: gapRows.concat(notAsked), hasGaps: gapRows.length + notAsked.length > 0, nGaps: gapRows.length + notAsked.length,
+      names: cap('names', nameRows, 14), kinds: kindRows, hasKinds: kindRows.length > 0, figures: cap('figs', figRows, 10), hasFigures: figRows.length > 0,
+      statements: cap('sts', stRows, 8), graphEl, hasGraph: !!graphEl,
+      mapNote: edges.length ? plural(edges.length, 'tie') + ' between names that share more statements than any of 199 random draws did. Click a ring to open it, a name for its statements.' : 'No two names share more statements than chance gives, so there are no ties to draw.',
+      notices: T.seen.void.notices.map(n => n.why),
+      nNames: nameRows.length, nStatements: stRows.length };
   }
   // ── An address that resolves to a repository. Not a special case in the interface: ingestUrl calls this
   // for any github.com/owner/repo address, wherever it came from. No file-count or file-size limit; text files
@@ -5072,7 +5365,7 @@ class Component extends DCLogic {
   }
   async addSearch(more) {
     const A = this.addState(), q = (A.q || '').trim();
-    if (!q || A.loading) return;
+    if (!q || A.loading || A.scope === 'research') return;   // the research assistant is reached only through researchRun
     const ticket = ++A.ticket, page = more ? A.page + 1 : 0;
     A.loading = true; A.error = ''; A.status = ''; if (!more) A.results = null; this.forceUpdate();
     try {
@@ -5094,7 +5387,7 @@ class Component extends DCLogic {
       try { await this.ingestUrl(/^https?:\/\//.test(q) ? q : 'https://' + q, { keepOpen: true }); } catch (e) { A.error = e.message || String(e); }
       this.forceUpdate(); return;
     }
-    return this.addSearch();
+    return A.scope === 'research' ? this.researchRun() : this.addSearch();
   }
   isAdded(r, known) {
     const u = (r.url || '').replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '');
@@ -5134,6 +5427,28 @@ class Component extends DCLogic {
     A.status = got.length ? 'Added ' + plural(got.length, 'source') + (missL ? ' · ' + missL + ' couldn’t be read' : '') + '.' : 'None of the ' + plural(urls.length, 'link') + ' could be read.';
     A.links = ''; A.pane = ''; this.forceUpdate();
   }
+  researchModalVals(S) {
+    const R = S.rs || {}, P = this.researchPrefs(), disc = R.disc, ids = this.researchLaneIds(), M = this._resM;
+    const fallback = { web: 'The open web', wikipedia: 'Wikipedia', github: 'GitHub', archive: 'Internet Archive', openalex: 'Research papers · OpenAlex', crossref: 'Research papers · Crossref' };
+    const label = id => (M ? M.L.labelOf(id) : fallback[id] || id);
+    const hostsOf = id => disc ? ((disc.search.find(x => x.scope === id) || {}).hosts || []) : [];
+    const lanes = ids.map(id => ({ label: label(id), hosts: disc ? hostsOf(id).join(', ') : 'checking…', on: !P.off[id],
+      onToggle: e => { const p = this.researchPrefs(); p.off = { ...p.off, [id]: !e.target.checked }; this.researchSavePrefs(p); this.forceUpdate(); } }));
+    const sendHosts = [...new Set(ids.filter(id => !P.off[id]).flatMap(hostsOf))];
+    const readHosts = disc ? [...new Set(disc.read.filter(d => d.host).map(d => d.host))] : [];
+    const stats = R.log ? R.log.stats() : null;
+    const sendLine = !disc ? 'Working out where a question would go…'
+      : !sendHosts.length ? 'Every lane is switched off, so nothing can be asked.'
+      : 'Pressing the button sends the question above, as typed, to: ' + sendHosts.join('; ') + '. ' + (P.third
+        ? 'A page is read from its own site first' + (R.bridge ? ', then through your heimdall bridge' : '') + '; when the site refuses, its address goes to ' + readHosts.join(', ') + '.'
+        : 'A page is read from its own site only, so what a site refuses stays unread — and is listed.') + ' Nothing is sent until you press it.';
+    return { lanes, third: P.third, onThird: e => { const p = this.researchPrefs(); p.third = !!e.target.checked; this.researchSavePrefs(p); this.researchDisclose(); },
+      thirdLine: P.third ? (readHosts.length ? 'They learn the address: ' + readHosts.join(', ') + '.' : '') : 'Pages a site refuses stay unread.',
+      sendLine, running: !!R.running, notRunning: !R.running, onSend: () => this.researchRun(), onStop: () => this.researchStop(),
+      progress: stats ? 'found ' + stats.found + ' · read ' + stats.read : '',
+      hasLog: !!(R.log && R.log.rows().length), rows: R.log ? R.log.rows().slice(-200).map(r => ({ ...r, col: TONE_COL[r.tone] || 'var(--mut)' })) : [],
+      summary: R.log && R.done ? R.log.summary() : '', hasError: !!R.error, error: R.error || '' };
+  }
   addVals() {
     const S = this.addState(), sc = SEARCH_SCOPES.find(x => x.id === S.scope) || SEARCH_SCOPES[0], known = this.knownIds(this.analysis());
     const rows = (S.results || []).map(r => {
@@ -5150,8 +5465,9 @@ class Component extends DCLogic {
     const pending = (S.results || []).filter(r => !this.isAdded(r, known)).length, reset = () => { S.ticket++; S.loading = false; S.results = null; S.error = ''; S.status = ''; S.more = false; };
     return {
       scopes: SEARCH_SCOPES.map(x => ({ id: x.id, label: x.label })), scope: S.scope,
-      onScope: e => { S.scope = e.target.value; reset(); try { localStorage.setItem('hd:add-scope', S.scope); } catch (er) {} if ((S.q || '').trim()) this.addSearch(); else this.forceUpdate(); },
+      onScope: e => { S.scope = e.target.value; reset(); try { localStorage.setItem('hd:add-scope', S.scope); } catch (er) {} if (S.scope === 'research') { this.forceUpdate(); this.researchProbe(); } else if ((S.q || '').trim()) this.addSearch(); else this.forceUpdate(); },
       q: S.q, placeholder: sc.ask + '…', onQ: e => { S.q = e.target.value; }, onKey: e => { if (e.key === 'Enter') { S.q = e.target.value; this.addGo(); } }, onSearch: () => this.addGo(),
+      isResearch: S.scope === 'research', arrowDisplay: S.scope === 'research' ? 'none' : 'flex', rs: this.researchModalVals(S),
       loading: S.loading, rows, hasPanel: !!(S.loading || S.results), showIntake: !(S.loading || S.results),
       resultsLine: S.loading && !S.results ? 'Searching ' + sc.label + '…' : plural(rows.length, sc.label.toLowerCase() + ' result') + (S.engine ? ' · ' + S.engine : ''),
       hasMore: !!S.more, onMore: () => this.addSearch(true), moreLabel: S.loading ? 'Loading…' : 'More results',
@@ -5176,7 +5492,7 @@ class Component extends DCLogic {
       this._html[d.id] = h || null;
     }
     this.setState(s => ({ htmlVer: s.htmlVer + 1, busy: '' }));
-    const stale = (this.state.added[id] || []).filter(d => d.url && d.type !== 'Link' && !wikiTitleOf(d.url) && (d.format !== 'page' || !this._html[d.id]) && d.format !== 'pdf' && d.type !== 'Repo file' && !(d.media && d.media.kind === 'youtube') && !this._upg?.[d.id]);
+    const stale = (this.state.added[id] || []).filter(d => d.url && d.type !== 'Link' && !wikiTitleOf(d.url) && (d.format !== 'page' || !this._html[d.id]) && d.format !== 'pdf' && d.type !== 'Repo file' && !d.research && !(d.media && d.media.kind === 'youtube') && !this._upg?.[d.id]);
     this._upg = this._upg || {};
     for (const d of stale) { this._upg[d.id] = 1; try { const g = await fetchAnySite(d.url); if (g.format === 'page' && g.html) { this._html[d.id] = g.html; idbPut('html:' + d.id, g.html).catch(() => {}); const added = { ...this.state.added, [id]: this.state.added[id].map(x => x.id === d.id ? { ...x, format: 'page' } : x) }; this.saveAdded(added); this.setState(s => ({ added, htmlVer: s.htmlVer + 1 })); } } catch (e) {} }
   }
@@ -8094,6 +8410,7 @@ class Component extends DCLogic {
       : view === 'reader' && S.readDoc ? { eyebrow: 'Reading · ' + docMeta(A.docById[S.readDoc]), title: A.docById[S.readDoc].title, sub: plural((A.stsByDoc[S.readDoc] || []).length, 'statement') + ' · names, figures and dates are marked', color: 'var(--acc)' }
       : view === 'reading' ? { eyebrow: 'The constitutional reading', title: 'Every name, found automatically', sub: 'A mechanical pass over every source (no AI) — every name it found, which spellings it merged into the same person or org as evidence came in, and who keeps turning up together.' }
       : view === 'ingest' ? { eyebrow: 'Ingest and publish', title: 'Bring in more, and make it public', sub: 'Find new material, transcribe it here, and publish what you keep.' }
+      : view === 'research' ? { eyebrow: 'Research', title: 'What it found and read', sub: 'The sources a question led to, what each says, and where they agree — every row opens at the words it came from.', color: 'var(--acc)' }
       : view === 'overview' ? { eyebrow: 'Situated reading', title: 'Evidence and negative spaces', sub: 'Compose a view, reopen its ground, and pursue what remains unknown.', color: 'var(--acc)' }
       : view === 'records' ? { eyebrow: 'Assertions', title: 'The workspace as tables', sub: 'Every source, statement, name, figure and date, linked back to where it came from.', color: 'var(--acc)' }
       : view === 'ask' ? { eyebrow: 'Ask the Fold', title: 'Ask the sources', sub: 'Answered by a small model running in this tab, from material found by the question\'s own words. Afterwards every sentence is checked: a numbered address where it matches something in the sources, a dotted line where it is the model\'s own, a wavy line where a figure or name is not in the material.', color: 'var(--acc)' }
@@ -8225,13 +8542,13 @@ class Component extends DCLogic {
     const segOpen = S.segOpen; const segToggleLabel = 'Saved folds'; const segCount = String(segList.length);
     const toggleSegOpen = () => { const open = !segOpen; try { localStorage.setItem('fold-explorer-segopen', open ? '1' : '0'); } catch (e) {} this.setState({ segOpen: open }); };
     const allYears = [...new Set(A.docs.map(d => d.year).filter(Boolean))].sort();
-    const V = {}; ['overview', 'draft', 'summary', 'search', 'surprise', 'names', 'types', 'figures', 'statements', 'connections', 'framing', 'views', 'patterns', 'reader', 'profile', 'ingest', 'reading'].forEach(k => { V[k] = !isEmpty && view === k; });
+    const V = {}; ['overview', 'draft', 'summary', 'search', 'surprise', 'names', 'types', 'figures', 'statements', 'connections', 'framing', 'views', 'patterns', 'reader', 'profile', 'ingest', 'reading', 'research'].forEach(k => { V[k] = !isEmpty && view === k; });
 
     const SU = isEmpty ? null : this.surprise(A); const Fid = new Set(F.map(st => st.id));
     const suF = SU ? SU.list.filter(x => Fid.has(x.st.id)) : [];
     const juncMode = S.suMode !== 'belief'; const JN = isEmpty ? [] : this.junctions(A, Fid);
     const gHi = on => ({ bg: on ? 'var(--sel)' : 'transparent', bd: on ? 'var(--acc2)' : 'transparent', weight: on ? 600 : 500 });
-    const NAVG = [['', [['summary', 'Overview'], ['ask', 'Ask'], ['draft', 'Draft']]], ['Read closely', [['names', 'Names'], ['records', 'Assertions']]], ['Explore', [['connections', 'Connections'], ['overview', 'Evidence overview']]], ['Manage', [['ingest', 'Add & publish']]]];
+    const NAVG = [['', [['summary', 'Overview'], ['ask', 'Ask'], ['draft', 'Draft']]], ['Read closely', [['names', 'Names'], ['records', 'Assertions']]], ['Explore', [['connections', 'Connections'], ['research', 'Research'], ['overview', 'Evidence overview']]], ['Manage', [['ingest', 'Add & publish']]]];
     const countFor = id => ({
       names: String(D.nameList.length), records: String(F.length),
       connections: String(D.edgeList.length),
@@ -8255,7 +8572,7 @@ class Component extends DCLogic {
       if (!A.docs.length) { this.autoResearch(v); return; }
       this.setState(s => ({ q: v, qDraft: undefined, view: 'search', readDoc: null, srN: 25, qaN: 0, prevView: s.view === 'search' || s.view === 'reader' ? (s.prevView || 'summary') : s.view })); };
     const omniOpen = live => { const v = typeof live === 'string' ? live : dv; if (!isOmniUrl(v)) return; clearTimeout(this._omniT); this.setState({ q: '', qDraft: undefined }); this.ingestUrl(/^https?:\/\//.test(v) ? v : 'https://' + v, { open: true }); };
-    Object.assign(this._extra = {}, { ...this.qaVals(A, F, qv, view), ...this.draftVals(A), ...this.pfCoVals(A), ...this.dbVals(A, view), ...this.askVals(A, view), askFold: () => { const q = (this.state.q || '').trim(); this.setState({ view: 'ask', readDoc: null }); setTimeout(() => this.askSend(q), 0); }, ...this.netVals(A, view), ...this.readingVals(A, view),
+    Object.assign(this._extra = {}, { ...this.qaVals(A, F, qv, view), ...this.draftVals(A), ...this.pfCoVals(A), ...this.dbVals(A, view), ...this.askVals(A, view), askFold: () => { const q = (this.state.q || '').trim(); this.setState({ view: 'ask', readDoc: null }); setTimeout(() => this.askSend(q), 0); }, ...this.netVals(A, view), ...this.readingVals(A, view), res: this.researchVals(A, view),
       pinPop: S.pinPop && view === 'reader' ? { has: true, x: S.pinPop.x + 'px', y: S.pinPop.y + 'px', onPin: e => { e.preventDefault(); this.pinSelection(); }, onCorrect: e => { e.preventDefault(); this.openCorr(S.pinPop.text); } } : { has: false },
       hasPinToast: !!S.pinToast, pinToast: S.pinToast || '', goDraft: () => { this.setState({ pinToast: '' }); this.go('draft'); }, plainRef: this.plainRef, omniRef: this.omniRef,
       rdPins: (() => { const n = view === 'reader' ? this.activePins().filter(p => p.docId === S.readDoc).length : 0; return { has: n > 0, label: plural(n, 'pin') + ' from this source →' }; })(), navGroups, omniUrl, omniOpen,
@@ -8382,7 +8699,7 @@ class Component extends DCLogic {
       hasFilters: chips.length > 0 && view !== 'search', chips, srcTuple, clearAll: () => this.setState(s => ({ f: {}, fw: {}, q: '', ...(s.view === 'search' ? { view: s.prevView || 'summary' } : {}) })),
       filterCount: F.length.toLocaleString() + ' of ' + A.sts.length.toLocaleString() + ' statements',
       ts: this.timeStrip(A, F),
-      openAdd: () => { this._add = null; this.addState().baseAdded = (S.added[cid] || []).length; this.setState({ showAdd: true }); }, closeAdd: () => this.setState({ showAdd: false }),
+      openAdd: () => { this._add = null; this.addState().baseAdded = (S.added[cid] || []).length; this.setState({ showAdd: true }); if (this.addState().scope === 'research') this.researchProbe(); }, closeAdd: () => this.setState({ showAdd: false }),
       closeAddBg: e => { if (e.target === e.currentTarget) this.setState({ showAdd: false }); },
       isEmpty, showWelcome: isEmpty && view !== 'ask', hasContent: !isEmpty, v: V, hdr,
       docCards, gaps, nameGroups, nameTable, typeBlocks, measures, noMeasures: !measures.length, ...(() => { const c = this.capL('stg', stGroups, 8); return { stGroups: c.items.map(g => ({ ...g, ...this.capL('stg:' + g.title, g.items, 4) })), stgMore: c }; })(),

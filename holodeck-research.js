@@ -22,7 +22,7 @@
 //
 // The only constants are resource ones (how many pages are fetched at once) and the null's DRAWS; they are declared.
 
-import { DRAWS, termsOf, relevance, earnedGainTest, hash32, stemsOf, fold } from './holodeck-research-null.js';
+import { DRAWS, termsOf, relevance, earnedGainTest, hash32, stemsOf, proseTest } from './holodeck-research-null.js';
 import { readSource, referentKey } from './holodeck-research-read.js';
 
 export const SCHEMA = 'HolodeckResearchRun@1';
@@ -100,7 +100,7 @@ export async function research(question, deps) {
   const laneTally = new Map();                      // scope -> { found, admitted, read, kept }
   const tally = s => laneTally.get(s) || (laneTally.set(s, { found: 0, admitted: 0, read: 0, kept: 0 }), laneTally.get(s));
   const followed = new Set();
-  let batchNo = 0, lastTest = null; rec.wouldStopAt = null;
+  let batchNo = 0, lastTest = null, round = 0; rec.wouldStopAt = null;
 
   const gate = c => {
     const text = c.title + ' . ' + c.snippet + ' . ' + c.url.replace(/^https?:\/\//, '').replace(/[\/_\-.?=&%+]+/g, ' ');
@@ -190,19 +190,30 @@ export async function research(question, deps) {
       if (!queue.length) return null;
       const batch = queue.slice(0, D.concurrency);
       await Promise.all(batch.map(readOne));
+      // a text that clears the relevance null can still be a record, not prose (a metadata dump): judged against the
+      // other sources read, and refused with the numbers
+      for (const c of batch.filter(c => c.state === 'kept')) {
+        const peers = [...cands.values()].filter(o => o !== c && o.state === 'kept').map(o => o.text);
+        const pt = proseTest(c.text, peers, { key: key0 + '|' + c.key + '|prose' });
+        if (pt.testable && pt.outside) {
+          c.state = 'not-prose'; c.why = 'read, but it is a record rather than prose: ' + (pt.obs * 100).toFixed(1) + ' % of its characters are structure, against at most ' + (pt.nullMax * 100).toFixed(1) + ' % in any of ' + pt.draws + ' stretches of the other sources';
+          rec.gaps.push({ kind: 'not-prose', id: c.id, url: c.url, title: c.title, why: c.why, via: c.via || null });
+          emit({ t: 'read', id: c.id, url: c.url, title: c.title, state: 'not-prose', why: c.why, via: c.via });
+        }
+      }
       const kept = batch.filter(c => c.state === 'kept');
       batchNo++;
       for (const c of kept) {
         c.sha256 = await D.sha256(c.text);
         for (const f of c.found) tally(f.scope).kept++;
       }
-      if (!kept.length) { emit({ t: 'batch', n: batchNo, sources: batch.map(c => c.id), kept: 0, test: null }); rec.batches.push({ n: batchNo, ids: batch.map(c => c.id), kept: 0, test: null }); continue; }
+      if (!kept.length) { emit({ t: 'batch', n: batchNo, round, sources: batch.map(c => c.id), kept: 0, test: null }); rec.batches.push({ n: batchNo, round, ids: batch.map(c => c.id), kept: 0, test: null }); continue; }
       const test = earnedGainTest(support, kept.map(c => c.referents), { key: key0 + '|batch' + batchNo });
       for (const c of kept) for (const r of c.referents) { support.set(r, (support.get(r) || 0) + 1); }
       for (const c of kept) for (const st of c.sts) for (const n of st.names) { const k = referentKey(n); if (k && !surface.has(k)) surface.set(k, n); }
       const earned = [...support.values()].filter(n => n >= 2).length;
       lastTest = test;
-      const b = { n: batchNo, ids: batch.map(c => c.id), kept: kept.length, test: test.testable ? { observed: test.observed, nullMax: test.nullMax, nullMedian: test.nullMedian, p: test.p, outside: test.outside, viaCorpus: test.viaCorpus, viaBatch: test.viaBatch } : { testable: false, why: test.why } };
+      const b = { n: batchNo, round, ids: batch.map(c => c.id), kept: kept.length, test: test.testable ? { observed: test.observed, nullMax: test.nullMax, nullMedian: test.nullMedian, p: test.p, outside: test.outside, viaCorpus: test.viaCorpus, viaBatch: test.viaBatch } : { testable: false, why: test.why } };
       rec.batches.push(b); rec.curve.push({ batch: batchNo, sources: [...cands.values()].filter(c => c.state === 'kept').length, referents: support.size, earned, singletons: support.size - earned });
       emit({ t: 'batch', ...b, referents: support.size, earned, sources: [...cands.values()].filter(c => c.state === 'kept').length });
       if (test.testable && !test.outside) {
@@ -214,7 +225,7 @@ export async function research(question, deps) {
 
   // ── rounds ──────────────────────────────────────────────────────────────────────────────────────────────────────
   const baseQueries = [...new Set([q, ...(D.queriesFor(q) || [])].map(clean).filter(Boolean))];
-  let stop = null, round = 0;
+  let stop = null;
   rec.rounds.push({ round: 0, kind: 'asked', scopes: [...routed.scopes], queries: baseQueries });
   emit({ t: 'round', round: 0, kind: 'asked', scopes: routed.scopes, queries: baseQueries });
   await searchRound(routed.scopes, baseQueries, 0);
@@ -230,7 +241,7 @@ export async function research(question, deps) {
     const pr = D.probe(webHits, [...used]) || { add: [], why: {} };
     const widen = [...new Set([...(pr.add || []), ...routed.rest])].filter(s => !used.has(s));
     let scopes, queries, kind, why = '';
-    if (widen.length) { scopes = widen; queries = baseQueries; kind = 'widened'; why = 'the corpus was still learning when the routed lanes ran out'; for (const s of widen) rec.lanes.push({ scope: s, why: (pr.why && pr.why[s]) || 'held back by the router; reached for because the corpus was still learning', round }); }
+    if (widen.length) { scopes = widen; queries = baseQueries; kind = 'widened'; why = [...cands.values()].some(c => c.state === 'kept') ? 'the corpus was still learning when the routed lanes ran out' : 'nothing could be kept from the routed lanes, so it looked in the ones the router had held back'; for (const s of widen) rec.lanes.push({ scope: s, why: (pr.why && pr.why[s]) || 'held back by the router; reached for because the corpus was still learning', round }); }
     else {
       const f = frontier(support, surface, qStems, followed);
       if (!f) { stop = 'candidates-exhausted'; break; }

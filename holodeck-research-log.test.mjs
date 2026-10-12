@@ -94,3 +94,13 @@ test('the terrain is laid out from the Holodeck’s own analysis: furniture left
   assert.equal(t.seen.entity.rows.find(r => r.name === 'Mara Quill').standing, 'earned');
   assert.equal(t.perSource.u1.echoedElsewhere[0].in[0], 'u2');
 });
+
+import { rowsOfRecord } from './holodeck-research-log.js';
+test('a stored record replays into the same rows the live stream gave (after a reload the ledger is still whole)', async () => {
+  const { run, log } = await aRun();
+  const live = log.rows(), again = rowsOfRecord(run, labelOf);
+  const sig = rows => rows.map(r => r.chip + '|' + r.key.split(':')[0]).sort();
+  assert.deepEqual(sig(again), sig(live));
+  assert.equal(again.find(r => r.key === 'stop').line, run.stop.detail);
+  assert.ok(again.filter(r => r.chip === 'Couldn’t read').every(r => r.line.length > 10));
+});

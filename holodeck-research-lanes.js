@@ -48,12 +48,13 @@ export async function searchHosts(scopes = SCOPES.map(s => s.id), { bridge = get
 }
 
 /** What each outward lane learns, in plain terms: the question goes to these hosts; a page address goes to these. */
-export async function disclosure({ bridge = getBridge() } = {}) {
+export async function disclosure({ bridge = getBridge(), directOnly = false } = {}) {
   const hosts = await searchHosts(undefined, { bridge });
   const sample = 'https://example.org/a-page';
   const relayHost = hostOf(FOLD_RELAY);
   const doors = [];
   doors.push({ id: 'site', label: 'the page’s own site', host: null, learns: 'the page address (every read starts here)' });
+  if (directOnly) return { search: await (async () => SCOPES.map(s => ({ scope: s.id, label: labelOf(s.id), hosts: s.id === 'web' ? [bridge ? (hostOf(bridge) || bridge) + ' (this machine) → DuckDuckGo / Brave' : hostOf(FOLD_RELAY) + ' (the fold’s relay) → DuckDuckGo / Brave'] : hosts[s.id] || [] })))(), read: doors };
   if (bridge) doors.push({ id: 'bridge', label: 'your heimdall bridge', host: hostOf(bridge) || bridge, learns: 'the page address — it fetches from this machine' });
   doors.push({ id: 'relay', label: 'the fold’s relay', host: relayHost, learns: 'the page address, only when the site refused a direct read' });
   for (const p of CORS_PROXIES.slice(1)) doors.push({ id: 'proxy', label: 'a public CORS proxy', host: hostOf(p(sample)), learns: 'the page address, only when the site refused a direct read' });
@@ -64,7 +65,7 @@ export async function disclosure({ bridge = getBridge() } = {}) {
 }
 
 /** The injected dependencies for holodeck-research.js. */
-export function makeLanes({ fetchImpl = (...a) => fetch(...a), bridge = null, readExtra = null, memo = makeMemo(), timeoutMs = 8000 } = {}) {
+export function makeLanes({ fetchImpl = (...a) => fetch(...a), bridge = null, readExtra = null, memo = makeMemo(), timeoutMs = 8000, directOnly = false } = {}) {
   if (bridge) setBridge(bridge);
   return {
     memo,
@@ -72,11 +73,11 @@ export function makeLanes({ fetchImpl = (...a) => fetch(...a), bridge = null, re
     // A PDF is not HTML: the page hands it to the Holodeck's own file reader (text layer) through readExtra.
     read: async (url, cand) => {
       if (readExtra && /\.pdf(?:[?#]|$)/i.test(url)) { try { const r = await readExtra(url, cand); if (r && r.ok) return r; } catch (e) {} }
-      const out = await readText(url, { fetchImpl, timeoutMs, memo });
+      const out = await readText(url, { fetchImpl, timeoutMs, memo, direct: !!directOnly });   // direct: the site's own answer only — no bridge, relay, proxy or reader
       if (out.ok && looksBinary(out.text)) return { ok: false, error: 'the response was not text (a binary served to a page request)', tried: ['direct'] };
       if (out.ok) return out;
-      const doors = ['direct', ...(getBridge() ? ['your bridge'] : []), 'the fold’s relay', 'public proxies', 'text readers'];
-      return { ok: false, error: out.error === 'unreachable' ? 'every door was tried and none returned text — the page may need its scripts to run, or the site refuses them all' : out.error || 'unreachable', tried: doors };
+      const doors = directOnly ? ['direct (third-party readers switched off)'] : ['direct', ...(getBridge() ? ['your bridge'] : []), 'the fold’s relay', 'public proxies', 'text readers'];
+      return { ok: false, error: directOnly ? 'the site refused a direct read, and third-party readers are switched off' : out.error === 'unreachable' ? 'every door was tried and none returned text — the page may need its scripts to run, or the site refuses them all' : out.error || 'unreachable', tried: doors };
     },
     route: q => routeSources(q, { lang: wikiEdition(q) }),
     probe: (hits, chosen) => probeSources(hits, chosen),

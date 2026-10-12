@@ -270,7 +270,7 @@ export function readingOf(run, parse) {
     const p = parse(s.text);
     p.sts.forEach((st, i) => sts.push({ id: s.id + ':' + i, doc: s.id, s: st.s, e: st.e, text: st.text, names: st.names, figs: st.figs, dates: st.dates, frame: st.frame }));
   }
-  const gaps = (run.gaps || []).filter(g => g.kind === 'unread' || g.kind === 'turned-away' || g.kind === 'off-topic-when-read');
+  const gaps = (run.gaps || []).filter(g => g.kind === 'unread' || g.kind === 'turned-away' || g.kind === 'off-topic-when-read' || g.kind === 'not-prose');
   return { docs, sts, gaps };
 }
 

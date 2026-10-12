@@ -126,3 +126,24 @@ export function earnedGainTest(prior, batch, { key = '', draws = DRAWS } = {}) {
   const nullMax = nul[nul.length - 1], ge = nul.filter(x => x >= observed.delta).length;
   return { testable: true, observed: observed.delta, viaCorpus: observed.viaCorpus, viaBatch: observed.viaBatch, nullMax, nullMedian: nul[nul.length >> 1], outside: observed.delta > nullMax, p: (1 + ge) / (draws + 1), draws };
 }
+
+// ── is it prose? ────────────────────────────────────────────────────────────────────────────────────────────────────
+// A page can mention the question's words and still be no account of anything: a metadata record returned as a string
+// ("{'type': 'BOOK CHAPTER', 'id': None, …}"), a JSON blob, a template dump. Prose is the reference class the corpus is
+// made of, so the null is the OTHER sources: the share of structure characters in this text against the share in 199
+// same-size stretches drawn from the other sources read. More than every one of them → it is a record, not prose.
+// With no other source there is nothing to be unlike, so it is untestable — and kept.
+const STRUCT = /[{}\[\]<>=_\\|^~]|["']\s*:/g;
+export function structureRate(text) { const t = String(text == null ? '' : text); if (!t.length) return 0; const m = t.match(STRUCT); return (m ? m.length : 0) / t.length; }
+export function proseTest(text, peers, { key = '', draws = DRAWS } = {}) {
+  const others = (peers || []).filter(p => typeof p === 'string' && p.length >= 40);
+  const t = String(text || '');
+  if (!others.length || !t.length) return { testable: false, why: 'no other source to compare its structure with' };
+  const r = rng(hash32(key + '|' + t.length + '|' + others.length)), win = Math.min(4000, t.length);
+  const obs = structureRate(t); let hi = 0;
+  for (let d = 0; d < draws; d++) {
+    const src = others[Math.floor(r() * others.length)], w = Math.min(win, src.length), at = Math.floor(r() * (src.length - w + 1));
+    const x = structureRate(src.slice(at, at + w)); if (x > hi) hi = x;
+  }
+  return { testable: true, obs: +obs.toFixed(5), nullMax: +hi.toFixed(5), outside: obs > hi, draws };
+}

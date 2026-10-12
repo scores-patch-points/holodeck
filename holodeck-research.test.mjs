@@ -335,3 +335,35 @@ test('a control run that ignores the stop reads on, and still records where the 
   assert.equal(control.wouldStopAt, stopped.batches.length);
   assert.ok(stopped.sources.length < control.sources.length);
 });
+
+import { proseTest, structureRate } from './holodeck-research-null.js';
+const DUMP = "{'type': 'BOOK CHAPTER', 'published_date': '1 September 2024', 'publication': 'The Book of Politics', 'title': 'Eiffel Tower', 'name': None, 'id': None, 'location': None, 'display_doi': 'https://doi.org/10.1215/9781478059189-019', 'grant_info': None, 'multiple_lead_investigators': [], 'finances': [], 'project_description': None, 'coaccess': [], 'multi-resolution': [{'url': 'http://www.jstor.org/stable/10.2307', 'tid': 'jstor.org'}]}";
+
+test('a metadata record is not prose: its structure share beats every stretch of the other sources', () => {
+  const peers = [onTopic(), onTopic(' More.', ['Ivo Harlow', 'Port Venn'])];
+  const t = proseTest(DUMP, peers, { key: 'p' });
+  assert.equal(t.testable, true); assert.equal(t.outside, true);
+  assert.equal(proseTest(peers[0], [peers[1], DUMP], { key: 'q' }).outside, false);
+});
+
+test('with no other source there is nothing to be unlike: untestable, and kept', () => {
+  assert.equal(proseTest(DUMP, [], { key: 'x' }).testable, false);
+  assert.equal(structureRate('Plain words only.'), 0);
+});
+
+test('a corpus made entirely of records does not flag its own kind', () => {
+  assert.equal(proseTest(DUMP, [DUMP.replace('Eiffel', 'Louvre'), DUMP.replace('Eiffel', 'Orsay')], { key: 'k' }).outside, false);
+});
+
+test('the loop refuses a record that mentions the question and says so with the numbers', async () => {
+  const pages = {
+    'https://a.example/z1': P('Zorblatt lighthouse 1', onTopic()),
+    'https://a.example/z2': P('Zorblatt lighthouse 2', onTopic(' More.')),
+    'https://j.example/rec': { title: 'Zorblatt lighthouse record', snippet: 'Zorblatt lighthouse Zorblatt keepers history', text: "{'title': 'Zorblatt lighthouse history', 'keepers': ['Mara Quill'], 'id': None, 'type': 'RECORD', 'kind': None, 'doi': None, 'zorblatt': 'Zorblatt lighthouse', 'meta': {'a': [], 'b': {}, 'c': None, 'zorblatt': 'Zorblatt lighthouse Zorblatt lighthouse Zorblatt'}}" },
+  };
+  const web = fakeWeb({ lanes: { web: Object.keys(pages) }, pages });
+  const run = await research('history of the Zorblatt lighthouse', base(web, { route: () => ({ scopes: ['web'], why: {}, rest: [] }) }));
+  const g = run.gaps.find(x => x.kind === 'not-prose');
+  assert.ok(g && /structure/.test(g.why), JSON.stringify(run.gaps.map(x => x.kind)));
+  assert.deepEqual(run.sources.map(s => s.url).sort(), ['https://a.example/z1', 'https://a.example/z2']);
+});
