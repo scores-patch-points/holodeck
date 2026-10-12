@@ -135,3 +135,13 @@ fast: 5 files · 9 tests pass · law: ok
 | Diaconis | a measurement was touched | index.html:6838 | clean | the normalized doc now carries the eyes summary (pages/chosen/watermark/disagreements); the counts are the reconciliation's own, no null invented |
 | Alexander | the composition seam | holodeck-screen.js:61 | clean | contentOf → reconcile → overlay cohere; the overlay only carries pages the model won (one page in, one out), pinned by test |
 clean: none (all seven routed lenses reported above; Marshall not routed — no law edited or cited)
+
+## 2026-10-11 — audio reads itself: auto-transcribe on add, words stream into the reader, the sound map classifies (YAMNet, in-browser) at the change points, and the measured preamble moves behind a disclosure (working, sound-classify)
+fast: 7 files · 5 tests pass · law: ok
+| lens | citation | file:line | verdict | one line |
+| Simon/Chekhov | new module with no test import | holodeck-classify.js | fixed | holodeck-classify.test.mjs imports it and proves the change-point merger (5 tests, two FALSIFIERs); the module is wired at both call sites (addDocs, componentDidUpdate) |
+| Diaconis | a measurement whose test uses synthetic frames | holodeck-classify.test.mjs:5 | noted | the merger rule is proved on synthetic label streams; YAMNet's own label accuracy is a machine reading — disclosed in the reader and README, never re-claimed as checked |
+| Feynman | a numeric constant in a comparison | holodeck-classify.js:75 | noted | k < 521 is the fixed AudioSet class count (a property of the model output), not tuned; the classify failure path is traced via hdT, not swallowed |
+| Pearl | a corroboration / independence claim | yamnet-names.js:265 | noted | "Independent music" is a class label; frames inside a span are smoothed *because* they are correlated, never counted as independent evidence |
+| Frankfurt | a placeholder value | index.html:2285 | false-positive-on-review | hint-placeholder-val="{{ false }}" is the surface's standing sc-if template syntax (dozens in the file), not a placeholder hack |
+clean: Diaconis, Feynman, Pearl reported above; Marshall not routed — no law edited or cited

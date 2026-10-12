@@ -89,7 +89,14 @@ export async function readSound(file, bytes, tr = noop, kind = 'Audio') {
     steady ? 'Its level is steady from start to end, with no silences.' : S.length ? 'It has ' + S.length + ' sounding section' + (S.length === 1 ? '' : 's') + ' separated by silence.' : 'It has no silence long enough to divide it into sections.',
     ...S.map(s => 'Section ' + s.i + ' is heard from ' + mmss(s.from) + ' to ' + mmss(s.to) + ' at an average level of ' + db(s.level) + ' decibels' + (s === loudest ? ', the loudest section' : '') + '.'),
   ];
-  return { type: kind, measured: true, format: 'html', html: para(lines), buf: bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength), media: { kind: 'local', dur: dur, sr: sr, ch: ch }, extra: { media: { kind: 'local', mime: file.type || '', size: bytes.byteLength, dur: dur, sr: sr, ch: ch }, kind: 'Recording', medium: kind, transcribed: false }, note: title + ' is ' + (kind === 'Video' ? 'a video; its sound track' : 'a sound file; it') + ' was measured for length, loudness and silences. No speech was transcribed.' };
+  return { type: kind, measured: true, format: 'html', html: measuredHtml(lines), buf: bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength), media: { kind: 'local', dur: dur, sr: sr, ch: ch }, extra: { media: { kind: 'local', mime: file.type || '', size: bytes.byteLength, dur: dur, sr: sr, ch: ch }, kind: 'Recording', medium: kind, transcribed: false }, note: title + ' is ' + (kind === 'Video' ? 'a video; its sound track' : 'a sound file; it') + ' was measured for length, loudness and silences. No speech was transcribed.' };
+}
+
+// The measured preamble is not the first thing a recording says: it sits behind a
+// small disclosure (the same <details> the provenance strip uses), so a recording
+// opens silent and asks to be transcribed — the measurement is still one click away.
+function measuredHtml(lines) {
+  return '<details style="font:400 14px/1.55 var(--sans,sans-serif);color:var(--mut,#777);max-width:560px"><summary style="cursor:pointer;list-style:none;font:600 11px var(--mono,monospace);letter-spacing:.07em;text-transform:uppercase;color:var(--acc,#4a90d9);outline:none;user-select:none">▸&nbsp;Measured from the bytes — length, sections, loudness</summary>' + para(lines) + '</details>';
 }
 
 // ---------- MIDI ----------

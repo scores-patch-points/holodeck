@@ -183,7 +183,10 @@ export async function transcribe(fileOrBuf, onProgress, model, opts) {
   const nChunks = Math.max(1, Math.ceil(pcm.length / CH));
   for (let o = 0, ci = 0; o < pcm.length; o += CH, ci++) { onProgress && onProgress({ stage: 'transcribing', pct: Math.round(o / pcm.length * 100), i: ci + 1, n: nChunks });
     const r = await _asr(pcm.subarray(o, Math.min(pcm.length, o + CH)), extra);
-    const base = o / 16000; (r.chunks || [{ timestamp: [0, CH / 16000], text: r.text }]).forEach(c => { const t = (c.text || '').trim(); if (t) segs.push({ start: +(base + (c.timestamp[0] || 0)).toFixed(2), end: +(base + (c.timestamp[1] || c.timestamp[0] || 0)).toFixed(2), text: t }); }); }
-  onProgress && onProgress({ stage: 'done', pct: 100 });
+    const base = o / 16000; (r.chunks || [{ timestamp: [0, CH / 16000], text: r.text }]).forEach(c => { const t = (c.text || '').trim(); if (t) segs.push({ start: +(base + (c.timestamp[0] || 0)).toFixed(2), end: +(base + (c.timestamp[1] || c.timestamp[0] || 0)).toFixed(2), text: t }); });
+    // The text is visible while it streams: each finished chunk hands back what has been
+    // heard so far, so the surface can show the words appearing instead of a silent bar.
+    onProgress && onProgress({ stage: 'transcribing', pct: Math.round(Math.min(pcm.length, o + CH) / pcm.length * 100), i: ci + 1, n: nChunks, partial: segs.slice() }); }
+  onProgress && onProgress({ stage: 'done', pct: 100, partial: segs.slice() });
   return { source: 'in-browser-whisper', model, segments: segs, duration: decoded.duration, priors: { prompt: opts.prompt || null, language: englishOnly ? 'en' : (lang || 'auto') } };
 }

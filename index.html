@@ -2216,7 +2216,7 @@ button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visi
             </div>
             <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;flex:none">
               <div style="display:flex;border:1px solid var(--line2);border-radius:8px;overflow:hidden">
-                <button onClick="{{ modeOriginal }}" style="border:0;padding:6px 12px;cursor:pointer;font:500 14px var(--sans);background:{{ modeO.bg }};color:{{ modeO.color }}">Original</button>
+                <button onClick="{{ modeOriginal }}" style="border:0;padding:6px 12px;cursor:pointer;font:500 14px var(--sans);background:{{ modeO.bg }};color:{{ modeO.color }}">{{ modeO.label }}</button>
                 <sc-if value="{{ hasFaithful }}" hint-placeholder-val="{{ false }}"><button onClick="{{ modeReading }}" style="border:0;padding:6px 12px;cursor:pointer;font:500 14px var(--sans);background:{{ modeR.bg }};color:{{ modeR.color }}">Reading</button></sc-if>
                 <sc-if value="{{ hasScreen }}" hint-placeholder-val="{{ false }}"><button onClick="{{ modeScreen }}" title="The measured 2D model drawn on the image: every region, coloured by role" style="border:0;padding:6px 12px;cursor:pointer;font:500 14px var(--sans);background:{{ modeSc.bg }};color:{{ modeSc.color }}">Regions</button></sc-if>
                 <sc-if value="{{ noFaithful }}" hint-placeholder-val="{{ true }}"><button onClick="{{ modePlain }}" style="border:0;padding:6px 12px;cursor:pointer;font:500 14px var(--sans);background:{{ modeP.bg }};color:{{ modeP.color }}">Text only</button></sc-if>
@@ -2282,6 +2282,17 @@ button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visi
                   <iframe id="fx-yt" src="{{ rdMedia.src }}" title="{{ rdMedia.title }}" referrerPolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen="{{ true }}" style="width:100%;aspect-ratio:16/9;border:0;border-radius:10px;background:#000"></iframe>
                 </sc-if>
                 <div style="display:flex;gap:10px;align-items:baseline;flex-wrap:wrap"><span id="fx-yt-now" style="font:600 13px var(--mono);color:var(--acc);white-space:nowrap"></span><span style="font:500 13px var(--sans);color:var(--ink2)">{{ rdMedia.kindLine }}</span></div>
+                <sc-if value="{{ rdMedia.isLocal }}" hint-placeholder-val="{{ false }}">
+                  <sc-if value="{{ rdMedia.clsBusy }}" hint-placeholder-val="{{ false }}">
+                    <span style="font:400 12.5px/1.45 var(--sans);color:var(--mut);text-wrap:pretty">Listening for what kind of sound this is — the model runs in this browser, the bytes never leave this machine…</span>
+                  </sc-if>
+                  <sc-if value="{{ rdMedia.hasCls }}" hint-placeholder-val="{{ false }}">
+                    <div style="display:flex;flex-direction:column;gap:3px">
+                      <span style="font:600 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--mut)">Sound map — where the kind changes</span>
+                      <span style="font:500 13px/1.55 var(--sans);color:var(--ink2);text-wrap:pretty">{{ rdMedia.clsLine }}<span style="color:var(--dim)"> ({{ rdMedia.clsMeta }})</span></span>
+                    </div>
+                  </sc-if>
+                </sc-if>
                 <span style="font:400 13px/1.45 var(--sans);color:var(--mut);text-wrap:pretty">{{ rdMedia.note }}</span>
                 <sc-if value="{{ rdMedia.timed }}" hint-placeholder-val="{{ false }}"><label style="display:flex;gap:8px;align-items:center;font:500 13px var(--sans);color:var(--ink2);cursor:pointer"><input type="checkbox" checked="{{ rdMedia.follow }}" onChange="{{ rdMedia.onFollow }}"></input>Follow the video in the transcript</label></sc-if>
                 <sc-if value="{{ rdMedia.canAsk }}" hint-placeholder-val="{{ false }}">
@@ -2325,6 +2336,16 @@ button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visi
               </div>
               <div id="fx-tx" style="min-width:0;overflow-x:hidden;overflow-wrap:anywhere;border-left:1px solid var(--line);padding:18px 28px 40px;font:400 17px/1.65 var(--serif);color:var(--ink);max-height:calc(100vh - 80px);overflow:auto;position:sticky;top:var(--hdr-h, 61px)">
                 <span style="display:block;font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mut);margin-bottom:10px">{{ rdMedia.txTitle }}</span>
+                <sc-if value="{{ rdMedia.hasNewNames }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:16px;border:1px solid var(--line2);border-radius:10px;padding:10px 12px;background:var(--s2)">
+                    <span style="font:500 13px/1.45 var(--sans);color:var(--ink)">The transcript names things the workspace doesn't know about yet — what else to know?<span style="color:var(--mut);font-weight:400"> (Asking a name opens what the workspace can find about it.)</span></span>
+                    <span style="display:flex;flex-wrap:wrap;gap:6px">
+                      <sc-for list="{{ rdMedia.newNames }}" as="nn" hint-placeholder-count="3">
+                        <button onClick="{{ nn.onOpen }}" style="border:1px solid var(--acc2);background:var(--sel);color:var(--ink);border-radius:999px;padding:3px 11px;cursor:pointer;font:500 13px var(--sans)" style-hover="border-color:var(--acc)">{{ nn.name }}</button>
+                      </sc-for>
+                    </span>
+                  </div>
+                </sc-if>
                 <div ref="{{ readerRef }}"></div>
               </div>
             </div>
@@ -2898,6 +2919,17 @@ function ohsSegmentsHtml(segs, title) {
     if (!cur || gap > 1.5 || cur.txt.length > 520) { cur = { t: g.start, end: g.end, txt: t }; paras.push(cur); } else { cur.txt += ' ' + t; cur.end = g.end; } });
   const P = TAG_STYLE.P ? ' style="' + TAG_STYLE.P + '"' : '';
   return '<h1' + (TAG_STYLE.H1 ? ' style="' + TAG_STYLE.H1 + '"' : '') + '>' + esc(title) + '</h1>\n' + paras.map(p => '<p data-t="' + Math.floor(p.t) + '"' + P + '>' + esc(p.txt) + '</p>').join('\n');
+}
+// The words arrive while the recognizer is still talking: the live pane is the same
+// paragraph builder as the landed transcript, without the headline, painted straight
+// into the reader as each chunk is heard.
+function liveSegmentsHtml(segs, done) {
+  const paras = []; let cur = null;
+  (segs || []).forEach(g => { const t = (g.text || '').trim(); if (!t) return; const gap = cur ? g.start - cur.end : 0;
+    if (!cur || gap > 1.5 || cur.txt.length > 520) { cur = { t: g.start, end: g.end, txt: t }; paras.push(cur); } else { cur.txt += ' ' + t; cur.end = g.end; } });
+  const P = TAG_STYLE.P ? ' style="' + TAG_STYLE.P + '"' : '';
+  return '<p ' + P + ' style="border-left:3px solid var(--acc2,#4a90d9);padding-left:12px;margin:0 0 10px;color:var(--ink,#222)">' + paras.map(p => '<span data-t="' + Math.floor(p.t) + '">' + esc(p.txt) + '</span>').join(' ') + '</p>'
+    + (done ? '' : '<p ' + P + ' style="color:var(--mut,#888);font-style:italic">' + 'Words appear here as they are heard — a machine reading, not the recording, and not yet checked by anyone.' + '</p>');
 }
 async function opfsDir(path) { const root = await navigator.storage.getDirectory(); let d = root; for (const p of path.split('/').filter(Boolean)) d = await d.getDirectoryHandle(p, { create: true }); return d; }
 async function opfsRead(path) { try { const parts = path.split('/'); const name = parts.pop(); const d = await opfsDir(parts.join('/')); const fh = await d.getFileHandle(name); return await (await fh.getFile()).arrayBuffer(); } catch (e) { return null; } }
@@ -4680,7 +4712,15 @@ class Component extends DCLogic {
     window.addEventListener('dragenter', this._h.enter); window.addEventListener('dragleave', this._h.leave); window.addEventListener('dragover', this._h.over); window.addEventListener('drop', this._h.drop); window.addEventListener('paste', this._h.paste);
   }
   componentWillUnmount() { window.removeEventListener('keydown', this._onFocusKey); window.removeEventListener('resize', this._onRz); if (this._pdfRo) { try { this._pdfRo.disconnect(); } catch (e) {} } window.removeEventListener('message', this._onYt); document.removeEventListener('selectionchange', this._onSelCh); window.removeEventListener('scroll', this._onSelCh, true); window.removeEventListener('message', this._onMsg); const h = this._h; window.removeEventListener('dragenter', h.enter); window.removeEventListener('dragleave', h.leave); window.removeEventListener('dragover', h.over); window.removeEventListener('drop', h.drop); window.removeEventListener('paste', h.paste); }
-  componentDidUpdate() { this.syncOverview(); this.applyTheme(); this.measureHdr(); try { const ff = document.getElementById('fold-folder-input'); if (ff && !ff.multiple) { ff.webkitdirectory = true; ff.setAttribute('webkitdirectory', ''); ff.multiple = true; ff.setAttribute('multiple', ''); } } catch (e) {} if (this._prevCorpus !== this.state.corpus || this._prevAdded !== this.state.added) { this._prevCorpus = this.state.corpus; this._prevAdded = this.state.added; this.loadHtml(); this.akAutoLoad(); } const rd0 = this.state.readDoc && this.analysis().docById[this.state.readDoc]; if (rd0 && rd0.media && rd0.media.kind === 'local') { this.ensureMediaUrl(rd0); } this.hookLocal(); this.syncReader(); this.ytHook(); this.syncOmni();
+  componentDidUpdate() { this.syncOverview(); this.applyTheme(); this.measureHdr(); try { const ff = document.getElementById('fold-folder-input'); if (ff && !ff.multiple) { ff.webkitdirectory = true; ff.setAttribute('webkitdirectory', ''); ff.multiple = true; ff.setAttribute('multiple', ''); } } catch (e) {} if (this._prevCorpus !== this.state.corpus || this._prevAdded !== this.state.added) { this._prevCorpus = this.state.corpus; this._prevAdded = this.state.added; this.loadHtml(); this.akAutoLoad(); } const rd0 = this.state.readDoc && this.analysis().docById[this.state.readDoc]; if (rd0 && rd0.media && rd0.media.kind === 'local') { this.ensureMediaUrl(rd0);
+      // A recording opened but never classified gets its sound map on first sight (an
+      // older stored recording, or one added before the classifier existed); the work
+      // is the same in-browser rung, guarded so it happens once until it lands.
+      if (this.clsOn() && !rd0.soundSpans && !this.clsBusy(rd0.id) && !(rd0.media.dur != null && rd0.media.dur > 6 * 3600)) {
+        (this._clsQueued = this._clsQueued || {});
+        if (!this._clsQueued[rd0.id]) { this._clsQueued[rd0.id] = 1; this.classifyDoc(rd0).catch(() => {}); }
+      }
+    } this.hookLocal(); this.syncReader(); this.ytHook(); this.syncOmni();
     const S = this.state;
     const askEl = document.getElementById('ak-composer');
     if (S.view === 'ask' && askEl) {
@@ -5469,6 +5509,48 @@ class Component extends DCLogic {
     catch (e) { this._asrNote = 'Not reachable at ' + url + '. Start it with: npm run asr'; return null; }
     finally { this.forceUpdate(); }
   }
+  // ── what kind of sound it is, and when the kind changes ──────────────────────
+  // Both automatic knobs are on by default and settable in localStorage: hd:autoTx
+  // ("off" stops auto-transcription of newly added audio) and hd:cls ("off" stops
+  // the sound classifier). The classifier is the browsing-rung YAMNet (holodeck-
+  // classify.js); the model runs here, the bytes never leave the machine.
+  autoTxOn() { try { const v = localStorage.getItem('hd:autoTx'); return v === null ? true : v !== 'off'; } catch (e) { return true; } }
+  clsOn() { try { const v = localStorage.getItem('hd:cls'); return v === null ? true : v !== 'off'; } catch (e) { return true; } }
+  clsBusy(id) { return !!(this._clsBusy && this._clsBusy.has(id)); }
+  async classifyDoc(d, buf) {
+    const id = d.id;
+    (this._clsBusy = this._clsBusy || new Set());
+    if (this._clsBusy.has(id)) return;
+    this._clsBusy.add(id);
+    try {
+      const dd = d.media ? d : (this.analysis().docById[id] || d);
+      if (!dd || !dd.media) return;
+      let b = buf || await mediaBytes(id);
+      if (!b) return;
+      if (dd.media.dur != null && dd.media.dur > 6 * 3600) { this.ilog('\u201c' + dd.title + '\u201d is over six hours; not classifying its sounds in this browser.'); return; }
+      const C = await import(new URL('holodeck-classify.js', location.href).href);
+      const r = await C.classifySound(b, { onProgress: p => hdT('cls', p.stage === 'classifying' ? 'window' : p.stage, p.stage === 'classifying' ? 'Classifying the sound \u00b7 ' + p.pct + '% \u00b7 ' + p.frames + ' frames' : p.stage) });
+      if (!r.spans.length) return;
+      this.replaceAddedDoc(id, { soundSpans: r.spans, clsModel: r.model });
+      this.ilog('Classified the sounds of \u201c' + dd.title + '\u201d: ' + r.spans.length + ' change' + (r.spans.length === 1 ? '' : 's') + ' of kind across ' + r.covered + '% of ' + fmtT(r.duration || 0) + ' (' + r.model + ', in this browser).');
+    } catch (e) { hdT('cls', 'fail', 'Sound classification failed: ' + (e && e.message || e)); }
+    finally { this._clsBusy.delete(id); this.forceUpdate && this.forceUpdate(); }
+  }
+  // The clean-up pass after a transcript lands: the names the recording is the only
+  // source of are the ones the hyperlexicon doesn't know yet — surfaced with a
+  // "what else to know about" door, not folded silently into the pinch.
+  transcriptNewNames(d, A) {
+    const sts = (A.stsByDoc[d.id] || []); const names = new Set();
+    sts.forEach(st => (st.names || []).forEach(n => names.add(n)));
+    const out = [];
+    for (const n of names) {
+      const r = A.names[n]; if (!r) continue;
+      if (!(r.type === 'person' || r.type === 'organisation' || r.type === 'place')) continue;
+      if (r.sts.some(st => st.doc !== d.id)) continue;
+      out.push(n);
+    }
+    return out.slice(0, 14);
+  }
   // Transcription runs are long and, in-browser, silent between chunks. The
   // surface reports one live line: the stage, the chunk, the percent, and how
   // long it has been going (with an estimate once there is a percent to pace
@@ -5476,6 +5558,7 @@ class Component extends DCLogic {
   txReset(docId) {
     if (this._txTick) clearInterval(this._txTick);
     this._txStart = Date.now();
+    this._txSegs = null; this._txLive = null;
     this.setState({ txBusy: true, txProgress: { stage: 'starting', docId: docId || null } });
     this._txTick = setInterval(() => { if (!this.state.txBusy) { clearInterval(this._txTick); this._txTick = null; return; } this.forceUpdate(); }, 1000);
   }
@@ -5485,11 +5568,21 @@ class Component extends DCLogic {
     if (p.pct != null) next.pct = Math.max(0, Math.min(100, Math.round(p.pct)));
     if (p.i != null) next.i = p.i;
     if (p.n != null) next.n = p.n;
+    // The text rides along the progress: each chunk of the in-browser recognizer hands
+    // back what has been heard so far, and the reader paints it live under the bar.
+    if (p.partial) { this._txSegs = p.partial; this._txLive = liveSegmentsHtml(p.partial, p.stage === 'done'); this.paintTxLive(); }
     this.setState({ txBusy: true, txProgress: next });
+  }
+  paintTxLive() {
+    const pr = this.state.txProgress; const el = this._rEl;
+    if (!el || !pr || !pr.docId || pr.docId !== this.state.readDoc) return;
+    el.innerHTML = this._txLive || '<p style="color:var(--mut)">Waiting for the first words…</p>';
+    const box = document.getElementById('fx-tx'); if (box) box.scrollTop = box.scrollHeight;
   }
   txDone() {
     if (this._txTick) { clearInterval(this._txTick); this._txTick = null; }
     this._txStart = null;
+    this._txSegs = null; this._txLive = null;
     this.setState({ txBusy: false, txProgress: null, txProg: '' });
   }
   txProgVals() {
@@ -5516,9 +5609,9 @@ class Component extends DCLogic {
     if (!buf) { this.toast('The recording’s audio isn’t kept in this browser — transcribe it in the reader.'); return; }
     this.transcribeLocal(d);
   }
-  async transcribeLocal(d0) {
+  async transcribeLocal(d0, bytes) {
     const A = this.analysis(); const prior = this.state.txPrior || 'workspace';
-    const buf = await mediaBytes(d0.id);
+    const buf = bytes || await mediaBytes(d0.id);
     if (!buf) {
       this.txDone();
       if (d0.media && d0.media.kind === 'youtube') { this.setState({ view: 'reader', readDoc: d0.id, txAsk: d0.id, note: '' }); this.toast('YouTube audio isn’t stored in this browser — in the reader, choose the file you downloaded and it is transcribed here.'); return; }
@@ -7174,6 +7267,20 @@ class Component extends DCLogic {
     nd.forEach(d => { d.status = 'source'; });
     if (!(T.focus instanceof Set)) T.focus = new Set(T.focus || []); nd.forEach(d => T.focus.add(d.id)); nd.forEach(d => hdT('store', 'mint', 'Stored \u201c' + hdCut(d.title, 60) + '\u201d as ' + d.id + (list[nd.indexOf(d)].html ? ' \u00b7 full page kept; ' + d.text.length.toLocaleString() + ' characters indexed for search' + (d.text.length >= 60000 ? ' (the cap; the reading below uses the whole page)' : '') : ' \u00b7 ' + d.text.length.toLocaleString() + ' characters kept'), { doc: d.id }));
     nd.forEach((d, i) => { const x = list[i]; if (x.html) { this._html[d.id] = x.html; idbPut('html:' + d.id, x.html).catch(() => {}); } if (x.pdf) idbPut('pdf:' + d.id, x.pdf).catch(() => {}); if (x.ocr) idbPut('ocr:' + d.id, x.ocr).catch(() => {}); if (x.eyesDetail) idbPut('eyes:' + d.id, x.eyesDetail).catch(() => {}); if (x.buf) { idbPut('media:' + d.id, x.buf).catch(() => {}); opfsWrite('media/' + d.id, x.buf); } if (d.hasImg && HD_PENDING_IMG['img:' + d.title]) { const u = HD_PENDING_IMG['img:' + d.title]; this._html['img:' + d.id] = u; idbPut('img:' + d.id, u).catch(() => {}); delete HD_PENDING_IMG['img:' + d.title]; } });
+    // A recording arrives and the work begins on its own: the sounds are classified at
+    // the chunks where the kind changes, and a lone audio file is transcribed right away —
+    // the reader opens on it so the words are watched as they stream in (both settable:
+    // hd:cls="off", hd:autoTx="off"). Nothing is transcribed without being kept.
+    const recs = [];
+    nd.forEach((d, i) => { const x = list[i]; if (!x.buf) return; if (!(d.media && d.media.kind === 'local')) return; if (!d.medium || d.transcribed) return; recs.push({ d, buf: x.buf }); });
+    if (recs.length) {
+      if (this.clsOn()) recs.forEach(({ d, buf }) => this.classifyDoc(d, buf).catch(() => {}));
+      if (!(aopt && aopt.defer) && recs.length === 1 && recs[0].d.medium === 'Audio' && this.autoTxOn()) {
+        const r0 = recs[0];
+        this.setState({ view: 'reader', readDoc: r0.d.id, sel: { type: 'doc', id: r0.d.id } });
+        this.transcribeLocal(r0.d, r0.buf);
+      }
+    }
     // Store first, then paint: each source lands in the workspace (and its bytes in IndexedDB) before the read and
     // the fold, so Sources fills in as the files arrive instead of freezing until the whole batch is done.
     const added = { ...this.state.added, [id]: [...(this.state.added[id] || []), ...nd] };
@@ -8042,10 +8149,15 @@ class Component extends DCLogic {
         if (m.kind === 'youtube') { const LZ = d0.lazy ? (this._lazy || {})[d0.id] : null; const segN = LZ && !LZ.loading ? LZ.segN : m.segN; const timed = segN > 0 || segN === -1;
           const org = typeof location !== 'undefined' ? encodeURIComponent(location.origin) : '';
           const prior = S.txPrior || 'workspace';
+          const txHere = !!(this.state.txBusy && this.state.txProgress && this.state.txProgress.docId === d0.id && this.state.txProgress.stage && this.state.txProgress.stage !== 'done');
+          const nn = timed || (LZ && LZ.segN && !LZ.loading) ? this.transcriptNewNames(d0, A) : [];
+          const newNames = nn.map(n => ({ name: n, onOpen: () => this.openProfile(n) }));
+          const hasNewNames = newNames.length > 0;
           return { has: true, isLocal: false, ytOnly: true, noAudio: true, hasUrl: true, title: d0.title, url: m.url || 'https://www.youtube.com/watch?v=' + m.id, timed, follow: S.ytFollow !== false, onFollow: e => this.setState({ ytFollow: e.target.checked }),
             src: 'https://www.youtube.com/embed/' + m.id + '?rel=0&enablejsapi=1&playsinline=1' + (org ? '&origin=' + org : ''),
             kindLine: d0.aboutOnly ? 'Linked video, not transcribed' : segN === -1 ? 'Loading transcript…' : timed ? plural(segN, 'timed segment') + (LZ && LZ.from ? ' · read from ' + (LZ.from === 'opfs' ? 'this browser’s file store' : LZ.from) : '') : 'Transcript without timings',
-            txTitle: d0.aboutOnly ? 'About this video' : timed ? 'Transcript · click a timecode to play from there' : 'Transcript',
+            hasNewNames, newNames, clsBusy: false, hasCls: false, clsLine: '', clsMeta: '',
+            txTitle: d0.aboutOnly ? 'About this video' : timed ? 'Transcript · click a timecode to play from there' : txHere ? 'Transcribing — words appear below as they are heard' : 'Transcript',
             note: d0.aboutOnly ? 'Only the link was captured. No transcript exists in the record yet.' : timed ? 'Machine transcript (' + ((LZ && LZ.model) || m.model || 'Whisper').split('/').pop() + '), not checked by a person. Use it to find moments; quote from the recording, not the transcript.' : 'Auto-caption or machine transcript with no timestamps, so the transcript can’t follow the video. Quote from the recording, not the transcript.',
             canAsk: !timed && !d0.aboutOnly, ask: S.txAsk === d0.id, noAsk: !timed && !d0.aboutOnly && S.txAsk !== d0.id,
 onAsk: () => { this.setState({ txAsk: d0.id }); this.pickYtFile(d0); }, onCancelAsk: () => this.setState({ txAsk: null }),
@@ -8056,10 +8168,25 @@ onAsk: () => { this.setState({ txAsk: d0.id }); this.pickYtFile(d0); }, onCancel
         const timed = m.segN > 0;
         const prior = S.txPrior || 'workspace';
         const PRIOR_LABEL = { workspace: 'the names this workspace already knows', none: 'no vocabulary prior', mine: 'the terms you typed' };
+        // The sound map: where the kind of sound meaningfully changes, read from the
+        // bytes by the in-browser classifier. The loudness/section measurement stays
+        // behind the disclosure; this is what the recording is, in chunks.
+        const spans = (d0.soundSpans || []);
+        const clsChunks = spans.map(s => ({ t: (s.start == null ? '' : fmtT(s.start) + ' \u2013 ' + fmtT(s.end)), name: s.name }));
+        const hasCls = clsChunks.length > 0;
+        const clsLine = clsChunks.map(c => (c.t ? c.t + ' ' : '') + c.name).join(' \u00b7 ');
+        const clsBusy = this.clsBusy(d0.id);
+        // The clean-up after the transcript: this recording is the only source of some
+        // names — the hyperlexicon doesn't know them yet, and is offered the door.
+        const nn = timed ? this.transcriptNewNames(d0, A) : [];
+        const newNames = nn.map(n => ({ name: n, onOpen: () => this.openProfile(n) }));
+        const hasNewNames = newNames.length > 0;
+        const txHere = !!(this.state.txBusy && this.state.txProgress && this.state.txProgress.docId === d0.id && this.state.txProgress.stage && this.state.txProgress.stage !== 'done');
         return { has: true, isLocal: true, ytOnly: false, hasUrl: false, title: d0.title, url: null, timed, follow: S.ytFollow !== false, onFollow: e => this.setState({ ytFollow: e.target.checked }),
           isAudio: (m.mime || '').indexOf('audio') === 0, noAudio: (m.mime || '').indexOf('audio') !== 0, hasSrc: !!(this._mediaUrl && this._mediaUrl[d0.id]), noSrc: !(this._mediaUrl && this._mediaUrl[d0.id]), src: (this._mediaUrl || {})[d0.id] || '',
           kindLine: timed ? plural(m.segN, 'timed segment') + ' · ' + (m.model || 'Whisper').split('/').pop() : (m.dur != null ? fmtT(m.dur) : '') + (m.mime ? ' · ' + m.mime.split('/')[0] + (m.size ? ' · ' + Math.max(1, Math.round(m.size / 1e6)) + ' MB' : '') : ''),
-          txTitle: timed ? 'Transcript · click a timecode to play from there' : 'Transcript',
+          hasCls, clsLine, clsBusy, clsMeta: (d0.clsModel || '').replace('yamnet-', ''), hasNewNames, newNames,
+          txTitle: timed ? 'Transcript · click a timecode to play from there' : txHere ? 'Transcribing — words appear below as they are heard' : 'Transcript',
           note: timed ? 'Machine transcript (' + (m.model || 'Whisper').split('/').pop() + '), not checked by a person' + (m.priors ? ' · transcribed with the prior: ' + (PRIOR_LABEL[m.priors.prompt] || m.priors.prompt || 'none') + ', language ' + (m.priors.language || 'auto') : '') + '. Quote from the recording, not the transcript.' : 'The recording is kept in this browser; nothing in it has been read until it is transcribed. A transcript is a machine interpretation — the priors you choose (what it should listen for, and in which language) change what it hears, and they stay on the record.',
           canAsk: !timed, ask: S.txAsk === d0.id, noAsk: !timed && S.txAsk !== d0.id,
           onAsk: () => { this.setState({ txAsk: d0.id }); this.transcribeLocal(d0); }, onCancelAsk: () => this.setState({ txAsk: null }),
@@ -8072,7 +8199,7 @@ onAsk: () => { this.setState({ txAsk: d0.id }); this.pickYtFile(d0); }, onCancel
       ...(() => { const d0 = S.readDoc && A.docById[S.readDoc]; const hf = !!(d0 && (d0.faithful || d0.binPath || d0.pdfSrc)); const onO = S.readMode === 'original' || (!hf && S.readMode === 'reading'), onR = hf && S.readMode === 'reading'; const pill = on => ({ bg: on ? 'var(--sel)' : 'transparent', color: on ? 'var(--ink)' : 'var(--mut)' });
         return { hasFaithful: hf, noFaithful: !hf, modeR: pill(onR), modeReading: () => this.setState({ readMode: 'reading' }),
           rdFaith: hf && S.readMode === 'original' ? { has: true, note: (d0.pdfSrc ? 'The PDF exactly as captured' + (d0.custody ? ' (' + d0.custody + ')' : '') + '.' : 'The page as captured' + (d0.custody ? ' (' + d0.custody + ')' : '') + '. Layout and styles load from ' + ohsPublisher(d0.url) + ' today and may have changed since; the words are the captured bytes.') + (this._faithFound ? ' ' + this._faithFound.found + ' of ' + plural(this._faithFound.total, 'statement') + ' located and marked; the rest differ in wording or layout — see Reading.' : '') } : { has: false }, _o: onO }; })(),
-      modeO: (() => { const d0 = S.readDoc && A.docById[S.readDoc]; const hf = !!(d0 && (d0.faithful || d0.binPath || d0.pdfSrc)); const on = S.readMode === 'original' || (!hf && S.readMode === 'reading'); return { bg: on ? 'var(--sel)' : 'transparent', color: on ? 'var(--ink)' : 'var(--mut)' }; })(), modeP: { bg: S.readMode === 'plain' ? 'var(--sel)' : 'transparent', color: S.readMode === 'plain' ? 'var(--ink)' : 'var(--mut)' }, modeS: { bg: S.readMode === 'restated' ? 'var(--sel)' : 'transparent', color: S.readMode === 'restated' ? 'var(--ink)' : 'var(--mut)' }, modeRestated: () => this.setState({ readMode: 'restated' }),
+      modeO: (() => { const d0 = S.readDoc && A.docById[S.readDoc]; const hf = !!(d0 && (d0.faithful || d0.binPath || d0.pdfSrc)); const on = S.readMode === 'original' || (!hf && S.readMode === 'reading'); return { bg: on ? 'var(--sel)' : 'transparent', color: on ? 'var(--ink)' : 'var(--mut)', label: d0 && d0.transcribed ? 'As heard' : 'Original' }; })(), modeP: { bg: S.readMode === 'plain' ? 'var(--sel)' : 'transparent', color: S.readMode === 'plain' ? 'var(--ink)' : 'var(--mut)' }, modeS: { bg: S.readMode === 'restated' ? 'var(--sel)' : 'transparent', color: S.readMode === 'restated' ? 'var(--ink)' : 'var(--mut)' }, modeRestated: () => this.setState({ readMode: 'restated' }),
 modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S.readMode === 'summary' ? 'var(--ink)' : 'var(--mut)' }, modeSummary: () => this.setState({ readMode: 'summary' }),
       hasScreen: !!(S.readDoc && A.docById[S.readDoc] && A.docById[S.readDoc].screen && A.docById[S.readDoc].screen.elements && A.docById[S.readDoc].screen.elements.length),
       modeSc: { bg: (S.screenRegions !== false) ? 'var(--sel)' : 'transparent', color: (S.screenRegions !== false) ? 'var(--ink)' : 'var(--mut)' },
