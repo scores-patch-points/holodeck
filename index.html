@@ -5110,7 +5110,7 @@ class Component extends DCLogic {
         emit: ev => { log.push(ev); tick(); }, signal: rs.ctl.signal, keySalt: 'holodeck', noStop: !!A.noStop,
       });
       rec.ms = Math.round(performance.now() - rs.t0); rec.bridge = rs.bridge || null; rec.directOnly = !P.third; rec.lanesAllowed = [...allowed];
-      rs.record = rec; try { window.__holodeckResearch = rec; } catch (e) {}
+      rs.record = rec; try { window.__holodeckResearch = rec; window.__holodeckResearchKit = { M, bg, app: this }; } catch (e) {}   // read-only handles for the falsification runs
       await this.researchIngest(rec, A);
     } catch (e) { rs.error = 'The research stopped: ' + ((e && e.message) || e); console.warn('research', e); }
     rs.running = false; rs.done = true; this.forceUpdate();

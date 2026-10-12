@@ -127,6 +127,49 @@ stitch 0:30-0:45 and 2:00-2:10 from wNHXllwtgBk as undercroft  -> both spans joi
 
 The cut is `yt-dlp --download-sections` on this machine; a stitch runs the parts through ffmpeg into one normalized file (part dims/fps/channels don't matter). The result lands in `clips/<name>.mp4`, served by this server at `/clips/<name>.mp4`, and is added as a doc with the words cut from the caption track when one exists. The standalone chat app (`the-fold`, vendored as `vendor/fold-chat`) types the same grammar through `fold-chat-clip.js`. Tests: `holodeck-clip.test.mjs`, `fold-chat/fold-chat-clip.test.mjs`. Falsifying control: any ordinary question parsing to a clip, or a clip sentence returning null.
 
+## Research assistant (2026-10-12)
+
+Type a topic or a question; it goes out, gathers what is about it, reads it, and lays the whole set out by terrain.
+**Add sources → Research assistant** (it is the first scope; "Find sources for this question" under a refused ask and the
+omni bar of an empty workspace open the same panel). When it finishes, the sources are ingested as **one trace** and the
+**Research** view (Explore) shows the run and the corpus; the Holodeck's existing views are scoped to the run by a
+"Research: …" segment chip.
+
+**Nothing is sent until you press the button.** The panel lists, before you press anything, exactly which hosts receive
+the question (derived by dry-running the vendored URL builders, so the list cannot drift from the code), which hosts
+learn a page address when a site refuses a direct read, and lets you switch off any lane or all third-party readers.
+`autoResearch()` no longer searches on its own — it only opens this panel.
+
+| Step | Lives in | What decides |
+|---|---|---|
+| search | `vendor/fold-chat/fold-chat-web.js` `search`, `fold-chat-route.js` (byte-identical to the fold; `holodeck-research-lanes.js` is a thin adapter) | the fold's router: web always, specialists by the ask's own cues and by what the web hits vote for; a 429 cools a lane |
+| gate | `holodeck-research-null.js` `relevance` | G² keyness of the question's terms against General English, vs the same-length stretch of ordinary English drawn 199 times: a candidate is read only if it is **outside every draw** |
+| read | `fold-chat-web.js` `readText` (direct → bridge → relay → public proxies → text readers; memo; dead-host memory); PDFs by the Holodeck's own file reader | an unreadable page is a typed gap that lists the doors tried |
+| keep | `relevance` again on the page text, and `proseTest` (a metadata dump that mentions the question is refused) | outside every draw / more structure than any of 199 stretches of the other sources |
+| stop | `saturationTest` | Good–Turing f1/n, leave-one-out, below **one** item — see below |
+| terrain | `holodeck-research-terrain.js` over the Holodeck's own analysis | ties, echoes, source groups each beat 199 random overlaps; every row carries `{ doc, id, s, e }` |
+
+The parse is mechanical end to end; no model reads, abstracts or scores anything. The page injects the Holodeck's own
+sentence/name/figure finder into the loop, so the stopping rule and the terrain the person sees come from one reading.
+
+**The nine registers stay backstage.** Six are SEEN and get a section (Sources · Names · Types · Figures · Statements ·
+Connections — the Holodeck's own cell names); three are SEEING and are filters, never a section (*Framing* → "How firmly
+said", *Views* → look at one source, *Patterns* → "Sources that agree"). The register vocabulary lives in the code
+(`CELLS` in `holodeck-research-terrain.js`) and `docs/RESEARCH-ASSISTANT-PREREG.md`.
+
+**Stopping, and what it does not claim.** The first version stopped when a batch's newly-confirmed names fell inside a
+re-sampling null. A shakedown showed that rule biased toward "inside" in any heavy-tailed corpus (it stopped at 6
+sources with 33 cleared pages unread), so it was replaced — before any registered run, recorded as Amendment 1 — by a
+saturation test: stop only when another source is expected to bring **less than one** name or word nobody has said.
+That is a one-unit floor, not a drawn null. Its honest consequence: a diverse corpus essentially never saturates, so a
+real run ends where the relevance null ends the pool (`candidates-exhausted`), and every page that cleared the null but
+was not read is listed as `held`. There is no page cap and no source count; the person's Stop is the only other end.
+
+**Results and failures** are in `docs/RESEARCH-ASSISTANT-PREREG.md` (predictions frozen, then results, then what
+failed, then what is not established). Run records: `docs/research-runs/`.
+
+Tests: `node --test holodeck-research.test.mjs holodeck-research-terrain.test.mjs holodeck-research-lanes.test.mjs holodeck-research-log.test.mjs`
+
 ## Status
 
 This is the live, ongoing home for this surface — active development happens here going forward, not in a local-only copy. It is **the fold**, the reading/research surface of The Fold, and inherits the former `the-fold` repo's surface role.
