@@ -79,6 +79,25 @@ export async function merge(temp, server, user, password, rooms, carry) {
   saveSession(main); return main;
 }
 
+// ---------- share by email (the mailer on bcc.hyphae.social sends the code) ----------
+// The link carries a ticket (never a password); the recipient proves the mailbox
+// with a code sent by the mailer and is handed the disposable account's password.
+export function mailerBase() {
+  try { return (localStorage.getItem('hd:mail') || '').replace(/\/+$/, '') || 'https://bcc.hyphae.social'; } catch (e) { return 'https://bcc.hyphae.social'; }
+}
+export async function emailShareRequest(base, email, origin, rooms) {
+  const r = await fetch((base || mailerBase()) + '/api/fold/request', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, origin, rooms }) });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) { const e = new Error((j && j.error) || ('HTTP ' + r.status)); e.status = r.status; throw e; }
+  return j;
+}
+export async function emailShareConfirm(base, ticket, email, code) {
+  const r = await fetch((base || mailerBase()) + '/api/fold/confirm', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ticket, email, code }) });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) { const e = new Error((j && j.error) || ('HTTP ' + r.status)); e.status = r.status; throw e; }
+  return j;
+}
+
 // ---------- rooms ----------
 export async function resolve(s, idOrAlias) { if (/^!/.test(idOrAlias)) return idOrAlias; const j = await api(s, 'GET', '/_matrix/client/v3/directory/room/' + encodeURIComponent(idOrAlias)); return j.room_id; }
 export async function join(s, idOrAlias) { const j = await api(s, 'POST', '/_matrix/client/v3/join/' + encodeURIComponent(idOrAlias), {}); return j.room_id; }

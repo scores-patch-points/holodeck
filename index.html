@@ -75,6 +75,24 @@ button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visi
           <option value="{{ o.id }}">{{ o.name }}</option>
         </sc-for>
       </select>
+      <sc-if value="{{ wsRenaming }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;gap:4px;align-items:center">
+          <input value="{{ wsNameDraft }}" onChange="{{ onWsNameDraft }}" onKeyDown="{{ onWsRenameKey }}"  title="Name for this workspace" style="flex:1;min-width:0;background:var(--s2);border:1px solid var(--acc2);border-radius:8px;color:var(--ink);font:400 13px var(--sans);padding:5px 9px;outline:none">
+          <button onClick="{{ onWsRenameSave }}" title="Save the new name" style="background:var(--acc2);border:0;color:#fff;border-radius:8px;cursor:pointer;font:600 13px var(--sans);padding:6px 9px">✓</button>
+          <button onClick="{{ onWsRenameCancel }}" title="Cancel" style="background:none;border:0;color:var(--mut);cursor:pointer;font:600 13px var(--sans);padding:6px 7px">✕</button>
+        </div>
+      </sc-if>
+      <div style="display:flex;gap:4px">
+        <sc-if value="{{ wsDeleting }}" hint-placeholder-val="{{ false }}">
+          <span style="flex:1;min-width:0;font:400 12px/1.4 var(--sans);color:var(--bad);align-self:center">Delete “{{ corpusName }}” and everything in it?</span>
+          <button onClick="{{ onWsDelYes }}" style="background:none;border:1px solid var(--bad);border-radius:8px;color:var(--bad);cursor:pointer;font:600 13px var(--sans);padding:5px 9px">Delete</button>
+          <button onClick="{{ onWsDelNo }}" style="background:none;border:0;color:var(--mut);cursor:pointer;font:500 13px var(--sans);padding:5px 6px">Cancel</button>
+        </sc-if>
+        <sc-if value="{{ wsNotDeleting }}" hint-placeholder-val="{{ true }}">
+          <button onClick="{{ onWsRenameStart }}" title="Rename this workspace" style="background:none;border:1px solid var(--line2);border-radius:8px;color:var(--ink2);cursor:pointer;font:500 13px var(--sans);padding:6px 10px" style-hover="border-color:var(--acc)">✎ Rename</button>
+          <button onClick="{{ onWsDelAsk }}" title="Delete this workspace" style="background:none;border:1px solid var(--line2);border-radius:8px;color:var(--mut);cursor:pointer;font:500 13px var(--sans);padding:6px 10px" style-hover="border-color:var(--bad);color:var(--bad)">✕ Delete</button>
+        </sc-if>
+      </div>
       <div style="display:flex;gap:4px">
         <input value="{{ wsNewName }}" onChange="{{ onWsNewName }}" onKeyDown="{{ onWsNewKey }}" placeholder="New workspace…" title="Name a new workspace, then press Enter or ＋ New" style="flex:1;min-width:0;background:var(--s2);border:1px solid var(--line2);border-radius:8px;color:var(--ink);font:400 13px var(--sans);padding:6px 9px;outline:none">
         <button onClick="{{ onWsNew }}" title="Create a new workspace" style="flex:none;background:var(--s2);border:1px solid var(--line2);border-radius:8px;color:var(--ink2);cursor:pointer;font:600 13px var(--sans);padding:0 10px;white-space:nowrap" style-hover="border-color:var(--acc)">＋ New</button>
@@ -92,8 +110,15 @@ button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visi
         <sc-if value="{{ hasFolders }}" hint-placeholder-val="{{ false }}">
           <sc-for list="{{ folderList }}" as="f" hint-placeholder-count="2">
             <div style="display:flex;align-items:center;gap:6px">
-              <button onClick="{{ f.onClick }}" style="flex:1;min-width:0;text-align:left;cursor:pointer;padding:5px 10px;border-radius:8px;background:{{ f.bg }};border:1px solid {{ f.bd }};display:flex;justify-content:space-between;align-items:baseline;gap:10px" style-hover="background:var(--s2)"><span style="font:{{ f.weight }} 14px var(--sans);color:var(--ink2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ f.label }}</span><span style="font:500 12px var(--mono);color:var(--mut);white-space:nowrap">{{ f.n }}</span></button>
-              <sc-if value="{{ f.hasRemove }}" hint-placeholder-val="{{ false }}"><span onClick="{{ f.onRemove }}" title="Delete this folder" style="cursor:pointer;color:var(--mut);font-size:12px;padding:2px 4px" style-hover="color:var(--bad)">✕</span></sc-if>
+              <sc-if value="{{ f.renaming }}" hint-placeholder-val="{{ false }}">
+                <input key="{{ f.id }}" value="{{ folderNameDraft }}" onChange="{{ f.onRename }}" onKeyDown="{{ f.onRenameKey }}"  placeholder="Folder name" style="flex:1;min-width:0;background:var(--bg);border:1px solid var(--acc2);border-radius:8px;color:var(--ink);font:400 13px var(--sans);padding:5px 9px;outline:none">
+                <button onClick="{{ f.onRenameSave }}" title="Save the new name" style="background:none;border:0;color:var(--ok);cursor:pointer;font:600 14px var(--sans);padding:2px 4px">✓</button>
+              </sc-if>
+              <sc-if value="{{ f.notRenaming }}" hint-placeholder-val="{{ true }}">
+                <button onClick="{{ f.onClick }}" style="flex:1;min-width:0;text-align:left;cursor:pointer;padding:5px 10px;border-radius:8px;background:{{ f.bg }};border:1px solid {{ f.bd }};display:flex;justify-content:space-between;align-items:baseline;gap:10px" style-hover="background:var(--s2)"><span style="font:{{ f.weight }} 14px var(--sans);color:var(--ink2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ f.label }}</span><span style="font:500 12px var(--mono);color:var(--mut);white-space:nowrap">{{ f.n }}</span></button>
+                <span onClick="{{ f.onRenameStart }}" title="Rename this folder" style="cursor:pointer;color:var(--mut);font-size:12px;padding:2px 3px" style-hover="color:var(--ink)">✎</span>
+                <sc-if value="{{ f.hasRemove }}" hint-placeholder-val="{{ false }}"><span onClick="{{ f.onRemove }}" title="Delete this folder" style="cursor:pointer;color:var(--mut);font-size:12px;padding:2px 4px" style-hover="color:var(--bad)">✕</span></sc-if>
+              </sc-if>
             </div>
           </sc-for>
         </sc-if>
@@ -539,6 +564,7 @@ button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visi
                   </div>
                       <div style="display:flex;gap:8px;flex-wrap:wrap">
                     <sc-if value="{{ d.hasReplay }}" hint-placeholder-val="{{ false }}"><button onClick="{{ d.onReplay }}" style="background:none;border:1px solid var(--line2);border-radius:8px;padding:5px 12px;cursor:pointer;font:500 14px var(--sans);color:var(--ink2)" style-hover="border-color:var(--acc)">Watch it being read</button></sc-if>
+                    <button onClick="{{ d.onRename }}" title="Rename this source" style="background:none;border:1px solid var(--line2);border-radius:8px;padding:5px 12px;cursor:pointer;font:500 14px var(--sans);color:var(--ink2)" style-hover="border-color:var(--acc)">Rename</button>
                     <sc-if value="{{ d.canUnkeep }}" hint-placeholder-val="{{ false }}"><button onClick="{{ d.onUnkeep }}" style="background:none;border:0;padding:5px 4px;cursor:pointer;font:500 13px var(--sans);color:var(--mut)" style-hover="color:var(--ink)">Set aside</button></sc-if>
                       </div>
                     </div>
@@ -2202,7 +2228,14 @@ button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visi
             <button onClick="{{ closeReader }}" title="Back" style="flex:none;width:36px;height:36px;border-radius:10px;border:1px solid var(--line2);background:var(--s2);color:var(--ink);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center" style-hover="border-color:var(--acc)">←</button>
             <div style="flex:1 1 320px;min-width:0;display:flex;flex-direction:column;gap:3px">
               <span style="font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--acc);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ rd.eyebrow }}</span>
-              <h1 style="margin:0;font:500 27px/1.2 var(--serif);color:var(--ink);text-wrap:balance">{{ rd.title }}</h1>
+              <sc-if value="{{ readerRenaming }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;gap:6px;align-items:center">
+                  <input  value="{{ readerNameDraft }}" onChange="{{ onReaderNameDraft }}" onKeyDown="{{ onReaderNameKey }}" title="Name for this source" style="flex:1 1 320px;min-width:0;background:var(--s2);border:1px solid var(--acc2);border-radius:8px;padding:6px 10px;font:500 22px/1.2 var(--serif);color:var(--ink);outline:none">
+                  <button onClick="{{ onReaderRenameSave }}" style="background:var(--acc2);border:0;color:#fff;border-radius:8px;padding:8px 12px;cursor:pointer;font:600 13px var(--sans)">Save</button>
+                  <button onClick="{{ onReaderRenameCancel }}" style="background:none;border:0;color:var(--mut);cursor:pointer;font:500 13px var(--sans);padding:7px 6px">Cancel</button>
+                </div>
+              </sc-if>
+              <sc-if value="{{ readerNotRenaming }}" hint-placeholder-val="{{ true }}"><h1 style="margin:0;font:500 27px/1.2 var(--serif);color:var(--ink);text-wrap:balance">{{ rd.title }}</h1></sc-if>
               <span style="font:400 14px var(--sans);color:var(--mut)">{{ rd.meta }}</span>
               <sc-if value="{{ hasFilters }}" hint-placeholder-val="{{ false }}">
                 <div style="display:flex;align-items:center;gap:6px 8px;flex-wrap:wrap;margin-top:4px">
@@ -2225,6 +2258,7 @@ button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visi
                 <button onClick="{{ modeSummary }}" title="The document curated from its own sentences — one line, five, three paragraphs. No model; every line is a verbatim span of this source" style="border:0;padding:6px 12px;cursor:pointer;font:500 14px var(--sans);background:{{ modeSum.bg }};color:{{ modeSum.color }}">Summary</button>
               </div>
               <sc-if value="{{ readerHasUrl }}" hint-placeholder-val="{{ false }}"><a href="{{ readerUrl }}" target="_blank" rel="noopener" style="font:500 14px var(--sans);white-space:nowrap">{{ readerSourceLabel }}</a></sc-if>
+              <button onClick="{{ onReaderRenameStart }}" title="Rename this source" style="background:none;border:1px solid var(--line2);border-radius:8px;padding:5px 12px;cursor:pointer;font:500 13px var(--sans);color:var(--ink2);white-space:nowrap" style-hover="border-color:var(--acc)">✎ Rename</button>
             </div>
           </div>
           <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:9px 18px;border-top:1px solid var(--line);background:var(--s2)">
@@ -2282,6 +2316,31 @@ button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visi
                   <iframe id="fx-yt" src="{{ rdMedia.src }}" title="{{ rdMedia.title }}" referrerPolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen="{{ true }}" style="width:100%;aspect-ratio:16/9;border:0;border-radius:10px;background:#000"></iframe>
                 </sc-if>
                 <div style="display:flex;gap:10px;align-items:baseline;flex-wrap:wrap"><span id="fx-yt-now" style="font:600 13px var(--mono);color:var(--acc);white-space:nowrap"></span><span style="font:500 13px var(--sans);color:var(--ink2)">{{ rdMedia.kindLine }}</span></div>
+                <sc-if value="{{ rdMedia.local }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;background:var(--s2);border:1px solid var(--line);border-radius:10px;padding:8px 10px">
+                    <button id="fx-pp" onClick="{{ rdMedia.onPlayPause }}" title="Play / pause the recording" style="min-width:36px;height:30px;border-radius:8px;border:1px solid var(--line2);background:var(--s1);color:var(--ink);cursor:pointer;font:600 14px var(--sans)">{{ rdMedia.playLabel }}</button>
+                    <button onClick="{{ rdMedia.onStopRecord }}" title="Stop — pause, rewind to the start, and clear the marking so you can read the transcript" style="background:none;border:1px solid var(--line2);border-radius:8px;height:30px;padding:0 11px;cursor:pointer;font:500 13px var(--sans);color:var(--ink2)" style-hover="border-color:var(--bad)">■ Stop</button>
+                    <span id="fx-tm" style="font:600 12.5px var(--mono);color:var(--ink2);white-space:nowrap">{{ rdMedia.timeLabel }}</span>
+                    <span id="fx-st" style="font:500 12px var(--sans);color:var(--mut);white-space:nowrap">{{ rdMedia.statusLabel }}</span>
+                  </div>
+                </sc-if>
+                <sc-if value="{{ rdMedia.ytOnly }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;background:var(--s2);border:1px solid var(--line);border-radius:10px;padding:8px 10px">
+                    <button onClick="{{ rdMedia.onStopRecord }}" title="Stop the video and clear the marking" style="background:none;border:1px solid var(--line2);border-radius:8px;height:30px;padding:0 11px;cursor:pointer;font:500 13px var(--sans);color:var(--ink2)" style-hover="border-color:var(--bad)">■ Stop</button>
+                    <span id="fx-st" style="font:500 12px var(--sans);color:var(--mut);white-space:nowrap">{{ rdMedia.statusLabel }}</span>
+                  </div>
+                </sc-if>
+                <sc-if value="{{ rdMedia.dl.has }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex;flex-direction:column;gap:6px;border-top:1px solid var(--line);padding-top:10px">
+                    <span style="font:600 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--mut)">Download transcript</span>
+                    <div style="display:flex;gap:6px;flex-wrap:wrap">
+                      <sc-for list="{{ rdMedia.dl.items }}" as="d" hint-placeholder-count="2"><button onClick="{{ d.onClick }}" title="{{ d.title }}" style="background:var(--s2);border:1px solid var(--line2);border-radius:8px;padding:4px 10px;cursor:pointer;font:500 12px var(--mono);color:var(--ink2)" style-hover="border-color:var(--acc)">{{ d.label }}</button></sc-for>
+                    </div>
+                  </div>
+                </sc-if>
+                <sc-if value="{{ rdMedia.dl.hasAudio }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex;gap:6px;flex-wrap:wrap"><button onClick="{{ rdMedia.dl.onAudio }}" title="{{ rdMedia.dl.audioTitle }}" style="border:1px solid var(--acc2);background:var(--sel);border-radius:8px;padding:4px 10px;cursor:pointer;font:500 13px var(--sans);color:var(--acc)" style-hover="border-color:var(--acc)" >{{ rdMedia.dl.audioLabel }}</button></div>
+                </sc-if>
                 <sc-if value="{{ rdMedia.isLocal }}" hint-placeholder-val="{{ false }}">
                   <sc-if value="{{ rdMedia.clsBusy }}" hint-placeholder-val="{{ false }}">
                     <span style="font:400 12.5px/1.45 var(--sans);color:var(--mut);text-wrap:pretty">Listening for what kind of sound this is — the model runs in this browser, the bytes never leave this machine…</span>
@@ -2668,8 +2727,30 @@ button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visi
               <button onClick="{{ ing.onShare }}" style="align-self:flex-start;background:var(--acc2);border:0;color:#fff;border-radius:8px;padding:6px 14px;cursor:pointer;font:600 14px var(--sans)">Copy a share link</button>
               <span style="font:400 13px/1.45 var(--sans);color:var(--mut);text-wrap:pretty">The link carries a ready-made account already invited to this room, so the recipient opens it signed in. Anyone holding the link can use that account.</span>
               <sc-if value="{{ ing.hasShare }}" hint-placeholder-val="{{ false }}"><input readOnly="{{ true }}" value="{{ ing.share }}" style="background:var(--s2);border:1px solid var(--line2);border-radius:8px;padding:5px 10px;font:500 12px var(--mono);color:var(--ink2);outline:none"></input></sc-if>
+              <span style="font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mut);padding-top:6px">Share by email — a code in their inbox</span>
+              <div style="display:flex;gap:8px;flex-wrap:wrap"><input onChange="{{ ing.onShareEmail }}" placeholder="friend@example.com" style="flex:1 1 180px;min-width:0;background:var(--s2);border:1px solid var(--line2);border-radius:8px;padding:6px 10px;font:500 13px var(--mono);color:var(--ink);outline:none"></input><button onClick="{{ ing.onShareMail }}" style="background:none;border:1px solid var(--line2);border-radius:8px;padding:5px 12px;cursor:pointer;font:500 14px var(--sans);color:var(--ink2)">{{ ing.shareMailLabel }}</button></div>
+              <span style="font:400 13px/1.45 var(--sans);color:var(--mut);text-wrap:pretty">The mailer makes a fresh account and emails them the link plus a six-digit code. They enter the code and sign in; the code is emailed, so it reaches whoever owns that address — not whoever holds a link. Thirty minutes to use it.</span>
+              <sc-if value="{{ ing.mailBusy }}" hint-placeholder-val="{{ false }}"><span style="font:500 13px var(--sans);color:var(--acc)">{{ ing.shareMailLabel }}</span></sc-if>
+              <sc-if value="{{ ing.hasMailShare }}" hint-placeholder-val="{{ false }}"><span style="font:400 13px/1.45 var(--sans);color:var(--ok);text-wrap:pretty">{{ ing.mailShareNote }}</span></sc-if>
             </sc-if>
           </section>
+      </div>
+    </div>
+  </sc-if>
+  <sc-if value="{{ shareMailOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeShareMailBg }}" style="position:fixed;inset:0;z-index:58;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;padding:20px;box-sizing:border-box">
+      <div onClick="{{ shareMailStop }}" style="width:100%;max-width:420px;box-sizing:border-box;background:var(--s1);border:1px solid var(--line2);border-radius:var(--r-lg);padding:24px;display:flex;flex-direction:column;gap:16px;box-shadow:0 24px 64px rgba(0,0,0,.45)">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
+          <div style="display:flex;flex-direction:column;gap:4px">
+            <h2 style="margin:0;font:600 20px var(--sans);color:var(--ink)">You were invited to a Fold workspace{{ shareMailFrom }}</h2>
+            <span style="font:400 13px/1.45 var(--sans);color:var(--mut);text-wrap:pretty">A six-digit code was emailed to the address they invited. Enter that address and the code — whoever owns the inbox signs in. No password is in this link.</span>
+          </div>
+          <button onClick="{{ closeShareMail }}" title="Close" style="flex:none;background:none;border:0;color:var(--mut);cursor:pointer;font-size:18px;line-height:1">✕</button>
+        </div>
+        <label style="display:flex;flex-direction:column;gap:6px;font:600 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mut)">Email<input autocomplete="email" onChange="{{ onShareMailEmail }}" placeholder="the address the code was sent to" style="background:var(--s2);border:1px solid var(--line2);border-radius:var(--r-sm);padding:8px 10px;font:500 14px var(--mono);color:var(--ink);outline:none"></input></label>
+        <label style="display:flex;flex-direction:column;gap:6px;font:600 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mut)">Code<input autocomplete="one-time-code" inputmode="numeric" maxlength="6" onChange="{{ onShareMailCode }}" onKeyDown="{{ onShareMailKey }}" placeholder="000000" style="background:var(--s2);border:1px solid var(--line2);border-radius:var(--r-sm);padding:8px 10px;font:600 18px var(--mono);letter-spacing:.2em;color:var(--ink);outline:none"></input></label>
+        <button onClick="{{ onShareMailGo }}" style="background:var(--acc2);border:0;color:#fff;border-radius:10px;padding:10px;cursor:pointer;font:600 14px var(--sans)">{{ shareMailGoLabel }}</button>
+        <sc-if value="{{ shareMailErr.has }}" hint-placeholder-val="{{ false }}"><span style="font:400 13px/1.45 var(--sans);color:var(--bad);text-wrap:pretty">{{ shareMailErr.msg }}</span></sc-if>
       </div>
     </div>
   </sc-if>
@@ -2919,6 +3000,46 @@ function ohsSegmentsHtml(segs, title) {
     if (!cur || gap > 1.5 || cur.txt.length > 520) { cur = { t: g.start, end: g.end, txt: t }; paras.push(cur); } else { cur.txt += ' ' + t; cur.end = g.end; } });
   const P = TAG_STYLE.P ? ' style="' + TAG_STYLE.P + '"' : '';
   return '<h1' + (TAG_STYLE.H1 ? ' style="' + TAG_STYLE.H1 + '"' : '') + '>' + esc(title) + '</h1>\n' + paras.map(p => '<p data-t="' + Math.floor(p.t) + '"' + P + '>' + esc(p.txt) + '</p>').join('\n');
+}
+// Downloading the transcript in other forms: the reader's paragraphs carry a data-t
+// start-time each, so the same words can be written back out as plain text, captions
+// (.srt / .vtt), markdown with timecodes, or a segments.json in the shape the surface
+// transcribes into. Paragraphs become cues; each cue ends where the next begins (or,
+// for the last one, five seconds after it starts). Times are rounded to a frame.
+function timedParasOf(html) {
+  const d = new DOMParser().parseFromString('<body>' + (html || '') + '</body>', 'text/html');
+  return [...d.body.querySelectorAll('[data-t]')].map(p => ({ t: +p.getAttribute('data-t') || 0, text: (p.textContent || '').replace(/\s+/g, ' ').trim() })).filter(p => p.text);
+}
+function cuesOf(paras) {
+  return paras.map((p, i) => ({ ...p, end: (paras[i + 1] ? paras[i + 1].t : p.t + 5) - 0.001 }));
+}
+function srtTime(t) { const m = Math.max(0, t); const h = Math.floor(m / 3600), mn = Math.floor(m / 60) % 60, s = Math.floor(m) % 60, ms = Math.floor((m - Math.floor(m)) * 1000); return String(h).padStart(2, '0') + ':' + String(mn).padStart(2, '0') + ':' + String(s).padStart(2, '0') + ',' + String(ms).padStart(3, '0'); }
+function vttTime(t) { return srtTime(t).replace(',', '.'); }
+function transcriptSrt(title, paras) {
+  return cuesOf(paras).map((c, i) => (i + 1) + '\n' + srtTime(c.t) + ' --> ' + srtTime(c.end) + '\n' + c.text).join('\n\n') + '\n';
+}
+function transcriptVtt(title, paras) {
+  return 'WEBVTT\n\n' + cuesOf(paras).map((c, i) => (i + 1) + '\n' + vttTime(c.t) + ' --> ' + vttTime(c.end) + '\n' + c.text).join('\n\n') + '\n';
+}
+function transcriptMd(title, paras) {
+  return '# ' + title + '\n\n' + paras.map(p => '**[' + fmtT(p.t) + ']** ' + p.text).join('\n\n') + '\n';
+}
+function transcriptJson(title, model, paras) {
+  return JSON.stringify({ title, model: model || 'Whisper', source: 'timed transcript', segments: cuesOf(paras).map(c => ({ start: +c.t.toFixed(1), end: +c.end.toFixed(1), text: c.text })) }, null, 1);
+}
+function downloadTextFile(name, mime, text) {
+  const blob = new Blob([text], { type: mime }); const url = URL.createObjectURL(blob); const a = document.createElement('a');
+  a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 4000);
+  return name;
+}
+function transcriptExt(ext) { return { txt: ['Transcript — plain text · no timecodes', 'text/plain', transcriptTxt], srt: ['Subtitles — .srt (SubRip)', 'text/plain', transcriptSrt], vtt: ['Captions — .vtt (WebVTT)', 'text/vtt', transcriptVtt], md: ['Markdown with timecodes — .md', 'text/markdown', transcriptMd], json: ['Segments — .json (start · end · text)', 'application/json', transcriptJson] }[ext] || null; }
+function transcriptTxt(title, paras) { return paras.map(p => p.text).join('\n\n') + '\n'; }
+// The share link's payload is unpadded base64url JSON (the mailer strips the padding,
+// JavaScript's atob needs it back before decoding).
+function unb64u(s) {
+  let b = String(s).replace(/-/g, '+').replace(/_/g, '/');
+  b += '='.repeat((4 - (b.length % 4)) % 4);
+  return JSON.parse(decodeURIComponent(escape(atob(b))));
 }
 // The words arrive while the recognizer is still talking: the live pane is the same
 // paragraph builder as the landed transcript, without the headline, painted straight
@@ -4680,7 +4801,7 @@ class Component extends DCLogic {
       this._overviewRoot = root; this._overviewMount = M.mountOverview(root, { ...options, docs: this.analysis().docs });
     }).catch(e => { this._overviewLoading = null; root.textContent = 'Overview unavailable: ' + e.message; });
   }
-  state = { corpus: null, added: loadAdded(), view: new URLSearchParams(location.search).has('work') ? 'ask' : 'summary', akMode: new URLSearchParams(location.search).get('work') === 'notebook' ? 'notebook' : new URLSearchParams(location.search).get('work') === 'fold' ? 'generate' : 'chat', akFocus: new URLSearchParams(location.search).get('fullscreen') === '1' || new URLSearchParams(location.search).get('work') === 'chat', akConvList: false, akNotes: {}, sel: null, f: {}, q: '', readDoc: null, showPos: false, showAdd: false, showSettings: false, draftText: '', fw: {}, note: '', theme: loadTheme(), railOpen: loadRailOpen(), segOpen: loadSegOpen(), topicsQ: '', topicsPage: 0, dragging: false, busy: '', just: null, readMode: 'original', htmlVer: 0, txAsk: null, txPrior: 'workspace', txLang: 'en', txModel: 'base', txBusy: false, txProg: '', txProgress: null, wsNewName: '', ground: { on: true, names: true, figures: true, dates: true, sentences: true }, wsRenaming: false, wsNameDraft: '', stripRead: { mode: 'Relate', domain: 'Interpretation', grain: 'Pattern' }, folder: null, folderDraft: '', mxOpen: false, mxErr: '', mxBusy: false, editOpen: null, editDraft: null };
+  state = { corpus: null, added: loadAdded(), view: new URLSearchParams(location.search).has('work') ? 'ask' : 'summary', akMode: new URLSearchParams(location.search).get('work') === 'notebook' ? 'notebook' : new URLSearchParams(location.search).get('work') === 'fold' ? 'generate' : 'chat', akFocus: new URLSearchParams(location.search).get('fullscreen') === '1' || new URLSearchParams(location.search).get('work') === 'chat', akConvList: false, akNotes: {}, sel: null, f: {}, q: '', readDoc: null, showPos: false, showAdd: false, showSettings: false, draftText: '', fw: {}, note: '', theme: loadTheme(), railOpen: loadRailOpen(), segOpen: loadSegOpen(), topicsQ: '', topicsPage: 0, dragging: false, busy: '', just: null, readMode: 'original', htmlVer: 0, txAsk: null, txPrior: 'workspace', txLang: 'en', txModel: 'base', txBusy: false, txProg: '', txProgress: null, wsNewName: '', ground: { on: true, names: true, figures: true, dates: true, sentences: true }, wsRenaming: false, wsNameDraft: '', wsDeleting: false, readerRename: false, readerNameDraft: '', stripRead: { mode: 'Relate', domain: 'Interpretation', grain: 'Pattern' }, folder: null, folderDraft: '', folderRename: null, folderNameDraft: '', mxOpen: false, mxErr: '', mxBusy: false, editOpen: null, editDraft: null };
   _html = {};
 
   componentDidMount() {
@@ -5201,6 +5322,70 @@ class Component extends DCLogic {
     return out; }
   ytPost(func, args) { const f = document.getElementById('fx-yt'); if (f && f.contentWindow) f.contentWindow.postMessage(JSON.stringify({ event: 'command', func, args: args || [] }), '*'); }
   ytSeek(t) { this._ytUser = 0; const lp = document.getElementById('fx-local'); if (lp) { lp.currentTime = t; lp.play(); this.ytMark(t, true); return; } this.ytPost('seekTo', [t, true]); this.ytPost('playVideo'); this.ytMark(t, true); }
+  // The transport bar: an explicit Play/Pause, a Stop that pauses, rewinds and clears
+  // the transcript marking (so the reader is readable again), and a live time readout
+  // updated straight on the DOM — no re-render per timeupdate.
+  toggleLocalPlay() { const lp = document.getElementById('fx-local'); if (!lp) return; if (lp.paused || lp.ended) lp.play(); else lp.pause(); this.fxSync(); }
+  stopPlayback() {
+    const lp = document.getElementById('fx-local');
+    if (lp) { lp.pause(); try { lp.currentTime = 0; } catch (e) {} }
+    this.ytPost('pauseVideo'); this.ytPost('seekTo', [0, true]);
+    if (this._ytCur) { this._ytCur.style.background = ''; this._ytCur.style.boxShadow = ''; this._ytCur = null; }
+    const now = document.getElementById('fx-yt-now'); if (now) now.textContent = '';
+    this.fxSync();
+  }
+  fxSync() {
+    const lp = document.getElementById('fx-local');
+    const tm = document.getElementById('fx-tm'); if (tm) tm.textContent = fmtT(lp ? lp.currentTime : 0) + (lp && lp.duration && isFinite(lp.duration) ? ' / ' + fmtT(lp.duration) : '');
+    const pp = document.getElementById('fx-pp'); if (pp) pp.textContent = (lp && !lp.paused && !lp.ended) ? '⏸' : '▶';
+    const st = document.getElementById('fx-st');
+    if (st) st.textContent = lp ? (lp.ended ? 'ended — press ▶ or a timecode to go again' : lp.paused ? (lp.currentTime > 0 ? 'paused' : '') : 'playing · the marked line follows') : '';
+  }
+  // ---- download the transcript in other forms, and the audio itself ----
+  transcriptSource(d) {
+    const LZ = (this._lazy || {})[d.id];
+    return { timed: !!(d.media && d.media.segN > 0), html: (d.lazy && LZ && LZ.html) || d.html || '', text: (d.lazy ? (LZ ? LZ.html : '') : d.html || '') || d.text || '' };
+  }
+  dlVals(d) {
+    const src = this.transcriptSource(d);
+    const title = d.title || 'transcript';
+    const paras = (d.media && d.media.segN > 0) ? timedParasOf(src.timed ? src.html : '') : [];
+    const items = [];
+    if (paras.length) for (const [code, extName] of [['txt', 'txt'], ['srt', 'srt'], ['vtt', 'vtt'], ['md', 'md'], ['json', 'json']]) { const x = ext(extName); items.push({ label: extName === 'txt' ? 'txt' : extName, code, title: x[0], onClick: () => this.downloadTranscript(d, paras, extName, title) }); }
+    else if ((src.text || '').trim()) items.push({ label: 'txt', code: 'txt', title: transcriptExt('txt')[0], onClick: () => this.downloadTranscript(d, [], 'txt', title) });
+    const isYt = d.media && d.media.kind === 'youtube';
+    return {
+      has: items.length > 0, items, hasAudio: this._mediaUrl && this._mediaUrl[d.id] ? true : isYt,
+      audioLabel: isYt ? 'Download audio (yt-dlp)' : 'Download audio',
+      audioTitle: isYt ? 'Asks your local yt-dlp helper to fetch the audio stream — the helper must be running' : 'The recording as it was kept in this browser',
+      onAudio: () => isYt ? this.downloadYtAudio(d) : this.downloadLocalAudio(d),
+    };
+  }
+  downloadTranscript(d, paras, extName, title) {
+    const x = transcriptExt(extName); if (!x) return;
+    const body = paras.length ? x[2](title, paras) : (this.transcriptSource(d).text || '').replace(/\s+$/g, '') + '\n';
+    const who = title || d.title || 'transcript';
+    const name = downloadTextFile(who.replace(/[^\w\- ]+/g, '').replace(/ +/g, '-').slice(0, 80) + '.' + extName, x[1], body);
+    this.toast('Downloaded ' + name + (paras.length ? ' — ' + plural(paras.length, 'cue') : ''));
+  }
+  downloadLocalAudio(d) {
+    const u = (this._mediaUrl || {})[d.id]; if (!u) { this.toast('The audio isn’t loaded in this reader yet — open it again and it will download.'); return; }
+    const ext = ((d.media && d.media.mime) || 'audio/.*').split('/').pop().replace('mpeg', 'mpga').replace('x-', '').replace('webm', 'weba') || 'bin';
+    const who = (d.title || 'recording').replace(/[^\w\- ]+/g, '').replace(/ +/g, '-').slice(0, 80);
+    const a = document.createElement('a'); a.href = u; a.download = who + '.' + ext; document.body.appendChild(a); a.click(); a.remove();
+    this.toast('Downloading ' + who + '.' + ext);
+  }
+  async downloadYtAudio(d) {
+    try {
+      const M = await hdYt(); const { buf, mime } = await M.audioFor(d.media.id);
+      const who = (d.title || d.media.id || 'video').replace(/[^\w\- ]+/g, '').replace(/ +/g, '-').slice(0, 80) || d.media.id;
+      const ext = (mime || '').split('/').pop() || 'm4a';
+      const blob = new Blob([buf], { type: mime || 'audio/mp4' }); const url = URL.createObjectURL(blob); const a = document.createElement('a');
+      a.href = url; a.download = who + '.' + ext; document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 60000);
+      this.toast('Downloaded the audio for ' + who + ' — transcribed from your local helper, never through a third party.');
+    } catch (e) { this.toast('The yt-dlp helper isn’t reachable — start it (python3 tools/ytdl-helper.py) and try again.'); }
+  }
   ytMark(t, force) { const root = this._rRoot; if (!root) return; const ps = [...root.querySelectorAll('[data-t]')]; if (!ps.length) return; let cur = null; for (const p of ps) { if (+p.getAttribute('data-t') <= t + 0.3) cur = p; else break; }
     const now = document.getElementById('fx-yt-now'); if (now) now.textContent = fmtT(Math.floor(t));
     if (cur === this._ytCur && !force) return; if (this._ytCur) { this._ytCur.style.background = ''; this._ytCur.style.boxShadow = ''; } this._ytCur = cur; if (!cur) return;
@@ -5395,7 +5580,43 @@ class Component extends DCLogic {
   async netDo(label, fn) { this.setState({ netBusy: label }); try { return await fn(await this.net()); } catch (e) { this.ilog(label + ' failed: ' + (e.message || e), 'bad'); } finally { this.setState({ netBusy: '' }); } }
   async netInit() { if (this._netInit) return; this._netInit = true; const N = await this.net();
     if (/fx-share=/.test(location.hash)) { try { const r = await N.consumeShare(); if (r) { this.setWsRooms({ priv: r.rooms[0] || null, pub: r.rooms[1] || this.wsRooms().pub || null }); this._net = { ...(this._net || {}), s: r.pending || r.s, shareTemp: r.pending ? r.s : null }; this.toast('Opened a workspace shared by ' + (r.from || 'someone')); if (!r.pending) { try { const d = await N.loadPrivate(r.s, r.rooms[0], 'work'); if (d && d.pins) this.savePins(d.pins); } catch (e) {} } } } catch (e) { this.ilog('Shared link could not be opened: ' + e.message, 'bad'); } }
+    if (/fx-mail=/.test(location.hash)) this.consumeEmailShare();
     const s = (this._net && this._net.s) || N.loadSession(); this._net = { ...(this._net || {}), s }; const R = this.wsRooms(); if (s && R.pub) { this.refreshRoom().catch(() => {}); } this.forceUpdate(); }
+  consumeEmailShare() {
+    const m = String(location.hash).match(/fx-mail=([\w-]+)/); if (!m) return;
+    let P = null; try { P = unb64u(m[1]); } catch (e) {}
+    history.replaceState(null, '', location.pathname + location.search);
+    if (!P || !P.t) { this.toast('That share link is malformed.'); return; }
+    this._mailT = P.t; this._mailRooms = (P.r || []).filter(r => /^!/.test(r)); this._mailFrom = P.f || '';
+    this.setState({ shareMailOpen: true, shareMailErr: '', shareMailBusy: false });
+  }
+  async doShareMailGo() {
+    if (this._mailGoing) return; this._mailGoing = true; this.setState({ shareMailBusy: true, shareMailErr: '' });
+    try {
+      const N = await this.net(); const email = String(this._shareMailEmail || '').trim().toLowerCase(); const code = String(this._shareMailCode || '').trim();
+      if (!/^[^\s@]+@[^\s@]+$/.test(email)) throw new Error('enter the email the code was sent to');
+      if (!/^\d{6}$/.test(code)) throw new Error('enter the six-digit code from the email');
+      const j = await N.emailShareConfirm(N.mailerBase(), this._mailT, email, code);
+      const s = await N.login(j.host, j.user, j.password);
+      this._net = { ...(this._net || {}), s, shareTemp: null };
+      for (const r of this._mailRooms) { try { await N.join(s, r); } catch (e) {} }
+      this.setWsRooms({ priv: this._mailRooms[0] || null, pub: this._mailRooms[1] || this.wsRooms().pub || null });
+      this.setState({ shareMailOpen: false, shareMailBusy: false });
+      this.toast('Signed in to the workspace shared with ' + email + '.');
+      if (this._mailRooms[0]) { try { const d = await N.loadPrivate(s, this._mailRooms[0], 'work'); if (d && d.pins) this.savePins(d.pins); } catch (e) {} }
+      this.forceUpdate();
+    } catch (e) { this.setState({ shareMailBusy: false, shareMailErr: String(e.message || e) }); }
+    finally { this._mailGoing = false; }
+  }
+  async mailShare(email) {
+    return this.netDo('Share by email', async N => { const s = this._net.s; if (!s || s.guest) throw new Error('sign in first'); const R = this.wsRooms(); if (!R.priv) throw new Error('create your private room first'); this.syncPrivate(true);
+      const to = String(email || '').trim(); if (!/^[^\s@]+@[^\s@]+$/.test(to)) throw new Error('enter the email to invite');
+      const j = await N.emailShareRequest(N.mailerBase(), to, location.origin, [R.priv, R.pub].filter(Boolean));
+      for (const room of [R.priv, R.pub].filter(Boolean)) { try { await N.invite(s, room, j.user); } catch (e) {} }
+      this._mailShareNote = 'Sent — the invite email carries the link and a code. ' + j.user + ' was created and invited to this workspace; whoever opens the inbox at ' + to + ' can sign in for 30 minutes.';
+      try { if (j.link) await navigator.clipboard.writeText(j.link); } catch (e) {} this.toast('Invite email sent — the code goes to ' + to + '');
+      this.ilog('Invited ' + j.user + ' by email (' + to + '); the code email is on its way.'); this.forceUpdate(); });
+  }
   async makeShare() { return this.netDo('Share link', async N => { const s = this._net.s; if (!s || s.guest) throw new Error('sign in first'); const R = this.wsRooms(); if (!R.priv) throw new Error('create your private room first'); this.syncPrivate(true); const r = await N.shareLink(s, [R.priv, R.pub], { name: 'Guest of ' + s.user.replace(/^@|:.*$/g, '') }); this._net.share = r.url; try { await navigator.clipboard.writeText(r.url); this.toast('Share link copied'); } catch (e) {} this.ilog('Made a ready-to-use account for the recipient (' + r.user + ') and invited it. Anyone with the link can use it.'); }); }
   async keepAccount(pw, name) { return this.netDo('Keep account', async N => { if (!pw || pw.length < 8) throw new Error('choose a password of 8 or more characters'); const n = await N.claim(this._net.s, pw, name); this._net.s = n; this.ilog('This account is yours now: ' + n.user); }); }
   async mergeAccount(user, pw) { return this.netDo('Merge', async N => { const temp = this._net.shareTemp || this._net.s; const R = this.wsRooms(); const main = await N.merge(temp, this.netCfg().server || temp.host, user, pw, [R.priv, R.pub]); this._net.s = main; this._net.shareTemp = null; this.ilog('Merged into ' + main.user + '; the temporary account was closed.'); }); }
@@ -5762,7 +5983,9 @@ class Component extends DCLogic {
   }
   hookLocal() {
     const el = document.getElementById('fx-local'); if (!el || el === this._fxLocal) return; this._fxLocal = el;
-    el.addEventListener('timeupdate', () => { if (this.state.ytFollow !== false) this.ytMark(el.currentTime); });
+    el.addEventListener('timeupdate', () => { if (this.state.ytFollow !== false) this.ytMark(el.currentTime); this.fxSync(); });
+    ['play', 'pause', 'ended', 'seeked', 'durationchange'].forEach(ev => el.addEventListener(ev, () => this.fxSync()));
+    this.fxSync();
   }
   async loadFromRoom() { return this.netDo('Load from room', async N => { await this.refreshRoom(); const s = this._net.s; const A = this.analysis(); const known = this.knownIds(A); const list = [];
     for (const b of this._net.chain || []) { const m = b.meta || {}; const k = m.ytid || (m.url || '').replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, ''); if (k && known.has(k) && m.kind !== 'transcript') continue;
@@ -6380,6 +6603,7 @@ class Component extends DCLogic {
       signedIn: !!s, notSignedIn: !s, isGuest: !!(s && s.guest), canWrite: !!(s && !s.guest), isTemp: !!(s && s.ephemeral) || !!n.shareTemp, who: s ? (s.ephemeral ? 'Temporary account on this device' : s.user + (s.guest ? ' · guest (read only)' : '')) : '', tempNote: n.shareTemp ? 'You opened a shared link while signed in as ' + (s && s.user) + '. Merge it to bring the shared rooms into this account.' : 'You were given this account by a shared link, so you can read and add without signing up. Keep it, merge it into an account you already have, or leave it on this device.',
       onKeepPw: e => { this._kp = e.target.value; }, onKeepName: e => { this._kn = e.target.value; }, onKeep: () => this.keepAccount(this._kp, this._kn), onMergeU: e => { this._mu = e.target.value; }, onMergeP: e => { this._mp = e.target.value; }, onMerge: () => this.mergeAccount(this._mu, this._mp),
       onShare: () => this.makeShare(), share: n.share || '', hasShare: !!n.share, server: cfg.server || 'hyphae.social',
+      onShareEmail: e => { this._shareEmail = e.target.value; }, onShareMail: () => this.mailShare(this._shareEmail), shareMailLabel: (n.mailBusy ? 'Sending…' : 'Send invite'), mailBusy: !!n.mailBusy, hasMailShare: !!this._mailShareNote, mailShareNote: this._mailShareNote || '',
       onServer: e => this.setNetCfg({ server: e.target.value.trim() }), onUser: e => { this._mxU = e.target.value; }, onPass: e => { this._mxP = e.target.value; },
       onLogin: () => this.openLogin(), onGuest: () => this.doGuest(), onLogout: () => this.signOut(),
       hasPub: !!R.pub, noPub: !R.pub, pub: R.pub || '', onCreatePub: () => this.createPublic(), onJoinAlias: e => { this._mxA = e.target.value; }, onJoin: () => this._mxA && this.joinPublic(this._mxA),
@@ -6422,6 +6646,33 @@ class Component extends DCLogic {
     this.toast('New workspace “' + nm + '” — describe its research task below.');
   }
   newWorkspace() { this.createWorkspace((this.state.wsNewName || '').trim()); }
+  // ---- rename & delete: workspaces, folders, sources ----
+  renameWorkspace(id, name) {
+    name = String(name == null ? '' : name).trim().slice(0, 80); if (!name) return;
+    const w = loadWorkspaceNames(); w[id] = name; try { saveWorkspaceNames(w); } catch (e) {}
+    this.toast('Workspace renamed to “' + name + '”.'); this.forceUpdate();
+  }
+  deleteWorkspace(id) {
+    const w = loadWorkspaceNames(); delete w[id]; try { saveWorkspaceNames(w); } catch (e) {}
+    const added = { ...this.state.added }; delete added[id]; this.saveAdded(added);
+    try { const rooms = JSON.parse(localStorage.getItem('fold-ws-rooms') || '{}'); delete rooms[id]; localStorage.setItem('fold-ws-rooms', JSON.stringify(rooms)); } catch (e) {}
+    try { const folds = JSON.parse(localStorage.getItem('fold-explorer-folders') || '{}'); delete folds[id]; localStorage.setItem('fold-explorer-folders', JSON.stringify(folds)); } catch (e) {}
+    const wasCurrent = this.corpusId() === id; const next = wasCurrent ? (Object.keys(added).find(k => added[k] && added[k].length) || 'custom') : this.corpusId();
+    const nextName = loadWorkspaceNames()[next] || (next === 'custom' ? 'Your content' : next);
+    this.setState({ added, ...(wasCurrent ? { corpus: next, view: 'summary', sel: null, f: {}, readDoc: null, folder: null } : {}) });
+    this.toast('Workspace deleted' + (wasCurrent ? ' — moved to ' + nextName : '') + '.');
+  }
+  renameDocTitle(id, title) {
+    title = String(title == null ? '' : title).trim().slice(0, 140); if (!title) return;
+    const cid = this.corpusId(); const added = { ...this.state.added, [cid]: (this.state.added[cid] || []).map(d => d.id === id ? { ...d, title } : d) };
+    this.saveAdded(added); this._key = null; this.setState({ added });
+    this.toast('Source renamed to “' + title + '”.');
+  }
+  renameFolder(id, name) {
+    name = String(name == null ? '' : name).trim().slice(0, 60); if (!name) return;
+    this.saveFolders(this.foldersFor().map(f => f.id === id ? { ...f, name } : f));
+  }
+  finishFolderRename(id) { const nm = (this.state.folderNameDraft || '').trim(); if (nm) this.renameFolder(id, nm); this.setState({ folderRename: null, folderNameDraft: '' }); }
   pinStatement(stId) {
     const A = this.analysis(); const st = A.byId[stId]; if (!st) return; const d = A.docById[st.doc]; const txt = clean(st.text);
     const same = this.pinData().pins.find(p => p.docId === d.id && (p.stId === st.id || p.excerpt === txt));
@@ -7641,7 +7892,7 @@ class Component extends DCLogic {
           return { originText: on ? on.why + ' ' + short(A.docById[on.of].title, 40) : 'Independent · shares no claims or outlet with another source', originDep: !!on, originCol: on ? 'var(--amber)' : 'var(--mut)' }; })(),
         drawsX: 0, drawOptions: drawOpts,
         onDraws: e => this.setMeta(d.id, { drawsOn: e.target.value }),
-        onKeep: () => this.setMeta(d.id, { status: 'source' }), onUnkeep: () => this.setMeta(d.id, { status: 'seen' }), onDiscard: () => this.discard(d.id) }; };
+        onKeep: () => this.setMeta(d.id, { status: 'source' }), onUnkeep: () => this.setMeta(d.id, { status: 'seen' }), onDiscard: () => this.discard(d.id), onRename: () => { this.read(d.id); setTimeout(() => this.setState({ readerRename: true, readerNameDraft: d.title }), 40); } }; };
     const seenDocs = A.docs.filter(d => this.mOf(d).status === 'seen');
     const keptDocs = A.docs.filter(d => this.mOf(d).status !== 'seen');
     const stsOf = d => A.stsByDoc[d.id] || [];
@@ -8086,9 +8337,11 @@ class Component extends DCLogic {
       suCursors: SU_CURSORS.map(c => { const on = SU && SU.cur === c.id; return { label: c.label, desc: c.desc, bg: on ? 'var(--sel)' : 'var(--s1)', bd: on ? 'var(--acc2)' : 'var(--line2)', fw: on ? 600 : 500, onClick: () => this.setState({ cursor: c.id, suN: 30 }) }; }),
       suReadingEmpty: !!(SU && SU.cur === 'reading' && SU.n === 0),
       ...(() => { const S2 = this.state; const list = this.foldersFor(); const open = this._foldersOpen !== false;
-        const items = list.map(f => { const on = S2.folder === f.id; return { label: f.name, n: String((f.docs || []).length), bg: on ? 'var(--sel)' : 'transparent', bd: on ? 'var(--acc2)' : 'var(--line)', weight: on ? 600 : 500,
-          onClick: () => this.setState({ folder: on ? null : f.id }), hasRemove: true, onRemove: e => { if (e && e.stopPropagation) e.stopPropagation(); this.removeFolder(f.id); } }; });
+        const items = list.map(f => { const on = S2.folder === f.id; const renaming = S2.folderRename === f.id; return { label: f.name, n: String((f.docs || []).length), bg: on ? 'var(--sel)' : 'transparent', bd: on ? 'var(--acc2)' : 'var(--line)', weight: on ? 600 : 500,
+          onClick: () => this.setState({ folder: on ? null : f.id }), hasRemove: true, onRemove: e => { if (e && e.stopPropagation) e.stopPropagation(); this.removeFolder(f.id); },
+          renaming, notRenaming: !renaming, onRenameStart: e => { if (e && e.stopPropagation) e.stopPropagation(); this.setState({ folderRename: f.id, folderNameDraft: f.name }); }, onRename: e => this.setState({ folderNameDraft: e.target.value }), onRenameKey: e => { if (e.stopPropagation) e.stopPropagation(); if (e.key === 'Enter') this.finishFolderRename(f.id); if (e.key === 'Escape') this.setState({ folderRename: null }); }, onRenameSave: e => { if (e && e.stopPropagation) e.stopPropagation(); this.finishFolderRename(f.id); } }; });
         return { foldersOpen: open, toggleFolders: () => { this._foldersOpen = !open; this.forceUpdate(); }, folderList: items, hasFolders: items.length > 0, folderActive: !!S2.folder,
+          folderRenameId: S2.folderRename, folderNameDraft: S2.folderNameDraft || '',
           folderDraft: S2.folderDraft || '', onFolderDraft: e => this.setState({ folderDraft: e.target.value }),
           onFolderNewKey: e => { if (e.key === 'Enter' && (S2.folderDraft || '').trim()) { this.addFolder(S2.folderDraft); this.setState({ folderDraft: '' }); } },
           onFolderNew: () => { if (this.state.folderDraft.trim()) { this.addFolder(this.state.folderDraft); this.setState({ folderDraft: '' }); } },
@@ -8108,6 +8361,7 @@ class Component extends DCLogic {
       readerSeen: !!(S.readDoc && A.docById[S.readDoc] && this.mOf(A.docById[S.readDoc]).status === 'seen'),
       readerFold: S.readDoc && this._fold.length ? ' ' + (A.stsByDoc[S.readDoc] || []).filter(s => this.inFold(s)).length + ' of its statements touch the topic.' : '',
       readerKeep: () => this.setMeta(S.readDoc, { status: 'source' }), readerDiscard: () => this.discard(S.readDoc),
+      readerRenaming: S.readerRename, readerNotRenaming: !S.readerRename, readerNameDraft: S.readerNameDraft != null ? S.readerNameDraft : (S.readDoc && A.docById[S.readDoc] ? A.docById[S.readDoc].title : ''), onReaderRenameStart: () => { const d = S.readDoc && A.docById[S.readDoc]; if (d) this.setState({ readerRename: true, readerNameDraft: d.title }); }, onReaderNameDraft: e => this.setState({ readerNameDraft: e.target.value }), onReaderNameKey: e => { if (e.key === 'Enter') this.onReaderRenameSave(); if (e.key === 'Escape') this.setState({ readerRename: false, readerNameDraft: '' }); }, onReaderRenameCancel: () => this.setState({ readerRename: false, readerNameDraft: '' }), onReaderRenameSave: () => { const d = S.readDoc; const nm = (this.state.readerNameDraft || '').trim(); if (d && nm) this.renameDocTitle(d, nm); this.setState({ readerRename: false, readerNameDraft: '' }); },
       corpusId: cid, corpusOptions: opts, q: S.q, corpusName: this.corpusName(), segList, hasSegments, segOpen, segToggleLabel, segCount, toggleSegOpen, addAsFold, navTop, navRead, navExplore, navRest,
       topicsList, hasTopics, topicsNote, hasTopicsNote, topicsStrayN, showTopicsStray, onTopicsStray, scope,
       topicsHasSearch, topicsSearchVal, onTopicsSearch, topicsHasPager, topicsPagerLine, onTopicsPrev, onTopicsNext, topicsHasPrev, topicsHasNext, topicsPageN: (topicsPage + 1) + ' of ' + topicsPages,
@@ -8122,6 +8376,8 @@ class Component extends DCLogic {
       dragging: S.dragging, isBusy: !!S.busy, busy: S.busy,
       onCorpus: e => this.setState({ corpus: e.target.value, view: 'summary', sel: null, f: {}, readDoc: null, folder: null, folderDraft: '' }),
       wsNewName: S.wsNewName || '', onWsNewName: e => this.setState({ wsNewName: e.target.value }), onWsNewKey: e => { if (e.key === 'Enter') this.newWorkspace(); }, onWsNew: () => this.newWorkspace(),
+      wsRenaming: S.wsRenaming, wsNameDraft: S.wsNameDraft != null ? S.wsNameDraft : this.corpusName(), onWsNameDraft: e => this.setState({ wsNameDraft: e.target.value }), onWsRenameStart: () => this.setState({ wsRenaming: true, wsNameDraft: this.corpusName() }), onWsRenameCancel: () => this.setState({ wsRenaming: false, wsNameDraft: '' }), onWsRenameKey: e => { if (e.key === 'Enter') this.onWsRenameSave(); if (e.key === 'Escape') this.setState({ wsRenaming: false, wsNameDraft: '' }); }, onWsRenameSave: () => { const nm = (this.state.wsNameDraft || '').trim(); if (nm) this.renameWorkspace(this.corpusId(), nm); this.setState({ wsRenaming: false, wsNameDraft: '' }); },
+      wsDeleting: S.wsDeleting, wsNotDeleting: !S.wsDeleting, onWsDelAsk: () => this.setState({ wsDeleting: true }), onWsDelNo: () => this.setState({ wsDeleting: false }), onWsDelYes: () => { this.setState({ wsDeleting: false }); this.deleteWorkspace(this.corpusId()); },
       onSearch: e => this.setState({ q: e.target.value }),
       hasFilters: chips.length > 0 && view !== 'search', chips, srcTuple, clearAll: () => this.setState(s => ({ f: {}, fw: {}, q: '', ...(s.view === 'search' ? { view: s.prevView || 'summary' } : {}) })),
       filterCount: F.length.toLocaleString() + ' of ' + A.sts.length.toLocaleString() + ' statements',
@@ -8154,6 +8410,7 @@ class Component extends DCLogic {
           const newNames = nn.map(n => ({ name: n, onOpen: () => this.openProfile(n) }));
           const hasNewNames = newNames.length > 0;
           return { has: true, isLocal: false, ytOnly: true, noAudio: true, hasUrl: true, title: d0.title, url: m.url || 'https://www.youtube.com/watch?v=' + m.id, timed, follow: S.ytFollow !== false, onFollow: e => this.setState({ ytFollow: e.target.checked }),
+            local: false, playLabel: '▶', timeLabel: (m.dur != null ? fmtT(m.dur) : '') || '0:00', statusLabel: '', onPlayPause: () => {}, onStopRecord: () => this.stopPlayback(), dl: this.dlVals(d0),
             src: 'https://www.youtube.com/embed/' + m.id + '?rel=0&enablejsapi=1&playsinline=1' + (org ? '&origin=' + org : ''),
             kindLine: d0.aboutOnly ? 'Linked video, not transcribed' : segN === -1 ? 'Loading transcript…' : timed ? plural(segN, 'timed segment') + (LZ && LZ.from ? ' · read from ' + (LZ.from === 'opfs' ? 'this browser’s file store' : LZ.from) : '') : 'Transcript without timings',
             hasNewNames, newNames, clsBusy: false, hasCls: false, clsLine: '', clsMeta: '',
@@ -8183,6 +8440,7 @@ onAsk: () => { this.setState({ txAsk: d0.id }); this.pickYtFile(d0); }, onCancel
         const hasNewNames = newNames.length > 0;
         const txHere = !!(this.state.txBusy && this.state.txProgress && this.state.txProgress.docId === d0.id && this.state.txProgress.stage && this.state.txProgress.stage !== 'done');
         return { has: true, isLocal: true, ytOnly: false, hasUrl: false, title: d0.title, url: null, timed, follow: S.ytFollow !== false, onFollow: e => this.setState({ ytFollow: e.target.checked }),
+          local: true, playLabel: '▶', timeLabel: (m.dur != null ? fmtT(m.dur) : '0:00'), statusLabel: '', onPlayPause: () => this.toggleLocalPlay(), onStopRecord: () => this.stopPlayback(), dl: this.dlVals(d0),
           isAudio: (m.mime || '').indexOf('audio') === 0, noAudio: (m.mime || '').indexOf('audio') !== 0, hasSrc: !!(this._mediaUrl && this._mediaUrl[d0.id]), noSrc: !(this._mediaUrl && this._mediaUrl[d0.id]), src: (this._mediaUrl || {})[d0.id] || '',
           kindLine: timed ? plural(m.segN, 'timed segment') + ' · ' + (m.model || 'Whisper').split('/').pop() : (m.dur != null ? fmtT(m.dur) : '') + (m.mime ? ' · ' + m.mime.split('/')[0] + (m.size ? ' · ' + Math.max(1, Math.round(m.size / 1e6)) + ' MB' : '') : ''),
           hasCls, clsLine, clsBusy, clsMeta: (d0.clsModel || '').replace('yamnet-', ''), hasNewNames, newNames,
@@ -8239,6 +8497,7 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
       onHeroGo: () => { const v = ((this._hero && this._hero.value) || '').trim(); if (v) { if (isOmniUrl(v)) omniOpen(v); else omniGo(v); } },
       showSettings: S.showSettings, openSettings: () => this.setState({ showSettings: true }), closeSettings: () => this.setState({ showSettings: false }), closeSettingsBg: e => { if (e.target === e.currentTarget) this.setState({ showSettings: false }); },
       acctLabel: (this._net && this._net.s && !this._net.s.guest) ? (this._net.s.ephemeral ? 'Temporary' : this._net.s.user) : 'Local', acctOn: !!(this._net && this._net.s && !this._net.s.guest), acctTitle: (this._net && this._net.s && this._net.s.user) ? this._net.s.user + ' — settings (account, sync, sharing)' : 'Settings — account, sync and sharing',
+      shareMailOpen: S.shareMailOpen, closeShareMail: () => this.setState({ shareMailOpen: false }), closeShareMailBg: e => { if (e.target === e.currentTarget) this.setState({ shareMailOpen: false }); }, shareMailStop: e => { if (e.stopPropagation) e.stopPropagation(); }, shareMailFrom: this._mailFrom ? ' — from ' + String(this._mailFrom).replace(/^@/, '') : '', shareMailGoLabel: S.shareMailBusy ? 'Checking…' : 'Sign in', onShareMailEmail: e => { this._shareMailEmail = e.target.value; }, onShareMailCode: e => { this._shareMailCode = e.target.value; }, onShareMailKey: e => { if (e.key === 'Enter') this.doShareMailGo(); }, onShareMailGo: () => this.doShareMailGo(), shareMailErr: { has: !!S.shareMailErr, msg: S.shareMailErr || '' },
       mxOpen: S.mxOpen, mxBusy: !!S.mxBusy, mxErr: S.mxErr || '', mxSubmit: S.mxBusy ? 'Signing in…' : 'Sign in',
       mxSignedIn: !!(this._net && this._net.s && !this._net.s.guest), mxNotSignedIn: !(this._net && this._net.s),
       mxWho: (this._net && this._net.s) ? (this._net.s.guest ? 'Guest · ' + this._net.s.user + ' · read only' : (this._net.s.ephemeral ? 'Temporary account · ' + this._net.s.user : this._net.s.user)) : '',
