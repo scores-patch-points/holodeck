@@ -4771,7 +4771,7 @@ async function readText(file, M) {
       const k = file.type.split('/')[0]; const kind = k[0].toUpperCase() + k.slice(1);
       const buf = await file.arrayBuffer(); let dur = null, meta = '';
       try {
-        if (k === 'audio') { const AC = window.OfflineAudioContext || window.webkitOfflineAudioContext; if (AC) { const ab = await new AC(1, 1, 44100).decodeAudioData(buf.slice(0)); dur = ab.duration; meta = fmtT(dur) + ' of sound at ' + ab.sampleRate + ' Hz'; } }
+        if (k === 'audio') { const P = await import(new URL('holodeck-pcm.js', location.href).href); const pr = await P.probeAudio(buf); if (pr && pr.duration) { dur = pr.duration; meta = fmtT(dur) + ' of sound at ' + Math.round(pr.sampleRate) + ' Hz'; } }
         else { const u = URL.createObjectURL(new Blob([buf], { type: file.type })); dur = await new Promise(r => { const v = document.createElement('video'); v.preload = 'metadata'; const done = d => { URL.revokeObjectURL(u); r(d); }; v.onloadedmetadata = () => done(isFinite(v.duration) ? v.duration : null); v.onerror = () => done(null); v.src = u; setTimeout(() => done(null), 8000); }); if (dur != null) meta = fmtT(dur) + ' of video'; }
       } catch (e) {}
       const extra = { media: { kind: 'local', name, mime: file.type, size: buf.byteLength, dur }, kind: 'Recording', medium: kind, transcribed: false };
@@ -5998,7 +5998,7 @@ class Component extends DCLogic {
       if (!b) return;
       if (dd.media.dur != null && dd.media.dur > 6 * 3600) { this.ilog('\u201c' + dd.title + '\u201d is over six hours; not classifying its sounds in this browser.'); return; }
       const C = await import(new URL('holodeck-classify.js', location.href).href);
-      const r = await C.classifySound(b, { onProgress: p => hdT('cls', p.stage === 'classifying' ? 'window' : p.stage, p.stage === 'classifying' ? 'Classifying the sound \u00b7 ' + p.pct + '% \u00b7 ' + p.frames + ' frames' : p.stage) });
+      const r = await C.classifySound(b, { onProgress: p => hdT('cls', p.stage === 'classifying' ? 'window' : p.stage, p.stage === 'classifying' ? 'Classifying the sound \u00b7 ' + (p.pct != null ? p.pct + '% \u00b7 ' : '') + p.frames + ' frames' : p.stage) });
       if (!r.spans.length) return;
       this.replaceAddedDoc(id, { soundSpans: r.spans, clsModel: r.model });
       this.ilog('Classified the sounds of \u201c' + dd.title + '\u201d: ' + r.spans.length + ' change' + (r.spans.length === 1 ? '' : 's') + ' of kind across ' + r.covered + '% of ' + fmtT(r.duration || 0) + ' (' + r.model + ', in this browser).');

@@ -46,12 +46,12 @@ async function load(onProgress) {
   const s = await _loading; _loading = null; return s;
 }
 
+// The whole recording at 16 kHz mono. Kept for callers that need it all at once; it streams
+// through holodeck-pcm.js rather than decoding the file in one piece (which, for a long
+// recording, exhausted the tab).
 export async function decode16k(buf) {
-  const AC = window.OfflineAudioContext || window.webkitOfflineAudioContext;
-  const ab = await new AC(1, 1, 16000).decodeAudioData(buf.slice(0));
-  const off = new AC(1, Math.ceil(ab.duration * 16000), 16000);
-  const src = off.createBufferSource(); src.buffer = ab; src.connect(off.destination); src.start();
-  return (await off.startRendering()).getChannelData(0);
+  const P = await import(new URL('holodeck-pcm.js', import.meta.url).href);
+  return P.decode16kAll(buf);
 }
 
 // classifySound(buf, { onProgress, maxSec }) -> { source, model, spans, covered, duration }
@@ -61,16 +61,17 @@ export async function classifySound(buf, opts = {}) {
   const maxSec = opts.maxSec || 4 * 3600;
   const session = await load(onProgress);
   onProgress && onProgress({ stage: 'decoding audio' });
-  const pcm = await decode16k(buf);
-  const duration = pcm.length / 16000;
-  const N = Math.min(pcm.length, Math.round(maxSec * 16000));
+  // YAMNet's frame count is a function of the waveform length; the sound is streamed in
+  // 20 s windows (holodeck-pcm.js) so only one window is decoded at a time, progress is
+  // real, and the frames are stitched.
+  const P = await import(new URL('holodeck-pcm.js', import.meta.url).href);
+  const total = (await P.audioDuration(buf)) || null;
   const inputName = session.inputNames[0];
-  // YAMNet's frame count is a function of the waveform length; feed it in ~20 s
-  // blocks so the tab stays alive and progress is real, then stitch frames.
-  const labels = [];
-  const BLOCK = 20 * 16000;
-  for (let o = 0; o < N; o += BLOCK) {
-    const part = pcm.subarray(o, Math.min(N, o + BLOCK));
+  const labels = []; let duration = 0;
+  for await (const w of P.pcm16k(buf, { winSec: 20 })) {
+    if (w.start >= maxSec) break;
+    const part = w.pcm; duration = w.start + part.length / 16000;
+    // a plain copy, as before: the window can be an AudioBuffer's own channel memory
     const feed = { [inputName]: new _ort.Tensor('float32', part.slice(0), [1, part.length]) };
     const out = await session.run(feed);
     const tensor = Object.values(out)[0];
@@ -83,7 +84,7 @@ export async function classifySound(buf, opts = {}) {
         labels.push(best);
       }
     }
-    onProgress && onProgress({ stage: 'classifying', pct: Math.round(Math.min(N, o + BLOCK) / N * 100), frames: labels.length });
+    onProgress && onProgress({ stage: 'classifying', pct: total ? Math.min(100, Math.round(duration / Math.min(total, maxSec) * 100)) : null, frames: labels.length });
     await new Promise(r => setTimeout(r, 0));
   }
   if (!labels.length) throw new Error('no frames were scored');

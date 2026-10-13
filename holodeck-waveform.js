@@ -2,7 +2,8 @@
 //
 // The reader's player shows video as video and audio as a waveform. This module is the audio half: it
 // reduces the decoded samples to a fixed number of peaks (pure, tested), decodes a recording's bytes to
-// those peaks in the browser (OfflineAudioContext at 8 kHz mono, so an hour of speech stays small), and
+// those peaks in the browser (streamed through holodeck-pcm.js one window at a time, so a three-hour
+// meeting never sits decoded in memory), and
 // paints them with the played part in the accent colour. Nothing leaves the tab.
 
 /** The loudest sample in each of `buckets` equal slices of `samples`, scaled so the loudest slice is 1. */
@@ -26,14 +27,22 @@ export function timeAtX(x, width, duration) {
   return Math.min(duration, Math.max(0, x / width * duration));
 }
 
-/** Decode a recording's bytes to { peaks, duration }, or null when the browser can't read the sound. */
-export async function decodePeaks(bytes, buckets = 1600, { maxBytes = 400e6 } = {}) {
+/** Decode a recording's bytes to { peaks, duration }, or null when the browser can't read the sound.
+ *  The sound streams in windows; each window leaves a fine row of peaks (one per 50 ms) that is
+ *  reduced to `buckets` at the end, so memory is the row, not the recording. */
+export async function decodePeaks(bytes, buckets = 1600) {
   try {
-    if (!bytes || (bytes.byteLength || 0) > maxBytes) return null;
-    const AC = (typeof window !== 'undefined') && (window.OfflineAudioContext || window.webkitOfflineAudioContext);
-    if (!AC) return null;
-    const ab = await new AC(1, 1, 8000).decodeAudioData(bytes.slice(0));
-    return { peaks: peaksOf(ab.getChannelData(0), buckets), duration: ab.duration };
+    if (!bytes || !(bytes.byteLength > 44)) return null;
+    if (typeof window === 'undefined' || !(window.OfflineAudioContext || window.webkitOfflineAudioContext)) return null;
+    const P = await import(new URL('holodeck-pcm.js', import.meta.url).href);
+    const STEP = 800; const fine = []; let n = 0;
+    for await (const w of P.pcm16k(bytes, { winSec: 60 })) {
+      const x = w.pcm;
+      for (let o = 0; o < x.length; o += STEP) { let m = 0; const e = Math.min(x.length, o + STEP); for (let i = o; i < e; i++) { const v = x[i] < 0 ? -x[i] : x[i]; if (v > m) m = v; } fine.push(m); }
+      n += x.length;
+    }
+    if (!n) return null;
+    return { peaks: peaksOf(Float32Array.from(fine), buckets), duration: n / P.RATE };
   } catch (e) { return null; }
 }
 
