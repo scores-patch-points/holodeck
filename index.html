@@ -9656,7 +9656,29 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
     const key = tok + ':' + rec.length; if (el._extKey === key) return; el._extKey = key;
     const W = 900, mctx = document.createElement('canvas').getContext('2d'), pages = [];
     el.innerHTML = '';
+    this.ensureFold(d, tok, rec);
+    const FR = this._foldRes && this._foldRes[tok];
+    // the slider: raw OCR to the left of the divider, the folded reading to its right, over the same page
+    const p0 = this._foldP == null ? 50 : this._foldP; el.style.setProperty('--p', p0 + '%');
+    const bar = document.createElement('div'); bar.style.cssText = 'position:sticky;top:0;z-index:6;display:flex;align-items:center;gap:12px;flex-wrap:wrap;width:100%;box-sizing:border-box;background:var(--bg);padding:10px 4px;border-bottom:1px solid var(--line);margin:0 0 14px;font:500 13px var(--sans);color:var(--ink2)';
+    const mkL = (t, c) => { const x = document.createElement('span'); x.textContent = t; x.style.cssText = 'font:600 12px var(--mono);letter-spacing:.05em;text-transform:uppercase;color:' + c; return x; };
+    const rng = document.createElement('input'); rng.type = 'range'; rng.min = '0'; rng.max = '100'; rng.value = String(p0); rng.style.cssText = 'flex:1 1 180px;min-width:120px;accent-color:var(--acc)';
+    rng.oninput = () => { this._foldP = +rng.value; el.style.setProperty('--p', rng.value + '%'); };
+    const st = document.createElement('span'); st.style.cssText = 'flex:1 1 100%;font:400 12px/1.4 var(--sans);color:var(--mut)';
+    st.textContent = FR === undefined ? 'Folding against the rest of the sample…' : FR === null ? 'No priors for the folded reading yet: run node tools/build-ocr-priors.mjs.'
+      : FR.stats.repaired + ' repaired · ' + FR.stats.refused + ' refused (ambiguous or unsupported) · ' + FR.stats.unread + ' unread · ' + (FR.engine ? FR.engine + '. ' : (FR.typed || 0) + ' typed by the engine. ') + 'Point at a coloured word for what vouches for it.';
+    bar.appendChild(mkL('Raw OCR', 'var(--mut)')); bar.appendChild(rng); bar.appendChild(mkL('Folded guess', 'var(--acc)')); bar.appendChild(st);
+    el.appendChild(bar);
+    // the page strips native title attributes, so the evidence behind a coloured word shows in our own tip
+    let tip = el._tip; if (!tip) { tip = el._tip = document.createElement('div'); tip.style.cssText = 'position:fixed;z-index:80;max-width:340px;background:var(--s1);color:var(--ink);border:1px solid var(--line2);border-radius:8px;padding:8px 10px;font:400 12px/1.45 var(--sans);box-shadow:0 4px 18px rgba(0,0,0,.18);pointer-events:none;display:none'; document.body.appendChild(tip); }
+    el.onmouseover = (ev) => { const t = ev.target && ev.target.closest ? ev.target.closest('[data-why]') : null; if (!t) { tip.style.display = 'none'; return; }
+      tip.textContent = t.getAttribute('data-why'); tip.style.display = 'block'; const r = t.getBoundingClientRect();
+      tip.style.left = Math.max(8, Math.min(innerWidth - 350, r.left)) + 'px'; tip.style.top = (r.bottom + 6) + 'px'; };
+    el.onmouseleave = () => { tip.style.display = 'none'; };
+    let pIdx = -1;
     for (const pg of rec) {
+      pIdx++; const FP = FR && FR.pages[pIdx];
+      (pg.elements || []).forEach((e, i) => { if (e) e.__i = i; });
       const els = (pg.elements || []).filter(e => e && e.text && Array.isArray(e.region) && e.region.length === 4);
       if (!els.length || !pg.width || !pg.height) continue;
       const k = W / pg.width, H = Math.round(pg.height * k);
@@ -9679,17 +9701,29 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
           const bots = L.els.map(e => e.region[1] + e.region[3]).sort((a, b) => a - b), base = bots[Math.floor(bots.length * 0.35)];
           const ln = document.createElement('div'); ln.style.cssText = 'position:absolute;left:0;top:' + (top * k) + 'px;width:100%;height:' + (hh * 1.25) + 'px';
           const fsH = Math.max(6, hh * 0.9);
-          for (const e of L.els) { const ww = e.region[2] * k; const sp = document.createElement('span');
-            // proportions are never changed: a word keeps its natural width-to-height and only its SIZE moves, down
-            // to what fits the width it occupied on the scan (never up past the line's own size)
-            mctx.font = '100px Arial, Helvetica, sans-serif'; const per = (mctx.measureText(e.text).width || 1) / 100;
+          // one word set at its recorded place; proportions are never changed: a word keeps its natural
+          // width-to-height and only its SIZE moves, down to what fits the width it occupied on the scan
+          const setWord = (e, text, extra, into) => { const ww = e.region[2] * k; const sp = document.createElement('span');
+            mctx.font = '100px Arial, Helvetica, sans-serif'; const per = (mctx.measureText(text).width || 1) / 100;
             const fs = Math.max(5, Math.min(fsH, ww > 0 ? ww / per : fsH));
-            sp.style.cssText = 'position:absolute;left:' + (e.region[0] * k) + 'px;top:' + ((base - top) * k - 0.85 * fs) + 'px;font-size:' + fs + 'px;line-height:1;white-space:pre';
-            sp.textContent = e.text + ' '; ln.appendChild(sp); }
+            sp.style.cssText = 'position:absolute;left:' + (e.region[0] * k) + 'px;top:' + ((base - top) * k - 0.85 * fs) + 'px;font-size:' + fs + 'px;line-height:1;white-space:pre;' + (extra || '');
+            sp.textContent = text + ' '; into.appendChild(sp); return sp; };
+          for (const e of L.els) setWord(e, e.text, '', ln);
           page.appendChild(ln);
+          // the folded layer: only the words the fold has something to say about, over the raw ones, right of the divider
+          if (FP) { let fln = null;
+            for (const e of L.els) { const r = FP.tokens[e.__i]; if (!r) continue;
+              const rep = r.kind === 'repaired', ref = r.kind === 'refused', typed = !!r.meaning; if (!rep && !ref && !typed) continue;
+              if (!fln) { fln = document.createElement('div'); fln.style.cssText = ln.style.cssText; page._fl.appendChild(fln); }
+              const css = 'background:#fff;' + (rep ? 'color:#0a6b5a;font-weight:600;text-decoration:underline dotted;' : ref ? 'text-decoration:underline wavy #b7791f;' : 'text-decoration:underline #3b5bdb;') + 'pointer-events:auto;';
+              const sp = setWord(e, rep ? r.to : e.text, css, fln);
+              sp.setAttribute('data-why', rep ? 'The scan reads “' + e.text + '”. Folded to “' + r.to + '”: ' + r.vouched + ' other contract' + (r.vouched === 1 ? '' : 's') + ' read it, and the words beside it have been read together ' + r.pairs + ' time' + (r.pairs === 1 ? '' : 's') + ' in the sample.'
+                : ref ? 'Left as read: ' + r.why + '.' : 'The engine reads this as ' + r.meaning.label + (r.meaning.n > 1 ? ' (' + r.meaning.n + ' mentions)' : '') + '.'); } }
         }
       };
       page._fill = fill;
+      if (FP) { const fl = document.createElement('div'); fl.style.cssText = 'position:absolute;inset:0;pointer-events:none;z-index:2;clip-path:inset(0 0 0 var(--p,50%))'; page.appendChild(fl); page._fl = fl;
+        const dv = document.createElement('div'); dv.style.cssText = 'position:absolute;top:0;bottom:0;left:var(--p,50%);width:0;border-left:2px solid var(--acc);z-index:3;pointer-events:none'; page.appendChild(dv); }
       wrap.appendChild(cap); wrap.appendChild(page); el.appendChild(wrap); pages.push(wrap);
     }
     const fit = () => { const z = Math.min(1, (el.clientWidth || W) / W); pages.forEach(w => { w.style.zoom = z < 0.999 ? String(z) : ''; }); };
@@ -9697,6 +9731,76 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
     try { if (el._extIo) el._extIo.disconnect();
       el._extIo = new IntersectionObserver(es => es.forEach(en => { if (en.isIntersecting) { const pg = en.target.querySelector('div + div'); if (pg && pg._fill) pg._fill(); el._extIo.unobserve(en.target); } }), { rootMargin: '1200px 0px' });
       pages.forEach(w => el._extIo.observe(w)); } catch (e) { pages.forEach(w => { const pg = w.querySelector('div + div'); if (pg && pg._fill) pg._fill(); }); }
+  }
+  // The folded reading. Priors are what the REST of the sample established (tools/build-ocr-priors.mjs); the fold is
+  // holodeck-fold.js: exact, then near-miss through the engine's own comparator, then the neighbours as witnesses, and a tie
+  // refused rather than guessed. Meaning comes from the engine's reading door, not from this page.
+  _extRepaint() { const el = this._extEl; if (el) { el._extKey = null; try { this.paintExtracted(); } catch (e) {} } }
+  ensureFold(d, tok, rec) {
+    this._foldRes = this._foldRes || {}; this._foldAsk = this._foldAsk || {};
+    if (this._foldRes[tok] !== undefined || this._foldAsk[tok]) return; this._foldAsk[tok] = 1;
+    (async () => {
+      try {
+        this._priors = this._priors || fetch('/ocr-priors.json').then(r => (r.ok ? r.json() : null)).catch(() => null);
+        const [mod, pr] = await Promise.all([import('./holodeck-fold.js'), this._priors]);
+        if (!pr) { this._foldRes[tok] = null; this._extRepaint(); return; }
+        const protect = new Set(); ['vendor', 'dept', 'about', 'contractNo'].forEach(k => String(d[k] || '').toLowerCase().split(/[^a-z']+/).forEach(w => { if (w) protect.add(w); }));
+        this._foldMake = this._foldMake && this._foldMake.pr === pr ? this._foldMake : { pr, f: mod.makeFold(pr) };
+        const res = this._foldMake.f.foldDoc(rec, { protect }); this._foldRes[tok] = res; this._extRepaint();
+        this.foldMeaning(d, tok, rec, res);
+      } catch (e) { this._foldRes[tok] = null; this._extRepaint(); }
+    })();
+  }
+  async foldMeaning(d, tok, rec, res) {
+    // the folded text in reading order, each token's offsets kept, so the engine's byte addresses land back on words
+    const enc = new TextEncoder(), seq = []; let text = '', bytes = 0;
+    const add = (s) => { text += s; bytes += enc.encode(s).length; };
+    rec.forEach((pg, p) => {
+      const els = (pg.elements || []).map((e, i) => ({ e, i })).filter(x => x.e && x.e.text && Array.isArray(x.e.region));
+      if (!els.length) return;
+      const hs = els.map(x => x.e.region[3]).sort((a, b) => a - b), mh = hs[Math.floor(hs.length / 2)] || 20;
+      els.sort((a, b) => (a.e.region[1] + a.e.region[3] / 2) - (b.e.region[1] + b.e.region[3] / 2));
+      const lines = []; for (const x of els) { const cy = x.e.region[1] + x.e.region[3] / 2, L = lines[lines.length - 1];
+        if (L && Math.abs(cy - L.cy) <= mh * 0.6) L.xs.push(x); else lines.push({ xs: [x], cy }); }
+      lines.forEach(L => { L.xs.sort((a, b) => a.e.region[0] - b.e.region[0]);
+        L.xs.forEach((x, j) => { const r = res.pages[p] && res.pages[p].tokens[x.i], t = r && r.kind === 'repaired' ? r.to : x.e.text;
+          if (j) add(' '); seq.push({ p, i: x.i, cs: text.length, bs: bytes, len: t.length }); add(t); }); add('\n'); });
+      add('\n');
+    });
+    let got = null;
+    for (const host of hdEngineHosts()) {
+      const ctl = new AbortController(), timer = setTimeout(() => ctl.abort(), 45000);
+      try { const r = await fetch(host + '/v1/read', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ name: d.title || tok, text: text.slice(0, 60000) }), signal: ctl.signal });
+        const j = await r.json(); if (r.ok && j.schema === 'EORead@1') { got = { host, read: j }; break; } } catch (e) { /* next host */ } finally { clearTimeout(timer); }
+    }
+    if (!got) { res.engine = 'the engine could not be reached, so nothing is typed'; this._extRepaint(); return; }
+    // The engine's mention addresses are offsets into its own normalised buffer, not into the text sent, so they are not
+    // used to place anything. What the engine decides is WHICH referents the document holds and under which surfaces;
+    // those surfaces are then found on the words, longest first.
+    const wd = (t) => String(t || '').toLowerCase().replace(/[^a-z0-9']+/g, ' ').trim();
+    const dict = new Map(); let maxLen = 1;
+    for (const ref of (got.read.referents || [])) {
+      const label = (ref.surfaces && ref.surfaces[0]) || ref.ref, n = Math.max(1, (ref.mentionsAt || []).length);
+      for (const sf of new Set([...(ref.allSurfaces || []), ...(ref.surfaces || [])])) {
+        const k = wd(sf); if (!k) continue; const parts = k.split(' ');
+        if (parts.length === 1 && k.length < 4) continue;             // a bare short word is not a referent's name
+        if (!dict.has(k)) dict.set(k, { label, n }); maxLen = Math.max(maxLen, parts.length);
+      }
+    }
+    const toks = seq.map(q => { const r = res.pages[q.p] && res.pages[q.p].tokens[q.i]; return { r, w: wd(r && r.kind === 'repaired' ? r.to : (rec[q.p].elements[q.i] || {}).text) }; });
+    let typed = 0;
+    for (let a = 0; a < toks.length;) {
+      let hit = null, len = 0;
+      for (let L = Math.min(maxLen, toks.length - a); L >= 1 && !hit; L--) {
+        const parts = []; let ok = true;
+        for (let m = 0; m < L; m++) { if (!toks[a + m].w) { ok = false; break; } parts.push(toks[a + m].w); }
+        if (ok && dict.has(parts.join(' '))) { hit = dict.get(parts.join(' ')); len = L; }
+      }
+      if (!hit) { a++; continue; }
+      for (let m = 0; m < len; m++) { const r = toks[a + m].r; if (r && r.kind !== 'repaired' && !r.meaning) { r.meaning = hit; typed++; } }
+      a += len;
+    }
+    res.typed = typed; this._extRepaint();
   }
   restatedVals(d, A) {
     const facts = this.statedFacts(d, A), hasFacts = facts.length > 0;

@@ -118,3 +118,18 @@ A reflowed "clean" version of a scan (paragraphs, headings guessed from capitals
 justified blocks. OCR gives every word's box, so the extracted view puts each word at its recorded position and
 size, aligned on the line's baseline (the lower-valued bottoms; descenders do not share it), as real selectable
 text, a page at a time as it scrolls into view. Layout is data; do not infer structure that was measured.
+
+## 19. Fold a scan against what the rest of the sample established, and refuse ties
+
+A "best guess" at a misread word is not the most likely next word. The engine's own discipline applies: a form
+another contract reads stands as read; a near-miss (one edit, four letters or more, or a visual confusable) is a
+last resort; the neighbours are witnesses that narrow candidates and never choose between them; more than one fit
+is refused, not guessed. A form is established by document frequency with the page's own document subtracted, so
+its misreads cannot vouch for themselves. Held out on 3,068 deliberately corrupted words: 77.5% put back, 1
+wrong, 14.7% refused. Names are not respelled.
+
+## 20. This page strips native tooltips, and the engine's addresses are in its own buffer
+
+Every `title` attribute is removed by a document-wide observer, so a hover explanation is `data-why` plus a tip
+the component draws. And `mentionsAt` from `/v1/read` are offsets into the engine's normalised text, not the text
+sent: use the engine for which referents exist and under which surfaces, then find those surfaces on the words.
