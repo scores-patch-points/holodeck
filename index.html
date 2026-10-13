@@ -9768,7 +9768,10 @@ onAsk: () => { this.setState({ txAsk: d0.id }); this.pickYtFile(d0); }, onCancel
         const other = spans.filter(x => !isSp(x.name) && x.start != null);
         const clsStrip = cdur ? other.map(x => ({ left: (x.start / cdur * 100).toFixed(2) + '%', w: Math.max(0.2, (x.end - x.start) / cdur * 100).toFixed(2) + '%' })) : [];
         const grp = {}; other.forEach(x => { (grp[x.name] = grp[x.name] || []).push(x); });
-        const clsEvents = Object.keys(grp).length ? Object.keys(grp).sort((a, b) => grp[b].length - grp[a].length).map(n => n + (grp[n].length > 1 ? ' ×' + grp[n].length : '') + ' at ' + grp[n].slice(0, 3).map(x => fmtT(x.start)).join(', ') + (grp[n].length > 3 ? ' …' : '')).join(' · ') : 'Nothing but speech.';
+        // On audio the timeline already marks where; the line just names the few kinds that appear most.
+        const grpKeys = Object.keys(grp).sort((a, b) => grp[b].length - grp[a].length);
+        const clsEvents = !grpKeys.length ? 'Nothing but speech.' : (m.mime || '').indexOf('audio') === 0 ? grpKeys.slice(0, 3).join(' · ')
+          : grpKeys.map(n => n + (grp[n].length > 1 ? ' ×' + grp[n].length : '') + ' at ' + grp[n].slice(0, 3).map(x => fmtT(x.start)).join(', ') + (grp[n].length > 3 ? ' …' : '')).join(' · ');
         // The clean-up after the transcript: this recording is the only source of some
         // names — the hyperlexicon doesn't know them yet, and is offered the door.
         const nn = timed ? this.transcriptNewNames(d0, A) : [];
