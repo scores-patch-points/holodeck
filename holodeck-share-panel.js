@@ -13,6 +13,7 @@
 // log. Its own session is kept in IndexedDB (stable device identity needs it);
 // the page's pre-existing sign-in is READ, never written.
 
+import { acquire as acquireMatrix, release as releaseMatrix } from './holodeck-session.js';
 import { makeShare, WORDS, GAP_WORDS, inviteWords, parseInvite, pairingCode, fingerprintGroups, STORES, REFUSE } from './holodeck-share.js';
 
 const CSS = `
@@ -93,7 +94,8 @@ export async function openSharePanel(ctx = {}) {
 export function closeSharePanel() {
   clearInterval(timer); timer = null;
   document.removeEventListener('keydown', onKey);
-  if (S && S.mx && S.mx.stop && !S.sim) { try { S.mx.stop(); } catch { /* already stopped */ } }
+  if (S && S.held) { try { releaseMatrix(S.held); } catch { /* the client is stopped when its last holder lets go */ } S.held = null; }
+  else if (S && S.mx && S.mx.stop && !S.sim) { try { S.mx.stop(); } catch { /* already stopped */ } }
   if (root) { root.remove(); root = null; }
   try { ctxRef && ctxRef.onClose && ctxRef.onClose(); } catch { /* the page's callback is its own */ }
 }
@@ -135,7 +137,8 @@ async function connectWith(sess) {
   const sdk = await loadSdk();
   try { sdk.logger && sdk.logger.setLevel('error'); } catch { /* noisy, harmless */ }
   const { connect } = await import('./holodeck-matrix.js');
-  const mx = await connect({ sdk, baseUrl: sess.baseUrl, userId: sess.userId, deviceId: sess.deviceId, accessToken: sess.accessToken, cryptoPrefix: `holodeck-${sess.userId}-${sess.deviceId}` });
+  const mx = await acquireMatrix(sess, () => connect({ sdk, baseUrl: sess.baseUrl, userId: sess.userId, deviceId: sess.deviceId, accessToken: sess.accessToken, cryptoPrefix: `holodeck-${sess.userId}-${sess.deviceId}` }));
+  S.held = mx;
   attach(mx, { encrypt: sdk.encryptAttachment, decrypt: sdk.decryptAttachment }, sess);
   await afterConnect();
 }
@@ -559,3 +562,6 @@ function logCard() {
 
 // exposed for the browser test and the page hunk
 export const _state = () => S;
+
+// The sign-in helpers, shared with the inbox so a person signs in once, the same way, in either place.
+export { idb as sessionStore, pageSession, loadSdk, repoIdFor, setRepoIdFor };

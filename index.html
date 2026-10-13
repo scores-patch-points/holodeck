@@ -468,6 +468,7 @@ button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visi
       </sc-if>
 
       <sc-if value="{{ v.overview }}" hint-placeholder-val="{{ false }}"><div id="overview-surface"></div></sc-if>
+      <sc-if value="{{ v.inbox }}" hint-placeholder-val="{{ false }}"><div id="inbox-surface" style="max-width:1100px"></div></sc-if>
       <sc-if value="{{ v.summary }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:6px;padding-top:10px;border-top:1px solid var(--line);margin-top:10px">
           <span style="font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--dim)">Source options</span>
@@ -535,6 +536,7 @@ button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visi
                     <sc-if value="{{ d.canProcess }}" hint-placeholder-val="{{ false }}"><button onClick="{{ d.onProcess }}" title="Run the eyes you have switched on over its pixels, read in the browser" style="background:{{ d.needsRead ? 'var(--acc2)' : 'none' }};border:1px solid {{ d.needsRead ? 'var(--acc2)' : 'var(--line2)' }};border-radius:8px;padding:5px 12px;cursor:pointer;font:500 14px var(--sans);color:{{ d.needsRead ? '#fff' : 'var(--ink2)' }};white-space:nowrap" style-hover="border-color:var(--acc)">Read the pixels (eyes)</button></sc-if>
                     <sc-if value="{{ d.canTranscribe }}" hint-placeholder-val="{{ false }}"><button onClick="{{ d.onTranscribe }}" title="Transcribe this recording — local service if set, else in this browser" style="background:none;border:1px solid var(--line2);border-radius:8px;padding:5px 12px;cursor:pointer;font:500 14px var(--sans);color:var(--ink2);white-space:nowrap" style-hover="border-color:var(--acc)">Transcribe it</button></sc-if>
                     <button onClick="{{ d.onSolo }}" title="Solo — fade the other sources; solo several; click again to bring them back" style="background:{{ d.soloOn ? 'var(--sel)' : 'none' }};border:1px solid {{ d.soloOn ? 'var(--acc)' : 'var(--line2)' }};border-radius:8px;padding:5px 12px;cursor:pointer;font:500 14px var(--sans);color:{{ d.soloOn ? 'var(--ink)' : 'var(--ink2)' }};white-space:nowrap" style-hover="border-color:var(--acc)">{{ d.soloLabel }}</button>
+                    <button onClick="{{ d.onComment }}" title="Comment on this source — end-to-end encrypted, visible only to the people in this repo" style="background:none;border:1px solid var(--line2);border-radius:8px;padding:5px 12px;cursor:pointer;font:500 14px var(--sans);color:var(--ink2);white-space:nowrap" style-hover="border-color:var(--acc)">Comment{{ d.commentBadge }}</button>
                   </div>
                   <details class="hd-disclosure" style="padding:8px 0 0;margin-top:auto">
                     <summary>Source details &amp; actions</summary>
@@ -2259,6 +2261,7 @@ button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visi
               </div>
               <sc-if value="{{ readerHasUrl }}" hint-placeholder-val="{{ false }}"><a href="{{ readerUrl }}" target="_blank" rel="noopener" style="font:500 14px var(--sans);white-space:nowrap">{{ readerSourceLabel }}</a></sc-if>
               <button onClick="{{ onReaderRenameStart }}" title="Rename this source" style="background:none;border:1px solid var(--line2);border-radius:8px;padding:5px 12px;cursor:pointer;font:500 13px var(--sans);color:var(--ink2);white-space:nowrap" style-hover="border-color:var(--acc)">✎ Rename</button>
+              <button onClick="{{ onReaderComment }}" title="Comment on this source — end-to-end encrypted, visible only to the people in this repo" style="background:none;border:1px solid var(--line2);border-radius:8px;padding:5px 12px;cursor:pointer;font:500 13px var(--sans);color:var(--ink2);white-space:nowrap" style-hover="border-color:var(--acc)">💬 Comment{{ readerCommentBadge }}</button>
             </div>
           </div>
           <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:9px 18px;border-top:1px solid var(--line);background:var(--s2)">
@@ -2500,6 +2503,7 @@ button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visi
     <sc-if value="{{ pinPop.has }}" hint-placeholder-val="{{ false }}">
       <div style="position:fixed;z-index:60;left:{{ pinPop.x }};top:{{ pinPop.y }};transform:translateX(-50%);display:flex;gap:8px;white-space:nowrap">
         <button onMouseDown="{{ pinPop.onPin }}" style="padding:7px 14px;border-radius:8px;border:0;background:var(--acc2);color:#fff;font:600 14px var(--sans);cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,.35)" style-hover="background:var(--acc3)">Pin excerpt</button>
+        <button onMouseDown="{{ pinPop.onComment }}" title="Comment on these words — only the people in this repo can read it" style="padding:7px 14px;border-radius:8px;border:1px solid var(--line2);background:var(--s1);color:var(--ink);font:600 14px var(--sans);cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,.35)">Comment</button>
         <button onMouseDown="{{ pinPop.onCorrect }}" title="Comment on this into the system" style="padding:7px 14px;border-radius:8px;border:1px solid var(--line2);background:var(--s1);color:var(--ink);font:600 14px var(--sans);cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,.35)">That's incorrect</button>
       </div>
     </sc-if>
@@ -2898,7 +2902,7 @@ button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visi
 function digammaH(x) { let r = 0; while (x < 6) { r -= 1 / x; x += 1; } const f = 1 / (x * x); return r + Math.log(x) - 0.5 / x - f * (1 / 12 - f * (1 / 120 - f * (1 / 252 - f * (1 / 240 - f / 132)))); }
 const klAdmitH = (bv, B) => Math.max(0, Math.log(B) - Math.log(bv) + digammaH(bv + 1) - digammaH(B + 1));
 const holoTokens = t => [...new Set((clean(t).toLowerCase().replace(/[\u2019']/g, '').match(/[a-z][a-z-]{2,}/g) || []).filter(w => !STOP.has(w) && !/^-|-$/.test(w)))];
-const VIEW_LABEL = { overview: 'Evidence overview', summary: 'Overview', search: 'Search', names: 'Names', types: 'Types', figures: 'Figures', statements: 'Statements', connections: 'Connections', framing: 'Framing', views: 'Views', patterns: 'Patterns', surprise: 'Surprise', reader: 'Sources', profile: 'Names', draft: 'Draft', records: 'Records', ask: 'Ask the Fold', ingest: 'Add & publish' };
+const VIEW_LABEL = { inbox: 'Inbox', overview: 'Evidence overview', summary: 'Overview', search: 'Search', names: 'Names', types: 'Types', figures: 'Figures', statements: 'Statements', connections: 'Connections', framing: 'Framing', views: 'Views', patterns: 'Patterns', surprise: 'Surprise', reader: 'Sources', profile: 'Names', draft: 'Draft', records: 'Records', ask: 'Ask the Fold', ingest: 'Add & publish' };
 const SU_CURSORS = [
   { id: 'loo', label: 'Everything else', desc: 'Each statement against normal text plus everything the other sources in this view say, regardless of date: what this source says that nothing else in view, and nothing normal, prepares you for.' },
   { id: 'pub', label: 'When published', desc: 'Sources in the order they were published: what a reader following the story would have learned, and when.' },
@@ -4791,6 +4795,45 @@ function mdRuns(text) {
 }
 
 class Component extends DCLogic {
+  // ---- comments, inbox and conversation: encrypted Matrix rooms of the workspace's repo (holodeck-inbox.js)
+  inboxCtl() {
+    const cid = this.corpusId();
+    if (this._inboxP && this._inboxCid === cid) return this._inboxP;
+    if (this._inboxP) { const old = this._inboxP; this._inboxP = null; this._inboxSum = null; old.then(c => { try { c.stop(); } catch (e) {} }).catch(() => {}); if (this._inboxMount) { try { this._inboxMount.destroy(); } catch (e) {} this._inboxMount = null; this._inboxRoot = null; } }
+    this._inboxCid = cid;
+    this._inboxP = import(new URL('holodeck-inbox.js', location.href).href).then(M => M.createInbox({
+      corpusId: () => this.corpusId(), corpusName: () => this.corpusName(),
+      docTitle: a => { const d = this.analysis().docById[String(a).replace(/^src:/, '')]; return d ? d.title : ''; },
+      docText: a => { const d = this.analysis().docById[String(a).replace(/^src:/, '')]; return d ? d.text : null; },
+      openSource: (a, anchor) => { const id = String(a).replace(/^src:/, ''); const A = this.analysis(); const d = A.docById[id]; if (!d) return this.toast('That source is not in this workspace on this device.');
+        let st = null; if (anchor && anchor.kind === 'statement') st = anchor.st; else if (anchor && anchor.kind === 'text') { const x = A.sts.find(z => z.doc === id && z.s <= anchor.s && anchor.s < z.e); st = x ? x.id : null; }
+        this.read(id, st); if (anchor && anchor.kind === 'moment') setTimeout(() => this.ytSeek(anchor.t), 400); },
+      openName: n => this.openProfile(n), openShare: () => this.openShareRepo(), toast: m => this.toast(m),
+      onChange: s => { this._inboxSum = s; this.setState(st => ({ inboxVer: (st.inboxVer || 0) + 1 })); },
+    }));
+    return this._inboxP;
+  }
+  syncInbox() {
+    const root = document.getElementById('inbox-surface');
+    if (!root) { if (this._inboxMount) { try { this._inboxMount.destroy(); } catch (e) {} this._inboxMount = null; this._inboxRoot = null; } return; }
+    if (this._inboxRoot === root && this._inboxCid === this.corpusId()) return;
+    this._inboxRoot = root;
+    this.inboxCtl().then(c => { if (root.isConnected && this._inboxRoot === root) { if (this._inboxMount) { try { this._inboxMount.destroy(); } catch (e) {} } this._inboxMount = c.mount(root); } }).catch(e => { root.textContent = 'The inbox could not open: ' + ((e && e.message) || e); });
+  }
+  commentsOf(docId) { const s = this._inboxSum; const b = s && s.byDoc && s.byDoc['src:' + docId]; return b || { total: 0, open: 0, unread: 0 }; }
+  commentOn(anchor, meta) {
+    const d = anchor && anchor.doc ? this.analysis().docById[String(anchor.doc).replace(/^src:/, '')] : null;
+    this.inboxCtl().then(c => c.compose(anchor, { title: d ? d.title : '', ...(meta || {}) })).catch(e => this.toast('Comments could not open: ' + ((e && e.message) || e)));
+  }
+  commentOnSelection() {
+    const pp = this.state.pinPop; if (!pp) return; const d = this.analysis().docById[this.state.readDoc]; if (!d) return;
+    const txt = pp.text.replace(/\s+/g, ' ').replace(CITE_RE, '').trim();
+    let s = null, e = null; try { const words = txt.split(' ').filter(Boolean).map(w => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')); const m = new RegExp(words.join('(?:\\s|\\[[^\\]]{1,20}\\])+')).exec(d.text); if (m) { s = m.index; e = m.index + m[0].length; } } catch (er) {}
+    try { window.getSelection().removeAllRanges(); } catch (er) {} this.setState({ pinPop: null });
+    const doc = 'src:' + d.id;
+    if (s != null && e > s) this.inboxCtl().then(c => c.compose({ kind: 'text', doc, s, e, quote: d.text.slice(s, e), before: d.text.slice(Math.max(0, s - 24), s), after: d.text.slice(e, e + 24) }, { title: d.title }));
+    else this.commentOn({ kind: 'source', doc, quote: txt.slice(0, 280) });
+  }
   syncOverview() {
     const root = document.getElementById('overview-surface');
     if (!root) return;
@@ -4808,6 +4851,8 @@ class Component extends DCLogic {
 
   componentDidMount() {
     this.hydrateAdded().catch(() => {});
+    // a workspace that is already an encrypted repo keeps its unread count live without opening the Inbox
+    try { if (JSON.parse(localStorage.getItem('hd:share:repos') || '{}')[this.corpusId()]) this.inboxCtl().then(c => c.start()).catch(() => {}); } catch (e) {}
     HD_POS_P.then(ok => { if (ok) { this._key = null; this.setState(st => ({ htmlVer: st.htmlVer + 1 })); } });
     hdLoadReference().then(ok => { if (ok) { this._key = null; this.setState(st => ({ htmlVer: st.htmlVer + 1 })); } }).catch(() => {}); // re-read names once the received normal (General English) is in — results never depend on load timing
     setTimeout(() => { try { this.netInit(); } catch (e) {} }, 800);
@@ -4835,7 +4880,7 @@ class Component extends DCLogic {
     window.addEventListener('dragenter', this._h.enter); window.addEventListener('dragleave', this._h.leave); window.addEventListener('dragover', this._h.over); window.addEventListener('drop', this._h.drop); window.addEventListener('paste', this._h.paste);
   }
   componentWillUnmount() { window.removeEventListener('keydown', this._onFocusKey); window.removeEventListener('resize', this._onRz); if (this._pdfRo) { try { this._pdfRo.disconnect(); } catch (e) {} } window.removeEventListener('message', this._onYt); document.removeEventListener('selectionchange', this._onSelCh); window.removeEventListener('scroll', this._onSelCh, true); window.removeEventListener('message', this._onMsg); const h = this._h; window.removeEventListener('dragenter', h.enter); window.removeEventListener('dragleave', h.leave); window.removeEventListener('dragover', h.over); window.removeEventListener('drop', h.drop); window.removeEventListener('paste', h.paste); }
-  componentDidUpdate() { this.syncOverview(); this.applyTheme(); this.measureHdr(); try { const ff = document.getElementById('fold-folder-input'); if (ff && !ff.multiple) { ff.webkitdirectory = true; ff.setAttribute('webkitdirectory', ''); ff.multiple = true; ff.setAttribute('multiple', ''); } } catch (e) {} if (this._prevCorpus !== this.state.corpus || this._prevAdded !== this.state.added) { this._prevCorpus = this.state.corpus; this._prevAdded = this.state.added; this.loadHtml(); this.akAutoLoad(); } const rd0 = this.state.readDoc && this.analysis().docById[this.state.readDoc]; if (rd0 && rd0.media && rd0.media.kind === 'local') { this.ensureMediaUrl(rd0);
+  componentDidUpdate() { this.syncOverview(); this.syncInbox(); this.applyTheme(); this.measureHdr(); try { const ff = document.getElementById('fold-folder-input'); if (ff && !ff.multiple) { ff.webkitdirectory = true; ff.setAttribute('webkitdirectory', ''); ff.multiple = true; ff.setAttribute('multiple', ''); } } catch (e) {} if (this._prevCorpus !== this.state.corpus || this._prevAdded !== this.state.added) { this._prevCorpus = this.state.corpus; this._prevAdded = this.state.added; this.loadHtml(); this.akAutoLoad(); } const rd0 = this.state.readDoc && this.analysis().docById[this.state.readDoc]; if (rd0 && rd0.media && rd0.media.kind === 'local') { this.ensureMediaUrl(rd0);
       // A recording opened but never classified gets its sound map on first sight (an
       // older stored recording, or one added before the classifier existed); the work
       // is the same in-browser rung, guarded so it happens once until it lands.
@@ -7896,7 +7941,7 @@ class Component extends DCLogic {
           return { originText: on ? on.why + ' ' + short(A.docById[on.of].title, 40) : 'Independent · shares no claims or outlet with another source', originDep: !!on, originCol: on ? 'var(--amber)' : 'var(--mut)' }; })(),
         drawsX: 0, drawOptions: drawOpts,
         onDraws: e => this.setMeta(d.id, { drawsOn: e.target.value }),
-        onKeep: () => this.setMeta(d.id, { status: 'source' }), onUnkeep: () => this.setMeta(d.id, { status: 'seen' }), onDiscard: () => this.discard(d.id), onRename: () => { this.read(d.id); setTimeout(() => this.setState({ readerRename: true, readerNameDraft: d.title }), 40); } }; };
+        onKeep: () => this.setMeta(d.id, { status: 'source' }), onUnkeep: () => this.setMeta(d.id, { status: 'seen' }), onDiscard: () => this.discard(d.id), onRename: () => { this.read(d.id); setTimeout(() => this.setState({ readerRename: true, readerNameDraft: d.title }), 40); }, onComment: () => this.commentOn({ kind: 'source', doc: 'src:' + d.id }), commentBadge: (() => { const b = this.commentsOf(d.id); return b.total ? ' · ' + b.total + (b.unread ? ' ●' : '') : ''; })() }; };
     const seenDocs = A.docs.filter(d => this.mOf(d).status === 'seen');
     const keptDocs = A.docs.filter(d => this.mOf(d).status !== 'seen');
     const stsOf = d => A.stsByDoc[d.id] || [];
@@ -8229,19 +8274,20 @@ class Component extends DCLogic {
     const segOpen = S.segOpen; const segToggleLabel = 'Saved folds'; const segCount = String(segList.length);
     const toggleSegOpen = () => { const open = !segOpen; try { localStorage.setItem('fold-explorer-segopen', open ? '1' : '0'); } catch (e) {} this.setState({ segOpen: open }); };
     const allYears = [...new Set(A.docs.map(d => d.year).filter(Boolean))].sort();
-    const V = {}; ['overview', 'draft', 'summary', 'search', 'surprise', 'names', 'types', 'figures', 'statements', 'connections', 'framing', 'views', 'patterns', 'reader', 'profile', 'ingest', 'reading'].forEach(k => { V[k] = !isEmpty && view === k; });
+    const V = {}; ['overview', 'draft', 'inbox', 'summary', 'search', 'surprise', 'names', 'types', 'figures', 'statements', 'connections', 'framing', 'views', 'patterns', 'reader', 'profile', 'ingest', 'reading'].forEach(k => { V[k] = !isEmpty && view === k; });
 
     const SU = isEmpty ? null : this.surprise(A); const Fid = new Set(F.map(st => st.id));
     const suF = SU ? SU.list.filter(x => Fid.has(x.st.id)) : [];
     const juncMode = S.suMode !== 'belief'; const JN = isEmpty ? [] : this.junctions(A, Fid);
     const gHi = on => ({ bg: on ? 'var(--sel)' : 'transparent', bd: on ? 'var(--acc2)' : 'transparent', weight: on ? 600 : 500 });
-    const NAVG = [['', [['summary', 'Overview'], ['ask', 'Ask'], ['draft', 'Draft']]], ['Read closely', [['names', 'Names'], ['records', 'Assertions']]], ['Explore', [['connections', 'Connections'], ['overview', 'Evidence overview']]], ['Manage', [['ingest', 'Add & publish']]]];
+    const NAVG = [['', [['summary', 'Overview'], ['ask', 'Ask'], ['inbox', 'Inbox'], ['draft', 'Draft']]], ['Read closely', [['names', 'Names'], ['records', 'Assertions']]], ['Explore', [['connections', 'Connections'], ['overview', 'Evidence overview']]], ['Manage', [['ingest', 'Add & publish']]]];
     const countFor = id => ({
       names: String(D.nameList.length), records: String(F.length),
       connections: String(D.edgeList.length),
       draft: this.activePins().length ? String(this.activePins().length) : '',
       ingest: (this._net && this._net.chain && this._net.chain.length) ? String(this._net.chain.length) : '',
       ask: (this._conv && this._conv.turns && this._conv.turns.length) ? String(this._conv.turns.length) : '',
+      inbox: this._inboxSum && this._inboxSum.unread ? String(this._inboxSum.unread) : '',
     }[id] || '');
     const navGroups = NAVG.map(([label, items]) => ({ label, hasLabel: !!label, items: items.map(([id, lab]) => ({ label: lab, count: countFor(id), ...gHi(view === id), onClick: () => this.setState({ view: id, readDoc: null, sel: null }) })) }));
     // split so Folds can sit right under The reading / Connections, inside Explore
@@ -8260,7 +8306,7 @@ class Component extends DCLogic {
       this.setState(s => ({ q: v, qDraft: undefined, view: 'search', readDoc: null, srN: 25, qaN: 0, prevView: s.view === 'search' || s.view === 'reader' ? (s.prevView || 'summary') : s.view })); };
     const omniOpen = live => { const v = typeof live === 'string' ? live : dv; if (!isOmniUrl(v)) return; clearTimeout(this._omniT); this.setState({ q: '', qDraft: undefined }); this.ingestUrl(/^https?:\/\//.test(v) ? v : 'https://' + v, { open: true }); };
     Object.assign(this._extra = {}, { ...this.qaVals(A, F, qv, view), ...this.draftVals(A), ...this.pfCoVals(A), ...this.dbVals(A, view), ...this.askVals(A, view), askFold: () => { const q = (this.state.q || '').trim(); this.setState({ view: 'ask', readDoc: null }); setTimeout(() => this.askSend(q), 0); }, ...this.netVals(A, view), ...this.readingVals(A, view),
-      pinPop: S.pinPop && view === 'reader' ? { has: true, x: S.pinPop.x + 'px', y: S.pinPop.y + 'px', onPin: e => { e.preventDefault(); this.pinSelection(); }, onCorrect: e => { e.preventDefault(); this.openCorr(S.pinPop.text); } } : { has: false },
+      pinPop: S.pinPop && view === 'reader' ? { has: true, x: S.pinPop.x + 'px', y: S.pinPop.y + 'px', onPin: e => { e.preventDefault(); this.pinSelection(); }, onComment: e => { e.preventDefault(); this.commentOnSelection(); }, onCorrect: e => { e.preventDefault(); this.openCorr(S.pinPop.text); } } : { has: false },
       hasPinToast: !!S.pinToast, pinToast: S.pinToast || '', goDraft: () => { this.setState({ pinToast: '' }); this.go('draft'); }, plainRef: this.plainRef, omniRef: this.omniRef,
       rdPins: (() => { const n = view === 'reader' ? this.activePins().filter(p => p.docId === S.readDoc).length : 0; return { has: n > 0, label: plural(n, 'pin') + ' from this source →' }; })(), navGroups, omniUrl, omniOpen,
       ...(() => {
@@ -8365,6 +8411,7 @@ class Component extends DCLogic {
       readerSeen: !!(S.readDoc && A.docById[S.readDoc] && this.mOf(A.docById[S.readDoc]).status === 'seen'),
       readerFold: S.readDoc && this._fold.length ? ' ' + (A.stsByDoc[S.readDoc] || []).filter(s => this.inFold(s)).length + ' of its statements touch the topic.' : '',
       readerKeep: () => this.setMeta(S.readDoc, { status: 'source' }), readerDiscard: () => this.discard(S.readDoc),
+      onReaderComment: () => this.commentOn({ kind: 'source', doc: 'src:' + S.readDoc }), readerCommentBadge: (() => { const b = this.commentsOf(S.readDoc); return b.total ? ' · ' + b.total + (b.unread ? ' (' + b.unread + ' new)' : '') : ''; })(),
       readerRenaming: S.readerRename, readerNotRenaming: !S.readerRename, readerNameDraft: S.readerNameDraft != null ? S.readerNameDraft : (S.readDoc && A.docById[S.readDoc] ? A.docById[S.readDoc].title : ''), onReaderRenameStart: () => { const d = S.readDoc && A.docById[S.readDoc]; if (d) this.setState({ readerRename: true, readerNameDraft: d.title }); }, onReaderNameDraft: e => this.setState({ readerNameDraft: e.target.value }), onReaderNameKey: e => { if (e.key === 'Enter') this.onReaderRenameSave(); if (e.key === 'Escape') this.setState({ readerRename: false, readerNameDraft: '' }); }, onReaderRenameCancel: () => this.setState({ readerRename: false, readerNameDraft: '' }), onReaderRenameSave: () => { const d = S.readDoc; const nm = (this.state.readerNameDraft || '').trim(); if (d && nm) this.renameDocTitle(d, nm); this.setState({ readerRename: false, readerNameDraft: '' }); },
       corpusId: cid, corpusOptions: opts, q: S.q, corpusName: this.corpusName(), segList, hasSegments, segOpen, segToggleLabel, segCount, toggleSegOpen, addAsFold, navTop, navRead, navExplore, navRest,
       topicsList, hasTopics, topicsNote, hasTopicsNote, topicsStrayN, showTopicsStray, onTopicsStray, scope,
@@ -8391,7 +8438,7 @@ class Component extends DCLogic {
       isEmpty, showWelcome: isEmpty && view !== 'ask', hasContent: !isEmpty, v: V, hdr,
       docCards, gaps, nameGroups, nameTable, typeBlocks, measures, noMeasures: !measures.length, ...(() => { const c = this.capL('stg', stGroups, 8); return { stGroups: c.items.map(g => ({ ...g, ...this.capL('stg:' + g.title, g.items, 4) })), stgMore: c }; })(),
       graphEl, timeInfo, ...orbX, ...(() => { const c = this.capL('pairs', pairs, 12); return { pairs: c.items, pairsMore: c }; })(), noPairs: !pairs.length, frameCols: frameCols.map(c => ({ ...c, ...this.capL('fr:' + c.label, c.items, 5) })), timeBars, ...(() => { const c = this.capL('topics', topicChips, 24); return { topicChips: c.items, topicMore: c }; })(), ...(() => { const c = this.capL('srcbars', [...sourceBars].sort((a, b) => +b.n - +a.n), 12); return { sourceBars: c.items, srcBarMore: c }; })(), shapes, noShapes: !shapes.length, hasRoutine: (this._routineN || 0) > 0, routineLine: plural(this._routineN || 0, 'routine agreement') + ' hidden: repeated by several sources, but about names and words that appear together in most sources anyway.', holds, breaks, noBreaks: !breaks.length,
-      hdrShow: !isEmpty && view !== 'reader' && view !== 'profile' && view !== 'ask' && view !== 'draft',
+      hdrShow: !isEmpty && view !== 'reader' && view !== 'profile' && view !== 'ask' && view !== 'draft' && view !== 'inbox',
       crumbLast, crumbAnc, hasAnc, yearOn: !isEmpty && (view === 'views' || view === 'surprise'),
       ...(() => { const d0 = S.readDoc && A.docById[S.readDoc]; if (!d0) return { rd: { eyebrow: '', title: '', meta: '' } }; const dsts = A.stsByDoc[d0.id] || []; const nm = new Set(dsts.flatMap(s => s.names)); const host = d0.url ? (/wikipedia\.org/.test(d0.url) ? 'Wikipedia' : d0.url.replace(/^https?:\/\/(www\.)?/, '').split('/')[0]) : 'Your content'; return { rd: { eyebrow: [host, d0.type, d0.year].filter(Boolean).join(' · '), title: d0.title, meta: [d0.authors && d0.authors.length ? 'By ' + d0.authors.join(', ') : '', d0.pubLabel ? 'Published ' + d0.pubLabel : ''].filter(Boolean).map(x => x + ' · ').join('') + plural(dsts.length, 'statement') + ' · ' + plural(nm.size, 'name') + ' · ' + plural(dsts.reduce((a, s) => a + s.figs.length, 0), 'figure') } }; })(),
       gsw: { track: S.ground.on ? 'var(--acc2)' : 'var(--line2)', left: S.ground.on ? '16px' : '2px' },
