@@ -4288,6 +4288,19 @@ const short = (t, n) => { t = clean(t); return t.length > n ? t.slice(0, n - 1) 
 // doc's own address so a doc stored before pdfSrc existed still renders its PDF.
 function epavTokenOf(d) { const m = /\/(?:Document|Open)\/([A-Za-z0-9]+)/.exec((d && d.url) || ''); if (m) return m[1]; const id = String((d && d.id) || ''); return id.startsWith('nash-') ? id.slice(5) : null; }
 function withPdfSrc(d) { if (d && !d.pdfSrc) { const t = epavTokenOf(d); if (t) return { ...d, pdfSrc: '/epav/' + t + '.pdf' }; } return d; }
+// A document's year is not "a date" until it says whose date it is. When the year is exactly the year of one date
+// the document itself states (its expiry, a signing), name it by that field: "Expires 2007", not a bare "2007" under
+// a "Date" header that means nothing. With no such field (or more than one) the year is left as it was.
+function withDateKey(d) {
+  if (!d || d.pubLabel || d.published || d.year == null || d.dateKey) return d;
+  const hit = new Map();
+  for (const k of Object.keys(d)) { if (FIELD_META_SKIP.has(k) || typeof d[k] !== 'string') continue;
+    const iso = fieldDateIso(d[k]); if (iso && iso.slice(0, 4) === String(d.year)) { const fk = fieldKey(k); hit.set(fk, FIELD_EXPLICIT_EXP.includes(fk) ? 'Expires' : fieldLabel(fk)); } }
+  if (hit.size !== 1) return d;
+  const key = [...hit.values()][0];
+  return { ...d, pubLabel: key + ' ' + d.year, dateKey: key };
+}
+const withDocNorm = d => withDateKey(withPdfSrc(d));
 // ---- emergent recurring fields ----------------------------------------------
 // Nothing is declared in advance. A "field" is a label that recurs across sources
 // with a value beside it: a structured key a source carries (contractNo, vendor,
@@ -4296,7 +4309,7 @@ function withPdfSrc(d) { if (d && !d.pdfSrc) { const t = epavTokenOf(d); if (t) 
 // number / text) is read off its own values, by plurality. Spellings of one label
 // ("Contract Number", "Contract No.", "Contract #", contractNo) share one key, so
 // they land in one column. The catalogue is a pure function of the sources.
-const FIELD_META_SKIP = new Set(['id', 'title', 'type', 'format', 'url', 'pages', 'text', 'note', 'pdfSrc', 'html', 'kind', 'medium', 'published', 'pubLabel', 'year', 'custody', 'custodyStatus', 'faithful', 'binPath', 'media', 'pdf', 'figures', 'needsRead', 'addedAt', 'hasImg', 'ocr', 'eyes', 'eyesDetail', 'ignored', 'transcribed', 'captionsWhy', 'standing', 'publisher', 'measured', 'screen', 'group', 'hasHtml', 'ocrModel', 'imgSrc', 'lang']);
+const FIELD_META_SKIP = new Set(['id', 'title', 'type', 'format', 'url', 'pages', 'text', 'note', 'pdfSrc', 'html', 'kind', 'medium', 'published', 'pubLabel', 'dateKey', 'year', 'custody', 'custodyStatus', 'faithful', 'binPath', 'media', 'pdf', 'figures', 'needsRead', 'addedAt', 'hasImg', 'ocr', 'eyes', 'eyesDetail', 'ignored', 'transcribed', 'captionsWhy', 'standing', 'publisher', 'measured', 'screen', 'group', 'hasHtml', 'ocrModel', 'imgSrc', 'lang']);
 const FIELD_TEXT_RE = /(?:^|[\n.;|])\s*([A-Z][A-Za-z]+(?:[ \/-][A-Za-z&]+){0,3})\s*(?:(?:No\.?|Number|Num\.?|#|ID)\s*[:#]?|:)\s*([A-Z0-9$][^\n;|]{0,48})/g;
 // Department and expiration come from the extraction itself (ePAV rows carry them as named fields), so they are
 // explicit columns, always present and always sortable -- not left to be discovered as one recurring label among many.
@@ -4437,7 +4450,7 @@ function fieldTopics(docs, cat) {
   return { groups, strayN: N - placed, basis: 'fields', candidates: cand.size };
 }
 function loadAdded() {
-  try { const a = JSON.parse(localStorage.getItem('fold-explorer-added') || 'null'); if (a) { const out = {}; for (const k in a) out[k] = Array.isArray(a[k]) ? a[k].map(withPdfSrc) : []; return out; } const c = JSON.parse(localStorage.getItem('fold-explorer-custom') || 'null'); return { custom: (c ? c.docs : []).map(withPdfSrc) }; } catch (e) { return {}; }
+  try { const a = JSON.parse(localStorage.getItem('fold-explorer-added') || 'null'); if (a) { const out = {}; for (const k in a) out[k] = Array.isArray(a[k]) ? a[k].map(withDocNorm) : []; return out; } const c = JSON.parse(localStorage.getItem('fold-explorer-custom') || 'null'); return { custom: (c ? c.docs : []).map(withPdfSrc) }; } catch (e) { return {}; }
 }
 const LEGACY_CORPORA = ['ohs', 'keybridge', 'bridge', 'transit', 'kitchen'];
 function purgeLegacyHistory() {
@@ -8055,7 +8068,7 @@ class Component extends DCLogic {
     if (!flags.length) return;
     let changed = false; const added = { ...this.state.added };
     for (const cid of flags) {
-      try { const b = await idbGet('added2:' + cid); if (!b) continue; const docs = JSON.parse(await unGzBytes(b)); if (Array.isArray(docs) && docs.length) { added[cid] = docs.map(withPdfSrc); changed = true; } } catch (e) {}
+      try { const b = await idbGet('added2:' + cid); if (!b) continue; const docs = JSON.parse(await unGzBytes(b)); if (Array.isArray(docs) && docs.length) { added[cid] = docs.map(withDocNorm); changed = true; } } catch (e) {}
     }
     if (changed) { this._key = null; this.setState(st => ({ added, htmlVer: st.htmlVer + 1 })); }
   }
@@ -10116,7 +10129,7 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
         if (r.contested || v) amb = { has: true, head: v ? 'Amount — decided by your vote' : 'Amount — ' + r.values.length + ' independent readings disagree', note: v ? 'You chose ' + AM.fmtUSD(v.value) + '; the other readings stay on the record.' : 'No single reading decides. Open the bytes and vote which is correct.', cta: 'Disclose the readings & vote', onOpen: () => this.openAmb(doc.id) };
       }
       d = { eyebrow: 'Source', color: 'var(--acc)', title: doc.title, amb,
-        facts: [{ k: doc.pubLabel ? 'Published' : 'Date', v: doc.pubLabel || (doc.year ? String(doc.year) : 'Undated') }, ...(doc.contractNo ? [{ k: 'Contract', v: doc.contractNo }] : []), ...(doc.about ? [{ k: 'About', v: doc.about }] : []), ...(doc.vendor ? [{ k: 'Vendor', v: doc.vendor }] : []), ...(doc.dept ? [{ k: 'Department', v: doc.dept }] : []), ...(doc.expires ? [{ k: 'Expires', v: doc.expires }] : []), ...((amount != null && AM) ? [{ k: 'Amount', v: AM.fmtUSD(amount) }] : (doc.amount ? [{ k: 'Amount', v: doc.amount }] : [])), ...(doc.publisher || (doc.authors && doc.authors.length) ? [{ k: 'By', v: doc.publisher || doc.authors.join(', ') }] : []), { k: 'Kind', v: [doc.kind || doc.type, doc.medium].filter(Boolean).join(' · ') || '—' }, ...(this.isLiveDoc(doc) ? [{ k: 'Read', v: 'Not readable here — kept as a link' }] : []), ...(doc.standing ? [{ k: 'Standing', v: doc.standing }] : []), ...((this._inf || {})[doc.id] ? [{ k: 'Origin', v: this._inf[doc.id].why + ' ' + A.docById[this._inf[doc.id].of].title }] : [])],
+        facts: [doc.dateKey ? { k: doc.dateKey, v: String(doc.year) } : { k: doc.pubLabel ? 'Published' : 'Date', v: doc.pubLabel || (doc.year ? String(doc.year) : 'Undated') }, ...(doc.contractNo ? [{ k: 'Contract', v: doc.contractNo }] : []), ...(doc.about ? [{ k: 'About', v: doc.about }] : []), ...(doc.vendor ? [{ k: 'Vendor', v: doc.vendor }] : []), ...(doc.dept ? [{ k: 'Department', v: doc.dept }] : []), ...(doc.expires ? [{ k: 'Expires', v: doc.expires }] : []), ...((amount != null && AM) ? [{ k: 'Amount', v: AM.fmtUSD(amount) }] : (doc.amount ? [{ k: 'Amount', v: doc.amount }] : [])), ...(doc.publisher || (doc.authors && doc.authors.length) ? [{ k: 'By', v: doc.publisher || doc.authors.join(', ') }] : []), { k: 'Kind', v: [doc.kind || doc.type, doc.medium].filter(Boolean).join(' · ') || '—' }, ...(this.isLiveDoc(doc) ? [{ k: 'Read', v: 'Not readable here — kept as a link' }] : []), ...(doc.standing ? [{ k: 'Standing', v: doc.standing }] : []), ...((this._inf || {})[doc.id] ? [{ k: 'Origin', v: this._inf[doc.id].why + ' ' + A.docById[this._inf[doc.id].of].title }] : [])],
         tagTitle: 'Names in it', tags: nm.slice(0, 10).map(nameTag),
         actions: [{ label: doc.media ? 'Watch and read the transcript' : this.isLiveDoc(doc) ? 'View the page' : 'Read it', onClick: () => this.read(doc.id) }, ...((doc.recordings || []).map(r => ({ label: r.label + ' ↗ (not transcribed)', onClick: () => window.open(r.url, '_blank', 'noopener') }))), ...(doc.url ? [{ label: 'Open original ↗', onClick: () => window.open(doc.url, '_blank', 'noopener') }] : []), { label: f.doc === doc.id ? 'Stop narrowing to this source' : 'Narrow everything to this source', onClick: () => this.setF('doc', f.doc === doc.id ? null : doc.id) }],
         listTitle: 'Its statements', list: listOf(sts), linkGroups: this.linkGroupsFor(doc.id, A) };
