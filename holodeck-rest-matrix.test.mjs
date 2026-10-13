@@ -89,8 +89,9 @@ test('the whole thing through the gate: enrol and create an account with your ow
     assert.equal(acc.owner, o.user);
     const swept = await owner.sweep({ rooms });
     assert.equal(swept[0].state, 'admitted', JSON.stringify(swept));
-    const got = await ana.claim({ door: acc.door });
+    const got = await ana.claim({ door: acc.door, input: link });
     assert.deepEqual(got.rooms, rooms);
+    assert.equal(got.vault, 'ready', 'the workspace key came to her inside the grant');
     assert.equal((await owner.people({ rooms })).find((p) => p.user === '@ana:stack.test').name, 'Ana (accountant)');
 
     // presence over REST, including the redaction of the previous beat
@@ -98,6 +99,16 @@ test('the whole thing through the gate: enrol and create an account with your ow
     assert.deepEqual((await owner.presence({ rooms })).map((p) => [p.name, p.viewing]), [['Ana (accountant)', 'doc:4']]);
     const live = (await mo.readEvents(priv, { type: EVT.presence })).filter((e) => e.decrypted);
     assert.ok(live.length <= 2, 'heartbeats replace each other over REST too: ' + live.length);
+
+    // what the homeserver was ever sent, and what it stores: no name, no page title, no key
+    const everythingSent = JSON.stringify(stack.hs.seen.map((r) => r.body));
+    const stored = JSON.stringify([...stack.hs.rooms.values()].map((r) => ({ state: [...r.state.values()], timeline: r.timeline })));
+    const wsKey = (await (await import('./holodeck-vault.js')).makeKeyring(ownerStore, { account: o.user }).current(priv)).key;
+    for (const needle of ['Ana (accountant)', 'Lease 4', 'Lease 0', wsKey, parseWorkspaceInvite(link).secret]) {
+      assert.equal(everythingSent.includes(needle), false, 'never sent to the homeserver: ' + needle.slice(0, 12));
+      assert.equal(stored.includes(needle), false, 'never stored by the homeserver: ' + needle.slice(0, 12));
+    }
+    assert.ok(stored.includes('io.holodeck.presence') && stored.includes('"vault":"hd.aes256gcm.v1"'), 'control: the scan sees the events and their sealed form, so it is not blind');
 
     // later, on another computer: password AND the six digits, or no sign-in
     T += 60_000;                                                             // past the step the enrolment code came from
@@ -125,7 +136,8 @@ test('someone with the link who created their account on the homeserver directly
     const o = stack.hs.user('owner');
     const mo = restMatrix({ base: stack.base, token: o.token, user: o.user });
     const priv = await mo.createRoom({ preset: 'private_chat' });
-    const owner = makeInvites({ mx: mo, store: memory(), gate: gateCrossing({ base: stack.base, openid: () => mo.getOpenIdToken() }) });
+    const ownerDevice = memory();
+    const owner = makeInvites({ mx: mo, store: ownerDevice, gate: gateCrossing({ base: stack.base, openid: () => mo.getOpenIdToken() }) });
     const inv = await owner.invite({ name: 'A', rooms: { priv }, base: BASE });
     const eve = stack.hs.user('eve');                                       // registered straight on the homeserver, around the gate
     const evi = makeInvites({ mx: restMatrix({ base: stack.base, token: eve.token, user: eve.user }), store: null });
@@ -135,7 +147,7 @@ test('someone with the link who created their account on the homeserver directly
     assert.equal((await mo.roomState(priv)).members[eve.user], undefined);
     assert.equal((await owner.outstanding({ rooms: { priv } }))[0].state, 'sent');
     // and with the gate unreachable the owner's device admits nobody
-    const down = makeInvites({ mx: mo, store: memory(), gate: gateCrossing({ base: 'http://127.0.0.1:9', openid: () => mo.getOpenIdToken() }) });
+    const down = makeInvites({ mx: mo, store: ownerDevice, gate: gateCrossing({ base: 'http://127.0.0.1:9', openid: () => mo.getOpenIdToken() }) });   // same device, gate unreachable
     const inv2 = await down.invite({ name: 'B', rooms: { priv }, base: BASE });
     const ana = stack.hs.user('ana');
     await makeInvites({ mx: restMatrix({ base: stack.base, token: ana.token, user: ana.user }), store: null }).open({ input: inv2.link });

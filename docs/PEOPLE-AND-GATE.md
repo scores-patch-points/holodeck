@@ -19,22 +19,47 @@ see or hold any of it, so the link you send cannot be used to sign in as them.
 | piece | where | does |
 |---|---|---|
 | `tools/login-gate/` | beside your homeserver | checks the six digits before the password reaches the homeserver; enrols an authenticator when an account is created; holds the secrets, encrypted |
-| `holodeck-invites.js` | the page | makes the invitation (a signing key: private half in the link, public half in room state), lets an enrolled account in, names, presence |
+| `holodeck-invites.js` | the page | makes the invitation (a signing key: private half in the link, public half in room state), lets an enrolled account in, names, presence — all of it sealed |
+| `holodeck-vault.js` | the page | seals content on the device (AES-256-GCM) with a workspace key the server never has; the keyring; rotation |
 | `holodeck-rest-matrix.js` | the page | plain Matrix REST; account creation and sign-in through the gate |
 | `holodeck-people-panel.js` | the page | the one screen |
 | `holodeck-invite-core.js` | both | TOTP (RFC 6238), proof, paste parsing, presence |
 | `holodeck-qr.js` | the page | the QR code |
 
-## Not tied to one browser
+## Sealed on your device
 
-The link carries a private signing key; the workspace's **private room state** carries only the matching public key
-(with the name and expiry). The person proves they hold the link by signing their account and the door. So **any
-browser signed in as you can let people in** — you can make the invitation on a laptop and have it completed while only
-your phone has Holodeck open. Nothing secret is stored on your side, so clearing site data costs you at most the
-convenience copy of a link, never an invitation. The homeserver sees the public key and the signature and can forge
-neither. The cost: the names of people with pending invitations are readable by members of the workspace.
+Everything private the Holodeck writes to Matrix is **sealed in the browser before it is sent** (`holodeck-vault.js`):
+your private work (pins, drafts, filters, reading history), the names you typed, the invitation registry, and who is
+viewing what. The homeserver stores `{ kid, iv, ct }` and cannot open it. (Matrix never encrypts state events, and a
+plain REST client cannot do Megolm, so the content itself is sealed here rather than relying on the room.)
 
-The authenticator secret is not on your side at all: it is in the person's app and the gate's encrypted store.
+* **The key** is a random 256-bit workspace key on member devices, in the browser's `localStorage`, scoped to the
+  signed-in **account** and the workspace — a second person on the same browser does not inherit it. It is never sent
+  to the homeserver, put in a URL, or logged.
+* **A new member gets it** inside their invitation's *grant*, sealed under a key derived (HKDF) from the link's own
+  secret. The link format did not change; the server sees a ciphertext only the person holding the link can open. The
+  owner's device must be open to admit someone (as before), because only it can seal the grant.
+* **Your other devices** need the key too. In the panel, under *What this does and does not protect*, **Copy a link to
+  use this workspace on another device**: open it on the other browser, signed in as you. Treat it like a password.
+  Until then that browser is **locked**: it reads no names, writes nothing sealed, and does not start a key of its own
+  (two keys for one workspace would each be unreadable to the other).
+* **Removing someone rotates the key.** After the person is banned from the rooms, the next key is posted in the
+  private room sealed under the key the remaining members hold; only the owner's (or a moderator's) rotation is
+  believed, and every key id is re-derived and checked.
+* **There is no plaintext fallback.** A device without the key neither reads nor writes sealed content; a device with
+  the key ignores plaintext where sealed content belongs (a forged "registry" could otherwise admit someone).
+* **What the server still sees:** who is a member and when they joined, room names, when anyone was active, the
+  event types and state keys, that invitations exist and when they were made (and the door rooms' aliases), and the
+  *size* of each value to within a bucket. The door room holds only a signature and room ids.
+* **What it cannot do:** give freshness — a malicious homeserver can replay an older sealed value; stop a removed
+  member keeping every key they held and everything they already read; or protect a device that is compromised
+  (the key is in `localStorage`, like the session token). Anything written in plaintext *before* this existed stays in
+  the server's history; the next save seals what is current, not what was.
+* **Public by design:** the workspace's public room (source custody, watches) is a publication and is not sealed.
+
+Not tied to one browser, as it was: **any** signed-in browser can still make an invitation and verify a signature
+(the public key and expiry are in the registry), but only a browser that holds the workspace key can read the
+registry or seal a grant. That is what *Copy a link to use this workspace on another device* is for.
 
 ## Deploying the gate (this is yours to do; the app cannot)
 
@@ -89,15 +114,15 @@ password in the password field.
 * **Protects:** a stolen or guessed password alone; a link, an email, or the owner's own mailbox; the owner (or an
   invited person's session) being used to sign in as someone else.
 * **Does not protect:** someone who already holds a session token (the browser's); a fake page that relays the six
-  digits in real time (TOTP is not phishing-resistant — passkeys are, and are a follow-up); the content of the rooms
-  from whoever runs the homeserver (they are ordinary, unencrypted Matrix rooms, which is how this workspace already
-  stores its data); a person whose invitation link is opened first by someone else who also enrols (the link is a
-  bearer invitation until used: send it as you would a key, and watch the list).
+  digits in real time (TOTP is not phishing-resistant — passkeys are, and are a follow-up); *who* is in the workspace
+  and when, from whoever runs the homeserver (see "Sealed on your device" for exactly what it can and cannot see); a
+  person whose invitation link is opened first by someone else who also enrols (the link is a bearer invitation until
+  used: send it as you would a key, and watch the list).
 * **The gate adds a trade:** someone can lock a person out for five minutes by failing on purpose. That is the lesser harm.
 
 ## Tests
 
-`node --test holodeck-invite-core.test.mjs holodeck-invites.test.mjs holodeck-rest-matrix.test.mjs holodeck-qr.test.mjs tools/login-gate/gate.test.mjs`
+`node --test holodeck-vault.test.mjs holodeck-vault-store.test.mjs holodeck-invite-core.test.mjs holodeck-invites.test.mjs holodeck-rest-matrix.test.mjs holodeck-qr.test.mjs tools/login-gate/gate.test.mjs`
 
 The homeserver in those tests is a small in-test HTTP double (`tests/fake-homeserver.mjs`), **not Synapse**. See
 `MATRIX-INVITES-PREREG.md`, Part II, for what was predicted and what was found.

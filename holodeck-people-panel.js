@@ -12,6 +12,7 @@
 // this panel is open.
 import { makeInvites, parseWorkspaceInvite, REFUSE, WORDS } from './holodeck-invites.js';
 import { restMatrix, baseFor, enrollStart, signUp, signIn, gateCrossing } from './holodeck-rest-matrix.js';
+import { deviceKeyring } from './holodeck-vault.js';
 import { parseInviteLines, groupKey, HEARTBEAT_MS } from './holodeck-invite-core.js';
 import { qrSvg } from './holodeck-qr.js';
 
@@ -85,7 +86,7 @@ function api() {
     sessionCache = { token: s.token, user: s.user, gate: gateOn() };
     mxCache = restMatrix({ base: s.base, token: s.token, user: s.user });
     const gate = gateOn() ? gateCrossing({ base: s.base, openid: () => mxCache.getOpenIdToken() }) : null;
-    invites = makeInvites({ mx: mxCache, store, gate, log: (l) => note(l.kind, l.text) });
+    invites = makeInvites({ mx: mxCache, store, gate, vault: deviceKeyring(s.user), log: (l) => note(l.kind, l.text) });   // the page's own keyring for this account
   }
   return { mx: mxCache, inv: invites, s };
 }
@@ -173,6 +174,7 @@ async function refresh() {
       for (const r of await a.inv.sweep({ rooms })) report(r);
       S.outstanding = (await a.inv.outstanding({ rooms })).filter((o) => o.state === 'sent');
     }
+    S.vault = await a.inv.status({ rooms }).catch(() => null);
     S.people = await a.inv.people({ rooms });
     S.online = await a.inv.presence({ rooms });
     if (!S.error || !/gate|sign/i.test(S.error)) S.error = '';
@@ -217,6 +219,15 @@ async function copy(text, label) {
 const cancel = (door) => act('Cancelling…', async () => { await api().inv.revoke({ rooms: roomsNow(), door }); S.made = S.made.filter((m) => m.door !== door); });
 const removePerson = (user) => act('Removing…', async () => { await api().inv.remove({ rooms: roomsNow(), user }); });
 const rename = (user) => { const name = val('hdp-name-' + user); if (!name) return; return act('Saving…', async () => { await api().inv.setName({ rooms: roomsNow(), user, name }); S.editing = null; }); };
+async function copyDeviceLink() {
+  const a = api();
+  if (!a) return;
+  try {
+    const key = await a.inv.deviceKey({ rooms: roomsNow() });
+    await copy(baseUrl().replace(/[#?].*$/, '') + '#vault=' + key, 'device');
+    S.error = '';
+  } catch (e) { S.error = words(e); draw(); }
+}
 function togglePresence(on) { lsSet(PRESENCE_OFF, on ? null : '0'); if (on) beat(true).catch(() => {}); draw(); }
 function setGate(on) { lsSet(GATE_OFF, on ? null : 'off'); invites = null; S.blocked = null; draw(); refresh().catch(() => {}); }
 
@@ -260,7 +271,7 @@ async function join() {
     clearInterval(claimTimer);
     claimTimer = setInterval(async () => {
       try {
-        const got = await a.inv.claim({ door: S.joining.door });
+        const got = await a.inv.claim({ door: S.joining.door, input: S.invite });   // the link holds the key the grant is sealed under
         clearInterval(claimTimer);
         ctxRef.setWsRooms({ priv: got.rooms.priv, ...(got.rooms.pub ? { pub: got.rooms.pub } : {}) });
         S.joined = true; S.invite = null; S.joining = null;
@@ -302,7 +313,9 @@ function body() {
     return out;
   }
 
-  const canInvite = !rooms.priv || S.owner;
+  if (S.vault && S.vault.vault === 'locked') out.push(el('div', { class: 'hdp-card hdp-bad', 'data-vault': 'locked' }, el('p', {}, WORDS.locked)));
+  else if (S.vault && S.vault.problem && S.vault.problem.code === 'vault-tampered') out.push(el('div', { class: 'hdp-card hdp-bad' }, el('p', {}, 'Something in this workspace did not authenticate — it was changed on the server, or moved. It was ignored.')));
+  const canInvite = (!rooms.priv || S.owner) && !(S.vault && S.vault.vault === 'locked');
   if (canInvite) out.push(inviteCard());
   if (S.made.length) out.push(madeCard());
   if (S.blocked) out.push(blockedCard());
@@ -314,6 +327,9 @@ function body() {
       el('p', {}, WORDS.bearer),
       el('p', {}, WORDS.scope),
       el('p', {}, WORDS.server),
+      S.vault && S.vault.vault === 'ready' ? el('div', { class: 'hdp-row', 'data-device-link': '' },
+        el('button', { class: 'hdp-quiet', type: 'button', onClick: copyDeviceLink }, S.copied === 'device' ? 'Copied' : 'Copy a link to use this workspace on another device'),
+        el('span', { class: 'hdp-mut' }, 'Treat it like a password: it carries the workspace key.')) : null,
       el('label', { class: 'hdp-row' }, el('input', { type: 'checkbox', style: 'width:auto', checked: presenceOn() ? '' : null, onChange: (e) => togglePresence(e.target.checked) }), el('span', {}, 'Show me as here, and what I am looking at, to people in this workspace')),
       el('label', { class: 'hdp-row' }, el('input', { type: 'checkbox', style: 'width:auto', checked: gateOn() ? null : '', onChange: (e) => setGate(!e.target.checked) }), el('span', {}, 'My homeserver does not run the login gate: let people in with a password alone')))));
   return out;
@@ -344,6 +360,9 @@ function blockedCard() {
     return el('div', { class: 'hdp-card hdp-bad' },
       el('p', {}, `${b.name} opened their link, but your homeserver's login gate did not answer, so nobody can be let in.`),
       el('p', { class: 'hdp-mut' }, 'Nobody is admitted while the gate cannot be reached. If your homeserver does not run the gate, you can turn that check off under “What this does and does not protect” — people are then let in with a password alone.'));
+  }
+  if (b.why === 'old-invitation') {
+    return el('div', { class: 'hdp-card hdp-bad' }, el('p', {}, `The invitation for ${b.name} was made before the workspace key existed, so it cannot carry it. Cancel it and make a new one.`));
   }
   return el('div', { class: 'hdp-card hdp-bad' }, el('p', {}, `${b.name}'s link was opened by an account that has not set up an authenticator (${b.user}), so they were not let in. The invitation is still open for the person it was meant for.`));
 }

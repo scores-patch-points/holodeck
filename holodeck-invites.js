@@ -21,31 +21,40 @@
 //
 // What stays where:
 //   * The link (private key) is on the device that made it, and in whatever channel the owner sends it through. It
-//     is dropped from the device once the person is in. The public key, the name and the expiry are room state:
-//     members of the workspace can read the names of people with pending invitations.
+//     is dropped from the device once the person is in.
+//   * Everything the workspace says about its people is SEALED on the device before it is sent (holodeck-vault.js):
+//     the names the owner typed, the invitation registry, and who is viewing what. The homeserver holds ciphertext
+//     and cannot read it. The key is on member devices; a new member receives it inside the grant, sealed under a
+//     key derived from their own link. Removing someone rotates the key.
+//   * The door room holds only what is needed to be let in: a signature and room ids. No name, no title.
 //
 // What it does NOT do (said in the panel too): a link is a bearer invitation until used — whoever opens it first and
 // enrols is let in, so send it as you would a key, and watch the people list. Once someone has signed in, their
-// browser holds a Matrix session token. TOTP is not phishing-resistant. These rooms are not end-to-end encrypted:
-// whoever runs the homeserver can read them.
+// browser holds a Matrix session token. TOTP is not phishing-resistant. The server still sees who is a member, when
+// anyone was active, and room names. A device that does not hold the workspace key can read none of the sealed
+// content and writes none: it never falls back to plaintext.
 import { newDoorAlias, isDoorAlias, newInviteKey, signInvite, verifyInvite, cleanName, onlineNow, ONLINE_MS } from './holodeck-invite-core.js';
+import {
+  makeKeyring, isSealed, VaultError, CODE as VCODE, EPOCH_EVENT, anySealed, deriveGrantKey, sealGrant, openGrant,
+} from './holodeck-vault.js';
 
 export const INVITE_TTL_MS = 7 * 24 * 3600 * 1000;           // how long a magic link keeps working
 
 export const EVT = Object.freeze({
   hello: 'io.holodeck.invite.hello',       // invitee -> door: "I opened the link" (a signal for the owner)
   request: 'io.holodeck.invite.request',   // invitee -> door: { sig }
-  grant: 'io.holodeck.invite.grant',       // owner -> door: { rooms, owner, user }
-  presence: 'io.holodeck.presence',        // member -> private room: { viewing, title }
+  grant: 'io.holodeck.invite.grant',       // owner -> door: SEALED under a key derived from the link: { rooms, owner, user, ring }
+  presence: 'io.holodeck.presence',        // member -> private room: SEALED { viewing, title }
 });
 export const STATE = Object.freeze({
-  people: 'io.holodeck.people',            // private room: { v, names: { userId: name } }
-  invites: 'io.holodeck.invites',          // private room: { v, invites: { [door]: { name, alias, pub, exp, created } } } — no secrets
+  people: 'io.holodeck.people',            // private room, SEALED: { v, names: { userId: name } }
+  invites: 'io.holodeck.invites',          // private room, SEALED: { v, invites: { [door]: { name, alias, pub, grant, exp, created } } }
 });
 export const REFUSE = Object.freeze({
   NotSignedIn: 'not-signed-in', NameNeeded: 'name-needed', NoRoom: 'no-room', InviteNotFound: 'invite-not-found',
   LinkIncomplete: 'link-incomplete', OwnerMismatch: 'owner-mismatch', WrongServer: 'wrong-server',
   InviteClosed: 'invite-closed', NoGrantYet: 'no-grant-yet', UnknownInvite: 'unknown-invite',
+  OldInvitation: 'old-invitation', GrantUnreadable: 'grant-unreadable',
 });
 export class InviteRefusal extends Error {
   constructor(code, why, detail = {}) { super(`${code}: ${why}`); this.name = 'InviteRefusal'; this.refusal = true; this.code = code; this.why = why; this.detail = detail; }
@@ -56,7 +65,8 @@ export const WORDS = Object.freeze({
   link: 'The link is an invitation, not a key to their account: they choose their own password and set up their own authenticator, and you never see either.',
   bearer: 'Whoever opens the link first and sets up an account is let in. Send it as you would a key, and watch the list.',
   scope: 'Signing in needs the password and the six digits every time, checked by the gate in front of your homeserver. Once someone is signed in, their browser holds the session.',
-  server: 'These rooms are not end-to-end encrypted: whoever runs the homeserver can read them.',
+  server: 'Names, invitations and who is viewing what are sealed on your device with a key the homeserver never has. It can still see who is a member, when they were active, and room names.',
+  locked: 'This device does not hold the workspace key yet, so it cannot read or write the workspace’s people. Open the device link from the device that started the workspace, or ask the owner for a new invitation.',
   name: 'The name you type is what everyone in the workspace sees next to when they are here.',
 });
 
@@ -86,7 +96,7 @@ export function parseWorkspaceInvite(input) {
 
 // ------------------------------------------------------------------ the machine
 
-export function makeInvites({ mx, store, gate = null, now = () => Date.now(), log = () => {} } = {}) {
+export function makeInvites({ mx, store, gate = null, vault = null, now = () => Date.now(), log = () => {} } = {}) {
   if (!mx) throw new Error('makeInvites needs an mx crossing');
   const say = (kind, text) => { try { log({ kind, text }); } catch { /* a sink never changes behaviour */ } };
   // a convenience copy of the links this device made, so it can show them again — NOT needed to let anyone in
@@ -94,9 +104,61 @@ export function makeInvites({ mx, store, gate = null, now = () => Date.now(), lo
   const linksAll = async () => { const v = store ? await store.get(LINKS) : null; return v && typeof v === 'object' && !Array.isArray(v) ? v : {}; };
   const linksSet = async (door, link) => { if (!store) return; const m = await linksAll(); if (link) m[door] = link; else delete m[door]; await store.set(LINKS, m); };
 
-  // the registry of pending invitations lives in the private room's state: public keys, names, expiry — no secrets
-  async function registry(priv) { const c = await mx.getState(priv, STATE.invites, '').catch(() => null); return c && c.invites && typeof c.invites === 'object' ? c.invites : {}; }
-  async function putRegistry(priv, invites) { await mx.setState(priv, STATE.invites, '', { v: 1, invites }); }
+  // ---- the vault: this device's keyring, and the only doors content goes through
+  const memory = new Map();
+  const ring = vault || makeKeyring(store || { async get(k) { return memory.has(k) ? JSON.parse(memory.get(k)) : null; }, async set(k, v) { memory.set(k, JSON.stringify(v)); } }, { account: mx.userId });
+  let problem = null;                                      // the last thing the vault refused, for the panel
+  const setProblem = (e) => { problem = e && e.vault ? { code: e.code, why: e.why } : null; };
+
+  // Rotation events from the room's owner (or anyone with moderator power) give this device the next key.
+  async function absorbEpochs(room) {
+    let st, evs;
+    try { st = await mx.roomState(room); evs = await mx.readEvents(room, { type: EPOCH_EVENT, limit: 100 }); } catch { return 0; }
+    const pl = (st.powerLevels && st.powerLevels.users) || {};
+    return ring.absorb(room, evs, { trusted: (u) => u === st.creator || Number(pl[u]) >= 50 });
+  }
+  // May this device seal into this room? It must hold the key, or be the workspace owner starting it — and never
+  // start a key when another device already sealed something (that would split the workspace across two keys).
+  async function prepare(room) {
+    if (await ring.has(room)) return;
+    if (await anySealed((t, k) => mx.getState(room, t, k))) throw new VaultError(VCODE.Locked, WORDS.locked);
+    const st = await mx.roomState(room);
+    if (st.creator !== mx.userId) throw new VaultError(VCODE.NotOwner, 'the workspace key comes from the person who made the workspace: open the invitation or device link they send');
+    await ring.ensure(room);
+  }
+  async function readSealed(room, type, key = '') {
+    const c = await mx.getState(room, type, key).catch(() => null);
+    if (!c || (typeof c === 'object' && !Object.keys(c).length)) return null;
+    if (isSealed(c)) {
+      try { return await ring.openFor(room, c, { type, key }); }
+      catch (e) {
+        if (e && e.code === VCODE.Locked && (await absorbEpochs(room))) {
+          try { return await ring.openFor(room, c, { type, key }); } catch (e2) { setProblem(e2); return null; }
+        }
+        setProblem(e); return null;
+      }
+    }
+    // Plaintext. Once a device holds the key it is never accepted back — a forged "registry" in the clear could
+    // admit someone. An older workspace with no key yet is read as it is, and its next write seals it.
+    if (await ring.has(room)) { setProblem(new VaultError(VCODE.Downgrade, 'something unsealed was found where sealed content belongs, so it was ignored')); return null; }
+    return c;
+  }
+  async function putSealed(room, type, key, value) {
+    await prepare(room);
+    await mx.setState(room, type, key || '', await ring.sealFor(room, value, { type, key: key || '' }));
+  }
+  /** 'ready' (this device holds the key), 'new' (nothing sealed yet) or 'locked' (sealed under a key it lacks). */
+  async function status({ rooms }) {
+    if (!rooms || !rooms.priv) return { vault: 'new' };
+    if (await ring.has(rooms.priv)) return { vault: 'ready', problem };
+    if (await anySealed((t, k) => mx.getState(rooms.priv, t, k))) return { vault: 'locked', problem };
+    return { vault: 'new', problem };
+  }
+
+  // the registry of pending invitations lives in the private room's state, sealed: public keys, names, expiry, and
+  // the derived key each grant is sealed under — none of it readable by the homeserver
+  async function registry(priv) { const c = await readSealed(priv, STATE.invites, ''); return c && c.invites && typeof c.invites === 'object' ? c.invites : {}; }
+  async function putRegistry(priv, invites) { await putSealed(priv, STATE.invites, '', { v: 1, invites }); }
   async function dropFromRegistry(priv, door) { const r = await registry(priv); if (r[door]) { delete r[door]; await putRegistry(priv, r); } }
 
   async function closeDoor(door, { keep = [], alias = null } = {}) {
@@ -122,6 +184,7 @@ export function makeInvites({ mx, store, gate = null, now = () => Date.now(), lo
     const label = cleanName(name);
     if (!label) throw refuse(REFUSE.NameNeeded, 'give this person a name', {});
     if (!rooms || !rooms.priv) throw refuse(REFUSE.NoRoom, 'there is no private room to invite them to yet', {});
+    await prepare(rooms.priv);                                  // may this device seal here? before anything is made
     let door = null, alias = null;
     for (let i = 0; i < 5 && !door; i++) {
       const a = newDoorAlias();
@@ -142,7 +205,7 @@ export function makeInvites({ mx, store, gate = null, now = () => Date.now(), lo
     const key = await newInviteKey();
     const link = workspaceInviteLink({ base, alias, secret: key.seed, from: mx.userId, server: mx.server });
     const reg = await registry(rooms.priv);
-    reg[door] = { name: label, alias, pub: key.pub, exp: now() + INVITE_TTL_MS, created: now(), pubRoom: rooms.pub || null };
+    reg[door] = { name: label, alias, pub: key.pub, grant: await deriveGrantKey(key.seed, alias), exp: now() + INVITE_TTL_MS, created: now(), pubRoom: rooms.pub || null };
     await putRegistry(rooms.priv, reg);
     await linksSet(door, link);
     say('ok', `Made an invitation for ${label}.`);
@@ -167,6 +230,7 @@ export function makeInvites({ mx, store, gate = null, now = () => Date.now(), lo
     const reg = await registry(rooms.priv);
     for (const [door, rec] of Object.entries(reg)) {
       if (now() > rec.exp) { await closeDoor(door, { alias: rec.alias }); await dropFromRegistry(rooms.priv, door); await linksSet(door, null); out.push({ door, name: rec.name, state: 'expired' }); continue; }
+      if (!rec.grant) { out.push({ door, name: rec.name, state: 'blocked', blocked: { why: REFUSE.OldInvitation } }); continue; }
       let evs;
       try { evs = await mx.readEvents(door); } catch { out.push({ door, name: rec.name, state: 'unreadable' }); continue; }
       const opened = evs.some((e) => e.sender !== mx.userId && e.type === EVT.hello);
@@ -199,9 +263,12 @@ export function makeInvites({ mx, store, gate = null, now = () => Date.now(), lo
         if (m !== 'join' && m !== 'invite') await mx.invite(room, user);
       } catch (e) { if (must) throw e; }
     }
-    const cur = (await mx.getState(priv, STATE.people, '').catch(() => null)) || {};
-    await mx.setState(priv, STATE.people, '', { v: 1, names: { ...(cur.names || {}), [user]: rec.name } });
-    await mx.sendEvent(door, EVT.grant, { v: 1, rooms: { priv, pub }, owner: mx.userId, user });
+    const cur = (await readSealed(priv, STATE.people, '')) || {};
+    await putSealed(priv, STATE.people, '', { v: 1, names: { ...(cur.names || {}), [user]: rec.name } });
+    // the grant is the only place the workspace key travels to a new member, sealed under a key only the link's
+    // holder can derive; the homeserver sees a ciphertext and room ids it already knows
+    const body = { v: 2, rooms: { priv, pub }, owner: mx.userId, user, ring: await ring.exportRing(priv) };
+    await mx.sendEvent(door, EVT.grant, await sealGrant(rec.grant, body, { room: door, type: EVT.grant, key: '' }));
     await closeDoor(door, { keep: [user], alias: rec.alias });
     try { await mx.leave(door); } catch { /* the person is in the door; the grant is in its history and stays readable */ }
     await dropFromRegistry(priv, door);
@@ -217,12 +284,12 @@ export function makeInvites({ mx, store, gate = null, now = () => Date.now(), lo
   }
 
   // ---------------------------------------------------------------- names, people, removal
-  async function names(rooms) { const c = await mx.getState(rooms.priv, STATE.people, '').catch(() => null); return (c && c.names) || {}; }
+  async function names(rooms) { const c = await readSealed(rooms.priv, STATE.people, ''); return (c && c.names) || {}; }
   async function setName({ rooms, user, name }) {
     const label = cleanName(name);
     if (!label) throw refuse(REFUSE.NameNeeded, 'a name cannot be empty', {});
-    const cur = (await mx.getState(rooms.priv, STATE.people, '').catch(() => null)) || {};
-    await mx.setState(rooms.priv, STATE.people, '', { v: 1, names: { ...(cur.names || {}), [user]: label } });
+    const cur = (await readSealed(rooms.priv, STATE.people, '')) || {};
+    await putSealed(rooms.priv, STATE.people, '', { v: 1, names: { ...(cur.names || {}), [user]: label } });
   }
   async function people({ rooms }) {
     const st = await mx.roomState(rooms.priv);
@@ -234,8 +301,22 @@ export function makeInvites({ mx, store, gate = null, now = () => Date.now(), lo
   async function remove({ rooms, user }) {
     const done = [];
     for (const room of [rooms.priv, rooms.pub].filter(Boolean)) { try { await mx.ban(room, user, 'removed'); done.push('banned'); } catch { done.push('not-banned'); } }
-    const cur = (await mx.getState(rooms.priv, STATE.people, '').catch(() => null)) || {};
-    if (cur.names && cur.names[user]) { const n = { ...cur.names }; delete n[user]; try { await mx.setState(rooms.priv, STATE.people, '', { v: 1, names: n }); } catch { /* the ban is what matters */ } }
+    // The person is out of the rooms, so they cannot read what is sent from here on. Give the remaining members the
+    // next key (sealed under the one they hold), THEN move the sealed state onto it. The key is only adopted here
+    // once its event is in the room, so a failed send never leaves this device on a key nobody else has.
+    let rotated = false;
+    if (await ring.has(rooms.priv)) {
+      try {
+        const plan = await ring.planRotation(rooms.priv);
+        await mx.sendEvent(rooms.priv, EPOCH_EVENT, await ring.epochContent(rooms.priv, plan));
+        await ring.add(rooms.priv, plan.next.key, plan.next.n);
+        rotated = true; done.push('rotated');
+      } catch { done.push('not-rotated'); }
+    }
+    const cur = (await readSealed(rooms.priv, STATE.people, '')) || {};
+    const n = { ...(cur.names || {}) }; delete n[user];
+    try { await putSealed(rooms.priv, STATE.people, '', { v: 1, names: n }); } catch { /* the ban is what matters */ }
+    if (rotated) { try { await putRegistry(rooms.priv, await registry(rooms.priv)); } catch { /* resealed on the next write */ } }
     return done;
   }
 
@@ -245,7 +326,9 @@ export function makeInvites({ mx, store, gate = null, now = () => Date.now(), lo
   async function announce({ rooms, viewing = '', title = '' }) {
     const room = rooms.priv;
     const sentAt = now();
-    const id = await mx.sendEvent(room, EVT.presence, { v: 1, viewing: String(viewing || '').slice(0, 200), title: String(title || '').slice(0, 200) });
+    await prepare(room);
+    const sealedBeat = await ring.sealFor(room, { v: 1, viewing: String(viewing || '').slice(0, 200), title: String(title || '').slice(0, 200) }, { type: EVT.presence, key: '', sender: mx.userId });
+    const id = await mx.sendEvent(room, EVT.presence, sealedBeat);
     beatSentAt.set(id, sentAt);
     if (beatSentAt.size > 24) beatSentAt.delete(beatSentAt.keys().next().value);
     const prev = lastBeat.get(room);
@@ -255,7 +338,17 @@ export function makeInvites({ mx, store, gate = null, now = () => Date.now(), lo
   }
   /** Who is here now and what they are looking at, under the names the owner gave. Judged in server time. */
   async function presence({ rooms, ttl = ONLINE_MS }) {
-    const evs = await mx.readEvents(rooms.priv, { type: EVT.presence, limit: 200 });
+    const raw = await mx.readEvents(rooms.priv, { type: EVT.presence, limit: 200 });
+    // open each beat with the sender it was sealed for; one that does not open (locked, moved, changed) is not a
+    // person being here. With a key in hand, plaintext beats are ignored: they could be written by anyone.
+    const haveKey = await ring.has(rooms.priv);
+    const evs = [];
+    for (const e of raw) {
+      if (e && isSealed(e.content)) {
+        try { evs.push({ ...e, content: await ring.openFor(rooms.priv, e.content, { type: EVT.presence, key: '', sender: e.sender }) }); }
+        catch (er) { if (er && er.code === VCODE.Tampered) setProblem(er); }
+      } else if (e && !haveKey) evs.push(e);
+    }
     let offset = 0;
     for (const e of evs) { if (e.sender === mx.userId && beatSentAt.has(e.event_id)) offset = (Number(e.origin_server_ts) || 0) - beatSentAt.get(e.event_id); }
     const st = await mx.roomState(rooms.priv);
@@ -291,20 +384,41 @@ export function makeInvites({ mx, store, gate = null, now = () => Date.now(), lo
   }
 
   /** Has the owner's device let me in? If so, join the rooms. */
-  async function claim({ door }) {
+  async function claim({ door, input = null }) {
     let st, evs;
     try { st = await mx.roomState(door); evs = await mx.readEvents(door); }
     catch { throw refuse(REFUSE.InviteClosed, 'this invitation was closed (used, cancelled or expired)', { door }); }
     if (!st.members || st.members[mx.userId] !== 'join') throw refuse(REFUSE.InviteClosed, 'this invitation was closed (used, cancelled or expired)', { door });
-    const g = evs.filter((e) => e.type === EVT.grant && e.sender === st.creator && e.content && e.content.user === mx.userId).pop();
-    if (!g) throw refuse(REFUSE.NoGrantYet, 'the person who invited you has not let you in yet', { door });
-    const rooms = g.content.rooms || {};
+    const grants = evs.filter((e) => e.type === EVT.grant && e.sender === st.creator && e.content && e.decrypted !== false);
+    if (!grants.length) throw refuse(REFUSE.NoGrantYet, 'the person who invited you has not let you in yet', { door });
+    let body = null;
+    const p = parseWorkspaceInvite(input);
+    for (const g of grants.reverse()) {
+      if (!isSealed(g.content)) { if (g.content.user === mx.userId) { body = g.content; break; } continue; }   // an older, unsealed grant
+      if (!p || !p.secret) continue;
+      try {
+        const o = await openGrant(await deriveGrantKey(p.secret, p.alias), g.content, { room: door, type: EVT.grant, key: '' });
+        if (o && o.user === mx.userId && o.owner === st.creator) { body = o; break; }
+      } catch { /* not sealed for this link */ }
+    }
+    if (!body) {
+      if (grants.some((e) => isSealed(e.content)) && (!p || !p.secret)) throw refuse(REFUSE.LinkIncomplete, 'open the whole link you were sent: it holds the key to read what the owner shared', { door });
+      throw refuse(REFUSE.NoGrantYet, 'the person who invited you has not let you in yet', { door });
+    }
+    const rooms = body.rooms || {};
     if (!rooms.priv) throw refuse(REFUSE.NoRoom, 'the grant names no room', {});
+    let vaultState = 'none';
+    if (typeof body.ring === 'string') { await ring.importRing(body.ring, { scope: rooms.priv }); vaultState = 'ready'; }
     await mx.join(rooms.priv);
     if (rooms.pub) { try { await mx.join(rooms.pub); } catch { /* the public room is optional */ } }
     try { await mx.leave(door); } catch { /* the owner closes it anyway */ }
-    return { rooms: { priv: rooms.priv, pub: rooms.pub || null }, owner: st.creator };
+    return { rooms: { priv: rooms.priv, pub: rooms.pub || null }, owner: st.creator, vault: vaultState };
   }
 
-  return { invite, revoke, sweep, outstanding, names, setName, people, remove, announce, presence, open, claim, mx };
+  // ---------------------------------------------------------------- the owner's other devices
+  /** The whole keyring as a string for the owner's other devices. Treat it like a password. */
+  const deviceKey = async ({ rooms }) => ring.exportRing(rooms.priv);
+  const useDeviceKey = async ({ text, rooms = null }) => ring.importRing(text, rooms && rooms.priv ? { scope: rooms.priv } : {});
+
+  return { invite, revoke, sweep, outstanding, names, setName, people, remove, announce, presence, open, claim, status, deviceKey, useDeviceKey, problem: () => problem, mx };
 }
