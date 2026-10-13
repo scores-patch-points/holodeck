@@ -3546,7 +3546,7 @@ function hdEngineMerge(t, ns, eng, hy) {
   return out.sort((a, b) => a.s - b.s);
 }
 // read-only handle for tests: the real functions, so a harness can recompute what a trace claims happened
-setTimeout(() => { try { window.__holodeck = Object.freeze({ analyze, holoKit, paradigms, fieldTopics, fieldCatalog, splitSentences, findNames, isJunk, readAny, hdHygiene, hdPos: w => hdPos(w), hdDeclReady: () => !!HD_DECL, hdEngineReady: () => !!HD_ENGINE, hdReaderReady: () => hdReaderReady(), hdAttrReady: () => hdAttrReady(), hdHoldReady: () => hdHoldReady(), summarizeHolders: (sts, names) => (HD_ATTR ? HD_ATTR.summarizeHolders(sts, names) : null) }); } catch (e) {} }, 0);
+setTimeout(() => { try { window.__holodeck = Object.freeze({ analyze, holoKit, paradigms, fieldTopics, fieldCatalog, splitSentences, findNames, isJunk, readAny, hdHygiene, hdPos: w => hdPos(w), hdPosForms: () => HD_POS, hdDeclReady: () => !!HD_DECL, hdEngineReady: () => !!HD_ENGINE, hdReaderReady: () => hdReaderReady(), hdAttrReady: () => hdAttrReady(), hdHoldReady: () => hdHoldReady(), summarizeHolders: (sts, names) => (HD_ATTR ? HD_ATTR.summarizeHolders(sts, names) : null) }); } catch (e) {} }, 0);
 const hdCut = (t, n) => { t = String(t || '').replace(/\s+/g, ' ').trim(); return t.length > n ? t.slice(0, n - 1) + '…' : t; };
 function splitSentences(text, tr) {
   const out = []; const re = /[^\n]+?(?:[.!?]+(?=\s|$)|(?=\n)|$)/g; let m;
@@ -9731,7 +9731,8 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
     const third = 100 / 3;
     const setAct = (a, on) => { const r = a.r, sp = a.sp; a.on = on;
       if (a.kind === 'rep') { sp.textContent = (on ? r.to : a.orig) + ' '; sp.classList.toggle('xf-rep', on);
-        if (on) sp.setAttribute('data-why', 'The scan reads “' + a.orig + '”. Folded to “' + r.to + '”: ' + r.vouched + ' other contract' + (r.vouched === 1 ? '' : 's') + ' read it, and the words beside it have been read together ' + r.pairs + ' time' + (r.pairs === 1 ? '' : 's') + ' in the sample.'
+        if (on && r.slot) sp.setAttribute('data-why', 'The scan reads “' + a.orig + '”, a word the sample holds but the language\'s lexicon does not. No other contract has read it beside “' + (r.ctx ? r.ctx[0] : '') + '” or “' + (r.ctx ? r.ctx[1] : '') + '”; “' + r.to + '” has been read beside both. As read it carries ' + (r.bitsRead || 0).toFixed(1) + ' bits of surprise here and “' + r.to + '” ' + (r.bitsFold || 0).toFixed(1) + '. Less certain than a respelling.');
+        else if (on) sp.setAttribute('data-why', 'The scan reads “' + a.orig + '”. Folded to “' + r.to + '”: ' + r.vouched + ' other contract' + (r.vouched === 1 ? '' : 's') + ' read it, and the words beside it have been read together ' + r.pairs + ' time' + (r.pairs === 1 ? '' : 's') + ' in the sample.'
           + (r.self ? ' This document itself reads it cleanly ' + r.self + ' time' + (r.self === 1 ? '' : 's') + '.' : '')
           + (r.recurs >= 3 ? ' This exact form appears ' + r.recurs + ' times here, so it may be printed that way in the source.' : '')); else sp.removeAttribute('data-why'); }
       else if (a.kind === 'typ') { sp.classList.toggle('xf-typ', on); if (on) sp.setAttribute('data-why', 'The engine reads this as ' + r.meaning.label + (r.meaning.n > 1 ? ' (' + r.meaning.n + ' mentions)' : '') + '.'); else sp.removeAttribute('data-why'); }
@@ -9744,14 +9745,15 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
       const p = level; const n1 = applyList(acts.rep, p / third), n2 = applyList(acts.typ, (p - third) / third), n3 = applyList(acts.clean, (p - 2 * third) / third);
       const t = p / 100; doc.style.background = 'rgb(' + [255 - 22 * t, 255 - 9 * t, 255 - 15 * t].map(Math.round).join(',') + ')';
       st.textContent = FR === undefined ? 'Folding against the rest of the sample…' : FR === null ? 'No priors for the folded reading yet: run node tools/build-ocr-priors.mjs.'
-        : 'Repairs ' + n1 + ' of ' + acts.rep.length + ' · engine reading ' + (FR.typed === undefined && !FR.engine ? 'in progress' : n2 + ' of ' + acts.typ.length) + (FR.engine ? ' (' + FR.engine + ')' : '') + ' · cleaned ' + n3 + ' of ' + acts.clean.length + '. Right of centre the page tints; all the way right clears stray glyphs. Point at a marked word for what vouches for it.';
+        : (FR.mode === 'none' ? 'No lexicon for “' + FR.lang + '” yet, so only stray glyphs are cleaned. ' : 'Read as ' + FR.lang + ' (' + FR.langBy + '); ' + (FR.mode === 'lexicon' ? 'no sample-wide priors for this language yet, so repairs stand on its lexicon and on what this document itself reads. ' : 'repairs stand on the sample of contracts. '))
+        + 'Repairs ' + n1 + ' of ' + acts.rep.length + ' · engine reading ' + (FR.typed === undefined && !FR.engine ? 'in progress' : n2 + ' of ' + acts.typ.length) + (FR.engine ? ' (' + FR.engine + ')' : '') + ' · cleaned ' + n3 + ' of ' + acts.clean.length + '. Right of centre the page tints; all the way right clears stray glyphs. Point at a marked word for what vouches for it.';
     };
     rng.oninput = () => { level = +rng.value; this._foldP = level; applyLevel(); this.urlSync(); };
     let pi = 0;
     const step = () => { if (el._extKey !== key) return;
       const end = Math.min(rec.length, pi + 3);
       for (; pi < end; pi++) addPage(rec[pi], pi);
-      const byEv = (x, y) => (y.r.vouched || 0) + (y.r.pairs || 0) - ((x.r.vouched || 0) + (x.r.pairs || 0));
+      const byEv = (x, y) => ((x.r.slot ? 1 : 0) - (y.r.slot ? 1 : 0)) || ((y.r.vouched || 0) + (y.r.pairs || 0) - ((x.r.vouched || 0) + (x.r.pairs || 0)));   // slot repairs, the least certain, last
       if (pi >= rec.length) { acts.rep.sort(byEv); acts.typ.sort((x, y) => y.r.meaning.n - x.r.meaning.n);
         acts.clean.sort((x, y) => (x.kind === 'ref' ? 0 : 1) - (y.kind === 'ref' ? 0 : 1) || (x.r.conf || 0) - (y.r.conf || 0)); }
       applyLevel();
@@ -9795,17 +9797,42 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
   // holodeck-fold.js: exact, then near-miss through the engine's own comparator, then the neighbours as witnesses, and a tie
   // refused rather than guessed. Meaning comes from the engine's reading door, not from this page.
   _extRepaint() { const el = this._extEl; if (el) { el._extKey = null; try { this.paintExtracted(); } catch (e) {} } }
+  // Which language this document is in, from the engine (its /v1/read names it); English when the engine cannot be reached,
+  // and the status line says so. The lexicon is the engine's own part-of-speech prior for that language
+  // (vendor/eoreader7/native/priors/pos-<iso3>.json); the sample-wide adjacency priors exist for English only so far.
+  async foldLanguage(rec) {
+    let text = ''; for (const pg of rec) { text += ' ' + String(pg.text || (pg.elements || []).map(e => e.text).join(' ')); if (text.length > 3000) break; }
+    for (const host of hdEngineHosts()) {
+      const ctl = new AbortController(), timer = setTimeout(() => ctl.abort(), 20000);
+      try { const r = await fetch(host + '/v1/read', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ name: 'language', text: text.slice(0, 3000) }), signal: ctl.signal });
+        const j = await r.json(); if (r.ok && j.schema === 'EORead@1' && j.language) return { code: String(j.language).toLowerCase(), by: 'the engine' }; } catch (e) { /* next host */ } finally { clearTimeout(timer); }
+    }
+    return { code: 'eng', by: 'assumed (the engine was not reachable)' };
+  }
+  async posForms(code) {
+    this._posLangs = this._posLangs || {};
+    if (this._posLangs[code] === undefined) this._posLangs[code] = fetch(new URL('vendor/eoreader7/native/priors/pos-' + code + '.json', location.href)).then(r => (r.ok ? r.json() : null)).then(j => (j && j.forms) || null).catch(() => null);
+    return this._posLangs[code];
+  }
   ensureFold(d, tok, rec) {
     this._foldRes = this._foldRes || {}; this._foldAsk = this._foldAsk || {};
     if (this._foldRes[tok] !== undefined || this._foldAsk[tok]) return; this._foldAsk[tok] = 1;
     (async () => {
       try {
-        this._priors = this._priors || fetch('/ocr-priors.json').then(r => (r.ok ? r.json() : null)).catch(() => null);
-        const [mod, pr] = await Promise.all([import('./holodeck-fold.js'), this._priors]);
-        if (!pr) { this._foldRes[tok] = null; this._extRepaint(); return; }
-        const protect = new Set(); ['vendor', 'dept', 'about', 'contractNo'].forEach(k => String(d[k] || '').toLowerCase().split(/[^a-z']+/).forEach(w => { if (w) protect.add(w); }));
-        this._foldMake = this._foldMake && this._foldMake.pr === pr ? this._foldMake : { pr, f: mod.makeFold(pr) };
-        const res = this._foldMake.f.foldDoc(rec, { protect }); this._foldRes[tok] = res; this._extRepaint();
+        const mod = await import('./holodeck-fold.js');
+        const lang = await this.foldLanguage(rec);
+        const code = /^[a-z]{2}$/.test(lang.code) ? ({ en: 'eng', fr: 'fra', de: 'deu', es: 'spa', it: 'ita', pt: 'por', ru: 'rus', pl: 'pol', nl: 'nld', sv: 'swe', da: 'dan', fi: 'fin', tr: 'tur', ar: 'arb', he: 'heb', hi: 'hin', ja: 'jpn', ko: 'kor', zh: 'cmn', el: 'ell', uk: 'ukr', cs: 'ces' }[lang.code] || lang.code) : lang.code;
+        // English also has the sample-wide priors (word and adjacency document frequencies from the OCR'd contracts)
+        let priors = { words: {}, pairs: {} };
+        if (code === 'eng') { this._priors = this._priors || fetch('/ocr-priors.json').then(r => (r.ok ? r.json() : null)).catch(() => null); priors = (await this._priors) || priors; }
+        let forms = code === 'eng' ? (window.__holodeck && window.__holodeck.hdPosForms ? window.__holodeck.hdPosForms() : null) : null;
+        if (!forms) forms = await this.posForms(code);
+        if (!forms && !Object.keys(priors.words).length) { this._foldRes[tok] = { pages: [], stats: {}, lang: code, langBy: lang.by, mode: 'none' }; this._extRepaint(); return; }
+        this._foldMakes = this._foldMakes || {};
+        const mk = this._foldMakes[code] = this._foldMakes[code] || mod.makeFold(priors, { lexicon: w => (forms ? (forms[String(w).toLowerCase()] || null) : null), lexiconForms: forms || [], lexiconReady: () => !!forms });
+        const protect = new Set(); ['vendor', 'dept', 'about', 'contractNo'].forEach(k => String(d[k] || '').toLowerCase().split(/[^\p{L}']+/u).forEach(w => { if (w) protect.add(w); }));
+        const res = mk.foldDoc(rec, { protect }); res.lang = code; res.langBy = lang.by; res.mode = mk.noPairs ? 'lexicon' : 'sample';
+        this._foldRes[tok] = res; this._extRepaint();
         this.foldMeaning(d, tok, rec, res);
       } catch (e) { this._foldRes[tok] = null; this._extRepaint(); }
     })();

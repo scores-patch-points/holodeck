@@ -164,3 +164,26 @@ for words of eight letters or more (shorter ones gave wrong repairs in the held-
 neighbour pair the sample has never seen is refused, and a form that recurs identically is disclosed as possibly
 printed that way: the scan itself prints "SPECIFICATGIONS" on 14 pages. The engine's ethos, logos and pathos organs
 are a conduct clearance, a claim-cycle lint and a felt-shape reader; none proposes a correction to a token.
+
+## 24. A repair is language-neutral or it is not a lesson
+
+The fold's English parts were a suffix list, ASCII capital tests, a Roman-numeral guard, a four-letter floor, and an
+English-only lexicon. None of that carries. What does: the engine's per-script word floor and unspaced-script
+detection (script-floor.js, script-segment.js); the language's own part-of-speech lexicon (pos-<iso3>.json, 61
+languages); endings LEARNED from the vocabulary, where an ending must beat every one of 100 random subsets of the
+vocabulary at having a known stem; case only protecting names in cased scripts; and a pair-free mode (the lexicon plus
+what the document itself reads) for the languages with no sample-wide adjacency priors. Measured on the UDHR in 22
+languages with synthetic corruption: 0 wrong repairs in 21, 1 of 26 in Russian, about a third of corrupted words
+recovered, and under 5 changes per 1,000 words of untouched text. Two cells were unsafe and are OFF, saying so: Arabic
+and Hebrew measured 26 and 22 false changes per 1,000 clean words (three-letter roots, small lexicon), so repair there
+waits for sample priors; unspaced scripts are passed through. Measure the control, the untouched text, in every language
+before trusting a recovery number in it.
+
+## 25. The slot rule needs no constant, only the evidence on both sides
+
+"The candidate is 30 times commoner" and "the term repeats fewer than four times" were numbers chosen to fit. Against 35
+candidates checked on the scans, one structural condition replaced both: the candidate has been read beside BOTH
+neighbours while the token has been read beside neither. All 18 repairs it admitted were right; none of the 10 wrong ones
+passed. Guards, not thresholds, do the rest: only lexicon-absent words are eligible, a valid form of a known stem family
+is left alone, a line-break fragment that joins its neighbour into a known word is a split word, and the candidate must be
+a word the lexicon knows (a garble the sample happens to hold is not a target).
