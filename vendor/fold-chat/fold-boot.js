@@ -14,3 +14,6 @@ import "./fold-exit-install.js";
 import { mount } from "./fold-chat.js";
 
 mount(document.querySelector(".app"));
+// a different thing to start than a chat, in the same list: the (simplified)
+// Agent. Dynamic + defensive so a failure here never breaks the app.
+import("./fold-chat-agentic.js").then((m) => m.mountAgentic()).catch((e) => console.warn("[agent] not mounted:", e?.message ?? e));

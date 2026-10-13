@@ -13,6 +13,14 @@ the 7.7 MB `.jsonl.zst` is left upstream — the pre-built index is the path act
 and the `.zst` path is only the key the index sits beside. `localStorage hd:reading`
 overrides the source with any absolute `.jsonl.zst` (or sibling `.index.json`) URL.
 
+## Vendored UI library (2026-10-11) — Litegraph.js, for the automation canvas
+
+`vendor/litegraph.js` (1,074,483 bytes) and `vendor/litegraph.css` (12,820 bytes) are vendored
+unchanged from the npm package `litegraph.js@0.7.18` (its `build/litegraph.js` and
+`css/litegraph.css`), MIT-licensed. The automation canvas (`fold-canvas.html`, `fold-canvas.js`)
+loads them as a plain `<script>`/`<link>` so the surface keeps its no-build rule. Only Litegraph's
+canvas is used; its built-in execution engine is ignored — `fold-scheduler` is the runner.
+
 ## Last sync
 date: 2026-09-25T19:46:51Z
 

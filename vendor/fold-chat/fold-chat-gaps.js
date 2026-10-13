@@ -42,12 +42,21 @@ export function unsourcedPlan(_policy = UNSOURCED_ANSWERS, { live = false } = {}
 export const ALONE_KINDS = Object.freeze([]);
 export const modelSpeaksAlone = (kind) => ALONE_KINDS.includes(kind);
 
+import { SELF_LINE, NO_LOOKUP_LINE } from "./fold-chat-self.js";
+import { genVoid, genVoidLine } from "./fold-chat-genvoid.js";
 export const SMALLTALK_LINE = "Ask me something and I'll show you what the sources say.";
 const KIND_WORDS = { generate: "creative writing", compose: "personal writing", code: "a programming question", transform: "a transformation of your own text", compute: "a calculation", advice: "advice" };
 
 /** The app-authored turn for a kind the model may not answer alone: { notice } and/or a computed card on the record. */
-export function aloneTurn(kind) {
+export function aloneTurn(kind, { outputType = null, hasMaterial = false, question = "" } = {}) {
+  // A WRITING request the model may not answer alone: the gap names the thing asked for and what would unblock it (fold-chat-genvoid.js), drawn as record.void.
+  if (outputType && (kind === "generate" || kind === "compose")) {
+    const g = genVoid({ outputType, webPassages: [], hasMaterial, barred: "alone", question });
+    if (!g.ok) return { notice: { kind: "no-sources", text: g.notice.text }, void: g.void };
+  }
   if (kind === "smalltalk") return { notice: { kind: "alone", text: SMALLTALK_LINE } };
+  if (kind === "self") return { notice: { kind: "alone", text: SELF_LINE } };          // the fold's own words about itself (fold-chat-self.js)
+  if (kind === "nolookup") return { notice: { kind: "alone", text: NO_LOOKUP_LINE } };   // the ask had nothing to look up, so nothing was searched
   if (kind === "compute") return { notice: null };            // the result card IS the answer (record.computed)
   return { notice: { kind: "no-sources", text: `There are no sources for this kind of ask (${KIND_WORDS[kind] || kind}), and the fold does not write without sources, so nothing was written. Ask it as a question and it will show what the sources say.` } };
 }
@@ -177,7 +186,11 @@ export function errorNotice(err) {
   const msg = String(err?.message || err || "unknown error").replace(/^error:\s*/i, "").trim();
   const status = err && typeof err.status === "number" ? err.status : null;
   let text;
-  if (status === 504 || /timed out|timeout/i.test(msg)) text = `The turn timed out before the model finished (${msg}). Nothing was written.`;
+  // A failure INSIDE the tab (the engine's CDN import, the weights download, the GPU) is not a bridge failure, even when
+  // its message says "Failed to fetch": branch on where it happened first, and never run the bridge regex on it.
+  const inTab = err && typeof err === "object" && err.kind !== "timeout" && (err.place === "tab" || ["no-gpu", "loader", "load-failed", "generate-failed", "declined"].includes(err.kind));
+  if (inTab) text = `The in-tab model could not ${err.kind === "generate-failed" || err.kind === "declined" ? "answer" : "load"} (${msg}). Nothing was written. Retry, pick a smaller model, or use the Fold's own server (\`npm run serve\`).`;
+  else if (status === 504 || /timed out|timeout/i.test(msg)) text = `The turn timed out before the model finished (${msg}). Nothing was written.`;
   else if (status === 429 || /429|rate.?limit|too many requests/i.test(msg)) text = `The model is rate-limited right now (${msg}). Nothing was written.`;
   else if (status === 0 || /unreachable|failed to fetch|networkerror|load failed/i.test(msg)) text = `The bridge could not be reached (${msg}). Nothing was written.`;
   else if (status === 400 || /refus|sealed|gate/i.test(msg)) text = `The request was refused (${msg}). Nothing was written.`;
@@ -206,7 +219,7 @@ export function declinedFallbackNotice(err, { from = "facing" } = {}) {
 export function noModelFallbackNotice(why, { from = "facing" } = {}) {
   const code = why?.code || "bridge-down";
   const text = code === "bridge-down"
-    ? "No model is reachable (the bridge isn't running), so this shows what the sources say. Start `heimdall up` for written answers."
+    ? "No model is reachable (no bridge answered and this tab has none loaded), so this shows what the sources say. Run `npm run serve` (the Fold's own server) or use the in-tab model for written answers."
     : `No model is available (${String(why?.text || "none is served").replace(/\s+/g, " ").trim()}), so this shows what the sources say.`;
   return { kind: "fold", retry: true, text, why: code, fellBackFrom: from };
 }
@@ -214,6 +227,7 @@ export function noModelFallbackNotice(why, { from = "facing" } = {}) {
 /** A gap drawn as the whole of a turn (no answer text) — the line the facing page shows where the answer would be. */
 export function gapAnswerLine(v) {
   if (!v) return "";
+  if (v.kind === "generate") return genVoidLine(v);     // "No essay was written." — the reason ("I can't write the essay: …") is the gap block's own note (fold-chat-genvoid.js)
   if (v.kind === "unreached") return "No answer was written: no source could be read to write one from.";
   if (v.kind === "live") return "No answer was written: this needs live data and none was reachable.";
   return "";
