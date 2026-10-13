@@ -2853,11 +2853,16 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
 
   </div>
 </div>
+  <sc-if value="{{ narrowDetailBtn }}" hint-placeholder-val="{{ false }}">
+    <button onClick="{{ openDetail }}" style="position:fixed;right:14px;bottom:14px;z-index:40;background:var(--acc2);border:0;border-radius:999px;color:#fff;cursor:pointer;font:600 14px var(--sans);padding:10px 16px;box-shadow:0 6px 20px rgba(0,0,0,.3)">Details</button>
+  </sc-if>
   <sc-if value="{{ extraScreen.has }}" hint-placeholder-val="{{ false }}">
     <div style="position:fixed;inset:0;z-index:58;background:var(--bg);display:flex;flex-direction:column">
       <div style="display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid var(--line);background:var(--s1)">
-        <button onClick="{{ extraScreen.close }}" style="background:var(--s2);border:1px solid var(--line2);border-radius:8px;color:var(--ink);cursor:pointer;font:500 14px var(--sans);padding:6px 12px">← Back</button>
-        <span style="font:600 16px var(--sans);color:var(--ink)">{{ extraScreen.label }}</span>
+        <nav aria-label="Breadcrumb" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <sc-for list="{{ extraScreen.crumbs }}" as="c" hint-placeholder-count="2"><button onClick="{{ c.onClick }}" style="background:none;border:0;color:var(--acc);cursor:pointer;padding:4px 2px;font:500 14px var(--sans)" style-hover="text-decoration:underline">{{ c.label }}</button><span aria-hidden="true" style="color:var(--dim)">›</span></sc-for>
+          <span aria-current="page" style="font:600 15px var(--sans);color:var(--ink)">{{ extraScreen.label }}</span>
+        </nav>
       </div>
       <iframe src="{{ extraScreen.src }}" title="Screen: {{ extraScreen.label }}" style="flex:1;border:0;width:100%;background:var(--bg)"></iframe>
     </div>
@@ -7856,7 +7861,7 @@ class Component extends DCLogic {
   toggleTopicGroup(p) { const cur = this.state.f.topicGroup; const same = cur && cur.label === p.label && !!cur.invert === !!p.invert; const ids = (p.docs || []).map(d => (typeof d === 'string' ? d : d.id)); this.setF('topicGroup', same ? null : { label: p.label, docs: ids, invert: !!p.invert }); }
   sel(type, id) { const S0 = this.state; if (type === 'name' && S0.view === 'reader' && !(S0.sel && S0.sel.type === 'name' && S0.sel.id === id)) this.pushHist(); if (type === 'doc') this.markRead(id); this.setState(s => (s.sel && s.sel.type === type && s.sel.id === id) ? { sel: null, selAll: false, pfIdx: 0, pfAll: false } : { sel: { type, id }, selAll: false, pfIdx: 0, pfAll: false }); }
   go(view) { this.setState({ view, readDoc: null }); }
-  read(docId, stId) { const S0 = this.state; if (S0.view !== 'reader' || docId !== S0.readDoc || (S0.sel && S0.sel.type === 'name')) this.pushHist(); this.markRead(docId); const live = this.isLiveDoc(this.analysis().docById[docId]); if (docId !== this.state.readDoc) { this.state.seekT = 0; this._faithFound = null; } this.setState({ view: 'reader', readDoc: docId, sel: stId ? { type: 'statement', id: stId } : { type: 'doc', id: docId }, ...(live ? { readMode: 'original' } : {}) }); }
+  read(docId, stId) { const S0 = this.state; if (S0.view !== 'reader' || docId !== S0.readDoc || (S0.sel && S0.sel.type === 'name')) this.pushHist(); this.markRead(docId); const live = this.isLiveDoc(this.analysis().docById[docId]); if (docId !== this.state.readDoc) { this.state.seekT = 0; this._faithFound = null; } this.setState({ view: 'reader', readDoc: docId, narrowDetail: false, sel: stId ? { type: 'statement', id: stId } : { type: 'doc', id: docId }, ...(live ? { readMode: 'original' } : {}) }); }
   saveAdded(added) {
     // The bytes go to IndexedDB as a gzipped binary blob, not localStorage: a big
     // corpus is stored compact, and the page only carries a small pointer. The
@@ -8884,7 +8889,10 @@ class Component extends DCLogic {
       hasPinToast: !!S.pinToast, pinToast: S.pinToast || '', goDraft: () => { this.setState({ pinToast: '' }); this.go('draft'); }, plainRef: this.plainRef, omniRef: this.omniRef,
       rdPins: (() => { const n = view === 'reader' ? this.activePins().filter(p => p.docId === S.readDoc).length : 0; return { has: n > 0, label: plural(n, 'pin') + ' from this source →' }; })(), navGroups, omniUrl, omniOpen,
       // the open extra screen, if any: a whole page shown full height over the app with a way back
-      extraScreen: (() => { const sc = SCREENS.find(x => x.id === S.screenId); return sc ?{ has: true, label: sc.label, src: sc.src, close: () => this.setState({ screenId: null }) } : { has: false, label: '', src: '', close: () => {} }; })(),
+      extraScreen: (() => { const sc = SCREENS.find(x => x.id === S.screenId); return sc ? { has: true, label: sc.label, src: sc.src, close: () => this.setState({ screenId: null }),
+        // the way back: Holodeck = leave the screen and show the view you came from; Sources = leave it and go to Sources
+        crumbs: [{ label: 'Holodeck', onClick: () => this.setState({ screenId: null }) }, { label: 'Sources', onClick: () => this.setState({ screenId: null, view: 'summary', readDoc: null, sel: null }) }] }
+        : { has: false, label: '', src: '', close: () => {}, crumbs: [] }; })(),
       ...(() => {
         if (view !== 'search' || !qv) return { sr: { sub: '', names: [], docs: [], figs: [], sts: [], co: [], others: [] } };
         const c = this.qc(A); const q = c.q;
@@ -9131,7 +9139,13 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
         const panelOpen = pfSide || (!(pf.has || view === 'draft' || view === 'profile') && !!det.hasSel);
         const colPad = !panelOpen ? '' : narrow ? '' : 'padding-right:' + SIDE_PANEL_W + 'px';
         const side = { sidePanelStyle, pfSide, colPad, narrowBack: narrow, pfClose: () => this.setState({ sel: null }) };
-        return pf.has || view === 'draft' || view === 'profile' ? { ...det, ...side, hasSel: false, noSel: true, pf } : { ...det, ...side, pf }; })(),
+        // Reading a source also selects it. On a narrow window that auto-selection must not raise the full-screen
+        // profile over the contract itself: the contract shows first, the profile is one tap away (Details) and
+        // Back returns to the contract. An explicit selection (a name, a statement) still swaps in the profile.
+        const docSelOnly = narrow && view === 'reader' && !!S.readDoc && !!S.sel && S.sel.type === 'doc' && S.sel.id === S.readDoc && !S.narrowDetail;
+        side.narrowDetailBtn = narrow && view === 'reader' && !!S.readDoc && (docSelOnly || !S.sel);
+        side.openDetail = () => this.setState({ sel: { type: 'doc', id: S.readDoc }, narrowDetail: true });
+        return pf.has || view === 'draft' || view === 'profile' || docSelOnly ? { ...det, ...side, hasSel: false, noSel: true, pf } : { ...det, ...side, pf }; })(),
       heroRef: r => { this._hero = r; }, onHeroKey: e => { if (e.key === 'Enter') { const v = (e.target.value || '').trim(); if (v) { if (isOmniUrl(v)) omniOpen(v); else omniGo(v); } } },
       onHeroGo: () => { const v = ((this._hero && this._hero.value) || '').trim(); if (v) { if (isOmniUrl(v)) omniOpen(v); else omniGo(v); } },
       showSettings: S.showSettings, openSettings: () => this.setState({ showSettings: true }), closeSettings: () => this.setState({ showSettings: false }), closeSettingsBg: e => { if (e.target === e.currentTarget) this.setState({ showSettings: false }); },
