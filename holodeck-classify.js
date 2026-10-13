@@ -67,12 +67,18 @@ export async function classifySound(buf, opts = {}) {
   const P = await import(new URL('holodeck-pcm.js', import.meta.url).href);
   const total = (await P.audioDuration(buf)) || null;
   const inputName = session.inputNames[0];
+  // The END2END export takes a 1-D waveform [N]; feeding [1, N] makes session.run reject
+  // ("Invalid rank for input"), which the caller only traces — it read as a hang. Follow the
+  // model's own declared rank when the runtime reports it, so an `hd:clsModel` that wants
+  // a batch axis still works.
+  const meta = session.inputMetadata && [].concat(session.inputMetadata).find(m => m && m.name === inputName);
+  const batched = !!(meta && meta.shape && meta.shape.length === 2);
   const labels = []; let duration = 0;
   for await (const w of P.pcm16k(buf, { winSec: 20 })) {
     if (w.start >= maxSec) break;
     const part = w.pcm; duration = w.start + part.length / 16000;
     // a plain copy, as before: the window can be an AudioBuffer's own channel memory
-    const feed = { [inputName]: new _ort.Tensor('float32', part.slice(0), [1, part.length]) };
+    const feed = { [inputName]: new _ort.Tensor('float32', part.slice(0), batched ? [1, part.length] : [part.length]) };
     const out = await session.run(feed);
     const tensor = Object.values(out)[0];
     if (!tensor || !tensor.data || !tensor.dims) throw new Error('the classifier returned no scores');
