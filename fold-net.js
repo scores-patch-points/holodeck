@@ -172,11 +172,11 @@ export async function fetchVia(proxyTpl, url) { const u = proxyTpl ? proxyTpl.re
 
 // ---------- in-browser Whisper ----------
 let _asr = null, _asrModel = null;
-// opts = { prompt, language }: the priors the transcriber listens with.
-// `prompt` becomes Whisper's initial-prompt tokens (the decoder prefix after the
-// start/language/task tokens — transformers.js doesn't wire this up itself, so the
-// prefix is built from the model's own _retrieve_init_tokens and the tokenizer).
-// `language` picks the decoder's language token; English-only (.en) models ignore it.
+// opts = { language }: `language` picks the decoder's language token; English-only (.en) models ignore it.
+// There is no vocabulary prior. A prefix of the workspace's names was once fed to the decoder through
+// `decoder_input_ids`; on the WebGPU path that threw ("Cannot convert [object Object] to a BigInt", and in the
+// app "Session mismatch"), so every transcription that listened with the default prior died in the decoder.
+// Plain transcription is what transformers.js supports, and it is what runs.
 export async function transcribe(fileOrBuf, onProgress, model, opts) {
   opts = opts || {}; model = model || 'onnx-community/whisper-base';
   onProgress && onProgress({ stage: 'loading model' });
@@ -191,17 +191,7 @@ export async function transcribe(fileOrBuf, onProgress, model, opts) {
   const CH = 30 * 16000, segs = [];
   const lang = opts.language && opts.language !== 'auto' ? opts.language : null;
   const englishOnly = /\.en$/.test(model);
-  let decPrefix = null;
-  if (opts.prompt || lang) {
-    try {
-      const g = await _asr.model._prepare_generation_config(null, { return_timestamps: true, ...(englishOnly ? {} : lang ? { language: lang } : {}) });
-      let init = _asr.model._retrieve_init_tokens ? _asr.model._retrieve_init_tokens(g) : null;
-      if (opts.prompt && _asr.tokenizer) { const tok = await _asr.tokenizer(opts.prompt, { add_special_tokens: false }); if (tok && tok.input_ids) init = [...init, ...tok.input_ids]; }
-      decPrefix = init;
-    } catch (e) { onProgress && onProgress({ stage: 'prior unavailable (' + (e && e.message || e) + ') — transcribing without it' }); }
-  }
   const extra = { return_timestamps: true, chunk_length_s: 30 };
-  if (decPrefix) extra.decoder_input_ids = decPrefix;
   if (lang && !englishOnly) extra.language = lang;
   const nChunks = total ? Math.max(1, Math.ceil(total / 30)) : null; let ci = 0, heard = 0;
   onProgress && onProgress({ stage: 'transcribing', pct: 0, i: 1, n: nChunks });
@@ -214,5 +204,5 @@ export async function transcribe(fileOrBuf, onProgress, model, opts) {
     // show the words appearing without copying a three-hour transcript every 30 seconds.
     onProgress && onProgress({ stage: 'transcribing', pct: total ? Math.min(100, Math.round(heard / total * 100)) : null, i: ci + (total && heard < total ? 1 : 0), n: nChunks || ci, partial: segs }); }
   onProgress && onProgress({ stage: 'done', pct: 100, partial: segs });
-  return { source: 'in-browser-whisper', model, segments: segs, duration: heard, priors: { prompt: opts.prompt || null, language: englishOnly ? 'en' : (lang || 'auto') } };
+  return { source: 'in-browser-whisper', model, segments: segs, duration: heard, priors: { prompt: null, language: englishOnly ? 'en' : (lang || 'auto') } };
 }

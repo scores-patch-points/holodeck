@@ -219,36 +219,47 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
     <sc-if value="{{ railOpen }}" hint-placeholder-val="{{ true }}">
     <div class="hd-workspace" style="display:flex;flex-direction:column;gap:6px;padding:8px 2px 2px;border-top:1px solid var(--line)">
       <span style="font:600 12px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--acc);padding:0 10px">Workspace</span>
-      <button onClick="{{ wsOpenMgr }}" title="Find, switch, rename or delete workspaces" style="display:flex;align-items:center;gap:8px;width:100%;box-sizing:border-box;background:var(--s2);border:1px solid var(--line2);border-radius:8px;color:var(--ink);font:500 14px var(--sans);padding:7px 10px;cursor:pointer;text-align:left" style-hover="border-color:var(--acc)"><span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ corpusName }}</span><span style="flex:none;font:500 12px var(--mono);color:var(--mut)">{{ wsCount }} ▾</span></button>
+      <sc-if value="{{ wsRenaming }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;gap:4px;align-items:center">
+          <input value="{{ wsNameDraft }}" onChange="{{ onWsNameDraft }}" onKeyDown="{{ onWsRenameKey }}" aria-label="Name for this workspace" autofocus="{{ true }}" style="flex:1;min-width:0;background:var(--s2);border:1px solid var(--acc2);border-radius:8px;color:var(--ink);font:500 14px var(--sans);padding:6px 9px;outline:none">
+          <button onClick="{{ onWsRenameSave }}" aria-label="Save the new name" style="background:var(--acc2);border:0;color:#fff;border-radius:8px;cursor:pointer;font:600 13px var(--sans);padding:6px 9px">✓</button>
+          <button onClick="{{ onWsRenameCancel }}" aria-label="Cancel" style="background:none;border:0;color:var(--mut);cursor:pointer;font:600 13px var(--sans);padding:6px 7px">✕</button>
+        </div>
+      </sc-if>
+      <sc-if value="{{ wsNotRenaming }}" hint-placeholder-val="{{ true }}">
+        <div style="position:relative">
+          <button onClick="{{ wsPopToggle }}" onDoubleClick="{{ onWsRenameStart }}" aria-haspopup="menu" aria-expanded="{{ wsPopOpen }}" aria-label="Workspace: {{ corpusName }}. Switch, or double-click to rename" style="display:flex;align-items:center;gap:8px;width:100%;box-sizing:border-box;background:var(--s2);border:1px solid var(--line2);border-radius:8px;color:var(--ink);font:500 14px var(--sans);padding:7px 10px;cursor:pointer;text-align:left" style-hover="border-color:var(--acc)"><span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ corpusName }}</span><span style="flex:none;font:500 12px var(--mono);color:var(--mut)">▾</span></button>
+          <sc-if value="{{ wsPopOpen }}" hint-placeholder-val="{{ false }}">
+            <div onClick="{{ wsPopClose }}" style="position:fixed;inset:0;z-index:40"></div>
+            <div role="menu" aria-label="Workspaces" style="position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:41;background:var(--s1);border:1px solid var(--line2);border-radius:10px;padding:5px;box-shadow:0 12px 32px rgba(0,0,0,.35);display:flex;flex-direction:column;gap:1px;max-height:70vh;overflow:auto">
+              <sc-for list="{{ wsQuick }}" as="w" hint-placeholder-count="3">
+                <button role="menuitemradio" aria-checked="{{ w.current }}" onClick="{{ w.onOpen }}" style="display:flex;align-items:center;gap:8px;width:100%;box-sizing:border-box;background:none;border:0;border-radius:7px;color:var(--ink);font:500 13.5px var(--sans);padding:6px 8px;cursor:pointer;text-align:left;background:{{ w.bg }}" style-hover="background:var(--s2)"><span style="flex:none;width:14px;color:var(--acc);font-size:12px">{{ w.mark }}</span><span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ w.name }}</span><span style="flex:none;font:500 11.5px var(--mono);color:var(--mut)">{{ w.n }}</span></button>
+              </sc-for>
+              <sc-if value="{{ wsHasMore }}" hint-placeholder-val="{{ false }}"><button role="menuitem" onClick="{{ wsOpenMgr }}" style="display:flex;align-items:center;gap:8px;width:100%;box-sizing:border-box;background:none;border:0;border-radius:7px;color:var(--ink);font:500 13.5px var(--sans);padding:6px 8px;cursor:pointer;text-align:left;color:var(--acc)" style-hover="background:var(--s2)">{{ wsMoreLabel }}</button></sc-if>
+              <div style="height:1px;background:var(--line);margin:4px 2px"></div>
+              <sc-if value="{{ wsAdding }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;gap:4px;padding:2px">
+                  <input value="{{ wsNewName }}" onChange="{{ onWsNewName }}" onKeyDown="{{ onWsNewKey }}" placeholder="Name it, then Enter" aria-label="Name for the new workspace" autofocus="{{ true }}" style="flex:1;min-width:0;background:var(--s2);border:1px solid var(--acc2);border-radius:8px;color:var(--ink);font:400 13.5px var(--sans);padding:6px 9px;outline:none">
+                  <button onClick="{{ onWsNew }}" aria-label="Create the workspace" style="background:var(--acc2);border:0;color:#fff;border-radius:8px;cursor:pointer;font:600 13px var(--sans);padding:0 10px">✓</button>
+                </div>
+              </sc-if>
+              <sc-if value="{{ wsNotAdding }}" hint-placeholder-val="{{ true }}"><button role="menuitem" onClick="{{ wsAddStart }}" style="display:flex;align-items:center;gap:8px;width:100%;box-sizing:border-box;background:none;border:0;border-radius:7px;color:var(--ink);font:500 13.5px var(--sans);padding:6px 8px;cursor:pointer;text-align:left" style-hover="background:var(--s2)"><span style="flex:none;width:14px;color:var(--mut)">＋</span>New workspace…</button></sc-if>
+              <button role="menuitem" onClick="{{ onWsRenameStart }}" style="display:flex;align-items:center;gap:8px;width:100%;box-sizing:border-box;background:none;border:0;border-radius:7px;color:var(--ink);font:500 13.5px var(--sans);padding:6px 8px;cursor:pointer;text-align:left" style-hover="background:var(--s2)"><span style="flex:none;width:14px;color:var(--mut)">✎</span><span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Rename “{{ corpusName }}”</span></button>
+              <sc-if value="{{ wsDeleting }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;flex-direction:column;gap:6px;padding:6px 8px">
+                  <span style="font:400 12.5px/1.4 var(--sans);color:var(--bad)">Delete “{{ corpusName }}” and everything in it?</span>
+                  <span style="display:flex;gap:6px"><button onClick="{{ onWsDelYes }}" style="background:var(--bad);border:0;color:#fff;border-radius:8px;cursor:pointer;font:600 13px var(--sans);padding:5px 10px">Delete for good</button><button onClick="{{ onWsDelNo }}" style="background:none;border:1px solid var(--line2);color:var(--ink2);border-radius:8px;cursor:pointer;font:500 13px var(--sans);padding:5px 10px">Keep</button></span>
+                </div>
+              </sc-if>
+              <sc-if value="{{ wsNotDeleting }}" hint-placeholder-val="{{ true }}"><button role="menuitem" onClick="{{ onWsDelAsk }}" style="display:flex;align-items:center;gap:8px;width:100%;box-sizing:border-box;background:none;border:0;border-radius:7px;color:var(--ink);font:500 13.5px var(--sans);padding:6px 8px;cursor:pointer;text-align:left;color:var(--mut)" style-hover="background:var(--s2);color:var(--bad)"><span style="flex:none;width:14px">✕</span>Delete this workspace…</button></sc-if>
+            </div>
+          </sc-if>
+        </div>
+      </sc-if>
       <sc-if value="{{ hasContent }}" hint-placeholder-val="{{ true }}">
       <button class="hd-railadd" onClick="{{ openAdd }}" title="Add a source: a file, a folder, a link or pasted text" style="width:100%;box-sizing:border-box;background:var(--acc2);border:0;color:#fff;border-radius:8px;padding:6px 10px;cursor:pointer;font:600 14px var(--sans)" style-hover="background:var(--acc3)">Add source</button>
       <sc-if value="{{ folderActive }}" hint-placeholder-val="{{ false }}"><button onClick="{{ clearFolder }}" style="width:100%;box-sizing:border-box;background:transparent;border:1px solid var(--line2);border-radius:8px;padding:4px 10px;cursor:pointer;font:500 12px var(--sans);color:var(--acc)" style-hover="border-color:var(--acc)">Clear folder scope ×</button></sc-if>
       </sc-if>
-      <details class="hd-disclosure hd-wsmore">
-      <summary title="Rename or delete this workspace, or start a new one">Rename · Delete · New</summary>
-      <sc-if value="{{ wsRenaming }}" hint-placeholder-val="{{ false }}">
-        <div style="display:flex;gap:4px;align-items:center">
-          <input value="{{ wsNameDraft }}" onChange="{{ onWsNameDraft }}" onKeyDown="{{ onWsRenameKey }}"  title="Name for this workspace" style="flex:1;min-width:0;background:var(--s2);border:1px solid var(--acc2);border-radius:8px;color:var(--ink);font:400 13px var(--sans);padding:5px 9px;outline:none">
-          <button onClick="{{ onWsRenameSave }}" title="Save the new name" style="background:var(--acc2);border:0;color:#fff;border-radius:8px;cursor:pointer;font:600 13px var(--sans);padding:6px 9px">✓</button>
-          <button onClick="{{ onWsRenameCancel }}" title="Cancel" style="background:none;border:0;color:var(--mut);cursor:pointer;font:600 13px var(--sans);padding:6px 7px">✕</button>
-        </div>
-      </sc-if>
-      <div style="display:flex;gap:4px">
-        <sc-if value="{{ wsDeleting }}" hint-placeholder-val="{{ false }}">
-          <span style="flex:1;min-width:0;font:400 12px/1.4 var(--sans);color:var(--bad);align-self:center">Delete “{{ corpusName }}” and everything in it?</span>
-          <button onClick="{{ onWsDelYes }}" style="background:none;border:1px solid var(--bad);border-radius:8px;color:var(--bad);cursor:pointer;font:600 13px var(--sans);padding:5px 9px">Delete</button>
-          <button onClick="{{ onWsDelNo }}" style="background:none;border:0;color:var(--mut);cursor:pointer;font:500 13px var(--sans);padding:5px 6px">Cancel</button>
-        </sc-if>
-        <sc-if value="{{ wsNotDeleting }}" hint-placeholder-val="{{ true }}">
-          <button onClick="{{ onWsRenameStart }}" title="Rename this workspace" style="background:none;border:1px solid var(--line2);border-radius:8px;color:var(--ink2);cursor:pointer;font:500 13px var(--sans);padding:6px 10px" style-hover="border-color:var(--acc)">✎ Rename</button>
-          <button onClick="{{ onWsDelAsk }}" title="Delete this workspace" style="background:none;border:1px solid var(--line2);border-radius:8px;color:var(--mut);cursor:pointer;font:500 13px var(--sans);padding:6px 10px" style-hover="border-color:var(--bad);color:var(--bad)">✕ Delete</button>
-        </sc-if>
-      </div>
-      <div style="display:flex;gap:4px">
-        <input value="{{ wsNewName }}" onChange="{{ onWsNewName }}" onKeyDown="{{ onWsNewKey }}" placeholder="New workspace…" title="Name a new workspace, then press Enter or ＋ New" style="flex:1;min-width:0;background:var(--s2);border:1px solid var(--line2);border-radius:8px;color:var(--ink);font:400 13px var(--sans);padding:6px 9px;outline:none">
-        <button onClick="{{ onWsNew }}" title="Create a new workspace" style="flex:none;background:var(--s2);border:1px solid var(--line2);border-radius:8px;color:var(--ink2);cursor:pointer;font:600 13px var(--sans);padding:0 10px;white-space:nowrap" style-hover="border-color:var(--acc)">＋ New</button>
-      </div>
-      </details>
     </div>
     <sc-if value="{{ hasContent }}" hint-placeholder-val="{{ false }}">
     <details class="hd-disclosure" open="{{ foldersOpen }}">
@@ -2561,6 +2572,7 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
                     <button onClick="{{ rdMedia.onStopRecord }}" title="Stop — pause, rewind to the start, and clear the marking so you can read the transcript" style="background:none;border:1px solid var(--line2);border-radius:8px;height:30px;padding:0 11px;cursor:pointer;font:500 13px var(--sans);color:var(--ink2)" style-hover="border-color:var(--bad)">■ Stop</button>
                     <span id="fx-tm" style="font:600 12.5px var(--mono);color:var(--ink2);white-space:nowrap">{{ rdMedia.timeLabel }}</span>
                     <span id="fx-st" style="font:500 12px var(--sans);color:var(--mut);white-space:nowrap">{{ rdMedia.statusLabel }}</span>
+                    <sc-if value="{{ rdMedia.canTx }}" hint-placeholder-val="{{ false }}"><button onClick="{{ rdMedia.onTx }}" aria-label="Transcribe this recording here, in this browser" style="margin-left:auto;height:30px;padding:0 14px;border:0;border-radius:8px;background:var(--acc2);color:#fff;cursor:pointer;font:600 13px var(--sans);white-space:nowrap">Transcribe</button></sc-if>
                   </div>
                 </sc-if>
                 <sc-if value="{{ rdMedia.ytOnly }}" hint-placeholder-val="{{ false }}">
@@ -2597,28 +2609,22 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
                 <sc-if value="{{ rdMedia.canAsk }}" hint-placeholder-val="{{ false }}">
                   <sc-if value="{{ rdMedia.ask }}" hint-placeholder-val="{{ false }}">
                     <div style="display:flex;flex-direction:column;gap:10px;border:1px solid var(--acc2);background:var(--sel);border-radius:12px;padding:12px 14px">
-                      <span style="font:600 13px var(--sans);color:var(--ink)">Which priors should the transcriber listen with?</span>
+                      <span style="font:600 13px var(--sans);color:var(--ink)">Transcribe this recording</span>
                       <span style="font:400 12.5px/1.45 var(--sans);color:var(--mut);text-wrap:pretty">{{ rdMedia.priorNote }}</span>
-                      <div style="display:flex;flex-direction:column;gap:6px">
-                        <label style="display:flex;gap:8px;align-items:flex-start;cursor:pointer;font:500 13px var(--sans);color:var(--ink)"><input type="radio" name="fx-prior" checked="{{ rdMedia.pw }}" onChange="{{ rdMedia.onPriorW }}">The names this workspace already knows</label>
-                        <label style="display:flex;gap:8px;align-items:flex-start;cursor:pointer;font:500 13px var(--sans);color:var(--ink)"><input type="radio" name="fx-prior" checked="{{ rdMedia.pn }}" onChange="{{ rdMedia.onPriorN }}">Plain English — no vocabulary prior</label>
-                        <label style="display:flex;gap:8px;align-items:flex-start;cursor:pointer;font:500 13px var(--sans);color:var(--ink)"><input type="radio" name="fx-prior" checked="{{ rdMedia.pm }}" onChange="{{ rdMedia.onPriorM }}">My own terms</label>
-                        <sc-if value="{{ rdMedia.pm }}" hint-placeholder-val="{{ false }}"><input onChange="{{ rdMedia.onTerms }}" placeholder="names, places, jargon, separated by commas" style="font:400 13px var(--sans);color:var(--ink);background:var(--s1);border:1px solid var(--line2);border-radius:6px;padding:6px 9px;outline:none"></sc-if>
-                      </div>
                       <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
                         <label style="display:flex;gap:6px;align-items:center;font:500 13px var(--sans);color:var(--ink2)">Language<select onChange="{{ rdMedia.onLang }}" value="{{ rdMedia.lang }}" style="font:400 13px var(--sans);color:var(--ink);background:var(--s1);border:1px solid var(--line2);border-radius:6px;padding:4px 6px"><sc-for list="{{ rdMedia.langs }}" as="l" hint-placeholder-count="2"><option value="{{ l.v }}">{{ l.l }}</option></sc-for></select></label>
                         <label style="display:flex;gap:6px;align-items:center;font:500 13px var(--sans);color:var(--ink2)">Recognizer<select onChange="{{ rdMedia.onModel }}" value="{{ rdMedia.model }}" style="font:400 13px var(--sans);color:var(--ink);background:var(--s1);border:1px solid var(--line2);border-radius:6px;padding:4px 6px"><sc-for list="{{ rdMedia.models }}" as="m" hint-placeholder-count="2"><option value="{{ m.v }}">{{ m.l }}</option></sc-for></select></label>
                       </div>
                       <div style="display:flex;gap:8px;align-items:center">
-                        <button onClick="{{ rdMedia.onTx }}" style="border:0;background:var(--acc2);color:#fff;border-radius:8px;padding:7px 14px;cursor:pointer;font:600 13px var(--sans)">Transcribe with these priors</button>
+                        <button onClick="{{ rdMedia.onTx }}" style="border:0;background:var(--acc2);color:#fff;border-radius:8px;padding:7px 14px;cursor:pointer;font:600 13px var(--sans)">Transcribe</button>
                         <button onClick="{{ rdMedia.onCancelAsk }}" style="border:1px solid var(--line2);background:transparent;color:var(--mut);border-radius:8px;padding:7px 12px;cursor:pointer;font:500 13px var(--sans)">Cancel</button>
                       </div>
                     </div>
                   </sc-if>
                   <sc-if value="{{ rdMedia.noAsk }}" hint-placeholder-val="{{ true }}">
                     <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-                      <button onClick="{{ rdMedia.onAsk }}" style="border:0;background:var(--acc2);color:#fff;border-radius:8px;padding:7px 14px;cursor:pointer;font:600 13px var(--sans)">Transcribe it (Whisper, in this browser)</button>
-                      <span style="font:400 12.5px var(--sans);color:var(--mut)">You'll be asked which priors it should listen with.</span>
+                      <button onClick="{{ rdMedia.onAsk }}" style="border:1px solid var(--line2);background:transparent;color:var(--ink2);border-radius:8px;padding:5px 12px;cursor:pointer;font:500 13px var(--sans)">Language and recognizer…</button>
+                      <span style="font:400 12.5px var(--sans);color:var(--mut)">Transcription runs in this browser; the recording does not leave this machine.</span>
                     </div>
                   </sc-if>
                 </sc-if>
@@ -4819,12 +4825,16 @@ function loadScript(src) { return new Promise((res, rej) => { if (document.query
 // "✦ Explore this page" bookmarklet — so no third party learns what is being read. GitHub, Wikipedia,
 // the Internet Archive, and the open scholarly graph (OpenAlex, Crossref) answer a browser directly
 // with no key, so only those can be searched.
+// The first scope is the one the search box opens on, so it is the general one; GitHub is one source among
+// several and sits last (a person who searches it keeps it: the choice is remembered, hd:add-scope).
 const SEARCH_SCOPES = [
-  { id: 'github', label: 'GitHub', ask: 'Search GitHub repositories' },
   { id: 'wikipedia', label: 'Wikipedia', ask: 'Search Wikipedia articles' },
   { id: 'archive', label: 'Internet Archive', ask: 'Search books, documents and recordings' },
+  { id: 'duckduckgo', label: 'DuckDuckGo', ask: 'Search the web with DuckDuckGo' },
+  { id: 'bing', label: 'Bing', ask: 'Search the web with Bing' },
   { id: 'openalex', label: 'Papers · OpenAlex', ask: 'Search research papers (OpenAlex)' },
   { id: 'crossref', label: 'Papers · Crossref', ask: 'Search research papers (Crossref)' },
+  { id: 'github', label: 'GitHub', ask: 'Search GitHub repositories' },
 ];
 function githubRepoOf(url) {
   const m = String(url).match(/^https?:\/\/(?:www\.)?github\.com\/([\w.-]+)\/([\w.-]+?)(?:\.git)?\/?(?:[?#].*)?$/i);
@@ -4859,6 +4869,30 @@ async function searchSources(scope, q, page) {
     let j = null; try { j = await r.json(); } catch (e) {}
     return { r, j };
   };
+  if (scope === 'duckduckgo' || scope === 'bing') {
+    // Neither engine answers a cross-origin read, so the results page is fetched through the same public relays
+    // the page reader uses — which means the relay sees the query. That is stated on the results line, not hidden;
+    // a person who would rather not can open the engine's own page (the address is in the error when no relay answers).
+    const ddg = scope === 'duckduckgo', who = ddg ? 'DuckDuckGo' : 'Bing';
+    const target = ddg ? 'https://html.duckduckgo.com/html/?q=' + encodeURIComponent(q) : 'https://www.bing.com/search?setlang=en&q=' + encodeURIComponent(q) + (page ? '&first=' + (page * 10 + 1) : '');
+    const relays = [u => 'https://api.allorigins.win/raw?url=' + encodeURIComponent(u), u => 'https://corsproxy.io/?url=' + encodeURIComponent(u), u => 'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(u)];
+    let html = '', via = '';
+    for (const rl of relays) {
+      try { const r = await fetchT(rl(target), 15000); if (!r.ok) continue; const t = await r.text(); if (t && t.length > 400 && /result|b_algo/.test(t)) { html = t; via = new URL(rl('https://x.test/')).hostname.replace(/^api\./, ''); break; } } catch (e) {}
+    }
+    if (!html) throw new Error(who + ' did not answer through any public relay, and its own page cannot be read from this browser. Open ' + (ddg ? 'https://duckduckgo.com/?q=' : 'https://www.bing.com/search?q=') + encodeURIComponent(q) + ' in a tab, and paste the link you want here.');
+    const doc = new DOMParser().parseFromString(html, 'text/html'); const out = [];
+    const unwrap = href => { try { const u = new URL(href, ddg ? 'https://duckduckgo.com/' : 'https://www.bing.com/');
+      const dd = u.searchParams.get('uddg'); if (dd) return dd;
+      const b = u.searchParams.get('u'); if (b && /^a1/.test(b)) { const x = atob(b.slice(2).replace(/-/g, '+').replace(/_/g, '/')); if (/^https?:/.test(x)) return x; }
+      return u.href; } catch (e) { return ''; } };
+    if (ddg) doc.querySelectorAll('.result, .web-result').forEach(el => { const a = el.querySelector('a.result__a'); if (!a) return; const url = unwrap(a.getAttribute('href') || ''); if (!/^https?:/.test(url) || /duckduckgo\.com\/y\.js/.test(url)) return;
+      out.push({ title: plainText(a.textContent), url, snippet: plainText((el.querySelector('.result__snippet') || {}).textContent || ''), source: 'DuckDuckGo', meta: (() => { try { return new URL(url).hostname.replace(/^www\./, ''); } catch (e) { return ''; } })() }); });
+    else doc.querySelectorAll('li.b_algo').forEach(el => { const a = el.querySelector('h2 a'); if (!a) return; const url = unwrap(a.getAttribute('href') || ''); if (!/^https?:/.test(url)) return;
+      out.push({ title: plainText(a.textContent), url, snippet: plainText(((el.querySelector('.b_caption p') || el.querySelector('p') || {}).textContent) || ''), source: 'Bing', meta: (() => { try { return new URL(url).hostname.replace(/^www\./, ''); } catch (e) { return ''; } })() }); });
+    if (!out.length) throw new Error(who + ' answered, but no results could be read from its page (it may have asked for a check). Open ' + (ddg ? 'https://duckduckgo.com/?q=' : 'https://www.bing.com/search?q=') + encodeURIComponent(q) + ' in a tab.');
+    return { results: out, more: !ddg && out.length >= 8, engine: who + ' · read through ' + via + ', which sees the query' };
+  }
   if (scope === 'github') {
     const { r, j } = await getJson('https://api.github.com/search/repositories?per_page=30&page=' + (page + 1) + '&q=' + encodeURIComponent(q), 'GitHub');
     if (r.status === 403 || r.status === 429) throw new Error('GitHub is limiting searches from this browser. Wait a minute and try again.');
@@ -5549,7 +5583,7 @@ class Component extends DCLogic {
       // A recording opened but never classified gets its sound map on first sight (an
       // older stored recording, or one added before the classifier existed); the work
       // is the same in-browser rung, guarded so it happens once until it lands.
-      if (this.clsOn() && !rd0.soundSpans && !this.clsBusy(rd0.id) && !(rd0.media.dur != null && rd0.media.dur > 6 * 3600)) {
+      if (this.clsOn() && !this.state.txBusy && !rd0.soundSpans && !this.clsBusy(rd0.id) && !(rd0.media.dur != null && rd0.media.dur > 6 * 3600)) {
         (this._clsQueued = this._clsQueued || {});
         if (!this._clsQueued[rd0.id]) { this._clsQueued[rd0.id] = 1; this.classifyDoc(rd0).catch(() => {}); }
       }
@@ -6565,6 +6599,23 @@ class Component extends DCLogic {
     } catch (e) { hdT('cls', 'fail', 'Sound classification failed: ' + (e && e.message || e)); }
     finally { this._clsBusy.delete(id); this.forceUpdate && this.forceUpdate(); }
   }
+  // A recording arrives and the work begins on its own, one thing at a time, so the two never compete for the
+  // tab: audio is transcribed first (the reader opens on a lone file so the words are watched as they stream in),
+  // and only once that has finished is its sound mapped — what is happening in it, like clapping or music.
+  // hd:autoTx="off" and hd:cls="off" turn the two off. A failure in either is its own and stops nothing else.
+  soundWork(recs, defer) {
+    const run = async () => {
+      for (const { d, buf } of recs) {
+        for (let i = 0; i < 60 && !this.analysis().docById[d.id]; i++) await new Promise(r => setTimeout(r, 100));
+        if (!defer && d.medium === 'Audio' && this.autoTxOn()) {
+          if (recs.length === 1) this.setState({ view: 'reader', readDoc: d.id, sel: { type: 'doc', id: d.id } });
+          try { await this.transcribeLocal(d, buf); } catch (e) { hdT('tx', 'fail', 'Transcription failed: ' + (e && e.message || e)); }
+        }
+        if (this.clsOn()) { try { await this.classifyDoc(this.analysis().docById[d.id] || d, buf); } catch (e) {} }
+      }
+    };
+    this._soundQ = (this._soundQ || Promise.resolve()).then(run, run);
+  }
   // The clean-up pass after a transcript lands: the names the recording is the only
   // source of are the ones the hyperlexicon doesn't know yet — surfaced with a
   // "what else to know about" door, not folded silently into the pinch.
@@ -6646,14 +6697,8 @@ class Component extends DCLogic {
       if (d0.media && d0.media.kind === 'youtube') { this.setState({ view: 'reader', readDoc: d0.id, txAsk: d0.id, note: '' }); this.toast('YouTube audio isn’t stored in this browser — in the reader, choose the file you downloaded and it is transcribed here.'); return; }
       this.setState({ txAsk: null, note: 'The recording’s bytes aren’t stored in this browser.' }); this.toast('The recording’s audio isn’t kept in this browser — nothing has been read from it yet.'); return;
     }
-    let prompt = null, priorNote = 'no vocabulary prior';
-    if (prior !== 'none') {
-      const names = [...new Set(A.sts.flatMap(s => s.names).filter(n => { const r = A.names[n]; return r && (r.type === 'person' || r.type === 'organisation' || r.type === 'place') && n.length <= 40; }))]
-        .map(n => [n, A.names[n].sts.length]).sort((a, b) => b[1] - a[1]).slice(0, 80).map(x => x[0]);
-      if (names.length) { prompt = names.join(', '); priorNote = 'the ' + names.length + ' names this workspace already knows'; }
-    }
-    const terms = (this._txTerms || '').trim();
-    if (terms) { prompt = prompt ? prompt + ', ' + terms : terms; priorNote = priorNote === 'no vocabulary prior' ? 'the terms you typed' : priorNote + ' and the terms you typed'; }
+    // Plain transcription: no vocabulary prior (it broke the decoder, see fold-net.js transcribe).
+    const prompt = null, priorNote = 'no vocabulary prior';
     const lang = this.state.txLang || 'en';
     const model = this.state.txModel === 'small' ? 'onnx-community/whisper-small' : this.state.txModel === 'smallen' ? 'onnx-community/whisper-small.en' : 'onnx-community/whisper-base';
     this.txReset(d0.id); this.setState({ txAsk: null });
@@ -6677,14 +6722,8 @@ class Component extends DCLogic {
   }
   async transcribeYt(d0, file) {
     const A = this.analysis(); const prior = this.state.txPrior || 'workspace';
-    let prompt = null, priorNote = 'no vocabulary prior';
-    if (prior !== 'none') {
-      const names = [...new Set(A.sts.flatMap(s => s.names).filter(n => { const r = A.names[n]; return r && (r.type === 'person' || r.type === 'organisation' || r.type === 'place') && n.length <= 40; }))]
-        .map(n => [n, A.names[n].sts.length]).sort((a, b) => b[1] - a[1]).slice(0, 80).map(x => x[0]);
-      if (names.length) { prompt = names.join(', '); priorNote = 'the ' + names.length + ' names this workspace already knows'; }
-    }
-    const terms = (this._txTerms || '').trim();
-    if (terms) { prompt = prompt ? prompt + ', ' + terms : terms; priorNote = priorNote === 'no vocabulary prior' ? 'the terms you typed' : priorNote + ' and the terms you typed'; }
+    // Plain transcription: no vocabulary prior (it broke the decoder, see fold-net.js transcribe).
+    const prompt = null, priorNote = 'no vocabulary prior';
     const lang = this.state.txLang || 'en';
     const model = this.state.txModel === 'small' ? 'onnx-community/whisper-small' : this.state.txModel === 'smallen' ? 'onnx-community/whisper-small.en' : 'onnx-community/whisper-base';
     this.txReset(d0.id); this.setState({ txAsk: null });
@@ -7454,7 +7493,7 @@ class Component extends DCLogic {
     const nm = (name || 'Untitled workspace').trim() || 'Untitled workspace';
     const added = { ...this.state.added, [id]: [] }; this.saveAdded(added);
     try { saveWorkspaceNames({ ...loadWorkspaceNames(), [id]: nm }); } catch (e) {}
-    this.setState({ added, corpus: id, view: 'ingest', sel: null, f: {}, q: '', readDoc: null, just: null, wsNewName: '' });
+    this.setState({ added, corpus: id, view: 'ingest', sel: null, f: {}, q: '', readDoc: null, just: null, wsNewName: '', wsPop: false, wsAdding: false });
     this.toast('New workspace “' + nm + '” — describe its research task below.');
   }
   newWorkspace() { this.createWorkspace((this.state.wsNewName || '').trim()); }
@@ -8369,20 +8408,11 @@ class Component extends DCLogic {
     nd.forEach(d => { d.status = 'source'; });
     if (!(T.focus instanceof Set)) T.focus = new Set(T.focus || []); nd.forEach(d => T.focus.add(d.id)); nd.forEach(d => hdT('store', 'mint', 'Stored \u201c' + hdCut(d.title, 60) + '\u201d as ' + d.id + (list[nd.indexOf(d)].html ? ' \u00b7 full page kept; ' + d.text.length.toLocaleString() + ' characters indexed for search' + (d.text.length >= 60000 ? ' (the cap; the reading below uses the whole page)' : '') : ' \u00b7 ' + d.text.length.toLocaleString() + ' characters kept'), { doc: d.id }));
     nd.forEach((d, i) => { const x = list[i]; if (x.html) { this._html[d.id] = x.html; idbPut('html:' + d.id, x.html).catch(() => {}); } if (x.pdf) idbPut('pdf:' + d.id, x.pdf).catch(() => {}); if (x.ocr) idbPut('ocr:' + d.id, x.ocr).catch(() => {}); if (x.eyesDetail) idbPut('eyes:' + d.id, x.eyesDetail).catch(() => {}); if (x.buf) { idbPut('media:' + d.id, x.buf).catch(() => {}); opfsWrite('media/' + d.id, x.buf); } if (d.hasImg && HD_PENDING_IMG['img:' + d.title]) { const u = HD_PENDING_IMG['img:' + d.title]; this._html['img:' + d.id] = u; idbPut('img:' + d.id, u).catch(() => {}); delete HD_PENDING_IMG['img:' + d.title]; } });
-    // A recording arrives and the work begins on its own: the sounds are classified at
-    // the chunks where the kind changes, and a lone audio file is transcribed right away —
-    // the reader opens on it so the words are watched as they stream in (both settable:
-    // hd:cls="off", hd:autoTx="off"). Nothing is transcribed without being kept.
+    // A recording arrives and the work begins on its own, one thing at a time (soundWork): audio is transcribed
+    // right away, and only then is its sound mapped. Nothing is transcribed without being kept.
     const recs = [];
     nd.forEach((d, i) => { const x = list[i]; if (!x.buf) return; if (!(d.media && d.media.kind === 'local')) return; if (!d.medium || d.transcribed) return; recs.push({ d, buf: x.buf }); });
-    if (recs.length) {
-      if (this.clsOn()) recs.forEach(({ d, buf }) => this.classifyDoc(d, buf).catch(() => {}));
-      if (!(aopt && aopt.defer) && recs.length === 1 && recs[0].d.medium === 'Audio' && this.autoTxOn()) {
-        const r0 = recs[0];
-        this.setState({ view: 'reader', readDoc: r0.d.id, sel: { type: 'doc', id: r0.d.id } });
-        this.transcribeLocal(r0.d, r0.buf);
-      }
-    }
+    if (recs.length) setTimeout(() => this.soundWork(recs, !!(aopt && aopt.defer)), 0);
     // Store first, then paint: each source lands in the workspace (and its bytes in IndexedDB) before the read and
     // the fold, so Sources fills in as the files arrive instead of freezing until the whole batch is done.
     const added = { ...this.state.added, [id]: [...(this.state.added[id] || []), ...nd] };
@@ -9377,7 +9407,14 @@ class Component extends DCLogic {
           onAsk: () => this.setState({ view: 'ask', akMode: 'chat' }), onBuild: () => this.setState({ view: 'ask', akMode: 'generate', akPane: 'sources' }),
           onAll: () => this.setState({ offDocs: {}, foldBand: false, view: 'summary' }) }; })(),
       drv: { ...drv, stats: hdr.sub || '', onKey: e => { if (e.key !== 'Enter') return; const live = (e.target.value || '').trim(); if (!live) return; this.setState({ dvQ: '' }); if (isOmniUrl(live)) omniOpen(live); else omniGo(live); } }, drvd, svGrid: svMode === 'grid' || svMode === 'cards', svList: svMode === 'list',
-      wsm, wsCount: wsAll.length, wsOpenMgr: () => this.setState({ wsOpen: true, wsQ: '', wsShown: 40, wsEdit: null, wsDelAsk: null }),
+      wsm, wsCount: wsAll.length, wsOpenMgr: () => this.setState({ wsOpen: true, wsPop: false, wsQ: '', wsShown: 40, wsEdit: null, wsDelAsk: null }),
+      // the switcher: the few most recent workspaces in a menu under the name (the manager, with search and sort, is
+      // one row away); rename is in the menu or by double-clicking the name; delete asks inside the menu
+      wsPopOpen: !!S.wsPop, wsPopToggle: () => this.setState(st => ({ wsPop: !st.wsPop, wsAdding: false, wsDeleting: false })), wsPopClose: () => this.setState({ wsPop: false, wsAdding: false, wsDeleting: false }),
+      wsQuick: wsAll.slice().sort((a, b) => (a.id === cid ? -1 : b.id === cid ? 1 : (b.at - a.at) || a.name.localeCompare(b.name))).slice(0, 6).map(w => ({ name: w.name, n: String(w.n), current: w.id === cid, mark: w.id === cid ? '✓' : '', bg: w.id === cid ? 'var(--sel)' : 'transparent', onOpen: () => { wsOpenIt(w.id); this.setState({ wsPop: false }); } })),
+      wsHasMore: wsAll.length > 6, wsMoreLabel: 'All ' + wsAll.length + ' workspaces…',
+      wsAdding: !!S.wsAdding, wsNotAdding: !S.wsAdding, wsAddStart: () => this.setState({ wsAdding: true, wsNewName: '' }),
+      wsNotRenaming: !S.wsRenaming,
       corpusId: cid, corpusOptions: opts, q: S.q, corpusName: this.corpusName(), segList, hasSegments, segOpen, segToggleLabel, segCount, toggleSegOpen, addAsFold, navTop, navRead, navExplore, navRest,
       topicsList, hasTopics, topicsOpen: !!activeTopicGroup || !!topicsQ, topicsLabel: P.groups.length ? 'Topics · ' + P.groups.length : 'Topics', topicsNote, hasTopicsNote, topicsStrayN, showTopicsStray, onTopicsStray, scope,
       topicsHasSearch, topicsSearchVal, onTopicsSearch, topicsHasPager, topicsPagerLine, onTopicsPrev, onTopicsNext, topicsHasPrev, topicsHasNext, topicsPageN: (topicsPage + 1) + ' of ' + topicsPages,
@@ -9399,8 +9436,8 @@ class Component extends DCLogic {
       dragging: S.dragging, isBusy: !!S.busy, busy: S.busy,
       onCorpus: e => this.setState({ corpus: e.target.value, view: 'summary', sel: null, f: {}, readDoc: null, folder: null, folderDraft: '' }),
       wsNewName: S.wsNewName || '', onWsNewName: e => this.setState({ wsNewName: e.target.value }), onWsNewKey: e => { if (e.key === 'Enter') this.newWorkspace(); }, onWsNew: () => this.newWorkspace(),
-      wsRenaming: S.wsRenaming, wsNameDraft: S.wsNameDraft != null ? S.wsNameDraft : this.corpusName(), onWsNameDraft: e => this.setState({ wsNameDraft: e.target.value }), onWsRenameStart: () => this.setState({ wsRenaming: true, wsNameDraft: this.corpusName() }), onWsRenameCancel: () => this.setState({ wsRenaming: false, wsNameDraft: '' }), onWsRenameKey: e => { if (e.key === 'Enter') this.onWsRenameSave(); if (e.key === 'Escape') this.setState({ wsRenaming: false, wsNameDraft: '' }); }, onWsRenameSave: () => { const nm = (this.state.wsNameDraft || '').trim(); if (nm) this.renameWorkspace(this.corpusId(), nm); this.setState({ wsRenaming: false, wsNameDraft: '' }); },
-      wsDeleting: S.wsDeleting, wsNotDeleting: !S.wsDeleting, onWsDelAsk: () => this.setState({ wsDeleting: true }), onWsDelNo: () => this.setState({ wsDeleting: false }), onWsDelYes: () => { this.setState({ wsDeleting: false }); this.deleteWorkspace(this.corpusId()); },
+      wsRenaming: S.wsRenaming, wsNameDraft: S.wsNameDraft != null ? S.wsNameDraft : this.corpusName(), onWsNameDraft: e => this.setState({ wsNameDraft: e.target.value }), onWsRenameStart: () => this.setState({ wsRenaming: true, wsPop: false, wsNameDraft: this.corpusName() }), onWsRenameCancel: () => this.setState({ wsRenaming: false, wsNameDraft: '' }), onWsRenameKey: e => { if (e.key === 'Enter') this.onWsRenameSave(); if (e.key === 'Escape') this.setState({ wsRenaming: false, wsNameDraft: '' }); }, onWsRenameSave: () => { const nm = (this.state.wsNameDraft || '').trim(); if (nm) this.renameWorkspace(this.corpusId(), nm); this.setState({ wsRenaming: false, wsNameDraft: '' }); },
+      wsDeleting: S.wsDeleting, wsNotDeleting: !S.wsDeleting, onWsDelAsk: () => this.setState({ wsDeleting: true }), onWsDelNo: () => this.setState({ wsDeleting: false }), onWsDelYes: () => { this.setState({ wsDeleting: false, wsPop: false }); this.deleteWorkspace(this.corpusId()); },
       onSearch: e => this.setState({ q: e.target.value }),
       hasFilters: chips.length > 0 && view !== 'search', chips, srcTuple, clearAll: () => this.setState(s => ({ f: {}, fw: {}, q: '', ...(s.view === 'search' ? { view: s.prevView || 'summary' } : {}) })),
       filterCount: F.length.toLocaleString() + ' of ' + A.sts.length.toLocaleString() + ' statements',
@@ -9470,8 +9507,8 @@ onAsk: () => { this.setState({ txAsk: d0.id }); this.pickYtFile(d0); }, onCancel
           kindLine: timed ? plural(m.segN, 'timed segment') + ' · ' + (m.model || 'Whisper').split('/').pop() : (m.dur != null ? fmtT(m.dur) : '') + (m.mime ? ' · ' + m.mime.split('/')[0] + (m.size ? ' · ' + Math.max(1, Math.round(m.size / 1e6)) + ' MB' : '') : ''),
           hasCls, clsLine, clsBusy, clsMeta: (d0.clsModel || '').replace('yamnet-', ''), hasNewNames, newNames,
           txTitle: timed ? 'Transcript · click a timecode to play from there' : txHere ? 'Transcribing — words appear below as they are heard' : 'Transcript',
-          note: timed ? 'Machine transcript (' + (m.model || 'Whisper').split('/').pop() + '), not checked by a person' + (m.priors ? ' · transcribed with the prior: ' + (PRIOR_LABEL[m.priors.prompt] || m.priors.prompt || 'none') + ', language ' + (m.priors.language || 'auto') : '') + '. Quote from the recording, not the transcript.' : 'The recording is kept in this browser; nothing in it has been read until it is transcribed. A transcript is a machine interpretation — the priors you choose (what it should listen for, and in which language) change what it hears, and they stay on the record.',
-          canAsk: !timed, ask: S.txAsk === d0.id, noAsk: !timed && S.txAsk !== d0.id,
+          note: timed ? 'Machine transcript (' + (m.model || 'Whisper').split('/').pop() + '), not checked by a person' + (m.priors ? ' · transcribed with the prior: ' + (PRIOR_LABEL[m.priors.prompt] || m.priors.prompt || 'none') + ', language ' + (m.priors.language || 'auto') : '') + '. Quote from the recording, not the transcript.' : 'The recording is kept in this browser; nothing in it has been read until it is transcribed. A transcript is a machine reading of the sound, not checked by a person.',
+          canAsk: !timed, ask: S.txAsk === d0.id, noAsk: !timed && S.txAsk !== d0.id, canTx: !timed && !txHere && S.txAsk !== d0.id,
           onAsk: () => { this.setState({ txAsk: d0.id }); this.transcribeLocal(d0); }, onCancelAsk: () => this.setState({ txAsk: null }),
           prior: prior, pw: prior === 'workspace', pn: prior === 'none', pm: prior === 'mine', onPriorW: () => this.setState({ txPrior: 'workspace' }), onPriorN: () => this.setState({ txPrior: 'none' }), onPriorM: () => this.setState({ txPrior: 'mine' }),
           lang: S.txLang || 'en', onLang: e => this.setState({ txLang: e.target.value }), langs: [['en', 'English'], ['es', 'Spanish'], ['fr', 'French'], ['de', 'German'], ['pt', 'Portuguese'], ['it', 'Italian'], ['nl', 'Dutch'], ['pl', 'Polish'], ['ru', 'Russian'], ['uk', 'Ukrainian'], ['ar', 'Arabic'], ['hi', 'Hindi'], ['zh', 'Chinese'], ['ja', 'Japanese'], ['ko', 'Korean']].map(([v, l]) => ({ v, l })),
