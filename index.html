@@ -2606,7 +2606,32 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
                         </div>
                       </sc-if>
                       <span style="font:400 13px/1.5 var(--sans);color:var(--ink2);text-wrap:pretty">{{ rdMedia.clsEvents }}</span>
-                      <details class="hd-disclosure" style="padding:0;border:0"><summary style="font:500 12px var(--sans);color:var(--mut)">Every change of sound ({{ rdMedia.clsN }})</summary><span style="font:400 12.5px/1.55 var(--mono);color:var(--mut);display:block;padding-top:6px">{{ rdMedia.clsLine }}</span></details>
+                      <details class="hd-disclosure" style="padding:0;border:0">
+                        <summary style="font:500 12px var(--sans);color:var(--mut)">Every change of sound ({{ rdMedia.clsN }})</summary>
+                        <div style="max-height:320px;overflow:auto;margin-top:6px;border:1px solid var(--line);border-radius:8px">
+                          <table style="width:100%;border-collapse:collapse;font:400 13px var(--sans);color:var(--ink2)">
+                            <thead>
+                              <tr style="background:var(--s2);position:sticky;top:0">
+                                <th style="text-align:left;padding:7px 12px;border-bottom:1px solid var(--line2);font:600 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--mut);white-space:nowrap">From</th>
+                                <th style="text-align:left;padding:7px 12px;border-bottom:1px solid var(--line2);font:600 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--mut);white-space:nowrap">To</th>
+                                <th style="text-align:left;padding:7px 12px;border-bottom:1px solid var(--line2);font:600 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--mut);width:100%">Sound</th>
+                                <th style="text-align:right;padding:7px 12px;border-bottom:1px solid var(--line2);font:600 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--mut);white-space:nowrap">Length</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <sc-for list="{{ rdMedia.clsTable }}" as="r" hint-placeholder-count="6">
+                                <tr>
+                                  <td style="padding:5px 12px;border-bottom:1px solid var(--line);font:400 12.5px var(--mono);white-space:nowrap">{{ r.from }}</td>
+                                  <td style="padding:5px 12px;border-bottom:1px solid var(--line);font:400 12.5px var(--mono);white-space:nowrap">{{ r.to }}</td>
+                                  <td style="padding:5px 12px;border-bottom:1px solid var(--line);color:var(--ink)">{{ r.name }}</td>
+                                  <td style="padding:5px 12px;border-bottom:1px solid var(--line);font:400 12.5px var(--mono);text-align:right;white-space:nowrap">{{ r.len }}</td>
+                                </tr>
+                              </sc-for>
+                            </tbody>
+                          </table>
+                        </div>
+                        <span style="display:block;padding-top:6px;font:400 12px var(--sans);color:var(--mut)">Read in this browser by {{ rdMedia.clsMeta }}. A classifier's guess at what kind of sound it is, not a transcript.</span>
+                      </details>
                     </div>
                   </sc-if>
                 </sc-if>
@@ -9501,7 +9526,7 @@ class Component extends DCLogic {
             local: false, playLabel: '▶', timeLabel: (m.dur != null ? fmtT(m.dur) : '') || '0:00', statusLabel: '', onPlayPause: () => {}, onStopRecord: () => this.stopPlayback(), dl: this.dlVals(d0),
             src: 'https://www.youtube.com/embed/' + m.id + '?rel=0&enablejsapi=1&playsinline=1' + (org ? '&origin=' + org : ''),
             kindLine: d0.aboutOnly ? 'Linked video, not transcribed' : segN === -1 ? 'Loading transcript…' : timed ? plural(segN, 'timed segment') + (LZ && LZ.from ? ' · read from ' + (LZ.from === 'opfs' ? 'this browser’s file store' : LZ.from) : '') : 'Transcript without timings',
-            hasNewNames, newNames, clsBusy: false, hasCls: false, clsLine: '', clsMeta: '',
+            hasNewNames, newNames, clsBusy: false, hasCls: false, clsLine: '', clsTable: [], clsMeta: '',
             txTitle: d0.aboutOnly ? 'About this video' : timed ? 'Transcript · click a timecode to play from there' : txHere ? 'Transcribing — words appear below as they are heard' : 'Transcript',
             note: d0.aboutOnly ? 'Only the link was captured. No transcript exists in the record yet.' : timed ? 'Machine transcript (' + ((LZ && LZ.model) || m.model || 'Whisper').split('/').pop() + '), not checked by a person. Use it to find moments; quote from the recording, not the transcript.' : 'Auto-caption or machine transcript with no timestamps, so the transcript can’t follow the video. Quote from the recording, not the transcript.',
             canAsk: !timed && !d0.aboutOnly, ask: S.txAsk === d0.id, noAsk: !timed && !d0.aboutOnly && S.txAsk !== d0.id,
@@ -9520,6 +9545,11 @@ onAsk: () => { this.setState({ txAsk: d0.id }); this.pickYtFile(d0); }, onCancel
         const clsChunks = spans.map(s => ({ t: (s.start == null ? '' : fmtT(s.start) + ' \u2013 ' + fmtT(s.end)), name: s.name }));
         const hasCls = clsChunks.length > 0;
         const clsLine = clsChunks.map(c => (c.t ? c.t + ' ' : '') + c.name).join(' \u00b7 ');
+        // The table behind the disclosure: the classifier's windows merged where the kind did not actually change,
+        // so "Speech 0:09-0:47, Speech 0:47-1:40" reads as one row, not a wall of run-on ranges.
+        const clsRows = []; spans.forEach(x => { if (x.start == null) return; const last = clsRows[clsRows.length - 1];
+          if (last && last.name === x.name && x.start - last.end < 1) last.end = x.end; else clsRows.push({ name: x.name, start: x.start, end: x.end }); });
+        const clsTable = clsRows.map(r => ({ from: fmtT(r.start), to: fmtT(r.end), name: r.name, len: fmtT(r.end - r.start), speech: /^speech$/i.test(String(r.name || '')) }));
         const clsBusy = this.clsBusy(d0.id);
         // What is worth saying about the sound is what is NOT speech: a run of "Speech · Speech · Speech" is one kind
         // split by the classifier's own windows. A timeline marks the other moments; one line names them.
@@ -9538,7 +9568,7 @@ onAsk: () => { this.setState({ txAsk: d0.id }); this.pickYtFile(d0); }, onCancel
           local: true, playLabel: '▶', timeLabel: (m.dur != null ? fmtT(m.dur) : '0:00'), statusLabel: '', onPlayPause: () => this.toggleLocalPlay(), onStopRecord: () => this.stopPlayback(), dl: this.dlVals(d0),
           isAudio: (m.mime || '').indexOf('audio') === 0, noAudio: (m.mime || '').indexOf('audio') !== 0, hasSrc: !!(this._mediaUrl && this._mediaUrl[d0.id]), noSrc: !(this._mediaUrl && this._mediaUrl[d0.id]), src: (this._mediaUrl || {})[d0.id] || '',
           kindLine: timed ? plural(m.segN, 'timed segment') + ' · ' + (m.model || 'Whisper').split('/').pop() : (m.dur != null ? fmtT(m.dur) : '') + (m.mime ? ' · ' + m.mime.split('/')[0] + (m.size ? ' · ' + Math.max(1, Math.round(m.size / 1e6)) + ' MB' : '') : ''),
-          hasCls, clsLine, clsBusy, clsMeta: (d0.clsModel || '').replace('yamnet-', ''), hasClsStrip: clsStrip.length > 0, clsStrip, clsEvents, clsN: String(spans.length), hasNewNames, newNames,
+          hasCls, clsLine, clsBusy, clsMeta: (d0.clsModel || '').replace('yamnet-', ''), hasClsStrip: clsStrip.length > 0, clsStrip, clsEvents, clsTable, clsN: String(clsTable.length), hasNewNames, newNames,
           txTitle: timed ? 'Transcript · click a timecode to play from there' : txHere ? 'Transcribing — words appear below as they are heard' : 'Transcript',
           note: timed ? 'Machine transcript (' + (m.model || 'Whisper').split('/').pop() + '), not checked by a person' + (m.priors ? ' · transcribed with the prior: ' + (PRIOR_LABEL[m.priors.prompt] || m.priors.prompt || 'none') + ', language ' + (m.priors.language || 'auto') : '') + '. Quote from the recording, not the transcript.' : 'The recording is kept in this browser; nothing in it has been read until it is transcribed. A transcript is a machine reading of the sound, not checked by a person.',
           canAsk: !timed, ask: S.txAsk === d0.id, noAsk: !timed && S.txAsk !== d0.id, canTx: !timed && !txHere && S.txAsk !== d0.id,
