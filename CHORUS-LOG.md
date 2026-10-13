@@ -145,3 +145,11 @@ fast: 7 files · 5 tests pass · law: ok
 | Pearl | a corroboration / independence claim | yamnet-names.js:265 | noted | "Independent music" is a class label; frames inside a span are smoothed *because* they are correlated, never counted as independent evidence |
 | Frankfurt | a placeholder value | index.html:2285 | false-positive-on-review | hint-placeholder-val="{{ false }}" is the surface's standing sc-if template syntax (dozens in the file), not a placeholder hack |
 clean: Diaconis, Feynman, Pearl reported above; Marshall not routed — no law edited or cited
+
+## 2026-10-13 — untranscribed audio cards show a waveform, not the measured preamble; a finished transcription lands in the workspace that holds it, not the one on screen (main, index.html)
+fast: 1 file · 0 affected tests (none imports index.html) · law: ok
+| lens | citation | file:line | verdict | one line |
+| Dijkstra | encodeURIComponent in an identity-looking position | index.html:5806 | false-positive-on-review | URL-encodes an SVG the function built itself into a data: URI; no locale, script or identity comparison |
+| Frankfurt | a placeholder value | index.html:616 | false-positive-on-review | hint-placeholder-val is the surface's standing sc-if template syntax, as logged 2026-10-11 |
+clean: Dijkstra, Frankfurt reported above; Marshall not routed — no law edited or cited
+checked live (not by a test): a mid-run workspace switch lost the transcript on the deployed page and lands it correctly with the fix; the same click with no switch transcribes in 13 s

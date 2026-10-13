@@ -70,6 +70,7 @@ button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visi
 .hd-drive-tile:hover{border-color:var(--line2);box-shadow:0 1px 8px rgba(0,0,0,.25)}
 .hd-drive-prev{all:unset;cursor:pointer;display:block;position:relative;height:118px;background:var(--s2);border-radius:11px 11px 0 0;overflow:hidden;padding:12px 14px;box-sizing:border-box}
 .hd-drive-snip{font:400 11px/1.45 var(--serif);color:var(--mut);display:-webkit-box;-webkit-line-clamp:6;-webkit-box-orient:vertical;overflow:hidden}
+.hd-drive-wave{position:absolute;left:14px;right:14px;top:14px;bottom:14px;background-repeat:no-repeat;background-position:center;background-size:100% 100%}
 .hd-drive-badge{position:absolute;right:10px;bottom:10px;min-width:30px;height:30px;padding:0 6px;box-sizing:border-box;border-radius:8px;display:flex;align-items:center;justify-content:center;font:700 12px var(--mono);color:#fff}
 .hd-drive-check{position:absolute;left:8px;top:8px;opacity:0;background:var(--s1);border-radius:6px;padding:3px 4px;line-height:0}
 .hd-drive-tile:hover .hd-drive-check,.hd-drive-check.on,.hd-drive-bar.has-sel~* .hd-drive-check{opacity:1}
@@ -612,7 +613,8 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
               <div class="hd-drive-tile" draggable="{{ true }}" onDragStart="{{ d.onDragStart }}" style="{{ d.tileStyle }}">
                 <button class="hd-drive-prev" onClick="{{ d.onRead }}" title="Open {{ d.title }}">
                   <sc-if value="{{ d.isVid }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;inset:0;background-image:{{ d.thumbBg }};background-size:cover;background-position:center;opacity:.85"></span></sc-if>
-                  <sc-if value="{{ d.noVid }}" hint-placeholder-val="{{ true }}"><span class="hd-drive-snip">{{ d.dvSnippet }}</span></sc-if>
+                  <sc-if value="{{ d.dvSnipOn }}" hint-placeholder-val="{{ true }}"><span class="hd-drive-snip">{{ d.dvSnippet }}</span></sc-if>
+                  <sc-if value="{{ d.dvIsWave }}" hint-placeholder-val="{{ false }}"><span class="hd-drive-wave" style="background-image:{{ d.dvWaveBg }}"></span></sc-if>
                   <sc-if value="{{ d.hasPdfThumb }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;inset:0;background-color:transparent;background-image:{{ d.pdfThumb }};background-size:cover;background-position:top center;background-repeat:no-repeat"></span></sc-if>
                   <span class="hd-drive-badge" style="background:{{ d.dvColor }}">{{ d.dvGlyph }}</span>
                 </button>
@@ -5774,9 +5776,34 @@ class Component extends DCLogic {
   async ensureWave() {
     const id = this.state.readDoc, d = id && this.analysis().docById[id];
     if (!d || !d.media || d.media.kind !== 'local' || (d.media.mime || '').indexOf('audio') !== 0) return;
-    this._wave = this._wave || {}; if (this._wave[id] !== undefined) return; this._wave[id] = 'loading';
-    try { const buf = await mediaBytes(id); const M = this._waveM = this._waveM || await import(new URL('holodeck-waveform.js', location.href).href); this._wave[id] = buf ? await M.decodePeaks(buf) : null; } catch (e) { this._wave[id] = null; }
-    this.forceUpdate();
+    this.loadWave(id, true);
+  }
+  // The peaks of a recording, decoded once and kept in this._wave[id] ({ peaks, duration }, 'loading', or null).
+  // The open recording decodes at once; the cards' waveforms wait their turn, one decode at a time.
+  loadWave(id, urgent) {
+    this._wave = this._wave || {}; this._waveRun = this._waveRun || new Set();
+    if (this._wave[id] !== undefined && !(urgent && this._wave[id] === 'loading' && !this._waveRun.has(id))) return;
+    this._wave[id] = 'loading';
+    const run = async () => {
+      if (this._waveRun.has(id) || (this._wave[id] !== 'loading')) return; this._waveRun.add(id);
+      try { const buf = await mediaBytes(id); const M = this._waveM = this._waveM || await import(new URL('holodeck-waveform.js', location.href).href); this._wave[id] = buf ? await M.decodePeaks(buf) : null; } catch (e) { this._wave[id] = null; }
+      this._waveRun.delete(id); this.forceUpdate();
+    };
+    if (urgent) run(); else this._waveQ = (this._waveQ || Promise.resolve()).then(run, run);
+  }
+  // A recording that has not been transcribed has no words to preview: its card shows the shape of the sound
+  // (a flat line while the peaks are still being read, or if the browser can't decode them).
+  tileWave(d, kick) {
+    const on = !!(d && d.media && d.media.kind === 'local' && /^audio/.test(d.media.mime || '') && !d.transcribed);
+    if (!on) return { dvIsWave: false, dvWaveBg: 'none' };
+    this._wave = this._wave || {}; if (kick && this._wave[d.id] === undefined) this.loadWave(d.id, false);
+    const W = this._wave[d.id], pk = W && W.peaks ? W.peaks : null, bars = 56; let r = '';
+    for (let b = 0; b < bars; b++) {
+      let m = 0; if (pk) { const lo = Math.floor(b * pk.length / bars), hi = Math.max(lo + 1, Math.floor((b + 1) * pk.length / bars)); for (let i = lo; i < hi && i < pk.length; i++) if (pk[i] > m) m = pk[i]; }
+      const h = Math.max(3, Math.round(m * 56)); r += '<rect x="' + b * 4 + '" y="' + (64 - h) / 2 + '" width="2.6" height="' + h + '" rx="1.3"/>';
+    }
+    const svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + bars * 4 + ' 64" preserveAspectRatio="none" fill="#a142f4"' + (pk ? '' : ' opacity=".4"') + '>' + r + '</svg>';
+    return { dvIsWave: true, dvWaveBg: 'url("data:image/svg+xml,' + encodeURIComponent(svg) + '")' };
   }
   hookWave() {
     const cv = document.getElementById('fx-wave');
@@ -6378,8 +6405,11 @@ class Component extends DCLogic {
     this.setState({ eyes: next });
   }
   replaceAddedDoc(id, patch) {
-    const cid = this.corpusId();
-    const added = { ...this.state.added, [cid]: (this.state.added[cid] || []).map(d => d.id === id ? { ...d, ...patch } : d) };
+    // A document belongs to the workspace it was added to, which is not always the one on screen when a long job
+    // (transcription, sound classification) finishes: the person may have switched meanwhile. Patch it where it lives.
+    const cur = this.corpusId(), all = this.state.added;
+    const cid = (all[cur] || []).some(d => d.id === id) ? cur : (Object.keys(all).find(k => (all[k] || []).some(d => d.id === id)) || cur);
+    const added = { ...all, [cid]: (all[cid] || []).map(d => d.id === id ? { ...d, ...patch } : d) };
     this.saveAdded(added);
     this.setState({ added, htmlVer: this.state.htmlVer + 1 });
   }
@@ -8454,7 +8484,7 @@ class Component extends DCLogic {
     const dvOwn = new Set((S.added[this.corpusId()] || []).map(x => x.id));
     const dvTiles = dvRows.map(r => { const it = r.it, id = r.id, sel = !!dvSel[id], own = dvOwn.has(id);
       const saveName = () => { const nm = (this.state.dvRenameDraft || '').trim(); if (this.state.dvRename === id && nm && nm !== r.title) this.renameDocTitle(id, nm); this.setState({ dvRename: null, dvRenameDraft: null }); };
-      return { ...it, id, selected: sel, checkCls: sel ? 'on' : '', tileStyle: sel ? 'border-color:var(--acc);box-shadow:0 0 0 2px var(--acc2)' : '',
+      return { ...it, ...(w => ({ ...w, dvSnipOn: !it.isVid && !w.dvIsWave }))(this.tileWave(A.docById[id], svMode === 'grid' || svMode === 'cards')), id, selected: sel, checkCls: sel ? 'on' : '', tileStyle: sel ? 'border-color:var(--acc);box-shadow:0 0 0 2px var(--acc2)' : '',
         onToggleSel: () => this.setState(st => { const m = { ...(st.dvSel || {}) }; if (m[id]) delete m[id]; else m[id] = true; return { dvSel: m, dvBulkAsk: false }; }),
         onDragStart: e => { try { const ids = dvSel[id] ? Object.keys(dvSel) : [id]; e.dataTransfer.setData('text/plain', ids.join(',')); e.dataTransfer.effectAllowed = 'move'; } catch (x) {} },
         renaming: S.dvRename === id, notRenaming: S.dvRename !== id, rnDraft: S.dvRenameDraft != null ? S.dvRenameDraft : r.title,
