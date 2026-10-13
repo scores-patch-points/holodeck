@@ -99,7 +99,57 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
 .hd-tx-fill{height:100%;background:var(--acc2);border-radius:3px;transition:width .4s ease}
 .hd-tx-indet{animation:hdTxPulse 1.1s ease-in-out infinite}
 @keyframes hdTxPulse{0%,100%{opacity:.3}50%{opacity:1}}
-@media(max-width:720px){.hd-shell{flex-direction:column}.hd-rail{position:relative!important;flex:none!important;width:100%;height:auto!important;border-right:0!important;border-bottom:1px solid var(--line);padding:12px!important;gap:10px!important}.hd-column{width:100%}.hd-primary{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px!important}.hd-primary button{padding:8px 4px!important;justify-content:center!important}.hd-primary .hd-count{display:none}.hd-content{padding:18px 14px!important}.hd-workspace{display:grid!important;grid-template-columns:minmax(0,1fr) auto;padding:4px 0!important;border:0!important}.hd-workspace>span{display:none}.hd-scope{font-size:12px!important}.hd-rail .hd-disclosure{padding:8px 0}.hd-source-card{padding:16px}}
+/* chrome diet — the rail and the contracts toolbar spend as little height as they can, so the contracts are on the first screen.
+   Narrow (the rail stacks above the content): one slim top bar (mark, Add, Menu, theme) + one row of tabs; the rest of the rail
+   (workspace, folders, topics, explore) is behind the Menu button. Wide: the same sections, tighter, with folders/topics as counted disclosures. */
+.hd-menubtn,.hd-topadd{display:none;align-items:center;gap:5px;border-radius:6px;cursor:pointer;font:500 13px var(--sans);padding:0 10px;height:26px;box-sizing:border-box;white-space:nowrap}
+.hd-menubtn{background:none;border:1px solid var(--line2);color:var(--ink2)}
+.hd-menubtn:hover{border-color:var(--acc);color:var(--ink)}
+.hd-topadd{background:var(--acc2);border:0;color:#fff;font-weight:600}
+.hd-rail .hd-disclosure{padding:8px 0}
+.hd-rail .hd-disclosure[open]>summary{margin-bottom:6px}
+.hd-rail .hd-primary{padding:4px 0 6px!important}
+.hd-rail details.hd-wsmore{border-top:0;padding:0}
+.hd-rail details.hd-wsmore>summary{font:500 12px var(--sans);color:var(--mut);min-height:22px;line-height:22px;padding:0 10px}
+.hd-rail details.hd-wsmore[open]>summary{margin-bottom:6px}
+.hd-rail details.hd-wsmore>div{margin-bottom:6px}
+.hd-main:has(>.hd-drive-bar){gap:10px!important}
+.hd-drive-bar{display:flex;flex-direction:row;flex-wrap:wrap;align-items:center;gap:6px 8px}
+.hd-drive-bar>*{flex:1 1 100%;min-width:0;order:10}
+.hd-drive-top,.hd-drive-tools{display:contents}
+.hd-drive-crumb{order:1;flex:none;font-size:17px}
+.hd-drive-crumb button{padding:2px 8px}
+.hd-drive-top>span:nth-child(2){order:2;flex:1 1 60px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12.5px!important}
+.hd-drive-search{order:3;flex:1 1 140px;max-width:420px;margin-left:auto;padding:6px 14px}
+.hd-drive-top>button:not(.hd-drive-add){order:4;flex:none}
+.hd-drive-top>.hd-drive-add{order:4;flex:none;display:none;padding:6px 14px}
+.hd-shell.rail-closed .hd-drive-top>.hd-drive-add{display:inline-block}
+.hd-drive-bar::before{content:"";order:5;flex:1 1 100%;height:0}
+.hd-drive-tools>.hd-chip{order:6}
+.hd-drive-tools>span:empty{display:none}
+.hd-drive-tools>select{order:7;margin-left:auto;max-width:140px;padding:4px 6px!important}
+.hd-drive-tools>.hd-chip{padding:4px 10px}
+.hd-drive-tools>div button{padding:5px 9px!important}
+.hd-drive-tools>details>summary{padding:0 9px!important;height:28px!important;line-height:28px}
+.hd-drive-tools>details{order:8}
+.hd-drive-tools>div{order:9}
+@media(max-width:720px){.hd-shell{flex-direction:column}.hd-rail{position:relative!important;flex:none!important;width:100%;height:auto!important;overflow:visible!important;border-right:0!important;border-bottom:1px solid var(--line);padding:6px 12px!important;gap:4px!important}.hd-column{width:100%}
+.hd-rail>nav{display:contents!important}
+.hd-railtop{order:0;padding:0!important}
+.hd-railcollapse{display:none!important}
+.hd-menubtn,.hd-topadd{display:inline-flex}
+.hd-primary{order:1;display:grid!important;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:4px!important;padding:0!important}
+.hd-primary button{padding:5px 2px!important;justify-content:center!important}
+.hd-primary button span{font-size:13px!important}
+.hd-primary .hd-count{display:none}
+.hd-rail .hd-workspace,.hd-rail>.hd-disclosure,.hd-rail>nav>div:not(.hd-primary),.hd-rail>nav>.hd-disclosure{display:none!important}
+.hd-rail.menu-open .hd-workspace{display:flex!important;order:2;padding:6px 0 2px!important;border:0!important}
+.hd-rail.menu-open>.hd-disclosure{display:block!important;order:3}
+.hd-rail.menu-open>nav>div:not(.hd-primary){display:flex!important;order:4;padding:6px 0!important}
+.hd-rail.menu-open>nav>.hd-disclosure{display:block!important;order:4}
+.hd-railadd{display:none!important}
+.hd-workspace>span{display:none}
+.hd-content{padding:6px 12px 12px!important}.hd-scope{font-size:12px!important}.hd-source-card{padding:16px}}
 </style>
 </helmet>
 <div class="{{ workspaceClass }}" style="min-height:100vh;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:14px;line-height:1.5">
@@ -154,19 +204,27 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
     </div>
   </div>
 </sc-if>
-<div class="hd-shell" style="display:flex;align-items:flex-start;min-height:100vh">
-  <div class="hd-rail" style="{{ railStyle }}">
-    <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;padding:2px 2px 2px 10px">
+<div class="hd-shell {{ shellCls }}" style="display:flex;align-items:flex-start;min-height:100vh">
+  <div class="hd-rail {{ railCls }}" onClick="{{ onRailClick }}" style="{{ railStyle }}">
+    <div class="hd-railtop" style="display:flex;align-items:center;justify-content:space-between;gap:6px;padding:2px 2px 2px 10px">
       <sc-if value="{{ railOpen }}" hint-placeholder-val="{{ true }}"><div style="display:flex;align-items:center;gap:10px;min-width:0"><span style="width:12px;height:12px;border-radius:3px;background:var(--acc2);flex:none"></span><span style="font:600 13px var(--mono),monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--ink);white-space:nowrap">Holodeck</span></div></sc-if>
       <div style="display:flex;align-items:center;gap:4px;flex:none">
+        <sc-if value="{{ hasContent }}" hint-placeholder-val="{{ false }}"><button class="hd-topadd" onClick="{{ openAdd }}" title="Add a source: a file, a folder, a link or pasted text">＋ Add</button></sc-if>
+        <button class="hd-menubtn" onClick="{{ toggleRailMenu }}" aria-expanded="{{ railMenu }}" title="Workspace, folders, topics and tools">{{ railMenuLabel }}</button>
         <sc-if value="{{ railOpen }}" hint-placeholder-val="{{ true }}"><button onClick="{{ toggleTheme }}" title="{{ themeTitle }}" style="background:none;border:1px solid var(--line2);border-radius:6px;width:24px;height:24px;cursor:pointer;font-size:13px;color:var(--ink);display:flex;align-items:center;justify-content:center" style-hover="border-color:var(--acc)">{{ themeIcon }}</button></sc-if>
-        <button onClick="{{ toggleRail }}" title="{{ railTitle }}" style="background:none;border:1px solid var(--line2);border-radius:6px;width:24px;height:24px;cursor:pointer;color:var(--mut);font:400 13px monospace;display:flex;align-items:center;justify-content:center" style-hover="color:var(--ink);border-color:var(--acc)">{{ railIcon }}</button>
+        <button class="hd-railcollapse" onClick="{{ toggleRail }}" title="{{ railTitle }}" style="background:none;border:1px solid var(--line2);border-radius:6px;width:24px;height:24px;cursor:pointer;color:var(--mut);font:400 13px monospace;display:flex;align-items:center;justify-content:center" style-hover="color:var(--ink);border-color:var(--acc)">{{ railIcon }}</button>
       </div>
     </div>
     <sc-if value="{{ railOpen }}" hint-placeholder-val="{{ true }}">
-    <div class="hd-workspace" style="display:flex;flex-direction:column;gap:8px;padding:10px 2px 4px;border-top:1px solid var(--line)">
+    <div class="hd-workspace" style="display:flex;flex-direction:column;gap:6px;padding:8px 2px 2px;border-top:1px solid var(--line)">
       <span style="font:600 12px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--acc);padding:0 10px">Workspace</span>
       <button onClick="{{ wsOpenMgr }}" title="Find, switch, rename or delete workspaces" style="display:flex;align-items:center;gap:8px;width:100%;box-sizing:border-box;background:var(--s2);border:1px solid var(--line2);border-radius:8px;color:var(--ink);font:500 14px var(--sans);padding:7px 10px;cursor:pointer;text-align:left" style-hover="border-color:var(--acc)"><span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ corpusName }}</span><span style="flex:none;font:500 12px var(--mono);color:var(--mut)">{{ wsCount }} ▾</span></button>
+      <sc-if value="{{ hasContent }}" hint-placeholder-val="{{ true }}">
+      <button class="hd-railadd" onClick="{{ openAdd }}" title="Add a source: a file, a folder, a link or pasted text" style="width:100%;box-sizing:border-box;background:var(--acc2);border:0;color:#fff;border-radius:8px;padding:6px 10px;cursor:pointer;font:600 14px var(--sans)" style-hover="background:var(--acc3)">Add source</button>
+      <sc-if value="{{ folderActive }}" hint-placeholder-val="{{ false }}"><button onClick="{{ clearFolder }}" style="width:100%;box-sizing:border-box;background:transparent;border:1px solid var(--line2);border-radius:8px;padding:4px 10px;cursor:pointer;font:500 12px var(--sans);color:var(--acc)" style-hover="border-color:var(--acc)">Clear folder scope ×</button></sc-if>
+      </sc-if>
+      <details class="hd-disclosure hd-wsmore">
+      <summary title="Rename or delete this workspace, or start a new one">Rename · Delete · New</summary>
       <sc-if value="{{ wsRenaming }}" hint-placeholder-val="{{ false }}">
         <div style="display:flex;gap:4px;align-items:center">
           <input value="{{ wsNameDraft }}" onChange="{{ onWsNameDraft }}" onKeyDown="{{ onWsRenameKey }}"  title="Name for this workspace" style="flex:1;min-width:0;background:var(--s2);border:1px solid var(--acc2);border-radius:8px;color:var(--ink);font:400 13px var(--sans);padding:5px 9px;outline:none">
@@ -189,15 +247,11 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
         <input value="{{ wsNewName }}" onChange="{{ onWsNewName }}" onKeyDown="{{ onWsNewKey }}" placeholder="New workspace…" title="Name a new workspace, then press Enter or ＋ New" style="flex:1;min-width:0;background:var(--s2);border:1px solid var(--line2);border-radius:8px;color:var(--ink);font:400 13px var(--sans);padding:6px 9px;outline:none">
         <button onClick="{{ onWsNew }}" title="Create a new workspace" style="flex:none;background:var(--s2);border:1px solid var(--line2);border-radius:8px;color:var(--ink2);cursor:pointer;font:600 13px var(--sans);padding:0 10px;white-space:nowrap" style-hover="border-color:var(--acc)">＋ New</button>
       </div>
-      <sc-if value="{{ hasContent }}" hint-placeholder-val="{{ true }}">
-      <button onClick="{{ openAdd }}" style="width:100%;box-sizing:border-box;background:var(--acc2);border:0;color:#fff;border-radius:8px;padding:8px 10px;cursor:pointer;font:600 14px var(--sans)" style-hover="background:var(--acc3)">Add source</button>
-      <sc-if value="{{ folderActive }}" hint-placeholder-val="{{ false }}"><button onClick="{{ clearFolder }}" style="width:100%;box-sizing:border-box;background:transparent;border:1px solid var(--line2);border-radius:8px;padding:5px 10px;cursor:pointer;font:500 12px var(--sans);color:var(--acc)" style-hover="border-color:var(--acc)">Clear folder scope ×</button></sc-if>
-      </sc-if>
-
+      </details>
     </div>
     <sc-if value="{{ hasContent }}" hint-placeholder-val="{{ false }}">
     <details class="hd-disclosure" open="{{ foldersOpen }}">
-      <summary>Folders</summary>
+      <summary>{{ foldersLabel }}</summary>
       <div style="display:flex;flex-direction:column;gap:4px;padding-top:6px">
         <sc-if value="{{ hasFolders }}" hint-placeholder-val="{{ false }}">
           <sc-for list="{{ folderList }}" as="f" hint-placeholder-count="2">
@@ -232,8 +286,9 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
         </sc-for>
       </div>
       <sc-if value="{{ hasContent }}" hint-placeholder-val="{{ false }}">
-      <div style="display:flex;flex-direction:column;gap:1px;padding:10px 0 12px;border-top:1px solid var(--line)">
-        <span style="font:600 12px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--acc);padding:2px 12px 6px">Topics</span>
+      <details class="hd-disclosure hd-topics" open="{{ topicsOpen }}">
+      <summary>{{ topicsLabel }}</summary>
+      <div style="display:flex;flex-direction:column;gap:1px;padding:0 0 4px">
         <sc-if value="{{ !hasTopics && !hasTopicsNote }}"><span style="padding:0 12px;font-size:12px;color:var(--mut)">Topics appear as sources connect.</span></sc-if>
         <sc-if value="{{ hasTopics }}" hint-placeholder-val="{{ false }}">
           <span style="font:400 11px var(--sans);color:var(--mut);padding:0 12px 4px;text-wrap:pretty">{{ topicsNote }}</span>
@@ -250,9 +305,9 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
           </sc-for>
           <sc-if value="{{ topicsHasPager }}" hint-placeholder-val="{{ false }}">
             <div style="display:flex;align-items:center;gap:4px;padding:2px 12px 0 20px">
-              <button onClick="{{ onTopicsPrev }}" style="all:unset;cursor:pointer;font:500 13px var(--sans);color:{{ topicsHasPrev ? 'var(--ink2)' : 'var(--dim)' }};padding:1px 6px" style-hover="color:var(--ink)">‹</button>
+              <button data-keep="1" onClick="{{ onTopicsPrev }}" style="all:unset;cursor:pointer;font:500 13px var(--sans);color:{{ topicsHasPrev ? 'var(--ink2)' : 'var(--dim)' }};padding:1px 6px" style-hover="color:var(--ink)">‹</button>
               <span style="font:500 11px var(--mono);color:var(--mut);flex:1;text-align:center;white-space:nowrap">{{ topicsPageN }}</span>
-              <button onClick="{{ onTopicsNext }}" style="all:unset;cursor:pointer;font:500 13px var(--sans);color:{{ topicsHasNext ? 'var(--ink2)' : 'var(--dim)' }};padding:1px 6px" style-hover="color:var(--ink)">›</button>
+              <button data-keep="1" onClick="{{ onTopicsNext }}" style="all:unset;cursor:pointer;font:500 13px var(--sans);color:{{ topicsHasNext ? 'var(--ink2)' : 'var(--dim)' }};padding:1px 6px" style-hover="color:var(--ink)">›</button>
             </div>
           </sc-if>
         </sc-if>
@@ -264,6 +319,7 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
           </button>
         </sc-if>
       </div>
+      </details>
       <details class="hd-disclosure" open="{{ toolsOpen }}">
         <summary>Explore &amp; manage</summary>
       <div style="display:flex;flex-direction:column;gap:1px;padding:10px 0 12px;border-top:1px solid var(--line)">
@@ -539,7 +595,7 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
         <div class="hd-drive-bar">
           <div class="hd-drive-top">
             <span class="hd-drive-crumb"><button onClick="{{ drv.onHome }}" title="All sources">{{ corpusName }}</button><sc-if value="{{ drv.inFolder }}" hint-placeholder-val="{{ false }}"><span style="color:var(--mut)">›</span><span style="padding:3px 8px">{{ drv.folderName }}</span></sc-if></span>
-            <span style="font:400 13px var(--sans);color:var(--mut)">{{ drv.stats }}</span>
+            <span title="{{ drv.stats }}" style="font:400 13px var(--sans);color:var(--mut)">{{ drv.stats }}</span>
             <input class="hd-drive-search" value="{{ drv.q }}" onChange="{{ drv.onQ }}" onKeyDown="{{ drv.onKey }}" placeholder="Search, ask a question, or paste a link — Enter" title="Filters the list by name as you type. Enter searches the sources, asks a question, or opens a link.">
             <button class="hd-drive-add" onClick="{{ openAdd }}">＋ Add source</button>
             <button onClick="{{ openSettings }}" title="{{ acctTitle }}" style="flex:none;display:inline-flex;align-items:center;gap:7px;box-sizing:border-box;background:none;border:1px solid var(--line2);border-radius:999px;padding:5px 11px;cursor:pointer;font:500 13px/1 var(--sans);color:var(--ink2);white-space:nowrap;max-width:230px" style-hover="border-color:var(--acc);color:var(--ink)"><span style="width:8px;height:8px;border-radius:50%;background:{{ acctOn ? 'var(--ok)' : 'var(--dim)' }};flex:none"></span><span style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ acctLabel }}</span><span aria-hidden="true" title="Settings" style="flex:none;font-size:14px;line-height:1;opacity:.75">⚙</span></button>
@@ -5261,7 +5317,7 @@ class Component extends DCLogic {
     setTimeout(() => this.measureHdr(), 400);
     setTimeout(() => { try { this.akAutoLoad(); } catch (e) {} }, 2500);
     this.applyTheme(); this.restoreReaders(); this._c = 0; import(new URL('holodeck-match.js', location.href).href).then(M => { this._mt = M; this._qc = null; this.forceUpdate(); }).catch(() => {}); import(new URL('holodeck-profile.js', location.href).href).then(M => { _hdProf = M; this._pbA = null; this.forceUpdate(); }).catch(() => {}); import(new URL('holodeck-lang.js', location.href).href).then(M => { _hdLang = M; this._pfLang = null; this.loadLangPriors(); this.forceUpdate(); }).catch(() => {}); import(new URL('holodeck-ambiguity.js', location.href).href).then(M => { this._ambM = M; this.forceUpdate(); }).catch(() => {}); hdSum().then(() => this.forceUpdate()).catch(() => {}); this.loadHtml(); if (typeof location !== 'undefined' && /fx-share=/.test(location.hash)) { this.netInit(); this.setState({ view: 'draft' }); }
-    this._onRz = () => { this.measureHdr(); if ((window.innerWidth < SIDE_PANEL_MIN_VW) !== this._narrow) this.forceUpdate(); }; window.addEventListener('resize', this._onRz);
+    this._onRz = () => { this.measureHdr(); const stk = window.innerWidth <= 720; if ((window.innerWidth < SIDE_PANEL_MIN_VW) !== this._narrow || stk !== this._stk) { this._stk = stk; this.forceUpdate(); } }; window.addEventListener('resize', this._onRz);
 
     this._onFocusKey = e => { if (e.key === 'Escape' && this.state.akFocus) this.setState({ akFocus: false }); }; window.addEventListener('keydown', this._onFocusKey);
     this._onSelCh = () => { cancelAnimationFrame(this._selRaf); this._selRaf = requestAnimationFrame(() => this.updatePinPop()); };
@@ -9089,11 +9145,11 @@ class Component extends DCLogic {
       noDiverge: !(SU && SU.perspectives && SU.perspectives.pairs.some(p => p.conflicting.length)),
       suCursors: SU_CURSORS.map(c => { const on = SU && SU.cur === c.id; return { label: c.label, desc: c.desc, bg: on ? 'var(--sel)' : 'var(--s1)', bd: on ? 'var(--acc2)' : 'var(--line2)', fw: on ? 600 : 500, onClick: () => this.setState({ cursor: c.id, suN: 30 }) }; }),
       suReadingEmpty: !!(SU && SU.cur === 'reading' && SU.n === 0),
-      ...(() => { const S2 = this.state; const list = this.foldersFor(); const open = this._foldersOpen !== false;
+      ...(() => { const S2 = this.state; const list = this.foldersFor(); const open = this._foldersOpen === true || !!S2.folder; /* closed by default (chrome diet); a scoped folder keeps it open */
         const items = list.map(f => { const on = S2.folder === f.id; const renaming = S2.folderRename === f.id; return { label: f.name, n: String((f.docs || []).length), bg: on ? 'var(--sel)' : 'transparent', bd: on ? 'var(--acc2)' : 'var(--line)', weight: on ? 600 : 500,
           onClick: () => this.setState({ folder: on ? null : f.id }), hasRemove: true, onRemove: e => { if (e && e.stopPropagation) e.stopPropagation(); this.removeFolder(f.id); },
           renaming, notRenaming: !renaming, onRenameStart: e => { if (e && e.stopPropagation) e.stopPropagation(); this.setState({ folderRename: f.id, folderNameDraft: f.name }); }, onRename: e => this.setState({ folderNameDraft: e.target.value }), onRenameKey: e => { if (e.stopPropagation) e.stopPropagation(); if (e.key === 'Enter') this.finishFolderRename(f.id); if (e.key === 'Escape') this.setState({ folderRename: null }); }, onRenameSave: e => { if (e && e.stopPropagation) e.stopPropagation(); this.finishFolderRename(f.id); } }; });
-        return { foldersOpen: open, toggleFolders: () => { this._foldersOpen = !open; this.forceUpdate(); }, folderList: items, hasFolders: items.length > 0, folderActive: !!S2.folder,
+        return { foldersOpen: open, foldersLabel: items.length ? 'Folders · ' + items.length : 'Folders', toggleFolders: () => { this._foldersOpen = !open; this.forceUpdate(); }, folderList: items, hasFolders: items.length > 0, folderActive: !!S2.folder,
           folderRenameId: S2.folderRename, folderNameDraft: S2.folderNameDraft || '',
           folderDraft: S2.folderDraft || '', onFolderDraft: e => this.setState({ folderDraft: e.target.value }),
           onFolderNewKey: e => { if (e.key === 'Enter' && (S2.folderDraft || '').trim()) { this.addFolder(S2.folderDraft); this.setState({ folderDraft: '' }); } },
@@ -9124,13 +9180,20 @@ class Component extends DCLogic {
       drv: { ...drv, stats: hdr.sub || '', onKey: e => { if (e.key !== 'Enter') return; const live = (e.target.value || '').trim(); if (!live) return; this.setState({ dvQ: '' }); if (isOmniUrl(live)) omniOpen(live); else omniGo(live); } }, drvd, svGrid: svMode === 'grid' || svMode === 'cards', svList: svMode === 'list',
       wsm, wsCount: wsAll.length, wsOpenMgr: () => this.setState({ wsOpen: true, wsQ: '', wsShown: 40, wsEdit: null, wsDelAsk: null }),
       corpusId: cid, corpusOptions: opts, q: S.q, corpusName: this.corpusName(), segList, hasSegments, segOpen, segToggleLabel, segCount, toggleSegOpen, addAsFold, navTop, navRead, navExplore, navRest,
-      topicsList, hasTopics, topicsNote, hasTopicsNote, topicsStrayN, showTopicsStray, onTopicsStray, scope,
+      topicsList, hasTopics, topicsOpen: !!activeTopicGroup || !!topicsQ, topicsLabel: P.groups.length ? 'Topics · ' + P.groups.length : 'Topics', topicsNote, hasTopicsNote, topicsStrayN, showTopicsStray, onTopicsStray, scope,
       topicsHasSearch, topicsSearchVal, onTopicsSearch, topicsHasPager, topicsPagerLine, onTopicsPrev, onTopicsNext, topicsHasPrev, topicsHasNext, topicsPageN: (topicsPage + 1) + ' of ' + topicsPages,
       toggleTheme: () => { const th = S.theme === 'dark' ? 'light' : 'dark'; try { localStorage.setItem('fold-explorer-theme', th); } catch (e) {} this.setState({ theme: th }); },
       workspaceClass: S.akFocus && view === 'ask' ? 'hd-workspace-surface hd-focus' : 'hd-workspace-surface',
-      railOpen: S.railOpen, railIcon: S.railOpen ? '‹' : '›', railTitle: S.railOpen ? 'Collapse' : 'Expand',
+      /* below 720px the rail stacks over the content and its collapse button is hidden (the Menu button replaces it), so it is always "open" there */
+      railOpen: S.railOpen || (typeof window !== 'undefined' && window.innerWidth <= 720),
+      shellCls: S.railOpen || (typeof window !== 'undefined' && window.innerWidth <= 720) ? '' : 'rail-closed',
+      railCls: S.railMenu ? 'menu-open' : '', railMenu: !!S.railMenu, railMenuLabel: S.railMenu ? '✕ Menu' : '☰ Menu',
+      toggleRailMenu: () => this.setState({ railMenu: !this.state.railMenu }),
+      /* a pick made inside the open menu (a topic, a tool) closes it so the result is what you see; pager arrows (data-keep) and form fields leave it open */
+      onRailClick: e => { try { if (!this.state.railMenu || !e || !e.target || !e.target.closest) return; const b = e.target.closest('nav button'); if (b && !b.closest('.hd-primary') && !b.hasAttribute('data-keep')) this.setState({ railMenu: false }); } catch (x) {} },
+      railIcon: S.railOpen ? '‹' : '›', railTitle: S.railOpen ? 'Collapse' : 'Expand',
       railStyle: S.railOpen
-        ? 'flex:0 0 220px;position:sticky;top:0;height:100vh;overflow:auto;box-sizing:border-box;border-right:1px solid var(--line);background:var(--s1);padding:16px 12px 20px;display:flex;flex-direction:column;gap:18px'
+        ? 'flex:0 0 220px;position:sticky;top:0;height:100vh;overflow:auto;box-sizing:border-box;border-right:1px solid var(--line);background:var(--s1);padding:10px 12px 14px;display:flex;flex-direction:column;gap:8px'
         : 'flex:0 0 40px;position:sticky;top:0;height:100vh;overflow:hidden;box-sizing:border-box;border-right:1px solid var(--line);background:var(--s1);padding:16px 8px 20px;display:flex;flex-direction:column;gap:18px',
       toggleRail: () => { const open = !S.railOpen; try { localStorage.setItem('fold-explorer-rail', open ? '1' : '0'); } catch (e) {} this.setState({ railOpen: open }); },
       themeIcon: S.theme === 'dark' ? '☀' : '☾', themeTitle: S.theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode',
@@ -9148,7 +9211,7 @@ class Component extends DCLogic {
       isEmpty, showWelcome: isEmpty && view !== 'ask', hasContent: !isEmpty, v: V, hdr,
       docCards, gaps: [] /* hidden with hasGaps */, nameGroups, nameTable, typeBlocks, measures, noMeasures: !measures.length, ...(() => { const c = this.capL('stg', stGroups, 8); return { stGroups: c.items.map(g => ({ ...g, ...this.capL('stg:' + g.title, g.items, 4) })), stgMore: c }; })(),
       graphEl, timeInfo, ...orbX, ...(() => { const c = this.capL('pairs', pairs, 12); return { pairs: c.items, pairsMore: c }; })(), noPairs: !pairs.length, frameCols: frameCols.map(c => ({ ...c, ...this.capL('fr:' + c.label, c.items, 5) })), timeBars, ...(() => { const c = this.capL('topics', topicChips, 24); return { topicChips: c.items, topicMore: c }; })(), ...(() => { const c = this.capL('srcbars', [...sourceBars].sort((a, b) => +b.n - +a.n), 12); return { sourceBars: c.items, srcBarMore: c }; })(), shapes, noShapes: !shapes.length, hasRoutine: (this._routineN || 0) > 0, routineLine: plural(this._routineN || 0, 'routine agreement') + ' hidden: repeated by several sources, but about names and words that appear together in most sources anyway.', holds, breaks, noBreaks: !breaks.length,
-      showOmni: view !== 'summary' || isEmpty, bodyPad: view === 'summary' && !isEmpty ? '10px 20px 20px' : '20px',
+      showOmni: view !== 'summary' || isEmpty, bodyPad: view === 'summary' && !isEmpty ? '8px 20px 16px' : '20px',
       showFilterLayers: FILTER_LAYERS, hdrSubShown: view === 'summary' ? '' : (hdr.sub || ''),
       hdrShow: !isEmpty && view !== 'summary' && !(view === 'connections' && S.foldBand) && view !== 'reader' && view !== 'profile' && view !== 'ask' && view !== 'draft' && view !== 'inbox',
       crumbLast, crumbAnc, hasAnc, yearOn: !isEmpty && (view === 'views' || view === 'surprise'),
