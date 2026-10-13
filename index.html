@@ -48,6 +48,46 @@ select option{background:var(--s1);color:var(--ink)}
 .hd-disclosure[open]>summary{margin-bottom:12px;color:var(--ink)}
 .hd-disclosure button{max-width:100%}
 button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--acc);outline-offset:3px}
+.hd-drive-bar{display:flex;flex-direction:column;gap:12px}
+.hd-drive-top{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.hd-drive-crumb{display:flex;align-items:center;gap:6px;font:500 20px var(--sans);color:var(--ink);min-width:0}
+.hd-drive-crumb button{all:unset;cursor:pointer;padding:3px 8px;border-radius:8px}
+.hd-drive-crumb button:hover{background:var(--s2)}
+.hd-drive-search{flex:1 1 240px;max-width:520px;margin-left:auto;background:var(--s2);border:1px solid var(--line2);border-radius:999px;color:var(--ink);font:400 14px var(--sans);padding:8px 16px;outline:none}
+.hd-drive-search:focus{border-color:var(--acc);background:var(--s1)}
+.hd-drive-add{background:var(--acc2);border:0;color:#fff;border-radius:999px;padding:8px 18px;cursor:pointer;font:600 14px var(--sans);white-space:nowrap}
+.hd-drive-tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.hd-chip{all:unset;cursor:pointer;border:1px solid var(--line2);border-radius:8px;padding:5px 12px;font:500 13px var(--sans);color:var(--ink2);white-space:nowrap}
+.hd-chip:hover{background:var(--s2)}
+.hd-chip.on{background:var(--sel);border-color:var(--acc2);color:var(--ink)}
+.hd-drive-folders{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px}
+.hd-drive-folder{display:flex;align-items:center;gap:10px;background:var(--s2);border:1px solid var(--line);border-radius:12px;padding:10px 14px;cursor:pointer;font:500 14px var(--sans);color:var(--ink);min-width:0}
+.hd-drive-folder:hover{background:var(--s1);border-color:var(--line2)}
+.hd-drive-folder.on{border-color:var(--acc);background:var(--sel)}
+.hd-drive-folder>span:nth-child(2){flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hd-drive-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px}
+.hd-drive-tile{position:relative;background:var(--s1);border:1px solid var(--line);border-radius:12px;display:flex;flex-direction:column}
+.hd-drive-tile:hover{border-color:var(--line2);box-shadow:0 1px 8px rgba(0,0,0,.25)}
+.hd-drive-prev{all:unset;cursor:pointer;display:block;position:relative;height:118px;background:var(--s2);border-radius:11px 11px 0 0;overflow:hidden;padding:12px 14px;box-sizing:border-box}
+.hd-drive-snip{font:400 11px/1.45 var(--serif);color:var(--mut);display:-webkit-box;-webkit-line-clamp:6;-webkit-box-orient:vertical;overflow:hidden}
+.hd-drive-badge{position:absolute;right:10px;bottom:10px;min-width:30px;height:30px;padding:0 6px;box-sizing:border-box;border-radius:8px;display:flex;align-items:center;justify-content:center;font:700 12px var(--mono);color:#fff}
+.hd-drive-check{position:absolute;left:8px;top:8px;opacity:0;background:var(--s1);border-radius:6px;padding:3px 4px;line-height:0}
+.hd-drive-tile:hover .hd-drive-check,.hd-drive-check.on,.hd-drive-bar.has-sel~* .hd-drive-check{opacity:1}
+.hd-drive-foot{display:flex;align-items:center;gap:8px;padding:10px 6px 2px 12px;min-width:0}
+.hd-drive-ic{flex:none;width:18px;height:18px;border-radius:5px;display:flex;align-items:center;justify-content:center;font:700 10px var(--mono);color:#fff}
+.hd-drive-name{flex:1;min-width:0;font:500 14px var(--sans);color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hd-drive-sub{padding:0 12px 11px 38px;font:400 12.5px var(--sans);color:var(--mut)}
+.hd-drive-menu{position:relative;flex:none}
+.hd-drive-menu>summary{list-style:none;cursor:pointer;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--mut);font:700 16px var(--sans)}
+.hd-drive-menu>summary::-webkit-details-marker{display:none}
+.hd-drive-menu>summary:hover,.hd-drive-menu[open]>summary{background:var(--s2);color:var(--ink)}
+.hd-drive-menu-panel{position:absolute;right:0;top:30px;z-index:30;min-width:190px;background:var(--s1);border:1px solid var(--line2);border-radius:10px;padding:6px;box-shadow:0 8px 28px rgba(0,0,0,.4);display:flex;flex-direction:column}
+.hd-drive-menu-panel button{all:unset;cursor:pointer;padding:8px 12px;border-radius:6px;font:400 14px var(--sans);color:var(--ink);white-space:nowrap}
+.hd-drive-menu-panel button:hover{background:var(--s2)}
+.hd-drive-row{display:grid;grid-template-columns:28px minmax(0,1fr) 150px 110px 130px 36px;gap:10px;align-items:center;padding:6px 10px;border-bottom:1px solid var(--line);font:400 14px var(--sans);color:var(--ink2)}
+.hd-drive-row:hover{background:var(--s2)}
+.hd-drive-row.head{font:600 12px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--mut);position:sticky;top:0;background:var(--bg);z-index:1}
+@media(max-width:720px){.hd-drive-row{grid-template-columns:28px minmax(0,1fr) 36px}.hd-drive-row .col-x{display:none}}
 .hd-source-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,280px),1fr));gap:14px}
 .hd-source-card{background:var(--s1);border:1px solid var(--line);border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:10px}
 .hd-tx-track{height:5px;border-radius:3px;background:var(--s2);overflow:hidden}
@@ -58,6 +98,57 @@ button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visi
 </style>
 </helmet>
 <div class="{{ workspaceClass }}" style="min-height:100vh;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:14px;line-height:1.5">
+<sc-if value="{{ wsm.open }}" hint-placeholder-val="{{ false }}">
+  <div onClick="{{ wsm.onClose }}" style="position:fixed;inset:0;z-index:70;background:rgba(0,0,0,.45);display:flex;align-items:flex-start;justify-content:center;padding:6vh 16px 16px;box-sizing:border-box">
+    <div onClick="{{ wsm.stop }}" role="dialog" aria-label="Workspaces" style="width:min(680px,100%);max-height:84vh;display:flex;flex-direction:column;background:var(--s1);border:1px solid var(--line2);border-radius:14px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.4)">
+      <div style="display:flex;align-items:baseline;gap:10px;padding:14px 16px 10px">
+        <span style="font:600 16px var(--sans);color:var(--ink)">Workspaces</span>
+        <span style="font:500 13px var(--mono);color:var(--mut)">{{ wsm.summary }}</span>
+        <button onClick="{{ wsm.onClose }}" title="Close" style="margin-left:auto;background:none;border:0;color:var(--mut);cursor:pointer;font:500 16px var(--sans);padding:2px 6px" style-hover="color:var(--ink)">✕</button>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:0 16px 10px">
+        <input value="{{ wsm.q }}" onChange="{{ wsm.onQ }}" onKeyDown="{{ wsm.onQKey }}" placeholder="Search workspaces…" autofocus="{{ true }}" style="flex:1 1 220px;min-width:0;background:var(--s2);border:1px solid var(--line2);border-radius:8px;color:var(--ink);font:400 14px var(--sans);padding:7px 10px;outline:none">
+        <div style="display:flex;border:1px solid var(--line2);border-radius:8px;overflow:hidden">
+          <sc-for list="{{ wsm.sorts }}" as="o" hint-placeholder-count="3"><button onClick="{{ o.onClick }}" style="border:0;padding:6px 11px;cursor:pointer;font:500 13px var(--sans);background:{{ o.bg }};color:{{ o.col }}">{{ o.label }}</button></sc-for>
+        </div>
+      </div>
+      <div style="flex:1;min-height:0;overflow:auto;border-top:1px solid var(--line)">
+        <sc-for list="{{ wsm.rows }}" as="w" hint-placeholder-count="5">
+          <div style="display:flex;align-items:center;gap:10px;padding:9px 16px;border-bottom:1px solid var(--line);background:{{ w.bg }}">
+            <sc-if value="{{ w.editing }}" hint-placeholder-val="{{ false }}">
+              <input value="{{ w.draft }}" onChange="{{ w.onDraft }}" onKeyDown="{{ w.onKey }}" title="New name" style="flex:1;min-width:0;background:var(--s2);border:1px solid var(--acc2);border-radius:8px;color:var(--ink);font:400 14px var(--sans);padding:6px 9px;outline:none">
+              <button onClick="{{ w.onSave }}" title="Save the new name" style="background:var(--acc2);border:0;color:#fff;border-radius:8px;cursor:pointer;font:600 13px var(--sans);padding:6px 10px">Save</button>
+              <button onClick="{{ w.onCancel }}" style="background:none;border:0;color:var(--mut);cursor:pointer;font:500 13px var(--sans);padding:6px 6px">Cancel</button>
+            </sc-if>
+            <sc-if value="{{ w.notEditing }}" hint-placeholder-val="{{ true }}">
+              <button onClick="{{ w.onOpen }}" title="Open this workspace" style="all:unset;cursor:pointer;flex:1;min-width:0;display:flex;flex-direction:column;gap:1px">
+                <span style="display:flex;gap:8px;align-items:baseline;min-width:0"><span style="font:500 15px var(--sans);color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ w.name }}</span><sc-if value="{{ w.current }}" hint-placeholder-val="{{ false }}"><span style="font:600 11px var(--mono);letter-spacing:.06em;color:var(--acc);border:1px solid var(--acc2);border-radius:4px;padding:0 5px;flex:none">OPEN</span></sc-if></span>
+                <span style="font:400 12.5px var(--sans);color:var(--mut)">{{ w.meta }}</span>
+              </button>
+              <sc-if value="{{ w.canEdit }}" hint-placeholder-val="{{ true }}">
+                <sc-if value="{{ w.noDelAsk }}" hint-placeholder-val="{{ true }}">
+                  <button onClick="{{ w.onRename }}" title="Rename this workspace" style="background:none;border:1px solid var(--line2);border-radius:8px;color:var(--ink2);cursor:pointer;font:500 13px var(--sans);padding:5px 10px;white-space:nowrap" style-hover="border-color:var(--acc)">Rename</button>
+                  <button onClick="{{ w.onAskDelete }}" title="Delete this workspace and everything in it" style="background:none;border:1px solid var(--line2);border-radius:8px;color:var(--mut);cursor:pointer;font:500 13px var(--sans);padding:5px 10px;white-space:nowrap" style-hover="border-color:var(--bad);color:var(--bad)">Delete</button>
+                </sc-if>
+                <sc-if value="{{ w.delAsk }}" hint-placeholder-val="{{ false }}">
+                  <span style="font:400 12.5px/1.35 var(--sans);color:var(--bad);text-align:right">{{ w.delText }}</span>
+                  <button onClick="{{ w.onDelete }}" style="background:var(--bad);border:1px solid var(--bad);color:#fff;border-radius:8px;cursor:pointer;font:600 13px var(--sans);padding:5px 10px;white-space:nowrap">Delete for good</button>
+                  <button onClick="{{ w.onCancelDelete }}" style="background:none;border:0;color:var(--mut);cursor:pointer;font:500 13px var(--sans);padding:5px 6px">Keep</button>
+                </sc-if>
+              </sc-if>
+            </sc-if>
+          </div>
+        </sc-for>
+        <sc-if value="{{ wsm.none }}" hint-placeholder-val="{{ false }}"><div style="padding:22px 16px;font:400 14px var(--sans);color:var(--mut)">No workspace matches “{{ wsm.q }}”.</div></sc-if>
+        <sc-if value="{{ wsm.hasMore }}" hint-placeholder-val="{{ false }}"><div style="padding:10px 16px"><button onClick="{{ wsm.onMore }}" style="background:none;border:1px solid var(--line2);border-radius:8px;color:var(--ink2);cursor:pointer;font:500 13px var(--sans);padding:6px 12px">{{ wsm.moreLabel }}</button></div></sc-if>
+      </div>
+      <div style="display:flex;gap:6px;padding:10px 16px;border-top:1px solid var(--line);background:var(--s2)">
+        <input value="{{ wsNewName }}" onChange="{{ onWsNewName }}" onKeyDown="{{ onWsNewKey }}" placeholder="Name a new workspace…" style="flex:1;min-width:0;background:var(--s1);border:1px solid var(--line2);border-radius:8px;color:var(--ink);font:400 14px var(--sans);padding:7px 10px;outline:none">
+        <button onClick="{{ onWsNew }}" style="flex:none;background:var(--acc2);border:0;color:#fff;border-radius:8px;cursor:pointer;font:600 13px var(--sans);padding:0 14px;white-space:nowrap">＋ New workspace</button>
+      </div>
+    </div>
+  </div>
+</sc-if>
 <div class="hd-shell" style="display:flex;align-items:flex-start;min-height:100vh">
   <div class="hd-rail" style="{{ railStyle }}">
     <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;padding:2px 2px 2px 10px">
@@ -70,11 +161,7 @@ button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visi
     <sc-if value="{{ railOpen }}" hint-placeholder-val="{{ true }}">
     <div class="hd-workspace" style="display:flex;flex-direction:column;gap:8px;padding:10px 2px 4px;border-top:1px solid var(--line)">
       <span style="font:600 12px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--acc);padding:0 10px">Workspace</span>
-      <select value="{{ corpusId }}" onChange="{{ onCorpus }}" style="width:100%;box-sizing:border-box;background:var(--s2);border:1px solid var(--line2);border-radius:8px;color:var(--ink);font:500 14px var(--sans);padding:7px 10px;cursor:pointer;outline:none">
-        <sc-for list="{{ corpusOptions }}" as="o" hint-placeholder-count="4">
-          <option value="{{ o.id }}">{{ o.name }}</option>
-        </sc-for>
-      </select>
+      <button onClick="{{ wsOpenMgr }}" title="Find, switch, rename or delete workspaces" style="display:flex;align-items:center;gap:8px;width:100%;box-sizing:border-box;background:var(--s2);border:1px solid var(--line2);border-radius:8px;color:var(--ink);font:500 14px var(--sans);padding:7px 10px;cursor:pointer;text-align:left" style-hover="border-color:var(--acc)"><span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ corpusName }}</span><span style="flex:none;font:500 12px var(--mono);color:var(--mut)">{{ wsCount }} ▾</span></button>
       <sc-if value="{{ wsRenaming }}" hint-placeholder-val="{{ false }}">
         <div style="display:flex;gap:4px;align-items:center">
           <input value="{{ wsNameDraft }}" onChange="{{ onWsNameDraft }}" onKeyDown="{{ onWsRenameKey }}"  title="Name for this workspace" style="flex:1;min-width:0;background:var(--s2);border:1px solid var(--acc2);border-radius:8px;color:var(--ink);font:400 13px var(--sans);padding:5px 9px;outline:none">
@@ -229,6 +316,7 @@ button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visi
   <div class="hd-column" style="flex:1 1 0;min-width:0;box-sizing:border-box;{{ colPad }}">
 
   <header class="hd-header" ref="{{ hdrRef }}" style="position:sticky;top:0;z-index:20;background:var(--hdr);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)">
+    <sc-if value="{{ showOmni }}" hint-placeholder-val="{{ true }}">
     <div style="max-width:1230px;padding:8px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
       <div style="flex:1 1 320px;min-width:220px;display:flex;align-items:center;border:1px solid var(--line2);border-radius:8px;background:var(--s1)">
         <input defaultValue="{{ omniVal }}" ref="{{ omniRef }}" onChange="{{ onOmni }}" onKeyDown="{{ onOmniKey }}" placeholder="Search, ask a question, or paste a link — then Enter" style="flex:1;min-width:0;background:transparent;border:0;color:var(--ink);font:400 14px var(--sans);padding:8px 12px;outline:none">
@@ -237,8 +325,10 @@ button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visi
       </div>
       <button onClick="{{ openSettings }}" title="{{ acctTitle }}" style="flex:none;display:inline-flex;align-items:center;gap:7px;box-sizing:border-box;background:none;border:1px solid var(--line2);border-radius:999px;padding:5px 11px;cursor:pointer;font:500 13px/1 var(--sans);color:var(--ink2);white-space:nowrap;max-width:230px" style-hover="border-color:var(--acc);color:var(--ink)"><span style="width:8px;height:8px;border-radius:50%;background:{{ acctOn ? 'var(--ok)' : 'var(--dim)' }};flex:none"></span><span style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ acctLabel }}</span><span aria-hidden="true" title="Settings" style="flex:none;font-size:14px;line-height:1;opacity:.75">⚙</span></button>
     </div>
+    </sc-if>
+    <sc-if value="{{ showFilterLayers }}" hint-placeholder-val="{{ false }}">
     <div style="max-width:1230px;margin:0 auto;padding:0 20px 8px;position:relative">
-      <sc-if value="{{ hasContent }}" hint-placeholder-val="{{ true }}">
+      <sc-if value="{{ hasContent && showFilterLayers }}" hint-placeholder-val="{{ false }}">
       <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
         <button onClick="{{ hb.toggleCollapsed }}" title="Show or hide the filters — sources, filtering, perspectives" style="display:flex;align-items:center;gap:7px;background:var(--s1);border:1px solid var(--line2);border-radius:8px;padding:4px 10px;cursor:pointer;font:500 13px var(--sans);color:var(--ink2);white-space:nowrap;position:relative;z-index:56" style-hover="border-color:var(--acc)"><span style="font:500 13px var(--mono);color:var(--acc)">▦</span><b style="font-weight:600;color:var(--ink)">Filters</b><span style="color:var(--dim);font-size:11px">{{ hb.caret }}</span></button>
         <span style="font:400 12px var(--sans);color:var(--mut);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ hb.line }}</span>
@@ -364,11 +454,12 @@ button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visi
       </sc-if>
       </sc-if>
     </div>
+    </sc-if>
     <sc-if value="{{ scope.show }}" hint-placeholder-val="{{ false }}">
       <div class="hd-scope" style="padding:0 20px 10px;display:flex;gap:6px 14px;align-items:baseline;flex-wrap:wrap;font:400 12px var(--sans);color:var(--mut)">
         <sc-if value="{{ scope.hasSegment }}"><button onClick="{{ scope.onClearSegment }}" style="all:unset;cursor:pointer;color:var(--acc)">{{ scope.segmentLabel }} · clear ×</button></sc-if>
         <sc-for list="{{ scope.filters }}" as="ch"><button onClick="{{ ch.onClear }}" style="all:unset;cursor:pointer;color:var(--acc)">{{ ch.k }}: {{ ch.v }} ×</button></sc-for>
-        <sc-if value="{{ scope.hasTopics }}" hint-placeholder-val="{{ false }}">
+        <sc-if value="{{ showFilterLayers && scope.hasTopics }}" hint-placeholder-val="{{ false }}">
           <span style="color:var(--dim)">Topics</span>
           <sc-for list="{{ scope.topics }}" as="t" hint-placeholder-count="3"><button onClick="{{ t.onClick }}" title="Segment the workspace to this topic's sources" style="all:unset;cursor:pointer;color:{{ t.col }}" style-hover="color:var(--ink)">{{ t.label }} ({{ t.n }})</button></sc-for>
           <sc-if value="{{ scope.hasStray }}" hint-placeholder-val="{{ false }}"><button onClick="{{ scope.onStray }}" style="all:unset;cursor:pointer;color:var(--acc)" style-hover="color:var(--ink)">Outside these topics ({{ scope.strayN }})</button></sc-if>
@@ -377,7 +468,7 @@ button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visi
     </sc-if>
   </header>
 
-  <div class="hd-body hd-content" style="max-width:1230px;padding:20px;display:flex;flex-wrap:wrap;gap:20px;align-items:flex-start">
+  <div class="hd-body hd-content" style="max-width:1230px;padding:{{ bodyPad }};display:flex;flex-wrap:wrap;gap:20px;align-items:flex-start">
 
 
     <main class="hd-main" style="flex:1 1 520px;min-width:0;display:flex;flex-direction:column;gap:16px">
@@ -412,8 +503,8 @@ button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visi
                 </sc-for>
               </div>
             </sc-if>
-            <h1 style="margin:0;font:500 30px/1.2 var(--serif);color:var(--ink);text-wrap:pretty">{{ crumbLast.label }}</h1>
-            <p style="margin:0;color:var(--mut);font-size:15px;text-wrap:pretty;max-width:760px">{{ hdr.sub }}{{ sr.sub }}</p>
+            <sc-if value="{{ !v.summary }}" hint-placeholder-val="{{ true }}"><h1 style="margin:0;font:500 30px/1.2 var(--serif);color:var(--ink);text-wrap:pretty">{{ crumbLast.label }}</h1></sc-if>
+            <p style="margin:0;color:var(--mut);font-size:15px;text-wrap:pretty;max-width:760px">{{ hdrSubShown }}{{ sr.sub }}</p>
             <sc-if value="{{ sr.hasOthers }}" hint-placeholder-val="{{ false }}">
               <div style="display:flex;align-items:center;gap:6px 8px;flex-wrap:wrap;margin-top:4px">
                 <span style="font:400 14px var(--sans);color:var(--mut)">Also narrowed to</span>
@@ -424,36 +515,6 @@ button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visi
             </sc-if>
           </div>
         </div>
-        <details class="hd-disclosure" open="{{ timeFilterActive }}">
-          <summary>{{ timeControlLabel }}</summary>
-          <div style="display:flex;flex-direction:column;gap:6px;margin-top:12px;padding-top:10px;border-top:1px solid var(--line)">
-          <div style="display:flex;align-items:center;gap:6px 14px;flex-wrap:wrap">
-            <span style="font:600 11px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--dim)">Time</span>
-            <div style="display:inline-flex;gap:2px">
-              <sc-for list="{{ ts.modes }}" as="m" hint-placeholder-count="3"><button onClick="{{ m.onClick }}" style="all:unset;cursor:pointer;padding:3px 9px;border-radius:6px;background:{{ m.bg }};color:{{ m.col }};font:500 13px var(--sans)" style-hover="color:var(--ink)">{{ m.label }}</button></sc-for>
-            </div>
-            <sc-if value="{{ ts.has }}" hint-placeholder-val="{{ true }}"><div style="display:inline-flex;gap:2px;margin-left:auto">
-              <sc-for list="{{ ts.presets }}" as="p" hint-placeholder-count="3"><button onClick="{{ p.onClick }}" style="all:unset;cursor:pointer;padding:3px 9px;border-radius:6px;background:{{ p.bg }};color:{{ p.col }};font:500 13px var(--sans)" style-hover="color:var(--ink)">{{ p.label }}</button></sc-for>
-            </div></sc-if>
-          </div>
-          <sc-if value="{{ ts.has }}" hint-placeholder-val="{{ true }}">
-            <div style="display:flex;gap:1px;align-items:flex-end;height:40px;user-select:none;cursor:crosshair">
-              <sc-for list="{{ ts.bars }}" as="t" hint-placeholder-count="12">
-                <div onMouseDown="{{ t.onDown }}" onMouseEnter="{{ t.onEnter }}" onMouseUp="{{ t.onUp }}" title="{{ t.title }}" style="flex:1 1 0;min-width:0;height:100%;display:flex;align-items:flex-end"><span style="display:block;width:100%;height:{{ t.h }};background:{{ t.color }};border-radius:2px 2px 0 0"></span></div>
-              </sc-for>
-            </div>
-            <div style="display:flex;gap:1px">
-              <sc-for list="{{ ts.bars }}" as="t" hint-placeholder-count="12"><span style="flex:1 1 0;min-width:0;font:500 11px var(--mono);color:var(--dim);white-space:nowrap;overflow:visible">{{ t.lab }}</span></sc-for>
-            </div>
-            <div style="display:flex;align-items:center;gap:4px 14px;flex-wrap:wrap;font:400 13px var(--sans);color:var(--mut)">
-              <span>{{ ts.summary }}</span>
-              <sc-if value="{{ ts.hasUndated }}" hint-placeholder-val="{{ false }}"><button onClick="{{ ts.undated.onClick }}" style="all:unset;cursor:pointer;color:var(--acc);font:500 13px var(--sans)" style-hover="color:var(--ink)">{{ ts.undated.label }}</button></sc-if>
-              <sc-if value="{{ ts.hasNotes }}" hint-placeholder-val="{{ false }}"><span style="color:var(--dim)">{{ ts.notes }}</span></sc-if>
-            </div>
-          </sc-if>
-          <sc-if value="{{ ts.empty }}" hint-placeholder-val="{{ false }}"><span style="font:400 13px var(--sans);color:var(--dim)">{{ ts.empty }}</span></sc-if>
-        </div>
-        </details>
         <sc-if value="{{ hasFilters }}" hint-placeholder-val="{{ false }}">
           <div style="display:flex;align-items:center;gap:6px 8px;flex-wrap:wrap;margin-top:6px;padding:8px 10px;background:var(--sel);border:1px solid var(--acc2);border-radius:10px">
             <span style="font:600 14px var(--sans);color:var(--ink);white-space:nowrap">{{ filterCount }}</span>
@@ -469,16 +530,46 @@ button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visi
 
       <sc-if value="{{ v.overview }}" hint-placeholder-val="{{ false }}"><div id="overview-surface"></div></sc-if>
       <sc-if value="{{ v.summary }}" hint-placeholder-val="{{ true }}">
-        <div style="display:flex;flex-direction:column;gap:6px;padding-top:10px;border-top:1px solid var(--line);margin-top:10px">
-          <span style="font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--dim)">Source options</span>
-        <sc-if value="{{ svTabsOn }}" hint-placeholder-val="{{ true }}">
-          <div style="display:flex;gap:2px 18px;flex-wrap:wrap;align-items:center;border-bottom:1px solid var(--line2)">
-            <sc-if value="{{ sourceKindsUseful }}"><sc-for list="{{ svTabs }}" as="t" hint-placeholder-count="5"><button onClick="{{ t.onClick }}" style="all:unset;cursor:pointer;display:flex;gap:6px;align-items:baseline;padding:8px 0;border-bottom:2px solid {{ t.bd }};margin-bottom:-1px;font:500 14px var(--sans);color:{{ t.col }};white-space:nowrap">{{ t.label }}<span style="font:500 12px var(--mono);color:var(--dim)">{{ t.n }}</span></button></sc-for></sc-if>
-            <span style="flex:1"></span>
-            <div style="display:flex;border:1px solid var(--line2);border-radius:8px;overflow:hidden;margin:4px 0"><sc-for list="{{ svModes }}" as="k" hint-placeholder-count="2"><button onClick="{{ k.onClick }}" style="border:0;background:{{ k.bg }};color:{{ k.col }};padding:4px 12px;cursor:pointer;font:500 13px var(--sans);white-space:nowrap">{{ k.label }}</button></sc-for></div>
+        <div class="hd-drive-bar">
+          <div class="hd-drive-top">
+            <span class="hd-drive-crumb"><button onClick="{{ drv.onHome }}" title="All sources">{{ corpusName }}</button><sc-if value="{{ drv.inFolder }}" hint-placeholder-val="{{ false }}"><span style="color:var(--mut)">›</span><span style="padding:3px 8px">{{ drv.folderName }}</span></sc-if></span>
+            <span style="font:400 13px var(--sans);color:var(--mut)">{{ drv.stats }}</span>
+            <input class="hd-drive-search" value="{{ drv.q }}" onChange="{{ drv.onQ }}" onKeyDown="{{ drv.onKey }}" placeholder="Search, ask a question, or paste a link — Enter" title="Filters the list by name as you type. Enter searches the sources, asks a question, or opens a link.">
+            <button class="hd-drive-add" onClick="{{ openAdd }}">＋ Add source</button>
+            <button onClick="{{ openSettings }}" title="{{ acctTitle }}" style="flex:none;display:inline-flex;align-items:center;gap:7px;box-sizing:border-box;background:none;border:1px solid var(--line2);border-radius:999px;padding:5px 11px;cursor:pointer;font:500 13px/1 var(--sans);color:var(--ink2);white-space:nowrap;max-width:230px" style-hover="border-color:var(--acc);color:var(--ink)"><span style="width:8px;height:8px;border-radius:50%;background:{{ acctOn ? 'var(--ok)' : 'var(--dim)' }};flex:none"></span><span style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ acctLabel }}</span><span aria-hidden="true" title="Settings" style="flex:none;font-size:14px;line-height:1;opacity:.75">⚙</span></button>
           </div>
-          <sc-if value="{{ srcHiddenNote }}" hint-placeholder-val="{{ false }}"><span style="font:400 13px var(--sans);color:var(--dim);margin-top:6px">{{ srcHiddenNote }}</span></sc-if>
-        </sc-if>
+          <div class="hd-drive-tools">
+            <sc-for list="{{ svTabs }}" as="t" hint-placeholder-count="4"><button class="hd-chip {{ t.cls }}" onClick="{{ t.onClick }}">{{ t.label }} <span style="color:var(--dim)">{{ t.n }}</span></button></sc-for>
+            <span style="flex:1"></span>
+            <select value="{{ drv.sort }}" onChange="{{ drv.onSort }}" title="Order" style="background:var(--s2);border:1px solid var(--line2);border-radius:8px;color:var(--ink);font:500 13px var(--sans);padding:5px 8px;outline:none"><sc-for list="{{ drv.sorts }}" as="o" hint-placeholder-count="4"><option value="{{ o.v }}">{{ o.l }}</option></sc-for></select>
+            <div style="display:flex;border:1px solid var(--line2);border-radius:8px;overflow:hidden"><sc-for list="{{ svModes }}" as="k" hint-placeholder-count="3"><button onClick="{{ k.onClick }}" style="border:0;background:{{ k.bg }};color:{{ k.col }};padding:5px 12px;cursor:pointer;font:500 13px var(--sans);white-space:nowrap">{{ k.label }}</button></sc-for></div>
+          </div>
+          <sc-if value="{{ drv.hasFolders }}" hint-placeholder-val="{{ false }}">
+            <div class="hd-drive-folders">
+              <sc-for list="{{ drv.folders }}" as="f" hint-placeholder-count="3">
+                <div class="hd-drive-folder {{ f.cls }}" onClick="{{ f.onOpen }}" onDragOver="{{ f.onOver }}" onDrop="{{ f.onDrop }}" title="{{ f.title }}"><span style="font-size:18px">{{ f.icon }}</span><span>{{ f.label }}</span><span style="font:500 12px var(--mono);color:var(--mut)">{{ f.n }}</span></div>
+              </sc-for>
+            </div>
+          </sc-if>
+          <sc-if value="{{ drv.hasSel }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--sel);border:1px solid var(--acc2);border-radius:10px;padding:7px 12px">
+              <span style="font:600 14px var(--sans);color:var(--ink)">{{ drv.selLabel }}</span>
+              <button class="hd-drive-add" onClick="{{ drv.onFold }}" title="Read these sources together: every other view, the chat and the Fold are limited to them, as one body of content" style="padding:6px 16px">{{ drv.foldLabel }}</button>
+              <sc-if value="{{ drv.hasFoldersOpts }}" hint-placeholder-val="{{ false }}"><select value="" onChange="{{ drv.onMove }}" style="background:var(--s1);border:1px solid var(--line2);border-radius:8px;color:var(--ink);font:500 13px var(--sans);padding:4px 8px;outline:none"><option value="__">Move to…</option><sc-for list="{{ drv.moveOpts }}" as="o" hint-placeholder-count="3"><option value="{{ o.v }}">{{ o.l }}</option></sc-for></select></sc-if>
+              <sc-if value="{{ drv.canBulkDelete }}" hint-placeholder-val="{{ false }}">
+                <sc-if value="{{ drv.noBulkAsk }}" hint-placeholder-val="{{ true }}"><button class="hd-chip" onClick="{{ drv.onBulkAsk }}" style="color:var(--bad)">Delete</button></sc-if>
+                <sc-if value="{{ drv.bulkAsk }}" hint-placeholder-val="{{ false }}"><span style="font:400 13px var(--sans);color:var(--bad)">Delete {{ drv.selLabel }} for good?</span><button onClick="{{ drv.onBulkDelete }}" style="background:var(--bad);border:0;color:#fff;border-radius:8px;padding:5px 12px;cursor:pointer;font:600 13px var(--sans)">Delete for good</button><button class="hd-chip" onClick="{{ drv.onBulkCancel }}">Keep</button></sc-if>
+              </sc-if>
+              <button class="hd-chip" onClick="{{ drv.onClearSel }}" style="margin-left:auto">Clear</button>
+            </div>
+          </sc-if>
+          <sc-if value="{{ drv.scoped }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--s2);border:1px solid var(--line2);border-radius:10px;padding:7px 12px">
+              <span style="font:500 13.5px var(--sans);color:var(--ink)">{{ drv.scopedText }}</span>
+              <button class="hd-chip" onClick="{{ drv.onShowAll }}" style="margin-left:auto">Show all sources</button>
+            </div>
+          </sc-if>
+          <sc-if value="{{ srcHiddenNote }}" hint-placeholder-val="{{ false }}"><span style="font:400 13px var(--sans);color:var(--dim)">{{ srcHiddenNote }}</span></sc-if>
         </div>
         <sc-if value="{{ svTable }}" hint-placeholder-val="{{ false }}">
           <sc-for list="{{ svTables }}" as="tb" hint-placeholder-count="1">
@@ -508,73 +599,91 @@ button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visi
             </section>
           </sc-for>
         </sc-if>
-        <sc-if value="{{ svCards }}" hint-placeholder-val="{{ true }}">
-        <sc-for list="{{ srcGroups }}" as="g" hint-placeholder-count="2">
-          <section style="display:flex;flex-direction:column;gap:8px">
-            <sc-if value="{{ showSourceGroupLabels }}"><div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap">
-              <span style="font:600 16px var(--sans);color:var(--ink)">{{ g.label }}</span>
-              <span style="font:500 13px var(--mono);color:var(--mut)">{{ g.n }}</span>
-              <span style="font:400 14px var(--sans);color:var(--mut)">{{ g.desc }}</span>
-              
-            </div></sc-if>
-            <div class="hd-source-grid">
-              <sc-for list="{{ g.items }}" as="d" hint-placeholder-count="2">
-                <div class="hd-source-card" style="{{ d.cardStyle }}">
-                  <sc-if value="{{ d.isVid }}" hint-placeholder-val="{{ false }}"><button onClick="{{ d.onRead }}" title="Watch with the transcript beside it" style="all:unset;cursor:pointer;position:relative;display:block;margin:-14px -16px 2px;border-radius:12px 12px 0 0;overflow:hidden;aspect-ratio:16/9;background:#000"><span style="position:absolute;inset:0;background-image:{{ d.thumbBg }};background-size:cover;background-position:center;opacity:.9"></span><span style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:56px;height:40px;border-radius:10px;background:rgba(0,0,0,.72);display:flex;align-items:center;justify-content:center;color:#fff;font:600 18px var(--sans)">▶</span></button></sc-if>
-                  <button onClick="{{ d.onRead }}" style="all:unset;cursor:pointer;display:flex;flex-direction:column;gap:2px">
-                    <span style="display:flex;gap:8px;align-items:baseline;flex-wrap:wrap"><span style="font:500 19px/1.25 var(--serif);color:var(--ink)">{{ d.title }}</span><sc-if value="{{ d.isNew }}" hint-placeholder-val="{{ false }}"><span style="font:600 12px var(--mono);letter-spacing:.08em;color:var(--ok);border:1px solid var(--ok);border-radius:4px;padding:0 5px">NEW</span></sc-if></span>
-                    <span style="font:400 14px var(--sans);color:var(--mut)">{{ d.meta }}</span>
-                  </button>
-                  <span style="font:400 14px var(--sans);color:var(--ink2)">{{ d.stats }}</span>
-                  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:2px">
-                    <sc-if value="{{ d.isSeen }}" hint-placeholder-val="{{ false }}">
-                      <button onClick="{{ d.onKeep }}" style="background:var(--acc2);border:0;color:#fff;border-radius:8px;padding:5px 12px;cursor:pointer;font:600 14px var(--sans)">Keep as a source</button>
-                      <button onClick="{{ d.onDiscard }}" style="background:none;border:1px solid var(--line2);border-radius:8px;padding:5px 12px;cursor:pointer;font:500 14px var(--sans);color:var(--ink2)" style-hover="border-color:var(--bad)">Discard</button>
-                    </sc-if>
-                    <button onClick="{{ d.onRead }}" style="background:none;border:1px solid var(--line2);border-radius:8px;padding:5px 12px;cursor:pointer;font:500 14px var(--sans);color:var(--ink2)" style-hover="border-color:var(--acc)">{{ d.readLabel }}</button>
-                    <sc-if value="{{ d.canProcess }}" hint-placeholder-val="{{ false }}"><button onClick="{{ d.onProcess }}" title="Run the eyes you have switched on over its pixels, read in the browser" style="background:{{ d.needsRead ? 'var(--acc2)' : 'none' }};border:1px solid {{ d.needsRead ? 'var(--acc2)' : 'var(--line2)' }};border-radius:8px;padding:5px 12px;cursor:pointer;font:500 14px var(--sans);color:{{ d.needsRead ? '#fff' : 'var(--ink2)' }};white-space:nowrap" style-hover="border-color:var(--acc)">Read the pixels (eyes)</button></sc-if>
-                    <sc-if value="{{ d.canTranscribe }}" hint-placeholder-val="{{ false }}"><button onClick="{{ d.onTranscribe }}" title="Transcribe this recording — local service if set, else in this browser" style="background:none;border:1px solid var(--line2);border-radius:8px;padding:5px 12px;cursor:pointer;font:500 14px var(--sans);color:var(--ink2);white-space:nowrap" style-hover="border-color:var(--acc)">Transcribe it</button></sc-if>
-                    <button onClick="{{ d.onSolo }}" title="Solo — fade the other sources; solo several; click again to bring them back" style="background:{{ d.soloOn ? 'var(--sel)' : 'none' }};border:1px solid {{ d.soloOn ? 'var(--acc)' : 'var(--line2)' }};border-radius:8px;padding:5px 12px;cursor:pointer;font:500 14px var(--sans);color:{{ d.soloOn ? 'var(--ink)' : 'var(--ink2)' }};white-space:nowrap" style-hover="border-color:var(--acc)">{{ d.soloLabel }}</button>
+        <sc-if value="{{ drv.empty }}" hint-placeholder-val="{{ false }}"><div style="padding:36px 8px;font:400 15px var(--sans);color:var(--mut);text-align:center">{{ drv.emptyText }}</div></sc-if>
+        <sc-if value="{{ svGrid }}" hint-placeholder-val="{{ true }}">
+          <div class="hd-drive-grid">
+            <sc-for list="{{ drv.tiles }}" as="d" hint-placeholder-count="4">
+              <div class="hd-drive-tile" draggable="{{ true }}" onDragStart="{{ d.onDragStart }}" style="{{ d.tileStyle }}">
+                <button class="hd-drive-prev" onClick="{{ d.onRead }}" title="Open {{ d.title }}">
+                  <sc-if value="{{ d.isVid }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;inset:0;background-image:{{ d.thumbBg }};background-size:cover;background-position:center;opacity:.85"></span></sc-if>
+                  <sc-if value="{{ d.noVid }}" hint-placeholder-val="{{ true }}"><span class="hd-drive-snip">{{ d.dvSnippet }}</span></sc-if>
+                  <span class="hd-drive-badge" style="background:{{ d.dvColor }}">{{ d.dvGlyph }}</span>
+                </button>
+                <label class="hd-drive-check {{ d.checkCls }}"><input type="checkbox" checked="{{ d.selected }}" onChange="{{ d.onToggleSel }}" title="Select"></input></label>
+                <sc-if value="{{ d.delAsking }}" hint-placeholder-val="{{ false }}">
+                  <div style="position:absolute;left:0;right:0;top:0;height:118px;background:rgba(0,0,0,.72);border-radius:11px 11px 0 0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:10px;text-align:center;z-index:5">
+                    <span style="font:500 13px/1.4 var(--sans);color:#fff">Delete this source and its stored copy? This can't be undone.</span>
+                    <span style="display:flex;gap:8px"><button onClick="{{ d.onDelete }}" style="background:var(--bad);border:0;color:#fff;border-radius:8px;padding:6px 12px;cursor:pointer;font:600 13px var(--sans)">Delete for good</button><button onClick="{{ d.onCancelDelete }}" style="background:#fff;border:0;color:#111;border-radius:8px;padding:6px 12px;cursor:pointer;font:500 13px var(--sans)">Keep it</button></span>
                   </div>
-                  <details class="hd-disclosure" style="padding:8px 0 0;margin-top:auto">
+                </sc-if>
+                <div class="hd-drive-foot">
+                  <span class="hd-drive-ic" style="background:{{ d.dvColor }}" title="{{ d.dvLabel }}">{{ d.dvGlyph }}</span>
+                  <sc-if value="{{ d.notRenaming }}" hint-placeholder-val="{{ true }}"><span class="hd-drive-name" title="{{ d.title }}">{{ d.title }}</span></sc-if>
+                  <sc-if value="{{ d.renaming }}" hint-placeholder-val="{{ false }}"><input value="{{ d.rnDraft }}" onChange="{{ d.onRnDraft }}" onKeyDown="{{ d.onRnKey }}" onBlur="{{ d.onRnSave }}" style="flex:1;min-width:0;background:var(--s2);border:1px solid var(--acc2);border-radius:6px;color:var(--ink);font:500 14px var(--sans);padding:3px 6px;outline:none"></sc-if>
+                  <details class="hd-drive-menu"><summary title="More actions">⋮</summary><div class="hd-drive-menu-panel"><sc-for list="{{ d.menu }}" as="m" hint-placeholder-count="4"><button onClick="{{ m.onClick }}" style="color:{{ m.col }}">{{ m.label }}</button></sc-for></div></details>
+                </div>
+                <span class="hd-drive-sub">{{ d.sub }}<sc-if value="{{ d.isNew }}" hint-placeholder-val="{{ false }}"> · <b style="color:var(--ok);font-weight:600">New</b></sc-if></span>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+        <sc-if value="{{ svList }}" hint-placeholder-val="{{ false }}">
+          <div style="border:1px solid var(--line);border-radius:12px;overflow:visible">
+            <div class="hd-drive-row head"><span></span><span>Name</span><span class="col-x">Kind</span><span class="col-x">Statements</span><span class="col-x">Added</span><span></span></div>
+            <sc-for list="{{ drv.tiles }}" as="d" hint-placeholder-count="4">
+              <div class="hd-drive-row" draggable="{{ true }}" onDragStart="{{ d.onDragStart }}" style="{{ d.tileStyle }}">
+                <input type="checkbox" checked="{{ d.selected }}" onChange="{{ d.onToggleSel }}" title="Select"></input>
+                <span style="display:flex;align-items:center;gap:10px;min-width:0">
+                  <span class="hd-drive-ic" style="background:{{ d.dvColor }}" title="{{ d.dvLabel }}">{{ d.dvGlyph }}</span>
+                  <sc-if value="{{ d.notRenaming }}" hint-placeholder-val="{{ true }}"><button onClick="{{ d.onRead }}" class="hd-drive-name" style="all:unset;cursor:pointer;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:500 14px var(--sans);color:var(--ink)" title="{{ d.title }}">{{ d.title }}</button></sc-if>
+                  <sc-if value="{{ d.renaming }}" hint-placeholder-val="{{ false }}"><input value="{{ d.rnDraft }}" onChange="{{ d.onRnDraft }}" onKeyDown="{{ d.onRnKey }}" onBlur="{{ d.onRnSave }}" style="flex:1;min-width:0;background:var(--s2);border:1px solid var(--acc2);border-radius:6px;color:var(--ink);font:500 14px var(--sans);padding:3px 6px;outline:none"></sc-if>
+                  <sc-if value="{{ d.delAsking }}" hint-placeholder-val="{{ false }}"><button onClick="{{ d.onDelete }}" style="background:var(--bad);border:0;color:#fff;border-radius:6px;padding:3px 10px;cursor:pointer;font:600 12px var(--sans);white-space:nowrap">Delete for good</button><button onClick="{{ d.onCancelDelete }}" class="hd-chip">Keep</button></sc-if>
+                </span>
+                <span class="col-x" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ d.dvLabel }}</span>
+                <span class="col-x">{{ d.stsS }}</span>
+                <span class="col-x" style="white-space:nowrap">{{ d.when }}</span>
+                <details class="hd-drive-menu"><summary title="More actions">⋮</summary><div class="hd-drive-menu-panel"><sc-for list="{{ d.menu }}" as="m" hint-placeholder-count="4"><button onClick="{{ m.onClick }}" style="color:{{ m.col }}">{{ m.label }}</button></sc-for></div></details>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+        <sc-if value="{{ drvd.has }}" hint-placeholder-val="{{ false }}">
+          <div style="position:fixed;top:0;right:0;bottom:0;z-index:60;width:min(420px,100%);overflow:auto;box-sizing:border-box;background:var(--s1);border-left:1px solid var(--line2);padding:18px 20px;display:flex;flex-direction:column;gap:12px;box-shadow:-8px 0 30px rgba(0,0,0,.3)">
+            <div style="display:flex;gap:10px;align-items:flex-start"><span class="hd-drive-ic" style="background:{{ drvd.dvColor }};width:26px;height:26px;font-size:12px">{{ drvd.dvGlyph }}</span><div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><span style="font:500 18px/1.3 var(--serif);color:var(--ink)">{{ drvd.title }}</span><span style="font:400 13px var(--sans);color:var(--mut)">{{ drvd.dvLabel }} · {{ drvd.meta }}</span><span style="font:400 13px var(--sans);color:var(--mut)">{{ drvd.stats }}</span></div><button onClick="{{ drvd.onClose }}" title="Close" style="background:none;border:0;color:var(--mut);cursor:pointer;font:500 16px var(--sans)">✕</button></div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap"><button onClick="{{ drvd.onRead }}" style="background:var(--acc2);border:0;color:#fff;border-radius:8px;padding:7px 16px;cursor:pointer;font:600 14px var(--sans)">Open source</button></div>
+            <details class="hd-disclosure" open="{{ true }}" style="padding:8px 0 0">
                     <summary>Source details &amp; actions</summary>
                     <div style="display:flex;flex-direction:column;gap:8px">
-                  <sc-if value="{{ d.hasBadges }}" hint-placeholder-val="{{ false }}">
+                  <sc-if value="{{ drvd.hasBadges }}" hint-placeholder-val="{{ false }}">
                     <div style="display:flex;gap:5px;flex-wrap:wrap">
-                      <sc-for list="{{ d.badges }}" as="b" hint-placeholder-count="2"><span style="display:flex;align-items:center;gap:5px;font:500 12px var(--sans);color:var(--ink2);border:1px solid var(--line2);border-radius:5px;padding:0 7px"><span style="width:7px;height:7px;border-radius:50%;background:{{ b.color }}"></span>{{ b.label }}</span></sc-for>
+                      <sc-for list="{{ drvd.badges }}" as="b" hint-placeholder-count="2"><span style="display:flex;align-items:center;gap:5px;font:500 12px var(--sans);color:var(--ink2);border:1px solid var(--line2);border-radius:5px;padding:0 7px"><span style="width:7px;height:7px;border-radius:50%;background:{{ b.color }}"></span>{{ b.label }}</span></sc-for>
                     </div>
                   </sc-if>
-                  <sc-if value="{{ d.hasEyes }}" hint-placeholder-val="{{ false }}">
+                  <sc-if value="{{ drvd.hasEyes }}" hint-placeholder-val="{{ false }}">
                     <div style="display:flex;flex-direction:column;gap:6px">
                       <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
                         <span style="font:600 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--dim)">Eyes</span>
-                        <sc-for list="{{ d.eyesRows }}" as="e" hint-placeholder-count="3"><button onClick="{{ e.onToggle }}" title="{{ e.note }}" style="background:{{ e.on ? 'var(--sel)' : 'transparent' }};border:1px solid {{ e.on ? 'var(--acc2)' : 'var(--line2)' }};border-radius:999px;padding:2px 10px;cursor:pointer;font:500 12px var(--sans);color:{{ e.on ? 'var(--ink)' : 'var(--mut)' }};white-space:nowrap" style-hover="border-color:var(--acc)">{{ e.label }}</button></sc-for>
-                        <button onClick="{{ d.onProcess }}" style="background:none;border:1px solid var(--line2);border-radius:999px;padding:2px 10px;cursor:pointer;font:500 12px var(--sans);color:var(--ink2);white-space:nowrap" style-hover="border-color:var(--acc)">Read with these eyes</button>
+                        <sc-for list="{{ drvd.eyesRows }}" as="e" hint-placeholder-count="3"><button onClick="{{ e.onToggle }}" title="{{ e.note }}" style="background:{{ e.on ? 'var(--sel)' : 'transparent' }};border:1px solid {{ e.on ? 'var(--acc2)' : 'var(--line2)' }};border-radius:999px;padding:2px 10px;cursor:pointer;font:500 12px var(--sans);color:{{ e.on ? 'var(--ink)' : 'var(--mut)' }};white-space:nowrap" style-hover="border-color:var(--acc)">{{ e.label }}</button></sc-for>
+                        <button onClick="{{ drvd.onProcess }}" style="background:none;border:1px solid var(--line2);border-radius:999px;padding:2px 10px;cursor:pointer;font:500 12px var(--sans);color:var(--ink2);white-space:nowrap" style-hover="border-color:var(--acc)">Read with these eyes</button>
                       </div>
-                      <span style="font:400 12px var(--sans);color:var(--mut);text-wrap:pretty">{{ d.eyesNote }}</span>
+                      <span style="font:400 12px var(--sans);color:var(--mut);text-wrap:pretty">{{ drvd.eyesNote }}</span>
                     </div>
                   </sc-if>
-                  <sc-if value="{{ d.hasDistinct }}" hint-placeholder-val="{{ false }}"><span style="font:500 14px var(--sans);color:var(--acc)">{{ d.distinct }}</span></sc-if>
-                  <sc-if value="{{ d.hasFold }}" hint-placeholder-val="{{ false }}"><span style="font:400 14px var(--sans);color:var(--mut)">{{ d.fold }}</span></sc-if>
+                  <sc-if value="{{ drvd.hasDistinct }}" hint-placeholder-val="{{ false }}"><span style="font:500 14px var(--sans);color:var(--acc)">{{ drvd.distinct }}</span></sc-if>
+                  <sc-if value="{{ drvd.hasFold }}" hint-placeholder-val="{{ false }}"><span style="font:400 14px var(--sans);color:var(--mut)">{{ drvd.fold }}</span></sc-if>
                   <div style="display:grid;grid-template-columns:auto minmax(0,1fr);gap:6px 10px;align-items:center;font:400 13px var(--sans);color:var(--mut)">
                     
-                    <sc-if value="{{ d.isKept }}" hint-placeholder-val="{{ true }}">
+                    <sc-if value="{{ drvd.isKept }}" hint-placeholder-val="{{ true }}">
 
                     </sc-if>
                   </div>
                       <div style="display:flex;gap:8px;flex-wrap:wrap">
-                    <sc-if value="{{ d.hasReplay }}" hint-placeholder-val="{{ false }}"><button onClick="{{ d.onReplay }}" style="background:none;border:1px solid var(--line2);border-radius:8px;padding:5px 12px;cursor:pointer;font:500 14px var(--sans);color:var(--ink2)" style-hover="border-color:var(--acc)">Watch it being read</button></sc-if>
-                    <button onClick="{{ d.onRename }}" title="Rename this source" style="background:none;border:1px solid var(--line2);border-radius:8px;padding:5px 12px;cursor:pointer;font:500 14px var(--sans);color:var(--ink2)" style-hover="border-color:var(--acc)">Rename</button>
-                    <sc-if value="{{ d.canUnkeep }}" hint-placeholder-val="{{ false }}"><button onClick="{{ d.onUnkeep }}" style="background:none;border:0;padding:5px 4px;cursor:pointer;font:500 13px var(--sans);color:var(--mut)" style-hover="color:var(--ink)">Set aside</button></sc-if>
+                    <sc-if value="{{ drvd.hasReplay }}" hint-placeholder-val="{{ false }}"><button onClick="{{ drvd.onReplay }}" style="background:none;border:1px solid var(--line2);border-radius:8px;padding:5px 12px;cursor:pointer;font:500 14px var(--sans);color:var(--ink2)" style-hover="border-color:var(--acc)">Watch it being read</button></sc-if>
+                    <sc-if value="{{ drvd.canUnkeep }}" hint-placeholder-val="{{ false }}"><button onClick="{{ drvd.onUnkeep }}" style="background:none;border:0;padding:5px 4px;cursor:pointer;font:500 13px var(--sans);color:var(--mut)" style-hover="color:var(--ink)">Set aside</button></sc-if>
                       </div>
                     </div>
                   </details>
-                </div>
-              </sc-for>
-            </div>
-            <sc-if value="{{ g.hasMore }}" hint-placeholder-val="{{ false }}"><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><button onClick="{{ g.onMore }}" style="background:none;border:1px solid var(--line2);border-radius:8px;padding:6px 12px;cursor:pointer;font:500 14px var(--sans);color:var(--ink2)" style-hover="border-color:var(--acc)">{{ g.moreLabel }}</button><span style="font:400 13px var(--sans);color:var(--dim)">{{ g.shown }}</span></div></sc-if><sc-if value="{{ g.canLess }}" hint-placeholder-val="{{ false }}"><button onClick="{{ g.onLess }}" style="all:unset;cursor:pointer;font:500 13px var(--sans);color:var(--mut)" style-hover="color:var(--ink)">Show fewer</button></sc-if>
-          </section>
-        </sc-for>
+          </div>
         </sc-if>
         <sc-if value="{{ hasGaps }}"><h2 style="margin:12px 0 0;font:600 16px var(--sans)">What to check</h2><p style="margin:0;color:var(--mut);font-size:13px">Gaps in these sources, not proof that something is absent.</p></sc-if>
         <sc-for list="{{ gaps }}" as="g" hint-placeholder-count="3">
@@ -1684,6 +1793,25 @@ button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visi
       </sc-if>
 
       <sc-if value="{{ v.connections }}" hint-placeholder-val="{{ false }}">
+        <sc-if value="{{ cfold.on }}" hint-placeholder-val="{{ false }}">
+          <section style="display:flex;flex-direction:column;gap:10px;background:var(--sel);border:1px solid var(--acc2);border-radius:12px;padding:14px 16px">
+            <div style="display:flex;gap:12px;align-items:baseline;flex-wrap:wrap">
+              <span style="font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--acc)">The Fold · read together</span>
+              <span style="font:500 16px var(--sans);color:var(--ink)">{{ cfold.title }}</span>
+            </div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap">
+              <sc-for list="{{ cfold.sources }}" as="x" hint-placeholder-count="3"><span style="display:inline-flex;align-items:center;gap:6px;background:var(--s1);border:1px solid var(--line2);border-radius:999px;padding:2px 10px;font:500 13px var(--sans);color:var(--ink2);max-width:100%"><span class="hd-drive-ic" style="background:{{ x.color }};width:15px;height:15px;font-size:9px">{{ x.glyph }}</span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ x.title }}</span></span></sc-for>
+            </div>
+            <span style="font:400 13px/1.45 var(--sans);color:var(--mut);text-wrap:pretty">The map below is the combined content: the names these sources share, nested under the names they are tied to most. Step the Names level up or down to open or fold the groups; click a name to see every statement it sits in.</span>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <button onClick="{{ cfold.onAsk }}" style="background:var(--acc2);border:0;color:#fff;border-radius:8px;padding:6px 14px;cursor:pointer;font:600 13px var(--sans)">Ask these sources</button>
+              <button onClick="{{ cfold.onBuild }}" style="background:none;border:1px solid var(--line2);border-radius:8px;padding:6px 14px;cursor:pointer;font:500 13px var(--sans);color:var(--ink2)" style-hover="border-color:var(--acc)">Build a document from them</button>
+              <button onClick="{{ cfold.onAll }}" style="background:none;border:0;padding:6px 8px;cursor:pointer;font:500 13px var(--sans);color:var(--acc)">Back to all sources</button>
+            </div>
+          </section>
+        </sc-if>
+        <sc-if value="{{ cfold.on }}" hint-placeholder-val="{{ false }}"><div style="border-radius:12px;background:var(--bg);border:1px solid var(--line)">{{ graphEl }}</div></sc-if>
+        <sc-if value="{{ !cfold.on }}" hint-placeholder-val="{{ true }}">
         <section style="display:flex;flex-direction:column;gap:8px;background:var(--s1);border:1px solid var(--line2);border-radius:12px;padding:12px 14px">
           <div style="display:flex;gap:10px;align-items:baseline;flex-wrap:wrap">
             <span style="font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--acc)">Showing</span>
@@ -1763,6 +1891,7 @@ button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visi
         <sc-if value="{{ pairsMore.hasMore }}" hint-placeholder-val="{{ false }}"><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><button onClick="{{ pairsMore.onMore }}" style="background:none;border:1px solid var(--line2);border-radius:8px;padding:6px 12px;cursor:pointer;font:500 14px var(--sans);color:var(--ink2)" style-hover="border-color:var(--acc)">{{ pairsMore.moreLabel }}</button><span style="font:400 13px var(--sans);color:var(--dim)">{{ pairsMore.shown }}</span></div></sc-if><sc-if value="{{ pairsMore.canLess }}" hint-placeholder-val="{{ false }}"><button onClick="{{ pairsMore.onLess }}" style="all:unset;cursor:pointer;font:500 13px var(--sans);color:var(--mut)" style-hover="color:var(--ink)">Show fewer</button></sc-if>
         <sc-if value="{{ noPairs }}" hint-placeholder-val="{{ false }}"><p style="color:var(--mut);margin:0">No two names appear together more often than chance would give.</p></sc-if>
         <sc-if value="{{ hasPairsHidden }}" hint-placeholder-val="{{ false }}"><p style="color:var(--mut);margin:0;font-size:14px">{{ pairsHidden }}</p></sc-if>
+        </sc-if>
       </sc-if>
 
       <sc-if value="{{ v.framing }}" hint-placeholder-val="{{ false }}">
@@ -2250,15 +2379,19 @@ button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visi
             <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;flex:none">
               <div style="display:flex;border:1px solid var(--line2);border-radius:8px;overflow:hidden">
                 <button onClick="{{ modeOriginal }}" style="border:0;padding:6px 12px;cursor:pointer;font:500 14px var(--sans);background:{{ modeO.bg }};color:{{ modeO.color }}">{{ modeO.label }}</button>
+                <button onClick="{{ modeMap }}" title="The names in this source and the ties between them, nested into groups" style="border:0;padding:6px 12px;cursor:pointer;font:500 14px var(--sans);background:{{ modeMp.bg }};color:{{ modeMp.color }}">Map</button>
                 <sc-if value="{{ hasFaithful }}" hint-placeholder-val="{{ false }}"><button onClick="{{ modeReading }}" style="border:0;padding:6px 12px;cursor:pointer;font:500 14px var(--sans);background:{{ modeR.bg }};color:{{ modeR.color }}">Reading</button></sc-if>
                 <sc-if value="{{ hasScreen }}" hint-placeholder-val="{{ false }}"><button onClick="{{ modeScreen }}" title="The measured 2D model drawn on the image: every region, coloured by role" style="border:0;padding:6px 12px;cursor:pointer;font:500 14px var(--sans);background:{{ modeSc.bg }};color:{{ modeSc.color }}">Regions</button></sc-if>
-                <sc-if value="{{ noFaithful }}" hint-placeholder-val="{{ true }}"><button onClick="{{ modePlain }}" style="border:0;padding:6px 12px;cursor:pointer;font:500 14px var(--sans);background:{{ modeP.bg }};color:{{ modeP.color }}">Text only</button></sc-if>
                 <button onClick="{{ modeRestated }}" title="The document restated from its own structure: no model, every clause from the text" style="border:0;padding:6px 12px;cursor:pointer;font:500 14px var(--sans);background:{{ modeS.bg }};color:{{ modeS.color }}">Restated</button>
                 <button onClick="{{ modeFigures }}" title="The document read as sectioned, keyed, nested figures — every amount, date and rate with the bytes it came from" style="border:0;padding:6px 12px;cursor:pointer;font:500 14px var(--sans);background:{{ modeFg.bg }};color:{{ modeFg.color }}">Figures</button>
                 <button onClick="{{ modeSummary }}" title="The document curated from its own sentences — one line, five, three paragraphs. No model; every line is a verbatim span of this source" style="border:0;padding:6px 12px;cursor:pointer;font:500 14px var(--sans);background:{{ modeSum.bg }};color:{{ modeSum.color }}">Summary</button>
               </div>
               <sc-if value="{{ readerHasUrl }}" hint-placeholder-val="{{ false }}"><a href="{{ readerUrl }}" target="_blank" rel="noopener" style="font:500 14px var(--sans);white-space:nowrap">{{ readerSourceLabel }}</a></sc-if>
               <button onClick="{{ onReaderRenameStart }}" title="Rename this source" style="background:none;border:1px solid var(--line2);border-radius:8px;padding:5px 12px;cursor:pointer;font:500 13px var(--sans);color:var(--ink2);white-space:nowrap" style-hover="border-color:var(--acc)">✎ Rename</button>
+              <sc-if value="{{ readerCanDelete }}" hint-placeholder-val="{{ false }}">
+                <sc-if value="{{ readerNoDelAsk }}" hint-placeholder-val="{{ true }}"><button onClick="{{ onReaderAskDelete }}" title="Delete this source and its stored copy from this browser" style="background:none;border:1px solid var(--line2);border-radius:8px;padding:5px 12px;cursor:pointer;font:500 13px var(--sans);color:var(--ink2);white-space:nowrap" style-hover="border-color:var(--bad)">Delete</button></sc-if>
+                <sc-if value="{{ readerDelAsk }}" hint-placeholder-val="{{ false }}"><button onClick="{{ onReaderDelete }}" title="This can't be undone" style="background:var(--bad);border:1px solid var(--bad);color:#fff;border-radius:8px;padding:5px 12px;cursor:pointer;font:600 13px var(--sans);white-space:nowrap">Delete for good</button><button onClick="{{ onReaderCancelDelete }}" style="background:none;border:0;color:var(--mut);cursor:pointer;font:500 13px var(--sans);padding:7px 6px">Keep it</button></sc-if>
+              </sc-if>
             </div>
           </div>
           <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:9px 18px;border-top:1px solid var(--line);background:var(--s2)">
@@ -2299,21 +2432,28 @@ button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visi
             <div style="border-top:1px solid var(--line);padding:10px 34px;font:400 13px/1.45 var(--sans);color:var(--mut);background:var(--s2);text-wrap:pretty">{{ rdFaith.note }}</div>
           </sc-if>
           <sc-if value="{{ rdMedia.has }}" hint-placeholder-val="{{ false }}">
-            <div style="border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));align-items:start">
+            <div style="border-top:1px solid var(--line);display:grid;grid-template-columns:{{ rdMedia.gridCols }};align-items:start">
               <div style="position:sticky;top:var(--hdr-h, 61px);min-width:0;padding:18px 20px 18px 24px;display:flex;flex-direction:column;gap:10px;background:var(--s1);z-index:2">
                 <sc-if value="{{ rdMedia.isLocal }}" hint-placeholder-val="{{ false }}">
                   <sc-if value="{{ rdMedia.hasSrc }}" hint-placeholder-val="{{ false }}">
                     <sc-if value="{{ rdMedia.isAudio }}" hint-placeholder-val="{{ true }}">
-                      <audio id="fx-local" controls preload="metadata" src="{{ rdMedia.src }}" style="width:100%"></audio>
+                      <audio id="fx-local" controls="{{ rdMedia.nativeControls }}" preload="metadata" src="{{ rdMedia.src }}" style="width:100%;display:{{ rdMedia.audioDisplay }}"></audio>
+                      <canvas id="fx-wave" title="Click or drag to move through the recording" style="width:100%;height:{{ rdMedia.waveH }};display:{{ rdMedia.waveDisplay }};background:var(--s2);border:1px solid var(--line);border-radius:10px;cursor:pointer;touch-action:none"></canvas>
                     </sc-if>
                     <sc-if value="{{ rdMedia.noAudio }}" hint-placeholder-val="{{ false }}">
-                      <video id="fx-local" controls preload="metadata" src="{{ rdMedia.src }}" style="width:100%;max-height:56vh;border:0;border-radius:10px;background:#000"></video>
+                      <video id="fx-local" controls preload="metadata" src="{{ rdMedia.src }}" style="width:100%;max-height:{{ rdMedia.videoMaxH }};border:0;border-radius:10px;background:#000"></video>
                     </sc-if>
                   </sc-if>
                   <sc-if value="{{ rdMedia.noSrc }}" hint-placeholder-val="{{ false }}"><span style="font:400 13px/1.45 var(--sans);color:var(--amber);text-wrap:pretty">The recording's bytes are kept in this browser's file store — opening…</span></sc-if>
                 </sc-if>
                 <sc-if value="{{ rdMedia.ytOnly }}" hint-placeholder-val="{{ false }}">
                   <iframe id="fx-yt" src="{{ rdMedia.src }}" title="{{ rdMedia.title }}" referrerPolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen="{{ true }}" style="width:100%;aspect-ratio:16/9;border:0;border-radius:10px;background:#000"></iframe>
+                </sc-if>
+                <sc-if value="{{ rdMedia.timed }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+                    <div style="display:flex;border:1px solid var(--line2);border-radius:8px;overflow:hidden"><sc-for list="{{ rdMedia.layouts }}" as="o" hint-placeholder-count="2"><button onClick="{{ o.onClick }}" title="{{ o.title }}" style="border:0;padding:4px 11px;cursor:pointer;font:500 13px var(--sans);background:{{ o.bg }};color:{{ o.col }};white-space:nowrap">{{ o.label }}</button></sc-for></div>
+                    <label style="display:flex;gap:6px;align-items:center;font:500 13px var(--sans);color:var(--ink2);cursor:pointer"><input type="checkbox" checked="{{ rdMedia.follow }}" onChange="{{ rdMedia.onFollow }}"></input>Follow along</label>
+                  </div>
                 </sc-if>
                 <div style="display:flex;gap:10px;align-items:baseline;flex-wrap:wrap"><span id="fx-yt-now" style="font:600 13px var(--mono);color:var(--acc);white-space:nowrap"></span><span style="font:500 13px var(--sans);color:var(--ink2)">{{ rdMedia.kindLine }}</span></div>
                 <sc-if value="{{ rdMedia.local }}" hint-placeholder-val="{{ false }}">
@@ -2330,6 +2470,7 @@ button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visi
                     <span id="fx-st" style="font:500 12px var(--sans);color:var(--mut);white-space:nowrap">{{ rdMedia.statusLabel }}</span>
                   </div>
                 </sc-if>
+                <sc-if value="{{ rdMedia.showExtras }}" hint-placeholder-val="{{ true }}">
                 <sc-if value="{{ rdMedia.dl.has }}" hint-placeholder-val="{{ false }}">
                   <div style="display:flex;flex-direction:column;gap:6px;border-top:1px solid var(--line);padding-top:10px">
                     <span style="font:600 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--mut)">Download transcript</span>
@@ -2353,7 +2494,7 @@ button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visi
                   </sc-if>
                 </sc-if>
                 <span style="font:400 13px/1.45 var(--sans);color:var(--mut);text-wrap:pretty">{{ rdMedia.note }}</span>
-                <sc-if value="{{ rdMedia.timed }}" hint-placeholder-val="{{ false }}"><label style="display:flex;gap:8px;align-items:center;font:500 13px var(--sans);color:var(--ink2);cursor:pointer"><input type="checkbox" checked="{{ rdMedia.follow }}" onChange="{{ rdMedia.onFollow }}"></input>Follow the video in the transcript</label></sc-if>
+                
                 <sc-if value="{{ rdMedia.canAsk }}" hint-placeholder-val="{{ false }}">
                   <sc-if value="{{ rdMedia.ask }}" hint-placeholder-val="{{ false }}">
                     <div style="display:flex;flex-direction:column;gap:10px;border:1px solid var(--acc2);background:var(--sel);border-radius:12px;padding:12px 14px">
@@ -2392,8 +2533,9 @@ button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visi
                   </div>
                 </sc-if>
                 <sc-if value="{{ rdMedia.hasUrl }}" hint-placeholder-val="{{ false }}"><a href="{{ rdMedia.url }}" target="_blank" rel="noopener" style="font:500 13px var(--sans);color:var(--acc);text-decoration:none">Open on YouTube ↗</a></sc-if>
+                </sc-if>
               </div>
-              <div id="fx-tx" style="min-width:0;overflow-x:hidden;overflow-wrap:anywhere;border-left:1px solid var(--line);padding:18px 28px 40px;font:400 17px/1.65 var(--serif);color:var(--ink);max-height:calc(100vh - 80px);overflow:auto;position:sticky;top:var(--hdr-h, 61px)">
+              <div id="fx-tx" style="min-width:0;overflow-x:hidden;overflow-wrap:anywhere;border-left:1px solid var(--line);padding:18px 28px 40px;font:400 17px/1.65 var(--serif);color:var(--ink);max-height:{{ rdMedia.txMaxH }};overflow:auto;position:{{ rdMedia.txPos }};top:var(--hdr-h, 61px)">
                 <span style="display:block;font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mut);margin-bottom:10px">{{ rdMedia.txTitle }}</span>
                 <sc-if value="{{ rdMedia.hasNewNames }}" hint-placeholder-val="{{ false }}">
                   <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:16px;border:1px solid var(--line2);border-radius:10px;padding:10px 12px;background:var(--s2)">
@@ -2407,6 +2549,12 @@ button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visi
                 </sc-if>
                 <div ref="{{ readerRef }}"></div>
               </div>
+            </div>
+          </sc-if>
+          <sc-if value="{{ isMapMode }}" hint-placeholder-val="{{ false }}">
+            <div style="border-top:1px solid var(--line);padding:14px 16px 16px;display:flex;flex-direction:column;gap:8px">
+              <span style="font:400 13px/1.45 var(--sans);color:var(--mut);text-wrap:pretty">The names in this source and the ties between them — names that share more statements than chance would give are tied, and nested under the name they are tied to most. Step the level to open or fold groups; click a name to read where it sits.</span>
+              <div style="border-radius:10px;background:var(--bg);border:1px solid var(--line)">{{ rdMapEl }}</div>
             </div>
           </sc-if>
           <sc-if value="{{ isOriginalFlat }}" hint-placeholder-val="{{ true }}">
@@ -2896,7 +3044,7 @@ button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visi
 function digammaH(x) { let r = 0; while (x < 6) { r -= 1 / x; x += 1; } const f = 1 / (x * x); return r + Math.log(x) - 0.5 / x - f * (1 / 12 - f * (1 / 120 - f * (1 / 252 - f * (1 / 240 - f / 132)))); }
 const klAdmitH = (bv, B) => Math.max(0, Math.log(B) - Math.log(bv) + digammaH(bv + 1) - digammaH(B + 1));
 const holoTokens = t => [...new Set((clean(t).toLowerCase().replace(/[\u2019']/g, '').match(/[a-z][a-z-]{2,}/g) || []).filter(w => !STOP.has(w) && !/^-|-$/.test(w)))];
-const VIEW_LABEL = { overview: 'Evidence overview', summary: 'Overview', search: 'Search', names: 'Names', types: 'Types', figures: 'Figures', statements: 'Statements', connections: 'Connections', framing: 'Framing', views: 'Views', patterns: 'Patterns', surprise: 'Surprise', reader: 'Sources', profile: 'Names', draft: 'Draft', records: 'Records', ask: 'Ask the Fold', ingest: 'Add & publish' };
+const VIEW_LABEL = { overview: 'Evidence overview', summary: 'Sources', search: 'Search', names: 'Names', types: 'Types', figures: 'Figures', statements: 'Statements', connections: 'Connections', framing: 'Framing', views: 'Views', patterns: 'Patterns', surprise: 'Surprise', reader: 'Sources', profile: 'Names', draft: 'Draft', records: 'Records', ask: 'Ask the Fold', ingest: 'Add & publish' };
 const SU_CURSORS = [
   { id: 'loo', label: 'Everything else', desc: 'Each statement against normal text plus everything the other sources in this view say, regardless of date: what this source says that nothing else in view, and nothing normal, prepares you for.' },
   { id: 'pub', label: 'When published', desc: 'Sources in the order they were published: what a reader following the story would have learned, and when.' },
@@ -4080,6 +4228,11 @@ function loadRailOpen() { try { const v = localStorage.getItem('fold-explorer-ra
 function loadSegOpen() { try { return localStorage.getItem('fold-explorer-segopen') === '1'; } catch (e) { return false; } }
 // display names for workspaces forked out of an existing one -- the fixed sample corpora and 'custom' never need an entry here
 function loadWorkspaceNames() { try { return JSON.parse(localStorage.getItem('fold-explorer-workspaces') || '{}'); } catch (e) { return {}; } }
+// The stacked filter layers (Filters row, Sources / Filtering / Perspectives strip, Topics line) are off for now.
+// Flip to true to bring them back; the narrowed-to chips and "Show everything" stay on regardless.
+const FILTER_LAYERS = false;
+function loadWsRecent() { try { return JSON.parse(localStorage.getItem('fold-ws-recent') || '{}'); } catch (e) { return {}; } }
+function touchWs(id) { try { const r = loadWsRecent(); r[id] = Date.now(); localStorage.setItem('fold-ws-recent', JSON.stringify(r)); } catch (e) {} }
 function saveWorkspaceNames(w) { try { localStorage.setItem('fold-explorer-workspaces', JSON.stringify(w)); } catch (e) {} }
 // Corrections log: plain-English "that's incorrect" filings, per workspace. Append-only entries with
 // status active/retracted (never deleted), so every correction is revisable and auditable. Active
@@ -4224,6 +4377,8 @@ async function pdfLib() { if (_pdfjs) return _pdfjs; const m = await import('htt
 const PDF_MAX_PAGES = 300;
 function idbOpen() { return new Promise((res, rej) => { const r = indexedDB.open('fold-explorer', 2); r.onupgradeneeded = () => { const db = r.result; if (!db.objectStoreNames.contains('blobs')) db.createObjectStore('blobs'); }; r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); }); }
 async function idbPut(k, v) { const db = await idbOpen(); return new Promise((res, rej) => { const tx = db.transaction('blobs', 'readwrite'); tx.objectStore('blobs').put(v, k); tx.oncomplete = () => res(); tx.onerror = () => rej(tx.error); }); }
+async function idbDel(k) { const db = await idbOpen(); return new Promise((res, rej) => { const tx = db.transaction('blobs', 'readwrite'); tx.objectStore('blobs').delete(k); tx.oncomplete = () => res(); tx.onerror = () => rej(tx.error); }); }
+async function opfsDel(path) { try { const parts = path.split('/'); const name = parts.pop(); const d = await opfsDir(parts.join('/')); await d.removeEntry(name); return true; } catch (e) { return false; } }
 async function idbGet(k) { const db = await idbOpen(); return new Promise((res, rej) => { const q = db.transaction('blobs', 'readonly').objectStore('blobs').get(k); q.onsuccess = () => res(q.result); q.onerror = () => rej(q.error); }); }
 // A recording's bytes live in OPFS (durable, ample quota) with the IndexedDB blob
 // as the fast path. Transcription and playback read whichever rung actually holds
@@ -4646,7 +4801,7 @@ function MapView(p) {
     import(new URL('holodeck-map.js', location.href).href).then(M => { if (dead || !host.current) return; ctl.current = M.mountMap(host.current, { legend: true, padBottom: 44, onProfile: n => cur.current.onProfile(n), onWitness: o => cur.current.onWitness && cur.current.onWitness(o) }); ctl.current.set(cur.current.data); }).catch(e => console.warn('holodeck map', e));
     return () => { dead = true; if (ctl.current) ctl.current.destroy(); ctl.current = null; }; }, []);
   R.useEffect(() => { if (ctl.current) ctl.current.set(p.data); });
-  return R.createElement('div', { ref: host, style: { position: 'relative', height: '560px' } });
+  return R.createElement('div', { ref: host, style: { position: 'relative', height: p.height || '560px' } });
 }
 
 const SAY_RE = '(?:said|says|told|wrote|writes|argued|added|stated|states|announced|asked|testified|explained|noted|claimed|contends|replied|responded)';
@@ -4833,7 +4988,7 @@ class Component extends DCLogic {
     window.addEventListener('dragenter', this._h.enter); window.addEventListener('dragleave', this._h.leave); window.addEventListener('dragover', this._h.over); window.addEventListener('drop', this._h.drop); window.addEventListener('paste', this._h.paste);
   }
   componentWillUnmount() { window.removeEventListener('keydown', this._onFocusKey); window.removeEventListener('resize', this._onRz); if (this._pdfRo) { try { this._pdfRo.disconnect(); } catch (e) {} } window.removeEventListener('message', this._onYt); document.removeEventListener('selectionchange', this._onSelCh); window.removeEventListener('scroll', this._onSelCh, true); window.removeEventListener('message', this._onMsg); const h = this._h; window.removeEventListener('dragenter', h.enter); window.removeEventListener('dragleave', h.leave); window.removeEventListener('dragover', h.over); window.removeEventListener('drop', h.drop); window.removeEventListener('paste', h.paste); }
-  componentDidUpdate() { this.syncOverview(); this.applyTheme(); this.measureHdr(); try { const ff = document.getElementById('fold-folder-input'); if (ff && !ff.multiple) { ff.webkitdirectory = true; ff.setAttribute('webkitdirectory', ''); ff.multiple = true; ff.setAttribute('multiple', ''); } } catch (e) {} if (this._prevCorpus !== this.state.corpus || this._prevAdded !== this.state.added) { this._prevCorpus = this.state.corpus; this._prevAdded = this.state.added; this.loadHtml(); this.akAutoLoad(); } const rd0 = this.state.readDoc && this.analysis().docById[this.state.readDoc]; if (rd0 && rd0.media && rd0.media.kind === 'local') { this.ensureMediaUrl(rd0);
+  componentDidUpdate() { try { const c = this.corpusId(); if (c !== this._wsSeen) { this._wsSeen = c; touchWs(c); } } catch (e) {} this.syncOverview(); this.applyTheme(); this.measureHdr(); try { const ff = document.getElementById('fold-folder-input'); if (ff && !ff.multiple) { ff.webkitdirectory = true; ff.setAttribute('webkitdirectory', ''); ff.multiple = true; ff.setAttribute('multiple', ''); } } catch (e) {} if (this._prevCorpus !== this.state.corpus || this._prevAdded !== this.state.added) { this._prevCorpus = this.state.corpus; this._prevAdded = this.state.added; this.loadHtml(); this.akAutoLoad(); } const rd0 = this.state.readDoc && this.analysis().docById[this.state.readDoc]; if (rd0 && rd0.media && rd0.media.kind === 'local') { this.ensureMediaUrl(rd0);
       // A recording opened but never classified gets its sound map on first sight (an
       // older stored recording, or one added before the classifier existed); the work
       // is the same in-browser rung, guarded so it happens once until it lands.
@@ -4841,7 +4996,7 @@ class Component extends DCLogic {
         (this._clsQueued = this._clsQueued || {});
         if (!this._clsQueued[rd0.id]) { this._clsQueued[rd0.id] = 1; this.classifyDoc(rd0).catch(() => {}); }
       }
-    } this.hookLocal(); this.syncReader(); this.ytHook(); this.syncOmni();
+    } this.hookLocal(); this.hookWave(); this.syncReader(); this.ytHook(); this.syncOmni();
     const S = this.state;
     const askEl = document.getElementById('ak-composer');
     if (S.view === 'ask' && askEl) {
@@ -5339,6 +5494,7 @@ class Component extends DCLogic {
     const tm = document.getElementById('fx-tm'); if (tm) tm.textContent = fmtT(lp ? lp.currentTime : 0) + (lp && lp.duration && isFinite(lp.duration) ? ' / ' + fmtT(lp.duration) : '');
     const pp = document.getElementById('fx-pp'); if (pp) pp.textContent = (lp && !lp.paused && !lp.ended) ? '⏸' : '▶';
     const st = document.getElementById('fx-st');
+    this.drawWave();
     if (st) st.textContent = lp ? (lp.ended ? 'ended — press ▶ or a timecode to go again' : lp.paused ? (lp.currentTime > 0 ? 'paused' : '') : 'playing · the marked line follows') : '';
   }
   // ---- download the transcript in other forms, and the audio itself ----
@@ -5351,7 +5507,7 @@ class Component extends DCLogic {
     const title = d.title || 'transcript';
     const paras = (d.media && d.media.segN > 0) ? timedParasOf(src.timed ? src.html : '') : [];
     const items = [];
-    if (paras.length) for (const [code, extName] of [['txt', 'txt'], ['srt', 'srt'], ['vtt', 'vtt'], ['md', 'md'], ['json', 'json']]) { const x = ext(extName); items.push({ label: extName === 'txt' ? 'txt' : extName, code, title: x[0], onClick: () => this.downloadTranscript(d, paras, extName, title) }); }
+    if (paras.length) for (const [code, extName] of [['txt', 'txt'], ['srt', 'srt'], ['vtt', 'vtt'], ['md', 'md'], ['json', 'json']]) { const x = transcriptExt(extName); items.push({ label: extName === 'txt' ? 'txt' : extName, code, title: x[0], onClick: () => this.downloadTranscript(d, paras, extName, title) }); }
     else if ((src.text || '').trim()) items.push({ label: 'txt', code: 'txt', title: transcriptExt('txt')[0], onClick: () => this.downloadTranscript(d, [], 'txt', title) });
     const isYt = d.media && d.media.kind === 'youtube';
     return {
@@ -5391,6 +5547,50 @@ class Component extends DCLogic {
     if (cur === this._ytCur && !force) return; if (this._ytCur) { this._ytCur.style.background = ''; this._ytCur.style.boxShadow = ''; } this._ytCur = cur; if (!cur) return;
     cur.style.background = 'var(--sel)'; cur.style.boxShadow = '-10px 0 0 var(--sel), 10px 0 0 var(--sel)'; cur.style.borderRadius = '4px';
     const box = document.getElementById('fx-tx'); if (box && this.state.ytFollow !== false && (force || Date.now() - (this._ytUser || 0) > 4000)) { const r = cur.getBoundingClientRect(), br = box.getBoundingClientRect(); if (r.top < br.top + 40 || r.bottom > br.bottom - 40) box.scrollTop += r.top - br.top - br.height / 3; } }
+  // A transcript that has just landed is read like any ingested file: if its source is open, the reader moves to the
+  // Map so the names the recording says, and the ties between them, appear beside the player and the transcript.
+  showMapFor(docId) { if (this.state.view === 'reader' && this.state.readDoc === docId) this.setState({ readMode: 'map' }); }
+  // The standard player: video is shown as video, audio as a waveform, and a recording with a transcript can be read
+  // beside the player or as the transcript itself (the player shrinks to a bar above it). The choice is remembered.
+  mediaLay(timed, needExtras) {
+    const S = this.state; let saved = ''; try { saved = localStorage.getItem('hd:media-layout') || ''; } catch (e) {}
+    const lay = timed && (S.mediaLayout || saved) === 'transcript' ? 'transcript' : 'side', tr = lay === 'transcript';
+    const seg = (k, l, t) => ({ label: l, title: t, bg: lay === k ? 'var(--sel)' : 'transparent', col: lay === k ? 'var(--ink)' : 'var(--mut)', onClick: () => { try { localStorage.setItem('hd:media-layout', k); } catch (e) {} this.setState({ mediaLayout: k }); } });
+    return { gridCols: tr ? 'minmax(0,1fr)' : 'repeat(auto-fit,minmax(min(100%,420px),1fr))', showExtras: !tr || !!needExtras || !!S.txBusy,
+      layouts: [seg('side', 'Player + transcript', 'The recording beside its transcript'), seg('transcript', 'Transcript', 'The transcript, full width, with the player kept above it')],
+      txMaxH: tr ? 'calc(100vh - 330px)' : 'calc(100vh - 80px)', txPos: tr ? 'static' : 'sticky', videoMaxH: tr ? '24vh' : '56vh' };
+  }
+  waveVals(d) {
+    const W = (this._wave || {})[d.id], ready = !!(W && W.peaks); let saved = ''; try { saved = localStorage.getItem('hd:media-layout') || ''; } catch (e) {}
+    const tr = (this.state.mediaLayout || saved) === 'transcript';
+    return { nativeControls: !ready, audioDisplay: ready ? 'none' : 'block', waveDisplay: ready ? 'block' : 'none', waveH: tr ? '56px' : '88px' };
+  }
+  async ensureWave() {
+    const id = this.state.readDoc, d = id && this.analysis().docById[id];
+    if (!d || !d.media || d.media.kind !== 'local' || (d.media.mime || '').indexOf('audio') !== 0) return;
+    this._wave = this._wave || {}; if (this._wave[id] !== undefined) return; this._wave[id] = 'loading';
+    try { const buf = await mediaBytes(id); const M = this._waveM = this._waveM || await import(new URL('holodeck-waveform.js', location.href).href); this._wave[id] = buf ? await M.decodePeaks(buf) : null; } catch (e) { this._wave[id] = null; }
+    this.forceUpdate();
+  }
+  hookWave() {
+    const cv = document.getElementById('fx-wave');
+    if (!cv) { this._fxWave = null; return; }
+    this.ensureWave();
+    if (cv !== this._fxWave) {
+      this._fxWave = cv;
+      const seek = e => { const W = (this._wave || {})[this.state.readDoc], el = document.getElementById('fx-local'); if (!W || !W.peaks || !el || !this._waveM) return; const r = cv.getBoundingClientRect(), t = this._waveM.timeAtX(e.clientX - r.left, r.width, el.duration || W.duration); el.currentTime = t; this.ytMark(t, true); this.drawWave(); };
+      let down = false; cv.addEventListener('pointerdown', e => { down = true; try { cv.setPointerCapture(e.pointerId); } catch (x) {} seek(e); });
+      cv.addEventListener('pointermove', e => { if (down) seek(e); }); ['pointerup', 'pointercancel'].forEach(ev => cv.addEventListener(ev, () => { down = false; }));
+      if (typeof ResizeObserver !== 'undefined') new ResizeObserver(() => this.drawWave()).observe(cv);
+    }
+    this.drawWave();
+  }
+  drawWave() {
+    const cv = document.getElementById('fx-wave'), W = (this._wave || {})[this.state.readDoc], el = document.getElementById('fx-local');
+    if (!cv || !W || !W.peaks || !this._waveM || !cv.clientWidth) return;
+    const dur = (el && isFinite(el.duration) && el.duration) || W.duration || 1;
+    this._waveM.drawWave(cv, W.peaks, el ? el.currentTime / dur : 0);
+  }
   ytHook() { const f = document.getElementById('fx-yt'); if (!f || f === this._ytF) return; this._ytF = f; this._ytCur = null; const hello = () => { try { f.contentWindow.postMessage(JSON.stringify({ event: 'listening', id: 'fx', channel: 'widget' }), '*'); } catch (e) {} };
     f.addEventListener('load', () => { hello(); setTimeout(hello, 500); setTimeout(hello, 1500); }); hello();
     const box = document.getElementById('fx-tx'); if (box) { box.addEventListener('wheel', () => { this._ytUser = Date.now(); }, { passive: true }); box.addEventListener('touchmove', () => { this._ytUser = Date.now(); }, { passive: true }); } }
@@ -5454,7 +5654,7 @@ class Component extends DCLogic {
   }
   positionSnapshot() { const A = this.analysis(), S = this.state, t = this.filterTuple();
     return { workspace: this.corpusName(), giver: 'the reader', question: (S.q || '').trim() || (this._fold || []).join(' ') || 'Explore this workspace',
-      frame: VIEW_LABEL[S.view] || S.view || 'Overview', sources: A.docs.filter(d => this._cnt && this._cnt.has(d.id) && !(S.offDocs || {})[d.id]).map(d => ({ id: d.id, title: d.title })),
+      frame: VIEW_LABEL[S.view] || S.view || 'Sources', sources: A.docs.filter(d => this._cnt && this._cnt.has(d.id) && !(S.offDocs || {})[d.id]).map(d => ({ id: d.id, title: d.title })),
       filters: t.filters, timeThrough: S.tMax || null, lens: S.suLens || null, cursor: S.cursor || null, centeredOn: S.sel && (S.sel.name || S.sel.id) || null, capturedAt: new Date().toISOString() }; }
   positionLine(p) { return p.workspace + ' · ' + p.sources.length + ' selected sources · Question: ' + p.question + ' · Reading as: ' + p.frame + (p.filters.length ? ' · Filters: ' + p.filters.map(f => f.key + '=' + String(f.value) + ' for ' + (f.forWhom?.giver || 'the reader')).join('; ') : '') + (p.timeThrough ? ' · Through ' + p.timeThrough : '') + (p.lens ? ' · Lens: ' + (p.lens.v || p.lens.k) : '') + (p.cursor ? ' · Sequence: ' + (SU_CURSORS.find(c => c.id === p.cursor)?.label || p.cursor) : '') + ' · As of ' + p.capturedAt.slice(0, 10) + ' · Your current reading'; }
   groundClaims(only) { this.flush(); const A = this.analysis(); let n = 0, src = 0, cont = 0, auth = 0;
@@ -5855,6 +6055,7 @@ class Component extends DCLogic {
       const media = { ...d0.media, segN: r.segments.length, model: r.model, priors: r.priors || { prompt: prompt ? priorNote : 'none', language: lang } };
       this._html[d0.id] = html; idbPut('html:' + d0.id, html).catch(() => {});
       this.replaceAddedDoc(d0.id, { format: 'html', html, text: htmlToText(html), media, transcribed: true });
+      this.showMapFor(d0.id);
       this.ilog('Transcribed ' + plural(r.segments.length, 'segment') + ' via ' + (r.source === 'local-mlx-whisper' ? 'the local transcriber' : 'the in-browser recognizer') + ' (' + r.model.split('/').pop() + '), listening with ' + priorNote + '.');
       this.txDone();
       const bytes = JSON.stringify({ source: r.source, model: r.model, segments: r.segments, priors: r.priors || { prompt: prompt ? priorNote : 'none', language: lang } });
@@ -6653,6 +6854,10 @@ class Component extends DCLogic {
     this.toast('Workspace renamed to “' + name + '”.'); this.forceUpdate();
   }
   deleteWorkspace(id) {
+    (this.state.added[id] || []).forEach(d => this.purgeDocBytes(d.id));
+    try { const r = loadWsRecent(); delete r[id]; localStorage.setItem('fold-ws-recent', JSON.stringify(r)); } catch (e) {}
+    try { const m = { ...this.metaAll() }; delete m[id]; this._meta = m; localStorage.setItem('fold-explorer-srcmeta', JSON.stringify(m)); } catch (e) {}
+    try { const pr = JSON.parse(localStorage.getItem('fold-explorer-pins') || '{}'); delete pr[id]; localStorage.setItem('fold-explorer-pins', JSON.stringify(pr)); if (this._pins) { const q = { ...this._pins }; delete q[id]; this._pins = q; } } catch (e) {}
     const w = loadWorkspaceNames(); delete w[id]; try { saveWorkspaceNames(w); } catch (e) {}
     const added = { ...this.state.added }; delete added[id]; this.saveAdded(added);
     try { const rooms = JSON.parse(localStorage.getItem('fold-ws-rooms') || '{}'); delete rooms[id]; localStorage.setItem('fold-ws-rooms', JSON.stringify(rooms)); } catch (e) {}
@@ -6995,7 +7200,7 @@ class Component extends DCLogic {
   backLabel(A) { const t = (this._hist || [])[(this._hist || []).length - 1]; if (!t) return null;
     if (t.sel && t.sel.type === 'name' && (t.view === 'profile' || t.view === 'reader')) return t.sel.id;
     if (t.view === 'reader' && t.readDoc && A.docById[t.readDoc]) return short(A.docById[t.readDoc].title, 60);
-    return { names: 'names', search: 'search results', summary: 'overview', surprise: 'junctions' }[t.view] || 'previous view'; }
+    return { names: 'names', search: 'search results', summary: 'sources', surprise: 'junctions' }[t.view] || 'previous view'; }
   goBack() { const H = this._hist || []; const A = this.analysis(); let t;
     while ((t = H.pop())) { if (t.view !== 'reader' || (t.readDoc && A.docById[t.readDoc])) break; }
     if (t) { if (t.view === 'reader' && t.readDoc !== this.state.readDoc) { this.state.seekT = 0; this._faithFound = null; } this.setState({ view: t.view, readDoc: t.readDoc, sel: t.sel, pfFrom: t.pfFrom, pfIdx: 0, pfAll: false, selAll: false }); if (typeof window !== 'undefined') window.scrollTo(0, 0); }
@@ -7360,7 +7565,41 @@ class Component extends DCLogic {
   _saveFolds(folds) { const cid = this.corpusId(); const all = { ...this.metaAll() }; all[cid] = { ...(all[cid] || {}), __folds: folds }; this._meta = all; try { localStorage.setItem('fold-explorer-srcmeta', JSON.stringify(all)); } catch (e) {} this.setState({ metaVer: (this.state.metaVer || 0) + 1 }); }
   addFoldFromFilter(label, f, q, n, fx) { label = (label || '').trim(); if (!label) return; const folds = this.myFolds(); if (folds.some(x => x.label === label)) return; this._saveFolds([...folds, { label, f, q, n, fx: fx && fx.conds && fx.conds.length ? fx : undefined }]); }
   removeFold(label) { this._saveFolds(this.myFolds().filter(x => x.label !== label)); }
-  discard(docId) { const cid = this.corpusId(); const added = { ...this.state.added, [cid]: (this.state.added[cid] || []).filter(d => d.id !== docId) }; this.saveAdded(added); this.setState({ added, view: 'summary', readDoc: null, sel: null, just: null }); }
+  discard(docId) { this.deleteSource(docId); }
+  // when this browser first took the source in: stamped at add time; older sources carry it in the id's base-36 prefix
+  addedAtOf(d) { if (d && d.addedAt) return d.addedAt; const m = d && /^u([0-9a-z]{8})/.exec(d.id || ''); const t = m ? parseInt(m[1], 36) : 0; return t > 1.5e12 && t < 4e12 ? t : 0; }
+  // what kind of file a source looks like to a person: a coloured type badge, a short label, and a text preview
+  driveVals(d) {
+    const med = d.medium || '', t = (d.type || '') + ' ' + (d.kind || '') + ' ' + med, mime = (d.media && d.media.mime) || '';
+    let g = '≡', c = '#4285f4', l = 'Document';
+    if ((d.media && d.media.kind === 'youtube') || /video/i.test(med) || /^video/.test(mime)) { g = '▶'; c = '#ea4335'; l = 'Video'; }
+    else if (/audio/i.test(med) || /^audio/.test(mime)) { g = '♪'; c = '#a142f4'; l = 'Audio'; }
+    else if (d.format === 'pdf' || d.pdfSrc || /\bpdf\b/i.test(t)) { g = 'PDF'; c = '#d93025'; l = 'PDF'; }
+    else if (/spreadsheet|data file|csv|xlsx/i.test(t)) { g = '▦'; c = '#0f9d58'; l = 'Spreadsheet'; }
+    else if (/image/i.test(t)) { g = '▣'; c = '#e8710a'; l = 'Image'; }
+    else if (/news|blog|web|page|government|organisation/i.test(t) || d.url) { g = '◍'; c = '#12a4b6'; l = 'Web page'; }
+    else if (/notes?\b/i.test(t)) { g = '✎'; c = '#f9ab00'; l = 'Note'; }
+    return { dvGlyph: g, dvColor: c, dvLabel: l, dvSnippet: String(d.text || '').replace(/\s+/g, ' ').trim().slice(0, 240) };
+  }
+  // every kept copy of a source's bytes: object URL, text, PDF, OCR, image, eyes, recording (IndexedDB + OPFS)
+  purgeDocBytes(docId) {
+    const u = (this._mediaUrl || {})[docId]; if (u) { try { URL.revokeObjectURL(u); } catch (e) {} delete this._mediaUrl[docId]; }
+    if (this._html) delete this._html[docId];
+    ['html', 'pdf', 'ocr', 'img', 'eyes', 'media'].forEach(k => idbDel(k + ':' + docId).catch(() => {})); opfsDel('media/' + docId);
+  }
+  // Delete a source this browser holds: its record, its folder membership and every kept copy of its bytes
+  // (text, PDF, OCR, image, eyes, recording). Pins keep their own excerpts. Sources of the shipped corpus aren't this browser's to delete.
+  deleteSource(docId) { this.deleteSources([docId]); }
+  deleteSources(ids) {
+    const cid = this.corpusId(); const have = this.state.added[cid] || []; const set = new Set((ids || []).filter(id => have.some(d => d.id === id)));
+    if (!set.size) return;
+    const titles = have.filter(d => set.has(d.id)).map(d => d.title);
+    const added = { ...this.state.added, [cid]: have.filter(d => !set.has(d.id)) }; this.saveAdded(added);
+    set.forEach(id => { try { this.setDocFolder(id, ''); } catch (e) {} this.purgeDocBytes(id); });
+    this._key = null;
+    this.setState({ added, view: 'summary', readDoc: null, sel: null, just: null, delAsk: null, dvSel: {}, dvBulkAsk: false, dvOpen: null, dvRename: null });
+    this.toast(set.size === 1 ? 'Deleted \u201c' + (titles[0] || 'Untitled') + '\u201d.' : 'Deleted ' + set.size + ' sources.');
+  }
   // copies a paradigm's own-added docs into a brand-new workspace (never removes them from where they are --
   // a fork branches, it doesn't cut); base/sample docs in the cluster stay in the original, since they aren't this browser's to move
   // a topic segment is a filter over the workspace's own detected groups, not a keyword fold: it keeps only
@@ -7498,7 +7737,7 @@ class Component extends DCLogic {
       // carries it too (the faithful capture keeps <meta>), so whoSays can name the author or publisher.
       let aut = x.authors || null, pub = x.published || null, pl = x.pubLabel || null, pu = x.publisher || null;
       if (!aut && !pub && _HDR && x.html && /^(html|page)$/i.test(x.format || '')) { try { const m = _HDR.metaOf(new DOMParser().parseFromString(x.html, 'text/html')); aut = m.authors; pub = m.published; pl = m.pubLabel; pu = m.publisher; } catch (e) {} }
-      return { ...(typeof x.text === 'string' && (!x.format || x.format === 'text') && !x.html && !x.extra?.media ? { overviewReceivedText: x.text } : {}), id: 'u' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), title: x.title || 'Untitled', year: x.year || null, type: x.type || 'Text', format: x.format || 'text', hasHtml: !!x.html, url: x.url || null, pages: x.pages || null, ...(x.extra || {}), measured: !!x.measured, text: x.format === 'pdf' ? (x.text || '') : x.html ? pageText(x.html, x.format).slice(0, 60000) : (x.text || ''), ...(aut && aut.length ? { authors: aut } : {}), ...(pub ? { published: pub } : {}), ...(pl ? { pubLabel: pl } : {}), ...(pu ? { publisher: pu } : {}), ...(x.challenge ? { challenge: x.challenge } : {}), ...(x.anchor ? { anchor: x.anchor } : {}), ...(x.eyes ? { eyes: x.eyes } : {}), ...(x.rateLimited ? { rateLimited: x.rateLimited } : {}) }; });
+      return { ...(typeof x.text === 'string' && (!x.format || x.format === 'text') && !x.html && !x.extra?.media ? { overviewReceivedText: x.text } : {}), id: 'u' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), addedAt: Date.now(), title: x.title || 'Untitled', year: x.year || null, type: x.type || 'Text', format: x.format || 'text', hasHtml: !!x.html, url: x.url || null, pages: x.pages || null, ...(x.extra || {}), measured: !!x.measured, text: x.format === 'pdf' ? (x.text || '') : x.html ? pageText(x.html, x.format).slice(0, 60000) : (x.text || ''), ...(aut && aut.length ? { authors: aut } : {}), ...(pub ? { published: pub } : {}), ...(pl ? { pubLabel: pl } : {}), ...(pu ? { publisher: pu } : {}), ...(x.challenge ? { challenge: x.challenge } : {}), ...(x.anchor ? { anchor: x.anchor } : {}), ...(x.eyes ? { eyes: x.eyes } : {}), ...(x.rateLimited ? { rateLimited: x.rateLimited } : {}) }; });
     // The hang (holodeck-hang.js): which lens reveals the most meaning here, measured per doc, never assumed.
     // Directions in localStorage hd:hang-directions can prefer one hang over another; every flip is logged.
     try {
@@ -7892,7 +8131,7 @@ class Component extends DCLogic {
           return { originText: on ? on.why + ' ' + short(A.docById[on.of].title, 40) : 'Independent · shares no claims or outlet with another source', originDep: !!on, originCol: on ? 'var(--amber)' : 'var(--mut)' }; })(),
         drawsX: 0, drawOptions: drawOpts,
         onDraws: e => this.setMeta(d.id, { drawsOn: e.target.value }),
-        onKeep: () => this.setMeta(d.id, { status: 'source' }), onUnkeep: () => this.setMeta(d.id, { status: 'seen' }), onDiscard: () => this.discard(d.id), onRename: () => { this.read(d.id); setTimeout(() => this.setState({ readerRename: true, readerNameDraft: d.title }), 40); } }; };
+        onKeep: () => this.setMeta(d.id, { status: 'source' }), onUnkeep: () => this.setMeta(d.id, { status: 'seen' }), onDiscard: () => this.discard(d.id), canDelete: (this.state.added[this.corpusId()] || []).some(x => x.id === d.id) && this.mOf(d).status !== 'seen', delAsking: this.state.delAsk === d.id, noDelAsking: this.state.delAsk !== d.id, onAskDelete: () => this.setState({ delAsk: d.id }), onCancelDelete: () => this.setState({ delAsk: null }), onDelete: () => this.deleteSource(d.id), onRename: () => { this.read(d.id); setTimeout(() => this.setState({ readerRename: true, readerNameDraft: d.title }), 40); }, ...this.driveVals(d), id: d.id }; };
     const seenDocs = A.docs.filter(d => this.mOf(d).status === 'seen');
     const keptDocs = A.docs.filter(d => this.mOf(d).status !== 'seen');
     const stsOf = d => A.stsByDoc[d.id] || [];
@@ -7928,7 +8167,7 @@ class Component extends DCLogic {
       ...(seenDocs.length ? [{ label: 'Seen, not kept', n: String(seenDocs.length), desc: 'Opened, but not counted.', items: seenDocs.map(cardOf) }] : []),
       ...(hasKinds ? Object.entries(kmap).sort((a, b) => KIND_ORDER.indexOf(a[0]) - KIND_ORDER.indexOf(b[0])).map(([k, ds]) => ({ label: k, n: String(ds.length), desc: KIND_DESC[k] || '', items: ds.slice().sort((x, y) => pubMsD(x) - pubMsD(y)).map(cardOf) })) : Object.entries(gmap).sort((x, y) => (x[0] === '_') - (y[0] === '_') || y[1].docs.length - x[1].docs.length).map(([k, g]) => ({ label: g.label, n: String(g.docs.length), desc: k === '_' ? (Object.keys(distinctOf).length ? 'No difference from the rest is large enough to matter.' : keptDocs.length < 2 ? '' : 'No difference between them is large enough to matter yet.') : '', items: g.docs.map(cardOf) }))),
     ];
-    const svMode = S.svMode || 'cards', svGroup = 'tabs'; const allSrcItems = srcGroups.flatMap(g => g.items.map(it => ({ it, g: g.label })));
+    const svMode = S.svMode || 'grid', svGroup = 'tabs'; const allSrcItems = srcGroups.flatMap(g => g.items.map(it => ({ it, g: g.label })));
     const docOfCard = it => A.docs.find(d => d.title === it.title) || null;
     const isVid = it => { const d = docByTitle.get(it.title); return !!(d && (d.medium === 'Video' || d.medium === 'Audio' || d.media)); }; const vidItems = allSrcItems.filter(x => isVid(x.it));
     const FAM = k => /^(Audit or report|Legislation|Letter|Meeting record|Contract)$/.test(k) ? 'Documents' : /^(Meeting recording|Video|Podcast|Recording)$/.test(k) ? 'Video & audio' : /^(Government page|Organisation page)$/.test(k) ? 'Official pages' : /^(News|Blog|Own article)$/.test(k) ? 'Press and commentary' : 'Other';
@@ -7939,7 +8178,7 @@ class Component extends DCLogic {
     const tCols = [['title', 'Source'], ['kind', 'Kind'], ['medium', 'Medium'], ['date', 'Date'], ['publisher', 'Publisher'], ['standing', 'Standing'], ['sts', 'Statements'], ['names', 'Names'], ['custody', 'Custody']];
     const svSort = S.svSort || 'date', svDir = S.svDir || -1;
     const rowOf = x => { const it = x.it; const d = A.docById[it.id] || docByTitle.get(it.title) || {}; const all = A.stsByDoc[d.id] || []; const nm = new Set(all.flatMap(s => s.names));
-      return { it, group: x.g, title: d.title || it.title, kind: d.kind || x.g, medium: d.medium || 'Text', date: d.pubLabel || (d.year ? String(d.year) : ''), iso: d.published || (d.year ? String(d.year) : ''), publisher: d.publisher || '', standing: d.standing || '', sts: all.length, names: nm.size, custody: d.custody || (it.isSeen ? 'seen, not kept' : ''),
+      return { it, id: d.id, addedAt: this.addedAtOf(d), group: x.g, title: d.title || it.title, kind: d.kind || x.g, medium: d.medium || 'Text', date: d.pubLabel || (d.year ? String(d.year) : ''), iso: d.published || (d.year ? String(d.year) : ''), publisher: d.publisher || '', standing: d.standing || '', sts: all.length, names: nm.size, custody: d.custody || (it.isSeen ? 'seen, not kept' : ''),
         hasVideo: !!(d.media && d.media.url), videoUrl: d.media && d.media.url ? d.media.url : '', mcol: MEDIUM_C[d.medium] || 'var(--mut)', ccol: /missing|failed|not-located|no-text/.test(d.custodyStatus || '') ? 'var(--bad)' : d.custodyStatus && d.custodyStatus !== 'captured' ? 'var(--amber)' : 'var(--mut)' }; };
     const sKey = { title: r => r.title.toLowerCase(), kind: r => r.kind, medium: r => r.medium, date: r => r.iso || '0', publisher: r => r.publisher.toLowerCase(), standing: r => r.standing, sts: r => r.sts, names: r => r.names, custody: r => r.custody };
     const sortRows = L => L.sort((a, b) => { const ka = sKey[svSort](a), kb = sKey[svSort](b); return (ka < kb ? -1 : ka > kb ? 1 : 0) * svDir || a.title.localeCompare(b.title); });
@@ -7950,10 +8189,59 @@ class Component extends DCLogic {
     const seg = on => ({ bg: on ? 'var(--sel2)' : 'transparent', col: on ? 'var(--ink)' : 'var(--mut)' });
     const meetVals = {};
     const svVals = { ...meetVals, srcHiddenNote: this._srcHidden ? plural(this._srcHidden, 'other source') + ' with nothing in this selection ' + (this._srcHidden === 1 ? 'is' : 'are') + ' hidden' : '', svCards: svMode === 'cards', svTable: svMode === 'table', svTabsOn: svGroup === 'tabs',
-      svModes: [['cards', 'Cards'], ['table', 'Table']].map(([k, l]) => ({ label: l, ...seg(svMode === k), onClick: () => this.setState({ svMode: k }) })),
-      svTabs: tabs.map(t => ({ label: t.label, n: t.n, bd: t.id === svTab ? 'var(--acc2)' : 'transparent', col: t.id === svTab ? 'var(--ink)' : 'var(--mut)', onClick: () => this.setState({ svTab: t.id }) })),
+      svModes: [['grid', 'Grid'], ['list', 'List'], ['table', 'Table']].map(([k, l]) => ({ label: l, ...seg(svMode === k || (k === 'grid' && svMode === 'cards')), onClick: () => this.setState({ svMode: k }) })),
+      svTabs: tabs.map(t => ({ label: t.label, n: t.n, cls: t.id === svTab ? 'on' : '', bd: t.id === svTab ? 'var(--acc2)' : 'transparent', col: t.id === svTab ? 'var(--ink)' : 'var(--mut)', onClick: () => this.setState({ svTab: t.id }) })),
       svCols: tCols.map(([k, l]) => ({ label: l + (svSort === k ? (svDir > 0 ? ' ↑' : ' ↓') : ''), onClick: () => this.setState({ svSort: k, svDir: svSort === k ? -svDir : (k === 'title' || k === 'publisher' ? 1 : -1) }) })),
       svTables: tables, svCardGroups: svGroup === 'one' ? [{ label: 'All sources', n: String(allSrcItems.length), desc: '', items: allSrcItems.map(x => x.it), hasMore: false }] : svGroup === 'tabs' ? (svTab === '__all' ? srcGroups : svTab === 'Recordings' ? (() => { const vg = srcGroups.filter(g => /^(Video|Meeting recording)$/.test(g.label)); const items = vg.flatMap(g => g.items).map(it => ({ it, d: docByTitle.get(it.title) || {} })).sort((x, y) => (y.d.published || String(y.d.year || '')).localeCompare(x.d.published || String(x.d.year || ''))).map(x => x.it); return [...(items.length ? [{ label: 'Video', n: String(items.length), desc: 'Meetings and other recordings. Open one to watch it with its transcript beside it.', items, hasMore: false }] : []), ...srcGroups.filter(g => FAM(g.label) === 'Recordings' && !/^(Video|Meeting recording)$/.test(g.label))]; })() : srcGroups.filter(g => FAM(g.label) === svTab)) : srcGroups };
+    // ---- the Drive-style files view: one flat list, typed icons, folders you can drop onto, a selection bar ----
+    const dvQ = (S.dvQ || '').trim().toLowerCase(), dvSel = S.dvSel || {}, dvSortK = S.dvSort || 'added', dvFl = this.foldersFor(), dvCurF = S.folder;
+    const dvKey = { added: r => r.addedAt || 0, title: r => r.title.toLowerCase(), date: r => r.iso || '', sts: r => r.sts }[dvSortK] || (r => r.addedAt || 0);
+    const dvDir = dvSortK === 'title' ? 1 : -1;
+    const dvRows = rowsAll.filter(r => (svTab === '__all' || FAM(r.group) === svTab) && (!dvQ || r.title.toLowerCase().includes(dvQ)))
+      .sort((a, b) => { const x = dvKey(a), y = dvKey(b); return ((x < y ? -1 : x > y ? 1 : 0) * dvDir) || a.title.localeCompare(b.title); });
+    const dvAgo = ms => { if (!ms) return ''; const dd = new Date(ms), days = Math.floor((Date.now() - ms) / 864e5); return days < 1 ? 'Today' : days < 2 ? 'Yesterday' : days < 30 ? days + ' days ago' : dd.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: dd.getFullYear() === new Date().getFullYear() ? undefined : 'numeric' }); };
+    const dvClose = fn => e => { try { const dt = e && e.target && e.target.closest ? e.target.closest('details') : null; if (dt) dt.open = false; } catch (x) {} fn(); };
+    const dvOwn = new Set((S.added[this.corpusId()] || []).map(x => x.id));
+    const dvTiles = dvRows.map(r => { const it = r.it, id = r.id, sel = !!dvSel[id], own = dvOwn.has(id);
+      const saveName = () => { const nm = (this.state.dvRenameDraft || '').trim(); if (this.state.dvRename === id && nm && nm !== r.title) this.renameDocTitle(id, nm); this.setState({ dvRename: null, dvRenameDraft: null }); };
+      return { ...it, id, selected: sel, checkCls: sel ? 'on' : '', tileStyle: sel ? 'border-color:var(--acc);box-shadow:0 0 0 2px var(--acc2)' : '',
+        onToggleSel: () => this.setState(st => { const m = { ...(st.dvSel || {}) }; if (m[id]) delete m[id]; else m[id] = true; return { dvSel: m, dvBulkAsk: false }; }),
+        onDragStart: e => { try { const ids = dvSel[id] ? Object.keys(dvSel) : [id]; e.dataTransfer.setData('text/plain', ids.join(',')); e.dataTransfer.effectAllowed = 'move'; } catch (x) {} },
+        renaming: S.dvRename === id, notRenaming: S.dvRename !== id, rnDraft: S.dvRenameDraft != null ? S.dvRenameDraft : r.title,
+        onRnDraft: e => this.setState({ dvRenameDraft: e.target.value }), onRnSave: saveName, onRnKey: e => { if (e.key === 'Enter') saveName(); else if (e.key === 'Escape') this.setState({ dvRename: null, dvRenameDraft: null }); },
+        when: dvAgo(r.addedAt) || r.date || 'Undated', stsS: String(r.sts),
+        sub: [dvAgo(r.addedAt), r.date && r.date !== dvAgo(r.addedAt) ? 'source ' + r.date : '', plural(r.sts, 'statement')].filter(Boolean).join(' · '),
+        menu: [{ label: 'Open', onClick: dvClose(it.onRead) }, ...(own ? [{ label: 'Rename', onClick: dvClose(() => this.setState({ dvRename: id, dvRenameDraft: r.title })) }] : []), { label: 'Details', onClick: dvClose(() => this.setState({ dvOpen: id })) },
+          { label: it.soloLabel || 'Only this source', onClick: dvClose(it.onSolo) },
+          ...(it.canTranscribe ? [{ label: 'Transcribe it', onClick: dvClose(it.onTranscribe) }] : []), ...(it.canProcess ? [{ label: 'Read it', onClick: dvClose(it.onProcess) }] : []),
+          ...(it.isSeen ? [{ label: 'Keep as a source', onClick: dvClose(it.onKeep) }] : []),
+          ...(it.isSeen ? [{ label: 'Discard', col: 'var(--bad)', onClick: dvClose(it.onDiscard) }] : it.canDelete ? [{ label: 'Delete', col: 'var(--bad)', onClick: dvClose(it.onAskDelete) }] : [])] }; });
+    const dvSelIds = Object.keys(dvSel).filter(id => A.docById[id]);
+    const dvFolderTiles = [{ id: null, label: 'All sources', icon: '🗂', n: String(keptDocs.length), cls: !dvCurF ? 'on' : '', title: 'Show every source', onOpen: () => this.setState({ folder: null }),
+        onOver: e => { try { e.preventDefault(); } catch (x) {} }, onDrop: e => { try { e.preventDefault(); String(e.dataTransfer.getData('text/plain')).split(',').filter(Boolean).forEach(id => this.setDocFolder(id, '')); } catch (x) {} } },
+      ...dvFl.map(f => ({ id: f.id, label: f.name, icon: '📁', n: String((f.docs || []).length), cls: dvCurF === f.id ? 'on' : '', title: 'Open the folder — or drop sources here to move them in', onOpen: () => this.setState({ folder: dvCurF === f.id ? null : f.id }),
+        onOver: e => { try { e.preventDefault(); } catch (x) {} }, onDrop: e => { try { e.preventDefault(); String(e.dataTransfer.getData('text/plain')).split(',').filter(Boolean).forEach(id => this.setDocFolder(id, f.id)); } catch (x) {} } }))];
+    const drv = { q: S.dvQ || '', onQ: e => this.setState({ dvQ: e.target.value }), onHome: () => this.setState({ folder: null, dvQ: '' }),
+      inFolder: !!(dvCurF && dvFl.some(f => f.id === dvCurF)), folderName: (dvFl.find(f => f.id === dvCurF) || {}).name || '',
+      sort: dvSortK, sorts: [['added', 'Recently added'], ['title', 'Name'], ['date', 'Date of source'], ['sts', 'Most statements']].map(([v, l]) => ({ v, l })), onSort: e => this.setState({ dvSort: e.target.value }),
+      hasFolders: dvFl.length > 0, folders: dvFolderTiles, tiles: dvTiles, empty: dvTiles.length === 0,
+      emptyText: dvQ ? 'No source matches “' + (S.dvQ || '').trim() + '”.' : dvCurF ? 'This folder is empty — drag sources onto it from “All sources”.' : 'Nothing here yet. Add a source to start.',
+      hasSel: dvSelIds.length > 0, selLabel: plural(dvSelIds.length, 'source') + ' selected', onClearSel: () => this.setState({ dvSel: {}, dvBulkAsk: false }),
+      hasFoldersOpts: dvFl.length > 0, moveOpts: [{ v: '', l: 'No folder' }, ...dvFl.map(f => ({ v: f.id, l: f.name }))],
+      onMove: e => { const v = e.target.value; if (v === '__') return; dvSelIds.forEach(id => this.setDocFolder(id, v)); this.setState({ dvSel: {} }); this.toast('Moved ' + plural(dvSelIds.length, 'source') + (v ? ' into the folder.' : ' out of its folder.')); },
+      canBulkDelete: dvSelIds.some(id => dvOwn.has(id)), bulkAsk: !!S.dvBulkAsk, noBulkAsk: !S.dvBulkAsk, onBulkAsk: () => this.setState({ dvBulkAsk: true }), onBulkCancel: () => this.setState({ dvBulkAsk: false }),
+      onBulkDelete: () => this.deleteSources(dvSelIds),
+      // the thing a plain drive can't do: read the chosen sources as one body of content. Everything not chosen is set
+      // aside (offDocs, which every view, the chat and the Fold already honour), and the Fold opens on what's left.
+      foldLabel: dvSelIds.length === 1 ? 'Open in the Fold' : 'Fold these ' + dvSelIds.length + ' sources',
+      onFold: () => { const keep = new Set(dvSelIds), off = {}; A.docs.forEach(d => { if (!keep.has(d.id)) off[d.id] = true; });
+        this.setState({ offDocs: off, dvSel: {}, dvBulkAsk: false, view: 'connections', foldBand: true, sel: null, readDoc: null });
+        setTimeout(() => { try { window.scrollTo(0, 0); } catch (x) {} }, 30);
+        this.toast(dvSelIds.length === 1 ? 'The Fold is open on one source.' : 'The Fold is open on ' + dvSelIds.length + ' sources, read together.'); },
+      scoped: Object.keys(S.offDocs || {}).some(k => (S.offDocs || {})[k] && A.docById[k]),
+      scopedText: (() => { const off = Object.keys(S.offDocs || {}).filter(k => (S.offDocs || {})[k] && A.docById[k]).length; const on = A.docs.length - off; return 'Showing ' + on + ' of ' + plural(A.docs.length, 'source') + ' — the rest are set aside in every view.'; })(),
+      onShowAll: () => this.setState({ offDocs: {} }) };
+    const drvd = S.dvOpen && A.docById[S.dvOpen] ? { has: true, ...cardOf(A.docById[S.dvOpen]), onClose: () => this.setState({ dvOpen: null }) } : { has: false };
     const undatedDocs = A.docs.filter(d => !d.year);
     const noDateSt = F.filter(st => !st.ownDate);
     const gaps = [
@@ -8099,7 +8387,7 @@ class Component extends DCLogic {
       : view === 'ask' ? { eyebrow: 'Ask the Fold', title: 'Ask the sources', sub: 'Answered by a small model running in this tab, from material found by the question\'s own words. Afterwards every sentence is checked: a numbered address where it matches something in the sources, a dotted line where it is the model\'s own, a wavy line where a figure or name is not in the material.', color: 'var(--acc)' }
       : view === 'draft' ? { eyebrow: 'Draft', title: 'Claims and the excerpts behind them', sub: 'Private to this browser — pinned passages keep their source.', color: 'var(--acc)' }
       : c ? { eyebrow: c.row + (this.props.showTerrainNames ? ' · ' + c.terrain : ''), title: c.label, sub: c.question, color: c.color }
-      : { eyebrow: 'Overview', title: this.corpusName(), sub: plural(docsIn.length, 'document') + ' · ' + plural(F.length, 'statement') + ' · ' + plural(D.nameList.length, 'name') + ' · ' + plural(figCount, 'figure') + '.' + (A.docs.length && !docsIn.length ? ' ' + plural(A.docs.length, 'link') + ' saved; none could be read yet.' : ''), color: 'var(--acc)' };
+      : { eyebrow: 'Sources', title: this.corpusName(), sub: plural(docsIn.length, 'document') + ' · ' + plural(F.length, 'statement') + ' · ' + plural(D.nameList.length, 'name') + ' · ' + plural(figCount, 'figure') + '.' + (A.docs.length && !docsIn.length ? ' ' + plural(A.docs.length, 'link') + ' saved; none could be read yet.' : ''), color: 'var(--acc)' };
 
     // chips — each chip is position 2 (filter) + position 3 (what-counts: for-whom)
     const chip = (key, k, v, onClear) => ({ key, k, v, w: this.fwLabel(key), onClear });
@@ -8133,7 +8421,7 @@ class Component extends DCLogic {
         push(this.corpusName(), () => this.go('summary'));
       } else {
         out.push({ label: this.corpusName(), onClick: () => this.go('summary') });
-        push(VIEW_LABEL[view] || 'Overview', () => this.go(view));
+        push(VIEW_LABEL[view] || 'Sources', () => this.go(view));
       }
       chips.forEach(c => { if (c.k !== 'Search') push(c.k.toLowerCase() + ': ' + c.v, c.onClear); });
       const rd = view === 'reader' && S.readDoc ? A.docById[S.readDoc] : null;
@@ -8162,6 +8450,31 @@ class Component extends DCLogic {
     const opts = [{ id: 'custom', name: 'Your content' + (addN('custom') ? ' (' + addN('custom') + ')' : '') }]
       .concat(Object.keys(S.added).filter(k => wsNames[k]).map(k => ({ id: k, name: wsNames[k] + ' (' + addN(k) + ')' })));
     const cid = this.corpusId(); const J = S.just; const demo = DEMOS[cid] || DEMOS.custom;
+    // the workspace manager: hundreds of workspaces never go in a <select>. Search, sort by recent / name / size,
+    // and render a page at a time. Rename and delete work per row; "Your content" is the fixed default and has neither.
+    const wsRecent = loadWsRecent(), wsQ = (S.wsQ || '').trim().toLowerCase(), wsSortK = S.wsSort || 'recent', wsLimit = S.wsShown || 40;
+    const wsAll = [{ id: 'custom', name: 'Your content', fixed: true }].concat(Object.keys(S.added).filter(k => wsNames[k]).map(k => ({ id: k, name: wsNames[k] }))).map(w => ({ ...w, n: addN(w.id), at: wsRecent[w.id] || 0 }));
+    const wsHit = wsAll.filter(w => !wsQ || w.name.toLowerCase().includes(wsQ));
+    wsHit.sort(wsSortK === 'name' ? (a, b) => a.name.localeCompare(b.name) : wsSortK === 'size' ? (a, b) => b.n - a.n || a.name.localeCompare(b.name) : (a, b) => (b.at - a.at) || a.name.localeCompare(b.name));
+    const wsAgo = ms => { if (!ms) return 'not opened yet'; const m = Math.round((Date.now() - ms) / 60000); if (m < 1) return 'opened just now'; if (m < 60) return 'opened ' + m + ' min ago'; const h = Math.round(m / 60); if (h < 24) return 'opened ' + h + ' h ago'; const dd = Math.round(h / 24); return dd < 60 ? 'opened ' + dd + ' d ago' : 'opened ' + new Date(ms).toLocaleDateString(); };
+    const wsOpenIt = id => this.setState({ corpus: id, view: 'summary', sel: null, f: {}, readDoc: null, folder: null, folderDraft: '', wsOpen: false, wsEdit: null, wsDelAsk: null });
+    const wsSeg = (k, l) => ({ label: l, bg: wsSortK === k ? 'var(--sel)' : 'transparent', col: wsSortK === k ? 'var(--ink)' : 'var(--mut)', onClick: () => this.setState({ wsSort: k, wsShown: 40 }) });
+    const wsm = {
+      open: !!S.wsOpen, onClose: () => this.setState({ wsOpen: false, wsEdit: null, wsDelAsk: null }), stop: e => { if (e && e.stopPropagation) e.stopPropagation(); },
+      q: S.wsQ || '', onQ: e => this.setState({ wsQ: e.target.value, wsShown: 40 }),
+      onQKey: e => { if (e.key === 'Escape') this.setState({ wsOpen: false }); else if (e.key === 'Enter' && wsHit[0]) wsOpenIt(wsHit[0].id); },
+      sorts: [wsSeg('recent', 'Recent'), wsSeg('name', 'A–Z'), wsSeg('size', 'Largest')],
+      summary: wsQ ? wsHit.length + ' of ' + wsAll.length : String(wsAll.length),
+      rows: wsHit.slice(0, wsLimit).map(w => { const editing = S.wsEdit === w.id, asking = S.wsDelAsk === w.id; const cur = w.id === cid;
+        return { name: w.name, current: cur, bg: cur ? 'var(--sel)' : 'transparent', meta: plural(w.n, 'source') + ' · ' + wsAgo(w.at), onOpen: () => wsOpenIt(w.id),
+          canEdit: !w.fixed, editing, notEditing: !editing, delAsk: asking, noDelAsk: !asking,
+          draft: S.wsEditDraft != null ? S.wsEditDraft : w.name, onDraft: e => this.setState({ wsEditDraft: e.target.value }),
+          onKey: e => { if (e.key === 'Enter') { this.renameWorkspace(w.id, S.wsEditDraft != null ? S.wsEditDraft : w.name); this.setState({ wsEdit: null, wsEditDraft: null }); } else if (e.key === 'Escape') this.setState({ wsEdit: null, wsEditDraft: null }); },
+          onSave: () => { this.renameWorkspace(w.id, S.wsEditDraft != null ? S.wsEditDraft : w.name); this.setState({ wsEdit: null, wsEditDraft: null }); },
+          onCancel: () => this.setState({ wsEdit: null, wsEditDraft: null }), onRename: () => this.setState({ wsEdit: w.id, wsEditDraft: w.name, wsDelAsk: null }),
+          onAskDelete: () => this.setState({ wsDelAsk: w.id, wsEdit: null }), onCancelDelete: () => this.setState({ wsDelAsk: null }),
+          delText: 'Delete “' + w.name + '” and its ' + plural(w.n, 'source') + '?', onDelete: () => { this.deleteWorkspace(w.id); this.setState({ wsDelAsk: null }); } }; }),
+      none: wsHit.length === 0, hasMore: wsHit.length > wsLimit, moreLabel: 'Show ' + Math.min(40, wsHit.length - wsLimit) + ' more (' + (wsHit.length - wsLimit) + ' not shown)', onMore: () => this.setState({ wsShown: wsLimit + 40 }) };
     // segmenting: the workspace's own discovered topics, computed once and driving the left-rail Topics
     // section, the global scope strip, and the Overview page's cards. A topic segment is source-based
     // (f.topicGroup keeps only the member documents' statements), not a keyword fold, so it holds even
@@ -8204,7 +8517,7 @@ class Component extends DCLogic {
       if (this._topicStr) return { label: 'Topic: ' + this._topicStr, onClear: () => this.setMeta('__topic', '') };
       return null; })();
     const scope = {
-      show: !isEmpty && (!!scopeSeg || chips.length > 0 || P.groups.length > 0),
+      show: !isEmpty && (!!scopeSeg || chips.length > 0 || (FILTER_LAYERS && P.groups.length > 0)),
       hasSegment: !!scopeSeg, segmentLabel: scopeSeg ? scopeSeg.label : '', onClearSegment: scopeSeg ? scopeSeg.onClear : null,
       filters: chips.map(ch => ({ k: ch.k, v: short(String(ch.v), 26), onClear: ch.onClear })),
       hasTopics: P.groups.length > 0,
@@ -8231,7 +8544,7 @@ class Component extends DCLogic {
     const suF = SU ? SU.list.filter(x => Fid.has(x.st.id)) : [];
     const juncMode = S.suMode !== 'belief'; const JN = isEmpty ? [] : this.junctions(A, Fid);
     const gHi = on => ({ bg: on ? 'var(--sel)' : 'transparent', bd: on ? 'var(--acc2)' : 'transparent', weight: on ? 600 : 500 });
-    const NAVG = [['', [['summary', 'Overview'], ['ask', 'Ask'], ['draft', 'Draft']]], ['Read closely', [['names', 'Names'], ['records', 'Assertions']]], ['Explore', [['connections', 'Connections'], ['overview', 'Evidence overview']]], ['Manage', [['ingest', 'Add & publish']]]];
+    const NAVG = [['', [['summary', 'Sources'], ['ask', 'Ask'], ['draft', 'Draft']]], ['Read closely', [['names', 'Names'], ['records', 'Assertions']]], ['Explore', [['connections', 'Connections'], ['overview', 'Evidence overview']]], ['Manage', [['ingest', 'Add & publish']]]];
     const countFor = id => ({
       names: String(D.nameList.length), records: String(F.length),
       connections: String(D.edgeList.length),
@@ -8355,13 +8668,20 @@ class Component extends DCLogic {
     return {
       ...this._extra,
       ...svVals,
-      sourceKindsUseful: tabs.length > 2, showSourceGroupLabels: svVals.svCardGroups.length > 1, hasGaps: gaps.length > 0, toolsOpen: ['names', 'records', 'connections', 'ingest'].includes(view), timeFilterActive: !!f.range, timeControlLabel: f.range ? 'Time filter · active' : 'Filter by time',
+      sourceKindsUseful: tabs.length > 2, showSourceGroupLabels: svVals.svCardGroups.length > 1, hasGaps: false, /* "What to check" hidden for now; restore with gaps.length > 0 */ toolsOpen: ['names', 'records', 'connections', 'ingest'].includes(view), timeFilterActive: !!f.range, timeControlLabel: f.range ? 'Time filter · active' : 'Filter by time',
       srcGroups: svVals.svCardGroups.map(g => ({ ...g, ...this.capL('sg:' + g.label, g.items, 60) })),
       hasPairsHidden: D.edgeHidden > 0, pairsHidden: plural(D.edgeHidden, 'other pair') + ' share a statement only once, or no more often than chance would give, so ' + (D.edgeHidden === 1 ? 'it is' : 'they are') + ' left out.',
       readerSeen: !!(S.readDoc && A.docById[S.readDoc] && this.mOf(A.docById[S.readDoc]).status === 'seen'),
       readerFold: S.readDoc && this._fold.length ? ' ' + (A.stsByDoc[S.readDoc] || []).filter(s => this.inFold(s)).length + ' of its statements touch the topic.' : '',
-      readerKeep: () => this.setMeta(S.readDoc, { status: 'source' }), readerDiscard: () => this.discard(S.readDoc),
+      readerKeep: () => this.setMeta(S.readDoc, { status: 'source' }), readerDiscard: () => this.discard(S.readDoc), readerCanDelete: !!(S.readDoc && (S.added[this.corpusId()] || []).some(x => x.id === S.readDoc) && this.mOf(A.docById[S.readDoc] || {}).status !== 'seen'), readerDelAsk: !!S.readDoc && S.delAsk === S.readDoc, readerNoDelAsk: S.delAsk !== S.readDoc, onReaderAskDelete: () => this.setState({ delAsk: S.readDoc }), onReaderCancelDelete: () => this.setState({ delAsk: null }), onReaderDelete: () => this.deleteSource(S.readDoc),
       readerRenaming: S.readerRename, readerNotRenaming: !S.readerRename, readerNameDraft: S.readerNameDraft != null ? S.readerNameDraft : (S.readDoc && A.docById[S.readDoc] ? A.docById[S.readDoc].title : ''), onReaderRenameStart: () => { const d = S.readDoc && A.docById[S.readDoc]; if (d) this.setState({ readerRename: true, readerNameDraft: d.title }); }, onReaderNameDraft: e => this.setState({ readerNameDraft: e.target.value }), onReaderNameKey: e => { if (e.key === 'Enter') this.onReaderRenameSave(); if (e.key === 'Escape') this.setState({ readerRename: false, readerNameDraft: '' }); }, onReaderRenameCancel: () => this.setState({ readerRename: false, readerNameDraft: '' }), onReaderRenameSave: () => { const d = S.readDoc; const nm = (this.state.readerNameDraft || '').trim(); if (d && nm) this.renameDocTitle(d, nm); this.setState({ readerRename: false, readerNameDraft: '' }); },
+      cfold: (() => { const off = S.offDocs || {}, on = A.docs.filter(d => !off[d.id]); const dvx = on.map(d => this.driveVals(d));
+        return { on: !!S.foldBand && view === 'connections' && Object.keys(S.offDocs || {}).some(k => S.offDocs[k]), title: plural(on.length, 'source') + ', one body of content',
+          sources: on.slice(0, 12).map((d, i) => ({ title: d.title, color: dvx[i].dvColor, glyph: dvx[i].dvGlyph })).concat(on.length > 12 ? [{ title: '+' + (on.length - 12) + ' more', color: 'var(--dim)', glyph: '…' }] : []),
+          onAsk: () => this.setState({ view: 'ask', akMode: 'chat' }), onBuild: () => this.setState({ view: 'ask', akMode: 'generate', akPane: 'sources' }),
+          onAll: () => this.setState({ offDocs: {}, foldBand: false, view: 'summary' }) }; })(),
+      drv: { ...drv, stats: hdr.sub || '', onKey: e => { if (e.key !== 'Enter') return; const live = (e.target.value || '').trim(); if (!live) return; this.setState({ dvQ: '' }); if (isOmniUrl(live)) omniOpen(live); else omniGo(live); } }, drvd, svGrid: svMode === 'grid' || svMode === 'cards', svList: svMode === 'list',
+      wsm, wsCount: wsAll.length, wsOpenMgr: () => this.setState({ wsOpen: true, wsQ: '', wsShown: 40, wsEdit: null, wsDelAsk: null }),
       corpusId: cid, corpusOptions: opts, q: S.q, corpusName: this.corpusName(), segList, hasSegments, segOpen, segToggleLabel, segCount, toggleSegOpen, addAsFold, navTop, navRead, navExplore, navRest,
       topicsList, hasTopics, topicsNote, hasTopicsNote, topicsStrayN, showTopicsStray, onTopicsStray, scope,
       topicsHasSearch, topicsSearchVal, onTopicsSearch, topicsHasPager, topicsPagerLine, onTopicsPrev, onTopicsNext, topicsHasPrev, topicsHasNext, topicsPageN: (topicsPage + 1) + ' of ' + topicsPages,
@@ -8385,9 +8705,11 @@ class Component extends DCLogic {
       openAdd: () => { this._add = null; this.addState().baseAdded = (S.added[cid] || []).length; this.setState({ showAdd: true }); }, closeAdd: () => this.setState({ showAdd: false }),
       closeAddBg: e => { if (e.target === e.currentTarget) this.setState({ showAdd: false }); },
       isEmpty, showWelcome: isEmpty && view !== 'ask', hasContent: !isEmpty, v: V, hdr,
-      docCards, gaps, nameGroups, nameTable, typeBlocks, measures, noMeasures: !measures.length, ...(() => { const c = this.capL('stg', stGroups, 8); return { stGroups: c.items.map(g => ({ ...g, ...this.capL('stg:' + g.title, g.items, 4) })), stgMore: c }; })(),
+      docCards, gaps: [] /* hidden with hasGaps */, nameGroups, nameTable, typeBlocks, measures, noMeasures: !measures.length, ...(() => { const c = this.capL('stg', stGroups, 8); return { stGroups: c.items.map(g => ({ ...g, ...this.capL('stg:' + g.title, g.items, 4) })), stgMore: c }; })(),
       graphEl, timeInfo, ...orbX, ...(() => { const c = this.capL('pairs', pairs, 12); return { pairs: c.items, pairsMore: c }; })(), noPairs: !pairs.length, frameCols: frameCols.map(c => ({ ...c, ...this.capL('fr:' + c.label, c.items, 5) })), timeBars, ...(() => { const c = this.capL('topics', topicChips, 24); return { topicChips: c.items, topicMore: c }; })(), ...(() => { const c = this.capL('srcbars', [...sourceBars].sort((a, b) => +b.n - +a.n), 12); return { sourceBars: c.items, srcBarMore: c }; })(), shapes, noShapes: !shapes.length, hasRoutine: (this._routineN || 0) > 0, routineLine: plural(this._routineN || 0, 'routine agreement') + ' hidden: repeated by several sources, but about names and words that appear together in most sources anyway.', holds, breaks, noBreaks: !breaks.length,
-      hdrShow: !isEmpty && view !== 'reader' && view !== 'profile' && view !== 'ask' && view !== 'draft',
+      showOmni: view !== 'summary' || isEmpty, bodyPad: view === 'summary' && !isEmpty ? '10px 20px 20px' : '20px',
+      showFilterLayers: FILTER_LAYERS, hdrSubShown: view === 'summary' ? '' : (hdr.sub || ''),
+      hdrShow: !isEmpty && view !== 'summary' && !(view === 'connections' && S.foldBand) && view !== 'reader' && view !== 'profile' && view !== 'ask' && view !== 'draft',
       crumbLast, crumbAnc, hasAnc, yearOn: !isEmpty && (view === 'views' || view === 'surprise'),
       ...(() => { const d0 = S.readDoc && A.docById[S.readDoc]; if (!d0) return { rd: { eyebrow: '', title: '', meta: '' } }; const dsts = A.stsByDoc[d0.id] || []; const nm = new Set(dsts.flatMap(s => s.names)); const host = d0.url ? (/wikipedia\.org/.test(d0.url) ? 'Wikipedia' : d0.url.replace(/^https?:\/\/(www\.)?/, '').split('/')[0]) : 'Your content'; return { rd: { eyebrow: [host, d0.type, d0.year].filter(Boolean).join(' · '), title: d0.title, meta: [d0.authors && d0.authors.length ? 'By ' + d0.authors.join(', ') : '', d0.pubLabel ? 'Published ' + d0.pubLabel : ''].filter(Boolean).map(x => x + ' · ').join('') + plural(dsts.length, 'statement') + ' · ' + plural(nm.size, 'name') + ' · ' + plural(dsts.reduce((a, s) => a + s.figs.length, 0), 'figure') } }; })(),
       gsw: { track: S.ground.on ? 'var(--acc2)' : 'var(--line2)', left: S.ground.on ? '16px' : '2px' },
@@ -8409,7 +8731,7 @@ class Component extends DCLogic {
           const nn = timed || (LZ && LZ.segN && !LZ.loading) ? this.transcriptNewNames(d0, A) : [];
           const newNames = nn.map(n => ({ name: n, onOpen: () => this.openProfile(n) }));
           const hasNewNames = newNames.length > 0;
-          return { has: true, isLocal: false, ytOnly: true, noAudio: true, hasUrl: true, title: d0.title, url: m.url || 'https://www.youtube.com/watch?v=' + m.id, timed, follow: S.ytFollow !== false, onFollow: e => this.setState({ ytFollow: e.target.checked }),
+          return { has: true, ...this.mediaLay(timed, !timed), isLocal: false, ytOnly: true, noAudio: true, hasUrl: true, title: d0.title, url: m.url || 'https://www.youtube.com/watch?v=' + m.id, timed, follow: S.ytFollow !== false, onFollow: e => this.setState({ ytFollow: e.target.checked }),
             local: false, playLabel: '▶', timeLabel: (m.dur != null ? fmtT(m.dur) : '') || '0:00', statusLabel: '', onPlayPause: () => {}, onStopRecord: () => this.stopPlayback(), dl: this.dlVals(d0),
             src: 'https://www.youtube.com/embed/' + m.id + '?rel=0&enablejsapi=1&playsinline=1' + (org ? '&origin=' + org : ''),
             kindLine: d0.aboutOnly ? 'Linked video, not transcribed' : segN === -1 ? 'Loading transcript…' : timed ? plural(segN, 'timed segment') + (LZ && LZ.from ? ' · read from ' + (LZ.from === 'opfs' ? 'this browser’s file store' : LZ.from) : '') : 'Transcript without timings',
@@ -8439,7 +8761,7 @@ onAsk: () => { this.setState({ txAsk: d0.id }); this.pickYtFile(d0); }, onCancel
         const newNames = nn.map(n => ({ name: n, onOpen: () => this.openProfile(n) }));
         const hasNewNames = newNames.length > 0;
         const txHere = !!(this.state.txBusy && this.state.txProgress && this.state.txProgress.docId === d0.id && this.state.txProgress.stage && this.state.txProgress.stage !== 'done');
-        return { has: true, isLocal: true, ytOnly: false, hasUrl: false, title: d0.title, url: null, timed, follow: S.ytFollow !== false, onFollow: e => this.setState({ ytFollow: e.target.checked }),
+        return { has: true, ...this.mediaLay(timed, !timed || S.txAsk === d0.id), ...this.waveVals(d0), isLocal: true, ytOnly: false, hasUrl: false, title: d0.title, url: null, timed, follow: S.ytFollow !== false, onFollow: e => this.setState({ ytFollow: e.target.checked }),
           local: true, playLabel: '▶', timeLabel: (m.dur != null ? fmtT(m.dur) : '0:00'), statusLabel: '', onPlayPause: () => this.toggleLocalPlay(), onStopRecord: () => this.stopPlayback(), dl: this.dlVals(d0),
           isAudio: (m.mime || '').indexOf('audio') === 0, noAudio: (m.mime || '').indexOf('audio') !== 0, hasSrc: !!(this._mediaUrl && this._mediaUrl[d0.id]), noSrc: !(this._mediaUrl && this._mediaUrl[d0.id]), src: (this._mediaUrl || {})[d0.id] || '',
           kindLine: timed ? plural(m.segN, 'timed segment') + ' · ' + (m.model || 'Whisper').split('/').pop() : (m.dur != null ? fmtT(m.dur) : '') + (m.mime ? ' · ' + m.mime.split('/')[0] + (m.size ? ' · ' + Math.max(1, Math.round(m.size / 1e6)) + ' MB' : '') : ''),
@@ -8452,7 +8774,9 @@ onAsk: () => { this.setState({ txAsk: d0.id }); this.pickYtFile(d0); }, onCancel
           lang: S.txLang || 'en', onLang: e => this.setState({ txLang: e.target.value }), langs: [['en', 'English'], ['es', 'Spanish'], ['fr', 'French'], ['de', 'German'], ['pt', 'Portuguese'], ['it', 'Italian'], ['nl', 'Dutch'], ['pl', 'Polish'], ['ru', 'Russian'], ['uk', 'Ukrainian'], ['ar', 'Arabic'], ['hi', 'Hindi'], ['zh', 'Chinese'], ['ja', 'Japanese'], ['ko', 'Korean']].map(([v, l]) => ({ v, l })),
           model: S.txModel || 'base', onModel: e => this.setState({ txModel: e.target.value }), models: [['base', 'whisper-base · fast, multilingual'], ['small', 'whisper-small · slower, more accurate, multilingual'], ['smallen', 'whisper-small.en · English only, most accurate for English']].map(([v, l]) => ({ v, l })),
           onTerms: e => { this._txTerms = e.target.value; }, ...this.txProgVals(), onTx: () => this.transcribeLocal(d0), priorNote: 'Whisper runs locally here; the recording never leaves this machine. A transcript is a machine interpretation — the prior changes what it hears, and the choice stays on the record.' }; })(),
-      isOriginalFlat: S.readMode !== 'plain' && S.readMode !== 'restated' && !(S.readDoc && A.docById[S.readDoc] && A.docById[S.readDoc].media),
+      isMapMode: S.readMode === 'map' && !!S.readDoc, rdMapEl: S.readMode === 'map' && S.readDoc ? this.graph(D, null, F, A, S.readDoc) : null,
+      modeMp: { bg: S.readMode === 'map' ? 'var(--sel)' : 'transparent', color: S.readMode === 'map' ? 'var(--ink)' : 'var(--mut)' }, modeMap: () => this.setState({ readMode: 'map' }),
+      isOriginalFlat: S.readMode !== 'plain' && S.readMode !== 'restated' && S.readMode !== 'map' && !(S.readDoc && A.docById[S.readDoc] && A.docById[S.readDoc].media),
       isRestated: S.readMode === 'restated', rs: S.readMode === 'restated' && S.readDoc && A.docById[S.readDoc] ? this.restatedVals(A.docById[S.readDoc], A) : { note: '', sections: [], hasCover: false, cover: { pairs: [] } }, isSummary: S.readMode === 'summary', sm: S.readMode === 'summary' && S.readDoc && A.docById[S.readDoc] ? this.summaryVals(A.docById[S.readDoc], A) : { has: false, note: '', one: '', five: [], three: [], n: 0, mono: true }, isPlain: S.readMode === 'plain', readerRef: this.readerRef,
       ...(() => { const d0 = S.readDoc && A.docById[S.readDoc]; const hf = !!(d0 && (d0.faithful || d0.binPath || d0.pdfSrc)); const onO = S.readMode === 'original' || (!hf && S.readMode === 'reading'), onR = hf && S.readMode === 'reading'; const pill = on => ({ bg: on ? 'var(--sel)' : 'transparent', color: on ? 'var(--ink)' : 'var(--mut)' });
         return { hasFaithful: hf, noFaithful: !hf, modeR: pill(onR), modeReading: () => this.setState({ readMode: 'reading' }),
@@ -8524,13 +8848,16 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
 
   corpusName() { const id = this.corpusId(); return id === 'custom' ? 'Your content' : SAMPLES[id] ? SAMPLES[id].name.replace(/\s*·\s*GitHub$/i, '') : loadWorkspaceNames()[id] || 'Your content'; }
 
-  graph(D, selName, F, A) {
+  graph(D, selName, F0, A, onlyDoc) {
     const h = React.createElement;
+    // one source: only the statements of that source, so the names and ties are what that source says on its own
+    const F = onlyDoc ? F0.filter(st => st.doc === onlyDoc) : F0;
+    if (onlyDoc) D = { ...D, nameList: D.nameList.map(n => ({ ...n, sts: n.sts.filter(x => x.doc === onlyDoc) })).filter(n => n.sts.length) };
     const longer = D.nameList.filter(n => n.name.includes(' ')).map(n => n.name);
     const frag = n => !n.name.includes(' ') && longer.some(L => L !== n.name && (L.endsWith(' ' + n.name) || L.endsWith('’' + n.name) || L.endsWith("'" + n.name)) && A.names[L] && A.names[L].sts.length >= 2);
     const pool = D.nameList.filter(n => holoName(n.name, A) && !(n.name.length <= 2 && !(n.aliases || []).length) && !frag(n)).slice(0, 160); if (!pool.length) return h('p', { style: { color: 'var(--mut)', margin: '12px' } }, 'No names to connect.');
-    const docs = A.docs.filter(d => this._cnt.has(d.id)).map(d => ({ id: d.id, title: d.title }));
-    const key = pool.map(n => n.name + ':' + n.sts.length).join('|') + '#' + F.length + '#' + docs.map(d => d.id).join(',');
+    const docs = A.docs.filter(d => (onlyDoc ? d.id === onlyDoc : this._cnt.has(d.id) && !(this.state.offDocs || {})[d.id])).map(d => ({ id: d.id, title: d.title }));
+    const key = (onlyDoc ? 'doc:' + onlyDoc + '|' : '') + pool.map(n => n.name + ':' + n.sts.length).join('|') + '#' + F.length + '#' + docs.map(d => d.id).join(',');
     let M = this._mapMemo;
     if (!M || M.key !== key) {
       // a tie is two names sharing more statements than chance would give (dmdCo); the map nests names by those ties
@@ -8538,7 +8865,7 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
       for (let i = 0; i < pool.length; i++) for (let j = i + 1; j < pool.length; j++) { const a = S[i], b = S[j]; let k = 0; const [sm, lg] = a.size < b.size ? [a, b] : [b, a]; sm.forEach(v => { if (lg.has(v)) k++; }); if (k && dmdCo(k, a.size, b.size, F.length)) edges.push({ a: pool[i].name, b: pool[j].name, c: k }); }
       M = this._mapMemo = { key, nodes: pool.map(n => ({ n: n.name, c: n.sts.length, color: TYPE_C[n.type] })), edges, occ: new Map(pool.map(n => [n.name, n.sts.map(x => ({ doc: x.doc, id: x.id, t: short(x.text, 240) }))])) };
     }
-    return h(MapView, { onWitness: o => this.read(o.doc, o.id), data: { sig: M.key, nodes: M.nodes, edges: M.edges, docs, occ: M.occ, sel: selName || null }, onProfile: id => this.setState({ sel: { type: 'name', id }, selAll: false, pfIdx: 0, pfAll: false, view: 'profile', readDoc: null }) });
+    return h(MapView, { height: onlyDoc ? '460px' : this.state.foldBand && this.state.view === 'connections' ? 'max(520px, 74vh)' : undefined, onWitness: o => this.read(o.doc, o.id), data: { sig: M.key, nodes: M.nodes, edges: M.edges, docs, occ: M.occ, sel: selName || null }, onProfile: id => this.setState({ sel: { type: 'name', id }, selAll: false, pfIdx: 0, pfAll: false, view: 'profile', readDoc: null }) });
   }
 
   orbitUi(A, selName) {
