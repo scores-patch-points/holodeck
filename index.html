@@ -1827,6 +1827,7 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
             <button onClick="{{ t.onClick }}" style="display:flex;align-items:baseline;gap:6px;background:{{ t.bg }};border:1px solid {{ t.bd }};border-radius:999px;padding:4px 12px;cursor:pointer;font:500 14px var(--sans);color:var(--ink)" style-hover="border-color:var(--acc)">{{ t.label }}<span style="font:400 12px var(--mono);color:var(--mut)">{{ t.n }}</span></button>
           </sc-for>
           <input value="{{ nameTable.q }}" onChange="{{ nameTable.onQ }}" placeholder="Filter names · try Calvn, /^Metro/, or Off*" style="margin-left:auto;flex:0 1 220px;min-width:140px;background:var(--s1);border:1px solid var(--line2);border-radius:8px;color:var(--ink);font:400 14px var(--sans);padding:6px 10px;outline:none">
+          <button onClick="{{ nameTable.onFix }}" title="Rename misspelled names in bulk; merge (SYN), split (SEG) or connect (CON) names by hand" style="background:none;border:1px solid var(--line2);border-radius:8px;color:var(--ink2);cursor:pointer;font:500 13px var(--sans);padding:6px 11px;white-space:nowrap" style-hover="border-color:var(--acc)">Fix names{{ nameTable.fixN }}</button>
         </div>
         <sc-if value="{{ nameTable.hasM }}" hint-placeholder-val="{{ false }}"><span style="font:500 12px var(--mono);color:var(--acc)">{{ nameTable.mLine }}</span></sc-if>
         <div style="background:var(--s1);border:1px solid var(--line);border-radius:12px;overflow:auto">
@@ -4636,6 +4637,8 @@ function saveWorkspaceNames(w) { try { localStorage.setItem('fold-explorer-works
 // not-name corrections suppress the matching name retroactively (re-analysis) and forward (new ingests).
 function loadCorrections() { try { return JSON.parse(localStorage.getItem('fold-explorer-corrections') || '{}'); } catch (e) { return {}; } }
 function saveCorrections(c) { try { localStorage.setItem('fold-explorer-corrections', JSON.stringify(c)); } catch (e) {} }
+// kinds filed from Fix names: SYN (merge/rename), SEG (cut a spelling out), CON (declared tie), distinct (two names, not a typo)
+const REF_KINDS = new Set(['syn', 'seg', 'con', 'distinct']);
 // Plain-English parser: '"INC" is not a contractor' -> {target:'INC', kind:'not-name'}.
 // A bare "that's incorrect" carries no target -- the caller supplies the context target (the row/flag clicked).
 function parseCorrection(text, contextTarget) {
@@ -5037,6 +5040,8 @@ async function searchSources(scope, q, page) {
   return { results: j.response.docs.map(d => ({ title: first(d.title) || d.identifier, url: 'https://archive.org/details/' + d.identifier, snippet: plainText(Array.isArray(d.description) ? d.description.join(' ') : d.description).slice(0, 300), source: first(d.creator) || 'Internet Archive', meta: [d.mediatype, d.year].filter(Boolean).join(' · '), thumb: 'https://archive.org/services/img/' + d.identifier, kind: 'archive' })), more: page * 20 + j.response.docs.length < (j.response.numFound || 0), engine: 'Internet Archive' };
 }
 let _hdFort = null; try { import(new URL('holodeck-fort.js', location.href).href).then(M => { _hdFort = M; }).catch(() => {}); } catch (e) {}
+// the person's hand on referent identity (SYN/SEG/CON edits from the corrections log), applied after every analysis
+let _hdRef = null; try { import(new URL('holodeck-referents.js', location.href).href).then(M => { _hdRef = M; try { window.__hdApp && window.__hdApp.forceUpdate(); } catch (e) {} }).catch(() => {}); } catch (e) {}
 // YouTube captions (holodeck-yt.js): yt-dlp on the reader's own machine first, the disclosed
 // public proxies second; in-browser Whisper only when there is no caption track at all. The
 // browser cannot read YouTube and Pyodide cannot either — its networking is the browser's fetch.
@@ -5679,6 +5684,7 @@ class Component extends DCLogic {
     document.addEventListener('click', e => { if (this._colDragJustEnded && hdr(e.target)) { e.stopPropagation(); e.preventDefault(); } }, true);
   }
   componentDidMount() {
+    try { window.__hdApp = this; } catch (e) {}
     setTimeout(() => { this.openFromUrl(); this._urlReady = true; this.urlSync(); }, 0);
     this.installColDrag();
     // optional extra screens: a deployment lists whole pages in screens.json and they join the sidebar; absent or
@@ -8382,7 +8388,17 @@ class Component extends DCLogic {
   // revising flips status and appends to history, so the log is the audit trail.
   corrections(id) { const all = loadCorrections(); return (all[id || this.corpusId()] || []).slice(); }
   activeCorrections(id) { return this.corrections(id).filter(c => c.status === 'active' && c.kind === 'not-name' && c.target); }
-  corrKey(id) { const cs = this.corrections(id); return cs.map(c => c.id + c.status).join(','); }
+  corrKey(id) { const cs = this.corrections(id); return cs.map(c => c.id + c.status).join(',') + (_hdRef && cs.some(c => REF_KINDS.has(c.kind)) ? ':r' : ''); }
+  refEdits(id) { return this.corrections(id).filter(c => c.status === 'active' && REF_KINDS.has(c.kind)); }
+  // "Fix names": file SYN/SEG/CON/distinct edits into the same append-only log; the next read applies them.
+  fileRefEdits(entries) {
+    const id = this.corpusId(); const all = loadCorrections(); const list = all[id] || []; const now = new Date().toISOString();
+    const add = entries.map((e, i) => ({ ...e, id: 'cx-' + Date.now().toString(36) + i + Math.random().toString(36).slice(2, 5), at: now, text: _hdRef ? _hdRef.sayEdit(e) : '', status: 'active', history: [{ at: now, action: 'filed' }] }));
+    all[id] = [...list, ...add]; saveCorrections(all); this.forceUpdate(); return add; }
+  openFixNames(opts) {
+    import(new URL('holodeck-referents-panel.js', location.href).href).then(M => { this._refP = M; M.openReferentsPanel({
+      getA: () => this.analysis(), edits: () => this.corrections(), file: es => this.fileRefEdits(es), revise: (cid, a) => this.reviseCorrection(cid, a),
+      openName: n => this.openProfile(n), toast: m => this.toast(m) }, opts || {}); }).catch(e => this.toast('Fix names could not open: ' + ((e && e.message) || e))); }
   fileCorrection(target, text) {
     text = String(text || '').trim();
     if (!text) { this.toast('Say it in plain English first, e.g. "INC" is not a contractor.'); return; }
@@ -8403,7 +8419,11 @@ class Component extends DCLogic {
     const t = String(target || '').replace(/\s+/g, ' ').trim().slice(0, 120);
     this.setState({ showCorr: true, corrTarget: t, corrDraft: t && !this.state.corrDraft ? '"' + t + '" is not correct as read' : this.state.corrDraft });
   }
-  applyCorrections(A, id) {    const sup = new Set(this.activeCorrections(id).map(c => c.target.toLowerCase()));
+  applyCorrections(A, id) {
+    this.applySup(A, id);
+    const R = this.refEdits(id); if (_hdRef && R.length && A && A.names) { try { _hdRef.applyEdits(A, R); } catch (e) { console.warn('referent edits', e); } }
+    if (this._refP) setTimeout(() => this._refP.refreshReferentsPanel(), 0); }
+  applySup(A, id) {    const sup = new Set(this.activeCorrections(id).map(c => c.target.toLowerCase()));
     if (!sup.size || !A || !A.names) return;
     A.names && Object.keys(A.names).forEach(n => { if (sup.has(n.toLowerCase())) delete A.names[n]; });
     (A.sts || []).forEach(st => {
@@ -8921,6 +8941,8 @@ class Component extends DCLogic {
     const nc = {}; Object.values(names).forEach(n => { nc[n.name] = n.sts.length; });
     const edgeAll = Object.values(edges).sort((a, b) => b.sts.length - a.sts.length);
     const edgeList = edgeAll.filter(e => dmdCo(e.sts.length, nc[e.a] || 0, nc[e.b] || 0, F.length));
+    // a tie the person declared (CON) stands whether or not chance would give it
+    (A.declaredTies || []).forEach(t => { if (!names[t.a] || !names[t.b]) return; const a = t.a < t.b ? t.a : t.b, b = t.a < t.b ? t.b : t.a; const e = edges[a + '|' + b] || (edges[a + '|' + b] = { a, b, sts: [] }); e.declared = t.rel; if (!edgeList.includes(e)) edgeList.push(e); });
     const edgeHidden = edgeAll.length - edgeList.length;
     const unitList = Object.values(units).sort((a, b) => b.items.length - a.items.length);
     unitList.forEach(u => { const vals = new Set(u.items.map(x => x.g.value)); u.generic = ['dollar', 'pound', 'euro', 'percent'].includes(u.unit); u.differs = !u.generic && u.docs.size > 1 && vals.size > 1; });
@@ -9237,7 +9259,7 @@ class Component extends DCLogic {
       .sort((a, b) => { const ka = ntKey[ntSort](a), kb = ntKey[ntSort](b); return (ka < kb ? -1 : ka > kb ? 1 : 0) * ntDir || b.n.sts.length - a.n.sts.length; });
     const ntHead = [['name', 'Name', 'left'], ['type', 'Type', 'left'], ['mentions', 'Mentions', 'right'], ['sources', 'Sources', 'right'], ['first', 'First', 'right'], ['last', 'Last', 'right']].map(([k, l, al]) => ({ label: l + (ntSort === k ? (ntDir > 0 ? ' ↑' : ' ↓') : ''), al, color: ntSort === k ? 'var(--ink)' : 'var(--mut)', onClick: () => this.setState({ ntSort: k, ntDir: ntSort === k ? -ntDir : (k === 'name' || k === 'type' || k === 'first' ? 1 : -1) }) }));
     const nameTable = {
-      head: ntHead, q: S.ntQ || '', onQ: e => this.setState({ ntQ: e.target.value, ntN: 50 }), mLine: this._ntM && this._mt ? this._mt.modeLine(this._ntM) : '', hasM: !!(this._ntM && this._ntM.mode !== 'exact'),
+      head: ntHead, q: S.ntQ || '', onQ: e => this.setState({ ntQ: e.target.value, ntN: 50 }), onFix: () => this.openFixNames({ tab: S.ntQ ? 'find' : 'typos', q: S.ntQ || '' }), fixN: (() => { const k = this.refEdits().length; return k ? ' · ' + k : ''; })(), mLine: this._ntM && this._mt ? this._mt.modeLine(this._ntM) : '', hasM: !!(this._ntM && this._ntM.mode !== 'exact'),
       tabs: [['all', 'All'], ['person', 'People'], ['organisation', 'Organisations'], ['place', 'Places'], ['other', 'Other']].filter(([k]) => ntCounts[k]).map(([k, l]) => ({ label: l, n: String(ntCounts[k]), bg: ntType === k ? 'var(--sel)' : 'transparent', bd: ntType === k ? 'var(--acc2)' : 'var(--line2)', onClick: () => this.setState({ ntType: k, ntN: 50 }) })),
       rows: ntRows.slice(0, ntN).map(r => { const on = isSel('name', r.n.name); return { name: r.n.name, aka: (r.n.aliases || []).length ? 'also ' + r.n.aliases.slice(0, 3).join(', ') : '', hasAka: (r.n.aliases || []).length > 0, type: TYPE_L[r.n.type].replace(/s$/, '').replace('Other name', 'Other'), color: TYPE_C[r.n.type], mentions: String(r.n.sts.length), pct: Math.max(2, Math.round(r.n.sts.length / maxN * 100)) + '%', sources: String(r.n.docs.size), first: r.y0 ? String(r.y0) : '—', last: r.y1 ? String(r.y1) : '—', tie: r.tie ? r.tie.y : '—', onTie: r.tie ? selN(r.tie.y) : () => {}, bg: on ? 'var(--sel)' : 'transparent', onClick: () => this.openProfile(r.n.name), onNarrow: e => { e.stopPropagation(); this.setF('name', f.name === r.n.name ? null : r.n.name); }, narrowLabel: f.name === r.n.name ? 'Un-narrow' : 'Narrow', onIncorrect: e => { e.stopPropagation(); this.fileCorrection(r.n.name, '"' + r.n.name + '" is not a name'); } }; }),
       count: ntRows.length === ntAll.length ? plural(ntAll.length, 'name') : ntRows.length + ' of ' + plural(ntAll.length, 'name'),
@@ -9519,7 +9541,7 @@ class Component extends DCLogic {
     const suF = SU ? SU.list.filter(x => Fid.has(x.st.id)) : [];
     const juncMode = S.suMode !== 'belief'; const JN = isEmpty ? [] : this.junctions(A, Fid);
     const gHi = on => ({ bg: on ? 'var(--sel)' : 'transparent', bd: on ? 'var(--acc2)' : 'transparent', weight: on ? 600 : 500 });
-    const NAVG = [['', [['summary', 'Sources'], ['ask', 'Ask'], ['draft', 'Draft']]], ['Read closely', [['names', 'Names'], ['records', 'Assertions']]], ['Explore', [['connections', 'Connections'], ['overview', 'Evidence overview']]], ['Manage', [['ingest', 'Add & publish']]], ['Links', [['lanes', 'Lanes'], ['margin', 'Margin'], ['seam', 'Seam'], ['orbit', 'Orbit'], ['fields', 'Fields'], ['review', 'Review']]]];
+    const NAVG = [['', [['summary', 'Sources'], ['ask', 'Ask'], ['draft', 'Draft']]], ['Read closely', [['names', 'Names'], ['fixnames', 'Fix names'], ['records', 'Assertions']]], ['Explore', [['connections', 'Connections'], ['overview', 'Evidence overview']]], ['Manage', [['ingest', 'Add & publish']]], ['Links', [['lanes', 'Lanes'], ['margin', 'Margin'], ['seam', 'Seam'], ['orbit', 'Orbit'], ['fields', 'Fields'], ['review', 'Review']]]];
     // extra screens from screens.json (see componentDidMount): beside Sources, Ask, Inbox and Draft at the top of the
     // sidebar, where they are seen, not inside the collapsed "Explore & manage" group
     const SCREENS = this._screens || [];
@@ -9534,7 +9556,7 @@ class Component extends DCLogic {
       review: this.linkWaiting(),
     }[id] || '');
     const navGroups = NAVG.map(([label, items]) => ({ label, hasLabel: !!label, items: items.map(([id, lab]) => { const isScr = id.startsWith('screen:');
-      return { label: lab, count: countFor(id), countColor: id === 'review' ? 'var(--amber)' : 'var(--mut)', ...gHi(isScr ? S.screenId === id.slice(7) : view === id), onClick: isScr ? () => this.setState({ screenId: id.slice(7) }) : () => this.setState({ view: id, readDoc: null, sel: null }) }; }) }));
+      return { label: lab, count: id === 'fixnames' ? (this.refEdits().length ? String(this.refEdits().length) : '') : countFor(id), countColor: id === 'review' ? 'var(--amber)' : 'var(--mut)', ...gHi(isScr ? S.screenId === id.slice(7) : view === id), onClick: id === 'fixnames' ? () => this.openFixNames() : isScr ? () => this.setState({ screenId: id.slice(7) }) : () => this.setState({ view: id, readDoc: null, sel: null }) }; }) }));
     // split so Folds can sit right under The reading / Connections, inside Explore
     const navTop = navGroups[0].items; const navRead = navGroups[1]; const navExplore = navGroups[2]; const navRest = navGroups.slice(3);
     const qv = (S.q || '').trim();
