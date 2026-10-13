@@ -88,6 +88,10 @@ button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visi
 .hd-drive-row:hover{background:var(--s2)}
 .hd-drive-row.head{font:600 12px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--mut);position:sticky;top:0;background:var(--bg);z-index:1}
 @media(max-width:720px){.hd-drive-row{grid-template-columns:28px minmax(0,1fr) 36px}.hd-drive-row .col-x{display:none}}
+/* the list narrows by ITS OWN width, not the viewport's: with the sidebar open the list can be far narrower than the window */
+.hd-drive-listbox{container-type:inline-size}
+th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
+@container (max-width:640px){.hd-drive-row{grid-template-columns:28px minmax(0,1fr) 36px}.hd-drive-row .col-x{display:none}}
 .hd-source-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,280px),1fr));gap:14px}
 .hd-source-card{background:var(--s1);border:1px solid var(--line);border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:10px}
 .hd-tx-track{height:5px;border-radius:3px;background:var(--s2);overflow:hidden}
@@ -546,7 +550,8 @@ button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visi
             <sc-if value="{{ drv.hasFieldPick }}" hint-placeholder-val="{{ false }}">
               <details class="hd-drive-menu"><summary title="Columns taken from fields that recur across your sources (contract id, expiry, vendor…) — shown in Table view and sortable" style="width:auto;padding:0 11px;border:1px solid var(--line2);border-radius:8px;font:500 13px var(--sans);height:30px">Fields · {{ drv.fieldsOn }}</summary>
                 <div class="hd-drive-menu-panel" style="min-width:340px;max-height:60vh;overflow:auto;padding:8px">
-                  <span style="font:400 12px/1.45 var(--sans);color:var(--dim);padding:2px 6px 8px">Labels that recur across sources, with the type read from their own values. Tick one to make it a column and a sort.</span>
+                  <span style="font:400 12px/1.45 var(--sans);color:var(--dim);padding:2px 6px 8px">Labels that recur across sources, most informative first, with the type read from their own values. Tick one to make it a column and a sort; drag any column header in Table view to move it.</span>
+                  <button onClick="{{ drv.onResetOrder }}" style="all:unset;cursor:pointer;align-self:flex-start;margin:0 6px 8px;padding:4px 10px;border:1px solid var(--line2);border-radius:6px;font:500 12px var(--sans);color:var(--ink2)" style-hover="color:var(--ink)">Reset column order</button>
                   <sc-for list="{{ drv.fieldPick }}" as="f" hint-placeholder-count="5"><label title="{{ f.tip }}" style="display:flex;gap:8px;align-items:center;padding:5px 6px;border-radius:6px;cursor:pointer;font:400 14px var(--sans);color:var(--ink)"><input type="checkbox" checked="{{ f.on }}" onChange="{{ f.onToggle }}"></input><span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ f.label }}</span><span style="font:500 11px var(--mono);color:var(--acc);text-transform:uppercase">{{ f.tag }}</span><span style="font:400 12px var(--mono);color:var(--dim);white-space:nowrap">{{ f.cover }}</span></label></sc-for>
                 </div>
               </details>
@@ -584,22 +589,13 @@ button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visi
           <sc-for list="{{ svTables }}" as="tb" hint-placeholder-count="1">
             <section style="display:flex;flex-direction:column;gap:6px">
               <sc-if value="{{ tb.hasLabel }}" hint-placeholder-val="{{ false }}"><span style="font:600 16px var(--sans);color:var(--ink);padding-top:6px">{{ tb.label }}</span></sc-if>
-              <div style="overflow:auto;border:1px solid var(--line);border-radius:10px;max-height:72vh">
+              <div class="hd-fill" style="overflow:auto;border:1px solid var(--line);border-radius:10px;min-height:240px">
                 <table style="border-collapse:collapse;width:100%;min-width:980px">
-                  <thead><tr><sc-for list="{{ svCols }}" as="c" hint-placeholder-count="9"><th onClick="{{ c.onClick }}" style="font:600 12px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--mut);text-align:left;padding:8px 10px;border-bottom:1px solid var(--line2);white-space:nowrap;cursor:pointer;background:var(--s1);position:sticky;top:0">{{ c.label }}</th></sc-for><th style="font:600 12px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--mut);text-align:left;padding:8px 10px;border-bottom:1px solid var(--line2);white-space:nowrap;cursor:pointer;background:var(--s1);position:sticky;top:0;cursor:default"></th></tr></thead>
+                  <thead><tr><sc-for list="{{ svCols }}" as="c" hint-placeholder-count="9"><th data-colkey="{{ c.key }}" title="Click to sort · drag to move" onClick="{{ c.onClick }}" style="user-select:none;-webkit-user-select:none;font:600 12px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--mut);text-align:left;padding:8px 10px;border-bottom:1px solid var(--line2);white-space:nowrap;cursor:pointer;background:var(--s1);position:sticky;top:0">{{ c.label }}</th></sc-for><th style="font:600 12px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--mut);text-align:left;padding:8px 10px;border-bottom:1px solid var(--line2);white-space:nowrap;cursor:pointer;background:var(--s1);position:sticky;top:0;cursor:default"></th></tr></thead>
                   <tbody>
                     <sc-for list="{{ tb.rows }}" as="r" hint-placeholder-count="8">
                       <tr style="background:var(--bg)" style-hover="background:var(--s1)">
-                        <td style="padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top;font:400 14px/1.4 var(--sans);color:var(--ink2);min-width:260px"><button onClick="{{ r.onRead }}" style="all:unset;cursor:pointer;font:500 15px/1.35 var(--serif);color:var(--ink)" style-hover="color:var(--acc)">{{ r.title }}</button></td>
-                        <td style="padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top;font:400 14px/1.4 var(--sans);color:var(--ink2);white-space:nowrap">{{ r.kind }}</td>
-                        <td style="padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top;font:400 14px/1.4 var(--sans);color:var(--ink2);white-space:nowrap"><span style="display:inline-flex;gap:6px;align-items:center"><span style="width:8px;height:8px;border-radius:50%;background:{{ r.mcol }}"></span>{{ r.medium }}</span></td>
-                        <td style="padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top;font:400 14px/1.4 var(--sans);color:var(--ink2);white-space:nowrap;font-family:var(--mono);font-size:13px">{{ r.date }}</td>
-                        <td style="padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top;font:400 14px/1.4 var(--sans);color:var(--ink2)">{{ r.publisher }}</td>
-                        <td style="padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top;font:400 14px/1.4 var(--sans);color:var(--ink2)">{{ r.standing }}</td>
-                        <td style="padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top;font:400 14px/1.4 var(--sans);color:var(--ink2);text-align:right;font-family:var(--mono);font-size:13px">{{ r.stsS }}</td>
-                        <td style="padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top;font:400 14px/1.4 var(--sans);color:var(--ink2);text-align:right;font-family:var(--mono);font-size:13px">{{ r.namesS }}</td>
-                        <td style="padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top;font:400 14px/1.4 var(--sans);color:var(--ink2);color:{{ r.ccol }};font-size:13px">{{ r.custody }}</td>
-                        <sc-for list="{{ r.xcells }}" as="x" hint-placeholder-count="0"><td style="padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top;font:400 13px/1.4 var(--mono);color:var(--ink2);white-space:nowrap">{{ x.v }}</td></sc-for>
+                        <sc-for list="{{ r.cells }}" as="c" hint-placeholder-count="9"><td style="{{ c.st }}"><sc-if value="{{ c.isTitle }}" hint-placeholder-val="{{ false }}"><button onClick="{{ c.onRead }}" style="all:unset;cursor:pointer;font:500 15px/1.35 var(--serif);color:var(--ink)" style-hover="color:var(--acc)">{{ c.v }}</button></sc-if><sc-if value="{{ c.isMedium }}" hint-placeholder-val="{{ false }}"><span style="display:inline-flex;gap:6px;align-items:center"><span style="width:8px;height:8px;border-radius:50%;background:{{ c.mcol }}"></span>{{ c.v }}</span></sc-if><sc-if value="{{ c.isPlain }}" hint-placeholder-val="{{ true }}">{{ c.v }}</sc-if></td></sc-for>
                         <td style="padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top;font:400 14px/1.4 var(--sans);color:var(--ink2);white-space:nowrap"><span style="display:flex;gap:10px;font:500 13px var(--sans)"><sc-if value="{{ r.hasVideo }}" hint-placeholder-val="{{ false }}"><a href="{{ r.videoUrl }}" target="_blank" rel="noopener" style="color:var(--acc);text-decoration:none">Video ↗</a></sc-if><button onClick="{{ r.onFocus }}" style="all:unset;cursor:pointer;color:var(--mut)" style-hover="color:var(--ink)">Only this</button></span></td>
                       </tr>
                     </sc-for>
@@ -639,7 +635,7 @@ button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visi
           </div>
         </sc-if>
         <sc-if value="{{ svList }}" hint-placeholder-val="{{ false }}">
-          <div style="border:1px solid var(--line);border-radius:12px;overflow:visible">
+          <div class="hd-drive-listbox" style="border:1px solid var(--line);border-radius:12px;overflow:visible">
             <div class="hd-drive-row head"><span></span><span>Name</span><span class="col-x">Kind</span><span class="col-x">Statements</span><span class="col-x">Added</span><span></span></div>
             <sc-for list="{{ drv.tiles }}" as="d" hint-placeholder-count="4">
               <div class="hd-drive-row" draggable="{{ true }}" onDragStart="{{ d.onDragStart }}" style="{{ d.tileStyle }}">
@@ -2669,7 +2665,8 @@ button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visi
     </sc-if>
     <sc-if value="{{ hasSel }}" hint-placeholder-val="{{ false }}">
     <aside style="{{ sidePanelStyle }}">
-      
+      <sc-if value="{{ narrowBack }}" hint-placeholder-val="{{ false }}"><button onClick="{{ clearSel }}" style="align-self:flex-start;background:var(--s2);border:1px solid var(--line2);border-radius:8px;color:var(--ink);cursor:pointer;font:500 14px var(--sans);padding:6px 12px">← Back</button></sc-if>
+
       <sc-if value="{{ hasSel }}" hint-placeholder-val="{{ false }}">
         <div style="display:flex;justify-content:space-between;align-items:center">
           <span style="font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:{{ d.color }}">{{ d.eyebrow }}</span>
@@ -2782,6 +2779,7 @@ button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visi
     </sc-if>
     <sc-if value="{{ pfSide }}" hint-placeholder-val="{{ false }}">
     <aside style="{{ sidePanelStyle }}">
+      <sc-if value="{{ narrowBack }}" hint-placeholder-val="{{ false }}"><button onClick="{{ pfClose }}" style="align-self:flex-start;background:var(--s2);border:1px solid var(--line2);border-radius:8px;color:var(--ink);cursor:pointer;font:500 14px var(--sans);padding:6px 12px">← Back</button></sc-if>
       <div style="display:flex;justify-content:flex-end;margin-bottom:-8px"><button onClick="{{ pfClose }}" title="Close" style="background:none;border:0;color:var(--mut);cursor:pointer;font-size:14px">✕</button></div>
       <div style="display:flex;flex-direction:column;gap:12px">
       <div style="display:flex;flex-direction:column;gap:3px">
@@ -2853,6 +2851,15 @@ button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visi
 
   </div>
 </div>
+  <sc-if value="{{ extraScreen.has }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;inset:0;z-index:58;background:var(--bg);display:flex;flex-direction:column">
+      <div style="display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid var(--line);background:var(--s1)">
+        <button onClick="{{ extraScreen.close }}" style="background:var(--s2);border:1px solid var(--line2);border-radius:8px;color:var(--ink);cursor:pointer;font:500 14px var(--sans);padding:6px 12px">← Back</button>
+        <span style="font:600 16px var(--sans);color:var(--ink)">{{ extraScreen.label }}</span>
+      </div>
+      <iframe src="{{ extraScreen.src }}" title="Screen: {{ extraScreen.label }}" style="flex:1;border:0;width:100%;background:var(--bg)"></iframe>
+    </div>
+  </sc-if>
   <sc-if value="{{ showSettings }}" hint-placeholder-val="{{ false }}">
     <div onClick="{{ closeSettingsBg }}" style="position:fixed;inset:0;z-index:55;background:rgba(6,5,12,.75);display:flex;justify-content:flex-end">
       <div style="width:min(460px,100%);height:100%;overflow:auto;box-sizing:border-box;background:var(--s1);border-left:1px solid var(--line2);padding:20px 22px;display:flex;flex-direction:column;gap:16px">
@@ -4220,6 +4227,10 @@ function withPdfSrc(d) { if (d && !d.pdfSrc) { const t = epavTokenOf(d); if (t) 
 // they land in one column. The catalogue is a pure function of the sources.
 const FIELD_META_SKIP = new Set(['id', 'title', 'type', 'format', 'url', 'pages', 'text', 'note', 'pdfSrc', 'html', 'kind', 'medium', 'published', 'pubLabel', 'year', 'custody', 'custodyStatus', 'faithful', 'binPath', 'media', 'pdf', 'figures', 'needsRead', 'addedAt', 'hasImg', 'ocr', 'eyes', 'eyesDetail', 'ignored', 'transcribed', 'standing', 'publisher', 'measured', 'screen', 'group', 'hasHtml', 'ocrModel', 'imgSrc', 'lang']);
 const FIELD_TEXT_RE = /(?:^|[\n.;|])\s*([A-Z][A-Za-z]+(?:[ \/-][A-Za-z&]+){0,3})\s*(?:(?:No\.?|Number|Num\.?|#|ID)\s*[:#]?|:)\s*([A-Z0-9$][^\n;|]{0,48})/g;
+// Department and expiration come from the extraction itself (ePAV rows carry them as named fields), so they are
+// explicit columns, always present and always sortable -- not left to be discovered as one recurring label among many.
+const FIELD_EXPLICIT_DEPT = ['dept', 'department', 'agency'];
+const FIELD_EXPLICIT_EXP = ['expires', 'expiration', 'expiration date', 'expiry'];
 function fieldKey(label) { const s = String(label).replace(/([a-z])([A-Z])/g, '$1 $2').toLowerCase().replace(/[^a-z0-9 ]+/g, ' ').replace(/\s+/g, ' ').trim(); return s.replace(/\s+(no|num|number|id|ref|reference)$/, '') || s; }
 function fieldLabel(key) { return key.charAt(0).toUpperCase() + key.slice(1); }
 function fieldDateIso(v) {
@@ -4269,8 +4280,16 @@ function fieldCatalog(docs) {
     // a plain-number field whose values are mostly each their own (more distinct values than repeats) is an identifier
     if (type === 'number' && distinct * 2 > e.docs) type = 'id';
     const sf = [...surf.get(e.key).entries()].sort((a, b) => b[1] - a[1])[0][0];
-    return { key: e.key, label: fieldLabel(e.key), type, n: e.docs, distinct, surface: sf };
-  }).sort((a, b) => b.n - a.n || a.key.localeCompare(b.key));
+    // importance, measured: how many sources carry the field x how well its values tell sources apart
+    // (Shannon entropy of its values over the most it could be, log2 n). No constant: a field every source has and
+    // that differs between sources outranks a rare one and a constant one.
+    const cnt = new Map(); for (const v of e.vals) cnt.set(v, (cnt.get(v) || 0) + 1);
+    let H = 0; for (const c of cnt.values()) { const p = c / e.vals.length; H -= p * Math.log2(p); }
+    const score = (e.docs / Math.max(1, docs.length)) * (e.vals.length > 1 ? H / Math.log2(e.vals.length) : 0);
+    return { key: e.key, label: fieldLabel(e.key), type, n: e.docs, distinct, surface: sf, score };
+  }).sort((a, b) => b.score - a.score || b.n - a.n || a.key.localeCompare(b.key));
+  // the two fields the extraction names explicitly get plain names, whatever the source spelled them
+  for (const f of fields) { if (FIELD_EXPLICIT_DEPT.includes(f.key)) f.label = 'Department'; else if (FIELD_EXPLICIT_EXP.includes(f.key)) f.label = 'Expires'; }
   const keep = new Set(fields.map(f => f.key)), byDoc = new Map();
   for (const [docId, o] of per) { const r = {}; for (const k of Object.keys(o)) if (keep.has(k)) r[k] = o[k]; byDoc.set(docId, r); }
   // default columns: the best-covered field of each type — no cutoff constant, just the leader per kind
@@ -5080,7 +5099,55 @@ class Component extends DCLogic {
   state = { corpus: null, added: loadAdded(), view: new URLSearchParams(location.search).has('work') ? 'ask' : 'summary', akMode: new URLSearchParams(location.search).get('work') === 'notebook' ? 'notebook' : new URLSearchParams(location.search).get('work') === 'fold' ? 'generate' : 'chat', akFocus: new URLSearchParams(location.search).get('fullscreen') === '1' || new URLSearchParams(location.search).get('work') === 'chat', akConvList: false, akNotes: {}, sel: null, f: {}, q: '', readDoc: null, showPos: false, showAdd: false, showSettings: false, draftText: '', fw: {}, note: '', theme: loadTheme(), railOpen: loadRailOpen(), segOpen: loadSegOpen(), topicsQ: '', topicsPage: 0, dragging: false, busy: '', just: null, readMode: 'original', htmlVer: 0, txAsk: null, txPrior: 'workspace', txLang: 'en', txModel: 'base', txBusy: false, txProg: '', txProgress: null, wsNewName: '', ground: { on: true, names: true, figures: true, dates: true, sentences: true }, wsRenaming: false, wsNameDraft: '', wsDeleting: false, readerRename: false, readerNameDraft: '', stripRead: { mode: 'Relate', domain: 'Interpretation', grain: 'Pattern' }, folder: null, folderDraft: '', folderRename: null, folderNameDraft: '', mxOpen: false, mxErr: '', mxBusy: false, editOpen: null, editDraft: null };
   _html = {};
 
+  // Move a table column to another column's position and remember it.
+  moveCol(from, to) {
+    const order = this._colOrder || [];
+    if (!from || !to || from === to || !order.includes(from) || !order.includes(to)) return;
+    const cur = order.filter(c => c !== from); cur.splice(order.indexOf(to), 0, from);
+    try { localStorage.setItem('holodeck-sv-colorder', JSON.stringify(cur)); } catch (e) {}
+    this.setState({ svColOrder: cur });
+  }
+  // Column dragging by pointer events: press a header, move past a few pixels, release over another header.
+  // Not HTML5 drag-and-drop: this page treats any native drag dropped on it as new content, and native drag on a
+  // table header is unreliable. Nothing here starts a native drag, so the page's drop handler never sees one.
+  installColDrag() {
+    if (this._colDragOn) return; this._colDragOn = true;
+    let st = null;
+    const hdr = el => (el && el.closest ? el.closest('th[data-colkey]') : null);
+    const clear = () => document.querySelectorAll('th.hd-drop').forEach(n => n.classList.remove('hd-drop'));
+    document.addEventListener('dragstart', e => { if (hdr(e.target)) e.preventDefault(); }, true);
+    document.addEventListener('pointerdown', e => {
+      if (e.button !== 0) return; const th = hdr(e.target); if (!th) return;
+      st = { key: th.getAttribute('data-colkey'), x: e.clientX, y: e.clientY, moved: false, th };
+    }, true);
+    document.addEventListener('pointermove', e => {
+      if (!st) return;
+      if (!st.moved && Math.hypot(e.clientX - st.x, e.clientY - st.y) > 5) { st.moved = true; st.th.style.opacity = '.45'; document.body.style.cursor = 'grabbing'; }
+      if (st.moved) { clear(); const t = hdr(document.elementFromPoint(e.clientX, e.clientY)); if (t && t !== st.th) t.classList.add('hd-drop'); }
+    }, true);
+    const finish = (e, cancel) => {
+      if (!st) return; const s = st; st = null;
+      s.th.style.opacity = ''; document.body.style.cursor = ''; clear();
+      if (!s.moved) return;                                   // a plain click still sorts
+      this._colDragJustEnded = true; setTimeout(() => { this._colDragJustEnded = false; }, 0);   // swallow the click that follows a drag
+      if (cancel) return;
+      const t = hdr(document.elementFromPoint(e.clientX, e.clientY));
+      if (t) this.moveCol(s.key, t.getAttribute('data-colkey'));
+    };
+    document.addEventListener('pointerup', e => finish(e, false), true);
+    document.addEventListener('pointercancel', e => finish(e, true), true);
+    document.addEventListener('click', e => { if (this._colDragJustEnded && hdr(e.target)) { e.stopPropagation(); e.preventDefault(); } }, true);
+  }
   componentDidMount() {
+    this.installColDrag();
+    // optional extra screens: a deployment lists whole pages in screens.json and they join the sidebar; absent or
+    // invalid means no change at all
+    try {
+      fetch(new URL('screens.json', location.href), { cache: 'no-store' }).then(r => (r.ok ? r.json() : [])).then(a => {
+        this._screens = Array.isArray(a) ? a.filter(x => x && typeof x.id === 'string' && typeof x.src === 'string').map(x => ({ id: x.id, label: String(x.label || x.id), src: x.src })) : [];
+        if (this._screens.length) this.setState({ screensN: this._screens.length });
+      }).catch(() => {});
+    } catch (e) {}
     this.hydrateAdded().catch(() => {});
     // a workspace that is already an encrypted repo keeps its unread count live without opening the Inbox
     try { if (JSON.parse(localStorage.getItem('hd:share:repos') || '{}')[this.corpusId()]) this.inboxCtl().then(c => c.start()).catch(() => {}); } catch (e) {}
@@ -5111,7 +5178,23 @@ class Component extends DCLogic {
     window.addEventListener('dragenter', this._h.enter); window.addEventListener('dragleave', this._h.leave); window.addEventListener('dragover', this._h.over); window.addEventListener('drop', this._h.drop); window.addEventListener('paste', this._h.paste);
   }
   componentWillUnmount() { window.removeEventListener('keydown', this._onFocusKey); window.removeEventListener('resize', this._onRz); if (this._pdfRo) { try { this._pdfRo.disconnect(); } catch (e) {} } window.removeEventListener('message', this._onYt); document.removeEventListener('selectionchange', this._onSelCh); window.removeEventListener('scroll', this._onSelCh, true); window.removeEventListener('message', this._onMsg); const h = this._h; window.removeEventListener('dragenter', h.enter); window.removeEventListener('dragleave', h.leave); window.removeEventListener('dragover', h.over); window.removeEventListener('drop', h.drop); window.removeEventListener('paste', h.paste); }
-  componentDidUpdate() { try { const c = this.corpusId(); if (c !== this._wsSeen) { this._wsSeen = c; touchWs(c); } } catch (e) {} this.syncOverview(); this.syncInbox(); this.applyTheme(); this.measureHdr(); try { const ff = document.getElementById('fold-folder-input'); if (ff && !ff.multiple) { ff.webkitdirectory = true; ff.setAttribute('webkitdirectory', ''); ff.multiple = true; ff.setAttribute('multiple', ''); } } catch (e) {} if (this._prevCorpus !== this.state.corpus || this._prevAdded !== this.state.added) { this._prevCorpus = this.state.corpus; this._prevAdded = this.state.added; this.loadHtml(); this.akAutoLoad(); } const rd0 = this.state.readDoc && this.analysis().docById[this.state.readDoc]; if (rd0 && rd0.media && rd0.media.kind === 'local') { this.ensureMediaUrl(rd0);
+  // Let a scrolling panel (class hd-fill) take all the vertical space below its own top edge, so the contracts
+  // panel fills the window instead of stopping at a fixed share of it. It scrolls inside itself.
+  fitFill() {
+    try {
+      document.querySelectorAll('.hd-fill').forEach(el => {
+        const top = el.getBoundingClientRect().top;
+        el.style.height = Math.max(240, Math.floor(innerHeight - Math.max(top, 0) - 14)) + 'px';
+      });
+    } catch (e) {}
+  }
+  installFill() {
+    if (this._fillOn) return; this._fillOn = true;
+    const go = () => this.fitFill();
+    window.addEventListener('resize', go);
+    window.addEventListener('scroll', go, { passive: true });
+  }
+  componentDidUpdate() { try { const c = this.corpusId(); if (c !== this._wsSeen) { this._wsSeen = c; touchWs(c); } } catch (e) {} this.installFill(); this.fitFill(); this.syncOverview(); this.syncInbox(); this.applyTheme(); this.measureHdr(); try { const ff = document.getElementById('fold-folder-input'); if (ff && !ff.multiple) { ff.webkitdirectory = true; ff.setAttribute('webkitdirectory', ''); ff.multiple = true; ff.setAttribute('multiple', ''); } } catch (e) {} if (this._prevCorpus !== this.state.corpus || this._prevAdded !== this.state.added) { this._prevCorpus = this.state.corpus; this._prevAdded = this.state.added; this.loadHtml(); this.akAutoLoad(); } const rd0 = this.state.readDoc && this.analysis().docById[this.state.readDoc]; if (rd0 && rd0.media && rd0.media.kind === 'local') { this.ensureMediaUrl(rd0);
       // A recording opened but never classified gets its sound map on first sight (an
       // older stored recording, or one added before the classifier existed); the work
       // is the same in-browser rung, guarded so it happens once until it lands.
@@ -8307,6 +8390,9 @@ class Component extends DCLogic {
     let fcSel = Array.isArray(S.svFields) ? S.svFields : null;
     if (!fcSel) { try { const j = JSON.parse(localStorage.getItem('holodeck-sv-fields') || 'null'); if (Array.isArray(j)) fcSel = j; } catch (e) {} }
     const fcBy = new Map(FC.fields.map(f => [f.key, f])); fcSel = (fcSel || FC.dflt).filter(k => fcBy.has(k));
+    // explicit fields lead the columns and cannot be unticked
+    const fcPinned = [FIELD_EXPLICIT_DEPT, FIELD_EXPLICIT_EXP].map(c => c.find(k => fcBy.has(k))).filter(Boolean);
+    fcSel = [...fcPinned, ...fcSel.filter(k => !fcPinned.includes(k))];
     const rowOf = x => { const it = x.it; const d = A.docById[it.id] || docByTitle.get(it.title) || {}; const all = A.stsByDoc[d.id] || []; const nm = new Set(all.flatMap(s => s.names));
       const fvals = FC.byDoc.get(d.id) || {};
       return { it, id: d.id, fvals, xcells: fcSel.map(k => ({ v: fvals[k] || '' })), addedAt: this.addedAtOf(d), group: x.g, title: d.title || it.title, kind: d.kind || x.g, medium: d.medium || 'Text', date: d.pubLabel || (d.year ? String(d.year) : ''), iso: d.published || (d.year ? String(d.year) : ''), publisher: d.publisher || '', standing: d.standing || '', sts: all.length, names: nm.size, custody: d.custody || (it.isSeen ? 'seen, not kept' : ''),
@@ -8316,7 +8402,30 @@ class Component extends DCLogic {
     const sK = svFld ? (r => fieldSortKey(svFld.type, r.fvals[svFld.key])) : (sKey[svSort] || sKey.date);
     // sources with no value for the field always sort last, whichever way it runs
     const sortRows = L => L.sort((a, b) => { const ka = sK(a), kb = sK(b); if (ka == null || kb == null) return ka == null && kb == null ? a.title.localeCompare(b.title) : ka == null ? 1 : -1; return (ka < kb ? -1 : ka > kb ? 1 : 0) * svDir || a.title.localeCompare(b.title); });
-    const rowsAll = allSrcItems.map(rowOf); const mkRows = L => sortRows(L).map(r => ({ ...r, stsS: String(r.sts), namesS: String(r.names), onRead: r.it.onRead, onSelect: r.it.onSelect, onFocus: r.it.onFocus }));
+    const rowsAll = allSrcItems.map(rowOf);
+    // ---- columns: one ordered list, so any column can sit anywhere ----
+    const TD = 'padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top;font:400 14px/1.4 var(--sans);color:var(--ink2)';
+    const colDefs = [
+      { k: 'title', label: 'Source', cell: r => ({ isTitle: true, v: r.title, onRead: r.onRead, st: TD + ';min-width:260px' }) },
+      { k: 'kind', label: 'Kind', cell: r => ({ isPlain: true, v: r.kind, st: TD + ';white-space:nowrap' }) },
+      { k: 'medium', label: 'Medium', cell: r => ({ isMedium: true, v: r.medium, mcol: r.mcol, st: TD + ';white-space:nowrap' }) },
+      { k: 'date', label: 'Date', cell: r => ({ isPlain: true, v: r.date, st: TD + ';white-space:nowrap;font-family:var(--mono);font-size:13px' }) },
+      { k: 'publisher', label: 'Publisher', cell: r => ({ isPlain: true, v: r.publisher, st: TD }) },
+      { k: 'standing', label: 'Standing', cell: r => ({ isPlain: true, v: r.standing, st: TD }) },
+      { k: 'sts', label: 'Statements', cell: r => ({ isPlain: true, v: r.stsS, st: TD + ';text-align:right;font-family:var(--mono);font-size:13px' }) },
+      { k: 'names', label: 'Names', cell: r => ({ isPlain: true, v: r.namesS, st: TD + ';text-align:right;font-family:var(--mono);font-size:13px' }) },
+      { k: 'custody', label: 'Custody', cell: r => ({ isPlain: true, v: r.custody, st: TD + ';color:' + r.ccol + ';font-size:13px' }) },
+      ...fcSel.map(fk => ({ k: 'f:' + fk, label: fcBy.get(fk).label, cell: r => ({ isPlain: true, v: (r.fvals || {})[fk] || '', st: TD + ';font:400 13px/1.4 var(--mono);white-space:nowrap' }) })),
+    ];
+    const colMap = new Map(colDefs.map(c => [c.k, c]));
+    // default: the source, the explicit fields, the other chosen fields by measured importance, then the built-in columns
+    const byImportance = fcSel.filter(k => !fcPinned.includes(k)).sort((a, b) => fcBy.get(b).score - fcBy.get(a).score);
+    const defaultOrder = ['title', ...fcPinned.map(k => 'f:' + k), ...byImportance.map(k => 'f:' + k), 'date', 'sts', 'names', 'kind', 'medium', 'publisher', 'standing', 'custody'];
+    let savedOrder = Array.isArray(S.svColOrder) ? S.svColOrder : null;
+    if (!savedOrder) { try { const j = JSON.parse(localStorage.getItem('holodeck-sv-colorder') || 'null'); if (Array.isArray(j)) savedOrder = j; } catch (e) {} }
+    const colOrder = [...(savedOrder || []).filter(k => colMap.has(k)), ...defaultOrder.filter(k => !(savedOrder || []).includes(k))];
+    this._colOrder = colOrder;
+    const mkRows = L => sortRows(L).map(r => { const row = { ...r, stsS: String(r.sts), namesS: String(r.names), onRead: r.it.onRead, onSelect: r.it.onSelect, onFocus: r.it.onFocus }; return { ...row, cells: colOrder.map(k => colMap.get(k).cell(row)) }; });
     const tables = svGroup === 'one' ? [{ label: '', hasLabel: false, rows: mkRows(rowsAll.slice()) }]
       : svGroup === 'tabs' ? [{ label: '', hasLabel: false, rows: mkRows(rowsAll.filter(r => svTab === '__all' || FAM(r.group) === svTab)) }]
       : srcGroups.map(g => ({ label: g.label + ' · ' + g.n, hasLabel: true, rows: mkRows(rowsAll.filter(r => r.group === g.label)) }));
@@ -8325,7 +8434,11 @@ class Component extends DCLogic {
     const svVals = { ...meetVals, srcHiddenNote: this._srcHidden ? plural(this._srcHidden, 'other source') + ' with nothing in this selection ' + (this._srcHidden === 1 ? 'is' : 'are') + ' hidden' : '', svCards: svMode === 'cards', svTable: svMode === 'table', svTabsOn: svGroup === 'tabs',
       svModes: [['grid', 'Grid'], ['list', 'List'], ['table', 'Table']].map(([k, l]) => ({ label: l, ...seg(svMode === k || (k === 'grid' && svMode === 'cards')), onClick: () => this.setState({ svMode: k }) })),
       svTabs: tabs.map(t => ({ label: t.label, n: t.n, cls: t.id === svTab ? 'on' : '', bd: t.id === svTab ? 'var(--acc2)' : 'transparent', col: t.id === svTab ? 'var(--ink)' : 'var(--mut)', onClick: () => this.setState({ svTab: t.id }) })),
-      svCols: [...tCols, ...fcSel.map(k => ['f:' + k, fcBy.get(k).label])].map(([k, l]) => ({ label: l + (svSort === k ? (svDir > 0 ? ' ↑' : ' ↓') : ''), onClick: () => this.setState({ svSort: k, svDir: svSort === k ? -svDir : (k === 'title' || k === 'publisher' || (k.startsWith('f:') && ['text', 'id'].includes(fcBy.get(k.slice(2)).type)) ? 1 : -1) }) })),
+      svCols: colOrder.map(k => ({ label: colMap.get(k).label + (svSort === k ? (svDir > 0 ? ' ↑' : ' ↓') : ''),
+        onClick: () => this.setState({ svSort: k, svDir: svSort === k ? -svDir : (k === 'title' || k === 'publisher' || (k.startsWith('f:') && ['text', 'id'].includes(fcBy.get(k.slice(2)).type)) ? 1 : -1) }),
+        // the column's key; dragging is done with pointer events (installColDrag), never the browser's native drag,
+        // which this page reads as "content dropped on the page"
+        key: k })),
       svTables: tables, svCardGroups: svGroup === 'one' ? [{ label: 'All sources', n: String(allSrcItems.length), desc: '', items: allSrcItems.map(x => x.it), hasMore: false }] : svGroup === 'tabs' ? (svTab === '__all' ? srcGroups : svTab === 'Recordings' ? (() => { const vg = srcGroups.filter(g => /^(Video|Meeting recording)$/.test(g.label)); const items = vg.flatMap(g => g.items).map(it => ({ it, d: docByTitle.get(it.title) || {} })).sort((x, y) => (y.d.published || String(y.d.year || '')).localeCompare(x.d.published || String(x.d.year || ''))).map(x => x.it); return [...(items.length ? [{ label: 'Video', n: String(items.length), desc: 'Meetings and other recordings. Open one to watch it with its transcript beside it.', items, hasMore: false }] : []), ...srcGroups.filter(g => FAM(g.label) === 'Recordings' && !/^(Video|Meeting recording)$/.test(g.label))]; })() : srcGroups.filter(g => FAM(g.label) === svTab)) : srcGroups };
     // ---- the Drive-style files view: one flat list, typed icons, folders you can drop onto, a selection bar ----
     const dvQ = (S.dvQ || '').trim().toLowerCase(), dvSel = S.dvSel || {}, dvSortK = S.dvSort || 'added', dvFl = this.foldersFor(), dvCurF = S.folder;
@@ -8362,14 +8475,19 @@ class Component extends DCLogic {
       inFolder: !!(dvCurF && dvFl.some(f => f.id === dvCurF)), folderName: (dvFl.find(f => f.id === dvCurF) || {}).name || '',
       sort: dvSortK,
       sorts: [['added', 'Recently added'], ['title', 'Name'], ['date', 'Date of source — newest'], ['dateAsc', 'Date of source — oldest'], ['sts', 'Most statements'],
-        ...fcSel.map(k => fcBy.get(k)).flatMap(f => f.type === 'date' ? [['f:' + f.key, f.label + ' — latest'], ['f:' + f.key + ':asc', f.label + ' — earliest']]
+        ...[...fcSel, ...FC.fields.map(f => f.key).filter(k => !fcSel.includes(k))].map(k => fcBy.get(k)).flatMap(f => f.type === 'date' ? [['f:' + f.key, f.label + ' — latest'], ['f:' + f.key + ':asc', f.label + ' — earliest']]
           : f.type === 'amount' || f.type === 'number' ? [['f:' + f.key, f.label + ' — highest'], ['f:' + f.key + ':asc', f.label + ' — lowest']]
           : [['f:' + f.key + ':asc', f.label + ' A–Z'], ['f:' + f.key, f.label + ' Z–A']])].map(([v, l]) => ({ v, l })),
-      onSort: e => { const v = e.target.value, base = v.replace(/:asc$/, '').replace(/^dateAsc$/, 'date'), asc = /:asc$/.test(v) || v === 'dateAsc' || v === 'title'; this.setState({ dvSort: v, ...(v === 'added' ? {} : { svSort: base, svDir: asc ? 1 : -1 }) }); },
+      onSort: e => { const v = e.target.value, base = v.replace(/:asc$/, '').replace(/^dateAsc$/, 'date'), asc = /:asc$/.test(v) || v === 'dateAsc' || v === 'title';
+        // sorting by a field that is not a column yet adds its column, so the order can be seen
+        const fk = base.startsWith('f:') ? base.slice(2) : null; let add = {};
+        if (fk && !fcSel.includes(fk)) { const cur = [...fcSel, fk]; try { localStorage.setItem('holodeck-sv-fields', JSON.stringify(cur)); } catch (x) {} add = { svFields: cur }; }
+        this.setState({ dvSort: v, ...add, ...(v === 'added' ? {} : { svSort: base, svDir: asc ? 1 : -1 }) }); },
       // the recurring-field picker: every label that recurs across sources, with its read type and how many sources carry it
+      onResetOrder: () => { try { localStorage.removeItem('holodeck-sv-colorder'); } catch (e) {} this.setState({ svColOrder: null }); },
       fieldsOn: String(fcSel.length), hasFieldPick: FC.fields.length > 0,
-      fieldPick: FC.fields.map(f => ({ label: f.label, tag: f.type, cover: f.n + ' of ' + A.docs.length, on: fcSel.includes(f.key), tip: 'Written ' + f.surface + ' · ' + f.distinct + ' distinct values',
-        onToggle: () => { const cur = fcSel.includes(f.key) ? fcSel.filter(k => k !== f.key) : [...fcSel, f.key]; try { localStorage.setItem('holodeck-sv-fields', JSON.stringify(cur)); } catch (e) {} this.setState({ svFields: cur }); } })),
+      fieldPick: FC.fields.map(f => ({ label: f.label, tag: f.type, cover: f.n + ' of ' + A.docs.length, on: fcSel.includes(f.key), tip: (fcPinned.includes(f.key) ? 'Explicit field, always shown. ' : '') + 'Written ' + f.surface + ' · ' + f.distinct + ' distinct values',
+        onToggle: () => { if (fcPinned.includes(f.key)) return; const cur = fcSel.includes(f.key) ? fcSel.filter(k => k !== f.key) : [...fcSel, f.key]; try { localStorage.setItem('holodeck-sv-fields', JSON.stringify(cur)); } catch (e) {} this.setState({ svFields: cur }); } })),
       hasFolders: dvFl.length > 0, folders: dvFolderTiles, tiles: dvTiles, empty: dvTiles.length === 0,
       emptyText: dvQ ? 'No source matches “' + (S.dvQ || '').trim() + '”.' : dvCurF ? 'This folder is empty — drag sources onto it from “All sources”.' : 'Nothing here yet. Add a source to start.',
       hasSel: dvSelIds.length > 0, selLabel: plural(dvSelIds.length, 'source') + ' selected', onClearSel: () => this.setState({ dvSel: {}, dvBulkAsk: false }),
@@ -8691,6 +8809,10 @@ class Component extends DCLogic {
     const juncMode = S.suMode !== 'belief'; const JN = isEmpty ? [] : this.junctions(A, Fid);
     const gHi = on => ({ bg: on ? 'var(--sel)' : 'transparent', bd: on ? 'var(--acc2)' : 'transparent', weight: on ? 600 : 500 });
     const NAVG = [['', [['summary', 'Sources'], ['ask', 'Ask'], ['inbox', 'Inbox'], ['draft', 'Draft']]], ['Read closely', [['names', 'Names'], ['records', 'Assertions']]], ['Explore', [['connections', 'Connections'], ['overview', 'Evidence overview']]], ['Manage', [['ingest', 'Add & publish']]]];
+    // extra screens from screens.json (see componentDidMount): beside Sources, Ask, Inbox and Draft at the top of the
+    // sidebar, where they are seen, not inside the collapsed "Explore & manage" group
+    const SCREENS = this._screens || [];
+    NAVG[0][1].push(...SCREENS.map(sc => ['screen:' + sc.id, sc.label]));
     const countFor = id => ({
       names: String(D.nameList.length), records: String(F.length),
       connections: String(D.edgeList.length),
@@ -8699,7 +8821,8 @@ class Component extends DCLogic {
       ask: (this._conv && this._conv.turns && this._conv.turns.length) ? String(this._conv.turns.length) : '',
       inbox: this._inboxSum && this._inboxSum.unread ? String(this._inboxSum.unread) : '',
     }[id] || '');
-    const navGroups = NAVG.map(([label, items]) => ({ label, hasLabel: !!label, items: items.map(([id, lab]) => ({ label: lab, count: countFor(id), ...gHi(view === id), onClick: () => this.setState({ view: id, readDoc: null, sel: null }) })) }));
+    const navGroups = NAVG.map(([label, items]) => ({ label, hasLabel: !!label, items: items.map(([id, lab]) => { const isScr = id.startsWith('screen:');
+      return { label: lab, count: countFor(id), ...gHi(isScr ? S.screenId === id.slice(7) : view === id), onClick: isScr ? () => this.setState({ screenId: id.slice(7) }) : () => this.setState({ view: id, readDoc: null, sel: null }) }; }) }));
     // split so Folds can sit right under The reading / Connections, inside Explore
     const navTop = navGroups[0].items; const navRead = navGroups[1]; const navExplore = navGroups[2]; const navRest = navGroups.slice(3);
     const qv = (S.q || '').trim();
@@ -8719,6 +8842,8 @@ class Component extends DCLogic {
       pinPop: S.pinPop && view === 'reader' ? { has: true, x: S.pinPop.x + 'px', y: S.pinPop.y + 'px', onPin: e => { e.preventDefault(); this.pinSelection(); }, onComment: e => { e.preventDefault(); this.commentOnSelection(); }, onCorrect: e => { e.preventDefault(); this.openCorr(S.pinPop.text); } } : { has: false },
       hasPinToast: !!S.pinToast, pinToast: S.pinToast || '', goDraft: () => { this.setState({ pinToast: '' }); this.go('draft'); }, plainRef: this.plainRef, omniRef: this.omniRef,
       rdPins: (() => { const n = view === 'reader' ? this.activePins().filter(p => p.docId === S.readDoc).length : 0; return { has: n > 0, label: plural(n, 'pin') + ' from this source →' }; })(), navGroups, omniUrl, omniOpen,
+      // the open extra screen, if any: a whole page shown full height over the app with a way back
+      extraScreen: (() => { const sc = SCREENS.find(x => x.id === S.screenId); return sc ?{ has: true, label: sc.label, src: sc.src, close: () => this.setState({ screenId: null }) } : { has: false, label: '', src: '', close: () => {} }; })(),
       ...(() => {
         if (view !== 'search' || !qv) return { sr: { sub: '', names: [], docs: [], figs: [], sts: [], co: [], others: [] } };
         const c = this.qc(A); const q = c.q;
@@ -8958,12 +9083,13 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
       ...(() => { const det = this.details(A, F, D); const pf = this.profileVals(A, det); pf.noProfile = !pf.has;
         const narrow = typeof window !== 'undefined' && window.innerWidth < SIDE_PANEL_MIN_VW; this._narrow = narrow;
         const sidePanelStyle = narrow
-          ? 'position:fixed;left:12px;right:12px;bottom:0;max-height:48vh;overflow:auto;z-index:45;background:var(--s1);border:1px solid var(--line2);border-bottom:0;border-radius:14px 14px 0 0;padding:16px;display:flex;flex-direction:column;gap:12px;box-sizing:border-box;box-shadow:0 -10px 30px rgba(0,0,0,.35)'
+          // narrow: the profile/detail SWAPS IN as a full-screen view (with a Back button), it is not a bottom sheet
+          ? 'position:fixed;inset:0;overflow:auto;z-index:45;background:var(--bg);padding:14px 16px 32px;display:flex;flex-direction:column;gap:12px;box-sizing:border-box'
           : 'position:fixed;top:0;right:0;bottom:0;width:' + SIDE_PANEL_W + 'px;overflow:auto;z-index:30;background:var(--s1);border-left:1px solid var(--line2);padding:20px 20px 28px;display:flex;flex-direction:column;gap:12px;box-sizing:border-box';
         const pfSide = !!pf.has && view === 'reader';
         const panelOpen = pfSide || (!(pf.has || view === 'draft' || view === 'profile') && !!det.hasSel);
-        const colPad = !panelOpen ? '' : narrow ? 'padding-bottom:48vh' : 'padding-right:' + SIDE_PANEL_W + 'px';
-        const side = { sidePanelStyle, pfSide, colPad, pfClose: () => this.setState({ sel: null }) };
+        const colPad = !panelOpen ? '' : narrow ? '' : 'padding-right:' + SIDE_PANEL_W + 'px';
+        const side = { sidePanelStyle, pfSide, colPad, narrowBack: narrow, pfClose: () => this.setState({ sel: null }) };
         return pf.has || view === 'draft' || view === 'profile' ? { ...det, ...side, hasSel: false, noSel: true, pf } : { ...det, ...side, pf }; })(),
       heroRef: r => { this._hero = r; }, onHeroKey: e => { if (e.key === 'Enter') { const v = (e.target.value || '').trim(); if (v) { if (isOmniUrl(v)) omniOpen(v); else omniGo(v); } } },
       onHeroGo: () => { const v = ((this._hero && this._hero.value) || '').trim(); if (v) { if (isOmniUrl(v)) omniOpen(v); else omniGo(v); } },

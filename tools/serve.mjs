@@ -16,6 +16,8 @@
 
 import { createServer } from 'node:http';
 import { readFile, stat } from 'node:fs/promises';
+import { createReadStream } from 'node:fs';
+import { execFile, spawn } from 'node:child_process';
 import { gzipSync, brotliCompressSync, constants as zc } from 'node:zlib';
 import { extname, join, normalize, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -63,10 +65,74 @@ async function epav(res, token) {
   send(res, 200, buf, { 'Content-Type': 'application/pdf', 'Content-Length': buf.length, 'Cache-Control': 'public, max-age=86400', 'X-Source': via });
 }
 
+// GET /api/sync-status — the pipeline's live sync state for sync-dashboard.html.
+// Pipes tools/sync-status.py over ssh to the VM (fixed argv, no request input in
+// the command); the script is read-only and prints one JSON object. Cached 10 s,
+// concurrent requests share one ssh.
+const LIVE_FILE = '/mnt/watch/nashville-legistar-archive/data/live/events.jsonl';
+const liveClients = new Set(); const liveRing = [];
+let liveProc = null, liveBuf = '', liveStopT = null;
+function liveStart() {
+  if (liveProc) return;
+  liveProc = spawn('ssh', ['-o', 'BatchMode=yes', '-o', 'ConnectTimeout=10', '-o', 'ServerAliveInterval=15', 'hyphae', 'tail', '-n', '100', '-F', LIVE_FILE], { stdio: ['ignore', 'pipe', 'ignore'] });
+  liveProc.stdout.on('data', (b) => {
+    liveBuf += b.toString('utf8'); let i;
+    while ((i = liveBuf.indexOf('\n')) >= 0) {
+      const line = liveBuf.slice(0, i).trim(); liveBuf = liveBuf.slice(i + 1);
+      if (!line) continue;
+      liveRing.push(line); if (liveRing.length > 100) liveRing.shift();
+      for (const c of liveClients) { try { c.write('data: ' + line + '\n\n'); } catch (e) {} }
+    }
+  });
+  liveProc.on('close', () => {
+    liveProc = null; liveBuf = '';
+    for (const c of liveClients) { try { c.write('event: down\ndata: {}\n\n'); } catch (e) {} }
+    if (liveClients.size) setTimeout(liveStart, 3000);        // the pages are still there: reconnect
+  });
+}
+function liveMaybeStop() {
+  clearTimeout(liveStopT);
+  if (!liveClients.size && liveProc) liveStopT = setTimeout(() => { if (!liveClients.size && liveProc) liveProc.kill(); }, 10000);
+}
+let syncCache = null, syncInflight = null;
+function syncStatus() {
+  if (syncCache && Date.now() - syncCache.at < 10000) return Promise.resolve(syncCache.body);
+  if (syncInflight) return syncInflight;
+  return syncInflight = new Promise((resolve, reject) => {
+    const child = execFile('ssh', ['-o', 'BatchMode=yes', '-o', 'ConnectTimeout=10', 'hyphae', 'python3', '-'],
+      { timeout: 25000, maxBuffer: 1 << 20 }, (err, stdout, stderr) => {
+        syncInflight = null;
+        if (err) return reject(new Error(String(stderr || err.message).trim().slice(0, 400)));
+        try { JSON.parse(stdout); } catch (e) { return reject(new Error('VM returned non-JSON output')); }
+        syncCache = { at: Date.now(), body: stdout };
+        resolve(stdout);
+      });
+    child.stdin.on('error', () => {});
+    createReadStream(join(ROOT, 'tools', 'sync-status.py')).pipe(child.stdin);
+  });
+}
+
 const server = createServer(async (req, res) => {
   try {
     const url = new URL(req.url, 'http://127.0.0.1');
     if (url.pathname.startsWith('/epav/')) return epav(res, url.pathname.slice('/epav/'.length).replace(/\.pdf$/, ''));
+    // GET /api/live — the pipeline's event stream (events.jsonl on the VM) as server-sent events. One shared
+    // `ssh ... tail -F` serves every page; it starts with the first page and stops shortly after the last leaves.
+    // Fixed argv, no request input in the command. Each new page first gets the last 100 lines from a ring buffer.
+    if (url.pathname === '/api/live') {
+      res.writeHead(200, { 'Content-Type': 'text/event-stream; charset=utf-8', 'Cache-Control': 'no-store', Connection: 'keep-alive' });
+      res.write(': connected\n\n');
+      for (const l of liveRing) res.write('data: ' + l + '\n\n');
+      liveClients.add(res); clearTimeout(liveStopT); liveStart();
+      const ka = setInterval(() => { try { res.write(': keepalive\n\n'); } catch (e) {} }, 15000);
+      req.on('close', () => { clearInterval(ka); liveClients.delete(res); liveMaybeStop(); });
+      return;
+    }
+    if (url.pathname === '/api/sync-status') {
+      const h = { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' };
+      try { return send(res, 200, await syncStatus(), h); }
+      catch (e) { return send(res, 502, JSON.stringify({ error: String((e && e.message) || e) }), h); }
+    }
 
     let p = decodeURIComponent(url.pathname);
     if (p.endsWith('/')) p += 'index.html';
