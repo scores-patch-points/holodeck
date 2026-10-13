@@ -63,13 +63,17 @@ export function makeFold(priors) {
       // number is left, it is DROPPED ("_]", "a¢y"). A bare symbol with no glyph in it still stands when the tokens on both
       // sides stand as read or are numbers ("Smith & Sons", "$ 1,000", a hyphen between words), the repairs' own witness.
       const ODD = /[_|~¢¬§¤¦\\^`<>{}\[\]⌟⌞⌜⌝]/, ODD_G = new RegExp(ODD.source, 'g');
-      const standing = (x) => x && (x.kind === 'read' || /\d/.test(x.text));
+      // standing: read elsewhere, a number, or a plain word of two letters or more (Inc., of, to): a separator between
+      // two such words is punctuation, not noise
+      const standing = (x) => x && (x.kind === 'read' || /\d/.test(x.text) || (/\p{L}{2,}/u.test(x.text) && !ODD.test(x.text)));
       page.forEach((r, i) => {
         if (r.kind === 'repaired' || r.kind === 'read' || r.kind === 'name') return;
         const t = r.text || '', hasOdd = ODD.test(t), symbolOnly = !/[\p{L}\p{N}]/u.test(t);
         if (!hasOdd && !(symbolOnly && !(standing(page[i - 1]) && standing(page[i + 1])))) return;
         const rest = t.replace(ODD_G, '').replace(/^[^\p{L}\p{N}$%(“"']+|[^\p{L}\p{N}%)”"'.,;:]+$/gu, '');
-        const keeps = /\p{L}{3,}/u.test(rest) || /\p{N}/u.test(rest);
+        // a lone X (or x) left in a form box is a CHECK MARK, which is information: it is kept, not dropped
+        const check = /^[xX]$/.test(rest);
+        const keeps = check || /\p{L}{3,}/u.test(rest) || /\p{N}/u.test(rest);
         r.junk = true; r.drop = !keeps; r.cleanTo = keeps ? rest : ''; r.conf = (els[i] && els[i].conf) || 0; stats.junk = (stats.junk || 0) + 1;
       });
       out.push({ page: pg.page, tokens: page });
