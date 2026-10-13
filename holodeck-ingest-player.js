@@ -74,14 +74,18 @@ const CSS = `
 
 
 // Replay state is a pure fold of the trace: the same events 0..k always give the same picture, whichever way the playhead came.
-const fresh = () => ({ nodes: new Map(), edges: new Map(), marks: new Map(), paradigm: '', echo: new Map(), odd: new Map(), lastSt: new Map(), occ: new Map() });
+const fresh = () => ({ nodes: new Map(), edges: new Map(), marks: new Map(), paradigm: '', echo: new Map(), odd: new Map(), lastSt: new Map(), occ: new Map(), stNames: new Map(), prov: new Map() });
 const node = (S, n) => S.nodes.get(n) || (S.nodes.set(n, { n, c: 0, st: 'cand', mine: false }), S.nodes.get(n));
 const ek = (a, b) => a < b ? a + '\u0001' + b : b + '\u0001' + a;
 const mark = (S, e, cls) => { if (e.doc == null || e.s == null) return; (S.marks.get(e.doc) || (S.marks.set(e.doc, []), S.marks.get(e.doc))).push({ s: e.s, e: e.e, cls }); };
 function apply(S, e) {
   if (e.stage === 'sentences') { mark(S, e, e.kind === 'statement' ? 's' : e.kind === 'furniture' ? 'fu' : ''); if (e.kind === 'statement') S.lastSt.set(e.doc, e); }
   else if (e.kind === 'name') { mark(S, e, 'nm'); const x = node(S, e.name); if (x.st === 'cand') x.c++;
-    const ls = S.lastSt.get(e.doc); if (ls) { const L = S.occ.get(e.name) || (S.occ.set(e.name, []), S.occ.get(e.name)); if (!L.some(o => o.doc === e.doc && o.id === ls.id)) L.push({ doc: e.doc, id: ls.id, s: ls.s, e: ls.e }); } }
+    const ls = S.lastSt.get(e.doc); if (ls) { const L = S.occ.get(e.name) || (S.occ.set(e.name, []), S.occ.get(e.name)); if (!L.some(o => o.doc === e.doc && o.id === ls.id)) L.push({ doc: e.doc, id: ls.id, s: ls.s, e: ls.e });
+      // names read in one statement are provisionally tied the moment they are read, so the picture fills in as the
+      // reading goes; the admission that comes later keeps, merges or drops them and supplies the real pairs
+      const key = e.doc + '\u0001' + ls.id; const set = S.stNames.get(key) || (S.stNames.set(key, new Set()), S.stNames.get(key));
+      if (!set.has(e.name)) { set.forEach(o => { if (o === e.name) return; const k = ek(o, e.name); const E = S.prov.get(k) || { a: o, b: e.name, c: 0, neg: false, mine: false }; E.c++; S.prov.set(k, E); }); set.add(e.name); } } }
   else if (e.kind === 'figure') mark(S, e, 'fg');
   else if (e.kind === 'date') mark(S, e, 'dt');
   else if (e.kind === 'merge') { const f = S.nodes.get(e.from); if (f && f.st === 'cand') { S.nodes.delete(e.from); node(S, e.to).c += f.c; }
@@ -194,7 +198,12 @@ function mount(T, opt = {}) {
   let dpr = 1;
   const map = mountMap($('.hdp-graph'), { padBottom: 30, wheelZoom: true, empty: 'Names appear here as they are found, then fold into the picture.', sentence: o => { const d = docs.get(o.doc); return d && d.text ? d.text.slice(o.s, o.e) : ''; } });
   function size() { dpr = window.devicePixelRatio || 1; const q = rc.getBoundingClientRect(); rc.width = q.width * dpr; rc.height = q.height * dpr; drawRibbon(); }
-  const mapData = S => { const e = ev[k]; return { nodes: [...S.nodes.values()], edges: [...S.edges.values()], docs: [...docs.values()], occ: S.occ, odd: S.odd, hot: new Set([e.name, e.to, ...(e.ns || [])].filter(Boolean)), hotPairs: e.pairs || [] }; };
+  // A name that has been read but not yet admitted is drawn with the others (as "found, not yet admitted") rather than
+  // held back until the end: the map says what has been read so far, and the admission step settles which stay.
+  const mapData = S => { const e = ev[k]; const nodes = [...S.nodes.values()].map(n => (n.st === 'cand' ? { ...n, st: 'read', color: 'var(--dim)' } : n)); const live = new Set(nodes.filter(n => n.st !== 'drop').map(n => n.n));
+    const edges = [...S.edges.values()]; const have = new Set(edges.map(E => ek(E.a, E.b)));
+    S.prov.forEach((E, key) => { if (!have.has(key) && live.has(E.a) && live.has(E.b)) edges.push(E); });
+    return { nodes, edges, docs: [...docs.values()], occ: S.occ, odd: S.odd, hot: new Set([e.name, e.to, ...(e.ns || [])].filter(Boolean)), hotPairs: e.pairs || [] }; };
 
   function drawRibbon() {
     const g = rc.getContext('2d'), w = rc.width, h = rc.height; g.clearRect(0, 0, w, h); const mp = maxPos();
