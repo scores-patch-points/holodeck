@@ -2868,7 +2868,7 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
         <div style="display:flex;justify-content:space-between;align-items:center"><h2 style="margin:0;font:500 24px var(--serif)">Settings</h2><button onClick="{{ closeSettings }}" style="background:none;border:0;color:var(--mut);cursor:pointer;font-size:16px">✕</button></div>
           <section style="background:var(--s1);border:1px solid var(--line);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:10px">
             <span style="font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mut)">Account &amp; sync</span>
-            <button onClick="{{ ing.onShareRepo }}" style="align-self:flex-start;background:var(--acc2);border:0;color:#fff;border-radius:8px;padding:7px 16px;cursor:pointer;font:600 14px var(--sans)">Share this repo — encrypted…</button>
+            <button onClick="{{ ing.onShareRepo }}" style="align-self:flex-start;background:var(--acc2);border:0;color:#fff;border-radius:8px;padding:7px 16px;cursor:pointer;font:600 14px var(--sans)">Invite people…</button>
             <span style="font:400 13px/1.45 var(--sans);color:var(--mut);text-wrap:pretty">Invite people to read or edit this workspace through encrypted Matrix rooms. The server cannot read the content; it can see who is a member and when.</span>
             <sc-if value="{{ ing.notSignedIn }}" hint-placeholder-val="{{ true }}">
               <span style="font:400 14px/1.5 var(--sans);color:var(--mut)">Your work stays in this browser until you sign in. Sign in with your own Matrix account to sync it and share it.</span>
@@ -2896,14 +2896,8 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
             <sc-if value="{{ ing.hasPriv }}" hint-placeholder-val="{{ false }}">
               <span style="font:400 13px var(--sans);color:var(--mut)">{{ ing.privAt }}</span>
               <div style="display:flex;gap:8px;flex-wrap:wrap"><input onChange="{{ ing.onInviteId }}" placeholder="@someone:hyphae.social" style="flex:1 1 180px;min-width:0;background:var(--s2);border:1px solid var(--line2);border-radius:8px;padding:6px 10px;font:500 13px var(--mono);color:var(--ink);outline:none"></input><button onClick="{{ ing.onInvite }}" style="background:none;border:1px solid var(--line2);border-radius:8px;padding:5px 12px;cursor:pointer;font:500 14px var(--sans);color:var(--ink2)">Invite</button><button onClick="{{ ing.onLoadPriv }}" style="background:none;border:1px solid var(--line2);border-radius:8px;padding:5px 12px;cursor:pointer;font:500 14px var(--sans);color:var(--ink2)">Load my work from it</button></div>
-              <button onClick="{{ ing.onShare }}" style="align-self:flex-start;background:var(--acc2);border:0;color:#fff;border-radius:8px;padding:6px 14px;cursor:pointer;font:600 14px var(--sans)">Copy a share link</button>
-              <span style="font:400 13px/1.45 var(--sans);color:var(--mut);text-wrap:pretty">The link carries a ready-made account already invited to this room, so the recipient opens it signed in. Anyone holding the link can use that account.</span>
-              <sc-if value="{{ ing.hasShare }}" hint-placeholder-val="{{ false }}"><input readOnly="{{ true }}" value="{{ ing.share }}" style="background:var(--s2);border:1px solid var(--line2);border-radius:8px;padding:5px 10px;font:500 12px var(--mono);color:var(--ink2);outline:none"></input></sc-if>
-              <span style="font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mut);padding-top:6px">Share by email — a code in their inbox</span>
-              <div style="display:flex;gap:8px;flex-wrap:wrap"><input onChange="{{ ing.onShareEmail }}" placeholder="friend@example.com" style="flex:1 1 180px;min-width:0;background:var(--s2);border:1px solid var(--line2);border-radius:8px;padding:6px 10px;font:500 13px var(--mono);color:var(--ink);outline:none"></input><button onClick="{{ ing.onShareMail }}" style="background:none;border:1px solid var(--line2);border-radius:8px;padding:5px 12px;cursor:pointer;font:500 14px var(--sans);color:var(--ink2)">{{ ing.shareMailLabel }}</button></div>
-              <span style="font:400 13px/1.45 var(--sans);color:var(--mut);text-wrap:pretty">The mailer makes a fresh account and emails them the link plus a six-digit code. They enter the code and sign in; the code is emailed, so it reaches whoever owns that address — not whoever holds a link. Thirty minutes to use it.</span>
-              <sc-if value="{{ ing.mailBusy }}" hint-placeholder-val="{{ false }}"><span style="font:500 13px var(--sans);color:var(--acc)">{{ ing.shareMailLabel }}</span></sc-if>
-              <sc-if value="{{ ing.hasMailShare }}" hint-placeholder-val="{{ false }}"><span style="font:400 13px/1.45 var(--sans);color:var(--ok);text-wrap:pretty">{{ ing.mailShareNote }}</span></sc-if>
+              
+              
             </sc-if>
           </section>
       </div>
@@ -2932,7 +2926,7 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
         <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
           <div style="display:flex;flex-direction:column;gap:4px">
             <h2 style="margin:0;font:600 20px var(--sans);color:var(--ink)">Sign in</h2>
-            <span style="font:400 13px/1.45 var(--sans);color:var(--mut);text-wrap:pretty">Use your own Matrix account. Your work stays on this device until you sign in — then it syncs and shares through your homeserver.</span>
+            <span style="font:400 13px/1.45 var(--sans);color:var(--mut);text-wrap:pretty">Use your own Matrix account. Your work stays on this device until you sign in — then it syncs and shares through your homeserver. If your account uses an authenticator app, type its six digits straight after your password.</span>
           </div>
           <button onClick="{{ closeLogin }}" title="Close" style="flex:none;background:none;border:0;color:var(--mut);cursor:pointer;font-size:18px;line-height:1">✕</button>
         </div>
@@ -6011,9 +6005,26 @@ class Component extends DCLogic {
   setNetCfg(p) { const c = { ...this.netCfg(), ...p }; try { localStorage.setItem('fold-net-cfg', JSON.stringify(c)); } catch (e) {} this.forceUpdate(); }
   ilog(msg, kind) { const L = (this._ilog = this._ilog || []); L.unshift({ t: new Date().toLocaleTimeString(), msg, kind: kind || 'info' }); if (L.length > 60) L.length = 60; this.forceUpdate(); }
   async netDo(label, fn) { this.setState({ netBusy: label }); try { return await fn(await this.net()); } catch (e) { this.ilog(label + ' failed: ' + (e.message || e), 'bad'); } finally { this.setState({ netBusy: '' }); } }
-  openShareRepo(code) { import(new URL('holodeck-share-panel.js', location.href).href).then(M => M.openSharePanel({ corpusId: () => this.corpusId(), corpusName: () => this.corpusName(), wsRooms: () => this.wsRooms(), analysis: () => this.analysis(), redeemCode: code || null })).catch(e => this.ilog('Share panel could not open: ' + ((e && e.message) || e), 'bad')); }
+  // What the share panel needs from this page. `viewing` is what this person is looking at right now (the open source,
+  // or the view's name) — it is what the people in the repo see next to their name when they are online.
+  shareCtx(code) { return { corpusId: () => this.corpusId(), corpusName: () => this.corpusName(), wsRooms: () => this.wsRooms(), analysis: () => this.analysis(), redeemCode: code || null, defaultServer: () => (this.netCfg().server || 'hyphae.social'),
+    // the page's own Matrix session, read — the panels never keep one of their own
+    session: () => { try { return (this._net && this._net.s) || JSON.parse(localStorage.getItem('fold-matrix-session') || 'null'); } catch (e) { return null; } },
+    setWsRooms: p => this.setWsRooms(p),
+    onLogin: () => this.openLogin(),
+    onSession: s => { this._net = { ...(this._net || {}), s }; this.forceUpdate(); },
+    onJoined: rooms => { this.refreshRoom().catch(() => {}); this.net().then(async N => { try { const s = this._net.s; const d = await N.loadPrivate(s, rooms.priv, 'work'); if (d && d.pins) this.savePins(d.pins); } catch (e) {} this.forceUpdate(); }); },
+    // what this person is looking at right now: it is what people in the workspace see next to their name while they are here
+    viewing: () => { try { const S = this.state; if (S.view === 'reader' && S.readDoc) { const d = (this.analysis().docById || {})[S.readDoc] || {}; return { viewing: 'doc:' + S.readDoc, title: String(d.title || S.readDoc) }; } return { viewing: 'view:' + String(S.view || ''), title: String(S.view || '') }; } catch (e) { return {}; } } }; }
+  // People: invite with a magic link, and see who is here. A 16-character code is a People invitation; a 5-character one belongs to the encrypted-repo panel.
+  openShareRepo(code) {
+    const emailInvite = /join=[a-z0-9]{16}/i.test(String(code || ''));
+    if (code && !emailInvite) { import(new URL('holodeck-share-panel.js', location.href).href).then(M => M.openSharePanel({ ...this.shareCtx(code) })).catch(e => this.ilog('Share panel could not open: ' + ((e && e.message) || e), 'bad')); return; }
+    import(new URL('holodeck-people-panel.js', location.href).href).then(M => M.openPeoplePanel({ ...this.shareCtx(null), inviteRaw: emailInvite ? code : null })).catch(e => this.ilog('The people panel could not open: ' + ((e && e.message) || e), 'bad'));
+  }
   async netInit() { if (this._netInit) return; this._netInit = true; const N = await this.net();
-    if (/#join=/.test(location.hash)) { const c = (location.hash.match(/join=([a-z0-9]{5})/i) || [])[1]; history.replaceState(null, '', location.pathname + location.search); this.openShareRepo(c); }
+    if (/#join=/.test(location.hash)) { const raw = location.hash; const email = /join=[a-z0-9]{16}(&|$)/i.test(raw); const c = (raw.match(/join=([a-z0-9]{5})(&|$)/i) || [])[1]; history.replaceState(null, '', location.pathname + location.search); this.openShareRepo(email ? raw : c); }
+    else { try { import(new URL('holodeck-people-panel.js', location.href).href).then(M => { const s = (this._net && this._net.s) || N.loadSession(); if (s && !s.guest && this.wsRooms().priv) M.resumePresence(this.shareCtx(null)); }).catch(() => {}); } catch (e) {} }
     if (/fx-share=/.test(location.hash)) { try { const r = await N.consumeShare(); if (r) { this.setWsRooms({ priv: r.rooms[0] || null, pub: r.rooms[1] || this.wsRooms().pub || null }); this._net = { ...(this._net || {}), s: r.pending || r.s, shareTemp: r.pending ? r.s : null }; this.toast('Opened a workspace shared by ' + (r.from || 'someone')); if (!r.pending) { try { const d = await N.loadPrivate(r.s, r.rooms[0], 'work'); if (d && d.pins) this.savePins(d.pins); } catch (e) {} } } } catch (e) { this.ilog('Shared link could not be opened: ' + e.message, 'bad'); } }
     if (/fx-mail=/.test(location.hash)) this.consumeEmailShare();
     const s = (this._net && this._net.s) || N.loadSession(); this._net = { ...(this._net || {}), s }; const R = this.wsRooms(); if (s && R.pub) { this.refreshRoom().catch(() => {}); } this.forceUpdate(); }

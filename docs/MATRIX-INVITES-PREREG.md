@@ -197,3 +197,152 @@ tier used a stand-in); persistence of the crypto store across a reload was seen 
 work (the same device re-opened its store and decrypted a request received before
 the reload) but not exercised across a browser restart; mobile width was seen
 once at 800 px wide, not systematically.
+
+---
+
+# Part II — password and authenticator at every sign-in (the gate), and an invitation that is only an invitation
+
+Written 2026-10-13. Two earlier drafts of this record (an email-invitation design on the encrypted stores, then an
+email-code design) were abandoned before any result was recorded; the code and tests for them were removed and they
+are not published here. Nothing below depends on them. This Part states predictions of the **gate**
+(`tools/login-gate/`) and of the rewritten `holodeck-invites.js`, **before any new-module test was run**. (The gate's
+own tests had been run when this was appended — they are listed under "Written after the gate's first run".)
+
+## What each party knows (the claim the owner asked for)
+
+| | knows | does not know |
+|---|---|---|
+| the person | their sign-in name, their password, their authenticator | — |
+| the owner | that an invitation exists for a name; the link they sent | the person's password, authenticator secret, or any way to sign in as them |
+| the homeserver | the password (as any homeserver does), room contents | the authenticator secret |
+| the gate | the authenticator secret, the password **in transit** (it is on the homeserver's side of the trust line) | — |
+
+"The email from me is useless because I don't have their password" is made precise as: **an invitation link does
+not let anyone sign in as anyone; it only lets an account that has already enrolled ask to be let into the rooms.**
+
+## Falsifiers — the gate
+
+* **G1 — the gate is a password oracle.** A wrong, missing or malformed code is refused **without the homeserver
+  being asked**. Probe: count homeserver `/login` requests across three refusals. Prediction: 0. Control: a
+  right-code/wrong-password attempt does reach the homeserver (count +1) and ends in the same words.
+* **G2 — a captured code works twice.** The same code within its step, and an earlier step's, are refused;
+  the next step's works. Prediction: refused, homeserver not asked on the replay.
+* **G3 — unlimited guessing.** After the configured failures a lock refuses even the **right** code, without
+  reaching the homeserver, and lifts after its time. An account that never enrolled signs in as before under
+  `enforce: "enrolled"`; under `"all"` it is refused unless allow-listed.
+* **G4 — a bypass.** `m.login.token`, an address login and a body with no usable user id are refused. A body with
+  the six digits after the password is accepted and the digits are stripped (so an ordinary Matrix app works).
+* **G5 — enrolment.** An account cannot be created without a ticket and a right code; the secret is shown once;
+  a ticket is single use; the homeserver never sees the ticket or the code.
+* **G6 — secrets at rest and in logs.** The store file holds no secret and no user id in the clear, is mode 0600,
+  and a tampered store is refused. No log line contains a secret, password, code, ticket or account name. The
+  gate module imports no filesystem.
+* **G7 — who may ask.** "Is this account enrolled?" answers only for an OpenID-verified admin; an access token,
+  an unknown token and a verified non-admin are refused.
+
+## Falsifiers — the invitation
+
+* **I1 — a link signs someone in.** Using only the link's secret, no account can be authenticated; the link is
+  not accepted by the gate or the homeserver as a credential. And the owner's own stored records contain no
+  password and no authenticator secret (scan the owner's store and everything the server holds).
+* **I2 — admission without enrolment.** When the gate says the account is not enrolled, nobody is admitted and the
+  invitation stays open; when it says enrolled, the account is let into the workspace's own rooms. A gate that is
+  unreachable admits nobody (fail closed).
+* **I3 — a proof for another account or door.** Refused. Control: a proof of the link half alone verifies for all.
+* **I4 — a door not made by the inviter named in the link.** Refused before anything is sent. Control: a client
+  that does not check sends the hello into the attacker's door.
+* **I5 — the server holds the link's half.** Scan: 0. The name is expected in room state (and found, so the scan
+  is not blind).
+* **I6 — presence.** As before: names from room state by authenticated sender, never heartbeat content; removed,
+  stale and spoofed not shown; a viewer's wrong clock does not hide people; heartbeats replace each other.
+* **I7 — end to end.** Three people each enrol through the gate, join by link, and appear online under the names
+  typed at invite time; a fourth with the link but no enrolment never appears.
+
+## Not established in advance
+
+The gate against a real Synapse behind a real reverse proxy (the tests use an in-test homeserver); that Synapse
+accepts the extra `totp` field on `/login` and `/register` (it ignores unknown keys, but this was not run
+here); whether a given authenticator app accepts the otpauth URI's parameters (the codes themselves are checked
+against RFC 6238 vectors); behaviour behind a proxy that rewrites the client address; clock skew greater than
+one step between the person's phone and the server; and a person who loses their phone (there is no recovery:
+the operator un-enrols them with the CLI and they enrol again).
+
+## Written after the gate's first run (kept apart from the predictions above)
+
+The gate's eight tests had been written and run before the section above was appended. First run: 7 of 8 passed;
+the failure was G7 and it was the test double, not the gate — the in-test homeserver issued OpenID tokens shorter
+than the gate's sanity floor, so the gate correctly refused them; the double was changed to issue realistic
+tokens. Nothing in the gate was changed to make it pass. G1–G7 are therefore *not* held-out predictions; I1–I7
+are, and no test of the rewritten invitation module had been run when this was appended.
+
+## Part II results
+
+Run 2026-10-13 against the in-test homeserver (not Synapse), plus a browser run of the real panels against that
+homeserver fronted by the real gate.
+
+| ID | Prediction | Result |
+|---|---|---|
+| G1 | a wrong/missing code never reaches the homeserver; right code + wrong password does, in the same words | **Held.** 3 refusals → 0 homeserver `/login` requests; right-code/wrong-password → +1 request and the identical error text. |
+| G2 | a code works once | **Held.** the same code refused, homeserver not asked; next step's works. |
+| G3 | lockout refuses even the right code, lifts after its time; unenrolled accounts per `enforce` | **Held.** |
+| G4 | `m.login.token`, address login, no user id refused; digits after the password accepted and stripped | **Held.** (`m.login.token` and the address login are refused *when routed to the gate*; see "bypass" in the deployment notes.) |
+| G5 | no account without ticket+code; secret once; ticket single use; homeserver never sees ticket/code | **Held.** The `totp` field is absent from what the homeserver received. |
+| G6 | store encrypted, 0600, tampering refused; no secrets in logs; no fs import | **Held.** |
+| G7 | only an OpenID-verified admin may ask who is enrolled | **Held** — after the double was fixed (see "Written after the gate's first run"). |
+| I1 | a link is not a credential; the owner's store and the server hold no password/authenticator material | **Held.** Plus, through the real gate: the owner's own password and the link's half both fail to sign in as the person. |
+| I2 | not enrolled ⇒ not admitted and the invitation stays open; gate unreachable ⇒ nobody admitted | **Held** (unit and through the gate). |
+| I3 | proof not replayable across account or door; first valid proof wins | **Held**, with the control (a proof of the half alone verifies for everyone) caught. |
+| I4 | a door not made by the named inviter is refused before anything is sent | **Held**, control caught. |
+| I5 | server holds no link half | **Held**; the name *is* found, so the scan is not blind. |
+| I6 | presence: names from state by authenticated sender, etc. | **Held**, including a viewer 1 h fast and 1 day slow. |
+| I7 | three enrolled people join and appear under the typed names; a fourth with the link and no enrolment never does | **Held** (unit; and in the browser one person end to end: enrol → create account → join → "Here now · 2" with the typed name and what they were reading). |
+
+### Defects found by running it, that the earlier tiers could not have found
+
+1. **Names leaked to the server** through `ledgerSeed` kept in account data (found by a canary scan in an earlier
+   design that was later dropped; the lesson stood: names are content and the registry is server-readable).
+2. **A closed invitation looked identical to "still waiting"** to the person (both `no-grant-yet`); it now has its
+   own code, so they are told it is closed.
+3. **Presence judged against the viewer's wall clock** hid everyone for a laptop whose clock was off; it is now
+   judged in server time, calibrated from the viewer's own heartbeats. A first fix (using their last heartbeat as
+   "now") defeated staleness and was caught by the stale-person test.
+4. **The QR encoder copied in from a sibling project was broken in five independent ways**: the format word was
+   written transposed, the data was padded to the payload count rather than the codeword count, the Reed–Solomon
+   remainder was nearly all zeros, multi-block symbols were not interleaved, and the zig-zag direction flipped wrongly
+   after the timing column; it also chose a version from characters, not bytes. The platform's own barcode decoder
+   found the finder patterns and returned an **empty payload for every input**, which is what exposed it. The
+   encoder's header claimed a passing round-trip test that is not on disk. The core was rewritten to the standard and
+   is now checked by (a) an independent decoder written from ISO/IEC 18004 that verifies format bits, both copies,
+   every block's Reed–Solomon syndromes and the byte-mode payload at 5+ versions, with a control that a flipped module
+   breaks a syndrome, and (b) the platform decoder in the browser, which now returns the otpauth URI, a Unicode
+   string and a 190-character string identically. (The project it was copied from still carries the original.)
+5. **A test double's token was shorter than the gate's floor**, and a test faked time on the wrong side of the gate;
+   both were the doubles, not the code, and are recorded as such.
+
+### Not established
+
+The gate behind a real reverse proxy in front of a real Synapse (that Synapse ignores the extra `totp` field on
+`/login` and `/register` is expected, not run); that every authenticator app accepts the otpauth URI's parameters
+(the codes themselves match RFC 6238; the URI follows the de-facto key-URI format and the platform decoder reads it
+back byte for byte); a phone whose clock is off by more than one 30-second step; behaviour under a proxy that
+rewrites client addresses; real-device camera scanning of the QR (decoded by software, not by a phone); the page's own
+sign-in modal with an enrolled account (the six-digits-after-the-password path is tested at the gate; the modal text
+was changed and parses, not driven in the pane); `index.html` merged with main, which has moved (see the hand-off);
+any end-to-end encryption claim (there is none: these are ordinary rooms).
+
+### Design change after the first run of the invitation tests (recorded, not edited into the predictions)
+
+The first version of `holodeck-invites.js` proved possession of the link with `HMAC(secret half | door | account)`.
+Its tests (I1–I7, 12 of 12) passed on the first run. Reading the result against the owner's earlier question — "is
+this tied solely to a device?" — the answer was *yes, for pending invitations*: the secret half was kept only in the
+IndexedDB of the browser that made them, so clearing site data or using another browser silently orphaned every
+pending invitation. The proof was therefore changed to an **Ed25519 signature** over (door, account): the link
+carries the private key, room state carries the public key, and no secret is stored by the owner. The tests were
+rewritten in the same shape, with these differences: I3's control is now "a signature that omits the account is
+genuine under the same key, so only binding the account stops replay"; the offline-guessing probe (a 10⁶ search
+over six digits) was removed because the six digits are no longer part of the proof at all (they are the gate's);
+and a test was added that **a second device with an empty store admits the person**. All 13 pass; the REST test that
+exercises the real gate passes unchanged apart from passing `rooms` to `sweep`/`outstanding`. The earlier results
+table above is the first design's; I1–I7 now describe the second, and the claim "nothing secret is stored on the
+owner's side" is checked directly (the owner's store holds no key once the person is in; the server holds the public
+key and not the link's private key).
