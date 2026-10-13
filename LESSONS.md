@@ -111,3 +111,10 @@ The shared checkout carries other people's uncommitted work and `main` moves und
 worktree off `main` containing only your hunks, fast-forward `main` only if it is still an ancestor (else
 rebase), and never move the branch ref without making the working tree match. Check the staged diff before
 committing, and leave uncommitted data files (the seed) out of the commit.
+
+## 18. When the positions are known, set the text back where it was
+
+A reflowed "clean" version of a scan (paragraphs, headings guessed from capitals) mangled amendments, tables and
+justified blocks. OCR gives every word's box, so the extracted view puts each word at its recorded position and
+size, aligned on the line's baseline (the lower-valued bottoms; descenders do not share it), as real selectable
+text, a page at a time as it scrolls into view. Layout is data; do not infer structure that was measured.

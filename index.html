@@ -2446,11 +2446,8 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
               <div style="display:flex;border:1px solid var(--line2);border-radius:8px;overflow:hidden">
                 <button onClick="{{ modeOriginal }}" style="border:0;padding:6px 12px;cursor:pointer;font:500 14px var(--sans);background:{{ modeO.bg }};color:{{ modeO.color }}">{{ modeO.label }}</button>
                 <button onClick="{{ modeMap }}" title="The names in this source and the ties between them, nested into groups" style="border:0;padding:6px 12px;cursor:pointer;font:500 14px var(--sans);background:{{ modeMp.bg }};color:{{ modeMp.color }}">Map</button>
-                <sc-if value="{{ hasFaithful }}" hint-placeholder-val="{{ false }}"><button onClick="{{ modeReading }}" style="border:0;padding:6px 12px;cursor:pointer;font:500 14px var(--sans);background:{{ modeR.bg }};color:{{ modeR.color }}">Reading</button></sc-if>
                 <sc-if value="{{ hasScreen }}" hint-placeholder-val="{{ false }}"><button onClick="{{ modeScreen }}" title="The measured 2D model drawn on the image: every region, coloured by role" style="border:0;padding:6px 12px;cursor:pointer;font:500 14px var(--sans);background:{{ modeSc.bg }};color:{{ modeSc.color }}">Regions</button></sc-if>
-                <button onClick="{{ modeRestated }}" title="The document restated from its own structure: no model, every clause from the text" style="border:0;padding:6px 12px;cursor:pointer;font:500 14px var(--sans);background:{{ modeS.bg }};color:{{ modeS.color }}">Restated</button>
-                <button onClick="{{ modeFigures }}" title="The document read as sectioned, keyed, nested figures — every amount, date and rate with the bytes it came from" style="border:0;padding:6px 12px;cursor:pointer;font:500 14px var(--sans);background:{{ modeFg.bg }};color:{{ modeFg.color }}">Figures</button>
-                <button onClick="{{ modeSummary }}" title="The document curated from its own sentences — one line, five, three paragraphs. No model; every line is a verbatim span of this source" style="border:0;padding:6px 12px;cursor:pointer;font:500 14px var(--sans);background:{{ modeSum.bg }};color:{{ modeSum.color }}">Summary</button>
+                <button onClick="{{ modeRestated }}" title="The contract's stated facts, then the document restated from its own structure: no model, every clause from the text" style="border:0;padding:6px 12px;cursor:pointer;font:500 14px var(--sans);background:{{ modeS.bg }};color:{{ modeS.color }}">Extracted</button>
               </div>
               <sc-if value="{{ readerHasUrl }}" hint-placeholder-val="{{ false }}"><a href="{{ readerUrl }}" target="_blank" rel="noopener" style="font:500 14px var(--sans);white-space:nowrap">{{ readerSourceLabel }}</a></sc-if>
               <button onClick="{{ onReaderRenameStart }}" title="Rename this source" style="background:none;border:1px solid var(--line2);border-radius:8px;padding:5px 12px;cursor:pointer;font:500 13px var(--sans);color:var(--ink2);white-space:nowrap" style-hover="border-color:var(--acc)">✎ Rename</button>
@@ -2631,6 +2628,14 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
           </sc-if>
           <sc-if value="{{ isRestated }}" hint-placeholder-val="{{ false }}">
             <div style="border-top:1px solid var(--line);padding:24px 34px 40px;max-width:860px;margin:0 auto;display:flex;flex-direction:column;gap:24px">
+              <sc-if value="{{ rs.hasFacts }}" hint-placeholder-val="{{ false }}">
+                <div style="background:var(--s1);border:1px solid var(--line);border-radius:12px;padding:16px 18px;display:grid;grid-template-columns:minmax(110px,auto) minmax(0,1fr);gap:8px 18px">
+                  <sc-for list="{{ rs.facts }}" as="f" hint-placeholder-count="4">
+                    <span style="font:600 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--mut);align-self:baseline">{{ f.label }}</span>
+                    <span style="font:500 16px/1.4 var(--sans);color:var(--ink);align-self:baseline;overflow-wrap:anywhere">{{ f.value }}</span>
+                  </sc-for>
+                </div>
+              </sc-if>
               <p style="margin:0;font:400 13px/1.5 var(--sans);color:var(--mut);text-wrap:pretty">{{ rs.note }}</p>
               <sc-if value="{{ rs.hasCover }}" hint-placeholder-val="{{ false }}">
                 <div style="background:var(--s1);border:1px solid var(--line);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:12px">
@@ -2644,6 +2649,7 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
                   <sc-if value="{{ rs.cover.hasTail }}" hint-placeholder-val="{{ false }}"><span style="font:400 14px var(--sans);color:var(--mut)">{{ rs.cover.tail }}</span></sc-if>
                 </div>
               </sc-if>
+              <sc-if value="{{ rs.hasPages }}" hint-placeholder-val="{{ false }}"><div ref="{{ extRef }}" style="display:flex;flex-direction:column;align-items:center;min-width:0"></div></sc-if>
               <sc-for list="{{ rs.sections }}" as="sec" hint-placeholder-count="3">
                 <section style="display:flex;flex-direction:column;gap:12px">
                   <sc-if value="{{ sec.hasTitle }}" hint-placeholder-val="{{ true }}"><span style="font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--acc)">{{ sec.title }}</span></sc-if>
@@ -5368,7 +5374,7 @@ class Component extends DCLogic {
     window.addEventListener('resize', go);
     window.addEventListener('scroll', go, { passive: true });
   }
-  componentDidUpdate() { try { const c = this.corpusId(); if (c !== this._wsSeen) { this._wsSeen = c; touchWs(c); } } catch (e) {} this.installFill(); this.fitFill(); this.syncOverview(); this.syncInbox(); this.applyTheme(); this.measureHdr(); try { const ff = document.getElementById('fold-folder-input'); if (ff && !ff.multiple) { ff.webkitdirectory = true; ff.setAttribute('webkitdirectory', ''); ff.multiple = true; ff.setAttribute('multiple', ''); } } catch (e) {} if (this._prevCorpus !== this.state.corpus || this._prevAdded !== this.state.added) { this._prevCorpus = this.state.corpus; this._prevAdded = this.state.added; this.loadHtml(); this.akAutoLoad(); } const rd0 = this.state.readDoc && this.analysis().docById[this.state.readDoc]; if (rd0 && rd0.media && rd0.media.kind === 'local') { this.ensureMediaUrl(rd0);
+  componentDidUpdate() { try { this.paintExtracted(); } catch (e) {} try { const c = this.corpusId(); if (c !== this._wsSeen) { this._wsSeen = c; touchWs(c); } } catch (e) {} this.installFill(); this.fitFill(); this.syncOverview(); this.syncInbox(); this.applyTheme(); this.measureHdr(); try { const ff = document.getElementById('fold-folder-input'); if (ff && !ff.multiple) { ff.webkitdirectory = true; ff.setAttribute('webkitdirectory', ''); ff.multiple = true; ff.setAttribute('multiple', ''); } } catch (e) {} if (this._prevCorpus !== this.state.corpus || this._prevAdded !== this.state.added) { this._prevCorpus = this.state.corpus; this._prevAdded = this.state.added; this.loadHtml(); this.akAutoLoad(); } const rd0 = this.state.readDoc && this.analysis().docById[this.state.readDoc]; if (rd0 && rd0.media && rd0.media.kind === 'local') { this.ensureMediaUrl(rd0);
       // A recording opened but never classified gets its sound map on first sight (an
       // older stored recording, or one added before the classifier existed); the work
       // is the same in-browser rung, guarded so it happens once until it lands.
@@ -7866,7 +7872,7 @@ class Component extends DCLogic {
       fitZ(); if (this._pdfRo) { try { this._pdfRo.disconnect(); } catch (e) {} }
       try { this._pdfRo = new ResizeObserver(() => { if (this._rKey !== key) { this._pdfRo.disconnect(); return; } fitZ(); }); this._pdfRo.observe(el); } catch (e) {}
       this._selKey = null; this.applySel(el); this.forceUpdate();
-    } catch (e) { if (this._rKey === key) el.innerHTML = '<p style="color:var(--bad);padding:24px">Couldn’t render the captured PDF (' + esc(e.message) + '). Switch to Reading.</p>'; }
+    } catch (e) { if (this._rKey === key) el.innerHTML = '<p style="color:var(--bad);padding:24px">Couldn’t render the captured PDF (' + esc(e.message) + '). Reload to try again, or open Extracted.</p>'; }
   }
   // Extracted figures — the document read as sectioned, keyed, nested JSON
   // (figures/<token>.json, built by tools/build-figures.mjs). Read back, not
@@ -9075,7 +9081,7 @@ class Component extends DCLogic {
     const omniOpen = live => { const v = typeof live === 'string' ? live : dv; if (!isOmniUrl(v)) return; clearTimeout(this._omniT); this.setState({ q: '', qDraft: undefined }); this.ingestUrl(/^https?:\/\//.test(v) ? v : 'https://' + v, { open: true }); };
     Object.assign(this._extra = {}, { ...this.qaVals(A, F, qv, view), ...this.draftVals(A), ...this.pfCoVals(A), ...this.dbVals(A, view), ...this.askVals(A, view), askFold: () => { const q = (this.state.q || '').trim(); this.setState({ view: 'ask', readDoc: null }); setTimeout(() => this.askSend(q), 0); }, ...this.netVals(A, view), ...this.readingVals(A, view),
       pinPop: S.pinPop && view === 'reader' ? { has: true, x: S.pinPop.x + 'px', y: S.pinPop.y + 'px', onPin: e => { e.preventDefault(); this.pinSelection(); }, onComment: e => { e.preventDefault(); this.commentOnSelection(); }, onCorrect: e => { e.preventDefault(); this.openCorr(S.pinPop.text); } } : { has: false },
-      hasPinToast: !!S.pinToast, pinToast: S.pinToast || '', goDraft: () => { this.setState({ pinToast: '' }); this.go('draft'); }, plainRef: this.plainRef, omniRef: this.omniRef,
+      hasPinToast: !!S.pinToast, pinToast: S.pinToast || '', goDraft: () => { this.setState({ pinToast: '' }); this.go('draft'); }, plainRef: this.plainRef, extRef: this.extRef, omniRef: this.omniRef,
       rdPins: (() => { const n = view === 'reader' ? this.activePins().filter(p => p.docId === S.readDoc).length : 0; return { has: n > 0, label: plural(n, 'pin') + ' from this source →' }; })(), navGroups, omniUrl, omniOpen,
       // the open extra screen, if any: a whole page shown full height over the app with a way back
       extraScreen: (() => { const sc = SCREENS.find(x => x.id === S.screenId); return sc ? { has: true, label: sc.label, src: sc.src, close: () => this.setState({ screenId: null }),
@@ -9299,7 +9305,7 @@ onAsk: () => { this.setState({ txAsk: d0.id }); this.pickYtFile(d0); }, onCancel
       ...(() => { const d0 = S.readDoc && A.docById[S.readDoc]; const hf = !!(d0 && (d0.faithful || d0.binPath || d0.pdfSrc)); const onO = S.readMode === 'original' || (!hf && S.readMode === 'reading'), onR = hf && S.readMode === 'reading'; const pill = on => ({ bg: on ? 'var(--sel)' : 'transparent', color: on ? 'var(--ink)' : 'var(--mut)' });
         return { hasFaithful: hf, noFaithful: !hf, modeR: pill(onR), modeReading: () => this.setState({ readMode: 'reading' }),
           rdFaith: hf && S.readMode === 'original' ? { has: true, note: (d0.pdfSrc ? 'The PDF exactly as captured' + (d0.custody ? ' (' + d0.custody + ')' : '') + '.' : 'The page as captured' + (d0.custody ? ' (' + d0.custody + ')' : '') + '. Layout and styles load from ' + ohsPublisher(d0.url) + ' today and may have changed since; the words are the captured bytes.') + (this._faithFound ? ' ' + this._faithFound.found + ' of ' + plural(this._faithFound.total, 'statement') + ' located and marked; the rest differ in wording or layout — see Reading.' : '') } : { has: false }, _o: onO }; })(),
-      modeO: (() => { const d0 = S.readDoc && A.docById[S.readDoc]; const hf = !!(d0 && (d0.faithful || d0.binPath || d0.pdfSrc)); const on = S.readMode === 'original' || (!hf && S.readMode === 'reading'); return { bg: on ? 'var(--sel)' : 'transparent', color: on ? 'var(--ink)' : 'var(--mut)', label: d0 && d0.transcribed ? 'As heard' : 'Original' }; })(), modeP: { bg: S.readMode === 'plain' ? 'var(--sel)' : 'transparent', color: S.readMode === 'plain' ? 'var(--ink)' : 'var(--mut)' }, modeS: { bg: S.readMode === 'restated' ? 'var(--sel)' : 'transparent', color: S.readMode === 'restated' ? 'var(--ink)' : 'var(--mut)' }, modeRestated: () => this.setState({ readMode: 'restated' }),
+      modeO: (() => { const d0 = S.readDoc && A.docById[S.readDoc]; const hf = !!(d0 && (d0.faithful || d0.binPath || d0.pdfSrc)); const on = S.readMode === 'original' || (!hf && S.readMode === 'reading'); return { bg: on ? 'var(--sel)' : 'transparent', color: on ? 'var(--ink)' : 'var(--mut)', label: d0 && d0.transcribed ? 'As heard' : 'Original' }; })(), modeP: { bg: S.readMode === 'plain' ? 'var(--sel)' : 'transparent', color: S.readMode === 'plain' ? 'var(--ink)' : 'var(--mut)' }, modeS: (() => { const d0 = S.readDoc && A.docById[S.readDoc]; const hf = !!(d0 && (d0.faithful || d0.binPath || d0.pdfSrc)); const on = ['restated', 'figures', 'summary'].includes(S.readMode) || (hf && S.readMode === 'reading'); return { bg: on ? 'var(--sel)' : 'transparent', color: on ? 'var(--ink)' : 'var(--mut)' }; })(), modeRestated: () => this.setState({ readMode: 'restated' }),
 modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S.readMode === 'summary' ? 'var(--ink)' : 'var(--mut)' }, modeSummary: () => this.setState({ readMode: 'summary' }),
       hasScreen: !!(S.readDoc && A.docById[S.readDoc] && A.docById[S.readDoc].screen && A.docById[S.readDoc].screen.elements && A.docById[S.readDoc].screen.elements.length),
       modeSc: { bg: (S.screenRegions !== false) ? 'var(--sel)' : 'transparent', color: (S.screenRegions !== false) ? 'var(--ink)' : 'var(--mut)' },
@@ -9624,7 +9630,84 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
     const v = { ok: true, note, sections: outSecs, hasCover: !!cover, cover: cover ? { ...cover, hasTail: !!cover.tail } : { pairs: [] } };
     this._rs = { key, v }; return v;
   }
-  restatedVals(d, A) { const v = this.restate(d, A); return v.ok ? v : { note: v.note, sections: [], hasCover: false, cover: { pairs: [] } }; }
+  // The fields the source itself states (department, vendor, contract, expiry...), best-ranked first: the facts that lead
+  // the Extracted view. Never values lifted out of the body text.
+  statedFacts(d, A) {
+    try {
+      const FC = this._fc && this._fc.A === A ? this._fc : (this._fc = { A, ...fieldCatalog(A.docs) });
+      const rank = new Map(FC.fields.map((f, i) => [f.key, i])), explicit = [...FIELD_EXPLICIT_DEPT, ...FIELD_EXPLICIT_EXP];
+      const out = [];
+      for (const k of Object.keys(d)) { if (FIELD_META_SKIP.has(k) || typeof d[k] !== 'string') continue;
+        const v = d[k].replace(/\s+/g, ' ').trim(), fk = fieldKey(k); if (!v || v.length > 160 || !rank.has(fk)) continue;
+        out.push({ fk, label: FIELD_EXPLICIT_DEPT.includes(fk) ? 'Department' : FIELD_EXPLICIT_EXP.includes(fk) ? 'Expires' : fieldLabel(fk), value: v, r: explicit.includes(fk) ? -1 : rank.get(fk) }); }
+      out.sort((a, b) => a.r - b.r);
+      return out.slice(0, 8).map(f => ({ label: f.label, value: f.value }));
+    } catch (e) { return []; }
+  }
+  // The scan read by OCR (ocr/<token>.json: word boxes per page) set back down exactly where it was: each page is a
+  // page-shaped box and every word sits at its recorded position and size, as real text you can select and copy.
+  // Nothing is reflowed or reworded, so the layout is the scan's own. Painted into the host the template gives us.
+  extRef = el => { this._extEl = el; if (el) this.paintExtracted(); };
+  paintExtracted() {
+    const el = this._extEl; if (!el || !el.isConnected) return;
+    const A = this._A, d = A && this.state.readDoc && A.docById[this.state.readDoc]; if (!d) return;
+    const tok = (typeof epavTokenOf === 'function') ? epavTokenOf(d) : null, rec = tok && this._epavOcr && this._epavOcr[tok];
+    if (!Array.isArray(rec) || !rec.length) return;
+    const key = tok + ':' + rec.length; if (el._extKey === key) return; el._extKey = key;
+    const W = 900, mctx = document.createElement('canvas').getContext('2d'), pages = [];
+    el.innerHTML = '';
+    for (const pg of rec) {
+      const els = (pg.elements || []).filter(e => e && e.text && Array.isArray(e.region) && e.region.length === 4);
+      if (!els.length || !pg.width || !pg.height) continue;
+      const k = W / pg.width, H = Math.round(pg.height * k);
+      const hs = els.map(e => e.region[3]).sort((a, b) => a - b), mh = hs[Math.floor(hs.length / 2)] || 20;
+      els.sort((a, b) => (a.region[1] + a.region[3] / 2) - (b.region[1] + b.region[3] / 2));
+      const lines = [];
+      for (const e of els) { const cy = e.region[1] + e.region[3] / 2, L = lines[lines.length - 1];
+        if (L && Math.abs(cy - L.cy) <= mh * 0.6) { L.els.push(e); L.cy = (L.cy * (L.els.length - 1) + cy) / L.els.length; } else lines.push({ els: [e], cy }); }
+      const wrap = document.createElement('div'); wrap.style.cssText = 'margin:0 auto 22px;width:' + W + 'px;transform-origin:top left';
+      const cap = document.createElement('div'); cap.textContent = 'Page ' + pg.page; cap.style.cssText = 'font:600 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--mut);margin:0 0 6px';
+      const page = document.createElement('div'); page.style.cssText = 'position:relative;width:' + W + 'px;height:' + H + 'px;background:#fff;color:#111;border:1px solid var(--line2);border-radius:4px;box-shadow:0 1px 6px rgba(0,0,0,.08);overflow:hidden;font-family:Arial,Helvetica,sans-serif;user-select:text';
+      // the words are painted when the page nears the viewport, so a 100-page scan opens at once
+      const fill = () => {
+        if (page._filled) return; page._filled = true;
+        for (const L of lines) {
+          L.els.sort((a, b) => a.region[0] - b.region[0]);
+          const top = Math.min(...L.els.map(e => e.region[1]));
+          const hs2 = L.els.map(e => e.region[3]).sort((a, b) => a - b), hh = hs2[Math.floor(hs2.length / 2)] * k;
+          // the line's baseline: words without descenders share it, and those are the lower-valued bottoms
+          const bots = L.els.map(e => e.region[1] + e.region[3]).sort((a, b) => a - b), base = bots[Math.floor(bots.length * 0.35)];
+          const ln = document.createElement('div'); ln.style.cssText = 'position:absolute;left:0;top:' + (top * k) + 'px;width:100%;height:' + (hh * 1.25) + 'px';
+          const fs = Math.max(6, hh * 0.9);
+          for (const e of L.els) { const ww = e.region[2] * k; const sp = document.createElement('span');
+            sp.style.cssText = 'position:absolute;left:' + (e.region[0] * k) + 'px;top:' + ((base - top) * k - 0.85 * fs) + 'px;font-size:' + fs + 'px;line-height:1;white-space:pre;transform-origin:0 0';
+            mctx.font = fs + 'px Arial, Helvetica, sans-serif'; const nat = mctx.measureText(e.text).width || 1; if (ww > 0 && Math.abs(ww / nat - 1) > 0.03) sp.style.transform = 'scaleX(' + (ww / nat) + ')';
+            sp.textContent = e.text + ' '; ln.appendChild(sp); }
+          page.appendChild(ln);
+        }
+      };
+      page._fill = fill;
+      wrap.appendChild(cap); wrap.appendChild(page); el.appendChild(wrap); pages.push(wrap);
+    }
+    const fit = () => { const z = Math.min(1, (el.clientWidth || W) / W); pages.forEach(w => { w.style.zoom = z < 0.999 ? String(z) : ''; }); };
+    fit(); try { if (el._extRo) el._extRo.disconnect(); el._extRo = new ResizeObserver(fit); el._extRo.observe(el); } catch (e) {}
+    try { if (el._extIo) el._extIo.disconnect();
+      el._extIo = new IntersectionObserver(es => es.forEach(en => { if (en.isIntersecting) { const pg = en.target.querySelector('div + div'); if (pg && pg._fill) pg._fill(); el._extIo.unobserve(en.target); } }), { rootMargin: '1200px 0px' });
+      pages.forEach(w => el._extIo.observe(w)); } catch (e) { pages.forEach(w => { const pg = w.querySelector('div + div'); if (pg && pg._fill) pg._fill(); }); }
+  }
+  restatedVals(d, A) {
+    const facts = this.statedFacts(d, A), hasFacts = facts.length > 0;
+    const tok = (typeof epavTokenOf === 'function') ? epavTokenOf(d) : null;
+    if (tok) {
+      this._epavOcr = this._epavOcr || {}; this._ocrAsk = this._ocrAsk || {};
+      const rec = this._epavOcr[tok];
+      if (rec === undefined && !this._ocrAsk[tok]) { this._ocrAsk[tok] = 1;
+        fetch('/ocr/' + tok + '.json').then(r => (r.ok ? r.json() : null)).then(j => { this._epavOcr[tok] = j || null; this.setState({ ocrN: Object.keys(this._epavOcr).length }); }).catch(() => { this._epavOcr[tok] = null; }); }
+      if (Array.isArray(rec) && rec.length) { const words = rec.reduce((n, pg) => n + ((pg.elements || []).length), 0);
+        return { note: 'The captured scan read by OCR and set back exactly as laid out — ' + plural(rec.length, 'page') + ', ' + words.toLocaleString() + ' words, every word at its position on the page and selectable. Compare against Original.', sections: [], hasPages: true, hasCover: false, cover: { pairs: [] }, facts, hasFacts }; }
+    }
+    const v = this.restate(d, A);
+    return v.ok ? { ...v, facts, hasFacts } : { note: tok ? 'This scan has not been read into text yet; the facts above are what the record states. Original shows the document.' : v.note, sections: [], hasCover: false, cover: { pairs: [] }, facts, hasFacts }; }
   // THE GROUNDED SUMMARY, on the reader (holodeck-summary.js): the document
   // curated from its OWN sentences — one line, five, three paragraphs. Zero
   // model, grounded by construction (every line is a verbatim span). Built
