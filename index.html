@@ -3282,12 +3282,15 @@ const STANDING_C = { 'Primary record': 'var(--green)', 'Article quoting the reco
 const fmtT = t => { t = Math.max(0, Math.floor(t)); const h = Math.floor(t / 3600), m = Math.floor(t / 60) % 60, x = t % 60; return (h ? h + ':' + String(m).padStart(2, '0') : m) + ':' + String(x).padStart(2, '0'); };
 const OHS_PUB = [[/legistar\.com/, 'Metro Council (Legistar)'], [/nashville\.gov/, 'Metro Nashville Government'], [/library\.municode|municode/, 'Metro Code'], [/nashvillescene/, 'Nashville Scene'], [/nashvillebanner/, 'Nashville Banner'], [/tennessean/, 'The Tennessean'], [/wkrn/, 'WKRN'], [/fox17/, 'FOX 17'], [/newschannel5/, 'NewsChannel 5'], [/thecontributor/, 'The Contributor'], [/axios/, 'Axios'], [/forbes/, 'Forbes'], [/citycast/, 'City Cast Nashville'], [/youtube/, 'Metro Nashville Network (YouTube)'], [/substack|ratiotempered|ratio/, 'Newsletter']];
 const ohsPublisher = u => { const h = String(u || ''); for (const [re, n] of OHS_PUB) if (re.test(h)) return n; try { return new URL(h).hostname.replace(/^www\./, ''); } catch (e) { return ''; } };
+// A run the recognizer made up (collapsed by holodeck-loops.js) keeps its count beside the one occurrence: said in the
+// app's voice, in an element the text reader skips (aria-hidden), so it is never part of what was said.
+const loopMark = (g) => (g && g.loop ? '<span data-gen="1" aria-hidden="true" style="font:500 11px var(--mono);color:var(--mut);margin-left:6px;white-space:nowrap">×' + g.loop.reps + ' repeated by the recognizer, collapsed</span>' : '');
 function ohsSegmentsHtml(segs, title) {
   const paras = []; let cur = null;
   segs.forEach(g => { const t = (g.text || '').trim(); if (!t) return; const gap = cur ? g.start - cur.end : 0;
-    if (!cur || gap > 1.5 || cur.txt.length > 520) { cur = { t: g.start, end: g.end, txt: t }; paras.push(cur); } else { cur.txt += ' ' + t; cur.end = g.end; } });
+    if (!cur || gap > 1.5 || cur.txt.length > 520) { cur = { t: g.start, end: g.end, txt: esc(t) + loopMark(g), raw: true }; paras.push(cur); } else { cur.txt += ' ' + esc(t) + loopMark(g); cur.end = g.end; } });
   const P = TAG_STYLE.P ? ' style="' + TAG_STYLE.P + '"' : '';
-  return '<h1' + (TAG_STYLE.H1 ? ' style="' + TAG_STYLE.H1 + '"' : '') + '>' + esc(title) + '</h1>\n' + paras.map(p => '<p data-t="' + Math.floor(p.t) + '"' + P + '>' + esc(p.txt) + '</p>').join('\n');
+  return '<h1' + (TAG_STYLE.H1 ? ' style="' + TAG_STYLE.H1 + '"' : '') + '>' + esc(title) + '</h1>\n' + paras.map(p => '<p data-t="' + Math.floor(p.t) + '"' + P + '>' + p.txt + '</p>').join('\n');
 }
 // Downloading the transcript in other forms: the reader's paragraphs carry a data-t
 // start-time each, so the same words can be written back out as plain text, captions
@@ -3335,7 +3338,7 @@ function unb64u(s) {
 function liveSegmentsHtml(segs, done) {
   const paras = []; let cur = null;
   (segs || []).forEach(g => { const t = (g.text || '').trim(); if (!t) return; const gap = cur ? g.start - cur.end : 0;
-    if (!cur || gap > 1.5 || cur.txt.length > 520) { cur = { t: g.start, end: g.end, txt: t }; paras.push(cur); } else { cur.txt += ' ' + t; cur.end = g.end; } });
+    if (!cur || gap > 1.5 || cur.txt.length > 520) { cur = { t: g.start, end: g.end, txt: t, html: esc(t) + loopMark(g) }; paras.push(cur); } else { cur.txt += ' ' + t; cur.html += ' ' + esc(t) + loopMark(g); cur.end = g.end; } });
   // The note is a label ABOVE the words, set in the interface's own type and boxed, so it cannot be read as one more line
   // of what was said: the words are the recognizer's, the note is the app's.
   const note = done ? '' : '<div data-live-note="1" style="user-select:none;margin:0 0 12px;padding:8px 12px;border:1px dashed var(--line2,#bbb);border-radius:8px;background:var(--s2,#f4f4f6);font:400 12.5px/1.45 var(--sans,sans-serif);color:var(--mut,#777)">'
@@ -3343,7 +3346,7 @@ function liveSegmentsHtml(segs, done) {
     + 'The words below are arriving as the recognizer hears them. This is not the saved transcript: it is replaced by one when the recognizer finishes, and nothing in it has been checked by anyone.</div>';
   // one style attribute: P already is one, and a second on the same element is ignored (which is how the note once
   // came out in the transcript's own serif, and the live words never got their accent border)
-  return note + '<p style="' + (TAG_STYLE.P || '') + ';border-left:3px solid var(--acc2,#4a90d9);padding-left:12px;margin:0 0 10px;color:var(--ink,#222)">' + paras.map(p => '<span data-t="' + Math.floor(p.t) + '">' + esc(p.txt) + '</span>').join(' ') + '</p>';
+  return note + '<p style="' + (TAG_STYLE.P || '') + ';border-left:3px solid var(--acc2,#4a90d9);padding-left:12px;margin:0 0 10px;color:var(--ink,#222)">' + paras.map(p => '<span data-t="' + Math.floor(p.t) + '">' + p.html + '</span>').join(' ') + '</p>';
 }
 async function opfsDir(path) { const root = await navigator.storage.getDirectory(); let d = root; for (const p of path.split('/').filter(Boolean)) d = await d.getDirectoryHandle(p, { create: true }); return d; }
 async function opfsRead(path) { try { const parts = path.split('/'); const name = parts.pop(); const d = await opfsDir(parts.join('/')); const fh = await d.getFileHandle(name); return await (await fh.getFile()).arrayBuffer(); } catch (e) { return null; } }
@@ -5425,7 +5428,9 @@ class Component extends DCLogic {
     if (d.lazy) { const L = (this._lazy || {})[d.id]; if (!L || L.loading) return false; }
     return true;
   }
-  linkEnds(LS, id) { return LS.links.filter(L => [L.from, L.to].some(sp => sp.doc === id && sp.kind !== 'whole' && sp.axis !== 'time')); }
+  // links to other sources only: a source's own caption timecodes (text ↔ its own time axis) are structure, and
+  // underlined they would mark every paragraph of every transcript
+  linkEnds(LS, id) { return LS.links.filter(L => L.from.doc !== L.to.doc && [L.from, L.to].some(sp => sp.doc === id && sp.kind !== 'whole' && sp.axis !== 'time')); }
   linkChips() {
     const S = this.state; if (S.view !== 'reader' || !S.readDoc) return [];
     const d = this.analysis().docById[S.readDoc]; const LS = this._lkSet || this.linkSet(); if (!d || !LS || !this.plainTextPath(d)) return [];
@@ -5942,9 +5947,12 @@ class Component extends DCLogic {
   omniRef = el => { this._omniEl = el; };
   hdrRef = el => { this._hdrEl = el; this.measureHdr(); };
   measureHdr() {
-    const el = this._hdrEl; if (!el) return;
+    // The ref can point at a header node the renderer has since replaced (a detached node measures 0 and the offset was
+    // never set, so every sticky element fell back to 61px under a 52px header and the page scrolled visibly through the
+    // gap). Read the header that is in the page now.
+    const el = (this._hdrEl && this._hdrEl.isConnected && this._hdrEl) || document.querySelector('header.hd-header'); if (!el) return;
     const h = Math.round(el.getBoundingClientRect().height);
-    if (h && h !== this._hdrH) { this._hdrH = h; try { document.documentElement.style.setProperty('--hdr-h', h + 'px'); } catch (e) {} }
+    if (h !== this._hdrH) { this._hdrH = h; try { document.documentElement.style.setProperty('--hdr-h', h + 'px'); } catch (e) {} }
   }
   // the search box is uncontrolled so typing never waits on a render; write it only when the query changes from elsewhere (Escape, a narrow-to button, a corpus switch)
   syncOmni() { const S = this.state; const v = S.qDraft !== undefined ? S.qDraft : S.q || ''; if (this._omniLast === undefined) { this._omniLast = v; return; } if (v === this._omniLast) return; this._omniLast = v; if (this._omniEl && this._omniEl.value !== v) this._omniEl.value = v; }
@@ -6714,6 +6722,9 @@ class Component extends DCLogic {
       this._html[d0.id] = html; idbPut('html:' + d0.id, html).catch(() => {});
       this.replaceAddedDoc(d0.id, { format: 'html', html, text: htmlToText(html), media, transcribed: true });
       this.showMapFor(d0.id);
+      // the transcript is a source like any other: the engine reads its text, so names, beings and the links built on
+      // them reach every surface (Names, Connections, Lanes, Margin, Seam, Orbit, Fields, Review)
+      hdEngineRead(d0.title, htmlToText(html)).then(got => { if (got) this.replaceAddedDoc(d0.id, { eng: hdEngineCompact(got.host, got.read), engTried: true }); else this.replaceAddedDoc(d0.id, { engTried: true }); }).catch(() => {});
       this.ilog('Transcribed ' + plural(r.segments.length, 'segment') + ' via ' + (r.source === 'local-mlx-whisper' ? 'the local transcriber' : 'the in-browser recognizer') + ' (' + r.model.split('/').pop() + '), listening with ' + priorNote + '.');
       this.txDone();
       const bytes = JSON.stringify({ source: r.source, model: r.model, segments: r.segments, priors: r.priors || { prompt: prompt ? priorNote : 'none', language: lang } });
@@ -7687,7 +7698,7 @@ class Component extends DCLogic {
   attachHandlers(target) {
     target.addEventListener('click', e => { const a = e.target.closest('a'); if (a && (e.metaKey || e.ctrlKey)) return; const nm = e.target.closest('[data-name]'); const st = e.target.closest('[data-st]');
       if (a && !e.shiftKey && /^https?:/.test(a.href || '')) { e.preventDefault(); e.stopPropagation(); this.navigate(a.href); return; }
-      if (nm) { e.preventDefault(); this.sel('name', nm.getAttribute('data-name')); return; }
+      if (nm) { e.preventDefault(); const dd = this._A && this.state.view === 'reader' && this.state.readDoc && this._A.docById[this.state.readDoc]; if (dd && dd.media && dd.media.segN > 0) { this.openProfile(nm.getAttribute('data-name')); return; } this.sel('name', nm.getAttribute('data-name')); return; }
       if (st) { e.preventDefault(); this.sel('statement', st.getAttribute('data-st')); return; }
       if (a) e.preventDefault(); }, true);
     target.addEventListener('submit', e => e.preventDefault(), true);
@@ -7952,6 +7963,7 @@ class Component extends DCLogic {
         b.onclick = e => { e.stopPropagation(); e.preventDefault(); this.ytSeek(t); }; p.insertBefore(b, p.firstChild);
         p.style.cursor = 'pointer'; p.title = 'Play from ' + fmtT(t); p.addEventListener('click', e => { if (e.target.closest('[data-name],a')) return; const sel = window.getSelection && window.getSelection(); if (sel && String(sel).trim()) return; e.stopPropagation(); e.preventDefault(); this.ytSeek(t); }); });
     }
+    try { this.repairLoops(d); } catch (e) { /* as it was */ }
     try { this.paintTranscriptSlider(el, d, A); } catch (e) { this._txErr = e; }
     try { this.paintLinkGutter(el, d, A); } catch (e) { this._lkErr = e; }
     const sk = JSON.stringify(S.sel); if (this._selKey !== sk && this._rRoot) { this._selKey = sk; this.applySel(this._rRoot); }
@@ -10089,14 +10101,14 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
         const rec = []; for (let i = 0; i < toks.length; i += 500) rec.push({ page: rec.length + 1, elements: toks.slice(i, i + 500).map(t => ({ text: t.text })) });
         const protect = new Set(); Object.keys(A.names || {}).forEach(n => String(n).toLowerCase().split(/[^a-z']+/).forEach(w => { if (w) protect.add(w); }));
         const fold = mod.makeFold(merged).foldDoc(rec, { protect });
-        toks.forEach((t, i) => { const r = fold.pages[Math.floor(i / 500)].tokens[i % 500]; if (r) t.r = r; });
+        toks.forEach((t, i) => { const r = fold.pages[Math.floor(i / 500)].tokens[i % 500]; if (r && !r.junk) t.r = r; }); // a stray-glyph token is cleanup, not a repair: not used here
         st.toks = toks; st.rep = toks.filter(t => t.r && t.r.kind === 'repaired').sort((a, b) => (b.r.vouched + b.r.pairs) - (a.r.vouched + a.r.pairs));
         st.state = pr.docs < 2 ? 'alone' : 'folded'; this.txRepaint(d.id);
         // what things are: the workspace's own typed names first, then the engine's reading of the (repaired) text
         const wd = t => String(t || '').toLowerCase().replace(/[^a-z0-9']+/g, ' ').trim();
         const dict = new Map(); let maxLen = 1;
-        const put = (surface, label, n, from) => { const k = wd(surface); if (!k) return; const parts = k.split(' '); if (parts.length === 1 && k.length < 4) return; if (!dict.has(k) || from === 'engine') dict.set(k, { label, n, from }); maxLen = Math.max(maxLen, parts.length); };
-        Object.keys(A.names || {}).forEach(n => { const r = A.names[n]; if (r && r.sts.length >= 2 && holoName(n, A)) put(n, (TYPE_L[r.type] || r.type || 'name').toLowerCase() + ' known from ' + plural(new Set(r.sts.map(x => A.byId[x] ? A.byId[x].doc : '')).size, 'source') + ' here', r.sts.length, 'workspace'); });
+        const put = (surface, label, n, from, entity) => { const k = wd(surface); if (!k) return; const parts = k.split(' '); if (parts.length === 1 && k.length < 4) return; if (!dict.has(k) || from === 'engine') dict.set(k, { label, n, from, entity: entity || surface }); maxLen = Math.max(maxLen, parts.length); };
+        Object.keys(A.names || {}).forEach(n => { const r = A.names[n]; if (r && r.sts.length >= 2 && holoName(n, A)) put(n, (TYPE_L[r.type] || r.type || 'name').toLowerCase() + ' known from ' + plural(new Set(r.sts.map(x => A.byId[x] ? A.byId[x].doc : '')).size, 'source') + ' here', r.sts.length, 'workspace', n); });
         const mark = () => { const ws = st.toks.map(t => wd(t.r && t.r.kind === 'repaired' ? t.r.to : t.text)); let typed = 0;
           st.toks.forEach(t => { delete t.meaning; });
           for (let a = 0; a < st.toks.length;) { let hit = null, len = 0;
@@ -10107,12 +10119,12 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
           st.typ = st.toks.filter(t => t.meaning).sort((x, y) => y.meaning.n - x.meaning.n); return typed; };
         mark(); this.txRepaint(d.id);
         let got = null;
-        for (const host of hdEngineHosts()) { const ctl = new AbortController(), timer = setTimeout(() => ctl.abort(), 45000);
+        for (const host of hdEngineHosts()) { const ctl = new AbortController(), timer = setTimeout(() => ctl.abort(), 150000); // 60,000 characters take ~40 s; the fold's own budget is 150 s
           try { const text = st.toks.map(t => (t.r && t.r.kind === 'repaired' ? t.r.to : t.text)).join(' ').slice(0, 60000);
             const r = await fetch(host + '/v1/read', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ name: d.title, text }), signal: ctl.signal });
             const j = await r.json(); if (r.ok && j.schema === 'EORead@1') { got = { host, read: j }; break; } } catch (e) { /* next host */ } finally { clearTimeout(timer); } }
         if (got) { for (const ref of (got.read.referents || [])) { const label = (ref.surfaces && ref.surfaces[0]) || ref.ref, n = Math.max(1, (ref.mentionsAt || []).length);
-            for (const sf of new Set([...(ref.allSurfaces || []), ...(ref.surfaces || [])])) put(sf, 'the engine reads this as ' + label + (n > 1 ? ' (' + n + ' mentions)' : ''), n, 'engine'); }
+            for (const sf of new Set([...(ref.allSurfaces || []), ...(ref.surfaces || [])])) put(sf, 'the engine reads this as ' + label + (n > 1 ? ' (' + n + ' mentions)' : ''), n, 'engine', label); }
           mark(); st.engine = 'the engine at ' + got.host.replace(/^https?:\/\//, ''); }
         else st.engine = 'the engine could not be reached, so only the workspace’s own names are typed';
         st.state = pr.docs < 2 ? 'alone' : 'done'; this.txRepaint(d.id);
@@ -10121,6 +10133,26 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
     return st;
   }
   txRepaint(id) { if (this._txPaintKey && this.state.readDoc === id) { this._txPaintKey = null; const el = this._rEl; const A = this._A; const d = A && A.docById[id]; if (el && d) { try { this.paintTranscriptSlider(el, d, A); } catch (e) {} } } }
+  // A transcript saved before the guard existed can hold the recognizer's runaway run ("hum, hum, hum…" ×300). On open,
+  // collapse it in the stored html, keep the count beside the one occurrence, and persist: said once, here, per source.
+  async repairLoops(d) {
+    this._lpDone = this._lpDone || {}; if (this._lpDone[d.id] || !d.media || !(d.media.segN > 0) || !d.html) return; this._lpDone[d.id] = 1;
+    try {
+      const M = await import(new URL('holodeck-loops.js', location.href).href);
+      const doc = new DOMParser().parseFromString('<body>' + d.html + '</body>', 'text/html');
+      const ps = [...doc.body.querySelectorAll('p[data-t]')]; if (!ps.length) return;
+      const r = M.collapseLoops(ps.map((p, i) => ({ start: i, end: i, text: p.textContent || '' })));
+      if (!r.loops.length) return;
+      const drop = new Set();
+      r.segs.forEach(g => { const p = ps[g.start]; if (!p) return; for (let k = g.start + 1; k <= g.end; k++) drop.add(k);
+        if (g.loop) { p.textContent = g.text; const m = doc.createElement('span'); m.setAttribute('data-gen', '1'); m.setAttribute('aria-hidden', 'true'); m.setAttribute('style', 'font:500 11px var(--mono);color:var(--mut);margin-left:6px;white-space:nowrap'); m.textContent = '×' + g.loop.reps + ' repeated by the recognizer, collapsed'; p.appendChild(m); } });
+      ps.forEach((p, i) => { if (drop.has(i)) p.remove(); });
+      const html = doc.body.innerHTML;
+      this._html[d.id] = html; idbPut('html:' + d.id, html).catch(() => {});
+      this.replaceAddedDoc(d.id, { html, text: htmlToText(html), loopsCollapsed: r.loops.length });
+      this.ilog('Collapsed ' + plural(r.loops.length, 'runaway repetition') + ' in “' + d.title + '” (' + r.basis + ').');
+    } catch (e) { /* the transcript stays as it was */ }
+  }
   paintTranscriptSlider(el, d, A) {
     if (!el || el.ownerDocument !== document || !this.txSliderOf(d) || !this.plainTextPath(d)) return;
     const st = this.ensureTxFold(d, A);
@@ -10133,7 +10165,7 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
     el.normalize(); this._txPaintKey = sig;
     if (!document.getElementById('xt-style')) { const c = document.createElement('style'); c.id = 'xt-style';
       c.textContent = '.xt-w .xt-n{display:none}.xt-w.on .xt-o{display:none}.xt-w.on .xt-n{display:inline;color:var(--ok);font-weight:600;text-decoration:underline dotted}.xt-m.on{text-decoration:underline;text-decoration-color:var(--acc);text-underline-offset:3px;text-decoration-thickness:1.5px;cursor:help}'; document.head.appendChild(c); }
-    const bar = document.createElement('div'); bar.className = 'xt-bar'; bar.style.cssText = 'position:sticky;top:var(--hdr-h,61px);z-index:6;display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--s1);padding:8px 2px;border-bottom:1px solid var(--line);margin:0 0 12px;font:500 13px var(--sans);color:var(--ink2)';
+    const bar = document.createElement('div'); bar.className = 'xt-bar'; bar.style.cssText = 'position:sticky;top:0;z-index:6;display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--s1);padding:8px 2px;border-bottom:1px solid var(--line);margin:0 0 12px;font:500 13px var(--sans);color:var(--ink2)';
     const lab = (t, c) => { const x = document.createElement('span'); x.textContent = t; x.style.cssText = 'font:600 12px var(--mono);letter-spacing:.05em;text-transform:uppercase;color:' + c; return x; };
     const rng = document.createElement('input'); rng.type = 'range'; rng.min = '0'; rng.max = '100'; rng.style.cssText = 'flex:1 1 180px;min-width:120px;accent-color:var(--acc)';
     rng.setAttribute('aria-label', 'From the raw transcription to the best guess');
@@ -10146,6 +10178,11 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
     el.addEventListener('mouseover', ev => { const t = ev.target && ev.target.closest ? ev.target.closest('[data-why]') : null; if (!t) { tip.style.display = 'none'; return; }
       tip.textContent = t.getAttribute('data-why'); tip.style.display = 'block'; const r = t.getBoundingClientRect(); tip.style.left = Math.max(8, Math.min(innerWidth - 350, r.left)) + 'px'; tip.style.top = (r.bottom + 6) + 'px'; });
     el.addEventListener('mouseleave', () => { tip.style.display = 'none'; });
+    // a typed word is a door to that entity's profile (not a seek of the recording)
+    if (!el._xtClick) { el._xtClick = true; el.addEventListener('click', ev => { const t = ev.target && ev.target.closest ? ev.target.closest('[data-entity]') : null; if (!t) return;
+      ev.preventDefault(); ev.stopPropagation(); const A2 = this._A; if (!A2) return; const raw = t.getAttribute('data-entity');
+      const exact = A2.names[raw] ? raw : Object.keys(A2.names).find(n => n.toLowerCase() === String(raw).toLowerCase());
+      if (exact) this.openProfile(exact); else this.setState({ q: raw, qDraft: raw, view: 'search' }); }, true); }
     // wrap the tokens that have something to show (a repair or a meaning), by offset into d.text
     const acts = []; // {t, kind, node-bound span}
     const want = new Map(); st.rep.forEach(t => want.set(t.s, { t, kind: 'rep' })); st.typ.forEach(t => { if (!want.has(t.s)) want.set(t.s, { t, kind: 'typ' }); });
@@ -10159,7 +10196,7 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
           if (w.kind === 'rep') { sp = document.createElement('span'); sp.className = 'xt-w';
             const o = document.createElement('span'); o.className = 'xt-o'; o.textContent = txt; const n = document.createElement('span'); n.className = 'xt-n'; n.setAttribute('aria-hidden', 'true'); n.textContent = w.t.r.to; sp.append(o, n);
             sp.dataset.why = 'Heard as “' + txt + '”. Read as “' + w.t.r.to + '”: ' + plural(w.t.r.vouched, 'other source') + ' here read it, and the words beside it have been read together ' + plural(w.t.r.pairs, 'time') + '.'; }
-          else { sp = document.createElement('span'); sp.className = 'xt-m'; sp.textContent = txt; sp.dataset.why = w.t.meaning.label + '.'; }
+          else { sp = document.createElement('span'); sp.className = 'xt-m'; sp.textContent = txt; sp.dataset.why = w.t.meaning.label + '. Click for its profile.'; sp.dataset.entity = w.t.meaning.entity || txt; }
           acts.push({ sp, kind: w.kind, ev: w.kind === 'rep' ? (w.t.r.vouched || 0) + (w.t.r.pairs || 0) : (w.t.meaning.n || 0) }); frag.append(sp); at = b; }
         if (at < len) frag.append(document.createTextNode(node.data.slice(at)));
         node.parentNode.replaceChild(frag, node); }

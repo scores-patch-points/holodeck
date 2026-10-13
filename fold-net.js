@@ -193,6 +193,9 @@ export async function transcribe(fileOrBuf, onProgress, model, opts) {
   const englishOnly = /\.en$/.test(model);
   const extra = { return_timestamps: true, chunk_length_s: 30 };
   if (lang && !englishOnly) extra.language = lang;
+  // A recognizer that loses the signal writes the same word again until the window ends ("hum, hum, hum…" three hundred
+  // times). Nothing downstream should ever see that as something said: it is collapsed here, with the count kept.
+  const { collapseLoops } = await import(new URL('holodeck-loops.js', import.meta.url).href);
   const nChunks = total ? Math.max(1, Math.ceil(total / 30)) : null; let ci = 0, heard = 0;
   onProgress && onProgress({ stage: 'transcribing', pct: 0, i: 1, n: nChunks });
   for await (const w of P.pcm16k(buf, { winSec: 30, signal: opts.signal })) {
@@ -202,7 +205,8 @@ export async function transcribe(fileOrBuf, onProgress, model, opts) {
     // The text is visible while it streams: each finished chunk hands back what has been
     // heard so far (only the new segments — the caller keeps the list), so the surface can
     // show the words appearing without copying a three-hour transcript every 30 seconds.
-    onProgress && onProgress({ stage: 'transcribing', pct: total ? Math.min(100, Math.round(heard / total * 100)) : null, i: ci + (total && heard < total ? 1 : 0), n: nChunks || ci, partial: segs }); }
-  onProgress && onProgress({ stage: 'done', pct: 100, partial: segs });
-  return { source: 'in-browser-whisper', model, segments: segs, duration: heard, priors: { prompt: null, language: englishOnly ? 'en' : (lang || 'auto') } };
+    onProgress && onProgress({ stage: 'transcribing', pct: total ? Math.min(100, Math.round(heard / total * 100)) : null, i: ci + (total && heard < total ? 1 : 0), n: nChunks || ci, partial: collapseLoops(segs).segs }); }
+  const clean = collapseLoops(segs);
+  onProgress && onProgress({ stage: 'done', pct: 100, partial: clean.segs });
+  return { source: 'in-browser-whisper', model, segments: clean.segs, loops: clean.loops, duration: heard, priors: { prompt: null, language: englishOnly ? 'en' : (lang || 'auto') } };
 }

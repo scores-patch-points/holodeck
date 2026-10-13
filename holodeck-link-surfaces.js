@@ -595,14 +595,18 @@ export function paintLinks(el, nodes, { doc, links, A, hues, onOpen, theme = 'da
     }
     node.parentNode.replaceChild(frag, node);
   }
-  // gutter: one row per link end, at the height of its first underlined span, pushed down where two would collide
-  const host = el; const cs = getComputedStyle(host); if (cs.position === 'static') { host.style.position = 'relative'; host.dataset.lkPos = '1'; }
+  // gutter: one row per link end, at the height of its first underlined span, pushed down where two would collide.
+  // It takes room from the text only when it has rows to show and is at most a third of the column; a narrow column
+  // keeps the underlines (click one for the passage card) and all of its width.
+  const host = el;
+  if (host.clientWidth < 262 * 3) return { count: new Set(items.map((i) => i.L.id)).size, destroy() {} };
+  const cs = getComputedStyle(host); if (cs.position === 'static') { host.style.position = 'relative'; host.dataset.lkPos = '1'; }
   host.dataset.lkPad = host.style.paddingRight || '0'; host.style.paddingRight = '262px';
   const gut = document.createElement('div'); gut.className = 'lk-gutter'; gut.style.cssText = 'position:absolute;top:0;right:0;width:248px;pointer-events:none';
   host.append(gut);
   const place = () => {
     gut.replaceChildren(); const hr = host.getBoundingClientRect(); let floor = 0; const seen = new Set();
-    items.forEach(it => {
+    items.forEach((it) => {
       if (seen.has(it.L.id)) return; seen.add(it.L.id);
       const anchor = host.querySelector('[data-lk~="' + CSS.escape(it.L.id) + '"]'); if (!anchor) return;
       const y = anchor.getBoundingClientRect().top - hr.top; const top = Math.max(y, floor);
@@ -617,10 +621,12 @@ export function paintLinks(el, nodes, { doc, links, A, hues, onOpen, theme = 'da
       gut.append(row); floor = top + row.offsetHeight + 6;
     });
     gut.style.height = floor + 'px';
+    if (!gut.children.length) { host.style.paddingRight = host.dataset.lkPad === '0' ? '' : host.dataset.lkPad; } // nothing to say: give the room back
+    else host.style.paddingRight = '262px';
   };
   place(); const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(() => place()) : null; if (ro) ro.observe(host);
   const later = setTimeout(place, 250);
-  return { count: new Set(items.map(i => i.L.id)).size, destroy() { clearTimeout(later); if (ro) ro.disconnect(); } };
+  return { count: new Set(items.map((i) => i.L.id)).size, destroy() { clearTimeout(later); if (ro) ro.disconnect(); } };
 }
 export function clearLinks(el) {
   el.querySelectorAll('.lk-gutter').forEach(n => n.remove());
