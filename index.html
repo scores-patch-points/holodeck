@@ -9678,10 +9678,13 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
           // the line's baseline: words without descenders share it, and those are the lower-valued bottoms
           const bots = L.els.map(e => e.region[1] + e.region[3]).sort((a, b) => a - b), base = bots[Math.floor(bots.length * 0.35)];
           const ln = document.createElement('div'); ln.style.cssText = 'position:absolute;left:0;top:' + (top * k) + 'px;width:100%;height:' + (hh * 1.25) + 'px';
-          const fs = Math.max(6, hh * 0.9);
+          const fsH = Math.max(6, hh * 0.9);
           for (const e of L.els) { const ww = e.region[2] * k; const sp = document.createElement('span');
-            sp.style.cssText = 'position:absolute;left:' + (e.region[0] * k) + 'px;top:' + ((base - top) * k - 0.85 * fs) + 'px;font-size:' + fs + 'px;line-height:1;white-space:pre;transform-origin:0 0';
-            mctx.font = fs + 'px Arial, Helvetica, sans-serif'; const nat = mctx.measureText(e.text).width || 1; if (ww > 0 && Math.abs(ww / nat - 1) > 0.03) sp.style.transform = 'scaleX(' + (ww / nat) + ')';
+            // proportions are never changed: a word keeps its natural width-to-height and only its SIZE moves, down
+            // to what fits the width it occupied on the scan (never up past the line's own size)
+            mctx.font = '100px Arial, Helvetica, sans-serif'; const per = (mctx.measureText(e.text).width || 1) / 100;
+            const fs = Math.max(5, Math.min(fsH, ww > 0 ? ww / per : fsH));
+            sp.style.cssText = 'position:absolute;left:' + (e.region[0] * k) + 'px;top:' + ((base - top) * k - 0.85 * fs) + 'px;font-size:' + fs + 'px;line-height:1;white-space:pre';
             sp.textContent = e.text + ' '; ln.appendChild(sp); }
           page.appendChild(ln);
         }
