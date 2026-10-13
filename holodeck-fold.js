@@ -15,7 +15,7 @@ import { isNearMissSpelling, opticalReferentForm } from './vendor/eoreader7/nati
 
 const MIN_LEN = 4;                                   // surfaces.js::MIN_VARIANT_LEN, the engine's own floor
 const coreOf = (t) => { const s = String(t || ''); if (/\d/.test(s)) return null;
-  const m = /^([^A-Za-z]*)([A-Za-z]+(?:['’][A-Za-z]+)?)([^A-Za-z]*)$/.exec(s); return m ? { pre: m[1], w: m[2], post: m[3] } : null; };
+  const m = /^([^\p{L}]*)(\p{L}+(?:['’]\p{L}+)?)([^\p{L}]*)$/u.exec(s); return m ? { pre: m[1], w: m[2], post: m[3] } : null; };
 const lc = (w) => w.toLowerCase().replace(/’/g, "'");
 const isTitle = (w) => /^[A-Z][a-z]+$/.test(w);
 const recase = (from, to) => (from === from.toUpperCase() && from.length > 1 ? to.toUpperCase() : /^[A-Z]/.test(from) ? to[0].toUpperCase() + to.slice(1) : to);
@@ -38,6 +38,9 @@ export function makeFold(priors) {
     const out = [], stats = { read: 0, repaired: 0, refused: 0, unread: 0, name: 0, other: 0 };
     for (const pg of rec) {
       const els = pg.elements || [], toks = els.map((e) => { const c = coreOf(e.text); return { e, c, w: c ? lc(c.w) : null }; });
+      // the page's own type height: a box far taller than that (handwriting, a stray stroke) is not a set word, so
+      // nothing is repaired from it (a handwritten "Government" was read "erent" and would have become "event")
+      const hts = els.map((e) => (e.region || [])[3]).filter(Boolean).sort((a, b) => a - b), typeH = hts[Math.floor(hts.length / 2)] || 0;
       const page = [];
       for (let i = 0; i < toks.length; i++) {
         const t = toks[i], r = { i, text: t.e.text, kind: 'other' };
@@ -46,6 +49,7 @@ export function makeFold(priors) {
         const infl = (t.w.endsWith('s') ? df(t.w.slice(0, -1)) : 0) + df(t.w + 's');
         if (df(t.w) > 0 || infl > 0 || protect.has(t.w)) { r.kind = 'read'; r.vouched = df(t.w) || infl; stats.read++; page.push(r); continue; }
         if (isTitle(t.c.w)) { r.kind = 'name'; stats.name++; page.push(r); continue; }          // a name is not respelled
+        if (typeH && t.e.region && t.e.region[3] > typeH * 1.5) { r.kind = 'refused'; r.why = 'its box is ' + Math.round(t.e.region[3] / typeH * 10) / 10 + ' times the page\'s own type height, so it is handwriting or a stray stroke, not set type'; stats.refused++; page.push(r); continue; }
         // near-miss candidates: established forms one edit away, or the same form seen through OCR-style glyph swaps
         const cand = new Set();
         for (const k of deletes(t.w)) for (const w of byDel.get(k) || []) if (df(w) > 0 && w !== t.w && isNearMissSpelling(t.w, w)) cand.add(w);
