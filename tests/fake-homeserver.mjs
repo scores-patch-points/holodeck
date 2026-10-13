@@ -27,7 +27,7 @@ export function homeserver({ name = 'rest.local', registration = 'dummy', port =
     const raw = await new Promise((ok) => { let b = ''; req.on('data', (c) => { b += c; }); req.on('end', () => ok(b)); });
     let body = {}; try { body = raw ? JSON.parse(raw) : {}; } catch { /* none */ }
     const auth = String(req.headers.authorization || '').replace(/^Bearer /, '');
-    seen.push({ method: req.method, path: u.pathname + u.search, auth, body });
+    seen.push({ method: req.method, path: u.pathname + u.search, auth, body, xff: req.headers['x-forwarded-for'] || null });
     const out = (code, obj) => { res.writeHead(code, { 'content-type': 'application/json', ...CORS }); res.end(JSON.stringify(obj)); };
     const err = (code, errcode, error) => out(code, { errcode, error });
     const p = decodeURIComponent(u.pathname);
@@ -42,7 +42,10 @@ export function homeserver({ name = 'rest.local', registration = 'dummy', port =
       if (typeof body.password === 'string') passwords.set(user, body.password);
       return out(200, { user_id: user, access_token: token, device_id: sid('D') });
     }
-    if ((p === '/_matrix/client/v3/login' || p === '/_matrix/client/r0/login') && req.method === 'POST') {
+    if (/^\/_matrix\/client\/(v3|r0|unstable|api\/v1)\/login$/.test(p) && req.method === 'GET') return out(200, { flows: [{ type: 'm.login.password' }, { type: 'm.login.application_service' }] });
+    if (/^\/_matrix\/client\/(v3|r0|unstable|api\/v1)\/login$/.test(p) && req.method === 'POST') {
+      if (body.type === 'm.login.application_service') return out(200, { user_id: '@bot:' + name, access_token: 'as_' + sid('t'), device_id: sid('D') });
+      if (body.type === 'm.login.token') return out(200, { user_id: '@someone:' + name, access_token: 'tok_' + sid('t'), device_id: sid('D') });
       if (body.type !== 'm.login.password') return err(400, 'M_UNKNOWN', 'Unsupported login type');
       const idu = (body.identifier && body.identifier.user) || body.user || '';
       const full = String(idu).startsWith('@') ? String(idu).toLowerCase() : `@${String(idu).toLowerCase()}:${name}`;
