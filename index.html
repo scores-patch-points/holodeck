@@ -3336,9 +3336,14 @@ function liveSegmentsHtml(segs, done) {
   const paras = []; let cur = null;
   (segs || []).forEach(g => { const t = (g.text || '').trim(); if (!t) return; const gap = cur ? g.start - cur.end : 0;
     if (!cur || gap > 1.5 || cur.txt.length > 520) { cur = { t: g.start, end: g.end, txt: t }; paras.push(cur); } else { cur.txt += ' ' + t; cur.end = g.end; } });
-  const P = TAG_STYLE.P ? ' style="' + TAG_STYLE.P + '"' : '';
-  return '<p ' + P + ' style="border-left:3px solid var(--acc2,#4a90d9);padding-left:12px;margin:0 0 10px;color:var(--ink,#222)">' + paras.map(p => '<span data-t="' + Math.floor(p.t) + '">' + esc(p.txt) + '</span>').join(' ') + '</p>'
-    + (done ? '' : '<p ' + P + ' style="color:var(--mut,#888);font-style:italic">' + 'Words appear here as they are heard — a machine reading, not the recording, and not yet checked by anyone.' + '</p>');
+  // The note is a label ABOVE the words, set in the interface's own type and boxed, so it cannot be read as one more line
+  // of what was said: the words are the recognizer's, the note is the app's.
+  const note = done ? '' : '<div data-live-note="1" style="user-select:none;margin:0 0 12px;padding:8px 12px;border:1px dashed var(--line2,#bbb);border-radius:8px;background:var(--s2,#f4f4f6);font:400 12.5px/1.45 var(--sans,sans-serif);color:var(--mut,#777)">'
+    + '<span style="font:600 11px var(--mono,monospace);letter-spacing:.07em;text-transform:uppercase;color:var(--acc,#2563eb);margin-right:8px">Transcribing now</span>'
+    + 'The words below are arriving as the recognizer hears them. This is not the saved transcript: it is replaced by one when the recognizer finishes, and nothing in it has been checked by anyone.</div>';
+  // one style attribute: P already is one, and a second on the same element is ignored (which is how the note once
+  // came out in the transcript's own serif, and the live words never got their accent border)
+  return note + '<p style="' + (TAG_STYLE.P || '') + ';border-left:3px solid var(--acc2,#4a90d9);padding-left:12px;margin:0 0 10px;color:var(--ink,#222)">' + paras.map(p => '<span data-t="' + Math.floor(p.t) + '">' + esc(p.txt) + '</span>').join(' ') + '</p>';
 }
 async function opfsDir(path) { const root = await navigator.storage.getDirectory(); let d = root; for (const p of path.split('/').filter(Boolean)) d = await d.getDirectoryHandle(p, { create: true }); return d; }
 async function opfsRead(path) { try { const parts = path.split('/'); const name = parts.pop(); const d = await opfsDir(parts.join('/')); const fh = await d.getFileHandle(name); return await (await fh.getFile()).arrayBuffer(); } catch (e) { return null; } }
@@ -7947,6 +7952,7 @@ class Component extends DCLogic {
         b.onclick = e => { e.stopPropagation(); e.preventDefault(); this.ytSeek(t); }; p.insertBefore(b, p.firstChild);
         p.style.cursor = 'pointer'; p.title = 'Play from ' + fmtT(t); p.addEventListener('click', e => { if (e.target.closest('[data-name],a')) return; const sel = window.getSelection && window.getSelection(); if (sel && String(sel).trim()) return; e.stopPropagation(); e.preventDefault(); this.ytSeek(t); }); });
     }
+    try { this.paintTranscriptSlider(el, d, A); } catch (e) { this._txErr = e; }
     try { this.paintLinkGutter(el, d, A); } catch (e) { this._lkErr = e; }
     const sk = JSON.stringify(S.sel); if (this._selKey !== sk && this._rRoot) { this._selKey = sk; this.applySel(this._rRoot); }
   }
@@ -10044,6 +10050,132 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
       a += len;
     }
     res.typed = typed; this._extRepaint();
+  }
+  // ---- the transcript slider: the raw transcription at the left, the best guess at the right.
+  // 0 is the transcription as the recognizer wrote it. Moving right applies, in order: (1) spelling repairs — a word the
+  // rest of the workspace never reads, one edit from a form it does, with its neighbours read beside it (holodeck-fold.js,
+  // the same fold the Extracted tab uses; a tie is refused, a name is never respelled); then (2) what each thing IS, from
+  // the workspace's own typed names and from the engine's reading of the whole transcript (POST /v1/read), shown as an
+  // underline with the label on hover. Nothing is written into the transcript: every repair keeps the heard word beside
+  // it, and the original is never touched. Not interpretation by a model: spellings and referents the workspace holds.
+  txSliderOf(d) { return !!(d && d.media && d.media.segN > 0 && d.text && d.text.length > 40); }
+  txPriors(A) {
+    const key = this._key + '|' + A.docs.length; if (this._txPri && this._txPri.key === key) return this._txPri.p;
+    const core = t => { const m = /^[^A-Za-z]*([A-Za-z]+(?:['’][A-Za-z]+)?)[^A-Za-z]*$/.exec(t || ''); return m ? m[1].toLowerCase().replace(/’/g, "'") : null; };
+    const wdf = new Map(), pdf = new Map(); let docs = 0;
+    for (const dd of A.docs.slice(0, 400)) { const t = String(dd.text || '').slice(0, 250000); if (t.length < 40) continue; docs++;
+      const ws = new Set(), ps = new Set(); let prev = null;
+      for (const raw of t.split(/\s+/)) { const w = core(raw); if (!w || w.length < 2) { prev = null; continue; } ws.add(w); if (prev) ps.add(prev + ' ' + w); prev = w; }
+      ws.forEach(w => wdf.set(w, (wdf.get(w) || 0) + 1)); ps.forEach(q => pdf.set(q, (pdf.get(q) || 0) + 1)); }
+    const words = {}, pairs = {};
+    for (const [w, n] of wdf) if (n >= 2) words[w] = n;
+    for (const [q, n] of pdf) { const [a, b] = q.split(' '); if (n >= 2 && words[a] && words[b]) pairs[q] = n; }
+    const p = { docs, words, pairs }; this._txPri = { key, p }; return p;
+  }
+  ensureTxFold(d, A) {
+    this._txf = this._txf || {};
+    const key = d.id + ':' + d.text.length + ':' + this._key;
+    if (this._txf[d.id] && this._txf[d.id].key === key) return this._txf[d.id];
+    const st = this._txf[d.id] = { key, state: 'folding', toks: [], rep: [], typ: [], engine: '', note: '' };
+    setTimeout(async () => {
+      try {
+        const mod = await import(new URL('holodeck-fold.js', location.href).href);
+        const pr = this.txPriors(A);
+        // an OCR'd-contract vocabulary, when the sample is present, adds to what the workspace itself establishes
+        let ocr = null; try { this._priors = this._priors || fetch('/ocr-priors.json').then(r => (r.ok ? r.json() : null)).catch(() => null); ocr = await this._priors; } catch (e) {}
+        const merged = { docs: pr.docs, words: { ...pr.words }, pairs: { ...pr.pairs } };
+        if (ocr && ocr.words) { for (const w in ocr.words) merged.words[w] = (merged.words[w] || 0) + ocr.words[w]; for (const q in (ocr.pairs || {})) merged.pairs[q] = (merged.pairs[q] || 0) + ocr.pairs[q]; }
+        const toks = []; const re = /\S+/g; let m; while ((m = re.exec(d.text))) toks.push({ s: m.index, e: m.index + m[0].length, text: m[0] });
+        const rec = []; for (let i = 0; i < toks.length; i += 500) rec.push({ page: rec.length + 1, elements: toks.slice(i, i + 500).map(t => ({ text: t.text })) });
+        const protect = new Set(); Object.keys(A.names || {}).forEach(n => String(n).toLowerCase().split(/[^a-z']+/).forEach(w => { if (w) protect.add(w); }));
+        const fold = mod.makeFold(merged).foldDoc(rec, { protect });
+        toks.forEach((t, i) => { const r = fold.pages[Math.floor(i / 500)].tokens[i % 500]; if (r) t.r = r; });
+        st.toks = toks; st.rep = toks.filter(t => t.r && t.r.kind === 'repaired').sort((a, b) => (b.r.vouched + b.r.pairs) - (a.r.vouched + a.r.pairs));
+        st.state = pr.docs < 2 ? 'alone' : 'folded'; this.txRepaint(d.id);
+        // what things are: the workspace's own typed names first, then the engine's reading of the (repaired) text
+        const wd = t => String(t || '').toLowerCase().replace(/[^a-z0-9']+/g, ' ').trim();
+        const dict = new Map(); let maxLen = 1;
+        const put = (surface, label, n, from) => { const k = wd(surface); if (!k) return; const parts = k.split(' '); if (parts.length === 1 && k.length < 4) return; if (!dict.has(k) || from === 'engine') dict.set(k, { label, n, from }); maxLen = Math.max(maxLen, parts.length); };
+        Object.keys(A.names || {}).forEach(n => { const r = A.names[n]; if (r && r.sts.length >= 2 && holoName(n, A)) put(n, (TYPE_L[r.type] || r.type || 'name').toLowerCase() + ' known from ' + plural(new Set(r.sts.map(x => A.byId[x] ? A.byId[x].doc : '')).size, 'source') + ' here', r.sts.length, 'workspace'); });
+        const mark = () => { const ws = st.toks.map(t => wd(t.r && t.r.kind === 'repaired' ? t.r.to : t.text)); let typed = 0;
+          st.toks.forEach(t => { delete t.meaning; });
+          for (let a = 0; a < st.toks.length;) { let hit = null, len = 0;
+            for (let L = Math.min(maxLen, st.toks.length - a); L >= 1 && !hit; L--) { const k = ws.slice(a, a + L); if (k.some(x => !x)) continue; const h = dict.get(k.join(' ')); if (h) { hit = h; len = L; } }
+            if (!hit) { a++; continue; }
+            for (let q = 0; q < len; q++) { const t = st.toks[a + q]; if (!(t.r && t.r.kind === 'repaired') && !t.meaning) { t.meaning = hit; typed++; } }
+            a += len; }
+          st.typ = st.toks.filter(t => t.meaning).sort((x, y) => y.meaning.n - x.meaning.n); return typed; };
+        mark(); this.txRepaint(d.id);
+        let got = null;
+        for (const host of hdEngineHosts()) { const ctl = new AbortController(), timer = setTimeout(() => ctl.abort(), 45000);
+          try { const text = st.toks.map(t => (t.r && t.r.kind === 'repaired' ? t.r.to : t.text)).join(' ').slice(0, 60000);
+            const r = await fetch(host + '/v1/read', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ name: d.title, text }), signal: ctl.signal });
+            const j = await r.json(); if (r.ok && j.schema === 'EORead@1') { got = { host, read: j }; break; } } catch (e) { /* next host */ } finally { clearTimeout(timer); } }
+        if (got) { for (const ref of (got.read.referents || [])) { const label = (ref.surfaces && ref.surfaces[0]) || ref.ref, n = Math.max(1, (ref.mentionsAt || []).length);
+            for (const sf of new Set([...(ref.allSurfaces || []), ...(ref.surfaces || [])])) put(sf, 'the engine reads this as ' + label + (n > 1 ? ' (' + n + ' mentions)' : ''), n, 'engine'); }
+          mark(); st.engine = 'the engine at ' + got.host.replace(/^https?:\/\//, ''); }
+        else st.engine = 'the engine could not be reached, so only the workspace’s own names are typed';
+        st.state = pr.docs < 2 ? 'alone' : 'done'; this.txRepaint(d.id);
+      } catch (e) { st.state = 'failed'; st.note = String((e && e.message) || e); this.txRepaint(d.id); }
+    }, 30);
+    return st;
+  }
+  txRepaint(id) { if (this._txPaintKey && this.state.readDoc === id) { this._txPaintKey = null; const el = this._rEl; const A = this._A; const d = A && A.docById[id]; if (el && d) { try { this.paintTranscriptSlider(el, d, A); } catch (e) {} } } }
+  paintTranscriptSlider(el, d, A) {
+    if (!el || el.ownerDocument !== document || !this.txSliderOf(d) || !this.plainTextPath(d)) return;
+    const st = this.ensureTxFold(d, A);
+    const sig = [d.id, this._rKey, st.state, st.rep.length, st.typ.length, st.engine].join('|');
+    if (this._txPaintKey === sig && el.querySelector('.xt-bar')) return;
+    // unwrap the previous paint; the original text nodes are what the offsets below are read from
+    el.querySelectorAll('.xt-bar').forEach(n => n.remove());
+    el.querySelectorAll('.xt-w').forEach(w => { const o = w.querySelector('.xt-o'); w.replaceWith(document.createTextNode(o ? o.textContent : w.textContent)); });
+    el.querySelectorAll('.xt-m').forEach(w => w.replaceWith(document.createTextNode(w.textContent)));
+    el.normalize(); this._txPaintKey = sig;
+    if (!document.getElementById('xt-style')) { const c = document.createElement('style'); c.id = 'xt-style';
+      c.textContent = '.xt-w .xt-n{display:none}.xt-w.on .xt-o{display:none}.xt-w.on .xt-n{display:inline;color:var(--ok);font-weight:600;text-decoration:underline dotted}.xt-m.on{text-decoration:underline;text-decoration-color:var(--acc);text-underline-offset:3px;text-decoration-thickness:1.5px;cursor:help}'; document.head.appendChild(c); }
+    const bar = document.createElement('div'); bar.className = 'xt-bar'; bar.style.cssText = 'position:sticky;top:var(--hdr-h,61px);z-index:6;display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--s1);padding:8px 2px;border-bottom:1px solid var(--line);margin:0 0 12px;font:500 13px var(--sans);color:var(--ink2)';
+    const lab = (t, c) => { const x = document.createElement('span'); x.textContent = t; x.style.cssText = 'font:600 12px var(--mono);letter-spacing:.05em;text-transform:uppercase;color:' + c; return x; };
+    const rng = document.createElement('input'); rng.type = 'range'; rng.min = '0'; rng.max = '100'; rng.style.cssText = 'flex:1 1 180px;min-width:120px;accent-color:var(--acc)';
+    rng.setAttribute('aria-label', 'From the raw transcription to the best guess');
+    const level0 = this._txLevel == null ? 0 : this._txLevel; rng.value = String(level0);
+    const msg = document.createElement('span'); msg.style.cssText = 'flex:1 1 100%;font:400 12px/1.4 var(--sans);color:var(--mut)';
+    bar.append(lab('Raw transcription', 'var(--mut)'), rng, lab('Best guess', 'var(--acc)'), msg);
+    el.insertBefore(bar, el.firstChild);
+    // tip on our own element: the page strips native title attributes
+    let tip = el._xtTip; if (!tip) { tip = el._xtTip = document.createElement('div'); tip.style.cssText = 'position:fixed;z-index:80;max-width:340px;background:var(--s1);color:var(--ink);border:1px solid var(--line2);border-radius:8px;padding:8px 10px;font:400 12px/1.45 var(--sans);box-shadow:0 4px 18px rgba(0,0,0,.18);pointer-events:none;display:none'; document.body.appendChild(tip); }
+    el.addEventListener('mouseover', ev => { const t = ev.target && ev.target.closest ? ev.target.closest('[data-why]') : null; if (!t) { tip.style.display = 'none'; return; }
+      tip.textContent = t.getAttribute('data-why'); tip.style.display = 'block'; const r = t.getBoundingClientRect(); tip.style.left = Math.max(8, Math.min(innerWidth - 350, r.left)) + 'px'; tip.style.top = (r.bottom + 6) + 'px'; });
+    el.addEventListener('mouseleave', () => { tip.style.display = 'none'; });
+    // wrap the tokens that have something to show (a repair or a meaning), by offset into d.text
+    const acts = []; // {t, kind, node-bound span}
+    const want = new Map(); st.rep.forEach(t => want.set(t.s, { t, kind: 'rep' })); st.typ.forEach(t => { if (!want.has(t.s)) want.set(t.s, { t, kind: 'typ' }); });
+    if (want.size) {
+      const nodes = []; walkText(el, (n, o) => nodes.push([n, o]));
+      for (const [node, o0] of nodes) { if (!node.isConnected) continue; const len = node.data.length, o1 = o0 + len;
+        const here = [...want.values()].filter(w => w.t.s >= o0 && w.t.e <= o1).sort((a, b) => a.t.s - b.t.s); if (!here.length) continue;
+        const frag = document.createDocumentFragment(); let at = 0;
+        for (const w of here) { const a = w.t.s - o0, b = w.t.e - o0; if (a < at) continue; if (a > at) frag.append(document.createTextNode(node.data.slice(at, a)));
+          const txt = node.data.slice(a, b); let sp;
+          if (w.kind === 'rep') { sp = document.createElement('span'); sp.className = 'xt-w';
+            const o = document.createElement('span'); o.className = 'xt-o'; o.textContent = txt; const n = document.createElement('span'); n.className = 'xt-n'; n.setAttribute('aria-hidden', 'true'); n.textContent = w.t.r.to; sp.append(o, n);
+            sp.dataset.why = 'Heard as “' + txt + '”. Read as “' + w.t.r.to + '”: ' + plural(w.t.r.vouched, 'other source') + ' here read it, and the words beside it have been read together ' + plural(w.t.r.pairs, 'time') + '.'; }
+          else { sp = document.createElement('span'); sp.className = 'xt-m'; sp.textContent = txt; sp.dataset.why = w.t.meaning.label + '.'; }
+          acts.push({ sp, kind: w.kind, ev: w.kind === 'rep' ? (w.t.r.vouched || 0) + (w.t.r.pairs || 0) : (w.t.meaning.n || 0) }); frag.append(sp); at = b; }
+        if (at < len) frag.append(document.createTextNode(node.data.slice(at)));
+        node.parentNode.replaceChild(frag, node); }
+    }
+    const rep = acts.filter(a => a.kind === 'rep'), typ = acts.filter(a => a.kind === 'typ');
+    // acts are applied in evidence order: the repairs most vouched for first, the most-mentioned things first
+    rep.sort((x, y) => y.ev - x.ev); typ.sort((x, y) => y.ev - x.ev);
+    const applyList = (list, f) => { const n = Math.round(list.length * Math.max(0, Math.min(1, f))); list.forEach((a, i) => { a.sp.classList.toggle('on', i < n); }); return n; };
+    const render = () => { const p = +rng.value; this._txLevel = p;
+      const n1 = applyList(rep, p / 50), n2 = applyList(typ, (p - 50) / 50);
+      msg.textContent = st.state === 'folding' ? 'Reading the transcript against everything else in this workspace…'
+        : st.state === 'failed' ? 'The fold could not run: ' + st.note
+        : st.state === 'alone' ? 'Nothing else in this workspace establishes a spelling yet, so there is nothing to repair: add the sources this recording is about and the guess improves. ' + (st.typ.length ? 'Things the workspace already names are underlined as you move right.' : '')
+        : 'Repairs ' + n1 + ' of ' + rep.length + ' · things named ' + n2 + ' of ' + typ.length + (st.engine ? ' (' + st.engine + ')' : (st.state === 'folded' ? ' (asking the engine…)' : '')) + '. Point at a marked word for what vouches for it. All the way left is exactly what was heard.';
+    };
+    rng.addEventListener('input', render); render();
   }
   restatedVals(d, A) {
     const facts = this.statedFacts(d, A), hasFacts = facts.length > 0;
