@@ -34,6 +34,8 @@ export async function login(server, user, password) {
   const s = { ...d, token: j.access_token, user: j.user_id, guest: false }; saveSession(s); return s;
 }
 export function logout() { saveSession(null); }
+// Adopt a session made elsewhere (an account created from an invite link). The caller never passes a password.
+export function useSession(s) { saveSession(s); return s; }
 
 // ---------- share links with ready-made accounts ----------
 const rnd = n => { const a = new Uint8Array(n); crypto.getRandomValues(a); return [...a].map(b => 'abcdefghijkmnpqrstuvwxyz23456789'[b % 32]).join(''); };

@@ -44,7 +44,10 @@ export function createFakeServer({ name = 'localhost', now = null } = {}) {
   const bundles = [];              // history key bundles: {to:user, room, keys:[...]}
 
   const sessionRooms = new Map();   // session_id -> roomId (so a bundle can be limited to one room)
-  const server = { name, rooms, aliases, accounts, media, requestLog, now: clock, olm, bundles, sessionRooms };
+  const openid = new Map();         // token -> { user, exp }  (what /openid/userinfo would answer)
+  const server = { name, rooms, aliases, accounts, media, requestLog, now: clock, olm, bundles, sessionRooms, openid };
+  /** What a third party learns by presenting an OpenID token to this homeserver: the user id, or null. */
+  server.openidUserinfo = (token, at = null) => { const v = openid.get(String(token)); return v && (at == null || at <= v.exp) ? { sub: v.user } : null; };
 
   const log = (who, op, roomId, type, content) => requestLog.push({ who, op, roomId, type, content: clone(content) });
   const id = (p) => p + (nextId++).toString(36);
@@ -117,8 +120,14 @@ export function createFakeServer({ name = 'localhost', now = null } = {}) {
     async function decryptTimeline(r) {
       pullInbox();
       const out = [];
+      // The server enforces `history_visibility: joined` for plain rooms: a member sees only what was sent after they joined.
+      // (Encrypted rooms get the same consequence from the key ratchet, modelled below.)
+      const hv = (stateOf(r, 'm.room.history_visibility') || {}).history_visibility;
+      const since = hv === 'joined' && r.joinedAt && r.joinedAt.has(userId) ? r.joinedAt.get(userId) : 0;
       for (const e of r.timeline) {
         if (e.type === 'm.room.member') continue;
+        if (since && e.type !== 'm.room.encrypted' && !e.redacted && e.origin_server_ts < since) continue;
+        if (e.redacted) { out.push({ event_id: e.event_id, type: 'm.room.encrypted', content: {}, sender: e.sender, origin_server_ts: e.origin_server_ts, decrypted: false }); continue; }
         if (e.type !== 'm.room.encrypted') { out.push({ event_id: e.event_id, type: e.type, content: clone(e.content), sender: e.sender, origin_server_ts: e.origin_server_ts, decrypted: true, plaintext: true }); continue; }
         const k = keys.get(e.content.session_id);
         if (!k || e.content.index < k.fromIndex) { out.push({ event_id: e.event_id, type: 'm.room.encrypted', content: {}, sender: e.sender, origin_server_ts: e.origin_server_ts, decrypted: false }); continue; }
@@ -134,7 +143,7 @@ export function createFakeServer({ name = 'localhost', now = null } = {}) {
 
       async createRoom(body) {
         const roomId = '!' + id('r') + ':' + name;
-        const r = { state: new Map(), timeline: [], members: new Map(), aliases: new Set() };
+        const r = { state: new Map(), timeline: [], members: new Map(), aliases: new Set(), joinedAt: new Map([[userId, 0]]) };
         const put = (type, key, content) => r.state.set(type + '|' + key, { content: clone(content), sender: userId, ts: clock() });
         if (body.room_alias_name) {
           const alias = `#${body.room_alias_name}:${name}`;
@@ -186,7 +195,9 @@ export function createFakeServer({ name = 'localhost', now = null } = {}) {
         const jr = (stateOf(r, 'm.room.join_rules') || {}).join_rule;
         if (m !== 'invite' && jr !== 'public') throw new MatrixError('M_FORBIDDEN', 'you are not invited to this room');
         r.members.set(userId, 'join');
-        r.timeline.push({ event_id: '$' + id('m'), type: 'm.room.member', sender: userId, state_key: userId, content: { membership: 'join' }, origin_server_ts: clock() });
+        const joinTs = clock();
+        r.joinedAt.set(userId, joinTs);
+        r.timeline.push({ event_id: '$' + id('m'), type: 'm.room.member', sender: userId, state_key: userId, content: { membership: 'join' }, origin_server_ts: joinTs });
         myLog('join', roomId, null, { acceptSharedHistory: !!opts.acceptSharedHistory });
         if (opts.acceptSharedHistory) {
           for (let i = bundles.length - 1; i >= 0; i--) {
@@ -264,10 +275,32 @@ export function createFakeServer({ name = 'localhost', now = null } = {}) {
         return eid;
       },
 
-      async readEvents(roomId) {
+      async readEvents(roomId, opts = {}) {
         const r = room(roomId);
         if (r.members.get(userId) !== 'join') throw new MatrixError('M_FORBIDDEN', 'not in that room');
-        return decryptTimeline(r);
+        let evs = await decryptTimeline(r);
+        if (opts.type) evs = evs.filter((e) => e.type === opts.type || (e.decrypted === false));
+        if (opts.limit && evs.length > opts.limit) evs = evs.slice(-opts.limit);
+        return evs;
+      },
+      // Matrix: anyone may redact their OWN event; redacting someone else's needs the room's `redact` level.
+      // A redacted event stays in the timeline with its content stripped (so it can no longer be read), and the
+      // redaction is itself an event.
+      async redactEvent(roomId, eventId) {
+        const r = room(roomId);
+        if (r.members.get(userId) !== 'join') throw new MatrixError('M_FORBIDDEN', 'not in that room');
+        const target = r.timeline.find((e) => e.event_id === eventId);
+        if (!target) throw new MatrixError('M_NOT_FOUND', 'no such event');
+        if (target.sender !== userId) need(r, userId, pl(r).redact ?? 50, 'redact someone else’s event');
+        target.redacted = true;
+        if (target.content) target.content = {};
+        r.timeline.push({ event_id: '$' + id('x'), type: 'm.room.redaction', sender: userId, redacts: eventId, content: { redacts: eventId }, origin_server_ts: clock() });
+        myLog('redact', roomId, 'm.room.redaction', { redacts: eventId });
+      },
+      async getOpenIdToken() {
+        const token = 'oidc-' + id('t') + '-' + b64(rand(9)).replace(/[^A-Za-z0-9]/g, '');
+        openid.set(token, { user: userId, exp: clock() + 3600_000 });
+        return { access_token: token, token_type: 'Bearer', matrix_server_name: name, expires_in: 3600 };
       },
       // test-only: hand this device the raw ciphertext regardless of membership (what could it decrypt?)
       async _decryptAll(roomId) { return decryptTimeline(room(roomId)); },
