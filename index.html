@@ -2709,6 +2709,19 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
             <button onClick="{{ a.onClick }}" style="white-space:normal;text-align:left;background:var(--sel);border:1px solid var(--line2);border-radius:8px;padding:7px 12px;cursor:pointer;font:500 14px var(--sans);color:var(--ink)" style-hover="border-color:var(--acc)">{{ a.label }}</button>
           </sc-for>
         </div>
+        <sc-for list="{{ d.linkGroups }}" as="g" hint-placeholder-count="0">
+          <div style="display:flex;flex-direction:column;gap:6px;border-top:1px solid var(--line);padding-top:10px">
+            <span style="font:600 14px var(--sans);color:var(--mut)">{{ g.title }}</span>
+            <span style="font:400 12px/1.4 var(--sans);color:var(--dim)">{{ g.note }}</span>
+            <sc-for list="{{ g.items }}" as="it" hint-placeholder-count="0">
+              <button onClick="{{ it.onClick }}" style="white-space:normal;text-align:left;background:var(--s2);border:1px solid var(--line);border-radius:8px;padding:7px 10px;cursor:pointer;display:flex;flex-direction:column;gap:2px" style-hover="border-color:var(--acc)">
+                <span style="font:600 13px var(--mono);color:var(--acc)">{{ it.label }}</span>
+                <span style="font:400 13px/1.4 var(--sans);color:var(--ink2)">{{ it.sub }}</span>
+                <span style="font:400 12px/1.4 var(--sans);color:var(--dim)">{{ it.why }}</span>
+              </button>
+            </sc-for>
+          </div>
+        </sc-for>
         <sc-if value="{{ d.hasList }}" hint-placeholder-val="{{ false }}">
           <span style="font:600 14px var(--sans);color:var(--mut)">{{ d.listTitle }}</span>
           <sc-for list="{{ d.list }}" as="s" hint-placeholder-count="2">
@@ -5100,6 +5113,21 @@ class Component extends DCLogic {
   state = { corpus: null, added: loadAdded(), view: new URLSearchParams(location.search).has('work') ? 'ask' : 'summary', akMode: new URLSearchParams(location.search).get('work') === 'notebook' ? 'notebook' : new URLSearchParams(location.search).get('work') === 'fold' ? 'generate' : 'chat', akFocus: new URLSearchParams(location.search).get('fullscreen') === '1' || new URLSearchParams(location.search).get('work') === 'chat', akConvList: false, akNotes: {}, sel: null, f: {}, q: '', readDoc: null, showPos: false, showAdd: false, showSettings: false, draftText: '', fw: {}, note: '', theme: loadTheme(), railOpen: loadRailOpen(), segOpen: loadSegOpen(), topicsQ: '', topicsPage: 0, dragging: false, busy: '', just: null, readMode: 'original', htmlVer: 0, txAsk: null, txPrior: 'workspace', txLang: 'en', txModel: 'base', txBusy: false, txProg: '', txProgress: null, wsNewName: '', ground: { on: true, names: true, figures: true, dates: true, sentences: true }, wsRenaming: false, wsNameDraft: '', wsDeleting: false, readerRename: false, readerNameDraft: '', stripRead: { mode: 'Relate', domain: 'Interpretation', grain: 'Pattern' }, folder: null, folderDraft: '', folderRename: null, folderNameDraft: '', mxOpen: false, mxErr: '', mxBusy: false, editOpen: null, editDraft: null };
   _html = {};
 
+  // The links a contract's profile shows, from contract-links.json (made by tools/link-contracts.mjs): legislation
+  // that names its contracting party, and the contracts it replaces or is replaced by. Each says on what basis it
+  // was made. None, when the file or the entry is missing.
+  linkGroupsFor(id, A) {
+    const CL = (this._contractLinks || {})[id];
+    if (!CL) return [];
+    const open = rid => (A && A.docById && A.docById[rid]) ? () => this.read(rid) : null;
+    const rep = (r) => ({ label: r.contractNo ? 'Contract ' + r.contractNo : 'Contract', sub: String(r.title || '').slice(0, 120) + (r.expires ? ' · expires ' + r.expires : ''), why: r.why || '', onClick: open(r.id) || (() => {}) });
+    const groups = [];
+    if ((CL.replaces || []).length) groups.push({ title: 'Replaces', note: 'Inferred from successive terms of the same party, department and subject; the documents do not say "replaces".', items: CL.replaces.map(rep) });
+    if ((CL.replacedBy || []).length) groups.push({ title: 'Replaced by', note: 'Inferred in the same way.', items: CL.replacedBy.map(rep) });
+    if ((CL.legislation || []).length) groups.push({ title: 'Legislation naming this party', note: 'Matches on the party\'s name in the matter title, not on a stated link. Check each is the same agreement.',
+      items: CL.legislation.map(m => ({ label: (m.file || 'Matter') + (m.status ? ' · ' + m.status : '') + (m.intro ? ' · ' + m.intro : ''), sub: String(m.title || '').slice(0, 220), why: m.note || '', onClick: () => { try { window.open(m.url, '_blank', 'noopener'); } catch (e) {} } })) });
+    return groups;
+  }
   // Move a table column to another column's position and remember it.
   moveCol(from, to) {
     const order = this._colOrder || [];
@@ -5147,6 +5175,12 @@ class Component extends DCLogic {
       fetch(new URL('screens.json', location.href), { cache: 'no-store' }).then(r => (r.ok ? r.json() : [])).then(a => {
         this._screens = Array.isArray(a) ? a.filter(x => x && typeof x.id === 'string' && typeof x.src === 'string').map(x => ({ id: x.id, label: String(x.label || x.id), src: x.src })) : [];
         if (this._screens.length) this.setState({ screensN: this._screens.length });
+      }).catch(() => {});
+    } catch (e) {}
+    // optional contract links (legislation naming the party; replacement chains), shown on a contract's profile
+    try {
+      fetch(new URL('contract-links.json', location.href), { cache: 'no-store' }).then(r => (r.ok ? r.json() : null)).then(j => {
+        if (j && j.links && typeof j.links === 'object') { this._contractLinks = j.links; this.setState({ linksN: Object.keys(j.links).length }); }
       }).catch(() => {});
     } catch (e) {}
     this.hydrateAdded().catch(() => {});
@@ -9941,7 +9975,7 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
         facts: [{ k: doc.pubLabel ? 'Published' : 'Date', v: doc.pubLabel || (doc.year ? String(doc.year) : 'Undated') }, ...(doc.contractNo ? [{ k: 'Contract', v: doc.contractNo }] : []), ...(doc.about ? [{ k: 'About', v: doc.about }] : []), ...(doc.vendor ? [{ k: 'Vendor', v: doc.vendor }] : []), ...(doc.dept ? [{ k: 'Department', v: doc.dept }] : []), ...(doc.expires ? [{ k: 'Expires', v: doc.expires }] : []), ...((amount != null && AM) ? [{ k: 'Amount', v: AM.fmtUSD(amount) }] : (doc.amount ? [{ k: 'Amount', v: doc.amount }] : [])), ...(doc.publisher || (doc.authors && doc.authors.length) ? [{ k: 'By', v: doc.publisher || doc.authors.join(', ') }] : []), { k: 'Kind', v: [doc.kind || doc.type, doc.medium].filter(Boolean).join(' · ') || '—' }, ...(this.isLiveDoc(doc) ? [{ k: 'Read', v: 'Not readable here — kept as a link' }] : []), ...(doc.standing ? [{ k: 'Standing', v: doc.standing }] : []), ...((this._inf || {})[doc.id] ? [{ k: 'Origin', v: this._inf[doc.id].why + ' ' + A.docById[this._inf[doc.id].of].title }] : [])],
         tagTitle: 'Names in it', tags: nm.slice(0, 10).map(nameTag),
         actions: [{ label: doc.media ? 'Watch and read the transcript' : this.isLiveDoc(doc) ? 'View the page' : 'Read it', onClick: () => this.read(doc.id) }, ...((doc.recordings || []).map(r => ({ label: r.label + ' ↗ (not transcribed)', onClick: () => window.open(r.url, '_blank', 'noopener') }))), ...(doc.url ? [{ label: 'Open original ↗', onClick: () => window.open(doc.url, '_blank', 'noopener') }] : []), { label: f.doc === doc.id ? 'Stop narrowing to this source' : 'Narrow everything to this source', onClick: () => this.setF('doc', f.doc === doc.id ? null : doc.id) }],
-        listTitle: 'Its statements', list: listOf(sts) };
+        listTitle: 'Its statements', list: listOf(sts), linkGroups: this.linkGroupsFor(doc.id, A) };
     } else if (sel.type === 'unit') {
       const items = A.sts.flatMap(st => st.figs.filter(g => g.unit === sel.id).map(g => ({ g, st })));
       const docs = new Set(items.map(x => x.st.doc)); const vals = new Set(items.map(x => x.g.value));
@@ -9956,6 +9990,7 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
         tagTitle: 'Open either', tags: [nameTag(a), nameTag(b)], actions: [], listTitle: 'Where they appear together', list: listOf(sts) };
     }
     if (!d) return none;
+    if (!d.linkGroups) d.linkGroups = [];
     if (narrowed) { d.hasScope = true; d.scope = 'Narrowed to ' + chips.map(c => c.k.toLowerCase() + ' ' + c.v).join(' · ');
       if (scopeN) { d.scopeCount = scopeN.k + ' of ' + scopeN.n + ' match your filters'; d.listTitle = (d.listTitle || '') + ' · ' + scopeN.k + ' of ' + scopeN.n + ' in view'; }
       else { const inV = sel.type === 'statement' ? Fs.has(sel.id) : null; d.scopeCount = inV === false ? 'Outside your filters' : inV ? 'Matches your filters' : 'Filters active'; } }
