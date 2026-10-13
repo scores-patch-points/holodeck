@@ -5313,6 +5313,7 @@ class Component extends DCLogic {
     document.addEventListener('click', e => { if (this._colDragJustEnded && hdr(e.target)) { e.stopPropagation(); e.preventDefault(); } }, true);
   }
   componentDidMount() {
+    setTimeout(() => { this.openFromUrl(); this._urlReady = true; this.urlSync(); }, 0);
     this.installColDrag();
     // optional extra screens: a deployment lists whole pages in screens.json and they join the sidebar; absent or
     // invalid means no change at all
@@ -5374,7 +5375,7 @@ class Component extends DCLogic {
     window.addEventListener('resize', go);
     window.addEventListener('scroll', go, { passive: true });
   }
-  componentDidUpdate() { try { this.paintExtracted(); } catch (e) {} try { const c = this.corpusId(); if (c !== this._wsSeen) { this._wsSeen = c; touchWs(c); } } catch (e) {} this.installFill(); this.fitFill(); this.syncOverview(); this.syncInbox(); this.applyTheme(); this.measureHdr(); try { const ff = document.getElementById('fold-folder-input'); if (ff && !ff.multiple) { ff.webkitdirectory = true; ff.setAttribute('webkitdirectory', ''); ff.multiple = true; ff.setAttribute('multiple', ''); } } catch (e) {} if (this._prevCorpus !== this.state.corpus || this._prevAdded !== this.state.added) { this._prevCorpus = this.state.corpus; this._prevAdded = this.state.added; this.loadHtml(); this.akAutoLoad(); } const rd0 = this.state.readDoc && this.analysis().docById[this.state.readDoc]; if (rd0 && rd0.media && rd0.media.kind === 'local') { this.ensureMediaUrl(rd0);
+  componentDidUpdate() { try { this.urlSync(); } catch (e) {} try { this.paintExtracted(); } catch (e) {} try { const c = this.corpusId(); if (c !== this._wsSeen) { this._wsSeen = c; touchWs(c); } } catch (e) {} this.installFill(); this.fitFill(); this.syncOverview(); this.syncInbox(); this.applyTheme(); this.measureHdr(); try { const ff = document.getElementById('fold-folder-input'); if (ff && !ff.multiple) { ff.webkitdirectory = true; ff.setAttribute('webkitdirectory', ''); ff.multiple = true; ff.setAttribute('multiple', ''); } } catch (e) {} if (this._prevCorpus !== this.state.corpus || this._prevAdded !== this.state.added) { this._prevCorpus = this.state.corpus; this._prevAdded = this.state.added; this.loadHtml(); this.akAutoLoad(); } const rd0 = this.state.readDoc && this.analysis().docById[this.state.readDoc]; if (rd0 && rd0.media && rd0.media.kind === 'local') { this.ensureMediaUrl(rd0);
       // A recording opened but never classified gets its sound map on first sight (an
       // older stored recording, or one added before the classifier existed); the work
       // is the same in-browser rung, guarded so it happens once until it lands.
@@ -9741,9 +9742,9 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
       const p = level; const n1 = applyList(acts.rep, p / third), n2 = applyList(acts.typ, (p - third) / third), n3 = applyList(acts.clean, (p - 2 * third) / third);
       const t = p / 100; doc.style.background = 'rgb(' + [255 - 22 * t, 255 - 9 * t, 255 - 15 * t].map(Math.round).join(',') + ')';
       st.textContent = FR === undefined ? 'Folding against the rest of the sample…' : FR === null ? 'No priors for the folded reading yet: run node tools/build-ocr-priors.mjs.'
-        : 'Repairs ' + n1 + ' of ' + acts.rep.length + ' · engine reading ' + n2 + ' of ' + acts.typ.length + (FR.engine ? ' (' + FR.engine + ')' : '') + ' · cleaned ' + n3 + ' of ' + acts.clean.length + '. Right of centre the page tints; all the way right clears stray glyphs. Point at a marked word for what vouches for it.';
+        : 'Repairs ' + n1 + ' of ' + acts.rep.length + ' · engine reading ' + (FR.typed === undefined && !FR.engine ? 'in progress' : n2 + ' of ' + acts.typ.length) + (FR.engine ? ' (' + FR.engine + ')' : '') + ' · cleaned ' + n3 + ' of ' + acts.clean.length + '. Right of centre the page tints; all the way right clears stray glyphs. Point at a marked word for what vouches for it.';
     };
-    rng.oninput = () => { level = +rng.value; this._foldP = level; applyLevel(); };
+    rng.oninput = () => { level = +rng.value; this._foldP = level; applyLevel(); this.urlSync(); };
     let pi = 0;
     const step = () => { if (el._extKey !== key) return;
       const end = Math.min(rec.length, pi + 3);
@@ -9757,6 +9758,36 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
     try { if (el._extRo) el._extRo.disconnect(); let w0 = el.clientWidth; let tm = null;
       el._extRo = new ResizeObserver(() => { if (Math.abs(el.clientWidth - w0) < 60) return; w0 = el.clientWidth; clearTimeout(tm); tm = setTimeout(() => this._extRepaint(), 250); });
       el._extRo.observe(el); } catch (e) {}
+  }
+  // The address bar names what is on screen, beside any other parameters:
+  //   ?doc=<contract id>&view=original|map|extracted[&level=0..100]    the reader, its tab, and the Extracted fold level
+  //   ?layout=table                                                    the sources table (grid is the default)
+  // A URL opens straight to that contract and view; the bar follows the page with replaceState, so Back keeps its own meaning.
+  urlSync() {
+    if (!this._urlReady) return;
+    try {
+      const S = this.state, u = new URL(location.href), q = u.searchParams, reader = S.view === 'reader' && S.readDoc;
+      const VM = { original: 'original', map: 'map', restated: 'extracted', reading: 'reading', figures: 'figures', summary: 'summary', plain: 'plain' };
+      const want = { doc: reader ? S.readDoc : null, view: reader ? (VM[S.readMode] || 'original') : null,
+        level: reader && S.readMode === 'restated' && this._foldP != null && Math.round(this._foldP) !== 100 ? String(Math.round(this._foldP)) : null,
+        layout: !reader && S.svMode === 'table' ? 'table' : null };
+      let changed = false;
+      for (const [k, v] of Object.entries(want)) { const cur = q.get(k);
+        if (v == null) { if (cur != null) { q.delete(k); changed = true; } } else if (cur !== v) { q.set(k, v); changed = true; } }
+      if (changed) history.replaceState(history.state, '', u.pathname + (q.toString() ? '?' + q.toString() : '') + u.hash);
+    } catch (e) { /* the address bar is a convenience; never break the page for it */ }
+  }
+  openFromUrl() {
+    try {
+      const q = new URL(location.href).searchParams, id = q.get('doc'), layout = q.get('layout');
+      if (layout === 'table') this.setState({ svMode: 'table' });
+      if (!id) return;
+      const A = this.analysis(); if (!A || !A.docById || !A.docById[id]) return;
+      const MV = { original: 'original', map: 'map', extracted: 'restated', reading: 'reading', figures: 'figures', summary: 'summary', plain: 'plain' };
+      const lv = q.get('level'); if (lv != null && lv !== '' && isFinite(+lv)) this._foldP = Math.max(0, Math.min(100, +lv));
+      this.read(id);
+      const m = MV[q.get('view')]; if (m) this.setState({ readMode: m });
+    } catch (e) { /* an unknown contract in the URL just opens the page */ }
   }
   // The folded reading. Priors are what the REST of the sample established (tools/build-ocr-priors.mjs); the fold is
   // holodeck-fold.js: exact, then near-miss through the engine's own comparator, then the neighbours as witnesses, and a tie
@@ -9796,7 +9827,7 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
     });
     let got = null;
     for (const host of hdEngineHosts()) {
-      const ctl = new AbortController(), timer = setTimeout(() => ctl.abort(), 45000);
+      const ctl = new AbortController(), timer = setTimeout(() => ctl.abort(), 150000);   // 60,000 characters take the engine ~40 s
       try { const r = await fetch(host + '/v1/read', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ name: d.title || tok, text: text.slice(0, 60000) }), signal: ctl.signal });
         const j = await r.json(); if (r.ok && j.schema === 'EORead@1') { got = { host, read: j }; break; } } catch (e) { /* next host */ } finally { clearTimeout(timer); }
     }

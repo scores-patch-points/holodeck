@@ -143,3 +143,12 @@ wide gaps in a justified scan line are the printer's, not the document's: set th
 what the layout actually says (centring, indents, relative size, blank space between blocks), and run the pages
 together as one continuous scroll. A glyph like ¢ or ⌟ inside a date or an amount is cleaned off it, not the token
 deleted; only what has no word or number left is dropped.
+
+## 22. Check a repair against the scan, and let the address say what is on screen
+
+A repair that looks right in context is not a repair that is right: of five sampled in one contract, three matched
+the scan, one was a handwritten "Government" turned into "event" by a generic phrase, and one appended an accent as if
+it were punctuation. Crop the page from the PDF at the OCR's own resolution (these were built at 150 dpi) and look. A
+box several times the page's type height is handwriting, not a word to repair. Letters are \p{L}, not [A-Za-z].
+The address bar is part of the interface: ?doc=<contract>&view=original|map|extracted[&level=] opens straight to that
+contract and view and follows the page with replaceState, so a copied URL reproduces what you were looking at.
