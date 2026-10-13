@@ -3581,6 +3581,23 @@ async function hdEngineRead(name, text) {
   }
   HD_ENG.downAt = Date.now(); return null;
 }
+// THE SOURCES READ TOGETHER. The engine's own reading across a workspace (POST /v1/read-across): which source names
+// which, what the named text holds that the naming source never writes, what is spoken of and held by no source.
+// The surface only asks and draws; it holds no cue word. One call per set of sources, cached by their identity.
+async function hdReadAcross(docs) {
+  if (!HD_ENG.url && Date.now() - HD_ENG.downAt < 60000) return null;
+  const body = JSON.stringify({ documents: docs.map(d => ({ id: d.id, title: d.title, text: d.text })) });
+  for (const host of hdEngineHosts()) {
+    const ctl = new AbortController(), timer = setTimeout(() => ctl.abort(), 60000);
+    try {
+      const r = await fetch(host + '/v1/read-across', { method: 'POST', headers: { 'content-type': 'application/json' }, body, signal: ctl.signal });
+      if (!r.ok) continue;
+      const j = await r.json(); if (j.schema !== 'EOReadAcross@1') continue;
+      return j;
+    } catch (e) { /* try the next host */ } finally { clearTimeout(timer); }
+  }
+  return null;
+}
 const hdEngineCompact = (host, r) => ({ host, ms: Math.round(r.ms), basis: r.basis || null, sentences: r.sentences.length, relations: r.relations.length, referents: r.referents.map(x => ({ surfaces: x.surfaces, routes: x.routes, grain: x.grain || null })).concat(r.descriptorBeings.map(b => ({ surfaces: b.surfaces, routes: ['descriptor'], grain: null }))) });
 const HD_ENGM = new WeakMap();
 function hdEngineMap(eng) { let m = HD_ENGM.get(eng); if (m) return m; m = new Map(); eng.referents.forEach(r => r.surfaces.forEach(sf => { const k = sf.toLowerCase(); if (!m.has(k)) m.set(k, { surface: sf, routes: r.routes, grain: r.grain }); })); HD_ENGM.set(eng, m); return m; }
@@ -5354,10 +5371,10 @@ class Component extends DCLogic {
     const A = this.analysis(); const ev = this.linkEvents();
     const key = this.linkKey(A, ev);
     if (this._lkSet && this._lkKey === key) return this._lkSet;
-    const bk = this._key + '|' + (this._contractLinks ? 1 : 0) + '|' + A.docs.length;
+    const bk = this._key + '|' + (this._contractLinks ? 1 : 0) + '|' + A.docs.length + '|' + (this._readAcross ? this._readAcrossKey : '');
     if (!this._lkBase || this._lkBaseKey !== bk) {
       this._lkBaseKey = bk; let C;
-      try { C = LM.R.collect(A, { contractLinks: this._contractLinks ? { links: this._contractLinks } : null, origins: this.inferOrigins(A), budget: 1.5e6 }); }
+      try { C = LM.R.collect(A, { contractLinks: this._contractLinks ? { links: this._contractLinks } : null, origins: this.inferOrigins(A), budget: 1.5e6, readAcross: this._readAcross || null }); }
       catch (e) { C = { links: [], weak: [], unresolved: [], truncated: false, coverage: null, error: String((e && e.message) || e) }; }
       this._lkBase = C;
     }
@@ -5366,11 +5383,24 @@ class Component extends DCLogic {
     this._lkKey = key; this._lkTally = null;
     return (this._lkSet = { ...C, links: [...byId.values()], rejected: main.rejected, weak: wk.links.filter(L => L.provenance !== 'confirmed'), decisions: ev, ver: key });
   }
-  linkKey(A, ev) { return this._key + '|' + ev.length + '|' + (this._contractLinks ? 1 : 0) + '|' + A.docs.length; }
+  linkKey(A, ev) { return this._key + '|' + ev.length + '|' + (this._contractLinks ? 1 : 0) + '|' + A.docs.length + '|' + (this._readAcross ? this._readAcrossKey : ''); }
+  // ask the engine to read the sources together, off the render path, once per set of sources
+  askReadAcross(A) {
+    if (A.docs.length < 2) return;
+    const key = A.docs.map(d => d.id + ':' + (d.text || '').length).sort().join('|');
+    if (this._raKey === key || this._raBusy) return;
+    this._raBusy = true; this._raKey = key;
+    hdReadAcross(A.docs.filter(d => d.text && d.text.trim())).then(res => {
+      this._raBusy = false;
+      if (!res || this._raKey !== key) return;
+      this._readAcross = res; this._readAcrossKey = key; this._lkBase = null; this._lkSet = null; this.forceUpdate();
+    }).catch(() => { this._raBusy = false; });
+  }
   // compute the set once per analysis, off the render path, so tiles and the rail count have it without a link view open
   ensureLinks() {
     const LM = this.linkMods(); if (!LM || this._lkSched) return;
     const A = this.analysis(); if (!A.docs.length) return;
+    try { this.askReadAcross(A); } catch (e) { /* the engine is optional: the surfaces stand without it */ }
     if (this._lkSet && this._lkKey === this.linkKey(A, this.linkEvents())) return;
     this._lkSched = setTimeout(() => { this._lkSched = null; try { this.linkSet(); } catch (e) { this._lkErr = e; } this.forceUpdate(); }, 120);
   }

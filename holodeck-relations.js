@@ -259,7 +259,7 @@ export function bagOf(st) {
   vals.forEach(v => { toks.add(v.token); toks.add('u:' + v.key); });                    // the value, and the kind of value it is
   return { toks, vals };
 }
-export function buildIndex(A, { onlyDocs = null } = {}) {
+export function buildIndex(A, { onlyDocs = null, cues = false } = {}) {
   const docs = (A.docs || []).filter(d => !onlyDocs || onlyDocs.has(d.id));
   const sts = []; const byDoc = new Map();
   for (const d of docs) {
@@ -283,7 +283,8 @@ export function buildIndex(A, { onlyDocs = null } = {}) {
   const vocab = [...df.keys()].sort(); const cum = new Float64Array(vocab.length); let tot = 0;
   vocab.forEach((t, i) => { tot += df.get(t); cum[i] = tot; });
   const draw = u => { const x = u * tot; let lo = 0, hi = vocab.length - 1; while (lo < hi) { const m = (lo + hi) >> 1; if (cum[m] < x) lo = m + 1; else hi = m; } return vocab[lo]; };
-  return { docs, sts, byDoc, info, df, N, idf, inv, score, draw, vocabSize: vocab.length };
+  // `cues` switches on the findings that read English negators (a denial). Off by default: no cue list runs unless asked.
+  return { docs, sts, byDoc, info, df, N, idf, inv, score, draw, vocabSize: vocab.length, cues: !!cues };
 }
 // A fixed-seed generator so the null is the same on every run (no clock, no Math.random).
 function lcg(seed) { let x = (seed >>> 0) || 1; return () => (x = (Math.imul(x, 1664525) + 1013904223) >>> 0) / 4294967296; }
@@ -414,7 +415,9 @@ const clipTo = (t, n) => { t = String(t || '').replace(/\s+/g, ' ').trim(); retu
 function negIn(text) { NEG_CUE.lastIndex = 0; const m = NEG_CUE.exec(text || ''); return m ? { raw: m[0], at: m.index } : null; }
 export function sharedTerms(ix, aId, bId, max = 4) {
   const P = ix.info.get(aId), Q = ix.info.get(bId); if (!P || !Q) return [];
-  const out = []; P.toks.forEach((t) => { if (Q.toks.has(t) && /^[\p{L}][\p{L}'’-]*$/u.test(t)) { const w = ix.idf(t); if (w > 0) out.push([t, w]); } });
+  // words that carry something in this workspace (in fewer than half its statements, four letters or more): a pair that
+  // shares only "on", "this" and "the" shares nothing worth marking
+  const out = []; P.toks.forEach((t) => { if (Q.toks.has(t) && distinctive(ix, t)) { const w = ix.idf(t); if (w > 0) out.push([t, w]); } });
   return out.sort((x, y) => y[1] - x[1] || (x[0] < y[0] ? -1 : 1)).slice(0, max).map((x) => x[0]);
 }
 export function marksFor(st, terms) {
@@ -434,12 +437,12 @@ export function findingFor(ix, a, b, verdictInfo) {
     return { kind: 'differs', headline: 'Different figures for the same thing: “' + x + '” here, “' + y + '” there', terms, marks: { from: [[via[0].s, via[0].e]].concat(ma), to: [[via[1].s, via[1].e]].concat(mb) } };
   }
   const na = negIn(a.text), nb = negIn(b.text);
-  if (!!na !== !!nb && terms.length) {
+  if (ix.cues && !!na !== !!nb && terms.length) {
     const den = na ? a : b, sta = na ? b : a, md = na ? ma : mb, ms = na ? mb : ma;
     return { kind: 'polarity', headline: 'One denies what the other states, over ' + terms.slice(0, 3).join(', ') + ': “' + around(den, md) + '” against “' + around(sta, ms) + '”', terms, marks: { from: ma, to: mb }, denier: na ? 'from' : 'to' };
   }
   if (verdict === 'same' && via) return { kind: 'same', headline: 'Both state “' + via[0].raw + '”' + (terms.length ? ', over ' + terms.slice(0, 3).join(', ') : ''), terms, marks: { from: [[via[0].s, via[0].e]].concat(ma), to: [[via[1].s, via[1].e]].concat(mb) } };
-  if (terms.length) return { kind: 'terms', headline: 'Both address ' + terms.join(', '), terms, marks: { from: ma, to: mb } };
+  if (terms.length >= 2) return { kind: 'terms', headline: 'Both address ' + terms.join(', '), terms, marks: { from: ma, to: mb } };
   return null;
 }
 // A definition writes its examples into its own text: '"Surveillance technology" includes: automatic license plate
@@ -475,130 +478,53 @@ export function definedLinks(A, ix) {
   return links;
 }
 
-// ── scope: what a resolution approves against what the exhibit it attaches contains ───────────────────────────────────
-// A resolution says in a sentence or two what it accepts, and attaches the thing itself ("a copy of which is attached
-// hereto and incorporated herein"). The attached text can be much larger than the sentence that approves it. The finding
-// is the difference, in the exhibit's own headings: entries whose distinctive words the resolution never writes. When a
-// third source raises one of those words, the entry is what "came to light", and it is said first.
-//   declares  a statement with an attachment cue, whose other words name exactly one other source (≥ 2 shared words
-//             with that source's title or opening)
-//   entries   heading-like lines of the exhibit: 2–12 words, set apart by capitals, not a sentence
-//   head      a word of an entry that is in few entries (≤ √entries): "drone" heads one entry; "solutions" is in half
-//   omitted   an entry with a head word that is nowhere in the resolution's own source
-const ATTACH = /\b(?:attached\s+(?:hereto|here)|incorporated\s+(?:herein|by\s+reference)|(?:the\s+)?attached\s+(?:exhibit|attachment|agreement|contract)|see\s+(?:the\s+)?(?:exhibit|attachment))\b/i;
-const MINOR = /^(?:and|of|for|with|the|to|in|on|or|a|an|&|by|at|as)$/i;
-// a heading has no finite verb: shouted legalese (“… WILL NOT, UNDER ANY CIRCUMSTANCES, BE LIABLE …”) is a sentence
-const AUX = /\b(?:will|shall|may|must|can|is|are|was|were|be|been|not|any|such|if|unless)\b/i;
-// a statement that points at the exhibit itself, not merely at the subject it is about
-const DEIXIS = /\b(?:in|within|inside|under|of|from|on)\s+(?:this|the|that)\s+(?:exhibit|contract|agreement|attachment|master\s+agreement)\b|\bthis\s+(?:exhibit|contract|attachment)\b/i;
-const CUE_STEMS = new Set(['exhibit', 'contract', 'agreement', 'attachment', 'master']);
-const stemW = (w) => w.replace(/['’]s$/, '').replace(/ies$/, 'y').replace(/s$/, '');
-const stems = (t) => (lower(t).replace(/['’]s\b/g, '').match(/\p{L}{4,}/gu) || []).map(stemW);
-function entriesOf(text) {
-  const out = []; let off = 0;
-  for (const raw of String(text || '').split('\n')) {
-    const lead = /^\s*(?:(?:[a-z]\.|\(\w{1,4}\)|\d+[.)])\s+)?/i.exec(raw)[0];
-    const body = raw.slice(lead.length).replace(/[;,]\s*$/, '').trimEnd();
-    const ws = body.split(/\s+/).filter(Boolean);
-    if (ws.length >= 2 && ws.length <= 12 && body.length <= 110 && /^\p{Lu}/u.test(body) && !/[.:?!]$/.test(body) && !AUX.test(body) && !(ws.length > 3 && !/\p{Ll}/u.test(body)) && /^[\p{L}\p{N}\s,'’&/()#.-]+$/u.test(body)) {
-      const major = ws.filter((w) => !MINOR.test(w)); const cap = major.filter((w) => /^\p{Lu}/u.test(w)).length;
-      if (major.length >= 2 && cap >= 0.75 * major.length) out.push({ s: off + lead.length, e: off + lead.length + body.length, text: body });
+// ── the engine's reading across sources ─────────────────────────────────────────────────────────────────────────────
+// What the sources establish TOGETHER is read by the engine (POST /v1/read-across: native/the-fold/read-across.js),
+// not here. This module only turns its answer into links: it holds no cue word of any language. The engine returns
+//   findings    licensed: they cleared a null (a source names another by carrying its title; a set of omissions that
+//               independent sources would not share by chance)
+//   candidates  held below the line: a form the named text holds that the naming source never writes and other sources
+//               return to, a thing spoken of in several modified ways that no source says
+// and every mark is a UTF-16 index into the document exactly as sent. A candidate is an `inferred` link, never more.
+const clipText = (t, n) => { t = String(t || '').replace(/\s+/g, ' ').trim(); return t.length > n ? t.slice(0, n - 1).trimEnd() + '…' : t; };
+export function importReadAcross(A, result) {
+  if (!result || result.schema !== 'EOReadAcross@1') return [];
+  const have = new Set((A.docs || []).map((d) => d.id));
+  const title = (id) => { const d = (A.docs || []).find((x) => x.id === id); return d ? d.title || d.id : id; };
+  const links = []; const inRange = (m) => m && have.has(m.doc) && Number.isFinite(m.s) && Number.isFinite(m.e) && m.e > m.s;
+  const marksOf = (list, doc) => (list || []).filter((m) => inRange(m) && m.doc === doc).map((m) => [m.s, m.e]);
+  const all = (result.findings || []).map((f) => ({ ...f, licensed: true })).concat((result.candidates || []).map((f) => ({ ...f, licensed: false })));
+  // the naming statement per (from, to): where a left-out summary hangs
+  const naming = new Map();
+  for (const f of all) if (f.kind === 'names' && f.licensed && f.statements && f.statements[0]) naming.set(f.from + '>' + f.to, f.statements[0]);
+  // the strongest pair first, and the forms the other sources return to most; a handful per pair, the rest stay with the engine
+  const perPair = new Map();
+  const ordered = all.slice().sort((x, y) => (y.namesMargin || 0) - (x.namesMargin || 0) || (y.licensed - x.licensed) || (y.attention || 0) - (x.attention || 0));
+  for (const f of ordered) {
+    if (f.kind === 'left-out') { const k = f.from + '>' + f.to; const n = perPair.get(k) || 0; if (n >= 6) continue; perPair.set(k, n + 1); }
+    if (f.kind === 'names') {
+      if (!f.licensed || !have.has(f.from) || !have.has(f.to) || !f.statements || !f.statements.length) continue;
+      const st = f.statements[0];
+      links.push(makeLink({ relation: 'says-about', from: charSpan(f.from, st.s, st.e), to: wholeSpan(f.to), provenance: 'computed', source: 'engine',
+        why: 'The engine reads this passage as naming “' + title(f.to) + '”: ' + f.basis + '.',
+        finding: { kind: 'names', headline: '“' + clipText(st.text, 130) + '” names “' + clipText(title(f.to), 70) + '”', terms: [], marks: { from: marksOf(f.marks, f.from), to: [] }, basis: f.basis } }));
+    } else if (f.kind === 'left-out') {
+      if (!have.has(f.from) || !have.has(f.to) || !f.where || !(f.raised || []).length) continue;
+      const r0 = f.raised[0]; const mk = (f.marks || []).find((m) => m.role === 'raised' && m.doc === r0.doc);
+      if (!mk || !inRange(mk) || !have.has(r0.doc)) continue;
+      const mine = (f.marks || []).find((m) => m.role === 'in-source' && m.doc === f.to);
+      links.push(makeLink({ relation: 'says-about', from: charSpan(r0.doc, mk.s, mk.e), to: charSpan(f.to, f.where.s, f.where.e), provenance: f.licensed ? 'computed' : 'inferred', source: 'engine',
+        why: f.basis + (f.set ? ' — ' + f.set : '') + '.',
+        finding: { kind: 'scope', headline: '“' + f.form + '” is in “' + clipText(title(f.to), 60) + '” and is raised here; “' + clipText(title(f.from), 60) + '” names that text and never writes it' + (f.licensed ? '' : ' (not licensed: ' + (f.set || 'below the line') + ')'),
+          terms: [f.form], marks: { from: [[mk.s, mk.e]], to: mine && inRange(mine) ? [[mine.s, mine.e]] : [] }, licensed: f.licensed, attendedBy: f.attendedBy } }));
+    } else if (f.kind === 'absent') {
+      const heldBy = (f.heldBy || []).find((id) => have.has(id)); const at = f.phrases && f.phrases[0] && f.phrases[0].at;
+      if (!have.has(f.from) || !heldBy || !at) continue;
+      links.push(makeLink({ relation: 'says-about', from: charSpan(f.from, at.s, at.e), to: wholeSpan(heldBy), provenance: 'inferred', source: 'engine',
+        why: f.basis + '.',
+        finding: { kind: 'absent', headline: 'Spoken of as ' + f.phrases.map((p) => '“' + p.phrase + '”').slice(0, 4).join(', ') + '; no source says any of them, though ' + (f.heldBy.length === 1 ? 'one says' : f.heldBy.length + ' say') + ' “' + f.form + '”',
+          terms: f.phrases.map((p) => p.phrase), marks: { from: marksOf(f.marks, f.from).slice(0, 6), to: [] }, licensed: false } }));
     }
-    off += raw.length + 1;
-  }
-  return out;
-}
-export function scopeLinks(A, ix) {
-  const links = []; const docText = new Map((A.docs || []).map((d) => [d.id, d])); const stemCache = new Map();
-  const stemsOf = (st) => { if (!stemCache.has(st.id)) stemCache.set(st.id, new Set(stems(st.text))); return stemCache.get(st.id); };
-  const chosen = new Map(); // one finding per (resolution source, exhibit): the operative paragraph if there is one
-  const pending = new Map();
-  const paragraphAt = (text, pos) => { const a = text.lastIndexOf('\n\n', pos); const b = text.indexOf('\n\n', pos); return [a < 0 ? 0 : a + 2, b < 0 ? text.length : b]; };
-  for (const D of ix.sts) {
-    const am = ATTACH.exec(D.text || ''); if (!am) continue;
-    const dd = docText.get(D.doc); if (!dd) continue;
-    const [p0, p1] = paragraphAt(String(dd.text || ''), D.s || 0); const para = String(dd.text || '').slice(p0, p1);
-    const own = new Set(stems(para.replace(ATTACH, ' ')));
-    let best = null, tie = false;
-    for (const d of A.docs || []) {
-      if (d.id === D.doc) continue;
-      const head = new Set(stems((d.title || '') + ' ' + String(d.text || '').slice(0, 600)));
-      let n = 0; own.forEach((w) => { if (head.has(w)) n++; });
-      if (n >= 2) { if (!best || n > best.n) { best = { d, n }; tie = false; } else if (n === best.n) tie = true; }
-    }
-    if (!best || tie) continue;
-    const B = best.d, Adoc = dd;
-    const ck = D.doc + '>' + B.id, operative = /\b(?:approv|accept|adopt|authoriz)/i.test(para);
-    if (chosen.has(ck) && (chosen.get(ck) || !operative)) continue; chosen.set(ck, operative); pending.delete(ck);
-    const vocabA = new Set(stems(Adoc.text));
-    const ents = entriesOf(B.text); if (ents.length < 4) continue;
-    const edf = new Map(); ents.forEach((e) => { e.words = [...new Set(stems(e.text))]; e.words.forEach((w) => edf.set(w, (edf.get(w) || 0) + 1)); });
-    const cap = Math.max(1, Math.floor(Math.sqrt(ents.length)));
-    const om = [];
-    for (const e of ents) {
-      const miss = e.words.filter((w) => !vocabA.has(w) && edf.get(w) <= cap);
-      if (miss.length) om.push({ ...e, miss });
-    }
-    if (!om.length) continue;
-    // raised: a statement in another source that points AT the exhibit ("in this exhibit, there are drones…") and names
-    // a word of one of these entries. That is a claim about the exhibit, and the exhibit can be read to check it: the
-    // word is there, in that heading, and the resolution never writes it. No rate is involved; the claim is verified.
-    om.forEach((e) => {
-      for (const S of ix.sts) {
-        if (S.doc === D.doc || S.doc === B.id || !DEIXIS.test(S.text || '')) continue;
-        const have = new Set(stems((S.text || '').replace(new RegExp(DEIXIS.source, 'ig'), ' '))); const w = e.miss.find((x) => have.has(x) && !CUE_STEMS.has(x));
-        if (w) { e.raised = { st: S, word: w }; break; }
-      }
-    });
-    om.sort((x, y) => (x.raised ? 0 : 1) - (y.raised ? 0 : 1) || x.s - y.s);
-    const raisedEnts = om.filter((e) => e.raised);
-    const shown = (raisedEnts.length ? raisedEnts : om).slice(0, 5); const rest = om.length - shown.length;
-    const list = shown.map((e) => '“' + clipTo(e.text, 60) + '”').join(', ');
-    const n = om.length;
-    const main = makeLink({ relation: 'says-about', from: charSpan(D.doc, D.s, D.e), to: wholeSpan(B.id), provenance: 'computed', source: 'scope',
-      why: 'The resolution approves the attached text; the attached text has ' + n + ' heading' + (n === 1 ? '' : 's') + ' the resolution never names.',
-      finding: { kind: 'scope', headline: 'Approves the attached text as “' + clipTo(para.replace(/\s+/g, ' '), 110) + '” — ' + (raisedEnts.length ? 'the attachment is raised elsewhere as containing ' : 'the attachment also lists ') + list + (rest > 0 ? ', and ' + rest + ' other heading' + (rest === 1 ? '' : 's') : '') + ' the resolution never names',
-        terms: shown.flatMap((e) => e.miss).slice(0, 6), omitted: om.length, entries: ents.length,
-        marks: { from: [[D.s + am.index, D.s + am.index + am[0].length]], to: shown.map((e) => [e.s, e.e]) } } });
-    const group = [main];
-    // and each entry another source raises is its own finding, from the place it was raised
-    om.filter((e) => e.raised).slice(0, 8).forEach((e) => {
-      const S = e.raised.st; const w = e.raised.word;
-      const re = new RegExp('\\b' + escRe(w.slice(0, Math.max(4, w.length - 1))) + '[\\p{L}\\p{N}]*', 'iu'); const mm = re.exec(S.text || ''); if (!mm) return;
-      const a0 = (S.s || 0) + mm.index, a1 = a0 + mm[0].length;
-      group.push(makeLink({ relation: 'says-about', from: valueSpan(S.doc, a0, a1, 0, 'omitted-term', mm[0]), to: charSpan(B.id, e.s, e.e), provenance: 'computed', source: 'scope',
-        why: '“' + w + '” is in the exhibit’s heading “' + e.text + '” and raised here; the resolution never uses the word.',
-        finding: { kind: 'scope', headline: '“' + mm[0] + '” is raised here and is in the attachment as “' + clipTo(e.text, 80) + '” — the resolution never names it',
-          terms: [w], marks: { from: [[a0, a1]], to: [[e.s, e.e]] }, resolution: D.doc } }));
-    });
-    pending.set(ck, group);
-  }
-  pending.forEach((g) => links.push(...g));
-  return links;
-}
-
-// ── absent: a source says a document is not available, and no source here is that document ───────────────────────────
-// "The existing contract is not on a government website", "we've had no public documentation of the contract for 17
-// years". The link goes from that statement to the document of that kind the workspace does hold, and says it is not the
-// one being asked about. The claim is about the workspace: nothing here is the earlier document.
-const PRIOR = /\b(existing|prior|previous|former|last|earlier|expired|old)\s+(contract|agreement|resolution|legislation|ordinance|lease)s?\b/i;
-const UNAVAIL = /\b(?:not\s+(?:on|available|posted|online|public|in)\b|isn['’]t\s+(?:on|available)|no\s+(?:public\s+)?(?:documentation|record|copy)|without\s+a\s+(?:contract|copy)|destroyed|can['’]t\s+(?:find|get|see)|(?:don['’]t|do\s+not)\s+have)\b/i;
-const KIND = { contract: /\b(?:contract|agreement)\b/i, agreement: /\b(?:contract|agreement)\b/i, resolution: /\b(?:resolution|legislation)\b/i, legislation: /\b(?:resolution|legislation|ordinance)\b/i, ordinance: /\b(?:ordinance|code)\b/i, lease: /\blease\b/i };
-export function absentLinks(A, ix) {
-  const links = []; const seen = new Set();
-  for (const S of ix.sts) {
-    const pm = PRIOR.exec(S.text || ''); if (!pm) continue;
-    const um = UNAVAIL.exec(S.text || ''); if (!um) continue;
-    const kind = KIND[lower(pm[2])]; if (!kind) continue;
-    const held = (A.docs || []).filter((d) => d.id !== S.doc && kind.test(d.title || ''));
-    if (!held.length) continue;
-    const B = held[0];
-    const key = S.id + '>' + B.id; if (seen.has(key)) continue; seen.add(key);
-    const p0 = (S.s || 0) + pm.index, p1 = p0 + pm[0].length, u0 = (S.s || 0) + um.index, u1 = u0 + um[0].length;
-    links.push(makeLink({ relation: 'says-about', from: charSpan(S.doc, S.s, S.e), to: wholeSpan(B.id), provenance: 'inferred', source: 'absent',
-      why: 'Says the ' + lower(pm[1]) + ' ' + lower(pm[2]) + ' is not available; the ' + lower(pm[2]) + ' this workspace holds is “' + (B.title || B.id) + '”.',
-      finding: { kind: 'absent', headline: 'Says the ' + lower(pm[1]) + ' ' + lower(pm[2]) + ' is not available — nothing here is that ' + lower(pm[2]) + '; the one that is here is “' + clipTo(B.title || B.id, 80) + '”',
-        terms: [lower(pm[1]) + ' ' + lower(pm[2])], marks: { from: [[p0, p1], [u0, u1]].sort((x, y) => x[0] - y[0]), to: [] } } }));
   }
   return links;
 }
@@ -731,11 +657,14 @@ function verdictOfBags(P, Q) {
 }
 
 // ── the whole set, with a reader's decisions applied ────────────────────────────────────────────────────────────
-export function collect(A, { contractLinks = null, origins = null, inferred = true, budget } = {}) {
+export function collect(A, { contractLinks = null, origins = null, inferred = true, budget, readAcross = null, cues = false } = {}) {
   const cites = importCitations(A);
   const base = [].concat(importCues(A), importAlignment(A), cites.links, importParts(A),
     contractLinks ? importContractLinks(contractLinks, A) : [], origins ? importOrigins(origins, A) : [], []);
-  { const ixd = buildIndex(A); base.push(...definedLinks(A, ixd), ...polarityLinks(A, ixd), ...scopeLinks(A, ixd), ...absentLinks(A, ixd)); }
+  // cross-source findings come from the engine's reading (readAcross). The cue-phrase finders below read English
+  // negators and definition verbs; they are off unless asked for, and kept for comparison only.
+  if (readAcross) base.push(...importReadAcross(A, readAcross));
+  if (cues) { const ixd = buildIndex(A); base.push(...definedLinks(A, ixd), ...polarityLinks(A, ixd)); }
   let truncated = false, coverage = null, weak = [];
   if (inferred) {
     const p = proposeAll(A, { budget }); base.push(...p.links); weak = p.weak; truncated = p.truncated;

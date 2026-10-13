@@ -183,12 +183,13 @@ const provChip = L => h('span', { class: 'lk-prov ' + L.provenance, text: PROVEN
 function dot(hue) { return h('span', { class: 'lk-dot', style: 'background:' + hue }); }
 
 // ── findings: the one thing a link establishes, said plainly, with the words themselves marked ──────────────────────
-const KIND_LABEL = { differs: 'Different figures', polarity: 'Denied', absent: 'Not on file', scope: 'Not named', defined: 'Defined as', same: 'Both state', terms: 'Same subject', cite: 'Cites' };
-const KIND_RANK = { differs: 0, polarity: 1, absent: 2, scope: 3, defined: 4, same: 5, cite: 6, terms: 7 };
+const KIND_LABEL = { differs: 'Different figures', polarity: 'Denied', absent: 'Spoken of, not held', scope: 'Not named', names: 'Refers to', defined: 'Defined as', same: 'Both state', terms: 'Same subject', cite: 'Cites' };
+const KIND_RANK = { differs: 0, polarity: 1, scope: 2, absent: 3, defined: 4, names: 5, same: 6, cite: 7, terms: 8 };
 const kindOf = (L) => (L.finding && L.finding.kind) || null;
 const kindRank = (L) => (kindOf(L) in KIND_RANK ? KIND_RANK[kindOf(L)] : 9);
 const leftOut = (L) => kindOf(L) === 'scope' || kindOf(L) === 'absent';
-function kindChip(L) { const k = kindOf(L); return k ? h('span', { class: 'lk-kind k-' + k }, KIND_LABEL[k] || k) : null; }
+// a finding the engine did not license says so on its chip: it is a candidate to look at, never a statement
+function kindChip(L) { const k = kindOf(L); return k ? h('span', { class: 'lk-kind k-' + k }, (KIND_LABEL[k] || k) + (L.finding.licensed === false ? ' · possible' : '')) : null; }
 function markClass(L) { const k = kindOf(L); return k === 'differs' || k === 'polarity' ? 'bad' : (k === 'scope' || k === 'absent' ? 'amb' : ''); }
 // A passage with its marked words. `marks` are absolute [s,e) offsets into the source's text; a whole-source end with
 // marks lists the marked entries (the attachment's headings) instead of its title.

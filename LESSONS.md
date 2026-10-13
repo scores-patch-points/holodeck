@@ -192,3 +192,24 @@ running; open a second tab on a separate workspace, and never edit the user's so
 browser keeps the first. The note that said the words were a machine reading came out in the transcript's own serif
 and read as the next line of what was said, and the live words never got their accent border. Merge declarations
 into one attribute, and set a note that is not content in the interface's own type, boxed, above the words.
+
+## 24. A cue list in a surface is a hand list: findings between sources are read by the engine
+
+The first "findings" (a denial, a definition, an attachment, "not on file") were written as English phrase lists in
+`holodeck-relations.js` and found exactly the two things in the one corpus they were tuned on. They would have
+found nothing in another language or another record. What several sources establish together is read by the
+engine (`POST /v1/read-across`, `native/the-fold/read-across.js` in khora): a source names another by carrying
+more than half of its title, a set of omissions is licensed only when it beats a null of independent sources,
+and a thing spoken of in several modified ways that no source holds is a candidate, never a statement. The
+surface imports links and says "possible" on every one the engine did not license. The cue finders stay in the
+module, off unless asked (`collect({ cues: true })`, `buildIndex(A, { cues: true })`).
+
+## 25. A null drawn from the candidates is not a null: draw it from the whole population
+
+The first co-membership null for "two other sources return to the same omitted words" replaced each source by a
+random subset of the omitted words **that someone had attended to**, so the population was the thing being
+tested and the null always matched the observation (13 of 13). The population is every omitted word of the
+named text, attended or not. A test document built from broad sources also cannot show it: a source that
+touches every part of the exhibit shares words with every other such source by chance, and the null is right to
+refuse. Plant narrow sources, run the control with the mechanism removed, and read the null's number beside the
+observed one before believing either.
