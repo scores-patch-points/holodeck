@@ -183,9 +183,11 @@ export async function transcribe(fileOrBuf, onProgress, model, opts) {
   if (!_asr || _asrModel !== model) { _asr = null; _asrModel = model; const T = await import('https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.1.2'); const device = navigator.gpu ? 'webgpu' : 'wasm';
     _asr = await T.pipeline('automatic-speech-recognition', model, { device, dtype: device === 'webgpu' ? 'fp32' : 'q8', progress_callback: p => onProgress && p.progress != null && onProgress({ stage: 'downloading model', pct: Math.round(p.progress) }) }); }
   onProgress && onProgress({ stage: 'decoding audio' });
-  const buf = fileOrBuf instanceof ArrayBuffer ? fileOrBuf : await fileOrBuf.arrayBuffer();
-  const ctx = new (window.OfflineAudioContext || window.webkitOfflineAudioContext)(1, 16000, 16000); const decoded = await ctx.decodeAudioData(buf.slice(0));
-  const off = new OfflineAudioContext(1, Math.ceil(decoded.duration * 16000), 16000); const src = off.createBufferSource(); src.buffer = decoded; src.connect(off.destination); src.start(); const pcm = (await off.startRendering()).getChannelData(0);
+  // The sound is streamed in 30 s windows (holodeck-pcm.js): decoding a long recording whole
+  // took the tab down (a three-hour file peaked at 8.3 GB and then failed to decode at all).
+  const P = await import(new URL('holodeck-pcm.js', import.meta.url).href);
+  const buf = fileOrBuf instanceof ArrayBuffer || ArrayBuffer.isView(fileOrBuf) ? fileOrBuf : await fileOrBuf.arrayBuffer();
+  const total = (await P.audioDuration(buf)) || null;
   const CH = 30 * 16000, segs = [];
   const lang = opts.language && opts.language !== 'auto' ? opts.language : null;
   const englishOnly = /\.en$/.test(model);
@@ -201,13 +203,16 @@ export async function transcribe(fileOrBuf, onProgress, model, opts) {
   const extra = { return_timestamps: true, chunk_length_s: 30 };
   if (decPrefix) extra.decoder_input_ids = decPrefix;
   if (lang && !englishOnly) extra.language = lang;
-  const nChunks = Math.max(1, Math.ceil(pcm.length / CH));
-  for (let o = 0, ci = 0; o < pcm.length; o += CH, ci++) { onProgress && onProgress({ stage: 'transcribing', pct: Math.round(o / pcm.length * 100), i: ci + 1, n: nChunks });
-    const r = await _asr(pcm.subarray(o, Math.min(pcm.length, o + CH)), extra);
-    const base = o / 16000; (r.chunks || [{ timestamp: [0, CH / 16000], text: r.text }]).forEach(c => { const t = (c.text || '').trim(); if (t) segs.push({ start: +(base + (c.timestamp[0] || 0)).toFixed(2), end: +(base + (c.timestamp[1] || c.timestamp[0] || 0)).toFixed(2), text: t }); });
+  const nChunks = total ? Math.max(1, Math.ceil(total / 30)) : null; let ci = 0, heard = 0;
+  onProgress && onProgress({ stage: 'transcribing', pct: 0, i: 1, n: nChunks });
+  for await (const w of P.pcm16k(buf, { winSec: 30, signal: opts.signal })) {
+    const r = await _asr(w.pcm, extra); ci++;
+    const base = w.start; heard = w.start + w.pcm.length / 16000;
+    (r.chunks || [{ timestamp: [0, w.pcm.length / 16000], text: r.text }]).forEach(c => { const t = (c.text || '').trim(); if (t) segs.push({ start: +(base + (c.timestamp[0] || 0)).toFixed(2), end: +(base + (c.timestamp[1] || c.timestamp[0] || 0)).toFixed(2), text: t }); });
     // The text is visible while it streams: each finished chunk hands back what has been
-    // heard so far, so the surface can show the words appearing instead of a silent bar.
-    onProgress && onProgress({ stage: 'transcribing', pct: Math.round(Math.min(pcm.length, o + CH) / pcm.length * 100), i: ci + 1, n: nChunks, partial: segs.slice() }); }
-  onProgress && onProgress({ stage: 'done', pct: 100, partial: segs.slice() });
-  return { source: 'in-browser-whisper', model, segments: segs, duration: decoded.duration, priors: { prompt: opts.prompt || null, language: englishOnly ? 'en' : (lang || 'auto') } };
+    // heard so far (only the new segments — the caller keeps the list), so the surface can
+    // show the words appearing without copying a three-hour transcript every 30 seconds.
+    onProgress && onProgress({ stage: 'transcribing', pct: total ? Math.min(100, Math.round(heard / total * 100)) : null, i: ci + (total && heard < total ? 1 : 0), n: nChunks || ci, partial: segs }); }
+  onProgress && onProgress({ stage: 'done', pct: 100, partial: segs });
+  return { source: 'in-browser-whisper', model, segments: segs, duration: heard, priors: { prompt: opts.prompt || null, language: englishOnly ? 'en' : (lang || 'auto') } };
 }

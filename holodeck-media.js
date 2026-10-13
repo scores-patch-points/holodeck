@@ -66,11 +66,25 @@ export async function readImage(file, bytes, tr = noop) {
 // ---------- sound (audio, and the audio track of video) ----------
 export async function readSound(file, bytes, tr = noop, kind = 'Audio') {
   const title = file.name.replace(/\.[^.]+$/, '');
-  let ab; try { const AC = window.OfflineAudioContext || window.webkitOfflineAudioContext; const ctx = new AC(1, 1, 44100); ab = await ctx.decodeAudioData(bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength)); }
-  catch (e) { tr('decode', 'fail', 'The browser could not decode a sound track (' + (e && e.message || 'unsupported codec') + ')'); return { type: kind, text: '', buf: bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength), media: { kind: 'local' }, extra: { media: { kind: 'local', mime: file.type || '', size: bytes.byteLength }, kind: 'Recording', medium: kind, transcribed: false }, note: title + ' has no sound track this browser can decode, so it is listed but nothing in it can be linked.' }; }
-  const sr = ab.sampleRate, ch = ab.numberOfChannels, dur = ab.duration; tr('decode', 'audio', 'Decoded ' + mmss(dur) + ' of sound, ' + ch + ' channel' + (ch > 1 ? 's' : '') + ' at ' + sr + ' Hz', { dur, sr, ch });
-  const d = ab.getChannelData(0), win = Math.max(1, Math.floor(sr / 4)), n = Math.floor(d.length / win), rms = new Float32Array(n); let peak = 0;
-  for (let i = 0; i < n; i++) { let s = 0; for (let j = i * win; j < (i + 1) * win; j++) { const v = d[j]; s += v * v; if (Math.abs(v) > peak) peak = Math.abs(v); } rms[i] = Math.sqrt(s / win); }
+  // The loudness envelope is measured as the sound streams (holodeck-pcm.js, 16 kHz mono, one
+  // window at a time): decoding the whole file here, at 44.1 kHz, is what took the tab down on
+  // long recordings. The rate and channels reported are the file's own, from its container.
+  const whole = bytes.byteOffset === 0 && bytes.byteLength === bytes.buffer.byteLength ? bytes.buffer : bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
+  const fail = e => { tr('decode', 'fail', 'The browser could not decode a sound track (' + (e && e.message || 'unsupported codec') + ')'); return { type: kind, text: '', buf: whole, media: { kind: 'local' }, extra: { media: { kind: 'local', mime: file.type || '', size: bytes.byteLength }, kind: 'Recording', medium: kind, transcribed: false }, note: title + ' has no sound track this browser can decode, so it is listed but nothing in it can be linked.' }; };
+  let P, probe = null; try { P = await import(new URL('holodeck-pcm.js', import.meta.url).href); probe = await P.probeAudio(bytes); } catch (e) { return fail(e); }
+  const win = 4000, rmsL = []; let peak = 0, samples = 0, carry = new Float32Array(0);
+  try {
+    for await (const w of P.pcm16k(bytes, { winSec: 60 })) {
+      let x = w.pcm; if (carry.length) { const y = new Float32Array(carry.length + x.length); y.set(carry); y.set(x, carry.length); x = y; }
+      const full = Math.floor(x.length / win) * win;
+      for (let o = 0; o < full; o += win) { let s2 = 0; for (let j = o; j < o + win; j++) { const v = x[j]; s2 += v * v; const a = v < 0 ? -v : v; if (a > peak) peak = a; } rmsL.push(Math.sqrt(s2 / win)); }
+      carry = x.slice(full); samples += w.pcm.length;
+    }
+  } catch (e) { return fail(e); }
+  if (!samples) return fail(new Error('no sound in the file'));
+  const sr = probe && probe.sampleRate ? Math.round(probe.sampleRate) : P.RATE, ch = probe && probe.channels ? probe.channels : 1, dur = samples / P.RATE;
+  tr('decode', 'audio', 'Decoded ' + mmss(dur) + ' of sound, ' + ch + ' channel' + (ch > 1 ? 's' : '') + ' at ' + sr + ' Hz' + (probe ? ' (' + probe.codec + ' in ' + probe.container + ', streamed)' : ''), { dur, sr, ch });
+  const rms = Float32Array.from(rmsL), n = rms.length;
   tr('decode', 'envelope', 'Measured loudness in ' + n + ' quarter-second windows; peak ' + (20 * Math.log10(peak || 1e-9)).toFixed(1) + ' dBFS', { n, peak });
   // silence floor from this file's own distribution: the 10th percentile of window loudness, not a fixed dB
   const sorted = [...rms].sort((a, b) => a - b), floor = (sorted[Math.floor(n * 0.1)] || 0) * 2 + 1e-4;
@@ -89,7 +103,7 @@ export async function readSound(file, bytes, tr = noop, kind = 'Audio') {
     steady ? 'Its level is steady from start to end, with no silences.' : S.length ? 'It has ' + S.length + ' sounding section' + (S.length === 1 ? '' : 's') + ' separated by silence.' : 'It has no silence long enough to divide it into sections.',
     ...S.map(s => 'Section ' + s.i + ' is heard from ' + mmss(s.from) + ' to ' + mmss(s.to) + ' at an average level of ' + db(s.level) + ' decibels' + (s === loudest ? ', the loudest section' : '') + '.'),
   ];
-  return { type: kind, measured: true, format: 'html', html: measuredHtml(lines), buf: bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength), media: { kind: 'local', dur: dur, sr: sr, ch: ch }, extra: { media: { kind: 'local', mime: file.type || '', size: bytes.byteLength, dur: dur, sr: sr, ch: ch }, kind: 'Recording', medium: kind, transcribed: false }, note: title + ' is ' + (kind === 'Video' ? 'a video; its sound track' : 'a sound file; it') + ' was measured for length, loudness and silences. No speech was transcribed.' };
+  return { type: kind, measured: true, format: 'html', html: measuredHtml(lines), buf: whole, media: { kind: 'local', dur: dur, sr: sr, ch: ch }, extra: { media: { kind: 'local', mime: file.type || '', size: bytes.byteLength, dur: dur, sr: sr, ch: ch }, kind: 'Recording', medium: kind, transcribed: false }, note: title + ' is ' + (kind === 'Video' ? 'a video; its sound track' : 'a sound file; it') + ' was measured for length, loudness and silences. No speech was transcribed.' };
 }
 
 // The measured preamble is not the first thing a recording says: it sits behind a
