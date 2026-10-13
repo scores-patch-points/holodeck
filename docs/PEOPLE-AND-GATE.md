@@ -39,27 +39,34 @@ The authenticator secret is not on your side at all: it is in the person's app a
 ## Deploying the gate (this is yours to do; the app cannot)
 
 The gate sees passwords in transit exactly as the homeserver does, so it runs **on the homeserver's machine or
-private network** and nowhere less trusted. Your reverse proxy sends it only these paths; everything else goes to the
-homeserver as before.
-
-```nginx
-location ~ ^/_matrix/client/(v3|r0)/(login|register)$ {
-    proxy_pass http://127.0.0.1:8788;
-    proxy_set_header X-Forwarded-For $remote_addr;   # overwrite, never append: the gate trusts this header
-}
-location /gate/ {
-    proxy_pass http://127.0.0.1:8788;
-    proxy_set_header X-Forwarded-For $remote_addr;
-}
-```
+private network** and nowhere less trusted. Your reverse proxy sends it only the login, register and `/gate/` paths;
+everything else goes to the homeserver as before. The files to copy are `tools/login-gate/*.mjs` and
+`holodeck-invite-core.js` (it imports it by relative path), plus `deploy/holodeck-gate.service` and
+`deploy/nginx-locations.conf`.
 
 ```bash
-cd tools/login-gate
-cp login-gate.example.json gate.json        # edit: upstream, serverName, admins (your @you:host), storePath
-export GATE_KEY=$(node cli.mjs keygen)      # 32 bytes, base64; keep it out of the config file and out of git
-node cli.mjs enroll gate.json @you:host     # enrol YOUR account too: prints a QR URI and key for your app
-node cli.mjs serve  gate.json               # run it (as a service, with GATE_KEY in its environment)
+# as root on the homeserver's machine
+useradd --system --home /opt/holodeck-gate --shell /usr/sbin/nologin holodeck-gate
+install -d /opt/holodeck-gate/tools/login-gate /etc/holodeck-gate
+# copy tools/login-gate/{gate,cli,cli-store}.mjs -> /opt/holodeck-gate/tools/login-gate/
+# copy holodeck-invite-core.js                    -> /opt/holodeck-gate/
+cp login-gate.example.json /etc/holodeck-gate/gate.json     # edit: upstream, serverName, admins, port
+echo "GATE_KEY=$(node /opt/holodeck-gate/tools/login-gate/cli.mjs keygen)" > /etc/holodeck-gate/key.env
+chmod 600 /etc/holodeck-gate/key.env
+cp deploy/holodeck-gate.service /etc/systemd/system/ && systemctl daemon-reload && systemctl enable --now holodeck-gate
+# add deploy/nginx-locations.conf inside the homeserver's server block, then:  nginx -t && systemctl reload nginx
 ```
+
+Choose `registration` for the kind of server this is:
+
+* `"optional"` (use this on a shared or already-running homeserver): a sign-up that asks to enrol is enrolled; one that
+  does not is passed through unchanged, so an existing sign-up page, a guest fallback, a bot or an old link keeps
+  working. People let into a workspace are required to have enrolled, which the owner's device checks with the gate.
+* `"enroll"`: no account can be made without an authenticator. Stricter, and it breaks any client that has never
+  heard of the gate.
+
+`allowOtherLoginTypes` is a list of login types the gate forwards untouched (bots and bridges use
+`m.login.application_service`). Anything not named is refused, because a token login would otherwise walk around the code.
 
 Then, and only then, consider `"enforce": "all"` (refuse accounts that never enrolled, except `allowUnenrolled`).
 

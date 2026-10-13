@@ -2,8 +2,9 @@
 //
 // Matrix has no TOTP of its own, so something has to verify it. This is that something: a small service that
 // the homeserver's reverse proxy routes ONLY these paths to —
-//     POST /_matrix/client/{v3,r0}/login      the password sign-in: refused without the right six digits
-//     POST /_matrix/client/{v3,r0}/register   making an account: refused without enrolling an authenticator
+//     POST /_matrix/client/{v3,r0,unstable,api/v1}/login      the password sign-in: refused without the right six digits
+//     POST /_matrix/client/{v3,r0,unstable,api/v1}/register   making an account: enrols an authenticator (see `registration`)
+//     (any other method on those two paths, e.g. GET /login to learn the flows, is passed to the homeserver untouched)
 //     POST /gate/v1/enroll/start              begin enrolling (returns the secret and its QR URI, once)
 //     GET  /gate/v1/enrolled?user=            "is this account enrolled?" — for the workspace owner's device only
 // — and everything else goes to the homeserver directly, untouched.
@@ -44,8 +45,14 @@ class Refusal extends Error { constructor(status, errcode, msg, extra = {}) { su
  *   admins:         ['@you:matrix.example.org']     who may ask whether an account is enrolled
  *   enforce:        'enrolled' | 'all'              'all' also refuses accounts that never enrolled…
  *   allowUnenrolled: ['@owner:…']                   …except these
- *   registration:   'enroll' | 'passthrough'
- *   allowOtherLoginTypes: false                     m.login.token etc. would bypass the code
+ *   registration:   'enroll' | 'optional' | 'passthrough'
+ *                   enroll      an account cannot be made without enrolling an authenticator (strict; breaks any client that
+ *                               does not know about the gate)
+ *                   optional    a request carrying a ticket and code enrols; one without is passed through unchanged, so an
+ *                               existing sign-up page, a guest fallback or a bot keeps working (use this on a shared server)
+ *                   passthrough nothing is enrolled at registration (operator CLI only)
+ *   allowOtherLoginTypes: false                     true, or an array like ['m.login.application_service']. m.login.token and
+ *                                                   the like would bypass the code, so they are refused unless named here
  *   issuer: 'Holodeck', trustProxy: false, limits: {…}
  * }
  * deps: { fetchImpl, now, store: { load(), save(obj) }, log(line) }
@@ -115,9 +122,13 @@ export function createGate(config, deps = {}) {
     const full = u.startsWith('@') ? u : `@${u}:${cfg.serverName.toLowerCase()}`;
     return MXID.test(full) ? full : null;
   }
-  async function upstream(method, path, body) {
+  // The homeserver rate-limits per client address; behind the gate every request would look like the gate's own. So the
+  // real address travels in X-Forwarded-For (the homeserver's listener must have x_forwarded: true).
+  async function upstream(method, path, body, ip = null) {
     let r;
-    try { r = await fetchImpl(String(cfg.upstream).replace(/\/+$/, '') + path, { method, headers: { 'content-type': 'application/json' }, body: body === undefined ? undefined : JSON.stringify(body) }); }
+    const headers = { 'content-type': 'application/json' };
+    if (ip) { headers['x-forwarded-for'] = ip; headers['x-forwarded-proto'] = 'https'; }
+    try { r = await fetchImpl(String(cfg.upstream).replace(/\/+$/, '') + path, { method, headers, body: body === undefined ? undefined : JSON.stringify(body) }); }
     catch { throw new Refusal(502, 'M_UNKNOWN', 'The homeserver could not be reached.'); }
     let j = {}; try { j = await r.json(); } catch { /* empty */ }
     return { status: r.status, body: j };
@@ -138,8 +149,9 @@ export function createGate(config, deps = {}) {
   async function login(body, ip) {
     await ready();
     if (body.type !== 'm.login.password') {
-      if (!cfg.allowOtherLoginTypes) throw new Refusal(403, 'M_FORBIDDEN', GENERIC);
-      return upstream('POST', '/_matrix/client/v3/login', body);
+      const allowed = cfg.allowOtherLoginTypes === true || (Array.isArray(cfg.allowOtherLoginTypes) && cfg.allowOtherLoginTypes.includes(body.type));
+      if (!allowed) throw new Refusal(403, 'M_FORBIDDEN', GENERIC);
+      return upstream('POST', '/_matrix/client/v3/login', body, ip);
     }
     const mxid = mxidOf(body);
     if (!mxid) throw new Refusal(403, 'M_FORBIDDEN', GENERIC);
@@ -147,7 +159,7 @@ export function createGate(config, deps = {}) {
     const rec = users.get(mxid);
     if (!rec) {
       if (cfg.enforce === 'all' && !cfg.allowUnenrolled.map((x) => x.toLowerCase()).includes(mxid)) { failUserAndIp(mxid, ip); throw new Refusal(403, 'M_FORBIDDEN', GENERIC); }
-      return upstream('POST', '/_matrix/client/v3/login', body);       // an account that never enrolled: password only, as before
+      return upstream('POST', '/_matrix/client/v3/login', body, ip);   // an account that never enrolled: password only, as before
     }
     // the code: its own field, or the last six digits of the password (so an ordinary Matrix app can sign in)
     let code = typeof body.totp === 'string' ? body.totp.trim() : '';
@@ -158,7 +170,7 @@ export function createGate(config, deps = {}) {
     const step = await matchStep(rec.secret, code);
     if (step === null || step <= (rec.lastStep ?? -1)) { failUserAndIp(mxid, ip); log('login refused ' + sha(mxid)); throw new Refusal(403, 'M_FORBIDDEN', GENERIC); }
     rec.lastStep = step; await persist();                               // single use, whatever the password turns out to be
-    const r = await upstream('POST', '/_matrix/client/v3/login', out);
+    const r = await upstream('POST', '/_matrix/client/v3/login', out, ip);
     if (r.status >= 400) { failUserAndIp(mxid, ip); log('login refused ' + sha(mxid)); return { status: 403, body: { errcode: 'M_FORBIDDEN', error: GENERIC } }; }
     log('login ok ' + sha(mxid));
     return r;
@@ -180,7 +192,11 @@ export function createGate(config, deps = {}) {
   }
   async function register(body, ip) {
     await ready();
-    if (cfg.registration === 'passthrough') { const { totp, ...rest } = body; void totp; return upstream('POST', '/_matrix/client/v3/register', rest); }
+    const wantsEnrol = body.totp && typeof body.totp === 'object';
+    if (cfg.registration === 'passthrough' || (cfg.registration === 'optional' && !wantsEnrol)) {
+      const { totp, ...rest } = body; void totp;
+      return upstream('POST', '/_matrix/client/v3/register', rest, ip);
+    }
     checkLocks(null, ip);
     const t = body.totp;
     const p = t && typeof t.ticket === 'string' ? pending.get(t.ticket) : null;
@@ -189,7 +205,7 @@ export function createGate(config, deps = {}) {
     const step = await matchStep(p.secret, code);
     if (step === null || step <= p.lastStep) { failed('i:' + ip, cfg.limits.ipFailures, cfg.limits.ipWindowMs, cfg.limits.userLockMs); throw new Refusal(403, 'M_FORBIDDEN', 'That code was not right. Check the six digits your app shows.'); }
     const { totp, ...rest } = body; void totp;
-    const r = await upstream('POST', '/_matrix/client/v3/register', rest);
+    const r = await upstream('POST', '/_matrix/client/v3/register', rest, ip);
     if (r.status === 200 && r.body && typeof r.body.user_id === 'string') {
       users.set(r.body.user_id.toLowerCase(), { secret: p.secret, lastStep: step, enrolledAt: now() });
       pending.delete(t.ticket);
@@ -229,8 +245,12 @@ export function createGate(config, deps = {}) {
       const url = new URL(req.url, 'http://x');
       const p = url.pathname;
       const ip = ipOf(req);
-      if (/^\/_matrix\/client\/(v3|r0)\/login$/.test(p) && req.method === 'POST') { const r = await login(await readJson(req), ip); return send(r.status, r.body); }
-      if (/^\/_matrix\/client\/(v3|r0)\/register$/.test(p) && req.method === 'POST') { const r = await register(await readJson(req), ip); return send(r.status, r.body); }
+      const LOGIN = /^\/_matrix\/client\/(api\/v1|r0|v3|unstable)\/login$/, REGISTER = /^\/_matrix\/client\/(api\/v1|r0|v3|unstable)\/register$/;
+      if (LOGIN.test(p) || REGISTER.test(p)) {
+        if (req.method !== 'POST') { const r = await upstream(req.method, p + url.search, undefined, ip); return send(r.status, r.body); }   // e.g. GET /login: the flows
+        const r = LOGIN.test(p) ? await login(await readJson(req), ip) : await register(await readJson(req), ip);
+        return send(r.status, r.body);
+      }
       if (p === '/gate/v1/enroll/start' && req.method === 'POST') return send(200, enrollStart(await readJson(req), ip));
       if (p === '/gate/v1/enrolled' && req.method === 'GET') return send(200, await enrolled(req, url));
       return send(404, { errcode: 'M_UNRECOGNIZED', error: 'Not routed here.' });

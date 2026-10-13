@@ -223,3 +223,59 @@ test('hygiene: bodies are bounded, JSON is required, the address limit applies t
     assert.equal((await fetch(base + '/_matrix/client/v3/sync')).status, 404, 'the gate serves only what it is routed');
   } finally { await stop(); }
 });
+
+// ---------------------------------------------------------------- what a shared, already-running homeserver needs
+
+test('production shape: registration "optional" keeps every existing sign-up working and still enrols those that ask; other methods on login are passed through', async () => {
+  await boot({ registration: 'optional' });
+  try {
+    // an old client that has never heard of the gate: an account is made, with no authenticator, exactly as before
+    const plain = await post('/_matrix/client/v3/register', { username: 'oldclient', password: 'a perfectly fine password', auth: { type: 'm.login.dummy' } });
+    assert.equal(plain.status, 200);
+    assert.equal(gate._users().has('@oldclient:' + NAME), false, 'not enrolled');
+    // and it signs in with the password alone, as before
+    const si = await post('/_matrix/client/v3/login', { type: 'm.login.password', identifier: { type: 'm.id.user', user: 'oldclient' }, password: 'a perfectly fine password' });
+    assert.equal(si.status, 200);
+    // a client that DOES know about the gate enrols, and from then on needs the code
+    const { start } = await signUp('newclient', 'another fine password');
+    assert.equal(gate._users().has('@newclient:' + NAME), true);
+    clock.t += 60_000;
+    assert.equal((await post('/_matrix/client/v3/login', { type: 'm.login.password', identifier: { type: 'm.id.user', user: 'newclient' }, password: 'another fine password' })).status, 403, 'now the password alone is refused');
+    assert.equal((await post('/_matrix/client/v3/login', { type: 'm.login.password', identifier: { type: 'm.id.user', user: 'newclient' }, password: 'another fine password', totp: await code(start.secret) })).status, 200);
+    // a request that names a ticket but gets the code wrong is NOT quietly passed through
+    const s2 = (await post('/gate/v1/enroll/start', {})).j;
+    const n = upstreamHits(/register/);
+    assert.equal((await post('/_matrix/client/v3/register', { username: 'tryer', password: 'x'.repeat(14), auth: { type: 'm.login.dummy' }, totp: { ticket: s2.ticket, code: '000000' } })).status, 403);
+    assert.equal(upstreamHits(/register/), n, 'a bad enrolment never reaches the homeserver');
+  } finally { await stop(); }
+});
+
+test('production shape: GET /login (how a client learns the flows) reaches the homeserver; the other API versions are gated too; the real client address is forwarded', async () => {
+  await boot();
+  try {
+    const { start } = await signUp('ana', 'correct horse battery');
+    clock.t += 60_000;
+    for (const v of ['r0', 'v3', 'unstable', 'api/v1']) {
+      const flows = await (await fetch(`${base}/_matrix/client/${v}/login`)).json();
+      assert.ok(flows.flows.some((f) => f.type === 'm.login.password'), v + ': flows come from the homeserver');
+      // the password alone is refused on every version of the path, and never reaches the homeserver
+      const n = upstreamHits(/login/);
+      const r = await post(`/_matrix/client/${v}/login`, { type: 'm.login.password', identifier: { type: 'm.id.user', user: 'ana' }, password: 'correct horse battery' });
+      assert.equal(r.status, 403, v + ': no code, no sign-in');
+      assert.equal(upstreamHits(/login/), n);
+    }
+    const ok = await post('/_matrix/client/unstable/login', { type: 'm.login.password', identifier: { type: 'm.id.user', user: 'ana' }, password: 'correct horse battery', totp: await code(start.secret) });
+    assert.equal(ok.status, 200);
+    const forwarded = hs.seen.filter((r) => /login/.test(r.path) && r.method === 'POST').pop();
+    assert.match(String(forwarded.xff), /^(127\.0\.0\.1|::1|::ffff:127\.0\.0\.1)$/, 'the client address travels in X-Forwarded-For (here: loopback, the test client)');
+  } finally { await stop(); }
+});
+
+test('production shape: an appservice login (bots, bridges) is forwarded when named; a token login still is not', async () => {
+  await boot({ allowOtherLoginTypes: ['m.login.application_service'] });
+  try {
+    const as = await post('/_matrix/client/v3/login', { type: 'm.login.application_service', identifier: { type: 'm.id.user', user: 'bot' } });
+    assert.equal(as.status, 200);
+    assert.equal((await post('/_matrix/client/v3/login', { type: 'm.login.token', token: 'x' })).status, 403);
+  } finally { await stop(); }
+});
