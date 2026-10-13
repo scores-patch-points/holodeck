@@ -1794,6 +1794,17 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
         </sc-if>
       </div>
       </sc-if>
+      <sc-if value="{{ pf.hasConns }}" hint-placeholder-val="{{ false }}">
+      <div style="background:var(--s1);border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:6px;margin-top:10px">
+        <span style="font:600 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mut)">{{ pf.connTitle }}</span>
+        <sc-for list="{{ pf.conns }}" as="c" hint-placeholder-count="3">
+          <button onClick="{{ c.onOpen }}" title="Open these two sources side by side" style="all:unset;cursor:pointer;display:flex;flex-direction:column;gap:2px;padding:6px 0;border-top:1px solid var(--line)">
+            <span style="font:600 11px var(--mono);letter-spacing:.04em;text-transform:uppercase;color:var(--acc)">{{ c.kind }} · <span style="color:var(--mut);text-transform:none;letter-spacing:0;font-family:var(--sans);font-weight:500">{{ c.source }}</span></span>
+            <span style="font:400 13px/1.45 var(--sans);color:var(--ink2);overflow-wrap:anywhere">{{ c.headline }}</span>
+          </button>
+        </sc-for>
+      </div>
+      </sc-if>
       <sc-if value="{{ pf.hasProf }}" hint-placeholder-val="{{ false }}">
             <div style="background:var(--s1);border:1px solid var(--line);border-radius:14px;padding:14px 22px;display:flex;flex-direction:column;gap:5px">
               <span style="font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mut)">What the sources say about it</span>
@@ -2991,6 +3002,17 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
       <sc-for list="{{ pf.tags }}" as="t" hint-placeholder-count="3"><button onClick="{{ t.onClick }}" style="background:var(--s1);border:1px solid {{ t.color }};border-radius:999px;padding:2px 10px;cursor:pointer;font:500 13px var(--sans);color:var(--ink)">{{ t.label }}</button></sc-for>
       </div>
       </sc-if>
+      <sc-if value="{{ pf.hasConns }}" hint-placeholder-val="{{ false }}">
+      <div style="background:var(--s1);border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:6px;margin-top:10px">
+        <span style="font:600 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mut)">{{ pf.connTitle }}</span>
+        <sc-for list="{{ pf.conns }}" as="c" hint-placeholder-count="3">
+          <button onClick="{{ c.onOpen }}" title="Open these two sources side by side" style="all:unset;cursor:pointer;display:flex;flex-direction:column;gap:2px;padding:6px 0;border-top:1px solid var(--line)">
+            <span style="font:600 11px var(--mono);letter-spacing:.04em;text-transform:uppercase;color:var(--acc)">{{ c.kind }} · <span style="color:var(--mut);text-transform:none;letter-spacing:0;font-family:var(--sans);font-weight:500">{{ c.source }}</span></span>
+            <span style="font:400 13px/1.45 var(--sans);color:var(--ink2);overflow-wrap:anywhere">{{ c.headline }}</span>
+          </button>
+        </sc-for>
+      </div>
+      </sc-if>
       <sc-if value="{{ pf.hasProf }}" hint-placeholder-val="{{ false }}">
       <div style="background:var(--s1);border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:4px;margin-top:10px">
         <span style="font:600 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mut)">What the sources say about it</span>
@@ -3636,6 +3658,8 @@ async function hdReadAcross(docs) {
 // that carries no information ("time unknown", "unexposed") is left out, and no row is starred.
 const HD_REL_PLAIN = { typed: 'Kind of name', 'also written': 'Also written as', 'said with': 'How it is stated', 'named in': 'Found in', about: 'Words around it', 'appears with': 'Appears with', figure: 'Figures', year: 'Years' };
 const HD_FRAME_PLAIN = { attributed: 'reported speech', fact: 'plain statement', plan: 'intent or plan', uncertain: 'hedged' };
+const HD_KIND_PLAIN = { differs: 'Different figures', polarity: 'Denied', scope: 'Not named', absent: 'Spoken of, not held', defined: 'Defined as', names: 'Refers to', same: 'Both state', terms: 'Same subject', cite: 'Cites' };
+const HD_KIND_RANK = { differs: 0, polarity: 1, scope: 2, absent: 3, defined: 4, names: 5, same: 6, cite: 7, terms: 8 };
 const HD_STANDING_PLAIN = { fixed: 'always the same', 'one at a time': 'one at a time', 'many-valued': 'many values' };
 const hdEngineCompact = (host, r) => ({ host, ms: Math.round(r.ms), basis: r.basis || null, sentences: r.sentences.length, relations: r.relations.length, referents: r.referents.map(x => ({ surfaces: x.surfaces, routes: x.routes, grain: x.grain || null })).concat(r.descriptorBeings.map(b => ({ surfaces: b.surfaces, routes: ['descriptor'], grain: null }))) });
 const HD_ENGM = new WeakMap();
@@ -10890,6 +10914,23 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
       this.setState({ pfIdx: i }); };
     const d = det.d;
     const pr = this.profileRows(A, n.name);
+    // Connections: what the link surfaces say about the statements this name sits in, so a click on a name shows what
+    // ties it to other sources (a finding first, then plain ties), and each opens the Seam on that pair of sources.
+    const conns = (() => { try {
+      const LS = this._lkSet; if (!LS || !LS.links || !sts.length) return [];
+      const touches = sp => !!sp && sp.kind !== 'whole' && sp.axis !== 'time' && Number.isFinite(sp.s) && sts.some(x => x.doc === sp.doc && x.s < sp.e && sp.s < x.e);
+      const seen = new Set(), out = [];
+      for (const L of LS.links) {
+        if (L.rejected || L.from.doc === L.to.doc) continue;
+        const mine = touches(L.from) ? L.from : touches(L.to) ? L.to : null; if (!mine) continue;
+        const other = mine === L.from ? L.to : L.from; const od = A.docById[other.doc]; if (!od) continue;
+        const kind = (L.finding && L.finding.kind) || (L.verdict === 'differs' ? 'differs' : 'terms');
+        const key = kind + '|' + other.doc; if (seen.has(key)) continue; seen.add(key);
+        out.push({ rank: HD_KIND_RANK[kind] ?? 9, kind: (HD_KIND_PLAIN[kind] || kind) + (L.finding && L.finding.licensed === false ? ' · possible' : ''), source: od.title,
+          headline: L.finding ? L.finding.headline : (L.why || 'Linked'), onOpen: () => this.setState({ view: 'seam', lkPair: [mine.doc, other.doc], readDoc: null, sel: null }) });
+      }
+      return out.sort((a, b) => a.rank - b.rank).slice(0, 8);
+    } catch (e) { return []; } })();
     // Referents the SOURCE itself named for this name, via its hyperlinks.
     const seenRef = new Set(); const refs = [];
     ((A.nameLinks || {})[n.name] || []).forEach(L => { if (seenRef.has(L.href)) return; seenRef.add(L.href);
@@ -10897,6 +10938,7 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
     refs.length = Math.min(refs.length, 6);
     return { has: true, eyebrow: d.eyebrow, color: d.color, title: n.name,
       ...(() => { const pl = this.profilePlain(A, n.name); return { hasProf: !!(pl && pl.rows.length), profKind: pl ? pl.kind : '', profEstablished: pr ? pr.established : false, profCount: pl ? pl.countLine : '', profRows: pl ? pl.rows : [] }; })(),
+      hasConns: conns.length > 0, conns, connTitle: 'Connections across sources · ' + conns.length,
       hasRefs: refs.length > 0, refs, refTitle: refs.length === 1 ? 'Linked referent' : 'Linked referents',
       sum: this.profileSummary(A, n.name),
       facts: d.facts, here: N ? plural(N, 'mention') + ' in this source' : 'Not named in this source’s statements', hasStep: N > 1, pos: N > 1 ? (Math.min(idx, N - 1) + 1) + ' / ' + N : '', prev: () => step(-1), next: () => step(1),
