@@ -3483,7 +3483,7 @@ function hdEngineMerge(t, ns, eng, hy) {
   return out.sort((a, b) => a.s - b.s);
 }
 // read-only handle for tests: the real functions, so a harness can recompute what a trace claims happened
-setTimeout(() => { try { window.__holodeck = Object.freeze({ analyze, holoKit, paradigms, splitSentences, findNames, isJunk, readAny, hdHygiene, hdPos: w => hdPos(w), hdDeclReady: () => !!HD_DECL, hdEngineReady: () => !!HD_ENGINE, hdReaderReady: () => hdReaderReady(), hdAttrReady: () => hdAttrReady(), hdHoldReady: () => hdHoldReady(), summarizeHolders: (sts, names) => (HD_ATTR ? HD_ATTR.summarizeHolders(sts, names) : null) }); } catch (e) {} }, 0);
+setTimeout(() => { try { window.__holodeck = Object.freeze({ analyze, holoKit, paradigms, fieldTopics, fieldCatalog, splitSentences, findNames, isJunk, readAny, hdHygiene, hdPos: w => hdPos(w), hdDeclReady: () => !!HD_DECL, hdEngineReady: () => !!HD_ENGINE, hdReaderReady: () => hdReaderReady(), hdAttrReady: () => hdAttrReady(), hdHoldReady: () => hdHoldReady(), summarizeHolders: (sts, names) => (HD_ATTR ? HD_ATTR.summarizeHolders(sts, names) : null) }); } catch (e) {} }, 0);
 const hdCut = (t, n) => { t = String(t || '').replace(/\s+/g, ' ').trim(); return t.length > n ? t.slice(0, n - 1) + '…' : t; };
 function splitSentences(text, tr) {
   const out = []; const re = /[^\n]+?(?:[.!?]+(?=\s|$)|(?=\n)|$)/g; let m;
@@ -4309,6 +4309,75 @@ function fieldCatalog(docs) {
   // default columns: the best-covered field of each type — no cutoff constant, just the leader per kind
   const dflt = []; for (const ty of ['id', 'date', 'amount']) { const f = fields.find(x => x.type === ty); if (f) dflt.push(f.key); }
   return { fields, byDoc, dflt };
+}
+// Topics from the sources' own recurring fields. A topic is a field value (a department, the head of an `about`) or
+// a word of a text field (a vendor word, a subject word) that two or more sources share, kept ONLY when those
+// sources' body text is more alike than ANY of 500 random same-size sets of sources. The text is not what formed the
+// group, so its coherence in the text is independent evidence the group is real; a sample of 500 fixed-seed draws
+// makes "beats all of them" a rank test (p <= 1/501 per candidate), not a tuned cutoff. Each source then sits in the
+// passing group whose members' text it is closest to (the most specific subject, not the largest). Own field words are removed from the text first so a group cannot cohere by repeating its own label.
+function fieldTopics(docs, cat) {
+  const N = docs.length, none = { groups: [], strayN: N, basis: 'fields' };
+  if (N < 4 || !cat || !cat.fields) return none;
+  // only fields the document itself states (its ledger/metadata fields), never values the regex lifted out of the body
+  // text: a group formed from the text and then checked against the text would be circular, not independent evidence.
+  const textKeys = new Set(cat.fields.filter(f => f.type === 'text').map(f => f.key));
+  const stated = docs.map(d => { const o = {}; for (const k of Object.keys(d)) { if (FIELD_META_SKIP.has(k) || typeof d[k] !== 'string') continue;
+    const fk = fieldKey(k), v = d[k].replace(/\s+/g, ' ').trim(); if (textKeys.has(fk) && v && v.length <= 120 && o[fk] == null) o[fk] = v; } return o; });
+  const keys = [...new Set(stated.flatMap(o => Object.keys(o)))];
+  if (!keys.length) return none;
+  const words = s => [...new Set(String(s || '').toUpperCase().match(/[A-Z]{3,}/g) || [])];
+  const head = v => String(v).split(/\s+[-–—]\s+/)[0].trim();
+  // candidate groups: (field, kind, value) -> member document indexes
+  const cand = new Map();
+  const put = (k, kind, v, i) => { const key = k + '\u0001' + kind + '\u0001' + v; let m = cand.get(key); if (!m) cand.set(key, m = { field: k, kind, value: v, members: new Set() }); m.members.add(i); };
+  docs.forEach((d, i) => { const f = stated[i];
+    for (const k of keys) { const v = f[k]; if (!v) continue; put(k, 'head', head(v).toUpperCase(), i); for (const w of words(v)) put(k, 'word', w, i); } });
+  // body-text vectors (tf-idf, unit length), minus each document's own field words
+  const tok = s => String(s || '').toLowerCase().match(/[a-z]{4,}/g) || [];
+  const tf = docs.map((d, i) => { const own = new Set(); const f = stated[i]; Object.values(f).forEach(v => tok(v).forEach(w => own.add(w))); tok(d.title).forEach(w => own.add(w));
+    const m = new Map(); for (const w of tok(String(d.text || '').slice(0, 60000))) if (!own.has(w)) m.set(w, (m.get(w) || 0) + 1); return m; });
+  const df = new Map(); tf.forEach(m => m.forEach((_, w) => df.set(w, (df.get(w) || 0) + 1)));
+  const vid = new Map(); [...df].forEach(([w, c]) => { if (c >= 2) vid.set(w, vid.size); });
+  const V = vid.size; if (!V) return none;
+  const vec = tf.map(m => { const idx = [], val = []; let ss = 0; m.forEach((c, w) => { const j = vid.get(w); if (j == null) return; const x = (1 + Math.log(c)) * Math.log(N / df.get(w)); idx.push(j); val.push(x); ss += x * x; }); const r = 1 / Math.sqrt(ss || 1); return { idx, val: val.map(x => x * r), ok: ss > 0 }; });
+  const okIx = vec.map((v, i) => v.ok ? i : -1).filter(i => i >= 0);
+  if (okIx.length < 4) return none;
+  const scratch = new Float64Array(V);
+  const meanCos = mem => { const m = mem.filter(i => vec[i].ok), n = m.length; if (n < 2) return null; const touched = [];
+    for (const i of m) { const { idx, val } = vec[i]; for (let k = 0; k < idx.length; k++) { if (scratch[idx[k]] === 0) touched.push(idx[k]); scratch[idx[k]] += val[k]; } }
+    let s2 = 0; for (const j of touched) { s2 += scratch[j] * scratch[j]; scratch[j] = 0; }
+    return (s2 - n) / (n * (n - 1)); };
+  const B = 500; let seed = 4242; const rnd = () => { seed = (seed + 0x6D2B79F5) >>> 0; let t = seed; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+  const nullBy = new Map();
+  const nullFor = n => { let o = nullBy.get(n); if (o) return o; const xs = [];
+    for (let b = 0; b < B; b++) { const pick = new Set(); while (pick.size < n) pick.add(okIx[Math.floor(rnd() * okIx.length)]); xs.push(meanCos([...pick])); }
+    const mean = xs.reduce((a, b) => a + b, 0) / B, sd = Math.sqrt(xs.reduce((a, b) => a + (b - mean) ** 2, 0) / B) || 1e-9;
+    nullBy.set(n, o = { mean, sd, max: Math.max(...xs) }); return o; };
+  const best = new Map();                                              // doc index -> its best passing group
+  for (const g of cand.values()) { const mem = [...g.members]; if (mem.length < 2 || mem.length >= N) continue;
+    const have = mem.filter(i => vec[i].ok); if (have.length < 2) continue;
+    const obs = meanCos(mem), nu = nullFor(have.length); if (!(obs > nu.max)) continue;
+    g.z = (obs - nu.mean) / nu.sd; g.cos = obs;
+    for (const i of mem) { const b = best.get(i); if (!b || g.cos > b.cos) best.set(i, g); } }   // the group whose members it reads most like
+  const by = new Map(); for (const [i, g] of best) { let o = by.get(g); if (!o) by.set(g, o = []); o.push(i); }
+  const tc = s => String(s).toLowerCase().replace(/(^|[ \-\/(])([a-z])/g, (m, p, c) => p + c.toUpperCase()).replace(/\b(Ii|Iii|Iv|Vi)\b/g, m => m.toUpperCase()).replace(/\bAgmt\b/g, 'Agreement');
+  const labelOf = (g, mem) => {
+    if (g.kind === 'head') return tc(g.value) + (FIELD_EXPLICIT_DEPT.includes(g.field) ? ' dept.' : '');
+    // a word names a group by the phrases ITS OWN members state, never by the bare token: the most shared phrase, then
+    // the next, until together they cover at least half the members (three at most, else the field and the word)
+    const cov = new Map(); for (const i of mem) { const v = String(stated[i][g.field] || '').toUpperCase().trim(); if (!v) continue;
+      for (const p of new Set([v, head(v)])) if (p.split(/[^A-Z]+/).includes(g.value)) cov.set(p, (cov.get(p) || 0) + 1); }
+    const ranked = [...cov].sort((a, b) => b[1] - a[1] || b[0].length - a[0].length);
+    const pick = []; let covered = 0; const used = new Set();
+    for (const [p] of ranked) { if (pick.length >= 3) break; const ms = mem.filter(i => !used.has(i) && [String(stated[i][g.field] || '').toUpperCase().trim()].some(v => v === p || head(v) === p));
+      if (!ms.length) continue; ms.forEach(i => used.add(i)); covered += ms.length; pick.push(p); if (covered * 2 >= mem.length) break; }
+    return covered * 2 >= mem.length && pick.length ? pick.map(tc).join(' / ') : fieldLabel(g.field) + ': ' + tc(g.value); };
+  const groups = []; for (const [g, mem] of by) if (mem.length >= 2) groups.push({ docs: mem.map(i => docs[i]), label: labelOf(g, mem), n: mem.length, field: g.field, z: g.z });
+  groups.sort((a, b) => b.n - a.n || b.z - a.z);
+  const seen = new Map(); groups.forEach(g => { const c = seen.get(g.label) || 0; seen.set(g.label, c + 1); if (c) g.label += ' (' + (c + 1) + ')'; });  // labels key the topic toggle: make them unique
+  const placed = new Set(groups.flatMap(g => g.docs.map(d => d.id))).size;
+  return { groups, strayN: N - placed, basis: 'fields', candidates: cand.size };
 }
 function loadAdded() {
   try { const a = JSON.parse(localStorage.getItem('fold-explorer-added') || 'null'); if (a) { const out = {}; for (const k in a) out[k] = Array.isArray(a[k]) ? a[k].map(withPdfSrc) : []; return out; } const c = JSON.parse(localStorage.getItem('fold-explorer-custom') || 'null'); return { custom: (c ? c.docs : []).map(withPdfSrc) }; } catch (e) { return {}; }
@@ -8334,7 +8403,16 @@ class Component extends DCLogic {
   // paradigm's own label (its spanning name, else its most-repeated content
   // word). Never a single statement's keyword.
   paradigmGroups(A) {
-    if (this._pgA !== A) { this._pgA = A; this._pg = paradigms(A); }
+    if (this._pgA !== A) { this._pgA = A;
+      // two ways to find topics: sources that repeat a claim/relationship/figure (the holograph), and sources that
+      // share a recurring field value validated against body text. The page shows whichever places more sources.
+      const claims = paradigms(A); claims.basis = 'claims'; this._pg = claims;
+      try {
+        const FC = this._fc && this._fc.A === A ? this._fc : (this._fc = { A, ...fieldCatalog(A.docs) });
+        const ft = fieldTopics(A.docs, FC);
+        if (ft.groups.length && ft.strayN < claims.strayN) this._pg = ft;
+      } catch (e) { /* the claim-based topics stand */ }
+    }
     return this._pg;
   }
   topicOfDoc(A, id) {
@@ -8837,7 +8915,7 @@ class Component extends DCLogic {
     const strayDocs = A.docs.filter(d => !realDocIds.has(d.id));
     const activeTopicGroup = (f.topicGroup && f.topicGroup.label) || null;
     const onTopicGroup = p => this.toggleTopicGroup(p);
-    const topicsNote = P.groups.length ? plural(P.groups.length, 'separate topic') + ' — sources that repeat a real claim, relationship or figure.' : A.docs.length >= 2 ? 'No two sources repeat a real claim, relationship or figure yet — ' + plural(A.docs.length, 'source') + ' each stands alone.' : '';
+    const topicsNote = P.groups.length ? plural(P.groups.length, 'separate topic') + (P.basis === 'fields' ? ' — sources that share a recurring field and read alike, more than any random set of sources would.' : ' — sources that repeat a real claim, relationship or figure.') : A.docs.length >= 2 ? 'No two sources repeat a real claim, relationship or figure yet — ' + plural(A.docs.length, 'source') + ' each stands alone.' : '';
     const hasTopics = P.groups.length > 0;
     const hasTopicsNote = !hasTopics && A.docs.length >= 2;
     const showTopicsStray = hasTopics && P.strayN > 0;
