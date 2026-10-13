@@ -77,16 +77,23 @@ function pickTrack(tracks, lang) {
   };
   return tracks.slice().sort((a, b) => score(a) - score(b))[0] || null;
 }
+// One budget for every proxy together. Measured 2026-10-13 on five videos: the watch page arrives,
+// but YouTube returns an empty body for the caption track unless the request carries a proof-of-origin
+// token a browser cannot mint, so this rung yields nothing today; it is kept for the day that changes,
+// not allowed to stall a link for the better part of a minute (each dead proxy used to take 15 s).
+const PROXY_BUDGET_MS = 6000;
 async function fromBrowser(id, lang) {
   const watch = 'https://www.youtube.com/watch?v=' + id;
+  const until = Date.now() + PROXY_BUDGET_MS, left = cap => Math.min(cap, until - Date.now());
   for (const p of PROXIES) {
-    let raw; try { const r = await fetch(p(watch), { signal: AbortSignal.timeout(15000) }); if (!r.ok) continue; raw = await r.text(); } catch (e) { continue; }
+    if (left(PROXY_BUDGET_MS) < 400) break;
+    let raw; try { const r = await fetch(p(watch), { signal: AbortSignal.timeout(left(15000)) }); if (!r.ok) continue; raw = await r.text(); } catch (e) { continue; }
     const m = raw.match(/"captionTracks":(\[.*?\])/); if (!m) continue;
     let tracks; try { tracks = JSON.parse(m[1]); } catch (e) { continue; }
     const t = pickTrack(tracks, lang); if (!t || !t.baseUrl) continue;
     try {
       const sep = t.baseUrl.indexOf('?') < 0 ? '?' : '&';
-      const r = await fetch(t.baseUrl + sep + 'fmt=json3', { signal: AbortSignal.timeout(20000) }); if (!r.ok) continue;
+      const r = await fetch(t.baseUrl + sep + 'fmt=json3', { signal: AbortSignal.timeout(Math.max(1500, left(20000))) }); if (!r.ok) continue;
       const segs = parseJson3(await r.text()); if (!segs.length) continue;
       const title = (raw.match(/"title":"([^"]{1,200})"/) || [])[1] || '';
       return { title: JSON.parse('"' + title + '"'), author: '', lang: t.languageCode || lang || '', kind: t.kind === 'asr' ? 'asr' : 'manual',
@@ -96,12 +103,25 @@ async function fromBrowser(id, lang) {
   return null;
 }
 
-// The one entry point the surface calls: captions by helper, then by proxy, else null (the
-// caller then keeps the link and offers the recording for in-browser Whisper).
+// The entry point the surface calls: captions by helper, then by proxy. Returns { cap, why }: cap is the
+// caption object or null, and when it is null `why` says what is true so the person is told it instead of
+// being handed a bare title —
+//   'helper-unreachable'  nothing answered at ytdlBase(): not started, or the browser blocked the page from
+//                         reaching 127.0.0.1 (a hosted copy of the page needs "Local network access" allowed)
+//   'helper-error'        the helper is up but could not read this video
+//   'no-track'            the helper read the video and it has no caption track
+export async function transcriptOutcome(id, lang) {
+  let why = 'no-track';
+  try { const h = await fromHelper(id, lang); if (h) return { cap: h, why: null }; }
+  catch (e) { why = (await helperHealth()) ? 'helper-error' : 'helper-unreachable'; }
+  try { const b = await fromBrowser(id, lang); if (b) return { cap: b, why: null }; } catch (e) {}
+  return { cap: null, why };
+}
+
+// Same contract as before for callers that only want the captions: the object, or null (the caller then
+// keeps the link and offers the recording for in-browser Whisper).
 export async function transcriptFor(id, lang) {
-  try { const h = await fromHelper(id, lang); if (h) return h; } catch (e) {}
-  try { const b = await fromBrowser(id, lang); if (b) return b; } catch (e) {}
-  return null;
+  return (await transcriptOutcome(id, lang)).cap;
 }
 
 // The audio, from the local helper only — there is no cross-origin way to the stream. Used

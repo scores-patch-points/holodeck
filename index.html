@@ -4226,7 +4226,7 @@ function withPdfSrc(d) { if (d && !d.pdfSrc) { const t = epavTokenOf(d); if (t) 
 // number / text) is read off its own values, by plurality. Spellings of one label
 // ("Contract Number", "Contract No.", "Contract #", contractNo) share one key, so
 // they land in one column. The catalogue is a pure function of the sources.
-const FIELD_META_SKIP = new Set(['id', 'title', 'type', 'format', 'url', 'pages', 'text', 'note', 'pdfSrc', 'html', 'kind', 'medium', 'published', 'pubLabel', 'year', 'custody', 'custodyStatus', 'faithful', 'binPath', 'media', 'pdf', 'figures', 'needsRead', 'addedAt', 'hasImg', 'ocr', 'eyes', 'eyesDetail', 'ignored', 'transcribed', 'standing', 'publisher', 'measured', 'screen', 'group', 'hasHtml', 'ocrModel', 'imgSrc', 'lang']);
+const FIELD_META_SKIP = new Set(['id', 'title', 'type', 'format', 'url', 'pages', 'text', 'note', 'pdfSrc', 'html', 'kind', 'medium', 'published', 'pubLabel', 'year', 'custody', 'custodyStatus', 'faithful', 'binPath', 'media', 'pdf', 'figures', 'needsRead', 'addedAt', 'hasImg', 'ocr', 'eyes', 'eyesDetail', 'ignored', 'transcribed', 'captionsWhy', 'standing', 'publisher', 'measured', 'screen', 'group', 'hasHtml', 'ocrModel', 'imgSrc', 'lang']);
 const FIELD_TEXT_RE = /(?:^|[\n.;|])\s*([A-Z][A-Za-z]+(?:[ \/-][A-Za-z&]+){0,3})\s*(?:(?:No\.?|Number|Num\.?|#|ID)\s*[:#]?|:)\s*([A-Z0-9$][^\n;|]{0,48})/g;
 // Department and expiration come from the extraction itself (ePAV rows carry them as named fields), so they are
 // explicit columns, always present and always sortable -- not left to be discovered as one recurring label among many.
@@ -5364,8 +5364,8 @@ class Component extends DCLogic {
     const lang = this.state.txLang || 'en';
     hdT('bytes', 'link', 'A YouTube video — captions first (yt-dlp on your own machine, then the disclosed proxies); Whisper only if no track exists');
     this.setState({ busy: 'Reading captions for “' + hdCut(title, 40) + '”' + (author ? ' · ' + author : '') + '…' });
-    let cap = null;
-    try { const M = await hdYt(); cap = await M.transcriptFor(id, lang); } catch (e) {}
+    let cap = null, why = 'no-track', helperAt = 'http://127.0.0.1:11450';
+    try { const M = await hdYt(); helperAt = M.ytdlBase(); const o = await M.transcriptOutcome(id, lang); cap = o.cap; why = o.why || why; } catch (e) {}
     if (cap && cap.segments && cap.segments.length) {
       const html = ohsSegmentsHtml(cap.segments, title);
       const media = { kind: 'youtube', id, url: link, segN: cap.segments.length, model: cap.model || 'captions', source: cap.source, via: cap.via, lang: cap.lang || lang, track: cap.kind };
@@ -5378,8 +5378,12 @@ class Component extends DCLogic {
     }
     const media = { kind: 'youtube', id, url: link, segN: 0 };
     const item = { title, url: link, type: 'YouTube video', text: title + (opt.snippet ? '. ' + opt.snippet : '') + (author ? ' Published on YouTube by ' + author + '.' : ''),
-      note: 'No caption track was found (yt-dlp on your own machine found none, and the public proxies did not answer). Start tools/ytdl-helper.py to read captions, or use the recording below — Whisper reads it here, in this tab.',
-      extra: { media, kind: 'Recording', medium: 'Video', author } };
+      note: why === 'helper-unreachable'
+        ? 'The captions were not read: this page could not reach the yt-dlp helper at ' + helperAt + '. Start it on your machine (python3 tools/ytdl-helper.py); a hosted copy of this page may also need “Local network access” allowed for the site in the browser. YouTube no longer lets a browser read captions by itself, so no public proxy can stand in for it. Or choose the video’s audio file below — Whisper reads it here, in this tab.'
+        : why === 'helper-error'
+          ? 'The yt-dlp helper is running but could not read this video (see its terminal). Choose the video’s audio file below — Whisper reads it here, in this tab.'
+          : 'This video has no caption track. Choose its audio file below — Whisper reads it here, in this tab.',
+      extra: { media, kind: 'Recording', medium: 'Video', author, captionsWhy: why } };
     this.setState({ busy: '' });
     if (opt.collect) opt.collect.push(item); else return this.addDocs([item], { open: opt.open, keepOpen: opt.keepOpen });
   }
@@ -5415,6 +5419,7 @@ class Component extends DCLogic {
         (cut && cut.length
           ? '<div style="margin-top:.6em;padding:.6em .8em;border-left:2px solid #777">' + lines + '</div>'
           : '<div style="margin-top:.6em;color:#8a8a8a">No caption track to cut against — this is a video clip only. Use the recording’s transcribe button if you need the words.</div>');
+    this.toast(why === 'helper-unreachable' ? 'No captions read — the yt-dlp helper could not be reached. See the note on the source.' : 'No captions read for this video — see the note on the source.');
       hdT('bytes', 'clip', (spec.kind === 'stitch' ? 'Stitched' : 'Snipped') + ' ' + man.duration + 's from ' + spec.id + ' → ' + man.url);
       return this.addDocs([{ title: man.name + ' — ' + spec.kind, year: new Date().getFullYear(), type: spec.kind === 'stitch' ? 'Video stitch' : 'Video clip', format: 'html', html: body, text: (cut || []).map(x => x.text).join('\n'), note: 'Snipped by yt-dlp on this machine at ' + ticks + (cut ? '.' : ' (video only; no captions found).') }], { open: true, keepOpen: true });
     } catch (e) {
@@ -8506,7 +8511,7 @@ class Component extends DCLogic {
         renaming: S.dvRename === id, notRenaming: S.dvRename !== id, rnDraft: S.dvRenameDraft != null ? S.dvRenameDraft : r.title,
         onRnDraft: e => this.setState({ dvRenameDraft: e.target.value }), onRnSave: saveName, onRnKey: e => { if (e.key === 'Enter') saveName(); else if (e.key === 'Escape') this.setState({ dvRename: null, dvRenameDraft: null }); },
         when: dvAgo(r.addedAt) || r.date || 'Undated', stsS: String(r.sts),
-        sub: [dvAgo(r.addedAt), r.date && r.date !== dvAgo(r.addedAt) ? 'source ' + r.date : '', plural(r.sts, 'statement'), this.commentsOf(id).total ? '💬 ' + this.commentsOf(id).total + (this.commentsOf(id).unread ? ' ●' : '') : ''].filter(Boolean).join(' · '),
+        sub: [dvAgo(r.addedAt), r.date && r.date !== dvAgo(r.addedAt) ? 'source ' + r.date : '', plural(r.sts, 'statement'), (dd => dd && dd.captionsWhy && !dd.transcribed ? 'no captions — ' + ({ 'helper-unreachable': 'helper not reachable', 'helper-error': 'helper could not read it', 'no-track': 'no caption track' }[dd.captionsWhy] || 'not read') : '')(A.docById[id]), this.commentsOf(id).total ? '💬 ' + this.commentsOf(id).total + (this.commentsOf(id).unread ? ' ●' : '') : ''].filter(Boolean).join(' · '),
         menu: [{ label: 'Open', onClick: dvClose(it.onRead) }, { label: 'Comment' + (this.commentsOf(id).total ? ' (' + this.commentsOf(id).total + ')' : ''), onClick: dvClose(() => this.commentOn({ kind: 'source', doc: 'src:' + id })) }, ...(own ? [{ label: 'Rename', onClick: dvClose(() => this.setState({ dvRename: id, dvRenameDraft: r.title })) }] : []), { label: 'Details', onClick: dvClose(() => this.setState({ dvOpen: id })) },
           { label: it.soloLabel || 'Only this source', onClick: dvClose(it.onSolo) },
           ...(it.canTranscribe ? [{ label: 'Transcribe it', onClick: dvClose(it.onTranscribe) }] : []), ...(it.canProcess ? [{ label: 'Read it', onClick: dvClose(it.onProcess) }] : []),

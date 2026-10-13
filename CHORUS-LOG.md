@@ -153,3 +153,13 @@ fast: 1 file · 0 affected tests (none imports index.html) · law: ok
 | Frankfurt | a placeholder value | index.html:616 | false-positive-on-review | hint-placeholder-val is the surface's standing sc-if template syntax, as logged 2026-10-11 |
 clean: Dijkstra, Frankfurt reported above; Marshall not routed — no law edited or cited
 checked live (not by a test): a mid-run workspace switch lost the transcript on the deployed page and lands it correctly with the fix; the same click with no switch transcribes in 13 s
+
+## 2026-10-13 — a YouTube link says why its captions were not read, and no longer stalls on proxies that cannot answer (main, holodeck-yt.js + index.html)
+fast: 3 files · 1 affected test file, 6 pass · law: ok
+| lens | citation | file:line | verdict | one line |
+| Simon/Chekhov | new mechanism with no test import | holodeck-yt.js | fixed | holodeck-yt.test.mjs imports transcriptOutcome/transcriptFor: captions, helper-unreachable, helper-error, no-track, the old null contract, and the proxy rung ending inside its one budget |
+| Feynman | a numeric constant in a comparison | holodeck-yt.js:89 | noted | PROXY_BUDGET_MS and the 400 ms floor are operational deadlines, not a threshold tuned against a golden or a verdict; 6 s replaces the measured 15 s x 4 stall |
+| Dijkstra | an allowlist | index.html:4229 | false-positive-on-review | one more field name in FIELD_META_SKIP so captionsWhy never becomes an emergent metadata column |
+| Kondo | a rung nothing profits from | holodeck-yt.js:83 | noted | the public-proxy rung returned no caption body on 5 of 5 videos (timedtext now needs a proof-of-origin token; the watch page itself still arrives, also via the n8n feed proxy); kept and bounded rather than stashed, a candidate for STASH.md if it stays empty |
+clean: Feynman, Dijkstra, Kondo reported above; Marshall not routed — no law edited or cited
+checked live (not by a test): with no helper the link ingests in about 7 s, the card reads "no captions — helper not reachable" and a toast names the cause; with tools/ytdl-helper.py running, the same link comes back transcribed "via your yt-dlp helper". Innertube POSTs from a browser origin fail on CORS, so no browser-only route remains.
