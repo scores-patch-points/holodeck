@@ -5643,6 +5643,9 @@ class Component extends DCLogic {
   }
   componentDidMount() {
     try { window.__hdApp = this; } catch (e) {}
+    // the Workspaces screen by address: #workspaces on load, or typed/linked while the page is open
+    this._heroHash = () => { if (location.hash === '#workspaces' && !this._heroOpen) this.openWorkspacesHero(); };
+    window.addEventListener('hashchange', this._heroHash); setTimeout(this._heroHash, 0);
     setTimeout(() => { this.openFromUrl(); this._urlReady = true; this.urlSync(); }, 0);
     this.installColDrag();
     // optional extra screens: a deployment lists whole pages in screens.json and they join the sidebar; absent or
@@ -6674,7 +6677,6 @@ class Component extends DCLogic {
         }
       } catch (e) {}
     }
-    if (/^#workspaces$/.test(location.hash)) this.openWorkspacesHero();
     if (/#join=/.test(location.hash)) { const raw = location.hash; const email = /join=[a-z0-9]{16}(&|$)/i.test(raw); const c = (raw.match(/join=([a-z0-9]{5})(&|$)/i) || [])[1]; history.replaceState(null, '', location.pathname + location.search); this.openShareRepo(email ? raw : c); }
     else { try { import(new URL('holodeck-people-panel.js', location.href).href).then(M => { const s = (this._net && this._net.s) || N.loadSession(); if (s && !s.guest && this.wsRooms().priv) M.resumePresence(this.shareCtx(null)); }).catch(() => {}); } catch (e) {} }
     if (/fx-share=/.test(location.hash)) { try { const r = await N.consumeShare(); if (r) { this.setWsRooms({ priv: r.rooms[0] || null, pub: r.rooms[1] || this.wsRooms().pub || null }); this._net = { ...(this._net || {}), s: r.pending || r.s, shareTemp: r.pending ? r.s : null }; this.toast('Opened a workspace shared by ' + (r.from || 'someone')); if (!r.pending) { try { const d = await N.loadPrivate(r.s, r.rooms[0], 'work'); if (d && d.pins) this.savePins(d.pins); } catch (e) {} } } } catch (e) { this.ilog('Shared link could not be opened: ' + e.message, 'bad'); } }
