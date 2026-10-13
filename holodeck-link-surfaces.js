@@ -2,17 +2,17 @@
 // the Reader's link gutter. One mount root, one link model (holodeck-relations.js), one grain control.
 //
 // DOM only — no data work lives here. Everything a surface draws comes from the relations module's functions
-// (atGrain, fieldsOf, orbitOf, seamOf, marginOf) so a surface and its test can never disagree. The Orbit nests with
-// the holons module's own functions (openAtLevel, repOf, rollUp, levelsOf).
+// (atGrain, fieldsOf, seamOf, marginOf) so a surface and its test can never disagree. The Orbit is the Holodeck's own
+// map engine (holodeck-map.js, with holodeck-holons.js nesting), fed bodies and ties.
 //
 // A surface cannot write a link by accident: `write` is handed to the Review surface alone (canWriteLinks), every
 // other surface is given null and has nothing to call.
 
 import {
-  RELATIONS, RELATION_IDS, PROVENANCE, GRAINS, DIFFERS, atGrain, fieldsOf, orbitOf, seamOf, marginOf, buildIndex, hueMap,
-  cuesOf, isTimed, fmtClock, onChars, admits, canWriteLinks, wholeSpan, makeLink,
+  RELATIONS, RELATION_IDS, PROVENANCE, GRAINS, DIFFERS, atGrain, fieldsOf, seamOf, marginOf, buildIndex, hueMap,
+  cuesOf, isTimed, fmtClock, onChars, admits, canWriteLinks, wholeSpan, makeLink, patternsOf, tallyByDoc,
 } from './holodeck-relations.js';
-import { openAtLevel, levelsOf, repOf, rollUp } from './holodeck-holons.js';
+import { mountMap } from './holodeck-map.js';
 
 const NS = 'http://www.w3.org/2000/svg';
 export const SURFACES = ['lanes', 'margin', 'seam', 'orbit', 'fields', 'review'];
@@ -74,6 +74,18 @@ const CSS = `
 .lk-btn.pri{background:var(--acc2);border-color:var(--acc2);color:#fff;font-weight:600}
 .lk-btn.bad:hover{border-color:var(--bad);color:var(--bad)}
 .lk-panel{background:var(--s1);border:1px solid var(--line);border-radius:12px;padding:12px 14px;min-width:0}
+.lk-orbit{position:relative;height:min(72vh,600px);min-height:400px;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--s1)}
+.lk-orbit .hm-layers{display:none}
+.lk-src{display:flex;flex-direction:column;gap:6px}
+.lk-srcrow{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.lk-sc{all:unset;cursor:pointer;display:inline-flex;gap:6px;align-items:center;border:1px solid var(--line2);border-radius:999px;padding:2px 10px 2px 8px;font:500 12.5px var(--sans);color:var(--ink2);max-width:260px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lk-sc.off{opacity:.45;border-style:dashed;text-decoration:line-through}
+.lk-sc:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.lk-pick{position:relative}
+.lk-pickpanel{border:1px solid var(--line2);background:var(--s1);border-radius:10px;padding:8px;display:flex;flex-direction:column;gap:6px;max-height:340px;overflow:auto}
+.lk-pickpanel label{display:flex;gap:8px;align-items:center;font:400 13px var(--sans);padding:2px 4px;border-radius:6px;cursor:pointer}
+.lk-pickpanel label:hover{background:var(--s2)}
+.lk-pickpanel label span.n{margin-left:auto;font:500 11.5px var(--mono);color:var(--mut)}
 .lk-svgwrap{background:var(--s1);border:1px solid var(--line);border-radius:12px;overflow:auto}
 .lk-svgwrap svg{display:block;width:100%;height:auto;min-width:620px}
 .lk-svgwrap text{font-family:var(--mono);font-size:10.5px;fill:var(--ink2)}
@@ -85,6 +97,19 @@ const CSS = `
 .lk-prov{font:500 10.5px var(--mono);letter-spacing:.04em;color:var(--mut);border:1px solid var(--line2);border-radius:4px;padding:0 5px;white-space:nowrap}
 .lk-prov.inferred{border-style:dashed}.lk-prov.confirmed{color:var(--ok);border-color:var(--ok)}
 .lk-weak{font:500 10.5px var(--mono);color:var(--amber);border:1px dashed var(--amber);border-radius:4px;padding:0 5px;white-space:nowrap}
+/* findings: what a pair establishes, with the words themselves marked */
+.lk-find{display:flex;flex-direction:column;gap:4px;min-width:0}
+.lk-kind{align-self:flex-start;font:600 10.5px var(--mono);letter-spacing:.06em;text-transform:uppercase;border-radius:4px;padding:1px 6px;border:1px solid var(--line2);color:var(--ink2);white-space:nowrap}
+.lk-kind.k-differs,.lk-kind.k-polarity{color:var(--bad);border-color:var(--bad)}
+.lk-kind.k-scope,.lk-kind.k-absent{color:var(--amber);border-color:var(--amber)}
+.lk-kind.k-defined{color:var(--acc);border-color:var(--acc)}
+.lk-head{font:600 14px/1.4 var(--sans);color:var(--ink);text-wrap:pretty}
+.lk-mk{background:color-mix(in srgb,var(--acc) 26%,transparent);border-radius:2px;padding:0 1px;font-weight:600;color:var(--ink)}
+.lk-mk.bad{background:color-mix(in srgb,var(--bad) 24%,transparent)}
+.lk-mk.amb{background:color-mix(in srgb,var(--amber) 26%,transparent)}
+.lk-ent{display:block;margin:2px 0}
+.lk-findrow{grid-column:1/-1;padding:6px 10px;border:1px solid var(--line);border-radius:10px;background:var(--s2)}
+.lk-pairfinds{display:flex;flex-direction:column;gap:8px}
 /* seam */
 .lk-seam{display:grid;grid-template-columns:minmax(0,1fr) 84px minmax(0,1fr);gap:8px 6px;align-items:stretch}
 .lk-cell{background:var(--s1);border:1px solid var(--line);border-radius:10px;padding:8px 11px;font:400 14px/1.5 var(--serif);min-width:0;text-wrap:pretty}
@@ -112,6 +137,7 @@ const CSS = `
 .lk-ul[data-rel="says-about"]{text-decoration-style:wavy;text-decoration-thickness:1px}
 .lk-ul[data-prov="inferred"]{text-decoration-style:dotted;text-decoration-thickness:1px;opacity:.9}
 .lk-ul[data-v="differs"]{text-decoration-color:var(--bad);text-decoration-style:solid;background:color-mix(in srgb,var(--bad) 16%,transparent);border-radius:2px}
+.lk-ul[data-v="left"]{text-decoration-color:var(--amber);text-decoration-style:solid;background:color-mix(in srgb,var(--amber) 18%,transparent);border-radius:2px}
 .lk-ul.on{background:color-mix(in srgb,var(--acc) 28%,transparent);border-radius:2px}
 .lk-sent.un{border-left:3px dashed var(--line2);padding-left:10px;color:var(--ink2)}
 /* review */
@@ -156,26 +182,109 @@ const relLabel = L => RELATIONS[L.relation].label + (L.verdict === 'differs' ? '
 const provChip = L => h('span', { class: 'lk-prov ' + L.provenance, text: PROVENANCE[L.provenance].label });
 function dot(hue) { return h('span', { class: 'lk-dot', style: 'background:' + hue }); }
 
+// ── findings: the one thing a link establishes, said plainly, with the words themselves marked ──────────────────────
+const KIND_LABEL = { differs: 'Different figures', polarity: 'Denied', absent: 'Not on file', scope: 'Not named', defined: 'Defined as', same: 'Both state', terms: 'Same subject', cite: 'Cites' };
+const KIND_RANK = { differs: 0, polarity: 1, absent: 2, scope: 3, defined: 4, same: 5, cite: 6, terms: 7 };
+const kindOf = (L) => (L.finding && L.finding.kind) || null;
+const kindRank = (L) => (kindOf(L) in KIND_RANK ? KIND_RANK[kindOf(L)] : 9);
+const leftOut = (L) => kindOf(L) === 'scope' || kindOf(L) === 'absent';
+function kindChip(L) { const k = kindOf(L); return k ? h('span', { class: 'lk-kind k-' + k }, KIND_LABEL[k] || k) : null; }
+function markClass(L) { const k = kindOf(L); return k === 'differs' || k === 'polarity' ? 'bad' : (k === 'scope' || k === 'absent' ? 'amb' : ''); }
+// A passage with its marked words. `marks` are absolute [s,e) offsets into the source's text; a whole-source end with
+// marks lists the marked entries (the attachment's headings) instead of its title.
+function passageNodes(A, sp, marks, cls, max = 230) {
+  const d = docOf(A, sp.doc); const text = d.text || '';
+  const ms = (marks || []).filter((m) => m && m[1] > m[0]);
+  if (sp.kind === 'whole') {
+    if (!ms.length) return [clip(d.title, max)];
+    return ms.slice(0, 6).map((m) => h('span', { class: 'lk-ent' }, '“', h('span', { class: 'lk-mk ' + cls }, clip(text.slice(m[0], m[1]), 80)), '”'));
+  }
+  if (sp.axis === 'time') return [quoteOf(A, sp, max)];
+  const sts = (A.stsByDoc && A.stsByDoc[sp.doc]) || []; const st = sts.find((x) => x.s <= sp.s && sp.s < x.e);
+  const base = st ? st.s : sp.s; const t = st ? st.text : text.slice(sp.s, sp.e);
+  const here = ms.filter((m) => m[0] >= base && m[1] <= base + t.length).map((m) => [m[0] - base, m[1] - base]);
+  if (!here.length) return [clip(t, max)];
+  here.sort((a, b) => a[0] - b[0]);
+  let a0 = 0, b0 = t.length, pre = '', post = '';
+  if (t.length > max) { a0 = Math.max(0, here[0][0] - 70); b0 = Math.min(t.length, a0 + max); if (a0 > 0) pre = '…'; if (b0 < t.length) post = '…'; }
+  const out = [pre]; let at = a0;
+  here.forEach(([x, y]) => { if (y <= at || x >= b0) return; const xs = Math.max(x, at), ye = Math.min(y, b0); if (xs > at) out.push(t.slice(at, xs)); out.push(h('span', { class: 'lk-mk ' + cls }, t.slice(xs, ye))); at = ye; });
+  if (at < b0) out.push(t.slice(at, b0)); out.push(post);
+  return out;
+}
+// the finding block: kind, headline, and the two ends with their marks
+function findingBlock(A, L, hues, { quotes = true } = {}) {
+  const f = L.finding; if (!f) return null;
+  const cls = markClass(L);
+  const end = (sp, marks, who) => h('div', { class: 'lk-pass', style: '--lk-c:' + ((hues && hues.get(sp.doc)) || 'var(--acc)') },
+    h('small', {}, who + clip(docOf(A, sp.doc).title, 36)), passageNodes(A, sp, marks, cls));
+  return h('div', { class: 'lk-find' }, kindChip(L), h('div', { class: 'lk-head' }, f.headline),
+    quotes ? h('div', { class: 'lk-two' }, end(L.from, f.marks && f.marks.from, 'from · '), end(L.to, f.marks && f.marks.to, 'to · ')) : null);
+}
+
 // ── the mount ───────────────────────────────────────────────────────────────────────────────────────────────────
 // opts: {view, A, key, links (the resolved set), weak, rejected, unresolved, truncated, coverage, decisions,
 //        grain, filter:{relations,minProvenance}, theme, workspace, pair, seamMode, centre, level,
 //        draft, onGrain, onFilter, onPair, onSeamMode, onCentre, onLevel, onDraft, onOpen(docId, s), write}
 export function mountLinks(root, opts) {
   ensureStyle(root.ownerDocument || document);
-  let o = opts; let card = null; const memo = new Map(); const lastPos = new Map(); let anim = 0;
+  // `raw` is what the app gave; `o` is what every surface reads: the sources switched off are gone from the sources, the
+  // links, the proposals and the unresolved pointers, so all six surfaces and the card agree without each knowing.
+  const effective = (r) => {
+    const off = r.off || {}; const all = (r.A && r.A.docs) || []; const docs = all.filter((d) => !off[d.id]);
+    const ok = (L) => !off[L.from.doc] && !off[L.to.doc];
+    return { ...r, A: docs.length === all.length ? r.A : { ...r.A, docs }, links: (r.links || []).filter(ok), weak: (r.weak || []).filter(ok), unresolved: (r.unresolved || []).filter((u) => !off[u.doc]) };
+  };
+  let raw = opts; let o = effective(raw); let card = null; const memo = new Map(); let orbitMap = null; let lastSig = null;
+  const sigOf = (r) => [r.view, r.key, (r.links || []).length, (r.weak || []).length, r.grain, JSON.stringify(r.filter || null), JSON.stringify(r.off || {}), JSON.stringify(r.pair || null),
+    r.seamMode, r.centre, r.level, (r.draft || '').length, r.theme, (r.decisions || []).length, r.reviewTab, r.truncated].join('|');
   const wrap = h('div', { class: 'lk' }); root.replaceChildren(wrap); root.style.containerType = 'inline-size';
 
   const hues = () => { const ids = new Set(); o.links.concat(o.weak || []).forEach(L => { ids.add(L.from.doc); ids.add(L.to.doc); }); (o.A.docs || []).forEach(d => ids.add(d.id)); return hueMap([...ids], o.theme); };
   const bad = () => DIFFERS[o.theme] || DIFFERS.dark;
   const shown = () => o.links.filter(admits(o.filter || { minProvenance: 'computed' }));
   const open = (doc, s) => o.onOpen && o.onOpen(doc, s);
-  const set = (patch, cb) => { o = { ...o, ...patch }; if (cb) cb(); render(); };
+  const set = (patch, cb) => { if ('off' in patch) memo.clear(); raw = { ...raw, ...patch }; o = effective(raw); if (cb) cb(); lastSig = sigOf(raw); render(); };
+
+  // ── Sources: which sources every surface reads, switched on and off in place ───────────────────────────────────
+  function sourcesBar() {
+    const all = (raw.A && raw.A.docs) || []; if (all.length < 2) return null;
+    const off = raw.off || {}; const H = hueMap(all.map((d) => d.id).sort(), o.theme);
+    const deg = tallyByDoc((raw.links || []).filter((L) => L.from.doc !== L.to.doc));
+    const on = all.filter((d) => !off[d.id]);
+    const commit = (next) => { raw.onSources && raw.onSources(next); set({ off: next }); };
+    const toggle = (id) => { const next = { ...off }; if (next[id]) delete next[id]; else next[id] = true; commit(next); };
+    const only = (id) => { const next = {}; all.forEach((d) => { if (d.id !== id) next[d.id] = true; }); commit(next); };
+    const wrapEl = h('div', { class: 'lk-src' });
+    const row = h('div', { class: 'lk-srcrow' }, h('span', { class: 'lk-lab' }, 'Sources'), h('span', { class: 'lk-note' }, on.length + ' of ' + all.length));
+    const ranked = all.slice().sort((a, b) => ((deg.get(b.id) || {}).links || 0) - ((deg.get(a.id) || {}).links || 0) || String(a.title).localeCompare(String(b.title)));
+    // one click switches a source off or on; double-click keeps only that one
+    ranked.slice(0, 10).forEach((d) => {
+      row.append(h('button', { class: 'lk-sc' + (off[d.id] ? ' off' : ''), 'aria-pressed': String(!off[d.id]), title: 'Click to switch off or on; double-click to keep only this source', 'data-id': d.id,
+        onclick: () => toggle(d.id), ondblclick: () => only(d.id) }, dot(H.get(d.id)), clip(d.title, 30))); });
+    const det = h('details', { class: 'lk-pick' });
+    det.append(h('summary', { class: 'lk-btn', style: 'display:inline-block' }, all.length > 10 ? 'All ' + all.length + ' sources…' : 'Choose…'));
+    const panel = h('div', { class: 'lk-pickpanel' });
+    const q = h('input', { class: 'lk-sel', placeholder: 'Filter sources…', 'aria-label': 'Filter sources', style: 'width:100%' });
+    const list = h('div', { style: 'display:flex;flex-direction:column;gap:1px' });
+    const paint = () => { const t = q.value.trim().toLowerCase(); list.replaceChildren();
+      ranked.filter((d) => !t || String(d.title).toLowerCase().includes(t)).slice(0, 200).forEach((d) => {
+        const cb = h('input', { type: 'checkbox' }); cb.checked = !off[d.id]; cb.addEventListener('change', () => toggle(d.id));
+        list.append(h('label', {}, cb, dot(H.get(d.id)), h('span', {}, clip(d.title, 52)), h('span', { class: 'n' }, plural((deg.get(d.id) || {}).links || 0, 'link')))); }); };
+    q.addEventListener('input', paint); paint();
+    panel.append(q, h('div', { class: 'lk-srcrow' },
+      h('button', { class: 'lk-btn', onclick: () => commit({}) }, 'All'),
+      h('button', { class: 'lk-btn', onclick: () => { const n = {}; all.forEach((d) => { n[d.id] = true; }); commit(n); } }, 'None'),
+      h('button', { class: 'lk-btn', title: 'Only the sources that link to another', onclick: () => { const n = {}; all.forEach((d) => { if (!((deg.get(d.id) || {}).links)) n[d.id] = true; }); commit(n); } }, 'Only linked')), list);
+    det.append(panel); row.append(det); wrapEl.append(row);
+    return wrapEl;
+  }
 
   function toolbar(view, count) {
     const bar = h('div', { class: 'lk-bar' });
-    const left = h('div', { class: 'lk-h' }, SURFACE_TITLE[view], h('small', {}, (o.workspace || '') + (o.workspace ? ' · ' : '') + plural((o.A.docs || []).length, 'source') + (count != null ? ' · ' + count : '')));
+    const left = h('div', { class: 'lk-h' }, plural((o.A.docs || []).length, 'source'), h('small', {}, plural(shown().filter((L) => L.from.doc !== L.to.doc).length, 'link') + (count != null ? ' · ' + count : '')));
     const right = h('div', { style: 'display:flex;gap:8px;align-items:center;flex-wrap:wrap' });
-    if (view !== 'fields' && view !== 'review' && view !== 'margin') {
+    if (view === 'lanes' || view === 'orbit') {
       right.append(h('span', { class: 'lk-lab' }, 'Grain'));
       right.append(h('div', { class: 'lk-seg', role: 'group', 'aria-label': 'Grain' }, GRAINS.map(g => h('button', {
         class: o.grain === g ? 'on' : '', 'aria-pressed': String(o.grain === g), title: GRAIN_TITLE[g], onclick: () => { o.onGrain && o.onGrain(g); set({ grain: g }); } }, GRAIN_LABEL[g]))));
@@ -248,7 +357,7 @@ export function mountLinks(root, opts) {
       list.forEach(({ sp }) => { if (sp.kind === 'whole') return; const [a, b] = xOf(d, sp);
         svg.append(sv('rect', { x: a, y: yy - (grain === 'ground' ? 6 : 5), width: Math.max(3, b - a), height: grain === 'ground' ? 12 : 10, rx: 1.5, fill: H.get(id), opacity: grain === 'ground' ? .28 : .42 })); });
     });
-    const stroke = L => L.verdict === 'differs' ? bad() : 'var(--ink)';
+    const stroke = L => L.verdict === 'differs' ? bad() : (leftOut(L) ? 'var(--amber)' : 'var(--ink)');
     const wide = L => ({ confirmed: 2.2, file: 1.9, computed: 1.5, inferred: 1.1 }[L.provenance]);
     const ends = (L) => {
       const da = docOf(A, L.from.doc), db = docOf(A, L.to.doc);
@@ -274,7 +383,7 @@ export function mountLinks(root, opts) {
         g.append(sv('path', { d, fill: 'none', stroke: st, 'stroke-width': RELATIONS[L.relation].line === 'thin' ? 1 : wide(L), 'stroke-dasharray': dash, 'marker-end': arrow ? 'url(#lk-arr)' : null, opacity: L.provenance === 'inferred' ? .8 : 1 }));
       }
       if (RELATIONS[L.relation].symmetric) { g.append(sv('circle', { cx: e.xa, cy: y1, r: 3.2, fill: st })); g.append(sv('circle', { cx: e.xb, cy: y2, r: 3.2, fill: st })); }
-      g.append(sv('title', {}, relLabel(L) + ' · ' + PROVENANCE[L.provenance].label + ' — ' + L.why));
+      g.append(sv('title', {}, (L.finding ? (KIND_LABEL[L.finding.kind] || L.finding.kind) + ': ' + L.finding.headline : relLabel(L) + ' · ' + PROVENANCE[L.provenance].label + ' — ' + L.why)));
       if (n) g.append(sv('text', { x: (e.xa + e.xb) / 2 + 6, y: my, style: 'fill:' + st }, n));
       svg.append(g);
     };
@@ -283,7 +392,7 @@ export function mountLinks(root, opts) {
       // whole-source ties as brackets down the right edge, plus how densely each source is tied
       const done = new Set();
       G.ties.forEach((L, i) => { if (!lane.has(L.from.doc) || !lane.has(L.to.doc) || L.from.doc === L.to.doc) return; const ya = lane.get(L.from.doc), yb = lane.get(L.to.doc); const xx = X1 + 4 + (i % 4) * 4;
-        svg.append(sv('path', { d: 'M' + X1 + ' ' + ya + ' H' + xx + ' V' + yb + ' H' + X1, fill: 'none', stroke: stroke(L), 'stroke-width': 1.2, 'stroke-dasharray': L.provenance === 'inferred' ? '2 3' : null, style: 'cursor:pointer', onclick: () => showCard({ links: [L] }) }, sv('title', {}, relLabel(L) + ' — ' + L.why))); drawn++; done.add(L.id); });
+        svg.append(sv('path', { d: 'M' + X1 + ' ' + ya + ' H' + xx + ' V' + yb + ' H' + X1, fill: 'none', stroke: stroke(L), 'stroke-width': 1.2, 'stroke-dasharray': L.provenance === 'inferred' ? '2 3' : null, style: 'cursor:pointer', onclick: () => showCard({ links: [L] }) }, sv('title', {}, L.finding ? (KIND_LABEL[L.finding.kind] || L.finding.kind) + ': ' + L.finding.headline : relLabel(L) + ' — ' + L.why))); drawn++; done.add(L.id); });
     } else if (grain === 'pattern') {
       G.bundles.forEach(P => { if (!lane.has(P.a) || !lane.has(P.b) || P.a === P.b) return;
         const e = { ya: lane.get(P.a), yb: lane.get(P.b), xa: (X0 + X1) / 2 - 40, xb: (X0 + X1) / 2 + 40 };
@@ -333,15 +442,26 @@ export function mountLinks(root, opts) {
     const summary = h('div', { class: 'lk-note' }, h('b', {}, [c.same + ' same', c.differs + ' differs', c.extends + ' extends', c.related + ' related', c.alone + ' alone'].join(' · ')),
       '. Pairs are proposed by wording; labels come from the figures. Nothing is merged.' + (S.rows.some(r => r.weak) ? ' Pairs marked weak do not beat chance in this workspace.' : ''));
     const figSpan = (txt, raw) => { const i = raw ? txt.indexOf(raw) : -1; if (i < 0) return [txt]; return [txt.slice(0, i), h('span', { class: 'lk-fig' }, raw), txt.slice(i + raw.length)]; };
-    const cell = (st, doc, raw) => st ? h('div', { class: 'lk-cell', style: 'border-left:3px solid ' + H.get(doc.id) }, ...figSpan(st.text, raw), h('button', { class: 'src', onclick: () => open(doc.id, st.s) }, 'open in ' + clip(doc.title, 28) + ' →'))
-      : h('div', { class: 'lk-cell void' }, doc.title + ' is silent');
+    // a cell shows the finding's own marked words when the pair has one, else the figure that differs
+    const cell = (st, doc, raw, L, side) => {
+      const marks = L && L.finding && L.finding.marks && L.finding.marks[side];
+      const body = st && marks && marks.length ? passageNodes(o.A, { doc: doc.id, kind: 'span', axis: 'chars', s: st.s, e: st.e }, marks, markClass(L), 400) : (st ? figSpan(st.text, raw) : null);
+      return st ? h('div', { class: 'lk-cell', style: 'border-left:3px solid ' + H.get(doc.id) }, ...body, h('button', { class: 'src', onclick: () => open(doc.id, st.s) }, 'open in ' + clip(doc.title, 28) + ' →'))
+        : h('div', { class: 'lk-cell void' }, doc.title + ' is silent');
+    };
+    // what came to light between exactly these two sources, beyond the row pairs: not named, not on file, defined as
+    const pairKey = (L) => [L.from.doc, L.to.doc].sort().join('|');
+    const meet = shown().filter((L) => L.finding && pairKey(L) === [a, b].sort().join('|') && ['scope', 'absent', 'defined'].includes(L.finding.kind)).sort((x, y) => kindRank(x) - kindRank(y));
+    const finds = meet.length ? h('div', { class: 'lk-pairfinds' }, h('div', { class: 'lk-lab' }, 'What came to light between these two'),
+      meet.slice(0, 6).map((L) => h('div', { class: 'lk-card', style: 'cursor:pointer', onclick: () => showCard({ links: [L] }) }, findingBlock(o.A, L, H)))) : null;
     let body;
     if (mode === 'seam' || mode === 'differences') {
       const rows = mode === 'differences' ? S.rows.filter(r => ['differs', 'extends'].includes(r.verdict)) : S.rows;
       body = rows.length ? h('div', { class: 'lk-seam' }, rows.flatMap(r => {
         const q = r.link && r.link.quote;
-        return [cell(r.a, da, q && q.from), h('div', { class: 'lk-mid ' + r.verdict, title: r.link ? r.link.why : '' }, r.verdict === 'alone' ? (r.a ? 'alone' : 'alone') : r.verdict, r.weak ? h('span', { class: 'lk-weak' }, 'weak') : null,
-          r.link ? h('button', { class: 'lk-btn', style: 'padding:1px 7px;font-size:11px', onclick: () => showCard({ links: [r.link] }) }, 'why') : null), cell(r.b, db, q && q.to)];
+        const F = r.link && r.link.finding; const said = F && F.kind !== 'terms' ? h('div', { class: 'lk-findrow' }, kindChip(r.link), h('div', { class: 'lk-head', style: 'font-weight:500' }, F.headline)) : null;
+        return [said, cell(r.a, da, q && q.from, r.link, 'from'), h('div', { class: 'lk-mid ' + r.verdict, title: r.link ? (F ? F.headline : r.link.why) : '' }, r.verdict === 'alone' ? 'alone' : r.verdict, r.weak ? h('span', { class: 'lk-weak' }, 'weak') : null,
+          r.link ? h('button', { class: 'lk-btn', style: 'padding:1px 7px;font-size:11px', onclick: () => showCard({ links: [r.link] }) }, 'why') : null), cell(r.b, db, q && q.to, r.link, 'to')].filter(Boolean);
       })) : h('div', { class: 'lk-empty' }, mode === 'differences' ? 'These two sources do not differ on any figure or date the wording paired.' : 'Nothing in these two sources reads alike.');
     } else {
       // overprint: one text — the first source in its order — with the second source's figure printed over where they differ
@@ -352,7 +472,7 @@ export function mountLinks(root, opts) {
       });
       body = h('div', { style: 'display:flex;flex-direction:column;gap:8px' }, ps);
     }
-    return h('div', { style: 'display:flex;flex-direction:column;gap:10px' }, head, summary, body);
+    return h('div', { style: 'display:flex;flex-direction:column;gap:10px' }, head, summary, finds, body);
   }
   const ix = () => { const k = (o.key || '') + '#ix'; let v = memo.get(k); if (!v) { v = buildIndex(o.A); memo.set(k, v); } return v; };
 
@@ -388,62 +508,55 @@ export function mountLinks(root, opts) {
   }
 
   // ── Orbit ──────────────────────────────────────────────────────────────────────────────────────────────────────
+  // The solar system is the Holodeck's own map engine (holodeck-map.js): the origin is the body in the middle, distance
+  // is the cumulative inverse bond (Dijkstra over the ties, so a strong tie sits near and a weak one drifts out), orbit
+  // speed falls with the ring, and bodies that are tied to a heavier body nest under it as moons, opened and closed by
+  // level. Here a body is a source (planet) or a linked passage (moon); a tie is a link between them. Nothing about the
+  // placement is chosen in this file: it is the engine's.
   function orbit() {
-    const A = o.A, links = shown();
-    const O = orbitOf(A, links, o.centre);
-    if (!O.planets.size) return h('div', { class: 'lk-empty' }, 'No two sources are linked yet, so there is nothing to orbit.');
-    const H = hues();
-    const lv = levelsOf(O.nest); const level = Math.min(o.level === 'parts' ? Math.max(1, lv.max) : 0, lv.max);
-    const open_ = openAtLevel(O.nest, level);
-    const W = 760, Hh = 520, cx = W / 2, cy = Hh / 2;
-    const ringStep = 108;
-    const byRing = new Map(); const far = [];
-    O.nest.roots.forEach(id => { if (id === O.centre) return; const d = O.dist.get(id); if (d == null) far.push(id); else (byRing.get(d) || byRing.set(d, []).get(d)).push(id); });
-    const maxRing = Math.max(0, ...byRing.keys()) + (far.length ? 1 : 0);
-    const scale = Math.min(1, (Math.min(cx, cy) - 56) / Math.max(1, maxRing * ringStep));
-    const pos = new Map(); pos.set(O.centre, [cx, cy]);
-    const place = (ids, ring) => ids.forEach((id, i) => { const a = -Math.PI / 2 + (2 * Math.PI * i) / ids.length + ring * 0.5; pos.set(id, [cx + Math.cos(a) * ringStep * ring * scale, cy + Math.sin(a) * ringStep * ring * scale]); });
-    [...byRing.keys()].sort((a, b) => a - b).forEach(k => place(byRing.get(k), k));
-    if (far.length) place(far, maxRing);
-    const svg = sv('svg', { viewBox: '0 0 ' + W + ' ' + Hh, role: 'img', 'aria-label': 'Orbit of sources around ' + clip(docOf(A, O.centre).title, 40) });
-    for (let k = 1; k <= maxRing; k++) {
-      svg.append(sv('circle', { cx, cy, r: ringStep * k * scale, fill: 'none', style: 'stroke:var(--line)', 'stroke-dasharray': far.length && k === maxRing ? '3 5' : null }));
-      svg.append(sv('text', { x: cx + 6, y: cy - ringStep * k * scale - 4, style: 'fill:var(--dim);font-size:9.5px' }, far.length && k === maxRing ? 'no path' : k + (k === 1 ? ' step' : ' steps')));
-    }
-    // visible bodies: a planet, or — where its holon is open — its moons
-    const rep = new Map(); const bodies = [];
-    O.nest.parent.forEach((_, id) => rep.set(id, repOf(O.nest, id, open_)));
-    const planetPos = id => pos.get(id) || [cx, cy];
-    const moonPos = (planet, i, n) => { const [px, py] = planetPos(planet); const a = (2 * Math.PI * i) / Math.max(1, n) - Math.PI / 2; const r = 22 + Math.min(14, n); return [px + Math.cos(a) * r, py + Math.sin(a) * r]; };
-    const where = id => { if (O.planets.has(id)) return planetPos(id); const m = O.moons.get(id); const sibs = O.nest.kids.get(m.doc); return moonPos(m.doc, sibs.indexOf(id), sibs.length); };
-    const shownIds = []; O.nest.roots.forEach(id => { shownIds.push(id); if (open_.has(id)) O.nest.kids.get(id).forEach(k => shownIds.push(k)); });
-    // ties between visible bodies, rolled up through the holons' own function
-    const ties = rollUp(O.edges, rep);
-    ties.forEach(t => { const [x1, y1] = where(t.a), [x2, y2] = where(t.b);
-      svg.append(sv('line', { x1, y1, x2, y2, style: 'stroke:var(--ink2)', 'stroke-width': Math.min(4, 0.8 + 0.6 * Math.log2(1 + t.c)), opacity: .55 }, sv('title', {}, plural(t.c, 'link')))); });
-    shownIds.forEach(id => {
-      const isMoon = O.moons.has(id); const [x, y] = where(id); const prev = lastPos.get(id);
-      const doc = isMoon ? O.moons.get(id).doc : id; const hue = H.get(doc);
-      const c = isMoon ? O.moons.get(id).c : O.planets.get(id).c; const r = isMoon ? 5 + Math.min(4, c) : (id === O.centre ? 26 : 14 + Math.min(10, c));
-      const from = prev || [x, y];
-      const g = sv('g', { style: 'cursor:pointer;transform:translate(' + from[0] + 'px,' + from[1] + 'px)', tabindex: 0, role: 'button',
-        'aria-label': isMoon ? clip(O.moons.get(id).st.text, 60) : docOf(A, id).title, onclick: () => { if (isMoon) showCard({ links: links.filter(L => L.id && O.edges.some(e => e.link === L.id && (e.a === id || e.b === id))), quote: O.moons.get(id).st }); else { o.onCentre && o.onCentre(id); set({ centre: id }); } },
-        onkeydown: ev => { if (ev.key === 'Enter') ev.target.dispatchEvent(new MouseEvent('click')); } });
-      g.append(sv('circle', { r, fill: hue, opacity: isMoon ? .85 : .22, stroke: hue, 'stroke-width': id === O.centre ? 2.5 : 1.2 }));
-      if (!isMoon) { g.append(sv('text', { y: r + 12, 'text-anchor': 'middle', style: 'font-size:11px;fill:var(--ink)' }, clip(docOf(A, id).title, 22))); g.append(sv('text', { y: 4, 'text-anchor': 'middle', style: 'font-size:11px;font-weight:600;fill:var(--ink)' }, String(c))); }
-      g.append(sv('title', {}, isMoon ? clip(O.moons.get(id).st.text, 160) : docOf(A, id).title + ' — ' + plural(c, 'link')));
-      svg.append(g);
-      if (prev) requestAnimationFrame(() => requestAnimationFrame(() => { g.style.transition = 'transform .55s ease'; g.style.transform = 'translate(' + x + 'px,' + y + 'px)'; }));
-    });
-    lastPos.clear(); shownIds.forEach(id => lastPos.set(id, where(id)));
-    const none = (A.docs || []).filter(d => !O.planets.has(d.id)).length;
-    const ctl = h('div', { class: 'lk-bar' },
-      h('div', { class: 'lk-chips' }, h('span', { class: 'lk-lab' }, 'Center'), h('b', {}, clip(docOf(A, O.centre).title, 40))),
-      h('div', { style: 'display:flex;gap:8px;align-items:center' }, h('span', { class: 'lk-lab' }, 'Level'), h('div', { class: 'lk-seg', role: 'group', 'aria-label': 'Level' },
-        [['roots', 'Roots'], ['parts', 'Parts']].map(([k, l]) => h('button', { class: (level === 0 ? 'roots' : 'parts') === k ? 'on' : '', title: k === 'roots' ? 'Sources only' : 'Open every source into the passages that carry links',
-          'aria-pressed': String((level === 0 ? 'roots' : 'parts') === k), onclick: () => { o.onLevel && o.onLevel(k); set({ level: k }); } }, l)))));
-    return h('div', { style: 'display:flex;flex-direction:column;gap:8px' }, ctl, h('div', { class: 'lk-svgwrap' }, svg),
-      h('div', { class: 'lk-note' }, 'Re-centering recomputes ring distance as link steps from the new center.' + (none ? ' ' + plural(none, 'source') + ' ' + (none === 1 ? 'has' : 'have') + ' no links and ' + (none === 1 ? 'is' : 'are') + ' not drawn.' : '')), noteTruth());
+    const A = o.A, grain = o.grain || 'figure'; const H = hues();
+    const links = shown().filter((L) => L.from.doc !== L.to.doc && L.from.axis !== 'time' && L.to.axis !== 'time');
+    if (!links.length) return h('div', { class: 'lk-empty' }, 'No two sources are linked yet, so there is nothing to orbit.');
+    const used = new Set(), names = new Map(), nodes = new Map(), ties = new Map(), occ = new Map();
+    const nameFor = (key, base) => { if (names.has(key)) return names.get(key); let n = base, k = 2; while (used.has(n)) n = base + ' #' + k++; used.add(n); names.set(key, n); return n; };
+    const stOf = (sp) => (onChars(sp) ? (((A.stsByDoc && A.stsByDoc[sp.doc]) || []).find((st) => st.s < sp.e && sp.s < st.e) || null) : null);
+    const body = (sp) => {
+      const st = grain === 'figure' ? stOf(sp) : null;
+      const key = st ? 'p:' + st.id : 'd:' + sp.doc;
+      const n = nameFor(key, st ? '“' + clip(st.text, 36) + '”' : clip(docOf(A, sp.doc).title, 34));
+      if (!nodes.has(n)) nodes.set(n, { n, c: 0, color: H.get(sp.doc), doc: sp.doc, st });
+      return nodes.get(n);
+    };
+    const tie = (a, b, w) => { if (a === b) return; const k = a.n < b.n ? a.n + '\u0001' + b.n : b.n + '\u0001' + a.n; const t = ties.get(k) || { a: a.n, b: b.n, c: 0 }; t.c += w; ties.set(k, t); a.c += w; b.c += w; };
+    let use = links;
+    if (grain === 'pattern') use = patternsOf(links).flatMap((p) => p.links); // only what recurs
+    use.forEach((L) => tie(body(L.from), body(L.to), 1));
+    // every source in view is a body, tied or not, so a source with no links is seen to have none
+    (A.docs || []).forEach((d) => { const n = nameFor('d:' + d.id, clip(docOf(A, d.id).title, 34)); if (!nodes.has(n)) nodes.set(n, { n, c: 0, color: H.get(d.id), doc: d.id, st: null }); });
+    const edges = [...ties.values()];
+    if (grain === 'figure') {
+      // a passage belongs to its source: the structural tie is the strongest in the map, so the passage nests under its
+      // source (a moon) and the engine's levels open and close them
+      const maxTie = Math.max(1, ...edges.map((e) => e.c)) + 1; const sum = new Map();
+      [...nodes.values()].filter((x) => x.st).forEach((x) => { const dn = names.get('d:' + x.doc); if (!dn) return; edges.push({ a: x.n, b: dn, c: maxTie }); sum.set(dn, (sum.get(dn) || 0) + x.c); });
+      sum.forEach((v, dn) => { nodes.get(dn).c += v; });
+      [...nodes.values()].forEach((x) => { if (!x.st) x.c += 1; });
+    } else [...nodes.values()].forEach((x) => { x.c += 1; });
+    nodes.forEach((x) => { if (x.st) { (occ.get(x.n) || occ.set(x.n, []).get(x.n)).push({ doc: x.doc, id: x.st.id, t: x.st.text }); } });
+    nodes.forEach((x) => { if (!x.st) { const mine = [...nodes.values()].filter((y) => y.st && y.doc === x.doc); mine.forEach((y) => (occ.get(x.n) || occ.set(x.n, []).get(x.n)).push({ doc: y.doc, id: y.st.id, t: y.st.text })); } });
+    const idsum = links.map((L) => L.id).join(','); let hh = 0; for (let i = 0; i < idsum.length; i++) hh = (Math.imul(hh, 31) + idsum.charCodeAt(i)) | 0;
+    const sig = [o.key, grain, hh, JSON.stringify(raw.off || {}), nodes.size, edges.length].join('|');
+    const centreName = o.centre && names.get('d:' + o.centre) ? names.get('d:' + o.centre) : null;
+    const host = h('div', { class: 'lk-orbit' });
+    setTimeout(() => {
+      if (!host.isConnected) return;
+      orbitMap = mountMap(host, { padBottom: 8, empty: 'Nothing is linked yet.', sentence: (x) => x.t,
+        onProfile: (n) => { const b = nodes.get(n); if (b) open(b.doc, b.st ? b.st.s : 0); } });
+      orbitMap.set({ sig, nodes: [...nodes.values()].map((x) => ({ n: x.n, c: x.c, color: x.color })), edges, docs: (A.docs || []).map((d) => ({ id: d.id, title: d.title })), occ, sel: centreName });
+    }, 0);
+    return h('div', { style: 'display:flex;flex-direction:column;gap:8px' }, host,
+      h('div', { class: 'lk-note' }, 'Planets are sources and moons are their linked passages. Click a body to make it the center: the nearer a body sits, the more links tie it there. Use ↑ ↓ to close or open the moons. At Ground only whole sources are drawn; at Pattern only ties that recur.'),
+      noteTruth());
   }
 
   // ── Fields ─────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -479,9 +592,10 @@ export function mountLinks(root, opts) {
     const today = new Date().toISOString().slice(0, 10);
     const todayN = (o.decisions || []).filter(e => e.action && e.at && String(e.at).slice(0, 10) === today).length;
     const tab = o.reviewTab || 'all';
-    const tabs = [['all', 'All', inferred.length], ['differs', 'Differs', inferred.filter(L => L.verdict === 'differs').length], ['same', 'Same value', inferred.filter(L => L.relation === 'same-value' && L.verdict !== 'differs').length], ['other', 'Other', inferred.filter(L => L.relation !== 'same-value').length]];
-    const keep = L => tab === 'all' || (tab === 'differs' && L.verdict === 'differs') || (tab === 'same' && L.relation === 'same-value' && L.verdict !== 'differs') || (tab === 'other' && L.relation !== 'same-value');
-    const rows = inferred.filter(keep);
+    const tabs = [['all', 'All', inferred.length], ['differs', 'Differs', inferred.filter(L => L.verdict === 'differs').length], ['left', 'Left out', inferred.filter(leftOut).length], ['same', 'Same value', inferred.filter(L => L.relation === 'same-value' && L.verdict !== 'differs').length], ['other', 'Other', inferred.filter(L => L.relation !== 'same-value' && !leftOut(L)).length]];
+    const keep = L => tab === 'all' || (tab === 'differs' && L.verdict === 'differs') || (tab === 'left' && leftOut(L)) || (tab === 'same' && L.relation === 'same-value' && L.verdict !== 'differs') || (tab === 'other' && L.relation !== 'same-value' && !leftOut(L));
+    // the pairs that establish the most come first: a difference, a denial, a document that is missing, what was left out
+    const rows = inferred.filter(keep).slice().sort((x, y) => kindRank(x) - kindRank(y));
     const wr = o.write;
     const card = L => {
       const rel = h('select', { class: 'lk-sel', 'aria-label': 'Change relation', onchange: e => { if (e.target.value) wr && wr({ action: 'change', id: L.id, relation: e.target.value }); } },
@@ -490,8 +604,8 @@ export function mountLinks(root, opts) {
       return h('div', { class: 'lk-card' },
         h('div', { style: 'display:flex;gap:8px;align-items:baseline;flex-wrap:wrap' },
           h('b', { style: 'font:600 13px var(--sans);' + (L.verdict === 'differs' ? 'color:var(--bad)' : '') }, 'proposed: ' + (L.verdict === 'differs' ? 'differs' : RELATIONS[L.relation].label)), L.weak ? h('span', { class: 'lk-weak', title: 'This pair does not beat chance in this workspace' }, 'below chance') : null, provChip(L),
-          h('span', { class: 'lk-note' }, L.why)),
-        h('div', { class: 'lk-two' }, pass(L.from), pass(L.to)),
+          L.finding ? null : h('span', { class: 'lk-note' }, L.why)),
+        L.finding ? findingBlock(A, L, H) : h('div', { class: 'lk-two' }, pass(L.from), pass(L.to)),
         h('div', { style: 'display:flex;gap:8px;align-items:center;flex-wrap:wrap' },
           h('button', { class: 'lk-btn pri', disabled: !wr, onclick: () => wr && wr({ action: 'confirm', id: L.id }) }, 'Confirm'),
           h('button', { class: 'lk-btn bad', disabled: !wr, onclick: () => wr && wr({ action: 'reject', id: L.id }) }, 'Reject'), rel,
@@ -527,17 +641,24 @@ export function mountLinks(root, opts) {
     const view = SURFACES.includes(o.view) ? o.view : 'lanes';
     const parts = [];
     let count = null;
+    if (orbitMap) { try { orbitMap.destroy(); } catch (e) { /* gone */ } orbitMap = null; }
     const fn = { lanes, margin, seam, orbit, fields, review }[view];
     const body = fn();
     if (view !== 'review') parts.push(...toolbar(view, count));
+    parts.push(sourcesBar());
     parts.push(body);
     wrap.replaceChildren(...parts.filter(Boolean));
     renderCard();
   }
-  render();
+  lastSig = sigOf(raw); render();
   return {
-    update(next) { const fresh = !next || (next.key !== o.key); if (fresh) memo.clear(); o = { ...o, ...next }; render(); },
-    destroy() { root.replaceChildren(); },
+    update(next) {
+      const merged = { ...raw, ...next }; const sig = sigOf(merged);
+      if (sig === lastSig) { raw = merged; o = effective(raw); return; } // nothing it draws has changed: do not rebuild (a typing cursor, a focused select)
+      if (!next || next.key !== raw.key || JSON.stringify(merged.off || {}) !== JSON.stringify(raw.off || {})) memo.clear();
+      raw = merged; o = effective(raw); lastSig = sig; render();
+    },
+    destroy() { if (orbitMap) { try { orbitMap.destroy(); } catch (e) { /* gone */ } orbitMap = null; } root.replaceChildren(); },
     get view() { return o.view; },
   };
 }
@@ -554,10 +675,12 @@ export function passageCard({ links = [], title = '', quote = null, A, hues, the
     links.slice(0, 40).map(L => h('div', { class: 'lk-card' },
       h('div', { style: 'display:flex;gap:8px;align-items:center;flex-wrap:wrap' },
         h('b', { style: 'font:600 12.5px var(--sans);' + (L.verdict === 'differs' ? 'color:var(--bad)' : '') }, RELATIONS[L.relation].glyph + ' ' + relLabel(L)), provChip(L), L.by ? h('span', { class: 'lk-note' }, 'by ' + L.by) : null),
+      L.finding ? h('div', { class: 'lk-find' }, kindChip(L), h('div', { class: 'lk-head' }, L.finding.headline)) : null,
       [L.from, L.to].map((sp, i) => h('div', { class: 'lk-pass', style: '--lk-c:' + (hues.get(sp.doc) || 'var(--acc)') },
-        h('small', {}, (i ? 'to · ' : 'from · ') + clip(docOf(A, sp.doc).title, 36)), quoteOf(A, sp, 220),
+        h('small', {}, (i ? 'to · ' : 'from · ') + clip(docOf(A, sp.doc).title, 36)),
+        L.finding ? passageNodes(A, sp, L.finding.marks && L.finding.marks[i ? 'to' : 'from'], markClass(L), 260) : quoteOf(A, sp, 220),
         h('button', { class: 'lk-btn', style: 'margin-top:4px;padding:2px 8px;font-size:12px', onclick: () => open(sp.doc, onChars(sp) ? sp.s : 0) }, onChars(sp) ? 'Open in reader' : 'Open source'))),
-      h('div', { class: 'lk-note' }, L.why))));
+      L.finding ? null : h('div', { class: 'lk-note' }, L.why))));
 }
 
 // ── the Reader's link gutter ────────────────────────────────────────────────────────────────────────────────────
@@ -569,7 +692,11 @@ export function paintLinks(el, nodes, { doc, links, A, hues, onOpen, theme = 'da
   const items = [];
   links.forEach(L => [['from', L.from, L.to], ['to', L.to, L.from]].forEach(([side, mine, theirs]) => {
     if (mine.doc !== doc || !onChars(mine)) return;
-    items.push({ L, s: mine.s, e: mine.e, other: theirs, side });
+    // a finding underlines exactly the words that carry it; a link with none underlines its whole passage
+    const ms = L.finding && L.finding.marks && L.finding.marks[side === 'from' ? 'from' : 'to'];
+    const inside = (ms || []).filter((m) => m[0] >= mine.s && m[1] <= mine.e && m[1] > m[0]);
+    if (inside.length) inside.forEach((m) => items.push({ L, s: m[0], e: m[1], other: theirs, side }));
+    else items.push({ L, s: mine.s, e: mine.e, other: theirs, side });
   }));
   if (!items.length) return { count: 0, destroy() {} };
   items.sort((a, b) => a.s - b.s || a.e - b.e);
@@ -587,9 +714,10 @@ export function paintLinks(el, nodes, { doc, links, A, hues, onOpen, theme = 'da
       const top = on.slice().sort((x, y) => PROVENANCE[y.L.provenance].rank - PROVENANCE[x.L.provenance].rank)[0];
       const sp = document.createElement('span'); sp.className = 'lk-ul'; sp.textContent = txt;
       sp.setAttribute('data-lk', on.map(x => x.L.id).join(' ')); sp.setAttribute('data-rel', top.L.relation); sp.setAttribute('data-prov', top.L.provenance);
-      if (on.some(x => x.L.verdict === 'differs')) sp.setAttribute('data-v', 'differs');
+      if (on.some(x => x.L.verdict === 'differs' || (x.L.finding && x.L.finding.kind === 'polarity'))) sp.setAttribute('data-v', 'differs');
+      if (on.some(x => leftOut(x.L))) sp.setAttribute('data-v', 'left');
       sp.style.setProperty('--lk-c', top.L.verdict === 'differs' ? bad : (hues.get(top.other.doc) || 'var(--acc)'));
-      sp.title = on.map(x => RELATIONS[x.L.relation].label + ' · ' + clip(quoteOf(A, x.other, 80), 80)).join('\n');
+      sp.title = on.map(x => x.L.finding ? (KIND_LABEL[x.L.finding.kind] || x.L.finding.kind) + ': ' + clip(x.L.finding.headline, 200) : RELATIONS[x.L.relation].label + ' · ' + clip(quoteOf(A, x.other, 80), 80)).join('\n');
       sp.addEventListener('click', ev => { ev.stopPropagation(); ev.preventDefault(); onOpen && onOpen({ links: on.map(x => x.L), anchor: sp }); });
       frag.append(sp);
     }
@@ -612,11 +740,11 @@ export function paintLinks(el, nodes, { doc, links, A, hues, onOpen, theme = 'da
       const y = anchor.getBoundingClientRect().top - hr.top; const top = Math.max(y, floor);
       const row = document.createElement('div'); row.className = 'lk-row'; row.style.cssText = 'position:absolute;left:0;right:0;top:' + top + 'px;pointer-events:auto';
       const rel = document.createElement('div'); rel.className = 'rel' + (it.L.verdict === 'differs' ? ' differs' : '');
-      rel.append(document.createTextNode(RELATIONS[it.L.relation].glyph + ' ' + relLabel(it.L)));
+      rel.append(document.createTextNode(it.L.finding ? (KIND_LABEL[it.L.finding.kind] || it.L.finding.kind) : RELATIONS[it.L.relation].glyph + ' ' + relLabel(it.L)));
       const pv = document.createElement('span'); pv.className = 'lk-prov ' + it.L.provenance; pv.textContent = PROVENANCE[it.L.provenance].label; rel.append(pv);
       const src = document.createElement('div'); src.className = 'src';
       const dt = document.createElement('span'); dt.className = 'lk-dot'; dt.style.background = hues.get(it.other.doc) || 'var(--acc)'; src.append(dt, document.createTextNode(clip(docOf(A, it.other.doc).title, 30)));
-      const q = document.createElement('q'); q.textContent = clip(quoteOf(A, it.other, 110), 110);
+      const q = document.createElement('q'); q.textContent = it.L.finding ? clip(it.L.finding.headline, 150) : clip(quoteOf(A, it.other, 110), 110);
       row.append(rel, src, q); row.addEventListener('click', () => onOpen && onOpen({ links: [it.L] }));
       gut.append(row); floor = top + row.offsetHeight + 6;
     });

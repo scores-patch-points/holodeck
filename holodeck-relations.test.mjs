@@ -7,8 +7,8 @@ import * as R from './holodeck-relations.js';
 // A statement list the way the app's analyze() would make one: sentence spans over the doc text, figures found by
 // the same kind of pattern (value, unit, raw, s, e relative to the statement).
 function figs(t) {
-  const out = []; const re = /\$(\d+(?:\.\d+)?)/g; let m;
-  while ((m = re.exec(t))) out.push({ raw: m[0], value: +m[1], unit: 'dollars', label: 'dollars', s: m.index, e: m.index + m[0].length });
+  const out = []; const re = /\$(\d[\d,]*(?:\.\d+)?)/g; let m;
+  while ((m = re.exec(t))) out.push({ raw: m[0], value: +m[1].replace(/,/g, ''), unit: 'dollars', label: 'dollars', s: m.index, e: m.index + m[0].length });
   return out;
 }
 function mkDoc(id, title, sentences, extra = {}) {
@@ -267,4 +267,172 @@ test('contracts: only Review and the Sources shelf may write links; every other 
   assert.deepEqual(writers, ['Review', 'Sources shelf']);
   ['Lanes', 'Margin', 'Seam', 'Fields', 'Passage', 'Reader', 'Graph', 'Player'].forEach(s => assert.equal(R.canWriteLinks(s), false, s));
   for (const c of R.SURFACE_CONTRACTS) if (!R.canWriteLinks(c.surface)) assert.ok(!c.ops.includes('INS') && !c.ops.includes('SEG') && !c.ops.includes('REC'), c.surface);
+});
+
+// ── findings: what a pair establishes, said plainly ────────────────────────────────────────────────────────────────
+// A workspace with a real vocabulary behind it: fifty short municipal sources of generated sentences, so a chance bag of
+// words has somewhere else to land and the null speaks for what chance would find.
+function bulk(n = 50) {
+  const W = ('budget council library bridge pavement transit riverside greenway playground cemetery harbor ferry dredging permit zoning '
+    + 'variance appeal hearing minutes agenda quorum motion amendment ordinance clerk treasurer assessor millage levy bond reserve audit '
+    + 'payroll pension grant stormwater sewer culvert hydrant inspector violation citation fine lien deed easement survey parcel '
+    + 'orchard festival concert marathon parade volunteer mulch seedling bench fountain pier boardwalk canoe shelter pavilion '
+    + 'snowplow salt asphalt crosswalk signal bicycle sidewalk lighting curb median roundabout viaduct tunnel depot platform').split(' ');
+  let x = 12345; const r = () => (x = (Math.imul(x, 1664525) + 1013904223) >>> 0) / 4294967296;
+  return Array.from({ length: n }, (_, i) => mkDoc('bulk' + i, 'Source ' + i, Array.from({ length: 4 }, () =>
+    'The ' + Array.from({ length: 7 }, () => W[Math.floor(r() * W.length)]).join(' ') + ' was discussed at the meeting.')));
+}
+const packet = () => mkDoc('packet', 'RS2026-2264 resolution and certification', [
+  'A resolution accepting the terms of a cooperative purchasing master agreement with Motorola Solutions for public safety software.',
+  'Does the contract contain any video surveillance or drone software as described in MCL 13.08.080? No.',
+  'The anticipated project value is $3,946,041.00 and council approval of the master agreement is required.',
+  'This cooperative request is recommended for approval by the Purchasing Agent.',
+]);
+const agreement = () => mkDoc('agree', 'Sourcewell master agreement 030425 with Motorola Solutions', [
+  'Category one covers public safety video surveillance solutions with related equipment, software and accessories.',
+  'Category two covers drone software and hardware and unmanned vehicle systems with related technology.',
+  'The anticipated project value is $3,946,041.00 under this master agreement.',
+  'Payment terms are net forty five days from the date of each invoice.',
+]);
+const ordinance = () => mkDoc('code', 'Metro Code 13.08.080', [
+  '"Surveillance technology" includes: automatic license plate readers, closed-circuit television cameras, drone software, video monitoring and recording technology, and biometric systems.',
+  '"Public right-of-way" shall mean any street, avenue, sidewalk or public outdoor space.',
+  'A public hearing and a civil rights review are required before the council approves surveillance technology.',
+]);
+
+test('finding: a denial against a statement over the same terms is flagged as a denial, with both quotes', () => {
+  const W = world([packet(), agreement(), ...filler(), ...bulk()]);
+  const S = R.seamOf(W, 'packet', 'agree');
+  const row = S.rows.find((r) => r.a && r.a.id === 'packet:1');
+  assert.ok(row && row.link, 'the certification pairs with something');
+  assert.equal(row.link.finding.kind, 'polarity');
+  assert.match(row.link.finding.headline, /denies what the other states/);
+  assert.match(row.link.finding.headline, /video|surveillance|drone/);
+  assert.equal(row.link.verdict, 'differs', 'a denial is a difference, not a resemblance');
+  // marks are absolute offsets onto the words themselves
+  const st = W.stsByDoc.packet[1]; const m = row.link.finding.marks.from[0];
+  assert.match(W.docs[0].text.slice(m[0], m[1]).toLowerCase(), /video|surveillance|drone/);
+});
+
+test('finding: the same figure in both is "both state", with the figure marked', () => {
+  const W = world([packet(), agreement(), ...filler()]);
+  const row = R.seamOf(W, 'packet', 'agree').rows.find((r) => r.a && r.a.id === 'packet:2');
+  assert.ok(row.link);
+  assert.equal(row.link.finding.kind, 'same');
+  assert.match(row.link.finding.headline, /\$3,946,041/);
+});
+
+test('finding: a phrase one source writes into a definition is a computed link to that definition', () => {
+  const W = world([agreement(), ordinance(), ...filler()]);
+  const ix = R.buildIndex(W);
+  const L = R.definedLinks(W, ix);
+  const drone = L.find((l) => l.from.doc === 'agree' && /drone/i.test(l.finding.terms[0]));
+  assert.ok(drone, 'the agreement names drone software, which the ordinance lists');
+  assert.equal(drone.to.doc, 'code');
+  assert.equal(drone.provenance, 'computed');
+  assert.equal(drone.finding.kind, 'defined');
+  assert.match(drone.finding.headline, /definition of “Surveillance technology”/);
+  const m = drone.finding.marks.from[0]; assert.match(W.docs.find((d) => d.id === 'agree').text.slice(m[0], m[1]).toLowerCase(), /^drone/);
+  // a source does not define itself
+  assert.equal(L.filter((l) => l.from.doc === l.to.doc).length, 0);
+});
+
+test('finding: a citation says which passage it lands on', () => {
+  const W = world([lease(), act()]);
+  const c = R.importCitations(W).links[0];
+  assert.equal(c.finding.kind, 'cite');
+  assert.match(c.finding.headline, /^Cites “§14/);
+  assert.match(c.finding.headline, /not to exceed \$15/);
+});
+
+test('collect: every link a reader is shown carries a finding or says why not', () => {
+  const W = world([packet(), agreement(), ordinance(), ...filler()]);
+  const C = R.collect(W, {});
+  const shown = C.links.filter((l) => l.source !== 'captions' && l.source !== 'title' && l.from.doc !== l.to.doc);
+  assert.ok(shown.length > 0);
+  shown.forEach((l) => assert.ok(l.finding && l.finding.headline, l.source + ' ' + l.relation + ' has no finding'));
+});
+
+// ── scope and absence: the two things the Motorola record turns on ──────────────────────────────────────────────────
+// Lines of a source are its statements; blank lines stay in the text, so paragraphs can be told apart.
+function mkLines(id, title, text) {
+  const sts = []; let off = 0;
+  text.split('\n').forEach((line, i) => {
+    const t = line.trim();
+    if (t.length) { const s = off + line.indexOf(t); sts.push({ id: id + ':' + i, doc: id, s, e: s + t.length, text: t, figs: [], names: [] }); }
+    off += line.length + 1;
+  });
+  return { doc: { id, title, text }, sts };
+}
+const resolution = () => mkLines('res', 'RS2026-2264 resolution and certification', [
+  'WHEREAS, the Purchasing Agent desires to participate in the master agreement between Sourcewell, a governmental agency,',
+  'and Motorola Solutions, Inc., a copy of which is attached hereto and incorporated herein; and,',
+  '',
+  'WHEREAS, this agreement was requested by the Department of Emergency Communications for computer aided dispatch;',
+  '',
+  'Section 1. That the master agreement between Sourcewell and Motorola Solutions, a copy of which is attached hereto, is hereby approved.',
+].join('\n'));
+const exhibit = () => mkLines('exh', 'Sourcewell master agreement 030425 with Motorola Solutions', [
+  'Computer Aided Dispatch',
+  'Records Management System',
+  'Drone Software and Hardware',
+  'Public Safety Video Surveillance Solutions',
+  'Data Migration Services',
+  'Fleet Telematics Platform',
+  'Payment is due within forty five days of each invoice.',
+].join('\n'));
+const debate = () => mkLines('deb', 'Council debate on RS2026-2264', [
+  'I am worried about how long the vote will take tonight.',
+  'In this exhibit, there are drones that may be purchased with this.',
+  'Why is the existing contract not on a government website?',
+  'The meeting was adjourned after the vote.',
+].join('\n'));
+
+test('scope: what the resolution approves against what the exhibit lists, led by what another source raised', () => {
+  const W = world([resolution(), exhibit(), debate(), ...filler()]);
+  const ix = R.buildIndex(W);
+  const L = R.scopeLinks(W, ix);
+  const main = L.find((l) => l.from.doc === 'res' && l.to.doc === 'exh' && l.to.kind === 'whole');
+  assert.ok(main, 'the resolution is linked to the exhibit it attaches');
+  assert.equal(main.finding.kind, 'scope');
+  assert.match(main.finding.headline, /Drone Software and Hardware/);
+  assert.match(main.finding.headline, /resolution never names/);
+  const raised = L.find((l) => l.from.doc === 'deb' && l.to.doc === 'exh');
+  assert.ok(raised, 'the statement that points at the exhibit is linked to the heading it names');
+  assert.match(W.docs.find((d) => d.id === 'exh').text.slice(raised.to.s, raised.to.e), /^Drone Software/);
+  assert.match(W.docs.find((d) => d.id === 'deb').text.slice(raised.from.s, raised.from.e).toLowerCase(), /^drone/);
+  // an entry the resolution does name is not omitted
+  assert.ok(!L.some((l) => l.finding && /Computer Aided Dispatch/.test(l.finding.headline) && /never names it/.test(l.finding.headline)));
+  assert.ok(L.every((l) => l.finding && l.finding.marks), 'every one marks the words');
+});
+
+test('scope: a statement that only shares a word with a heading, without pointing at the exhibit, raises nothing', () => {
+  const quiet = mkLines('deb', 'Council debate', ['Drones were discussed for an hour.', 'The vote was held after the meeting.'].join('\n'));
+  const L = R.scopeLinks(world([resolution(), exhibit(), quiet, ...filler()]), R.buildIndex(world([resolution(), exhibit(), quiet, ...filler()])));
+  assert.ok(!L.some((l) => l.from.doc === 'deb'));
+  assert.doesNotMatch(L.find((l) => l.from.doc === 'res').finding.headline, /raised elsewhere/);
+});
+
+test('absent: a source says the existing contract is not available; the link says nothing here is that contract', () => {
+  const W = world([resolution(), exhibit(), debate(), ...filler()]);
+  const L = R.absentLinks(W, R.buildIndex(W));
+  assert.equal(L.length, 1);
+  assert.equal(L[0].finding.kind, 'absent');
+  assert.equal(L[0].to.doc, 'exh');
+  assert.match(L[0].finding.headline, /existing contract is not available/);
+  const m = L[0].finding.marks.from; const t = W.docs.find((d) => d.id === 'deb').text;
+  assert.deepEqual(m.map(([a, b]) => t.slice(a, b).toLowerCase()), ['existing contract', 'not on']);
+});
+
+test('absent: an ordinary reference to "the contract" is not a claim that one is missing', () => {
+  const quiet = mkLines('deb', 'Debate', ['The contract is on the agenda tonight.', 'The existing contract expired in June.'].join('\n'));
+  const W = world([resolution(), exhibit(), quiet, ...filler()]);
+  assert.equal(R.absentLinks(W, R.buildIndex(W)).length, 0);
+});
+
+test('definitions: a lone generic word in a definition is not an example', () => {
+  const D = mkDoc('code', 'Code', ['"Surveillance technology" shall mean any electronic surveillance device, hardware, or software that records location.']);
+  const S = mkDoc('agree', 'Agreement', ['The hardware is delivered to the location named in the order.']);
+  const W = world([D, S, ...filler()]);
+  assert.equal(R.definedLinks(W, R.buildIndex(W)).length, 0);
 });

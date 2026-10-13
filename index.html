@@ -2598,9 +2598,15 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
                     <span style="font:400 12.5px/1.45 var(--sans);color:var(--mut);text-wrap:pretty">Listening for what kind of sound this is — the model runs in this browser, the bytes never leave this machine…</span>
                   </sc-if>
                   <sc-if value="{{ rdMedia.hasCls }}" hint-placeholder-val="{{ false }}">
-                    <div style="display:flex;flex-direction:column;gap:3px">
-                      <span style="font:600 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--mut)">Sound map — where the kind changes</span>
-                      <span style="font:500 13px/1.55 var(--sans);color:var(--ink2);text-wrap:pretty">{{ rdMedia.clsLine }}<span style="color:var(--dim)"> ({{ rdMedia.clsMeta }})</span></span>
+                    <div style="display:flex;flex-direction:column;gap:6px">
+                      <span style="font:600 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--mut)">What else is heard</span>
+                      <sc-if value="{{ rdMedia.hasClsStrip }}" hint-placeholder-val="{{ false }}">
+                        <div style="position:relative;height:12px;border-radius:6px;background:var(--s2);border:1px solid var(--line);overflow:hidden" aria-label="Where in the recording something other than speech is heard">
+                          <sc-for list="{{ rdMedia.clsStrip }}" as="c" hint-placeholder-count="4"><span style="position:absolute;top:0;bottom:0;left:{{ c.left }};width:{{ c.w }};min-width:3px;background:var(--amber)"></span></sc-for>
+                        </div>
+                      </sc-if>
+                      <span style="font:400 13px/1.5 var(--sans);color:var(--ink2);text-wrap:pretty">{{ rdMedia.clsEvents }}</span>
+                      <details class="hd-disclosure" style="padding:0;border:0"><summary style="font:500 12px var(--sans);color:var(--mut)">Every change of sound ({{ rdMedia.clsN }})</summary><span style="font:400 12.5px/1.55 var(--mono);color:var(--mut);display:block;padding-top:6px">{{ rdMedia.clsLine }}</span></details>
                     </div>
                   </sc-if>
                 </sc-if>
@@ -5410,6 +5416,7 @@ class Component extends DCLogic {
     const o = { view: S.view, A, key: this._key, links: LS.links, weak: LS.weak, rejected: LS.rejected, unresolved: LS.unresolved, truncated: LS.truncated, coverage: LS.coverage, decisions: LS.decisions,
       grain: P.grain || 'figure', filter: P.filter || { minProvenance: 'computed' }, theme: document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark', workspace: this.corpusName(),
       pair: S.lkPair || null, seamMode: S.lkSeamMode || 'seam', centre: S.lkCentre || null, level: S.lkLevel || 'roots', reviewTab: S.lkReviewTab || 'all',
+      off: S.offDocs || {}, onSources: off => this.setState({ offDocs: off }),
       draft: (() => { try { return localStorage.getItem(dkey) || ''; } catch (e) { return ''; } })(),
       onGrain: g => this.setLinkPref('grain', g), onFilter: f => this.setLinkPref('filter', f), onPair: p => this.setState({ lkPair: p }), onSeamMode: m => this.setState({ lkSeamMode: m }),
       onCentre: c => this.setState({ lkCentre: c }), onLevel: l => this.setState({ lkLevel: l }), onDraft: t => { try { localStorage.setItem(dkey, t); } catch (e) {} },
@@ -9513,6 +9520,13 @@ onAsk: () => { this.setState({ txAsk: d0.id }); this.pickYtFile(d0); }, onCancel
         const hasCls = clsChunks.length > 0;
         const clsLine = clsChunks.map(c => (c.t ? c.t + ' ' : '') + c.name).join(' \u00b7 ');
         const clsBusy = this.clsBusy(d0.id);
+        // What is worth saying about the sound is what is NOT speech: a run of "Speech · Speech · Speech" is one kind
+        // split by the classifier's own windows. A timeline marks the other moments; one line names them.
+        const isSp = n => /^speech$/i.test(String(n || '')), cdur = (m.dur != null && m.dur > 0) ? m.dur : (spans.length ? spans[spans.length - 1].end : 0);
+        const other = spans.filter(x => !isSp(x.name) && x.start != null);
+        const clsStrip = cdur ? other.map(x => ({ left: (x.start / cdur * 100).toFixed(2) + '%', w: Math.max(0.2, (x.end - x.start) / cdur * 100).toFixed(2) + '%' })) : [];
+        const grp = {}; other.forEach(x => { (grp[x.name] = grp[x.name] || []).push(x); });
+        const clsEvents = Object.keys(grp).length ? Object.keys(grp).sort((a, b) => grp[b].length - grp[a].length).map(n => n + (grp[n].length > 1 ? ' ×' + grp[n].length : '') + ' at ' + grp[n].slice(0, 3).map(x => fmtT(x.start)).join(', ') + (grp[n].length > 3 ? ' …' : '')).join(' · ') : 'Nothing but speech.';
         // The clean-up after the transcript: this recording is the only source of some
         // names — the hyperlexicon doesn't know them yet, and is offered the door.
         const nn = timed ? this.transcriptNewNames(d0, A) : [];
@@ -9523,7 +9537,7 @@ onAsk: () => { this.setState({ txAsk: d0.id }); this.pickYtFile(d0); }, onCancel
           local: true, playLabel: '▶', timeLabel: (m.dur != null ? fmtT(m.dur) : '0:00'), statusLabel: '', onPlayPause: () => this.toggleLocalPlay(), onStopRecord: () => this.stopPlayback(), dl: this.dlVals(d0),
           isAudio: (m.mime || '').indexOf('audio') === 0, noAudio: (m.mime || '').indexOf('audio') !== 0, hasSrc: !!(this._mediaUrl && this._mediaUrl[d0.id]), noSrc: !(this._mediaUrl && this._mediaUrl[d0.id]), src: (this._mediaUrl || {})[d0.id] || '',
           kindLine: timed ? plural(m.segN, 'timed segment') + ' · ' + (m.model || 'Whisper').split('/').pop() : (m.dur != null ? fmtT(m.dur) : '') + (m.mime ? ' · ' + m.mime.split('/')[0] + (m.size ? ' · ' + Math.max(1, Math.round(m.size / 1e6)) + ' MB' : '') : ''),
-          hasCls, clsLine, clsBusy, clsMeta: (d0.clsModel || '').replace('yamnet-', ''), hasNewNames, newNames,
+          hasCls, clsLine, clsBusy, clsMeta: (d0.clsModel || '').replace('yamnet-', ''), hasClsStrip: clsStrip.length > 0, clsStrip, clsEvents, clsN: String(spans.length), hasNewNames, newNames,
           txTitle: timed ? 'Transcript · click a timecode to play from there' : txHere ? 'Transcribing — words appear below as they are heard' : 'Transcript',
           note: timed ? 'Machine transcript (' + (m.model || 'Whisper').split('/').pop() + '), not checked by a person' + (m.priors ? ' · transcribed with the prior: ' + (PRIOR_LABEL[m.priors.prompt] || m.priors.prompt || 'none') + ', language ' + (m.priors.language || 'auto') : '') + '. Quote from the recording, not the transcript.' : 'The recording is kept in this browser; nothing in it has been read until it is transcribed. A transcript is a machine reading of the sound, not checked by a person.',
           canAsk: !timed, ask: S.txAsk === d0.id, noAsk: !timed && S.txAsk !== d0.id, canTx: !timed && !txHere && S.txAsk !== d0.id,
