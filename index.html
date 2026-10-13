@@ -365,7 +365,7 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
           <sc-for list="{{ G.items }}" as="g" hint-placeholder-count="3">
             <button onClick="{{ g.onClick }}" style="white-space:normal;text-align:left;cursor:pointer;padding:5px 12px 5px 20px;border-radius:8px;background:{{ g.bg }};border:1px solid {{ g.bd }};display:flex;justify-content:space-between;align-items:baseline;gap:10px" style-hover="background:var(--s2)">
               <span style="font:{{ g.weight }} 14px var(--sans);color:var(--ink2)">{{ g.label }}</span>
-              <span style="font:500 12px var(--mono);color:var(--mut);white-space:nowrap">{{ g.count }}</span>
+              <span style="font:500 12px var(--mono);color:{{ g.countColor }};white-space:nowrap">{{ g.count }}</span>
             </button>
           </sc-for>
         </div>
@@ -406,8 +406,11 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
             <button onClick="{{ hb.flt.onClick }}" style="all:unset;cursor:pointer;box-sizing:border-box;width:100%;padding:9px 14px;display:flex;flex-direction:column;gap:2px;min-width:0;padding-right:34px" style-hover="opacity:.85"><span style="font:700 10.5px var(--sans);letter-spacing:.1em;text-transform:uppercase;color:var(--acc)">{{ hb.flt.label }}</span><span style="font:600 14px/1.3 var(--sans);color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ hb.flt.value }}</span><span style="font:400 11.5px var(--sans);color:var(--dim)">{{ hb.flt.caption }}</span></button>
             <sc-if value="{{ hb.flt.active }}" hint-placeholder-val="{{ false }}"><button onClick="{{ hb.flt.onClear }}" title="Clear every filter" style="all:unset;cursor:pointer;position:absolute;top:6px;right:8px;width:20px;height:20px;display:flex;align-items:center;justify-content:center;border-radius:50%;font:500 15px var(--sans);color:var(--mut)" style-hover="color:var(--ink);background:var(--sel)">×</button></sc-if>
           </div>
-          <div style="position:relative;min-width:0;background:{{ hb.per.bg }}">
+          <div style="position:relative;min-width:0;border-right:1px solid var(--line);background:{{ hb.per.bg }}">
             <button onClick="{{ hb.per.onClick }}" style="all:unset;cursor:pointer;box-sizing:border-box;width:100%;padding:9px 14px;display:flex;flex-direction:column;gap:2px;min-width:0" style-hover="opacity:.85"><span style="display:flex;align-items:center;gap:8px"><span style="font:700 10.5px var(--sans);letter-spacing:.1em;text-transform:uppercase;color:var(--acc)">{{ hb.per.label }}</span><sc-for list="{{ hb.dots }}" as="d" hint-placeholder-count="3"><span style="width:8px;height:8px;border-radius:50%;background:{{ d.color }};opacity:{{ d.op }}"></span></sc-for></span><span style="font:600 14px/1.3 var(--sans);color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ hb.per.value }}</span><span style="font:400 11.5px var(--sans);color:var(--dim)">{{ hb.per.caption }}</span></button>
+          </div>
+          <div style="position:relative;min-width:0;background:{{ hb.lnk.bg }}">
+            <button onClick="{{ hb.lnk.onClick }}" style="all:unset;cursor:pointer;box-sizing:border-box;width:100%;padding:9px 14px;display:flex;flex-direction:column;gap:2px;min-width:0" style-hover="opacity:.85"><span style="font:700 10.5px var(--sans);letter-spacing:.1em;text-transform:uppercase;color:var(--acc)">{{ hb.lnk.label }}</span><span style="font:600 14px/1.3 var(--sans);color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ hb.lnk.value }}</span><span style="font:400 11.5px var(--sans);color:var(--dim)">{{ hb.lnk.caption }}</span></button>
           </div>
         </div>
           <sc-if value="{{ hb.openSources }}" hint-placeholder-val="{{ false }}">
@@ -477,6 +480,17 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
             </div>
           </sc-if>
 
+          <sc-if value="{{ hb.openLinks }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute;left:0;right:0;top:calc(100% + 8px);z-index:3;background:var(--s1);border:1px solid var(--line2);border-radius:14px;padding:16px 18px 18px;box-shadow:0 16px 44px rgba(0,0,0,.3);display:flex;flex-direction:column;gap:12px">
+              <span style="font:400 13.5px/1.45 var(--sans);color:var(--mut)">Which relations the link surfaces draw, and how firmly a link must be established to be drawn.</span>
+              <div style="display:flex;flex-wrap:wrap;gap:6px">
+                <sc-for list="{{ hb.lnk.rels }}" as="r" hint-placeholder-count="6"><button onClick="{{ r.onClick }}" style="all:unset;cursor:pointer;border:1px solid {{ r.bd }};background:{{ r.bg }};border-radius:8px;padding:3px 10px;font:500 13px var(--sans);color:var(--ink)">{{ r.label }} <span style="font:500 12px var(--mono);color:var(--mut)">{{ r.n }}</span></button></sc-for>
+              </div>
+              <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+                <button onClick="{{ hb.lnk.onFirm }}" style="all:unset;cursor:pointer;border:1px solid var(--line2);border-radius:8px;padding:3px 10px;font:500 13px var(--sans);color:var(--ink)">{{ hb.lnk.firmLabel }}</button>
+              </div>
+            </div>
+          </sc-if>
           <sc-if value="{{ hb.openPerspectives }}" hint-placeholder-val="{{ false }}">
             <div style="position:absolute;left:0;right:0;top:calc(100% + 8px);z-index:3;background:var(--s1);border:1px solid var(--line2);border-radius:14px;padding:16px 18px 18px;box-shadow:0 16px 44px rgba(0,0,0,.3);display:flex;flex-direction:column;gap:12px">
               <sc-if value="{{ true }}" hint-placeholder-val="{{ false }}">
@@ -591,6 +605,7 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
       </sc-if>
 
       <sc-if value="{{ v.overview }}" hint-placeholder-val="{{ false }}"><div id="overview-surface"></div></sc-if>
+      <sc-if value="{{ v.linkSurface }}" hint-placeholder-val="{{ false }}"><div id="links-surface" style="min-width:0"></div></sc-if>
       <sc-if value="{{ v.inbox }}" hint-placeholder-val="{{ false }}"><div id="inbox-surface" style="max-width:1100px"></div></sc-if>
       <sc-if value="{{ v.summary }}" hint-placeholder-val="{{ true }}">
         <div class="hd-drive-bar">
@@ -627,12 +642,32 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
             <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--sel);border:1px solid var(--acc2);border-radius:10px;padding:7px 12px">
               <span style="font:600 14px var(--sans);color:var(--ink)">{{ drv.selLabel }}</span>
               <button class="hd-drive-add" onClick="{{ drv.onFold }}" title="Read these sources together: every other view, the chat and the Fold are limited to them, as one body of content" style="padding:6px 16px">{{ drv.foldLabel }}</button>
+              <sc-if value="{{ drv.canCompare }}" hint-placeholder-val="{{ false }}">
+                <button class="hd-chip" onClick="{{ drv.onCompare }}" title="Line the two sources up, statement by statement, in the Seam">Compare</button>
+                <button class="hd-chip" onClick="{{ drv.onLinkForm }}" title="Declare how these two sources relate">Link these…</button>
+              </sc-if>
               <sc-if value="{{ drv.hasFoldersOpts }}" hint-placeholder-val="{{ false }}"><select value="" onChange="{{ drv.onMove }}" style="background:var(--s1);border:1px solid var(--line2);border-radius:8px;color:var(--ink);font:500 13px var(--sans);padding:4px 8px;outline:none"><option value="__">Move to…</option><sc-for list="{{ drv.moveOpts }}" as="o" hint-placeholder-count="3"><option value="{{ o.v }}">{{ o.l }}</option></sc-for></select></sc-if>
               <sc-if value="{{ drv.canBulkDelete }}" hint-placeholder-val="{{ false }}">
                 <sc-if value="{{ drv.noBulkAsk }}" hint-placeholder-val="{{ true }}"><button class="hd-chip" onClick="{{ drv.onBulkAsk }}" style="color:var(--bad)">Delete</button></sc-if>
                 <sc-if value="{{ drv.bulkAsk }}" hint-placeholder-val="{{ false }}"><span style="font:400 13px var(--sans);color:var(--bad)">Delete {{ drv.selLabel }} for good?</span><button onClick="{{ drv.onBulkDelete }}" style="background:var(--bad);border:0;color:#fff;border-radius:8px;padding:5px 12px;cursor:pointer;font:600 13px var(--sans)">Delete for good</button><button class="hd-chip" onClick="{{ drv.onBulkCancel }}">Keep</button></sc-if>
               </sc-if>
               <button class="hd-chip" onClick="{{ drv.onClearSel }}" style="margin-left:auto">Clear</button>
+            </div>
+          </sc-if>
+          <sc-if value="{{ drv.lk.open }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;gap:10px;background:var(--s1);border:1px solid var(--line2);border-radius:12px;padding:12px 14px">
+              <span style="font:600 14px var(--sans);color:var(--ink)">Link these two sources</span>
+              <span style="font:400 13px/1.45 var(--sans);color:var(--mut)">{{ drv.lk.a }} &nbsp;→&nbsp; {{ drv.lk.b }}</span>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+                <span style="font:500 12px var(--mono);color:var(--mut)">The first</span>
+                <select value="{{ drv.lk.rel }}" onChange="{{ drv.lk.onRel }}" style="background:var(--s2);border:1px solid var(--line2);border-radius:8px;color:var(--ink);font:500 13px var(--sans);padding:4px 8px;outline:none"><sc-for list="{{ drv.lk.rels }}" as="r" hint-placeholder-count="6"><option value="{{ r.v }}">{{ r.l }}</option></sc-for></select>
+                <span style="font:500 12px var(--mono);color:var(--mut)">the second</span>
+              </div>
+              <input value="{{ drv.lk.qa }}" onChange="{{ drv.lk.onQa }}" placeholder="Optional: words from the first source that carry it (leave empty for the whole source)" style="background:var(--bg);border:1px solid var(--line2);border-radius:8px;color:var(--ink);font:400 13px var(--sans);padding:6px 10px;outline:none">
+              <input value="{{ drv.lk.qb }}" onChange="{{ drv.lk.onQb }}" placeholder="Optional: words from the second source" style="background:var(--bg);border:1px solid var(--line2);border-radius:8px;color:var(--ink);font:400 13px var(--sans);padding:6px 10px;outline:none">
+              <sc-if value="{{ drv.lk.err }}" hint-placeholder-val="{{ false }}"><span style="font:400 13px var(--sans);color:var(--bad)">{{ drv.lk.err }}</span></sc-if>
+              <div style="display:flex;gap:8px"><button class="hd-drive-add" onClick="{{ drv.lk.onSave }}" style="padding:6px 16px">Save link</button><button class="hd-chip" onClick="{{ drv.lk.onCancel }}">Cancel</button></div>
+              <span style="font:400 12px/1.4 var(--sans);color:var(--dim)">A link you declare is recorded as confirmed, with who made it and when. It stays in this browser, and can be revised under Review.</span>
             </div>
           </sc-if>
           <sc-if value="{{ drv.scoped }}" hint-placeholder-val="{{ false }}">
@@ -688,7 +723,7 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
                   <sc-if value="{{ d.renaming }}" hint-placeholder-val="{{ false }}"><input value="{{ d.rnDraft }}" onChange="{{ d.onRnDraft }}" onKeyDown="{{ d.onRnKey }}" onBlur="{{ d.onRnSave }}" style="flex:1;min-width:0;background:var(--s2);border:1px solid var(--acc2);border-radius:6px;color:var(--ink);font:500 14px var(--sans);padding:3px 6px;outline:none"></sc-if>
                   <details class="hd-drive-menu"><summary title="More actions">⋮</summary><div class="hd-drive-menu-panel"><sc-for list="{{ d.menu }}" as="m" hint-placeholder-count="4"><button onClick="{{ m.onClick }}" style="color:{{ m.col }}">{{ m.label }}</button></sc-for></div></details>
                 </div>
-                <span class="hd-drive-sub">{{ d.sub }}<sc-if value="{{ d.isNew }}" hint-placeholder-val="{{ false }}"> · <b style="color:var(--ok);font-weight:600">New</b></sc-if></span>
+                <span class="hd-drive-sub">{{ d.sub }}<sc-if value="{{ d.isNew }}" hint-placeholder-val="{{ false }}"> · <b style="color:var(--ok);font-weight:600">New</b></sc-if><sc-if value="{{ d.hasLinks }}" hint-placeholder-val="{{ false }}"> · <span title="{{ d.linkTitle }}">{{ d.linkN }}</span><sc-if value="{{ d.hasDiffers }}" hint-placeholder-val="{{ false }}"> · <b style="color:var(--bad);font-weight:600">{{ d.diffN }}</b></sc-if></sc-if></span>
               </div>
             </sc-for>
           </div>
@@ -3143,7 +3178,7 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
 function digammaH(x) { let r = 0; while (x < 6) { r -= 1 / x; x += 1; } const f = 1 / (x * x); return r + Math.log(x) - 0.5 / x - f * (1 / 12 - f * (1 / 120 - f * (1 / 252 - f * (1 / 240 - f / 132)))); }
 const klAdmitH = (bv, B) => Math.max(0, Math.log(B) - Math.log(bv) + digammaH(bv + 1) - digammaH(B + 1));
 const holoTokens = t => [...new Set((clean(t).toLowerCase().replace(/[\u2019']/g, '').match(/[a-z][a-z-]{2,}/g) || []).filter(w => !STOP.has(w) && !/^-|-$/.test(w)))];
-const VIEW_LABEL = { inbox: 'Inbox', overview: 'Evidence overview', summary: 'Sources', search: 'Search', names: 'Names', types: 'Types', figures: 'Figures', statements: 'Statements', connections: 'Connections', framing: 'Framing', views: 'Views', patterns: 'Patterns', surprise: 'Surprise', reader: 'Sources', profile: 'Names', draft: 'Draft', records: 'Records', ask: 'Ask the Fold', ingest: 'Add & publish' };
+const VIEW_LABEL = { inbox: 'Inbox', overview: 'Evidence overview', summary: 'Sources', search: 'Search', names: 'Names', types: 'Types', figures: 'Figures', statements: 'Statements', connections: 'Connections', framing: 'Framing', views: 'Views', patterns: 'Patterns', surprise: 'Surprise', reader: 'Sources', profile: 'Names', draft: 'Draft', records: 'Records', ask: 'Ask the Fold', ingest: 'Add & publish', lanes: 'Lanes', margin: 'Margin', seam: 'Seam', orbit: 'Orbit', fields: 'Fields', review: 'Review' };
 const SU_CURSORS = [
   { id: 'loo', label: 'Everything else', desc: 'Each statement against normal text plus everything the other sources in this view say, regardless of date: what this source says that nothing else in view, and nothing normal, prepares you for.' },
   { id: 'pub', label: 'When published', desc: 'Sources in the order they were published: what a reader following the story would have learned, and when.' },
@@ -5243,6 +5278,142 @@ class Component extends DCLogic {
     if (s != null && e > s) this.inboxCtl().then(c => c.compose({ kind: 'text', doc, s, e, quote: d.text.slice(s, e), before: d.text.slice(Math.max(0, s - 24), s), after: d.text.slice(e, e + 24) }, { title: d.title }));
     else this.commentOn({ kind: 'source', doc, quote: txt.slice(0, 280) });
   }
+  // ---- the link surfaces: Lanes, Margin, Seam, Orbit, Fields, Review, the Reader's gutter, Compare and Link these.
+  // holodeck-relations.js is the model (six relations, three grains, four provenances; the importers; the wording
+  // proposals, kept only when they beat a resampling null); holodeck-link-surfaces.js draws it. A link in the file
+  // (caption timecodes, a stated citation, contract-links.json) is exact; a proposal waits for a reader. Decisions are
+  // an append-only log per workspace, in this browser, like the corrections log.
+  linkMods() {
+    if (this._LM) return this._LM;
+    if (!this._LMp) this._LMp = Promise.all([import(new URL('holodeck-relations.js', location.href).href), import(new URL('holodeck-link-surfaces.js', location.href).href)])
+      .then(([R, U]) => { this._LM = { R, U }; this.forceUpdate(); }).catch(e => { this._LMerr = e; this.forceUpdate(); });
+    return null;
+  }
+  linkEvents() { const k = 'hd:links:' + this.corpusId(); if (this._lkEvK !== k) { this._lkEvK = k; try { this._lkEv = JSON.parse(localStorage.getItem(k) || '[]'); } catch (e) { this._lkEv = []; } } return this._lkEv; }
+  linkActor() { const s = this._net && this._net.s; return (s && s.user) || 'this reader'; }
+  linkDecide(ev) {
+    const e = { ...ev, at: new Date().toISOString(), by: this.linkActor() };
+    const list = this.linkEvents().concat([e]); this._lkEv = list;
+    try { localStorage.setItem('hd:links:' + this.corpusId(), JSON.stringify(list)); } catch (x) { this.toast('That decision could not be kept in this browser (storage is full or blocked).'); }
+    this._lkSet = null; this.forceUpdate();
+  }
+  linkPrefs() { const k = 'hd:linkprefs:' + this.corpusId(); try { return JSON.parse(localStorage.getItem(k) || '{}') || {}; } catch (e) { return {}; } }
+  setLinkPref(key, val) { const p = { ...this.linkPrefs(), [key]: val }; try { localStorage.setItem('hd:linkprefs:' + this.corpusId(), JSON.stringify(p)); } catch (e) {} this.setState(s => ({ lkPrefV: (s.lkPrefV || 0) + 1 })); }
+  // the set for this analysis with the reader's decisions applied. The importers and proposals run once per analysis;
+  // decisions are re-applied cheaply when the log changes.
+  linkSet() {
+    const LM = this.linkMods(); if (!LM) return null;
+    const A = this.analysis(); const ev = this.linkEvents();
+    const key = this.linkKey(A, ev);
+    if (this._lkSet && this._lkKey === key) return this._lkSet;
+    const bk = this._key + '|' + (this._contractLinks ? 1 : 0) + '|' + A.docs.length;
+    if (!this._lkBase || this._lkBaseKey !== bk) {
+      this._lkBaseKey = bk; let C;
+      try { C = LM.R.collect(A, { contractLinks: this._contractLinks ? { links: this._contractLinks } : null, origins: this.inferOrigins(A), budget: 1.5e6 }); }
+      catch (e) { C = { links: [], weak: [], unresolved: [], truncated: false, coverage: null, error: String((e && e.message) || e) }; }
+      this._lkBase = C;
+    }
+    const C = this._lkBase; const main = LM.R.resolveLinks(C.links, ev); const wk = LM.R.resolveLinks(C.weak, ev);
+    const byId = new Map(); main.links.forEach(L => byId.set(L.id, L)); wk.links.filter(L => L.provenance === 'confirmed').forEach(L => byId.set(L.id, { ...L, weak: false }));
+    this._lkKey = key; this._lkTally = null;
+    return (this._lkSet = { ...C, links: [...byId.values()], rejected: main.rejected, weak: wk.links.filter(L => L.provenance !== 'confirmed'), decisions: ev, ver: key });
+  }
+  linkKey(A, ev) { return this._key + '|' + ev.length + '|' + (this._contractLinks ? 1 : 0) + '|' + A.docs.length; }
+  // compute the set once per analysis, off the render path, so tiles and the rail count have it without a link view open
+  ensureLinks() {
+    const LM = this.linkMods(); if (!LM || this._lkSched) return;
+    const A = this.analysis(); if (!A.docs.length) return;
+    if (this._lkSet && this._lkKey === this.linkKey(A, this.linkEvents())) return;
+    this._lkSched = setTimeout(() => { this._lkSched = null; try { this.linkSet(); } catch (e) { this._lkErr = e; } this.forceUpdate(); }, 120);
+  }
+  linkWaiting() { const S = this._lkSet; if (!S) return ''; const n = S.links.filter(L => L.provenance === 'inferred').length + (S.weak || []).length; return n ? String(n) : ''; }
+  // what a tile says about how connected its source is: links at or above computed, and how many of them differ
+  linkTile(id) {
+    const LS = this._lkSet; if (!LS || !this._LM) return { hasLinks: false, linkN: '', hasDiffers: false, diffN: '', linkTitle: '' };
+    if (!this._lkTally) this._lkTally = this._LM.R.tallyByDoc(LS.links.filter(L => L.provenance !== 'inferred'));
+    const t = this._lkTally.get(id); if (!t) return { hasLinks: false, linkN: '', hasDiffers: false, diffN: '', linkTitle: '' };
+    return { hasLinks: true, linkN: plural(t.links, 'link'), hasDiffers: t.differs > 0, diffN: t.differs + ' differ', linkTitle: 'Links to other sources in this workspace, not counting proposals that wait for a reader' };
+  }
+  linkForm(selIds, A) {
+    const f = this.state.lkForm; const LM = this._LM;
+    if (!f || !LM || selIds.length !== 2) return { open: false, rels: [] };
+    const t = id => (A.docById[id] || {}).title || id;
+    return { open: true, a: t(selIds[0]), b: t(selIds[1]), rel: f.rel, qa: f.qa, qb: f.qb, err: f.err, rels: LM.R.RELATION_IDS.map(r => ({ v: r, l: LM.R.RELATIONS[r].label })),
+      onRel: e => this.setState(s => ({ lkForm: { ...s.lkForm, rel: e.target.value } })), onQa: e => this.setState(s => ({ lkForm: { ...s.lkForm, qa: e.target.value } })), onQb: e => this.setState(s => ({ lkForm: { ...s.lkForm, qb: e.target.value } })),
+      onCancel: () => this.setState({ lkForm: null }),
+      onSave: () => { const r = LM.U.declaredLink({ A, from: selIds[0], to: selIds[1], relation: f.rel, quoteFrom: f.qa, quoteTo: f.qb });
+        if (r.error) { this.setState(s => ({ lkForm: { ...s.lkForm, err: r.error } })); return; }
+        this.linkDecide({ action: 'declare', link: r.link }); this.setState({ lkForm: null, dvSel: {} }); this.toast('Linked. It is recorded as confirmed, by ' + this.linkActor() + '.'); } };
+  }
+  linkHues(LS) { const ids = []; (LS ? LS.links : []).concat(LS ? LS.weak : []).forEach(L => { ids.push(L.from.doc, L.to.doc); }); this.analysis().docs.forEach(d => ids.push(d.id)); return this._LM.R.hueMap(ids, document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark'); }
+  openLinked(doc, s) {
+    const A = this.analysis(); const sts = A.stsByDoc[doc] || []; const st = s != null ? sts.find(x => x.s <= s && s < x.e) : null;
+    this.closePassage(); this.read(doc, st ? st.id : null);
+  }
+  openPassage(c) {
+    const LM = this._LM; if (!LM) return; this.closePassage();
+    const LS = this.linkSet();
+    this._lkCard = LM.U.passageCard({ links: c.links, A: this.analysis(), hues: this.linkHues(LS), theme: document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark',
+      onOpen: (doc, s) => this.openLinked(doc, s), onClose: () => this.closePassage() });
+    document.body.appendChild(this._lkCard);
+  }
+  closePassage() { if (this._lkCard) { try { this._lkCard.remove(); } catch (e) {} this._lkCard = null; } }
+  syncLinks() {
+    const root = document.getElementById('links-surface');
+    if (!root) { if (this._lkMount) { try { this._lkMount.destroy(); } catch (e) {} this._lkMount = null; this._lkRoot = null; } return; }
+    const LM = this.linkMods(); const LS = LM ? this.linkSet() : null;
+    if (!LM || !LS) { root.textContent = this._LMerr ? 'The link surfaces could not load: ' + this._LMerr.message : 'Reading the links…'; this._lkRoot = null; return; }
+    const S = this.state, A = this.analysis(); const P = this.linkPrefs();
+    const dkey = 'hd:margin:' + this.corpusId();
+    const o = { view: S.view, A, key: this._key, links: LS.links, weak: LS.weak, rejected: LS.rejected, unresolved: LS.unresolved, truncated: LS.truncated, coverage: LS.coverage, decisions: LS.decisions,
+      grain: P.grain || 'figure', filter: P.filter || { minProvenance: 'computed' }, theme: document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark', workspace: this.corpusName(),
+      pair: S.lkPair || null, seamMode: S.lkSeamMode || 'seam', centre: S.lkCentre || null, level: S.lkLevel || 'roots', reviewTab: S.lkReviewTab || 'all',
+      draft: (() => { try { return localStorage.getItem(dkey) || ''; } catch (e) { return ''; } })(),
+      onGrain: g => this.setLinkPref('grain', g), onFilter: f => this.setLinkPref('filter', f), onPair: p => this.setState({ lkPair: p }), onSeamMode: m => this.setState({ lkSeamMode: m }),
+      onCentre: c => this.setState({ lkCentre: c }), onLevel: l => this.setState({ lkLevel: l }), onDraft: t => { try { localStorage.setItem(dkey, t); } catch (e) {} },
+      onOpen: (doc, s) => this.openLinked(doc, s), write: S.view === 'review' && LM.R.canWriteLinks('Review') ? ev => this.linkDecide(ev) : null };
+    if (this._lkRoot === root && this._lkMount) { this._lkMount.update(o); return; }
+    this._lkRoot = root; try { this._lkMount && this._lkMount.destroy(); } catch (e) {} this._lkMount = LM.U.mountLinks(root, o);
+  }
+  // reader chips: Links 9 · Differs 1 · Inferred 2 — what the gutter underlines
+  plainTextPath(d) {
+    const S = this.state; if (!['original', 'reading', undefined, null].includes(S.readMode)) return false;
+    if (d.screen && d.screen.elements && d.screen.elements.length) return false;
+    if (d.format === 'pdf' || d.format === 'page') return false;
+    if ((d.faithful || d.binPath) && !d.pdfSrc && S.readMode === 'original') return false;
+    if (d.pdfSrc && S.readMode === 'original') return false;
+    if (S.readMode === 'original' && this.isLiveDoc(d)) return false;
+    if (d.lazy) { const L = (this._lazy || {})[d.id]; if (!L || L.loading) return false; }
+    return true;
+  }
+  linkEnds(LS, id) { return LS.links.filter(L => [L.from, L.to].some(sp => sp.doc === id && sp.kind !== 'whole' && sp.axis !== 'time')); }
+  linkChips() {
+    const S = this.state; if (S.view !== 'reader' || !S.readDoc) return [];
+    const d = this.analysis().docById[S.readDoc]; const LS = this._lkSet || this.linkSet(); if (!d || !LS || !this.plainTextPath(d)) return [];
+    const mine = this.linkEnds(LS, d.id); if (!mine.length) return [];
+    const rd = { links: true, differs: false, inferred: true, ...(S.lkRd || {}) };
+    const n = new Set(mine.map(L => L.id)).size, nd = new Set(mine.filter(L => L.verdict === 'differs').map(L => L.id)).size, ni = new Set(mine.filter(L => L.provenance === 'inferred').map(L => L.id)).size;
+    const chip = (k, label, color, title) => ({ label, title, color, op: 1, bd: rd[k] ? 'var(--acc)' : 'var(--line2)', bg: rd[k] ? 'var(--sel)' : 'transparent',
+      onClick: () => this.setState(s => { const cur = { links: true, differs: false, inferred: true, ...(s.lkRd || {}) }; return { lkRd: { ...cur, [k]: !cur[k] } }; }) });
+    return [chip('links', 'Links ' + n, 'var(--acc)', 'Underline every passage that links to another source, with a gutter that says what to'),
+      chip('differs', 'Differs ' + nd, 'var(--bad)', 'Underline only the links where the figures disagree'),
+      chip('inferred', 'Inferred ' + ni, 'var(--mut)', 'Show links a reader has not confirmed yet, drawn dotted')];
+  }
+  paintLinkGutter(el, d, A) {
+    const LM = this._LM, S = this.state; if (!LM || !el || el.ownerDocument !== document) return;
+    const LS = this.linkSet(); if (!LS) return;
+    const rd = { links: true, differs: false, inferred: true, ...(S.lkRd || {}) };
+    const theme = document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+    const sig = [d.id, this._rKey, LS.ver, rd.links, rd.differs, rd.inferred, theme].join('|');
+    if (this._lkPainted === sig && el.querySelector('.lk-gutter')) return;
+    LM.U.clearLinks(el); if (this._lkPaint) { this._lkPaint.destroy(); this._lkPaint = null; }
+    this._lkPainted = sig;
+    if (!this.plainTextPath(d) || !rd.links) return;
+    let mine = this.linkEnds(LS, d.id); if (rd.differs) mine = mine.filter(L => L.verdict === 'differs'); if (!rd.inferred) mine = mine.filter(L => L.provenance !== 'inferred');
+    if (!mine.length) return;
+    const nodes = []; walkText(el, (n, o) => nodes.push([n, o]));
+    this._lkPaint = LM.U.paintLinks(el, nodes, { doc: d.id, links: mine, A, hues: this.linkHues(LS), theme, onOpen: c => this.openPassage(c) });
+  }
   syncOverview() {
     const root = document.getElementById('overview-surface');
     if (!root) return;
@@ -5374,7 +5545,7 @@ class Component extends DCLogic {
     window.addEventListener('resize', go);
     window.addEventListener('scroll', go, { passive: true });
   }
-  componentDidUpdate() { try { this.paintExtracted(); } catch (e) {} try { const c = this.corpusId(); if (c !== this._wsSeen) { this._wsSeen = c; touchWs(c); } } catch (e) {} this.installFill(); this.fitFill(); this.syncOverview(); this.syncInbox(); this.applyTheme(); this.measureHdr(); try { const ff = document.getElementById('fold-folder-input'); if (ff && !ff.multiple) { ff.webkitdirectory = true; ff.setAttribute('webkitdirectory', ''); ff.multiple = true; ff.setAttribute('multiple', ''); } } catch (e) {} if (this._prevCorpus !== this.state.corpus || this._prevAdded !== this.state.added) { this._prevCorpus = this.state.corpus; this._prevAdded = this.state.added; this.loadHtml(); this.akAutoLoad(); } const rd0 = this.state.readDoc && this.analysis().docById[this.state.readDoc]; if (rd0 && rd0.media && rd0.media.kind === 'local') { this.ensureMediaUrl(rd0);
+  componentDidUpdate() { try { this.paintExtracted(); } catch (e) {} try { const c = this.corpusId(); if (c !== this._wsSeen) { this._wsSeen = c; touchWs(c); } } catch (e) {} this.installFill(); this.fitFill(); this.syncOverview(); this.syncInbox(); this.syncLinks(); this.ensureLinks(); this.applyTheme(); this.measureHdr(); try { const ff = document.getElementById('fold-folder-input'); if (ff && !ff.multiple) { ff.webkitdirectory = true; ff.setAttribute('webkitdirectory', ''); ff.multiple = true; ff.setAttribute('multiple', ''); } } catch (e) {} if (this._prevCorpus !== this.state.corpus || this._prevAdded !== this.state.added) { this._prevCorpus = this.state.corpus; this._prevAdded = this.state.added; this.loadHtml(); this.akAutoLoad(); } const rd0 = this.state.readDoc && this.analysis().docById[this.state.readDoc]; if (rd0 && rd0.media && rd0.media.kind === 'local') { this.ensureMediaUrl(rd0);
       // A recording opened but never classified gets its sound map on first sight (an
       // older stored recording, or one added before the classifier existed); the work
       // is the same in-browser rung, guarded so it happens once until it lands.
@@ -7737,6 +7908,7 @@ class Component extends DCLogic {
         b.onclick = e => { e.stopPropagation(); e.preventDefault(); this.ytSeek(t); }; p.insertBefore(b, p.firstChild);
         p.style.cursor = 'pointer'; p.title = 'Play from ' + fmtT(t); p.addEventListener('click', e => { if (e.target.closest('[data-name],a')) return; const sel = window.getSelection && window.getSelection(); if (sel && String(sel).trim()) return; e.stopPropagation(); e.preventDefault(); this.ytSeek(t); }); });
     }
+    try { this.paintLinkGutter(el, d, A); } catch (e) { this._lkErr = e; }
     const sk = JSON.stringify(S.sel); if (this._selKey !== sk && this._rRoot) { this._selKey = sk; this.applySel(this._rRoot); }
   }
   applySel(el) {
@@ -8700,7 +8872,7 @@ class Component extends DCLogic {
         onDragStart: e => { try { const ids = dvSel[id] ? Object.keys(dvSel) : [id]; e.dataTransfer.setData('text/plain', ids.join(',')); e.dataTransfer.effectAllowed = 'move'; } catch (x) {} },
         renaming: S.dvRename === id, notRenaming: S.dvRename !== id, rnDraft: S.dvRenameDraft != null ? S.dvRenameDraft : r.title,
         onRnDraft: e => this.setState({ dvRenameDraft: e.target.value }), onRnSave: saveName, onRnKey: e => { if (e.key === 'Enter') saveName(); else if (e.key === 'Escape') this.setState({ dvRename: null, dvRenameDraft: null }); },
-        when: dvAgo(r.addedAt) || r.date || 'Undated', stsS: String(r.sts),
+        when: dvAgo(r.addedAt) || r.date || 'Undated', stsS: String(r.sts), ...this.linkTile(id),
         sub: [dvAgo(r.addedAt), r.date && r.date !== dvAgo(r.addedAt) ? 'source ' + r.date : '', plural(r.sts, 'statement'), (dd => dd && dd.captionsWhy && !dd.transcribed ? 'no captions — ' + ({ 'helper-unreachable': 'helper not reachable', 'helper-error': 'helper could not read it', 'extension-error': 'extension could not read it', 'no-track': 'no caption track' }[dd.captionsWhy] || 'not read') : '')(A.docById[id]), this.commentsOf(id).total ? '💬 ' + this.commentsOf(id).total + (this.commentsOf(id).unread ? ' ●' : '') : ''].filter(Boolean).join(' · '),
         menu: [{ label: 'Open', onClick: dvClose(it.onRead) }, { label: 'Comment' + (this.commentsOf(id).total ? ' (' + this.commentsOf(id).total + ')' : ''), onClick: dvClose(() => this.commentOn({ kind: 'source', doc: 'src:' + id })) }, ...(own ? [{ label: 'Rename', onClick: dvClose(() => this.setState({ dvRename: id, dvRenameDraft: r.title })) }] : []), { label: 'Details', onClick: dvClose(() => this.setState({ dvOpen: id })) },
           { label: it.soloLabel || 'Only this source', onClick: dvClose(it.onSolo) },
@@ -8731,6 +8903,10 @@ class Component extends DCLogic {
         onToggle: () => { if (fcPinned.includes(f.key)) return; const cur = fcSel.includes(f.key) ? fcSel.filter(k => k !== f.key) : [...fcSel, f.key]; try { localStorage.setItem('holodeck-sv-fields', JSON.stringify(cur)); } catch (e) {} this.setState({ svFields: cur }); } })),
       hasFolders: dvFl.length > 0, folders: dvFolderTiles, tiles: dvTiles, empty: dvTiles.length === 0,
       emptyText: dvQ ? 'No source matches “' + (S.dvQ || '').trim() + '”.' : dvCurF ? 'This folder is empty — drag sources onto it from “All sources”.' : 'Nothing here yet. Add a source to start.',
+      canCompare: dvSelIds.length === 2 && this.linkMods() != null,
+      onCompare: () => this.setState({ view: 'seam', lkPair: dvSelIds.slice(0, 2), readDoc: null, sel: null, dvSel: {}, lkForm: null }),
+      onLinkForm: () => this.setState({ lkForm: { rel: 'cites', qa: '', qb: '', err: '' } }),
+      lk: this.linkForm(dvSelIds, A),
       hasSel: dvSelIds.length > 0, selLabel: plural(dvSelIds.length, 'source') + ' selected', onClearSel: () => this.setState({ dvSel: {}, dvBulkAsk: false }),
       hasFoldersOpts: dvFl.length > 0, moveOpts: [{ v: '', l: 'No folder' }, ...dvFl.map(f => ({ v: f.id, l: f.name }))],
       onMove: e => { const v = e.target.value; if (v === '__') return; dvSelIds.forEach(id => this.setDocFolder(id, v)); this.setState({ dvSel: {} }); this.toast('Moved ' + plural(dvSelIds.length, 'source') + (v ? ' into the folder.' : ' out of its folder.')); },
@@ -8890,6 +9066,7 @@ class Component extends DCLogic {
       : view === 'overview' ? { eyebrow: 'Situated reading', title: 'Evidence and negative spaces', sub: 'Compose a view, reopen its ground, and pursue what remains unknown.', color: 'var(--acc)' }
       : view === 'records' ? { eyebrow: 'Assertions', title: 'The workspace as tables', sub: 'Every source, statement, name, figure and date, linked back to where it came from.', color: 'var(--acc)' }
       : view === 'ask' ? { eyebrow: 'Ask the Fold', title: 'Ask the sources', sub: 'Answered by a small model running in this tab, from material found by the question\'s own words. Afterwards every sentence is checked: a numbered address where it matches something in the sources, a dotted line where it is the model\'s own, a wavy line where a figure or name is not in the material.', color: 'var(--acc)' }
+      : ['lanes', 'margin', 'seam', 'orbit', 'fields', 'review'].includes(view) ? { eyebrow: 'Links', title: VIEW_LABEL[view], sub: 'Sources read together by relation, not by type.', color: 'var(--acc)' }
       : view === 'draft' ? { eyebrow: 'Draft', title: 'Claims and the excerpts behind them', sub: 'Private to this browser — pinned passages keep their source.', color: 'var(--acc)' }
       : c ? { eyebrow: c.row + (this.props.showTerrainNames ? ' · ' + c.terrain : ''), title: c.label, sub: c.question, color: c.color }
       : { eyebrow: 'Sources', title: this.corpusName(), sub: plural(docsIn.length, 'document') + ' · ' + plural(F.length, 'statement') + ' · ' + plural(D.nameList.length, 'name') + ' · ' + plural(figCount, 'figure') + '.' + (A.docs.length && !docsIn.length ? ' ' + plural(A.docs.length, 'link') + ' saved; none could be read yet.' : ''), color: 'var(--acc)' };
@@ -9044,12 +9221,13 @@ class Component extends DCLogic {
     const toggleSegOpen = () => { const open = !segOpen; try { localStorage.setItem('fold-explorer-segopen', open ? '1' : '0'); } catch (e) {} this.setState({ segOpen: open }); };
     const allYears = [...new Set(A.docs.map(d => d.year).filter(Boolean))].sort();
     const V = {}; ['overview', 'draft', 'inbox', 'summary', 'search', 'surprise', 'names', 'types', 'figures', 'statements', 'connections', 'framing', 'views', 'patterns', 'reader', 'profile', 'ingest', 'reading'].forEach(k => { V[k] = !isEmpty && view === k; });
+    V.linkSurface = !isEmpty && ['lanes', 'margin', 'seam', 'orbit', 'fields', 'review'].includes(view);
 
     const SU = isEmpty ? null : this.surprise(A); const Fid = new Set(F.map(st => st.id));
     const suF = SU ? SU.list.filter(x => Fid.has(x.st.id)) : [];
     const juncMode = S.suMode !== 'belief'; const JN = isEmpty ? [] : this.junctions(A, Fid);
     const gHi = on => ({ bg: on ? 'var(--sel)' : 'transparent', bd: on ? 'var(--acc2)' : 'transparent', weight: on ? 600 : 500 });
-    const NAVG = [['', [['summary', 'Sources'], ['ask', 'Ask'], ['inbox', 'Inbox'], ['draft', 'Draft']]], ['Read closely', [['names', 'Names'], ['records', 'Assertions']]], ['Explore', [['connections', 'Connections'], ['overview', 'Evidence overview']]], ['Manage', [['ingest', 'Add & publish']]]];
+    const NAVG = [['', [['summary', 'Sources'], ['ask', 'Ask'], ['inbox', 'Inbox'], ['draft', 'Draft']]], ['Read closely', [['names', 'Names'], ['records', 'Assertions']]], ['Explore', [['connections', 'Connections'], ['overview', 'Evidence overview']]], ['Manage', [['ingest', 'Add & publish']]], ['Links', [['lanes', 'Lanes'], ['margin', 'Margin'], ['seam', 'Seam'], ['orbit', 'Orbit'], ['fields', 'Fields'], ['review', 'Review']]]];
     // extra screens from screens.json (see componentDidMount): beside Sources, Ask, Inbox and Draft at the top of the
     // sidebar, where they are seen, not inside the collapsed "Explore & manage" group
     const SCREENS = this._screens || [];
@@ -9061,9 +9239,10 @@ class Component extends DCLogic {
       ingest: (this._net && this._net.chain && this._net.chain.length) ? String(this._net.chain.length) : '',
       ask: (this._conv && this._conv.turns && this._conv.turns.length) ? String(this._conv.turns.length) : '',
       inbox: this._inboxSum && this._inboxSum.unread ? String(this._inboxSum.unread) : '',
+      review: this.linkWaiting(),
     }[id] || '');
     const navGroups = NAVG.map(([label, items]) => ({ label, hasLabel: !!label, items: items.map(([id, lab]) => { const isScr = id.startsWith('screen:');
-      return { label: lab, count: countFor(id), ...gHi(isScr ? S.screenId === id.slice(7) : view === id), onClick: isScr ? () => this.setState({ screenId: id.slice(7) }) : () => this.setState({ view: id, readDoc: null, sel: null }) }; }) }));
+      return { label: lab, count: countFor(id), countColor: id === 'review' ? 'var(--amber)' : 'var(--mut)', ...gHi(isScr ? S.screenId === id.slice(7) : view === id), onClick: isScr ? () => this.setState({ screenId: id.slice(7) }) : () => this.setState({ view: id, readDoc: null, sel: null }) }; }) }));
     // split so Folds can sit right under The reading / Connections, inside Explore
     const navTop = navGroups[0].items; const navRead = navGroups[1]; const navExplore = navGroups[2]; const navRest = navGroups.slice(3);
     const qv = (S.q || '').trim();
@@ -9238,7 +9417,7 @@ class Component extends DCLogic {
       ...(() => { const d0 = S.readDoc && A.docById[S.readDoc]; if (!d0) return { rd: { eyebrow: '', title: '', meta: '' } }; const dsts = A.stsByDoc[d0.id] || []; const nm = new Set(dsts.flatMap(s => s.names)); const host = d0.url ? (/wikipedia\.org/.test(d0.url) ? 'Wikipedia' : d0.url.replace(/^https?:\/\/(www\.)?/, '').split('/')[0]) : 'Your content'; return { rd: { eyebrow: [host, d0.type, d0.year].filter(Boolean).join(' · '), title: d0.title, meta: [d0.authors && d0.authors.length ? 'By ' + d0.authors.join(', ') : '', d0.pubLabel ? 'Published ' + d0.pubLabel : ''].filter(Boolean).map(x => x + ' · ').join('') + plural(dsts.length, 'statement') + ' · ' + plural(nm.size, 'name') + ' · ' + plural(dsts.reduce((a, s) => a + s.figs.length, 0), 'figure') } }; })(),
       gsw: { track: S.ground.on ? 'var(--acc2)' : 'var(--line2)', left: S.ground.on ? '16px' : '2px' },
       toggleGround: () => this.setState(s => ({ ground: { ...s.ground, on: !s.ground.on } })),
-      layers: [['names', 'Names', 'var(--acc)', 'People, organisations and places'], ['figures', 'Figures', 'var(--amber)', 'Numbers and amounts'], ['dates', 'Dates', 'var(--date)', 'Years, months and times'], ['sentences', 'Sentences', 'var(--sel2)', 'Make every sentence clickable']].map(([k, label, color, title]) => { const on = S.ground.on && S.ground[k]; return { label, title, color, op: S.ground.on ? (on ? 1 : 0.5) : 0.35, bd: on ? 'var(--line2)' : 'transparent', bg: on ? 'var(--s1)' : 'transparent', onClick: () => this.setState(s => ({ ground: { ...s.ground, on: true, [k]: s.ground.on ? !s.ground[k] : true } })) }; }),
+      layers: [['names', 'Names', 'var(--acc)', 'People, organisations and places'], ['figures', 'Figures', 'var(--amber)', 'Numbers and amounts'], ['dates', 'Dates', 'var(--date)', 'Years, months and times'], ['sentences', 'Sentences', 'var(--sel2)', 'Make every sentence clickable']].map(([k, label, color, title]) => { const on = S.ground.on && S.ground[k]; return { label, title, color, op: S.ground.on ? (on ? 1 : 0.5) : 0.35, bd: on ? 'var(--line2)' : 'transparent', bg: on ? 'var(--s1)' : 'transparent', onClick: () => this.setState(s => ({ ground: { ...s.ground, on: true, [k]: s.ground.on ? !s.ground[k] : true } })) }; }).concat(this.linkChips(A)),
       readerPad: S.readDoc && A.docById[S.readDoc] && (A.docById[S.readDoc].format === 'page' || ((A.docById[S.readDoc].faithful || A.docById[S.readDoc].binPath) && S.readMode === 'original')) ? '0' : A.docById[S.readDoc] && A.docById[S.readDoc].pdfSrc && S.readMode === 'original' ? '24px 16px' : '28px 34px', readerMax: S.readDoc && A.docById[S.readDoc] && (A.docById[S.readDoc].format === 'page' || ((A.docById[S.readDoc].faithful || A.docById[S.readDoc].binPath) && S.readMode === 'original')) ? 'none' : '900px',
       pop: (() => { const p = S.popRec; if (!p) return { open: false }; return { open: true, key: p.key, value: p.value, kind: p.kind, desc: p.desc, snip: p.snip, bytes: 'bytes ' + p.evidence.s + '–' + p.evidence.e, close: () => this.closePop(), bg: () => this.closePop(), stop: e => { if (e && e.stopPropagation) e.stopPropagation(); } }; })(),
       amb: (() => { const o = this._ambOpen; const AM = this._ambM; if (!o || !AM) return { open: false };
@@ -10011,8 +10190,16 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
     const act = v.ready ? v.staves.filter(x => x.on) : [];
     const per = { open: open === 'perspectives', bg: open === 'perspectives' ? 'var(--sel)' : 'transparent', onClick: tog('perspectives'), label: 'Perspectives', caption: 'the perspective',
       value: !v.ready ? 'None yet' : act.length <= 2 ? act.map(x => x.label).join(' and ') : act[0].label + ' and ' + (act.length - 1) + ' more' };
-    return { ...v, readout, src, srcRows, hasSrcRows: srcRows.length > 0, srcAll: () => this.setState({ offDocs: {} }), srcNone, srcQ: S.srcQ || '', onSrcQ: e => this.setState({ srcQ: e.target.value }), srcMatch: srcQ ? srcRows.length + ' match' + (srcRows.length === 1 ? '' : 'es') : '', flt, filt, per, isOpen: !!open, openSources: open === 'sources', openFiltering: open === 'filtering', openPerspectives: open === 'perspectives', close: () => this.setState({ hbOpen: null, hbHover: null }),
-      show: !S.hbCollapsed, caret: S.hbCollapsed ? '▸' : '▾', toggleCollapsed: () => this.setState(st => ({ hbCollapsed: !st.hbCollapsed })), line: [src.value, flt.value, per.value].filter(Boolean).join(' · '),
+    const lnkP = this.linkPrefs(); const lnkSet = this._lkSet;
+    const lnkOn = new Set(lnkP.filter && lnkP.filter.relations ? lnkP.filter.relations : (this._LM ? this._LM.R.RELATION_IDS : []));
+    const lnk = { open: open === 'links', bg: open === 'links' ? 'var(--sel)' : 'transparent', onClick: tog('links'), label: 'Links', caption: (lnkP.filter && lnkP.filter.minProvenance === 'inferred') ? 'everything, with inferred' : 'confirmed + computed',
+      value: !this._LM ? 'Reading the links…' : lnkOn.size === this._LM.R.RELATION_IDS.length ? 'All relations' : plural(lnkOn.size, 'relation'),
+      firmLabel: (lnkP.filter && lnkP.filter.minProvenance === 'inferred') ? 'Showing inferred links too — click to hide them' : 'Hiding inferred links — click to show them',
+      onFirm: () => this.setLinkPref('filter', { ...(lnkP.filter || {}), minProvenance: (lnkP.filter && lnkP.filter.minProvenance === 'inferred') ? 'computed' : 'inferred' }),
+      rels: this._LM ? this._LM.R.RELATION_IDS.map(r => { const on = lnkOn.has(r); return { label: this._LM.R.RELATIONS[r].label, n: String(lnkSet ? lnkSet.links.filter(L => L.relation === r).length : 0), bd: on ? 'var(--acc)' : 'var(--line2)', bg: on ? 'var(--sel)' : 'transparent',
+        onClick: () => { const cur = new Set(lnkOn); if (cur.has(r)) cur.delete(r); else cur.add(r); this.setLinkPref('filter', { ...(lnkP.filter || {}), relations: cur.size === this._LM.R.RELATION_IDS.length ? null : [...cur] }); } }; }) : [] };
+    return { ...v, lnk, openLinks: open === 'links', readout, src, srcRows, hasSrcRows: srcRows.length > 0, srcAll: () => this.setState({ offDocs: {} }), srcNone, srcQ: S.srcQ || '', onSrcQ: e => this.setState({ srcQ: e.target.value }), srcMatch: srcQ ? srcRows.length + ' match' + (srcRows.length === 1 ? '' : 'es') : '', flt, filt, per, isOpen: !!open, openSources: open === 'sources', openFiltering: open === 'filtering', openPerspectives: open === 'perspectives', close: () => this.setState({ hbOpen: null, hbHover: null }),
+      show: !S.hbCollapsed, caret: S.hbCollapsed ? '▸' : '▾', toggleCollapsed: () => this.setState(st => ({ hbCollapsed: !st.hbCollapsed })), line: [src.value, flt.value, per.value, lnk.value].filter(Boolean).join(' · '),
       dots: v.ready ? v.staves.map(x => ({ color: x.color, op: x.on ? 1 : 0.25 })) : [],
       cols: v.cols.map((c, i) => ({ ...c, hl: hl(i), bd: i === hv || c.sel ? 'var(--acc)' : 'var(--line2)', onEnter: set(i), onLeave: clear })),
       staves: v.staves.map(st => ({ ...st, cols: st.cols.map((c, i) => ({ ...c, hl: hl(i), onEnter: set(i), onLeave: clear })) })),
