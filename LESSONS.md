@@ -187,3 +187,52 @@ neighbours while the token has been read beside neither. All 18 repairs it admit
 passed. Guards, not thresholds, do the rest: only lexicon-absent words are eligible, a valid form of a known stem family
 is left alone, a line-break fragment that joins its neighbour into a known word is a split word, and the candidate must be
 a word the lexicon knows (a garble the sample happens to hold is not a target).
+
+## 26. A wording link is kept only when it beats a null drawn from the workspace minus its partner
+
+Statements are paired across sources by shared tokens (idf in bits, adjacent-word pairs, normalised dates and figures),
+mutual best and strictly best. Whether a pair is *more than chance* is asked of a resampling null: replace the
+statement with as many tokens drawn from the workspace's own token distribution (fixed seed) and take that
+replacement's best partner score; the real pair must beat every draw, on both sides. Three things were tried and
+measured before this one. Drawing from the whole workspace is wrong: the bag pulls in the partner's own distinctive
+words at its share of the corpus, which is the very dependence under test (lease 5.1 against act §14: observed 31.5,
+null 31.7). Drawing from statements of *other* sources is wrong the other way: a third source that says something
+closer penalises a genuine pair. Excluding the partner source from the draw gives numbers that read as a null
+(genuine pairs 19–39 against 16–20; loose ones lose). A workspace of eleven statements cannot beat chance with
+anything, and says so: those pairs go to a "below chance" list in Review, never asserted and never dropped. A
+tie is not a best, and a decision a reader made is an event in an append-only log, so recomputing never loses it.
+
+## 27. A default that adds a feature can break the main path: test the default, with a real file
+
+Transcription listened with a vocabulary prior by default (the workspace's names fed to Whisper as
+`decoder_input_ids`). On the WebGPU path that threw ("Cannot convert [object Object] to a BigInt"; in the app,
+"Session mismatch"), so every automatic transcription died in the decoder while the manual one with "no prior"
+worked. The prior was removed, not repaired: plain transcription is what transformers.js supports, and it was
+verified over one, two and three 30-second windows and then on a two-hour file that began by itself. A feature
+that changes what the recognizer is *given* needs its own check against the recognizer, not against the page.
+
+## 28. Do not write a waveform down as sentences
+
+Reading a recording used to produce "Section 3 is heard from 1:14 to 1:35 at an average level of -17 decibels":
+forty-odd statements per file, each true and none of them said by anyone. They became the source's statements, so
+every summary of a recording summarised its loudness. A recording is listed with its length, rate and channels
+from its container, and gets words only from a transcript and kinds of sound only from the sound map.
+
+## 29. Queue the model jobs a recording starts; do not start them together
+
+The sound classifier (YAMNet, onnxruntime-web) and the recognizer (transformers.js) are two runtimes in one tab.
+A recording now transcribes first and is classified after it, one file at a time (`soundWork`); a failure in
+either is its own and stops nothing else.
+
+## 30. A shared preview is somebody's page: test in a copy, or ask
+
+The preview pane is a real browser the user also uses. A two-hour transcription was started in it by hand while
+this was being built, and a reload would have lost it. Do not reload, click or script a tab that has a job
+running; open a second tab on a separate workspace, and never edit the user's sources to make a test pass.
+
+## 31. One style attribute per element
+
+`'<p ' + P + ' style="…">'` where `P` is itself ` style="…"` gives the element two `style` attributes, and the
+browser keeps the first. The note that said the words were a machine reading came out in the transcript's own serif
+and read as the next line of what was said, and the live words never got their accent border. Merge declarations
+into one attribute, and set a note that is not content in the interface's own type, boxed, above the words.
