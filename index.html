@@ -67,6 +67,15 @@ button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visi
 .hd-drive-folder>span:nth-child(2){flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .hd-drive-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px}
 .hd-drive-tile{position:relative;background:var(--s1);border:1px solid var(--line);border-radius:12px;display:flex;flex-direction:column}
+/* a file that is still being read: in the grid the moment it is dropped, with a bar that moves; click it to watch */
+.hd-drive-tile.reading{border-style:dashed;border-color:var(--acc2)}
+.hd-pending-note{display:flex;align-items:center;gap:8px;margin:0;color:var(--mut);font:500 14px var(--sans)}
+.hd-pending-dot{width:8px;height:8px;border-radius:50%;background:var(--acc2);animation:hd-pulse 1s ease-in-out infinite}
+@keyframes hd-pulse{0%,100%{opacity:.25;transform:scale(.8)}50%{opacity:1;transform:scale(1.1)}}
+@media (prefers-reduced-motion:reduce){.hd-pending-dot{animation:none;opacity:.7}}
+.hd-drive-tile.reading::after{content:"";position:absolute;left:12px;right:12px;bottom:0;height:3px;border-radius:3px;background:linear-gradient(90deg,transparent,var(--acc2),transparent);background-size:40% 100%;background-repeat:no-repeat;animation:hd-reading 1.3s linear infinite}
+@keyframes hd-reading{from{background-position:-40% 0}to{background-position:140% 0}}
+@media (prefers-reduced-motion:reduce){.hd-drive-tile.reading::after{animation:none;background:var(--acc2);opacity:.45}}
 .hd-drive-tile:hover{border-color:var(--line2);box-shadow:0 1px 8px rgba(0,0,0,.25)}
 .hd-drive-prev{all:unset;cursor:pointer;display:block;position:relative;height:118px;background:var(--s2);border-radius:11px 11px 0 0;overflow:hidden;padding:12px 14px;box-sizing:border-box}
 .hd-drive-snip{font:400 11px/1.45 var(--serif);color:var(--mut);display:-webkit-box;-webkit-line-clamp:6;-webkit-box-orient:vertical;overflow:hidden}
@@ -713,7 +722,7 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
         <sc-if value="{{ svGrid }}" hint-placeholder-val="{{ true }}">
           <div class="hd-drive-grid">
             <sc-for list="{{ drv.tiles }}" as="d" hint-placeholder-count="4">
-              <div class="hd-drive-tile" draggable="{{ true }}" onDragStart="{{ d.onDragStart }}" style="{{ d.tileStyle }}">
+              <div class="hd-drive-tile {{ d.tileCls }}" draggable="{{ true }}" onDragStart="{{ d.onDragStart }}" style="{{ d.tileStyle }}">
                 <button class="hd-drive-prev" onClick="{{ d.onRead }}" title="Open {{ d.title }}">
                   <sc-if value="{{ d.isVid }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;inset:0;background-image:{{ d.thumbBg }};background-size:cover;background-position:center;opacity:.85"></span></sc-if>
                   <sc-if value="{{ d.dvSnipOn }}" hint-placeholder-val="{{ true }}"><span class="hd-drive-snip">{{ d.dvSnippet }}</span></sc-if>
@@ -1787,13 +1796,13 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
       </sc-if>
       <sc-if value="{{ pf.hasProf }}" hint-placeholder-val="{{ false }}">
             <div style="background:var(--s1);border:1px solid var(--line);border-radius:14px;padding:14px 22px;display:flex;flex-direction:column;gap:5px">
-              <span style="font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mut)">Profile — key parameters, induced per kind</span>
-              <span style="font:500 12px var(--mono);color:var(--acc)">{{ pf.profKind }}<span style="color:var(--mut)"> · {{ pf.profCount }} parameter{{ pf.profCount === 1 ? '' : 's' }}</span></span>
+              <span style="font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mut)">What the sources say about it</span>
+              <span style="font:500 13px var(--sans);color:var(--ink2)">{{ pf.profKind }}<span style="color:var(--mut)"> · {{ pf.profCount }}</span></span>
               <sc-for list="{{ pf.profRows }}" as="r" hint-placeholder-count="4">
                 <div style="display:grid;grid-template-columns:1.4fr auto 1.8fr;gap:10px;align-items:center;padding:5px 0;border-top:1px solid var(--line)">
-                  <span style="font:600 13px var(--sans);color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ r.star }} {{ r.rel }}</span>
-                  <span style="font:600 10px var(--mono);border:1px solid var(--line2);border-radius:99px;padding:1px 7px;color:var(--mut);white-space:nowrap">{{ r.standing }}</span>
-                  <span style="font:400 13px var(--sans);color:var(--ink2);text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ r.vals }}</span>
+                  <span style="font:600 13px var(--sans);color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ r.rel }}</span>
+                  <span style="font:500 11px var(--sans);color:var(--mut);white-space:nowrap">{{ r.standing }}</span>
+                  <span style="font:400 13px var(--sans);color:var(--ink2);text-align:right;overflow-wrap:anywhere">{{ r.vals }}</span>
                 </div>
               </sc-for>
             </div>
@@ -2984,12 +2993,12 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
       </sc-if>
       <sc-if value="{{ pf.hasProf }}" hint-placeholder-val="{{ false }}">
       <div style="background:var(--s1);border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:4px;margin-top:10px">
-        <span style="font:600 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mut)">Profile — induced per kind</span>
-        <span style="font:500 11px var(--mono);color:var(--acc)">{{ pf.profKind }}</span>
+        <span style="font:600 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mut)">What the sources say about it</span>
+        <span style="font:500 13px var(--sans);color:var(--ink2)">{{ pf.profKind }}<span style="color:var(--mut)"> · {{ pf.profCount }}</span></span>
         <sc-for list="{{ pf.profRows }}" as="r" hint-placeholder-count="4">
           <div style="display:grid;grid-template-columns:1.2fr auto;gap:0 8px;align-items:baseline;padding:5px 0;border-top:1px solid var(--line)">
-            <span style="font:600 13px var(--sans);color:var(--ink)">{{ r.star }} {{ r.rel }}<span style="font:600 9px var(--mono);color:var(--mut)"> · {{ r.standing }}</span></span>
-            <span style="grid-column:1 / -1;font:400 12px var(--sans);color:var(--ink2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ r.vals }}</span>
+            <span style="font:600 13px var(--sans);color:var(--ink)">{{ r.rel }}<span style="font:500 11px var(--sans);color:var(--mut)">{{ r.standingNote }}</span></span>
+            <span style="grid-column:1 / -1;font:400 13px/1.45 var(--sans);color:var(--ink2);overflow-wrap:anywhere">{{ r.vals }}</span>
           </div>
         </sc-for>
       </div>
@@ -3460,9 +3469,9 @@ const CELL = {}; ROWS.forEach(r => r.cells.forEach(c => { CELL[c[0]] = { id: c[0
 // (holodeck-ingest-player.js) animates exactly these events. With no trace running, every hook is one null check.
 let HD_TR = null;
 function hdTraceStart(label) { if (HD_TR) return HD_TR; HD_TR = { schema: 'HolodeckIngestTrace@1', label, startedAt: new Date().toISOString(), t0: performance.now(), ev: [], focus: new Set(), docs: [] }; hdT('bytes', 'start', 'Ingest started: ' + label);
-  // Open the play-along animation now, so the read is visible WHILE it happens (not only after). It follows the
-  // trace as it grows and can be exited at any time; hdFinish later flips the same window from live to replay.
-  try { import(new URL('holodeck-ingest-player.js', location.href).href).then(M => M.open(HD_TR, { live: true })).catch(() => {}); } catch (e) {}
+  // The play-along no longer takes over the screen: the file is a tile in Sources from the moment it is dropped, with
+  // a moving bar, and a click on that tile opens this same trace live (it follows the trace as it grows, can be
+  // exited at any time, and hdFinish flips the window from live to replay).
   return HD_TR; }
 function hdT(stage, kind, msg, data) { const T = HD_TR; if (T) T.ev.push({ t: performance.now() - T.t0, stage, kind, msg, ...(data || {}) }); }
 const hdF = doc => !!HD_TR && HD_TR.focus.has(doc);
@@ -3623,6 +3632,11 @@ async function hdReadAcross(docs) {
   }
   return null;
 }
+// The profile's relation names are the reader's own ("named in", "said with"); a person reads these instead. A standing
+// that carries no information ("time unknown", "unexposed") is left out, and no row is starred.
+const HD_REL_PLAIN = { typed: 'Kind of name', 'also written': 'Also written as', 'said with': 'How it is stated', 'named in': 'Found in', about: 'Words around it', 'appears with': 'Appears with', figure: 'Figures', year: 'Years' };
+const HD_FRAME_PLAIN = { attributed: 'reported speech', fact: 'plain statement', plan: 'intent or plan', uncertain: 'hedged' };
+const HD_STANDING_PLAIN = { fixed: 'always the same', 'one at a time': 'one at a time', 'many-valued': 'many values' };
 const hdEngineCompact = (host, r) => ({ host, ms: Math.round(r.ms), basis: r.basis || null, sentences: r.sentences.length, relations: r.relations.length, referents: r.referents.map(x => ({ surfaces: x.surfaces, routes: x.routes, grain: x.grain || null })).concat(r.descriptorBeings.map(b => ({ surfaces: b.surfaces, routes: ['descriptor'], grain: null }))) });
 const HD_ENGM = new WeakMap();
 function hdEngineMap(eng) { let m = HD_ENGM.get(eng); if (m) return m; m = new Map(); eng.referents.forEach(r => r.surfaces.forEach(sf => { const k = sf.toLowerCase(); if (!m.has(k)) m.set(k, { surface: sf, routes: r.routes, grain: r.grain }); })); HD_ENGM.set(eng, m); return m; }
@@ -5690,7 +5704,7 @@ class Component extends DCLogic {
   async ingest(dt) {
     if (!dt) return;
     const files = await hdFilesFromDataTransfer(dt);
-    if (files.length) { try { HD_KNOWN_NAMES = Object.keys(this.analysis().names || {}); } catch (e) {} hdTraceStart(files.length === 1 ? files[0].name : plural(files.length, 'file')); this.setState({ busy: 'Reading ' + plural(files.length, 'file') + '…', showAdd: false }); const list = []; for (const fl of files) list.push(await readAny(fl)); this.addDocs(list); return; }
+    if (files.length) { try { HD_KNOWN_NAMES = Object.keys(this.analysis().names || {}); } catch (e) {} hdTraceStart(files.length === 1 ? files[0].name : plural(files.length, 'file')); this.setState({ busy: 'Reading ' + plural(files.length, 'file') + '…', showAdd: false, view: 'summary', folder: null }); this.beginReading(files); try { const list = []; for (const fl of files) list.push(await readAny(fl)); await this.addDocs(list); } finally { this.endReading(); } return; }
     let text = (dt.getData('text/plain') || '').trim(); const html = dt.getData('text/html') || '';
     if (!text) text = ((dt.getData('text/uri-list') || '').split('\n').find(l => l && l[0] !== '#') || '').trim();
     const title = dt.getData('application/x-fold-title'); const year = +dt.getData('application/x-fold-year') || null; const fallback = dt.getData('application/x-fold-fallback') || null;
@@ -5700,6 +5714,28 @@ class Component extends DCLogic {
     if (html && html.length > text.length) { const clean = sanitizeHtml(html); if (htmlToText(clean).trim()) return this.addDocs([{ title: title || short(text.replace(/\s+/g, ' '), 48), year: year || new Date().getFullYear(), type: 'Dropped text', format: 'html', html: clean }]); }
     if (!text) return;
     this.addDocs([{ title: title || short(text.replace(/\s+/g, ' '), 48), year: year || new Date().getFullYear(), type: title ? 'Text' : 'Dropped text', text }]);
+  }
+  // A file is a tile in Sources from the moment it is dropped: dashed, with a bar that moves and the step the reader
+  // is on. Clicking it opens the live reading, the same player that replays the finished read.
+  beginReading(files) {
+    const t0 = Date.now();
+    this._reading = files.map((f, i) => ({ id: 'reading:' + t0 + ':' + i, title: f.name || 'file', size: f.size || 0, t0 }));
+    if (this._readingTick) clearInterval(this._readingTick);
+    this._readingTick = setInterval(() => { try { this.forceUpdate(); } catch (e) {} }, 600);
+    this.forceUpdate();
+  }
+  endReading() { this._reading = null; if (this._readingTick) { clearInterval(this._readingTick); this._readingTick = null; } try { this.forceUpdate(); } catch (e) {} }
+  readingTiles() {
+    const R = this._reading; if (!R || !R.length) return [];
+    const T = HD_TR; const step = T && T.ev.length ? T.ev[T.ev.length - 1].msg : 'Opening the file…';
+    const watch = () => { if (!HD_TR) return; import(new URL('holodeck-ingest-player.js', location.href).href).then(M => M.open(HD_TR, { live: true })).catch(() => {}); };
+    const noop = () => {};
+    return R.map(r => ({
+      id: r.id, title: r.title, tileCls: 'reading', tileStyle: 'cursor:pointer', onRead: watch, onDragStart: noop, onToggleSel: noop,
+      dvColor: 'var(--acc2)', dvGlyph: '…', dvLabel: 'Being read', dvSnipOn: true, dvSnippet: step, dvIsWave: false, isVid: false, hasPdfThumb: false,
+      selected: false, checkCls: '', delAsking: false, notRenaming: true, renaming: false, menu: [], isNew: false, hasLinks: false,
+      sub: 'Reading · ' + Math.max(1, Math.round((Date.now() - r.t0) / 1000)) + ' s · click to watch it being read',
+    }));
   }
   async ingestUrl(url, opt) {
     opt = opt || {};
@@ -8046,10 +8082,14 @@ class Component extends DCLogic {
     if (tg) { scrollTo(); setTimeout(scrollTo, 450); setTimeout(scrollTo, 1400); }
   }
   async renderPdf(el, d, R, A, key) {
-    el.innerHTML = '<p style="color:var(--mut);font:400 14px var(--sans),sans-serif">Rendering pages…</p>';
+    // The words are already read: show them at once, under a note that the page images are still being drawn, instead of
+    // an empty "Rendering pages…" until the first page finishes. The pages replace the text when they are ready.
+    const stand = (d.text || '').trim(); const paras = stand ? stand.slice(0, 20000).split(/\n{2,}/).filter(x => x.trim()) : [];
+    const standIn = paras.length ? '<div style="margin-top:12px;font:400 15px/1.7 var(--serif);color:var(--ink2);white-space:pre-wrap;overflow-wrap:anywhere">' + paras.map(x => '<p style="margin:0 0 12px">' + esc(x) + '</p>').join('') + (stand.length > 20000 ? '<p style="color:var(--mut);font:400 13px var(--sans)">…the rest of the text follows the pages.</p>' : '') + '</div>' : '';
+    el.innerHTML = '<p class="hd-pending-note"><span class="hd-pending-dot"></span>Drawing the pages… ' + (paras.length ? 'the text is here while they load.' : '') + '</p>' + standIn;
     let buf = null; try { buf = await idbGet('pdf:' + d.id); } catch (e) {}
     if (this._rKey !== key) return;
-    if (!buf) { el.innerHTML = '<p style="color:var(--mut)">The original PDF isn’t stored in this browser, so only its text can be shown — switch to “Text only”.</p>'; return; }
+    if (!buf) { el.innerHTML = '<p style="color:var(--mut)">The original PDF isn’t stored in this browser, so only its text can be shown — switch to “Text only”.</p>' + standIn; return; }
     try {
       const pdfjs = await pdfLib(); const pdf = await pdfjs.getDocument({ data: new Uint8Array(buf).slice() }).promise;
       let ocr = null; try { ocr = await idbGet('ocr:' + d.id); } catch (e) {}
@@ -8440,7 +8480,9 @@ class Component extends DCLogic {
     else hdT('paradigm', 'none', 'No paradigm: nothing here shares two or more uncommon names (reach ≤ ' + (Math.sqrt(A.docs.length) + 1).toFixed(1) + ' sources) with another source');
     hdT('store', 'done', 'Ingest finished'); T.ms = performance.now() - T.t0; T.focus = [...T.focus]; HD_TR = null;
     (window.__hdTraces = window.__hdTraces || []).push(T); if (window.__hdTraces.length > 8) window.__hdTraces.shift();
-    import(new URL('holodeck-ingest-player.js', location.href).href).then(M => M.open(T)).catch(e => console.warn('ingest player', e));
+    // only a window the reader already has open flips from live to replay; a finished read no longer opens one by itself
+    // (the source's tile has "How this was read" for the replay)
+    if (document.querySelector('.hdp')) import(new URL('holodeck-ingest-player.js', location.href).href).then(M => M.open(T)).catch(e => console.warn('ingest player', e));
   }
   // Sources already in the workspace were read with the surface's own finder only; the engine reads each
   // added source at add-time. This re-runs the engine over what is already here, once it is reachable, and
@@ -8498,6 +8540,7 @@ class Component extends DCLogic {
     // the fold, so Sources fills in as the files arrive instead of freezing until the whole batch is done.
     const added = { ...this.state.added, [id]: [...(this.state.added[id] || []), ...nd] };
     this.saveAdded(added);
+    this.endReading(); // the file is now a source in the workspace: its own tile (marked "reading" while staged) replaces the placeholder
     (this._stage = this._stage || new Set()); nd.forEach(d => this._stage.add(d.id));
     (this._stagedIds = this._stagedIds || []).push(...nd.map(d => d.id));
     (this._stagedNotes = this._stagedNotes || []).push(...list.map(x => x.note).filter(Boolean));
@@ -8989,7 +9032,11 @@ class Component extends DCLogic {
           { label: it.soloLabel || 'Only this source', onClick: dvClose(it.onSolo) },
           ...(it.canTranscribe ? [{ label: 'Transcribe it', onClick: dvClose(it.onTranscribe) }] : []), ...(it.canProcess ? [{ label: 'Read it', onClick: dvClose(it.onProcess) }] : []),
           ...(it.isSeen ? [{ label: 'Keep as a source', onClick: dvClose(it.onKeep) }] : []),
-          ...(it.isSeen ? [{ label: 'Discard', col: 'var(--bad)', onClick: dvClose(it.onDiscard) }] : it.canDelete ? [{ label: 'Delete', col: 'var(--bad)', onClick: dvClose(it.onAskDelete) }] : [])] }; });
+          ...(it.isSeen ? [{ label: 'Discard', col: 'var(--bad)', onClick: dvClose(it.onDiscard) }] : it.canDelete ? [{ label: 'Delete', col: 'var(--bad)', onClick: dvClose(it.onAskDelete) }] : [])] }; })
+      // a source that is stored but still being folded keeps the moving bar, and a click on it shows the reading
+      .map(t => (this._stage && this._stage.has(t.id)
+        ? { ...t, tileCls: 'reading', sub: 'Reading… click to watch it being read', onRead: () => { if (HD_TR) import(new URL('holodeck-ingest-player.js', location.href).href).then(M => M.open(HD_TR, { live: true })).catch(() => {}); else t.onRead && t.onRead(); } }
+        : t));
     const dvSelIds = Object.keys(dvSel).filter(id => A.docById[id]);
     const dvFolderTiles = [{ id: null, label: 'All sources', icon: '🗂', n: String(keptDocs.length), cls: !dvCurF ? 'on' : '', title: 'Show every source', onOpen: () => this.setState({ folder: null }),
         onOver: e => { try { e.preventDefault(); } catch (x) {} }, onDrop: e => { try { e.preventDefault(); String(e.dataTransfer.getData('text/plain')).split(',').filter(Boolean).forEach(id => this.setDocFolder(id, '')); } catch (x) {} } },
@@ -9012,7 +9059,7 @@ class Component extends DCLogic {
       fieldsOn: String(fcSel.length), hasFieldPick: FC.fields.length > 0,
       fieldPick: FC.fields.map(f => ({ label: f.label, tag: f.type, cover: f.n + ' of ' + A.docs.length, on: fcSel.includes(f.key), tip: (fcPinned.includes(f.key) ? 'Explicit field, always shown. ' : '') + 'Written ' + f.surface + ' · ' + f.distinct + ' distinct values',
         onToggle: () => { if (fcPinned.includes(f.key)) return; const cur = fcSel.includes(f.key) ? fcSel.filter(k => k !== f.key) : [...fcSel, f.key]; try { localStorage.setItem('holodeck-sv-fields', JSON.stringify(cur)); } catch (e) {} this.setState({ svFields: cur }); } })),
-      hasFolders: dvFl.length > 0, folders: dvFolderTiles, tiles: dvTiles, empty: dvTiles.length === 0,
+      hasFolders: dvFl.length > 0, folders: dvFolderTiles, tiles: [...this.readingTiles(), ...dvTiles], empty: dvTiles.length === 0 && !(this._reading && this._reading.length),
       emptyText: dvQ ? 'No source matches “' + (S.dvQ || '').trim() + '”.' : dvCurF ? 'This folder is empty — drag sources onto it from “All sources”.' : 'Nothing here yet. Add a source to start.',
       canCompare: dvSelIds.length === 2 && this.linkMods() != null,
       onCompare: () => this.setState({ view: 'seam', lkPair: dvSelIds.slice(0, 2), readDoc: null, sel: null, dvSel: {}, lkForm: null }),
@@ -10728,6 +10775,33 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
       rows: M.paramRows(p, built).map(r => ({ rel: r.rel, star: r.star, standing: r.standing, cls: r.cls, vals: r.values.map(v => v.text + (v.n > 1 ? ' ×' + v.n : '')).join(' · ') + (r.more ? ' ' + r.more : '') })),
     };
   }
+  // The profile card in plain words: what the sources say about a name, one row per kind of thing said. The relation
+  // names the reader induces ("named in", "said with", "appears with") are the engine's own; here each is a sentence a
+  // person can read, the internal source ids become source titles, and a column that carries no information is left out.
+  profilePlain(A, name) {
+    const M = _hdProf; if (!M) return null;
+    const built = this.profileBuild(A); if (!built) return null;
+    const p = built.byId.get(name); if (!p || !p.parameters.length) return null;
+    const REL = HD_REL_PLAIN, FRAME = HD_FRAME_PLAIN, STANDING = HD_STANDING_PLAIN;
+    const title = id => { const d = (A.docById && A.docById[id]) || (A.docs || []).find(x => x.id === id); return d ? d.title : id; };
+    // the "kind of name" row says "other" when no type was established, which the header already says
+    const rows = M.paramRows(p, built).filter(r => !(r.rel === 'typed' && r.values.length === 1 && r.values[0].text === 'other')).map(r => {
+      const vals = r.values.map(v => {
+        let t = v.text;
+        if (r.rel === 'said with') t = FRAME[t] || t;
+        else if (r.rel === 'named in') t = title(t);
+        return t + (v.n > 1 ? ' ×' + v.n : '');
+      });
+      return { rel: REL[r.rel] || r.rel, standingNote: STANDING[r.standing] ? ' · ' + STANDING[r.standing] : '', hasStanding: !!STANDING[r.standing], standing: STANDING[r.standing] || '', vals: vals.join(' · ') + (r.more ? ' ' + r.more : '') };
+    });
+    const typed = M.paramRows(p, built).find(r => r.rel === 'typed');
+    const kindWord = typed && typed.values[0] ? typed.values[0].text : '';
+    return {
+      kind: kindWord && kindWord !== 'other' ? 'Read as ' + kindWord : 'No type established',
+      countLine: rows.length + (rows.length === 1 ? ' kind of detail recorded' : ' kinds of detail recorded'),
+      rows,
+    };
+  }
   // The summary field: what the profile is about, instant from the induced
   // profile + the analysis (no model call), larger or smaller at will. Every
   // proposition carries full provenance to the exact source statements that
@@ -10765,11 +10839,12 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
     const sbtn = (on) => `background:none;border:1px solid ${on ? 'var(--acc)' : 'var(--line2)'};border-radius:99px;padding:0 7px;cursor:pointer;font:500 10px var(--mono);color:${on ? 'var(--acc)' : 'var(--mut)'}`;
     const stmtShort = lens.stmtShort;
     const props = M.summaryProps(p, built).map(pr => ({
-      rel: pr.rel, starMark: pr.star ? '★' : '', standing: pr.standing,
+      rel: HD_REL_PLAIN[pr.rel] || pr.rel, starMark: '', standing: HD_STANDING_PLAIN[pr.standing] || '',
       vals: pr.vals.map(v => {
         const witness = prov.get(pr.rel + '\u0001' + String(v.raw)) || [];
+        const word = pr.rel === 'named in' ? ((A.docById && A.docById[v.text]) ? A.docById[v.text].title : v.text) : pr.rel === 'said with' ? (HD_FRAME_PLAIN[v.text] || v.text) : v.text;
         return {
-          label: v.text + (v.n > 1 ? ' ×' + v.n : ''), hasProv: witness.length > 0,
+          label: word + (v.n > 1 ? ' ×' + v.n : ''), hasProv: witness.length > 0,
           provLabel: witness.length ? ' · ' + stmtShort(witness.length) : '',
           onCite: witness[0] ? () => this.read(witness[0].doc, witness[0].id) : null,
         };
@@ -10821,7 +10896,7 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
       const r = referentOfLink(L.href); refs.push({ label: r.label, host: r.host, href: r.href, wiki: r.wiki, onOpen: () => this.navigate(L.href) }); });
     refs.length = Math.min(refs.length, 6);
     return { has: true, eyebrow: d.eyebrow, color: d.color, title: n.name,
-      hasProf: !!(pr && pr.rows.length), profKind: pr ? pr.kind : '', profEstablished: pr ? pr.established : false, profCount: pr ? pr.count : 0, profRows: pr ? pr.rows : [],
+      ...(() => { const pl = this.profilePlain(A, n.name); return { hasProf: !!(pl && pl.rows.length), profKind: pl ? pl.kind : '', profEstablished: pr ? pr.established : false, profCount: pl ? pl.countLine : '', profRows: pl ? pl.rows : [] }; })(),
       hasRefs: refs.length > 0, refs, refTitle: refs.length === 1 ? 'Linked referent' : 'Linked referents',
       sum: this.profileSummary(A, n.name),
       facts: d.facts, here: N ? plural(N, 'mention') + ' in this source' : 'Not named in this source’s statements', hasStep: N > 1, pos: N > 1 ? (Math.min(idx, N - 1) + 1) + ' / ' + N : '', prev: () => step(-1), next: () => step(1),
