@@ -96,6 +96,22 @@
   .chip.info { background: var(--info-bg); color: var(--info-fg); border-color: var(--info-fg); }
   .chip.neu { background: var(--neu-bg); color: var(--neu-fg); border-color: var(--neu-fg); }
   .chip.bad { background: var(--bad-bg); color: var(--bad-fg); border-color: var(--bad-fg); }
+  /* by department */
+  .sr { position: absolute; left: -9999px; }
+  .deptbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 8px; }
+  .deptbar input { font: inherit; padding: 6px 10px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); color: var(--text); min-width: 220px; }
+  .deptwrap { max-height: 420px; overflow: auto; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); }
+  .depttable { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .depttable th, .depttable td { padding: 6px 10px; text-align: left; border-bottom: 1px solid var(--border); }
+  .depttable th { position: sticky; top: 0; background: var(--surface); z-index: 1; }
+  .depttable th button { all: unset; cursor: pointer; font-weight: 700; color: var(--text); }
+  .depttable th button:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  .depttable .n { text-align: right; font-variant-numeric: tabular-nums; }
+  .depttable th.n button { display: inline-block; }
+  .depttable .mini { display: inline-block; vertical-align: middle; width: 90px; height: 8px; border-radius: 4px; background: var(--track); margin-right: 8px; overflow: hidden; }
+  .depttable .mini i { display: block; height: 100%; background: var(--fill-arch); }
+  .crumbs { font-size: 14px; margin: 0 0 10px; color: var(--muted); }
+  .crumbs a { color: var(--info-fg); }
   /* live activity */
   .livebar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 8px; }
   .livecounts, .livefilters { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
@@ -127,6 +143,7 @@
 </head>
 <body>
 <div class="wrap">
+  <nav class="crumbs" id="crumbs" aria-label="Breadcrumb" hidden><a href="index.html">Holodeck</a> <span aria-hidden="true">›</span> <span aria-current="page">Sync</span></nav>
   <header>
     <div>
       <h1>Contract sync state</h1>
@@ -248,15 +265,35 @@
           <p class="barnote">A bar turns amber and is labelled "high" above 75 percent used.</p>
         </section>
 
+        <section class="panel" aria-labelledby="h-dept" id="dept">
+          <h2 id="h-dept">By department</h2>
+          <div class="deptbar">
+            <label for="dept-filter" class="sr">Filter departments</label>
+            <input type="search" id="dept-filter" placeholder="Filter departments" autocomplete="off">
+            <span class="barnote" id="dept-count"></span>
+          </div>
+          <div class="deptwrap">
+            <table class="depttable" id="dept-table">
+              <thead><tr>
+                <th><button type="button" data-k="department">Department</button></th>
+                <th class="n"><button type="button" data-k="found">Found</button></th>
+                <th class="n"><button type="button" data-k="archived">Archived</button></th>
+                <th class="n"><button type="button" data-k="queue">Queue</button></th>
+                <th class="n"><button type="button" data-k="backlog">Backlog</button></th>
+                <th><button type="button" data-k="percent_archived">Done</button></th>
+              </tr></thead>
+              <tbody id="dept-body"></tbody>
+            </table>
+          </div>
+          <p class="barnote">Each contract the inventory found is counted once, under the department it was found in. Done is archived over found. Click a heading to sort.</p>
+        </section>
+
         <section class="panel" aria-labelledby="h-live" id="live">
           <h2 id="h-live">Live activity</h2>
           <div class="livebar">
             <span class="chip neu" id="live-state" role="status">Connecting</span>
-            <button type="button" id="live-pause">Pause</button>
             <span class="barnote" id="live-note">Events from the pipeline on the VM, newest first.</span>
           </div>
-          <div class="livecounts" id="live-counts" aria-label="Events in the last minute by kind"></div>
-          <div class="livefilters" id="live-filters" role="group" aria-label="Show these kinds"></div>
           <ol class="livefeed" id="live-feed" aria-live="off"></ol>
         </section>
 
@@ -285,6 +322,8 @@
   var inflight = false;
 
   var $ = function (id) { return document.getElementById(id); };
+  // opened on its own, the page links back into the app; inside the app's screen the app's own trail is shown instead
+  try { if (window.top === window) $('crumbs').hidden = false; } catch (e) { $('crumbs').hidden = false; }
   var fmt = function (n) { return (typeof n === 'number' && isFinite(n)) ? n.toLocaleString('en-US') : 'n/a'; };
   var dec = function (n, d) { return (typeof n === 'number' && isFinite(n)) ? n.toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d }) : 'n/a'; };
   var set = function (id, t) { $(id).textContent = t; };
@@ -432,11 +471,57 @@
     var w = d.warnings || [];
     $('f-warn').hidden = w.length === 0;
     set('f-warn', w.length ? 'Collector warnings: ' + w.join('; ') : '');
+    deptRows = d.departments || [];
+    renderDepts();
   }
 
-  function showError(msg) {
+  // ---- by department: sortable, filterable pivot of the sync state ----
+  var deptRows = [], deptSort = { k: 'backlog', dir: -1 };
+  function renderDepts() {
+    var q = ($('dept-filter').value || '').trim().toLowerCase();
+    var rows = deptRows.filter(function (r) { return !q || r.department.toLowerCase().indexOf(q) >= 0; });
+    var k = deptSort.k, dir = deptSort.dir;
+    rows.sort(function (a, b) {
+      var x = a[k], y = b[k];
+      if (typeof x === 'string') return dir * x.localeCompare(y);
+      x = x == null ? -1 : x; y = y == null ? -1 : y;
+      return (x === y ? a.department.localeCompare(b.department) : (x < y ? -1 : 1) * dir);
+    });
+    var body = $('dept-body'); body.textContent = '';
+    rows.forEach(function (r) {
+      var tr = document.createElement('tr');
+      function td(txt, cls) { var c = document.createElement('td'); if (cls) c.className = cls; c.textContent = txt; tr.appendChild(c); return c; }
+      td(r.department);
+      td(fmt(r.found), 'n'); td(fmt(r.archived), 'n'); td(fmt(r.queue), 'n'); td(fmt(r.backlog), 'n');
+      var c = document.createElement('td');
+      var mini = document.createElement('span'); mini.className = 'mini';
+      var fill = document.createElement('i'); fill.style.width = Math.min(100, r.percent_archived || 0) + '%'; mini.appendChild(fill);
+      c.appendChild(mini); c.appendChild(document.createTextNode(r.percent_archived == null ? 'n/a' : r.percent_archived.toFixed(1) + '%'));
+      tr.appendChild(c);
+      body.appendChild(tr);
+    });
+    set('dept-count', rows.length + ' of ' + deptRows.length + ' departments');
+    var hs = document.querySelectorAll('#dept-table th button');
+    for (var i = 0; i < hs.length; i++) {
+      var on = hs[i].getAttribute('data-k') === k;
+      hs[i].parentNode.setAttribute('aria-sort', on ? (dir > 0 ? 'ascending' : 'descending') : 'none');
+    }
+  }
+  document.getElementById('dept-filter').addEventListener('input', function () { renderDepts(); });
+  document.getElementById('dept-table').addEventListener('click', function (e) {
+    var b = e.target.closest ? e.target.closest('button[data-k]') : null;
+    if (!b) return;
+    var k = b.getAttribute('data-k');
+    deptSort = { k: k, dir: deptSort.k === k ? -deptSort.dir : (k === 'department' ? 1 : -1) };
+    renderDepts();
+  });
+
+  // kind: 'server' = this page's own local Holodeck server did not answer (the VM may be perfectly fine);
+  //       'vm' = the server answered but could not reach the VM (HTTP 502)
+  function showError(msg, kind) {
     $('error').hidden = false;
-    set('error-msg', msg);
+    set('error-title', kind === 'vm' ? 'Could not reach the VM' : "The local Holodeck server isn't answering");
+    set('error-msg', kind === 'vm' ? msg : msg + ' This page is served by the local Holodeck server (node tools/serve.mjs); it is not running or not reachable, so nothing can be fetched. Start it again and the numbers resume.');
     $('error-stale').hidden = !data;
     $('loading').hidden = true;
   }
@@ -456,7 +541,7 @@
         return r.text().then(function (t) {
           var j = null;
           try { j = JSON.parse(t); } catch (e) { /* handled below */ }
-          if (!r.ok) throw new Error((j && j.error) || ('HTTP ' + r.status));
+          if (!r.ok) { var er = new Error((j && j.error) || ('HTTP ' + r.status)); er.kind = (r.status === 502 ? 'vm' : 'server'); throw er; }
           if (!j || !j.counts) throw new Error('Unexpected response from the server');
           return j;
         });
@@ -471,7 +556,8 @@
       })
       .catch(function (e) {
         var m = (e && e.name === 'AbortError') ? 'The request timed out after ' + (TIMEOUT_MS / 1000) + ' seconds.' : String((e && e.message) || e);
-        showError(m);
+        // a timeout can be a slow VM behind a live server; a network failure or non-502 status means the server itself
+        showError(m, (e && e.kind) ? e.kind : (e && e.name === 'AbortError') ? 'vm' : 'server');
       })
       .then(function () {
         clearTimeout(timer);
@@ -493,27 +579,15 @@
 
   // ---- live activity: server-sent events from /api/live (the VM's events.jsonl) ----
   (function live() {
-    var KINDS = {   // kind -> [chip class, shown by default]
-      'uploaded': ['ok', true], 'fetched': ['info', true], 'read': ['info', true], 'verdict': ['neu', true],
-      'destroyed-stub': ['warn', true], 'upload-failed': ['bad', true], 'fetch-failed': ['bad', true],
-      'read-failed': ['bad', true], 'missing-home': ['bad', true], 'skip-fetch': ['warn', true],
-      'dropped-local-pdf': ['neu', false], 'heartbeat': ['neu', false]
-    };
-    var MAX_ROWS = 150, WINDOW_MS = 60000;
-    var feed = $('live-feed'), counts = $('live-counts'), filters = $('live-filters'), stateEl = $('live-state'), pauseBtn = $('live-pause');
-    var shown = {}, recent = [], rows = [], paused = false, held = [], es = null, dirty = false, lastEventAt = 0;
-    Object.keys(KINDS).forEach(function (k) { shown[k] = KINDS[k][1]; });
-
-    function ensureFilter(k) {
-      if (document.getElementById('lf-' + k)) return;
-      if (!(k in shown)) shown[k] = true;
-      var lab = document.createElement('label');
-      var cb = document.createElement('input'); cb.type = 'checkbox'; cb.id = 'lf-' + k; cb.checked = !!shown[k];
-      cb.addEventListener('change', function () { shown[k] = cb.checked; rebuild(); });
-      lab.appendChild(cb); lab.appendChild(document.createTextNode(k));
-      filters.appendChild(lab);
-    }
-    Object.keys(KINDS).forEach(ensureFilter);
+    // kind -> chip colour; the two bookkeeping kinds are not listed at all (one fires with every upload)
+    var CLS = { 'uploaded': 'ok', 'fetched': 'info', 'read': 'info', 'verdict': 'neu', 'destroyed-stub': 'warn',
+      'upload-failed': 'bad', 'fetch-failed': 'bad', 'read-failed': 'bad', 'missing-home': 'bad', 'skip-fetch': 'warn' };
+    var SKIP = { 'dropped-local-pdf': 1, 'heartbeat': 1 };
+    var KINDS = {};
+    Object.keys(CLS).forEach(function (k) { KINDS[k] = [CLS[k]]; });
+    var MAX_ROWS = 100;
+    var feed = $('live-feed'), stateEl = $('live-state');
+    var rows = [], es = null, dirty = false, lastEventAt = 0;
 
     function rowFor(e) {
       var li = document.createElement('li');
@@ -533,35 +607,14 @@
     }
     function rebuild() {
       feed.textContent = '';
-      var n = 0;
-      for (var i = rows.length - 1; i >= 0 && n < MAX_ROWS; i--) {
-        if (shown[rows[i].kind] === false) continue;
-        feed.appendChild(rowFor(rows[i])); n++;
-      }
-    }
-    function paintCounts() {
-      var cutoff = Date.now() - WINDOW_MS, c = {};
-      recent = recent.filter(function (r) { return r.t >= cutoff; });
-      recent.forEach(function (r) { c[r.kind] = (c[r.kind] || 0) + 1; });
-      counts.textContent = '';
-      Object.keys(c).sort(function (a, b) { return c[b] - c[a]; }).forEach(function (k) {
-        var s = document.createElement('span'); s.className = 'lc';
-        var b = document.createElement('b'); b.textContent = String(c[k]);
-        s.appendChild(b); s.appendChild(document.createTextNode(' ' + k + ' / min'));
-        counts.appendChild(s);
-      });
-      if (!recent.length) { var s2 = document.createElement('span'); s2.className = 'lc'; s2.textContent = 'No events in the last minute'; counts.appendChild(s2); }
-    }
-    function accept(e) {
-      lastEventAt = Date.now();
-      recent.push({ kind: e.kind || 'event', t: Date.now() });
-      ensureFilter(e.kind || 'event');
-      rows.push(e); if (rows.length > 600) rows.shift();
-      dirty = true;
+      for (var i = rows.length - 1, n = 0; i >= 0 && n < MAX_ROWS; i--, n++) feed.appendChild(rowFor(rows[i]));
     }
     function onLine(text) {
       var e; try { e = JSON.parse(text); } catch (x) { return; }
-      if (paused) { held.push(e); if (held.length > 600) held.shift(); } else accept(e);
+      if (SKIP[e.kind]) return;
+      lastEventAt = Date.now();
+      rows.push(e); if (rows.length > MAX_ROWS) rows.shift();
+      dirty = true;
     }
     function setState(txt, cls) { stateEl.textContent = txt; stateEl.className = 'chip ' + cls; }
     function connect() {
@@ -572,17 +625,9 @@
       es.addEventListener('down', function () { setState('VM link dropped, reconnecting', 'warn'); });
       es.onerror = function () { setState('Reconnecting', 'bad'); };
     }
-    pauseBtn.addEventListener('click', function () {
-      paused = !paused;
-      pauseBtn.textContent = paused ? 'Resume' : 'Pause';
-      if (!paused) { held.forEach(accept); held = []; }
-      else setState('Paused', 'neu');
-      if (!paused && es && es.readyState === 1) setState('Live', 'ok');
-    });
     setInterval(function () {
       if (dirty) { dirty = false; rebuild(); }
-      paintCounts();
-      if (!paused && es && es.readyState === 1 && lastEventAt && Date.now() - lastEventAt > 45000) setState('Connected, quiet for ' + Math.round((Date.now() - lastEventAt) / 1000) + ' s', 'neu');
+      if (es && es.readyState === 1 && lastEventAt && Date.now() - lastEventAt > 45000) setState('Connected, quiet for ' + Math.round((Date.now() - lastEventAt) / 1000) + ' s', 'neu');
     }, 500);
     connect();
   })();

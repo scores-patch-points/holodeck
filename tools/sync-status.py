@@ -79,10 +79,14 @@ def in_window(ts):
 
 # --- universe (inventory output) -------------------------------------------
 universe = set()
+universe_dept = {}   # token -> the department the inventory found it under
 for d in stream_json(os.path.join(UNIVERSE_DIR, "rows.jsonl")):
     t = d.get("token")
     if isinstance(t, str) and t:
         universe.add(t)
+        dep = d.get("department")
+        if isinstance(dep, str) and dep.strip() and t not in universe_dept:
+            universe_dept[t] = dep.strip()
 
 # --- fetched ledger ----------------------------------------------------------
 fetched = set()
@@ -119,6 +123,26 @@ backlog = len(universe - fetched - archived)
 # Tokens fetched/archived that the inventory has not (yet) listed. Zero in
 # practice; reported so that a >100% figure could never be silent.
 outside = len((fetched | archived) - universe)
+
+# --- by department (the pivot) ----------------------------------------------
+# Each token found by the inventory is counted once, under the department the inventory found it in.
+# archived = in the manifest; queue = fetched, not archived; backlog = found, not fetched.
+by_dept = {}
+for t in universe:
+    name = universe_dept.get(t, "(department not recorded)")
+    r = by_dept.get(name)
+    if r is None:
+        r = by_dept[name] = {"department": name, "found": 0, "archived": 0, "queue": 0, "backlog": 0}
+    r["found"] += 1
+    if t in archived:
+        r["archived"] += 1
+    elif t in fetched:
+        r["queue"] += 1
+    else:
+        r["backlog"] += 1
+departments = sorted(by_dept.values(), key=lambda r: (-r["backlog"], r["department"]))
+for r in departments:
+    r["percent_archived"] = round(100.0 * r["archived"] / r["found"], 1) if r["found"] else None
 
 
 def pct(n, d):
@@ -328,6 +352,7 @@ out = {
         "outside_universe": outside,
     },
     "universe_is_lower_bound": not complete,
+    "departments": departments,
     "percent": {
         "fetched": pct(n_fetched, n_universe),
         "archived": pct(n_archived, n_universe),
