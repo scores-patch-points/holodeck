@@ -163,3 +163,12 @@ fast: 3 files · 1 affected test file, 6 pass · law: ok
 | Kondo | a rung nothing profits from | holodeck-yt.js:83 | noted | the public-proxy rung returned no caption body on 5 of 5 videos (timedtext now needs a proof-of-origin token; the watch page itself still arrives, also via the n8n feed proxy); kept and bounded rather than stashed, a candidate for STASH.md if it stays empty |
 clean: Feynman, Dijkstra, Kondo reported above; Marshall not routed — no law edited or cited
 checked live (not by a test): with no helper the link ingests in about 7 s, the card reads "no captions — helper not reachable" and a toast names the cause; with tools/ytdl-helper.py running, the same link comes back transcribed "via your yt-dlp helper". Innertube POSTs from a browser origin fail on CORS, so no browser-only route remains.
+
+## 2026-10-13 — a Cloudflare Worker that answers the helper's /health and /captions, so a hosted page can read YouTube captions with nothing local (main, tools/cf-captions)
+fast: 4 files · 1 affected test file, 8 pass · law: ok
+| lens | citation | file:line | verdict | one line |
+| Simon/Chekhov | new source with no test import | tools/cf-captions/worker.mjs | fixed | worker.test.mjs imports it: response shape, ANDROID→IOS fallback, 502 with the refusal reason, empty-body refusal, origin / id / method / path checks, and that fmt is replaced not appended (ANDROID tracks arrive with fmt=srv3) |
+| Dijkstra | case-folding a language tag | tools/cf-captions/worker.mjs:26 | noted | BCP-47 tags are ASCII and case-insensitive, so lowercasing is the comparison, not an identity; pickTrack is a copy of holodeck-yt.js's (unexported there), so the two can drift — a candidate to export and import |
+| Feynman | a skip / a "only" in prose | tools/cf-captions/README.md:25 | false-positive-on-review | the line states the worker's scope; no check is skipped |
+clean: Feynman, Dijkstra, Simon/Chekhov reported above; Marshall not routed — no law edited or cited
+checked live (not by a test): the worker's code run against real YouTube from an ordinary address returned captions for 4 of 4 videos (2, 6, 59 and 26 segments). The first run returned "empty" on all of them — the ANDROID client's track URL already carries fmt=srv3 and the appended fmt=json3 was ignored; fixed by replacing the parameter. NOT measured: YouTube's treatment of Cloudflare's egress addresses; nothing is deployed.
