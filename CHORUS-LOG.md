@@ -172,3 +172,14 @@ fast: 4 files · 1 affected test file, 8 pass · law: ok
 | Feynman | a skip / a "only" in prose | tools/cf-captions/README.md:25 | false-positive-on-review | the line states the worker's scope; no check is skipped |
 clean: Feynman, Dijkstra, Simon/Chekhov reported above; Marshall not routed — no law edited or cited
 checked live (not by a test): the worker's code run against real YouTube from an ordinary address returned captions for 4 of 4 videos (2, 6, 59 and 26 segments). The first run returned "empty" on all of them — the ANDROID client's track URL already carries fmt=srv3 and the appended fmt=json3 was ignored; fixed by replacing the parameter. NOT measured: YouTube's treatment of Cloudflare's egress addresses; nothing is deployed.
+
+## 2026-10-13 — the user's own browser reads the captions: a capture-extension bridge and rung, with one shared reader the Cloudflare worker now imports (main, extension/ + holodeck-yt.js + tools/cf-captions)
+fast: 12 files · 3 affected test files, 24 pass · law: ok
+| lens | citation | file:line | verdict | one line |
+| Simon/Chekhov | new source with no test import | extension/captions.js, extension/background.js | fixed | captions.test.mjs imports the reader, runs content.js in a stub window against it, and imports background.js with a stub chrome (id validation, async reply, other messages ignored) |
+| Diaconis | Math.random | holodeck-yt.js:113 | false-positive-on-review | a request/reply correlation id, not a sample or a null |
+| Feynman | numeric constants | extension/captions.js:32 | noted | 1.2 s and 520 characters decide only how closely-following caption lines are joined for display (copied from holodeck-yt.js parseJson3); they are presentation, tuned against nothing, and bear on no verdict |
+| Dijkstra | case-folding a language tag | extension/captions.js:41 | noted | BCP-47 tags are ASCII; also changed here: language now outranks manual-vs-auto (the copied scoring put a German typed track above English auto-captions) |
+clean: Diaconis, Feynman, Dijkstra, Simon/Chekhov reported above; Marshall not routed — no law edited or cited
+bug found only by the integration chain, not the unit tests: window.postMessage to oneself is delivered to the sender's own listener, so the page took its ping for the extension's answer and reported "not installed"; fixed by matching the reply type, and the test stub now echoes like a browser.
+checked live (not by a test): real content.js + real reader + real network + the page's transcriptOutcome, in one process: 4 of 4 videos through rung=extension in ~0.5 s each. NOT checked: the extension loaded unpacked in a real Chrome (no way to do that from here).

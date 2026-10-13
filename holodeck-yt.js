@@ -103,19 +103,53 @@ async function fromBrowser(id, lang) {
   return null;
 }
 
-// The entry point the surface calls: captions by helper, then by proxy. Returns { cap, why }: cap is the
-// caption object or null, and when it is null `why` says what is true so the person is told it instead of
-// being handed a bare title —
+// rung 0: the capture extension, when installed. The read is made by the person's own browser, on their
+// own address — the one place a YouTube caption track still comes back with its body. The page asks by
+// window.postMessage; extension/content.js relays to the background and back. A ping first, so a person
+// without the extension loses a fraction of a second and never waits on a local-network prompt.
+function askExtension(msg, want, ms) {
+  return new Promise(resolve => {
+    if (typeof window === 'undefined' || !window.addEventListener || !window.postMessage) return resolve(null);
+    const rid = 'yt' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+    const done = v => { window.removeEventListener('message', on); clearTimeout(timer); resolve(v); };
+    // window.postMessage to oneself is delivered to this very listener too: only the reply type counts,
+    // never the request echoing back with its own rid.
+    const on = e => { const d = e && e.data; if (e.source === window && d && d.rid === rid && d.type === want) done(d); };
+    const timer = setTimeout(() => done(null), ms);
+    window.addEventListener('message', on);
+    try { window.postMessage({ ...msg, rid }, location.origin); } catch (err) { done(null); }
+  });
+}
+async function fromExtension(id, lang) {
+  const here = await askExtension({ type: 'fold-captions-ping' }, 'fold-captions-here', 700);
+  if (!here) return { present: false };
+  const r = await askExtension({ type: 'fold-captions-request', id, lang: lang || 'en' }, 'fold-captions-result', 45000);
+  if (!r) return { present: true, error: 'the extension did not answer' };
+  if (!r.ok) return { present: true, error: r.error || 'the extension could not read it' };
+  if (!Array.isArray(r.segments) || !r.segments.length) return { present: true, empty: true };
+  return { present: true, cap: { title: r.title || '', author: r.author || '', lang: r.lang || lang || '', kind: r.kind || '', segments: r.segments,
+    source: 'extension', model: 'captions', via: 'your own browser (the capture extension)', rung: 'extension' } };
+}
+
+// The entry point the surface calls: the extension, then the helper, then the proxies. Returns { cap, why,
+// detail }: cap is the caption object or null, and when it is null `why` says what is true so the person
+// is told it instead of being handed a bare title —
+//   'extension-error'     the capture extension is installed and could not read it (detail says why)
 //   'helper-unreachable'  nothing answered at ytdlBase(): not started, or the browser blocked the page from
 //                         reaching 127.0.0.1 (a hosted copy of the page needs "Local network access" allowed)
 //   'helper-error'        the helper is up but could not read this video
-//   'no-track'            the helper read the video and it has no caption track
+//   'no-track'            the video has no caption track
 export async function transcriptOutcome(id, lang) {
-  let why = 'no-track';
+  let why = 'no-track', detail = '';
+  try {
+    const x = await fromExtension(id, lang);
+    if (x.cap) return { cap: x.cap, why: null };
+    if (x.present && x.error) { why = 'extension-error'; detail = x.error; }
+  } catch (e) {}
   try { const h = await fromHelper(id, lang); if (h) return { cap: h, why: null }; }
-  catch (e) { why = (await helperHealth()) ? 'helper-error' : 'helper-unreachable'; }
+  catch (e) { if (why !== 'extension-error') why = (await helperHealth()) ? 'helper-error' : 'helper-unreachable'; }
   try { const b = await fromBrowser(id, lang); if (b) return { cap: b, why: null }; } catch (e) {}
-  return { cap: null, why };
+  return { cap: null, why, detail };
 }
 
 // Same contract as before for callers that only want the captions: the object, or null (the caller then

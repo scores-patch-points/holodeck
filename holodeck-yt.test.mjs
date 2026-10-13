@@ -16,7 +16,7 @@ function route(table) {
     throw new TypeError('Failed to fetch');
   };
 }
-test.afterEach(() => { globalThis.fetch = realFetch; });
+test.afterEach(() => { globalThis.fetch = realFetch; delete globalThis.window; delete globalThis.location; });
 
 const HELPER = 'http://127.0.0.1:11450';
 const segs = [{ start: 1, end: 3, text: 'All right, so here we are' }];
@@ -69,4 +69,44 @@ test('proxies that never answer end within one budget, not 15 s each', async () 
   assert.equal(o.cap, null);
   assert.equal(o.why, 'helper-unreachable');
   assert.ok(took < 9000, 'took ' + took + ' ms — four proxies at 15 s each would be a minute');
+});
+
+// ── the capture extension, answering through window.postMessage ──────────────────────────────────
+function fakeExtension(handler) {
+  const ls = new Set();
+  const win = {
+    addEventListener: (t, f) => ls.add(f), removeEventListener: (t, f) => ls.delete(f),
+    // Like a browser: the page's own message is delivered back to its own listeners, then the extension answers.
+    postMessage(msg) { setTimeout(() => {
+      for (const f of [...ls]) f({ source: win, data: msg });
+      const r = handler(msg); if (r) for (const f of [...ls]) f({ source: win, data: { rid: msg.rid, ...r } });
+    }, 0); },
+  };
+  globalThis.window = win; globalThis.location = { origin: 'https://scores-patch-points.github.io' };
+}
+
+test('the extension answers first: its captions, and the helper is never asked', async () => {
+  fakeExtension(m => m.type === 'fold-captions-ping' ? { type: 'fold-captions-here' }
+    : { type: 'fold-captions-result', ok: true, title: 't', lang: 'en', kind: 'manual', segments: segs });
+  let helperAsked = false;
+  globalThis.fetch = async () => { helperAsked = true; throw new TypeError('Failed to fetch'); };
+  const o = await transcriptOutcome('jNQXAC9IVRw', 'en');
+  assert.equal(o.why, null); assert.equal(o.cap.rung, 'extension'); assert.equal(helperAsked, false);
+});
+
+test('no extension: the ping costs under a second and the helper is tried as before', async () => {
+  fakeExtension(() => null); // nothing answers
+  route([[HELPER + '/captions', json({ title: 't', segments: segs })]]);
+  const t0 = Date.now();
+  const o = await transcriptOutcome('jNQXAC9IVRw', 'en');
+  assert.equal(o.cap.rung, 'helper');
+  assert.ok(Date.now() - t0 < 1500, 'waited ' + (Date.now() - t0) + ' ms for an extension that is not there');
+});
+
+test('extension present but refused: extension-error with its reason, even when the helper is also down', async () => {
+  fakeExtension(m => m.type === 'fold-captions-ping' ? { type: 'fold-captions-here' }
+    : { type: 'fold-captions-result', ok: false, error: 'LOGIN_REQUIRED: Sign in to confirm you’re not a bot' });
+  route([]);
+  const o = await transcriptOutcome('jNQXAC9IVRw', 'en');
+  assert.equal(o.cap, null); assert.equal(o.why, 'extension-error'); assert.match(o.detail, /LOGIN_REQUIRED/);
 });

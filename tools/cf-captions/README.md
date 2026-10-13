@@ -5,6 +5,15 @@ proof-of-origin token, and the player API sends no CORS header). The local `tool
 the full answer. This Worker is the answer for a hosted page when nothing is running on the reader's
 machine: it answers the helper's `/health` and `/captions` with the same JSON.
 
+## Which one
+
+- **The capture extension** (`extension/`, Load unpacked) reads captions from the person's *own*
+  browser and address, with no server and no account. It cannot be rate-limited as a datacenter and
+  needs nothing deployed. Prefer it for yourself.
+- **This Worker** is for people who will not install an extension, or a shared hosted copy. YouTube
+  sees Cloudflare's addresses, not theirs (see below).
+- Both use the same reader, `extension/captions.js`.
+
 ## Use
 
 ```bash
