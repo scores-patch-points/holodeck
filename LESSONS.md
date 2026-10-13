@@ -133,3 +133,13 @@ wrong, 14.7% refused. Names are not respelled.
 Every `title` attribute is removed by a document-wide observer, so a hover explanation is `data-why` plus a tip
 the component draws. And `mentionsAt` from `/v1/read` are offsets into the engine's normalised text, not the text
 sent: use the engine for which referents exist and under which surfaces, then find those surfaces on the words.
+
+## 21. A fold slider is a level, and a scan's justification gaps are not layout
+
+A divider drawn across the page answers "where", not "how much", and it cut words in half. The slider is a fold
+LEVEL: 0 is the OCR as read; moving right applies, in thirds, the repairs (most-vouched first), the engine's reading
+of what the words are, then the cleanup of stray glyphs and what stays unsure. The page tints subtly with it. And the
+wide gaps in a justified scan line are the printer's, not the document's: set the words at ordinary spacing, keep
+what the layout actually says (centring, indents, relative size, blank space between blocks), and run the pages
+together as one continuous scroll. A glyph like ¢ or ⌟ inside a date or an amount is cleaned off it, not the token
+deleted; only what has no word or number left is dropped.

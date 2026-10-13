@@ -58,6 +58,20 @@ export function makeFold(priors) {
         else { r.kind = 'unread'; stats.unread++; }
         page.push(r);
       }
+      // JUNK: stray glyphs the scan put in or around text (_ | ~ ¢ [ ] ⌟ ...) are noise, not text. A token carrying one is
+      // CLEANED of it ("|9/30/2006" -> "9/30/2006", "$__2,000,000" -> "$2,000,000"); if nothing that reads as a word or a
+      // number is left, it is DROPPED ("_]", "a¢y"). A bare symbol with no glyph in it still stands when the tokens on both
+      // sides stand as read or are numbers ("Smith & Sons", "$ 1,000", a hyphen between words), the repairs' own witness.
+      const ODD = /[_|~¢¬§¤¦\\^`<>{}\[\]⌟⌞⌜⌝]/, ODD_G = new RegExp(ODD.source, 'g');
+      const standing = (x) => x && (x.kind === 'read' || /\d/.test(x.text));
+      page.forEach((r, i) => {
+        if (r.kind === 'repaired' || r.kind === 'read' || r.kind === 'name') return;
+        const t = r.text || '', hasOdd = ODD.test(t), symbolOnly = !/[\p{L}\p{N}]/u.test(t);
+        if (!hasOdd && !(symbolOnly && !(standing(page[i - 1]) && standing(page[i + 1])))) return;
+        const rest = t.replace(ODD_G, '').replace(/^[^\p{L}\p{N}$%(“"']+|[^\p{L}\p{N}%)”"'.,;:]+$/gu, '');
+        const keeps = /\p{L}{3,}/u.test(rest) || /\p{N}/u.test(rest);
+        r.junk = true; r.drop = !keeps; r.cleanTo = keeps ? rest : ''; r.conf = (els[i] && els[i].conf) || 0; stats.junk = (stats.junk || 0) + 1;
+      });
       out.push({ page: pg.page, tokens: page });
     }
     return { pages: out, stats };

@@ -9644,93 +9644,119 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
       return out.slice(0, 8).map(f => ({ label: f.label, value: f.value }));
     } catch (e) { return []; }
   }
-  // The scan read by OCR (ocr/<token>.json: word boxes per page) set back down exactly where it was: each page is a
-  // page-shaped box and every word sits at its recorded position and size, as real text you can select and copy.
-  // Nothing is reflowed or reworded, so the layout is the scan's own. Painted into the host the template gives us.
+  // The scan read by OCR (ocr/<token>.json: word boxes per page), set as ONE continuous document: no page boxes and no
+  // page breaks. What the scan's layout says is kept (a heading stays centred, an indent stays indented, a line's relative
+  // size, the blank space between blocks); what it only did to justify a line is not, so words sit at ordinary spacing.
+  // The slider is a FOLD LEVEL, not a position: 0 is the OCR as read, and moving right applies, in turn, the repairs
+  // (most-vouched first), the engine's reading of what the words are, then the cleanup of stray glyphs and what stays unsure.
+  // The page's background shifts subtly with the level.
   extRef = el => { this._extEl = el; if (el) this.paintExtracted(); };
   paintExtracted() {
     const el = this._extEl; if (!el || !el.isConnected) return;
     const A = this._A, d = A && this.state.readDoc && A.docById[this.state.readDoc]; if (!d) return;
     const tok = (typeof epavTokenOf === 'function') ? epavTokenOf(d) : null, rec = tok && this._epavOcr && this._epavOcr[tok];
     if (!Array.isArray(rec) || !rec.length) return;
-    const key = tok + ':' + rec.length; if (el._extKey === key) return; el._extKey = key;
-    const W = 900, mctx = document.createElement('canvas').getContext('2d'), pages = [];
-    el.innerHTML = '';
+    const wBucket = Math.round((el.clientWidth || 800) / 60);
+    const FR0 = this._foldRes && this._foldRes[tok];
+    const key = tok + ':' + rec.length + ':' + wBucket + ':' + (FR0 === undefined ? 'u' : FR0 === null ? 'n' : 'f' + (FR0.typed || 0));
+    if (el._extKey === key) return; el._extKey = key;
     this.ensureFold(d, tok, rec);
-    const FR = this._foldRes && this._foldRes[tok];
-    // the slider: raw OCR to the left of the divider, the folded reading to its right, over the same page
-    const p0 = this._foldP == null ? 50 : this._foldP; el.style.setProperty('--p', p0 + '%');
-    const bar = document.createElement('div'); bar.style.cssText = 'position:sticky;top:0;z-index:6;display:flex;align-items:center;gap:12px;flex-wrap:wrap;width:100%;box-sizing:border-box;background:var(--bg);padding:10px 4px;border-bottom:1px solid var(--line);margin:0 0 14px;font:500 13px var(--sans);color:var(--ink2)';
+    const FR = FR0;
+    el.innerHTML = '';
     const mkL = (t, c) => { const x = document.createElement('span'); x.textContent = t; x.style.cssText = 'font:600 12px var(--mono);letter-spacing:.05em;text-transform:uppercase;color:' + c; return x; };
-    const rng = document.createElement('input'); rng.type = 'range'; rng.min = '0'; rng.max = '100'; rng.value = String(p0); rng.style.cssText = 'flex:1 1 180px;min-width:120px;accent-color:var(--acc)';
-    rng.oninput = () => { this._foldP = +rng.value; el.style.setProperty('--p', rng.value + '%'); };
+    const bar = document.createElement('div'); bar.style.cssText = 'position:sticky;top:0;z-index:6;display:flex;align-items:center;gap:12px;flex-wrap:wrap;width:100%;box-sizing:border-box;background:var(--bg);padding:10px 4px;border-bottom:1px solid var(--line);margin:0 0 14px;font:500 13px var(--sans);color:var(--ink2)';
+    const rng = document.createElement('input'); rng.type = 'range'; rng.min = '0'; rng.max = '100'; rng.style.cssText = 'flex:1 1 180px;min-width:120px;accent-color:var(--acc)';
+    let level = this._foldP == null ? 100 : this._foldP; rng.value = String(level);
     const st = document.createElement('span'); st.style.cssText = 'flex:1 1 100%;font:400 12px/1.4 var(--sans);color:var(--mut)';
-    st.textContent = FR === undefined ? 'Folding against the rest of the sample…' : FR === null ? 'No priors for the folded reading yet: run node tools/build-ocr-priors.mjs.'
-      : FR.stats.repaired + ' repaired · ' + FR.stats.refused + ' refused (ambiguous or unsupported) · ' + FR.stats.unread + ' unread · ' + (FR.engine ? FR.engine + '. ' : (FR.typed || 0) + ' typed by the engine. ') + 'Point at a coloured word for what vouches for it.';
     bar.appendChild(mkL('Raw OCR', 'var(--mut)')); bar.appendChild(rng); bar.appendChild(mkL('Folded guess', 'var(--acc)')); bar.appendChild(st);
     el.appendChild(bar);
-    // the page strips native title attributes, so the evidence behind a coloured word shows in our own tip
+    // the evidence behind a marked word shows in our own tip: the page strips native title attributes
     let tip = el._tip; if (!tip) { tip = el._tip = document.createElement('div'); tip.style.cssText = 'position:fixed;z-index:80;max-width:340px;background:var(--s1);color:var(--ink);border:1px solid var(--line2);border-radius:8px;padding:8px 10px;font:400 12px/1.45 var(--sans);box-shadow:0 4px 18px rgba(0,0,0,.18);pointer-events:none;display:none'; document.body.appendChild(tip); }
     el.onmouseover = (ev) => { const t = ev.target && ev.target.closest ? ev.target.closest('[data-why]') : null; if (!t) { tip.style.display = 'none'; return; }
       tip.textContent = t.getAttribute('data-why'); tip.style.display = 'block'; const r = t.getBoundingClientRect();
       tip.style.left = Math.max(8, Math.min(innerWidth - 350, r.left)) + 'px'; tip.style.top = (r.bottom + 6) + 'px'; };
     el.onmouseleave = () => { tip.style.display = 'none'; };
-    let pIdx = -1;
-    for (const pg of rec) {
-      pIdx++; const FP = FR && FR.pages[pIdx];
+    const colW = Math.max(260, Math.min(el.clientWidth || 860, 860) - 76);
+    const doc = document.createElement('div');
+    doc.style.cssText = 'box-sizing:border-box;width:100%;max-width:860px;margin:0 auto;padding:32px 38px 64px;border:1px solid var(--line2);border-radius:8px;color:#111;font-family:Arial,Helvetica,sans-serif;user-select:text;transition:background .15s';
+    const css = document.createElement('style');
+    css.textContent = '.xf-rep{color:#0a6b5a;font-weight:600;text-decoration:underline dotted}.xf-ref{text-decoration:underline wavy #b7791f}.xf-typ{text-decoration:underline #3b5bdb}';
+    doc.appendChild(css); el.appendChild(doc);
+    const acts = { rep: [], typ: [], clean: [] };
+    const mctx = document.createElement('canvas').getContext('2d');
+    const med = (a) => { a = a.slice().sort((x, y) => x - y); return a[Math.floor(a.length / 2)]; };
+    let prevBottom = null, first = true;
+    const addPage = (pg, pIdx) => {
+      const FP = FR && FR.pages[pIdx];
       (pg.elements || []).forEach((e, i) => { if (e) e.__i = i; });
       const els = (pg.elements || []).filter(e => e && e.text && Array.isArray(e.region) && e.region.length === 4);
-      if (!els.length || !pg.width || !pg.height) continue;
-      const k = W / pg.width, H = Math.round(pg.height * k);
-      const hs = els.map(e => e.region[3]).sort((a, b) => a - b), mh = hs[Math.floor(hs.length / 2)] || 20;
+      if (!els.length || !pg.width) return;
+      const mh = med(els.map(e => e.region[3])) || 20;
       els.sort((a, b) => (a.region[1] + a.region[3] / 2) - (b.region[1] + b.region[3] / 2));
       const lines = [];
       for (const e of els) { const cy = e.region[1] + e.region[3] / 2, L = lines[lines.length - 1];
         if (L && Math.abs(cy - L.cy) <= mh * 0.6) { L.els.push(e); L.cy = (L.cy * (L.els.length - 1) + cy) / L.els.length; } else lines.push({ els: [e], cy }); }
-      const wrap = document.createElement('div'); wrap.style.cssText = 'margin:0 auto 22px;width:' + W + 'px;transform-origin:top left';
-      const cap = document.createElement('div'); cap.textContent = 'Page ' + pg.page; cap.style.cssText = 'font:600 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--mut);margin:0 0 6px';
-      const page = document.createElement('div'); page.style.cssText = 'position:relative;width:' + W + 'px;height:' + H + 'px;background:#fff;color:#111;border:1px solid var(--line2);border-radius:4px;box-shadow:0 1px 6px rgba(0,0,0,.08);overflow:hidden;font-family:Arial,Helvetica,sans-serif;user-select:text';
-      // the words are painted when the page nears the viewport, so a 100-page scan opens at once
-      const fill = () => {
-        if (page._filled) return; page._filled = true;
-        for (const L of lines) {
-          L.els.sort((a, b) => a.region[0] - b.region[0]);
-          const top = Math.min(...L.els.map(e => e.region[1]));
-          const hs2 = L.els.map(e => e.region[3]).sort((a, b) => a - b), hh = hs2[Math.floor(hs2.length / 2)] * k;
-          // the line's baseline: words without descenders share it, and those are the lower-valued bottoms
-          const bots = L.els.map(e => e.region[1] + e.region[3]).sort((a, b) => a - b), base = bots[Math.floor(bots.length * 0.35)];
-          const ln = document.createElement('div'); ln.style.cssText = 'position:absolute;left:0;top:' + (top * k) + 'px;width:100%;height:' + (hh * 1.25) + 'px';
-          const fsH = Math.max(6, hh * 0.9);
-          // one word set at its recorded place; proportions are never changed: a word keeps its natural
-          // width-to-height and only its SIZE moves, down to what fits the width it occupied on the scan
-          const setWord = (e, text, extra, into) => { const ww = e.region[2] * k; const sp = document.createElement('span');
-            mctx.font = '100px Arial, Helvetica, sans-serif'; const per = (mctx.measureText(text).width || 1) / 100;
-            const fs = Math.max(5, Math.min(fsH, ww > 0 ? ww / per : fsH));
-            sp.style.cssText = 'position:absolute;left:' + (e.region[0] * k) + 'px;top:' + ((base - top) * k - 0.85 * fs) + 'px;font-size:' + fs + 'px;line-height:1;white-space:pre;' + (extra || '');
-            sp.textContent = text + ' '; into.appendChild(sp); return sp; };
-          for (const e of L.els) setWord(e, e.text, '', ln);
-          page.appendChild(ln);
-          // the folded layer: only the words the fold has something to say about, over the raw ones, right of the divider
-          if (FP) { let fln = null;
-            for (const e of L.els) { const r = FP.tokens[e.__i]; if (!r) continue;
-              const rep = r.kind === 'repaired', ref = r.kind === 'refused', typed = !!r.meaning; if (!rep && !ref && !typed) continue;
-              if (!fln) { fln = document.createElement('div'); fln.style.cssText = ln.style.cssText; page._fl.appendChild(fln); }
-              const css = 'background:#fff;' + (rep ? 'color:#0a6b5a;font-weight:600;text-decoration:underline dotted;' : ref ? 'text-decoration:underline wavy #b7791f;' : 'text-decoration:underline #3b5bdb;') + 'pointer-events:auto;';
-              const sp = setWord(e, rep ? r.to : e.text, css, fln);
-              sp.setAttribute('data-why', rep ? 'The scan reads “' + e.text + '”. Folded to “' + r.to + '”: ' + r.vouched + ' other contract' + (r.vouched === 1 ? '' : 's') + ' read it, and the words beside it have been read together ' + r.pairs + ' time' + (r.pairs === 1 ? '' : 's') + ' in the sample.'
-                : ref ? 'Left as read: ' + r.why + '.' : 'The engine reads this as ' + r.meaning.label + (r.meaning.n > 1 ? ' (' + r.meaning.n + ' mentions)' : '') + '.'); } }
-        }
-      };
-      page._fill = fill;
-      if (FP) { const fl = document.createElement('div'); fl.style.cssText = 'position:absolute;inset:0;pointer-events:none;z-index:2;clip-path:inset(0 0 0 var(--p,50%))'; page.appendChild(fl); page._fl = fl;
-        const dv = document.createElement('div'); dv.style.cssText = 'position:absolute;top:0;bottom:0;left:var(--p,50%);width:0;border-left:2px solid var(--acc);z-index:3;pointer-events:none'; page.appendChild(dv); }
-      wrap.appendChild(cap); wrap.appendChild(page); el.appendChild(wrap); pages.push(wrap);
-    }
-    const fit = () => { const z = Math.min(1, (el.clientWidth || W) / W); pages.forEach(w => { w.style.zoom = z < 0.999 ? String(z) : ''; }); };
-    fit(); try { if (el._extRo) el._extRo.disconnect(); el._extRo = new ResizeObserver(fit); el._extRo.observe(el); } catch (e) {}
-    try { if (el._extIo) el._extIo.disconnect();
-      el._extIo = new IntersectionObserver(es => es.forEach(en => { if (en.isIntersecting) { const pg = en.target.querySelector('div + div'); if (pg && pg._fill) pg._fill(); el._extIo.unobserve(en.target); } }), { rootMargin: '1200px 0px' });
-      pages.forEach(w => el._extIo.observe(w)); } catch (e) { pages.forEach(w => { const pg = w.querySelector('div + div'); if (pg && pg._fill) pg._fill(); }); }
+      lines.forEach(L => { L.els.sort((a, b) => a.region[0] - b.region[0]); const last = L.els[L.els.length - 1];
+        L.l = L.els[0].region[0]; L.r = last.region[0] + last.region[2]; L.top = Math.min(...L.els.map(e => e.region[1])); L.bot = Math.max(...L.els.map(e => e.region[1] + e.region[3])); L.hh = med(L.els.map(e => e.region[3])); });
+      // a box far taller than the page's own lines (a stray stroke merged into one word) must not set the line's type size
+      const pageH = med(lines.map(L => L.hh)); lines.forEach(L => { L.hh = Math.min(L.hh, pageH * 1.5); });
+      const body = lines.filter(L => L.els.length >= 8), src = body.length >= 3 ? body : lines;
+      const bodyL = med(src.map(L => L.l)), bodyR = med(src.map(L => L.r)), Wb = Math.max(bodyR - bodyL, pg.width * 0.3), k = colW / Wb;
+      lines.forEach((L, li) => {
+        const row = document.createElement('div');
+        const fs0 = Math.max(9, Math.min(42, L.hh * k * 0.9)); const txt = L.els.map(e => e.text).join(' ');
+        mctx.font = fs0 + 'px Arial, Helvetica, sans-serif'; const nat = mctx.measureText(txt).width || 1;
+        const fs = nat > colW ? Math.max(8, fs0 * colW / nat) : fs0;
+        const center = (L.l + L.r) / 2, width = L.r - L.l;
+        let align = 'left', indent = 0;
+        if (Math.abs(center - pg.width / 2) < pg.width * 0.03 && width < Wb * 0.85) align = 'center';
+        else if (L.r > bodyR - Wb * 0.02 && L.l > bodyL + Wb * 0.4) align = 'right';
+        else indent = Math.min(Math.max(0, (L.l - bodyL) * k), colW * 0.5);
+        const gap = li === 0 ? (first ? 0 : 22) : Math.min(40, Math.max(0, (L.top - lines[li - 1].bot) * k * 0.8));
+        first = false;
+        row.style.cssText = 'margin-top:' + gap + 'px;font-size:' + fs + 'px;line-height:1.3;text-align:' + align + ';padding-left:' + indent + 'px;white-space:pre-wrap;overflow-wrap:anywhere';
+        for (const e of L.els) { const sp = document.createElement('span'); sp.textContent = e.text + ' ';
+          const r = FP && FP.tokens[e.__i];
+          if (r) { const o = { sp, r, orig: e.text, on: false };
+            if (r.junk) acts.clean.push({ ...o, kind: 'junk' });
+            else if (r.kind === 'repaired') acts.rep.push({ ...o, kind: 'rep' });
+            else if (r.kind === 'refused') acts.clean.push({ ...o, kind: 'ref' });
+            if (r.meaning && r.kind !== 'repaired') acts.typ.push({ ...o, kind: 'typ' }); }
+          row.appendChild(sp); }
+        doc.appendChild(row);
+      });
+    };
+    // the levels: thirds of the slider, each class ordered by the evidence behind it
+    const third = 100 / 3;
+    const setAct = (a, on) => { const r = a.r, sp = a.sp; a.on = on;
+      if (a.kind === 'rep') { sp.textContent = (on ? r.to : a.orig) + ' '; sp.classList.toggle('xf-rep', on);
+        if (on) sp.setAttribute('data-why', 'The scan reads “' + a.orig + '”. Folded to “' + r.to + '”: ' + r.vouched + ' other contract' + (r.vouched === 1 ? '' : 's') + ' read it, and the words beside it have been read together ' + r.pairs + ' time' + (r.pairs === 1 ? '' : 's') + ' in the sample.'); else sp.removeAttribute('data-why'); }
+      else if (a.kind === 'typ') { sp.classList.toggle('xf-typ', on); if (on) sp.setAttribute('data-why', 'The engine reads this as ' + r.meaning.label + (r.meaning.n > 1 ? ' (' + r.meaning.n + ' mentions)' : '') + '.'); else sp.removeAttribute('data-why'); }
+      else if (a.kind === 'ref') { sp.classList.toggle('xf-ref', on); if (on) sp.setAttribute('data-why', 'Left as read: ' + r.why + '.'); else sp.removeAttribute('data-why'); }
+      else if (a.kind === 'junk') { if (r.drop) sp.style.display = on ? 'none' : ''; else sp.textContent = (on ? r.cleanTo : a.orig) + ' ';
+        if (on && !r.drop) sp.setAttribute('data-why', 'Stray glyph removed: the scan reads “' + a.orig + '”.'); else sp.removeAttribute('data-why'); }
+    };
+    const applyList = (list, f) => { const n = Math.round(list.length * Math.max(0, Math.min(1, f))); list.forEach((a, i) => { const on = i < n; if (a.on !== on) setAct(a, on); }); return n; };
+    const applyLevel = () => {
+      const p = level; const n1 = applyList(acts.rep, p / third), n2 = applyList(acts.typ, (p - third) / third), n3 = applyList(acts.clean, (p - 2 * third) / third);
+      const t = p / 100; doc.style.background = 'rgb(' + [255 - 22 * t, 255 - 9 * t, 255 - 15 * t].map(Math.round).join(',') + ')';
+      st.textContent = FR === undefined ? 'Folding against the rest of the sample…' : FR === null ? 'No priors for the folded reading yet: run node tools/build-ocr-priors.mjs.'
+        : 'Repairs ' + n1 + ' of ' + acts.rep.length + ' · engine reading ' + n2 + ' of ' + acts.typ.length + (FR.engine ? ' (' + FR.engine + ')' : '') + ' · cleaned ' + n3 + ' of ' + acts.clean.length + '. Right of centre the page tints; all the way right clears stray glyphs. Point at a marked word for what vouches for it.';
+    };
+    rng.oninput = () => { level = +rng.value; this._foldP = level; applyLevel(); };
+    let pi = 0;
+    const step = () => { if (el._extKey !== key) return;
+      const end = Math.min(rec.length, pi + 3);
+      for (; pi < end; pi++) addPage(rec[pi], pi);
+      const byEv = (x, y) => (y.r.vouched || 0) + (y.r.pairs || 0) - ((x.r.vouched || 0) + (x.r.pairs || 0));
+      if (pi >= rec.length) { acts.rep.sort(byEv); acts.typ.sort((x, y) => y.r.meaning.n - x.r.meaning.n);
+        acts.clean.sort((x, y) => (x.kind === 'ref' ? 0 : 1) - (y.kind === 'ref' ? 0 : 1) || (x.r.conf || 0) - (y.r.conf || 0)); }
+      applyLevel();
+      if (pi < rec.length) requestAnimationFrame(step); };
+    step();
+    try { if (el._extRo) el._extRo.disconnect(); let w0 = el.clientWidth; let tm = null;
+      el._extRo = new ResizeObserver(() => { if (Math.abs(el.clientWidth - w0) < 60) return; w0 = el.clientWidth; clearTimeout(tm); tm = setTimeout(() => this._extRepaint(), 250); });
+      el._extRo.observe(el); } catch (e) {}
   }
   // The folded reading. Priors are what the REST of the sample established (tools/build-ocr-priors.mjs); the fold is
   // holodeck-fold.js: exact, then near-miss through the engine's own comparator, then the neighbours as witnesses, and a tie
@@ -9763,7 +9789,8 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
       const lines = []; for (const x of els) { const cy = x.e.region[1] + x.e.region[3] / 2, L = lines[lines.length - 1];
         if (L && Math.abs(cy - L.cy) <= mh * 0.6) L.xs.push(x); else lines.push({ xs: [x], cy }); }
       lines.forEach(L => { L.xs.sort((a, b) => a.e.region[0] - b.e.region[0]);
-        L.xs.forEach((x, j) => { const r = res.pages[p] && res.pages[p].tokens[x.i], t = r && r.kind === 'repaired' ? r.to : x.e.text;
+        L.xs.forEach((x, j) => { const r = res.pages[p] && res.pages[p].tokens[x.i]; if (r && r.junk && r.drop) return;
+          const t = r && r.kind === 'repaired' ? r.to : r && r.junk ? r.cleanTo : x.e.text;
           if (j) add(' '); seq.push({ p, i: x.i, cs: text.length, bs: bytes, len: t.length }); add(t); }); add('\n'); });
       add('\n');
     });
