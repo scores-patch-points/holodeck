@@ -228,9 +228,11 @@ function select(id) {
 }
 
 // ---------------------------------------------------------------- acting
+const changed = () => { try { ctx.onChange && ctx.onChange(); } catch { /* the page redraws itself */ } };
 async function act(label, fn) {
   H.busy = label; H.error = ''; draw();
   try { await fn(); } catch (e) { H.error = words(e); }
+  changed();
   H.busy = ''; await readSelected().catch(() => {}); draw();
 }
 async function copy(text, label) {
@@ -240,7 +242,7 @@ function rename(id) {
   const name = String(H.draft || '').trim();
   if (!name) return;
   try { ctx.rename(id, name); } catch (e) { H.error = words(e); }
-  H.edit = null; draw(); setTimeout(draw, 60);
+  H.edit = null; changed(); draw(); setTimeout(draw, 60);
 }
 function createWs() {
   const name = String(H.newName || '').trim() || 'Untitled workspace';
@@ -253,7 +255,7 @@ function remove(id) {
   const w = listNow().find((x) => x.id === id);
   try { ctx.remove(id); } catch (e) { H.error = words(e); }
   delete H.sums[id]; delete H.reads[id];
-  H.ask = null; if (H.sel === id) H.sel = null;
+  H.ask = null; if (H.sel === id) H.sel = null; changed();
   say(`Deleted “${(w && w.name) || 'workspace'}” from this device.`);
   draw(); setTimeout(draw, 60);
 }
@@ -321,6 +323,7 @@ function draw() {
   if (!root) return;
   const list = listNow();
   const t = totals(list, H.sums, roomsOf);
+  try { ctx.onTotals && ctx.onTotals(t); } catch { /* the page's own count */ }
   const sum = root.querySelector('[data-summary]');
   if (sum) sum.textContent = headerLine(t) + (sessionNow() ? '' : ' · sign in to see and invite people');
   const body = root.querySelector('.body');

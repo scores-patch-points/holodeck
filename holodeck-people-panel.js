@@ -320,6 +320,7 @@ function body() {
   if (S.made.length) out.push(madeCard());
   if (S.blocked) out.push(blockedCard());
   out.push(peopleCard());
+  if (ctxRef.onAllWorkspaces) out.push(el('div', { class: 'hdp-row' }, el('button', { class: 'hdp-quiet', type: 'button', onClick: () => { closePeoplePanel(); ctxRef.onAllWorkspaces(); } }, 'All workspaces and their people →')));
   if (S.lines.length) out.push(el('div', { class: 'hdp-mut' }, S.lines.slice(0, 3).map((l) => el('div', { class: l.kind === 'bad' ? 'hdp-bad' : '' }, l.text))));
   out.push(el('details', {}, el('summary', {}, 'What this does and does not protect'),
     el('div', { class: 'hdp-mut' },

@@ -170,57 +170,6 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
 </style>
 </helmet>
 <div class="{{ workspaceClass }}" style="min-height:100vh;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:14px;line-height:1.5">
-<sc-if value="{{ wsm.open }}" hint-placeholder-val="{{ false }}">
-  <div onClick="{{ wsm.onClose }}" style="position:fixed;inset:0;z-index:70;background:rgba(0,0,0,.45);display:flex;align-items:flex-start;justify-content:center;padding:6vh 16px 16px;box-sizing:border-box">
-    <div onClick="{{ wsm.stop }}" role="dialog" aria-label="Workspaces" style="width:min(680px,100%);max-height:84vh;display:flex;flex-direction:column;background:var(--s1);border:1px solid var(--line2);border-radius:14px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.4)">
-      <div style="display:flex;align-items:baseline;gap:10px;padding:14px 16px 10px">
-        <span style="font:600 16px var(--sans);color:var(--ink)">Workspaces</span>
-        <span style="font:500 13px var(--mono);color:var(--mut)">{{ wsm.summary }}</span>
-        <button onClick="{{ wsm.onClose }}" title="Close" style="margin-left:auto;background:none;border:0;color:var(--mut);cursor:pointer;font:500 16px var(--sans);padding:2px 6px" style-hover="color:var(--ink)">✕</button>
-      </div>
-      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:0 16px 10px">
-        <input value="{{ wsm.q }}" onChange="{{ wsm.onQ }}" onKeyDown="{{ wsm.onQKey }}" placeholder="Search workspaces…" autofocus="{{ true }}" style="flex:1 1 220px;min-width:0;background:var(--s2);border:1px solid var(--line2);border-radius:8px;color:var(--ink);font:400 14px var(--sans);padding:7px 10px;outline:none">
-        <div style="display:flex;border:1px solid var(--line2);border-radius:8px;overflow:hidden">
-          <sc-for list="{{ wsm.sorts }}" as="o" hint-placeholder-count="3"><button onClick="{{ o.onClick }}" style="border:0;padding:6px 11px;cursor:pointer;font:500 13px var(--sans);background:{{ o.bg }};color:{{ o.col }}">{{ o.label }}</button></sc-for>
-        </div>
-      </div>
-      <div style="flex:1;min-height:0;overflow:auto;border-top:1px solid var(--line)">
-        <sc-for list="{{ wsm.rows }}" as="w" hint-placeholder-count="5">
-          <div style="display:flex;align-items:center;gap:10px;padding:9px 16px;border-bottom:1px solid var(--line);background:{{ w.bg }}">
-            <sc-if value="{{ w.editing }}" hint-placeholder-val="{{ false }}">
-              <input value="{{ w.draft }}" onChange="{{ w.onDraft }}" onKeyDown="{{ w.onKey }}" title="New name" style="flex:1;min-width:0;background:var(--s2);border:1px solid var(--acc2);border-radius:8px;color:var(--ink);font:400 14px var(--sans);padding:6px 9px;outline:none">
-              <button onClick="{{ w.onSave }}" title="Save the new name" style="background:var(--acc2);border:0;color:#fff;border-radius:8px;cursor:pointer;font:600 13px var(--sans);padding:6px 10px">Save</button>
-              <button onClick="{{ w.onCancel }}" style="background:none;border:0;color:var(--mut);cursor:pointer;font:500 13px var(--sans);padding:6px 6px">Cancel</button>
-            </sc-if>
-            <sc-if value="{{ w.notEditing }}" hint-placeholder-val="{{ true }}">
-              <button onClick="{{ w.onOpen }}" title="Open this workspace" style="all:unset;cursor:pointer;flex:1;min-width:0;display:flex;flex-direction:column;gap:1px">
-                <span style="display:flex;gap:8px;align-items:baseline;min-width:0"><span style="font:500 15px var(--sans);color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ w.name }}</span><sc-if value="{{ w.current }}" hint-placeholder-val="{{ false }}"><span style="font:600 11px var(--mono);letter-spacing:.06em;color:var(--acc);border:1px solid var(--acc2);border-radius:4px;padding:0 5px;flex:none">OPEN</span></sc-if></span>
-                <span style="font:400 12.5px var(--sans);color:var(--mut)">{{ w.meta }}</span>
-              </button>
-              <sc-if value="{{ w.canEdit }}" hint-placeholder-val="{{ true }}">
-                <sc-if value="{{ w.noDelAsk }}" hint-placeholder-val="{{ true }}">
-                  <button onClick="{{ w.onRename }}" title="Rename this workspace" style="background:none;border:1px solid var(--line2);border-radius:8px;color:var(--ink2);cursor:pointer;font:500 13px var(--sans);padding:5px 10px;white-space:nowrap" style-hover="border-color:var(--acc)">Rename</button>
-                  <button onClick="{{ w.onAskDelete }}" title="Delete this workspace and everything in it" style="background:none;border:1px solid var(--line2);border-radius:8px;color:var(--mut);cursor:pointer;font:500 13px var(--sans);padding:5px 10px;white-space:nowrap" style-hover="border-color:var(--bad);color:var(--bad)">Delete</button>
-                </sc-if>
-                <sc-if value="{{ w.delAsk }}" hint-placeholder-val="{{ false }}">
-                  <span style="font:400 12.5px/1.35 var(--sans);color:var(--bad);text-align:right">{{ w.delText }}</span>
-                  <button onClick="{{ w.onDelete }}" style="background:var(--bad);border:1px solid var(--bad);color:#fff;border-radius:8px;cursor:pointer;font:600 13px var(--sans);padding:5px 10px;white-space:nowrap">Delete for good</button>
-                  <button onClick="{{ w.onCancelDelete }}" style="background:none;border:0;color:var(--mut);cursor:pointer;font:500 13px var(--sans);padding:5px 6px">Keep</button>
-                </sc-if>
-              </sc-if>
-            </sc-if>
-          </div>
-        </sc-for>
-        <sc-if value="{{ wsm.none }}" hint-placeholder-val="{{ false }}"><div style="padding:22px 16px;font:400 14px var(--sans);color:var(--mut)">No workspace matches “{{ wsm.q }}”.</div></sc-if>
-        <sc-if value="{{ wsm.hasMore }}" hint-placeholder-val="{{ false }}"><div style="padding:10px 16px"><button onClick="{{ wsm.onMore }}" style="background:none;border:1px solid var(--line2);border-radius:8px;color:var(--ink2);cursor:pointer;font:500 13px var(--sans);padding:6px 12px">{{ wsm.moreLabel }}</button></div></sc-if>
-      </div>
-      <div style="display:flex;gap:6px;padding:10px 16px;border-top:1px solid var(--line);background:var(--s2)">
-        <input value="{{ wsNewName }}" onChange="{{ onWsNewName }}" onKeyDown="{{ onWsNewKey }}" placeholder="Name a new workspace…" style="flex:1;min-width:0;background:var(--s1);border:1px solid var(--line2);border-radius:8px;color:var(--ink);font:400 14px var(--sans);padding:7px 10px;outline:none">
-        <button onClick="{{ onWsNew }}" style="flex:none;background:var(--acc2);border:0;color:#fff;border-radius:8px;cursor:pointer;font:600 13px var(--sans);padding:0 14px;white-space:nowrap">＋ New workspace</button>
-      </div>
-    </div>
-  </div>
-</sc-if>
 <div class="hd-shell {{ shellCls }}" style="display:flex;align-items:flex-start;min-height:100vh">
   <div class="hd-rail {{ railCls }}" onClick="{{ onRailClick }}" style="{{ railStyle }}">
     <div class="hd-railtop" style="display:flex;align-items:center;justify-content:space-between;gap:6px;padding:2px 2px 2px 10px">
@@ -3064,7 +3013,7 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
         <div style="display:flex;justify-content:space-between;align-items:center"><h2 style="margin:0;font:500 24px var(--serif)">Settings</h2><button onClick="{{ closeSettings }}" style="background:none;border:0;color:var(--mut);cursor:pointer;font-size:16px">✕</button></div>
           <section style="background:var(--s1);border:1px solid var(--line);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:10px">
             <span style="font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mut)">Account &amp; sync</span>
-            <button onClick="{{ ing.onShareRepo }}" style="align-self:flex-start;background:var(--acc2);border:0;color:#fff;border-radius:8px;padding:7px 16px;cursor:pointer;font:600 14px var(--sans)">Invite people…</button>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><button onClick="{{ ing.onShareRepo }}" style="background:var(--acc2);border:0;color:#fff;border-radius:8px;padding:7px 16px;cursor:pointer;font:600 14px var(--sans)">Invite people…</button><button onClick="{{ ing.onAllWorkspaces }}" style="background:none;border:1px solid var(--line2);color:var(--ink2);border-radius:8px;padding:7px 14px;cursor:pointer;font:500 14px var(--sans)" style-hover="border-color:var(--acc)">All workspaces &amp; people…</button></div>
             <span style="font:400 13px/1.45 var(--sans);color:var(--mut);text-wrap:pretty">Invite people to read or edit this workspace. Their names, your private work and who is viewing what are sealed on your device with a key the server never has. The server can still see who is a member, when they were active, and room names.</span>
             <sc-if value="{{ ing.notSignedIn }}" hint-placeholder-val="{{ true }}">
               <span style="font:400 14px/1.5 var(--sans);color:var(--mut)">Your work stays in this browser until you sign in. Sign in with your own Matrix account to sync it and share it.</span>
@@ -6673,10 +6622,11 @@ class Component extends DCLogic {
     session: () => { try { return (this._net && this._net.s) || JSON.parse(localStorage.getItem('fold-matrix-session') || 'null'); } catch (e) { return null; } },
     setWsRooms: p => this.setWsRooms(p),
     onLogin: () => this.openLogin(),
+    onAllWorkspaces: () => this.openWorkspacesHero(),
     onSession: s => { this._net = { ...(this._net || {}), s }; this.forceUpdate(); },
     onJoined: rooms => { this.refreshRoom().catch(() => {}); this.net().then(async N => { try { const s = this._net.s; const d = await N.loadPrivate(s, rooms.priv, 'work'); if (d && d.pins) this.savePins(d.pins); } catch (e) {} this.forceUpdate(); }); },
     // what this person is looking at right now: it is what people in the workspace see next to their name while they are here
-    viewing: () => { try { const S = this.state; if (S.view === 'reader' && S.readDoc) { const d = (this.analysis().docById || {})[S.readDoc] || {}; return { viewing: 'doc:' + S.readDoc, title: String(d.title || S.readDoc) }; } return { viewing: 'view:' + String(S.view || ''), title: String(S.view || '') }; } catch (e) { return {}; } } }; }
+    viewing: () => { try { const S = this.state; if (this._heroOpen) return { viewing: 'view:workspaces', title: 'Workspaces' }; if (S.view === 'reader' && S.readDoc) { const d = (this.analysis().docById || {})[S.readDoc] || {}; return { viewing: 'doc:' + S.readDoc, title: String(d.title || S.readDoc) }; } return { viewing: 'view:' + String(S.view || ''), title: String(S.view || '') }; } catch (e) { return {}; } } }; }
   // Workspaces: every workspace on one screen, with everyone in each and the invitations still open (holodeck-workspaces-hero.js).
   openWorkspacesHero(select) {
     const roomsAll = () => { try { return JSON.parse(localStorage.getItem('fold-ws-rooms') || '{}'); } catch (e) { return {}; } };
@@ -6691,8 +6641,19 @@ class Component extends DCLogic {
       create: name => this.createWorkspace(name, { stay: true }),
       open: id => { touchWs(id); this.setState({ corpus: id, view: 'summary', sel: null, f: {}, readDoc: null, folder: null, folderDraft: '' }); },
       joinWithLink: raw => this.openShareRepo(raw),
+      onLogin: () => { this._heroAfterLogin = true; this.openLogin(); },        // signed in, the screen comes back
+      onChange: () => this.forceUpdate(),                                       // a rename, a new room, a person: the rail and Settings redraw
+      onTotals: t => { const was = this._wsTotals; this._wsTotals = t; if (!was || was.waiting !== t.waiting) this.forceUpdate(); },
+      // closing rewrites this entry rather than stepping back, so no older #workspaces entry can reopen it unasked
+      onClose: () => { this._heroOpen = false; if (location.hash === '#workspaces') history.replaceState(null, '', location.pathname + location.search); },
       linkBase: () => location.origin + location.pathname.replace(/index\.html$/, ''),
       onShared: id => { if (id === this.corpusId()) import(new URL('holodeck-people-panel.js', location.href).href).then(M => M.resumePresence(this.shareCtx(null))).catch(() => {}); } };
+    this._heroOpen = true;
+    if (location.hash !== '#workspaces') history.pushState(null, '', location.pathname + location.search + '#workspaces');
+    if (!this._heroPop) {                                                        // Back closes the screen; Forward opens it again
+      this._heroPop = () => { if (location.hash === '#workspaces') { if (!this._heroOpen) this.openWorkspacesHero(); } else if (this._heroOpen) { this._heroOpen = false; import(new URL('holodeck-workspaces-hero.js', location.href).href).then(M => M.closeWorkspacesHero()).catch(() => {}); } };
+      window.addEventListener('popstate', this._heroPop);
+    }
     import(new URL('holodeck-workspaces-hero.js', location.href).href).then(M => M.openWorkspacesHero(ctx)).catch(e => this.ilog('The Workspaces screen could not open: ' + ((e && e.message) || e), 'bad'));
   }
   // People: invite with a magic link, and see who is here. A 16-character code is a People invitation; a 5-character one belongs to the encrypted-repo panel.
@@ -6713,7 +6674,7 @@ class Component extends DCLogic {
         }
       } catch (e) {}
     }
-    if (/^#workspaces$/.test(location.hash)) { history.replaceState(null, '', location.pathname + location.search); this.openWorkspacesHero(); }
+    if (/^#workspaces$/.test(location.hash)) this.openWorkspacesHero();
     if (/#join=/.test(location.hash)) { const raw = location.hash; const email = /join=[a-z0-9]{16}(&|$)/i.test(raw); const c = (raw.match(/join=([a-z0-9]{5})(&|$)/i) || [])[1]; history.replaceState(null, '', location.pathname + location.search); this.openShareRepo(email ? raw : c); }
     else { try { import(new URL('holodeck-people-panel.js', location.href).href).then(M => { const s = (this._net && this._net.s) || N.loadSession(); if (s && !s.guest && this.wsRooms().priv) M.resumePresence(this.shareCtx(null)); }).catch(() => {}); } catch (e) {} }
     if (/fx-share=/.test(location.hash)) { try { const r = await N.consumeShare(); if (r) { this.setWsRooms({ priv: r.rooms[0] || null, pub: r.rooms[1] || this.wsRooms().pub || null }); this._net = { ...(this._net || {}), s: r.pending || r.s, shareTemp: r.pending ? r.s : null }; this.toast('Opened a workspace shared by ' + (r.from || 'someone')); if (!r.pending) { try { const d = await N.loadPrivate(r.s, r.rooms[0], 'work'); if (d && d.pins) this.savePins(d.pins); } catch (e) {} } } } catch (e) { this.ilog('Shared link could not be opened: ' + e.message, 'bad'); } }
@@ -6759,7 +6720,7 @@ class Component extends DCLogic {
   async mergeAccount(user, pw) { return this.netDo('Merge', async N => { const temp = this._net.shareTemp || this._net.s; const R = this.wsRooms(); const main = await N.merge(temp, this.netCfg().server || temp.host, user, pw, [R.priv, R.pub]); this._net.s = main; this._net.shareTemp = null; this.ilog('Merged into ' + main.user + '; the temporary account was closed.'); }); }
   async signIn(user, pass) { return this.netDo('Sign in', async N => { const s = user ? await N.login(this.netCfg().server || 'hyphae.social', user, pass) : await N.guest(this.netCfg().server || 'hyphae.social'); this._net = { ...(this._net || {}), s }; this.ilog('Signed in as ' + s.user + (s.guest ? ' (guest, read only)' : '')); if (this.wsRooms().pub) await this.refreshRoom(); }); }
   openLogin() { this.setState({ mxOpen: true, mxErr: '' }); setTimeout(() => { const el = document.getElementById('fold-mx-user'); if (el) { try { el.focus(); } catch (e) {} } }, 40); }
-  closeLogin() { this.setState({ mxOpen: false, mxErr: '' }); }
+  closeLogin() { this._heroAfterLogin = false; this.setState({ mxOpen: false, mxErr: '' }); }
   async doLogin() {
     const server = ((this._mxSrv != null ? this._mxSrv : this.netCfg().server) || 'hyphae.social').trim().replace(/\/+$/, '');
     const user = (this._mxU || '').trim(); const pass = this._mxP || '';
@@ -6773,6 +6734,7 @@ class Component extends DCLogic {
       this._net = { ...(this._net || {}), s }; this._mxP = '';
       this.ilog('Signed in as ' + s.user);
       this.setState({ mxBusy: false, mxOpen: false, mxErr: '' });
+      if (this._heroAfterLogin) { this._heroAfterLogin = false; this.openWorkspacesHero(); }
       if (this.wsRooms().pub) await this.refreshRoom();
     } catch (e) { this.setState({ mxBusy: false, mxErr: this._mxErrText(e) }); }
   }
@@ -6786,6 +6748,7 @@ class Component extends DCLogic {
       this._net = { ...(this._net || {}), s };
       this.ilog('Signed in as ' + s.user + (s.guest ? ' (guest, read only)' : ''));
       this.setState({ mxBusy: false, mxOpen: false, mxErr: '' });
+      if (this._heroAfterLogin) { this._heroAfterLogin = false; this.openWorkspacesHero(); }
       if (this.wsRooms().pub) await this.refreshRoom();
     } catch (e) { this.setState({ mxBusy: false, mxErr: this._mxErrText(e) }); }
   }
@@ -7793,7 +7756,7 @@ class Component extends DCLogic {
       onShare: () => this.makeShare(), share: n.share || '', hasShare: !!n.share, server: cfg.server || 'hyphae.social',
       onShareEmail: e => { this._shareEmail = e.target.value; }, onShareMail: () => this.mailShare(this._shareEmail), shareMailLabel: (n.mailBusy ? 'Sending…' : 'Send invite'), mailBusy: !!n.mailBusy, hasMailShare: !!this._mailShareNote, mailShareNote: this._mailShareNote || '',
       onServer: e => this.setNetCfg({ server: e.target.value.trim() }), onUser: e => { this._mxU = e.target.value; }, onPass: e => { this._mxP = e.target.value; },
-      onLogin: () => this.openLogin(), onGuest: () => this.doGuest(), onLogout: () => this.signOut(), onShareRepo: () => this.openShareRepo(),
+      onLogin: () => this.openLogin(), onGuest: () => this.doGuest(), onLogout: () => this.signOut(), onShareRepo: () => this.openShareRepo(), onAllWorkspaces: () => { this.setState({ showSettings: false }); this.openWorkspacesHero(); },
       hasPub: !!R.pub, noPub: !R.pub, pub: R.pub || '', onCreatePub: () => this.createPublic(), onJoinAlias: e => { this._mxA = e.target.value; }, onJoin: () => this._mxA && this.joinPublic(this._mxA),
       hasPriv: !!R.priv, noPriv: !R.priv, priv: R.priv || '', onCreatePriv: () => this.createPrivate(), onInviteId: e => { this._mxI = e.target.value; }, onInvite: () => this._mxI && this.invitePriv(this._mxI), onLoadPriv: () => this.loadPrivateWork(), privAt: n.privAt ? 'Last synced ' + n.privAt : 'Syncs pins, drafts, filters and reading history a few seconds after each change.',
       hd: this._hd || {}, hasHd: !!(this._hd && this._hd.link), hdLink: (this._hd && this._hd.link) || '', hdNote: (this._hd && this._hd.note) || '', hdBusy: S.netBusy === 'Heimdall invite' || S.netBusy === 'Record code', onHdMint: () => this.heimdallMint(), onHdCopy: () => this.heimdallCopy(), onHdCode: e => { this._hdCode = e.target.value; }, onHdRecord: () => this.heimdallRecord(),
@@ -9541,31 +9504,10 @@ class Component extends DCLogic {
     const opts = [{ id: 'custom', name: 'Your content' + (addN('custom') ? ' (' + addN('custom') + ')' : '') }]
       .concat(Object.keys(S.added).filter(k => wsNames[k]).map(k => ({ id: k, name: wsNames[k] + ' (' + addN(k) + ')' })));
     const cid = this.corpusId(); const J = S.just; const demo = DEMOS[cid] || DEMOS.custom;
-    // the workspace manager: hundreds of workspaces never go in a <select>. Search, sort by recent / name / size,
-    // and render a page at a time. Rename and delete work per row; "Your content" is the fixed default and has neither.
-    const wsRecent = loadWsRecent(), wsQ = (S.wsQ || '').trim().toLowerCase(), wsSortK = S.wsSort || 'recent', wsLimit = S.wsShown || 40;
+    // every workspace, searched, sorted, renamed and deleted, is on the Workspaces screen (openWorkspacesHero); the rail keeps the quick switcher
+    const wsRecent = loadWsRecent();
     const wsAll = [{ id: 'custom', name: 'Your content', fixed: true }].concat(Object.keys(S.added).filter(k => wsNames[k]).map(k => ({ id: k, name: wsNames[k] }))).map(w => ({ ...w, n: addN(w.id), at: wsRecent[w.id] || 0 }));
-    const wsHit = wsAll.filter(w => !wsQ || w.name.toLowerCase().includes(wsQ));
-    wsHit.sort(wsSortK === 'name' ? (a, b) => a.name.localeCompare(b.name) : wsSortK === 'size' ? (a, b) => b.n - a.n || a.name.localeCompare(b.name) : (a, b) => (b.at - a.at) || a.name.localeCompare(b.name));
-    const wsAgo = ms => { if (!ms) return 'not opened yet'; const m = Math.round((Date.now() - ms) / 60000); if (m < 1) return 'opened just now'; if (m < 60) return 'opened ' + m + ' min ago'; const h = Math.round(m / 60); if (h < 24) return 'opened ' + h + ' h ago'; const dd = Math.round(h / 24); return dd < 60 ? 'opened ' + dd + ' d ago' : 'opened ' + new Date(ms).toLocaleDateString(); };
-    const wsOpenIt = id => this.setState({ corpus: id, view: 'summary', sel: null, f: {}, readDoc: null, folder: null, folderDraft: '', wsOpen: false, wsEdit: null, wsDelAsk: null });
-    const wsSeg = (k, l) => ({ label: l, bg: wsSortK === k ? 'var(--sel)' : 'transparent', col: wsSortK === k ? 'var(--ink)' : 'var(--mut)', onClick: () => this.setState({ wsSort: k, wsShown: 40 }) });
-    const wsm = {
-      open: !!S.wsOpen, onClose: () => this.setState({ wsOpen: false, wsEdit: null, wsDelAsk: null }), stop: e => { if (e && e.stopPropagation) e.stopPropagation(); },
-      q: S.wsQ || '', onQ: e => this.setState({ wsQ: e.target.value, wsShown: 40 }),
-      onQKey: e => { if (e.key === 'Escape') this.setState({ wsOpen: false }); else if (e.key === 'Enter' && wsHit[0]) wsOpenIt(wsHit[0].id); },
-      sorts: [wsSeg('recent', 'Recent'), wsSeg('name', 'A–Z'), wsSeg('size', 'Largest')],
-      summary: wsQ ? wsHit.length + ' of ' + wsAll.length : String(wsAll.length),
-      rows: wsHit.slice(0, wsLimit).map(w => { const editing = S.wsEdit === w.id, asking = S.wsDelAsk === w.id; const cur = w.id === cid;
-        return { name: w.name, current: cur, bg: cur ? 'var(--sel)' : 'transparent', meta: plural(w.n, 'source') + ' · ' + wsAgo(w.at), onOpen: () => wsOpenIt(w.id),
-          canEdit: !w.fixed, editing, notEditing: !editing, delAsk: asking, noDelAsk: !asking,
-          draft: S.wsEditDraft != null ? S.wsEditDraft : w.name, onDraft: e => this.setState({ wsEditDraft: e.target.value }),
-          onKey: e => { if (e.key === 'Enter') { this.renameWorkspace(w.id, S.wsEditDraft != null ? S.wsEditDraft : w.name); this.setState({ wsEdit: null, wsEditDraft: null }); } else if (e.key === 'Escape') this.setState({ wsEdit: null, wsEditDraft: null }); },
-          onSave: () => { this.renameWorkspace(w.id, S.wsEditDraft != null ? S.wsEditDraft : w.name); this.setState({ wsEdit: null, wsEditDraft: null }); },
-          onCancel: () => this.setState({ wsEdit: null, wsEditDraft: null }), onRename: () => this.setState({ wsEdit: w.id, wsEditDraft: w.name, wsDelAsk: null }),
-          onAskDelete: () => this.setState({ wsDelAsk: w.id, wsEdit: null }), onCancelDelete: () => this.setState({ wsDelAsk: null }),
-          delText: 'Delete “' + w.name + '” and its ' + plural(w.n, 'source') + '?', onDelete: () => { this.deleteWorkspace(w.id); this.setState({ wsDelAsk: null }); } }; }),
-      none: wsHit.length === 0, hasMore: wsHit.length > wsLimit, moreLabel: 'Show ' + Math.min(40, wsHit.length - wsLimit) + ' more (' + (wsHit.length - wsLimit) + ' not shown)', onMore: () => this.setState({ wsShown: wsLimit + 40 }) };
+    const wsOpenIt = id => this.setState({ corpus: id, view: 'summary', sel: null, f: {}, readDoc: null, folder: null, folderDraft: '' });
     // segmenting: the workspace's own discovered topics, computed once and driving the left-rail Topics
     // section, the global scope strip, and the Overview page's cards. A topic segment is source-based
     // (f.topicGroup keeps only the member documents' statements), not a keyword fold, so it holds even
@@ -9636,7 +9578,7 @@ class Component extends DCLogic {
     const suF = SU ? SU.list.filter(x => Fid.has(x.st.id)) : [];
     const juncMode = S.suMode !== 'belief'; const JN = isEmpty ? [] : this.junctions(A, Fid);
     const gHi = on => ({ bg: on ? 'var(--sel)' : 'transparent', bd: on ? 'var(--acc2)' : 'transparent', weight: on ? 600 : 500 });
-    const NAVG = [['', [['summary', 'Sources'], ['ask', 'Ask'], ['draft', 'Draft']]], ['Read closely', [['names', 'Names'], ['fixnames', 'Fix names'], ['records', 'Assertions']]], ['Explore', [['connections', 'Connections'], ['overview', 'Evidence overview']]], ['Manage', [['ingest', 'Add & publish']]], ['Links', [['lanes', 'Lanes'], ['margin', 'Margin'], ['seam', 'Seam'], ['orbit', 'Orbit'], ['fields', 'Fields'], ['review', 'Review']]]];
+    const NAVG = [['', [['summary', 'Sources'], ['ask', 'Ask'], ['draft', 'Draft']]], ['Read closely', [['names', 'Names'], ['fixnames', 'Fix names'], ['records', 'Assertions']]], ['Explore', [['connections', 'Connections'], ['overview', 'Evidence overview']]], ['Manage', [['ingest', 'Add & publish'], ['hero:workspaces', 'Workspaces & people']]], ['Links', [['lanes', 'Lanes'], ['margin', 'Margin'], ['seam', 'Seam'], ['orbit', 'Orbit'], ['fields', 'Fields'], ['review', 'Review']]]];
     // extra screens from screens.json (see componentDidMount): beside Sources, Ask, Inbox and Draft at the top of the
     // sidebar, where they are seen, not inside the collapsed "Explore & manage" group
     const SCREENS = this._screens || [];
@@ -9649,9 +9591,10 @@ class Component extends DCLogic {
       ask: (this._conv && this._conv.turns && this._conv.turns.length) ? String(this._conv.turns.length) : '',
       inbox: this._inboxSum && this._inboxSum.unread ? String(this._inboxSum.unread) : '',
       review: this.linkWaiting(),
+      'hero:workspaces': this._wsTotals && this._wsTotals.waiting ? String(this._wsTotals.waiting) : '',
     }[id] || '');
     const navGroups = NAVG.map(([label, items]) => ({ label, hasLabel: !!label, items: items.map(([id, lab]) => { const isScr = id.startsWith('screen:');
-      return { label: lab, count: id === 'fixnames' ? (this.refEdits().length ? String(this.refEdits().length) : '') : countFor(id), countColor: id === 'review' ? 'var(--amber)' : 'var(--mut)', ...gHi(isScr ? S.screenId === id.slice(7) : view === id), onClick: id === 'fixnames' ? () => this.openFixNames() : isScr ? () => this.setState({ screenId: id.slice(7) }) : () => this.setState({ view: id, readDoc: null, sel: null }) }; }) }));
+      return { label: lab, count: id === 'fixnames' ? (this.refEdits().length ? String(this.refEdits().length) : '') : countFor(id), countColor: id === 'review' || id === 'hero:workspaces' ? 'var(--amber)' : 'var(--mut)', ...gHi(isScr ? S.screenId === id.slice(7) : view === id), onClick: id === 'hero:workspaces' ? () => this.openWorkspacesHero() : id === 'fixnames' ? () => this.openFixNames() : isScr ? () => this.setState({ screenId: id.slice(7) }) : () => this.setState({ view: id, readDoc: null, sel: null }) }; }) }));
     // split so Folds can sit right under The reading / Connections, inside Explore
     const navTop = navGroups[0].items; const navRead = navGroups[1]; const navExplore = navGroups[2]; const navRest = navGroups.slice(3);
     const qv = (S.q || '').trim();
@@ -9786,7 +9729,7 @@ class Component extends DCLogic {
           onAsk: () => this.setState({ view: 'ask', akMode: 'chat' }), onBuild: () => this.setState({ view: 'ask', akMode: 'generate', akPane: 'sources' }),
           onAll: () => this.setState({ offDocs: {}, foldBand: false, view: 'summary' }) }; })(),
       drv: { ...drv, stats: hdr.sub || '', onKey: e => { if (e.key !== 'Enter') return; const live = (e.target.value || '').trim(); if (!live) return; this.setState({ dvQ: '' }); if (isOmniUrl(live)) omniOpen(live); else omniGo(live); } }, drvd, svGrid: svMode === 'grid' || svMode === 'cards', svList: svMode === 'list',
-      wsm, wsCount: wsAll.length, wsOpenMgr: () => { this.setState({ wsPop: false, wsAdding: false, wsDeleting: false }); this.openWorkspacesHero(); },
+      wsCount: wsAll.length, wsOpenMgr: () => { this.setState({ wsPop: false, wsAdding: false, wsDeleting: false }); this.openWorkspacesHero(); },
       // the switcher: the few most recent workspaces in a menu under the name (the manager, with search and sort, is
       // one row away); rename is in the menu or by double-clicking the name; delete asks inside the menu
       wsPopOpen: !!S.wsPop, wsPopToggle: () => this.setState(st => ({ wsPop: !st.wsPop, wsAdding: false, wsDeleting: false })), wsPopClose: () => this.setState({ wsPop: false, wsAdding: false, wsDeleting: false }),
