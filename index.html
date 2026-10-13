@@ -44,6 +44,13 @@ select option{background:var(--s1);color:var(--ink)}
 @media(max-width:700px){.hd-focus .hd-body{padding:0 12px 12px!important}.hd-workbar{gap:6px}.hd-workbar .hd-scope{width:100%;order:3}}
 
 .hd-disclosure{border-top:1px solid var(--line);padding:12px 0;color:var(--mut)}
+.hd-ph-cap{min-height:96px;background:var(--s2);border:1px solid var(--line);border-radius:10px;padding:12px 16px;display:flex;flex-direction:column;justify-content:flex-end;gap:6px}
+.hd-ph-prev{font:400 14px/1.45 var(--serif);color:var(--mut);cursor:pointer;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.hd-ph-line{font:400 21px/1.5 var(--serif);text-wrap:pretty}
+.hd-ph-line span{cursor:pointer;border-radius:4px;transition:color .12s,background .12s}
+.hd-ph-line span:hover{text-decoration:underline}
+.hd-ph-said{color:var(--ink)}.hd-ph-yet{color:var(--dim)}.hd-ph-now{color:var(--ink);background:var(--sel);box-shadow:0 0 0 2px var(--sel)}
+.hd-ph-hint{font:400 13.5px var(--sans);color:var(--mut)}
 .hd-disclosure>summary{cursor:pointer;font:500 13px var(--sans);min-height:24px;line-height:24px}
 .hd-disclosure[open]>summary{margin-bottom:12px;color:var(--ink)}
 .hd-disclosure button{max-width:100%}
@@ -2580,9 +2587,11 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
                 <sc-if value="{{ rdMedia.ytOnly }}" hint-placeholder-val="{{ false }}">
                   <iframe id="fx-yt" src="{{ rdMedia.src }}" title="{{ rdMedia.title }}" referrerPolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen="{{ true }}" style="width:100%;aspect-ratio:16/9;border:0;border-radius:10px;background:#000"></iframe>
                 </sc-if>
+                <sc-if value="{{ rdMedia.phCaption }}" hint-placeholder-val="{{ false }}"><div id="fx-cap" class="hd-ph-cap" aria-live="off"></div></sc-if>
+                <sc-if value="{{ rdMedia.phLane }}" hint-placeholder-val="{{ false }}"><canvas id="fx-lane" title="Click a word to play from it · drag to scrub" style="width:100%;height:132px;display:block;background:var(--s2);border:1px solid var(--line);border-radius:10px;cursor:pointer;touch-action:none"></canvas></sc-if>
                 <sc-if value="{{ rdMedia.timed }}" hint-placeholder-val="{{ false }}">
                   <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-                    <div style="display:flex;border:1px solid var(--line2);border-radius:8px;overflow:hidden"><sc-for list="{{ rdMedia.layouts }}" as="o" hint-placeholder-count="2"><button onClick="{{ o.onClick }}" title="{{ o.title }}" style="border:0;padding:4px 11px;cursor:pointer;font:500 13px var(--sans);background:{{ o.bg }};color:{{ o.col }};white-space:nowrap">{{ o.label }}</button></sc-for></div>
+                    <div role="group" aria-label="Arrange the words at the play head" style="display:flex;flex-wrap:wrap;border:1px solid var(--line2);border-radius:8px;overflow:hidden"><sc-for list="{{ rdMedia.layouts }}" as="o" hint-placeholder-count="2"><button onClick="{{ o.onClick }}" title="{{ o.title }}" style="border:0;padding:4px 11px;cursor:pointer;font:500 13px var(--sans);background:{{ o.bg }};color:{{ o.col }};white-space:nowrap">{{ o.label }}</button></sc-for></div>
                     <label style="display:flex;gap:6px;align-items:center;font:500 13px var(--sans);color:var(--ink2);cursor:pointer"><input type="checkbox" checked="{{ rdMedia.follow }}" onChange="{{ rdMedia.onFollow }}"></input>Follow along</label>
                   </div>
                 </sc-if>
@@ -5757,7 +5766,7 @@ class Component extends DCLogic {
         (this._clsQueued = this._clsQueued || {});
         if (!this._clsQueued[rd0.id]) { this._clsQueued[rd0.id] = 1; this.classifyDoc(rd0).catch(() => {}); }
       }
-    } this.hookLocal(); this.hookWave(); this.syncReader(); this.ytHook(); this.syncOmni();
+    } this.hookLocal(); this.hookWave(); this.syncReader(); this.ytHook(); this.hookPlayhead(); this.syncOmni();
     const S = this.state;
     const askEl = document.getElementById('ak-composer');
     if (S.view === 'ask' && askEl) {
@@ -6335,7 +6344,7 @@ class Component extends DCLogic {
       this.toast('Downloaded the audio for ' + who + ' — transcribed from your local helper, never through a third party.');
     } catch (e) { this.toast('The yt-dlp helper isn’t reachable — start it (python3 tools/ytdl-helper.py) and try again.'); }
   }
-  ytMark(t, force) { const root = this._rRoot; if (!root) return; const ps = [...root.querySelectorAll('[data-t]')]; if (!ps.length) return; let cur = null; for (const p of ps) { if (+p.getAttribute('data-t') <= t + 0.3) cur = p; else break; }
+  ytMark(t, force) { const root = this._rRoot; if (!root) return; this.paintPlayhead(t); const ps = [...root.querySelectorAll('[data-t]')]; if (!ps.length) return; let cur = null; for (const p of ps) { if (+p.getAttribute('data-t') <= t + 0.3) cur = p; else break; }
     const now = document.getElementById('fx-yt-now'); if (now) now.textContent = fmtT(Math.floor(t));
     if (cur === this._ytCur && !force) return; if (this._ytCur) { this._ytCur.style.background = ''; this._ytCur.style.boxShadow = ''; } this._ytCur = cur; if (!cur) return;
     cur.style.background = 'var(--sel)'; cur.style.boxShadow = '-10px 0 0 var(--sel), 10px 0 0 var(--sel)'; cur.style.borderRadius = '4px';
@@ -6347,16 +6356,18 @@ class Component extends DCLogic {
   // beside the player or as the transcript itself (the player shrinks to a bar above it). The choice is remembered.
   mediaLay(timed, needExtras) {
     const S = this.state; let saved = ''; try { saved = localStorage.getItem('hd:media-layout') || ''; } catch (e) {}
-    const lay = timed && (S.mediaLayout || saved) === 'transcript' ? 'transcript' : 'side', tr = lay === 'transcript';
+    const want = S.mediaLayout || saved, lay = timed && ['transcript', 'caption', 'lane'].includes(want) ? want : 'side', tr = lay === 'transcript', under = lay === 'caption' || lay === 'lane';
     const seg = (k, l, t) => ({ label: l, title: t, bg: lay === k ? 'var(--sel)' : 'transparent', col: lay === k ? 'var(--ink)' : 'var(--mut)', onClick: () => { try { localStorage.setItem('hd:media-layout', k); } catch (e) {} this.setState({ mediaLayout: k }); } });
-    return { gridCols: tr ? 'minmax(0,1fr)' : 'repeat(auto-fit,minmax(min(100%,420px),1fr))', showExtras: !tr || !!needExtras || !!S.txBusy,
-      layouts: [seg('side', 'Player + transcript', 'The recording beside its transcript'), seg('transcript', 'Transcript', 'The transcript, full width, with the player kept above it')],
-      txMaxH: tr ? 'calc(100vh - 330px)' : 'calc(100vh - 80px)', txPos: tr ? 'static' : 'sticky', videoMaxH: tr ? '24vh' : '56vh' };
+    return { gridCols: tr || under ? 'minmax(0,1fr)' : 'repeat(auto-fit,minmax(min(100%,420px),1fr))', showExtras: !(tr || under) || !!needExtras || !!S.txBusy,
+      layouts: [seg('side', 'Facing pages', 'The waveform as a panel, the transcript scrolling on the facing side'), seg('caption', 'Under the wave', 'The line being spoken appears under the waveform, word by word, as the cursor moves'),
+        seg('lane', 'Word lane', 'A zoomed window of the sound slides past a fixed play head, each word pinned under its moment — click a word to jump to it'), seg('transcript', 'Transcript', 'The transcript, full width, with the player kept above it')],
+      phCaption: timed && lay === 'caption', phLane: timed && lay === 'lane', layout: lay,
+      txMaxH: tr ? 'calc(100vh - 330px)' : under ? 'max(220px, calc(100vh - 480px))' : 'calc(100vh - 80px)', txPos: tr || under ? 'static' : 'sticky', videoMaxH: tr || under ? '24vh' : '56vh' };
   }
   waveVals(d) {
     const W = (this._wave || {})[d.id], ready = !!(W && W.peaks); let saved = ''; try { saved = localStorage.getItem('hd:media-layout') || ''; } catch (e) {}
-    const tr = (this.state.mediaLayout || saved) === 'transcript';
-    return { nativeControls: !ready, audioDisplay: ready ? 'none' : 'block', waveDisplay: ready ? 'block' : 'none', waveH: tr ? '56px' : '88px' };
+    const lay = this.state.mediaLayout || saved, H = { transcript: '56px', caption: '96px', lane: '40px' }[lay] || (d.transcribed ? 'clamp(150px, 30vh, 260px)' : '88px');
+    return { nativeControls: !ready, audioDisplay: ready ? 'none' : 'block', waveDisplay: ready ? 'block' : 'none', waveH: H };
   }
   async ensureWave() {
     const id = this.state.readDoc, d = id && this.analysis().docById[id];
@@ -6409,7 +6420,66 @@ class Component extends DCLogic {
     const dur = (el && isFinite(el.duration) && el.duration) || W.duration || 1;
     this._waveM.drawWave(cv, W.peaks, el ? el.currentTime / dur : 0);
   }
-  ytHook() { const f = document.getElementById('fx-yt'); if (!f || f === this._ytF) return; this._ytF = f; this._ytCur = null; const hello = () => { try { f.contentWindow.postMessage(JSON.stringify({ event: 'listening', id: 'fx', channel: 'widget' }), '*'); } catch (e) {} };
+  // ---- the words at the play head (holodeck-playhead.js) ----
+  // The transcript's timed paragraphs become cues with estimated word times, kept until the reader or the length changes.
+  phCues() {
+    const root = this._rRoot, M = this._phM; if (!root || !M) return null;
+    const ps = [...root.querySelectorAll('[data-t]')], el = document.getElementById('fx-local'), W = (this._wave || {})[this.state.readDoc];
+    const dur = (el && isFinite(el.duration) && el.duration) || (W && W.duration) || 0, key = ps.length + ':' + Math.round(dur);
+    if (this._phC && this._phC.root === root && this._phC.key === key) return this._phC;
+    const cues = M.cuesOf(ps.map(p => ({ t: +p.getAttribute('data-t'), text: this.paraText(p), p })), dur);
+    return (this._phC = { root, key, cues, words: M.wordsOf(cues), dur });
+  }
+  // A paragraph's spoken words, without the timecode button put in front of it.
+  paraText(p, upTo) { let s = ''; const w = document.createTreeWalker(p, NodeFilter.SHOW_TEXT); let n;
+    while ((n = w.nextNode())) { if (n.parentElement && n.parentElement.closest('button')) continue; if (upTo && n === upTo.node) return s.length + upTo.off; s += n.data; } return upTo ? s.length : s; }
+  // Clicking inside a paragraph plays from the word clicked, not from the top of the paragraph.
+  timeAtClick(p, t0, e) {
+    try { const C = this.phCues(); if (!C) return t0; let node = null, off = 0;
+      if (document.caretPositionFromPoint) { const c = document.caretPositionFromPoint(e.clientX, e.clientY); if (c) { node = c.offsetNode; off = c.offset; } }
+      else if (document.caretRangeFromPoint) { const r = document.caretRangeFromPoint(e.clientX, e.clientY); if (r) { node = r.startContainer; off = r.startOffset; } }
+      if (!node || node.nodeType !== 3 || !p.contains(node)) return t0;
+      const cue = C.cues.find(c => c.t === t0 && c.text === this.paraText(p)); return cue ? this._phM.timeAtChar(cue, this.paraText(p, { node, off })) : t0; } catch (x) { return t0; }
+  }
+  // A name clicked in a transcript opens its profile and also marks the moment it was said: the recording is cued
+  // there at once, and when the reader comes back to the recording it picks up from that word.
+  phJumpFrom(el, e, docId) {
+    const p = el.closest('[data-t]'); if (!p) return; const t = this.timeAtClick(p, +p.getAttribute('data-t'), e);
+    this._phResume = { doc: docId, t }; const lp = document.getElementById('fx-local'); if (lp) { try { lp.currentTime = t; } catch (x) {} }
+  }
+  phResumeOn(kind, el) {
+    const R = this._phResume; if (!R || R.doc !== this.state.readDoc) return; this._phResume = null;
+    if (kind === 'local') { const go = () => { try { el.currentTime = R.t; } catch (x) {} this.ytMark(R.t, true); }; if (el.readyState >= 1) go(); else el.addEventListener('loadedmetadata', go, { once: true }); }
+    else el.addEventListener('load', () => setTimeout(() => { this.ytPost('seekTo', [R.t, true]); this.ytMark(R.t, true); }, 800), { once: true });
+  }
+  // A caption box or lane that has just mounted is painted at the current moment, before anything plays.
+  hookPlayhead() {
+    const cap = document.getElementById('fx-cap'), lane = document.getElementById('fx-lane'), k = cap || lane;
+    const W = (this._wave || {})[this.state.readDoc], mk = k && (k.id + ':' + !!(W && W.peaks));
+    if (!k || (k === this._phMounted && mk === this._phMk)) return; this._phMounted = k; this._phMk = mk; const el = document.getElementById('fx-local');
+    setTimeout(() => this.paintPlayhead(el ? el.currentTime : (this._phT || 0)), 0);
+  }
+  phLoad() { return this._phMP || (this._phMP = import(new URL('holodeck-playhead.js', location.href).href).then(M => { this._phM = M; return M; })); }
+  paintPlayhead(t) {
+    const cap = document.getElementById('fx-cap'), lane = document.getElementById('fx-lane'); if (!cap && !lane) return;
+    if (!this._phM) { this.phLoad().then(() => this.paintPlayhead(t)); return; }
+    const C = this.phCues(); if (!C) return; this._phT = t;
+    if (cap) this._phM.paintCaption(cap, C.cues, t, s => this.ytSeek(s));
+    if (lane) { this.hookLane(lane); const W = (this._wave || {})[this.state.readDoc]; this._phHits = this._phM.drawLane(lane, W && W.peaks, C.dur || (W && W.duration) || 0, C.words, t); }
+  }
+  // The word lane: click a word to play from it; drag sideways to scrub (the sound moves under the fixed play head).
+  hookLane(cv) {
+    if (cv === this._phLane) return; this._phLane = cv; let drag = null;
+    cv.addEventListener('pointerdown', e => { drag = { x: e.clientX, t: this._phT || 0, moved: false }; try { cv.setPointerCapture(e.pointerId); } catch (x) {} });
+    cv.addEventListener('pointermove', e => { if (!drag) return; const dx = e.clientX - drag.x; if (Math.abs(dx) > 4) drag.moved = true; if (!drag.moved) return;
+      const t = Math.max(0, drag.t - dx * ((this._phHits && this._phHits.span) || 16) / cv.clientWidth), el = document.getElementById('fx-local'); if (el) { el.currentTime = t; this.ytMark(t, true); } else this.paintPlayhead(t); });
+    cv.addEventListener('pointerup', e => { const d = drag; drag = null; if (!d) return; if (d.moved) { if (!document.getElementById('fx-local')) this.ytSeek(this._phT || 0); return; }
+      const r = cv.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top, h = (this._phHits || []).find(b => x >= b.x0 - 3 && x <= b.x1 + 3 && y >= b.y0 - 4 && y <= b.y1);
+      this.ytSeek(h ? h.word.t : Math.max(0, (this._phT || 0) + (x / r.width - 0.5) * ((this._phHits && this._phHits.span) || 16))); });
+    cv.addEventListener('pointercancel', () => { drag = null; });
+    if (typeof ResizeObserver !== 'undefined') new ResizeObserver(() => { if (this._phT != null) this.paintPlayhead(this._phT); }).observe(cv);
+  }
+  ytHook() { const f = document.getElementById('fx-yt'); if (!f || f === this._ytF) return; this._ytF = f; this._ytCur = null; this.phResumeOn('yt', f); const hello = () => { try { f.contentWindow.postMessage(JSON.stringify({ event: 'listening', id: 'fx', channel: 'widget' }), '*'); } catch (e) {} };
     f.addEventListener('load', () => { hello(); setTimeout(hello, 500); setTimeout(hello, 1500); }); hello();
     const box = document.getElementById('fx-tx'); if (box) { box.addEventListener('wheel', () => { this._ytUser = Date.now(); }, { passive: true }); box.addEventListener('touchmove', () => { this._ytUser = Date.now(); }, { passive: true }); } }
   hIndex(A) {
@@ -7078,9 +7148,12 @@ class Component extends DCLogic {
     this.setState({});
   }
   hookLocal() {
-    const el = document.getElementById('fx-local'); if (!el || el === this._fxLocal) return; this._fxLocal = el;
+    const el = document.getElementById('fx-local'); if (!el || el === this._fxLocal) return; this._fxLocal = el; this.phResumeOn('local', el);
     el.addEventListener('timeupdate', () => { if (this.state.ytFollow !== false) this.ytMark(el.currentTime); this.fxSync(); });
     ['play', 'pause', 'ended', 'seeked', 'durationchange'].forEach(ev => el.addEventListener(ev, () => this.fxSync()));
+    // Under the wave and the word lane move with the sound, not with timeupdate's quarter-second ticks.
+    const tick = () => { if (el.paused || el.ended || el !== this._fxLocal) { this._phRaf = 0; return; } this.paintPlayhead(el.currentTime); this._phRaf = requestAnimationFrame(tick); };
+    el.addEventListener('play', () => { if (!this._phRaf) this._phRaf = requestAnimationFrame(tick); });
     this.fxSync();
   }
   async loadFromRoom() { return this.netDo('Load from room', async N => { await this.refreshRoom(); const s = this._net.s; const A = this.analysis(); const known = this.knownIds(A); const list = [];
@@ -7927,7 +8000,7 @@ class Component extends DCLogic {
   attachHandlers(target) {
     target.addEventListener('click', e => { const a = e.target.closest('a'); if (a && (e.metaKey || e.ctrlKey)) return; const nm = e.target.closest('[data-name]'); const st = e.target.closest('[data-st]');
       if (a && !e.shiftKey && /^https?:/.test(a.href || '')) { e.preventDefault(); e.stopPropagation(); this.navigate(a.href); return; }
-      if (nm) { e.preventDefault(); const dd = this._A && this.state.view === 'reader' && this.state.readDoc && this._A.docById[this.state.readDoc]; if (dd && dd.media && dd.media.segN > 0) { this.openProfile(nm.getAttribute('data-name')); return; } this.sel('name', nm.getAttribute('data-name')); return; }
+      if (nm) { e.preventDefault(); const dd = this._A && this.state.view === 'reader' && this.state.readDoc && this._A.docById[this.state.readDoc]; if (dd && dd.media && dd.media.segN > 0) { this.phJumpFrom(nm, e, dd.id); this.openProfile(nm.getAttribute('data-name')); return; } this.sel('name', nm.getAttribute('data-name')); return; }
       if (st) { e.preventDefault(); this.sel('statement', st.getAttribute('data-st')); return; }
       if (a) e.preventDefault(); }, true);
     target.addEventListener('submit', e => e.preventDefault(), true);
@@ -8187,10 +8260,11 @@ class Component extends DCLogic {
       if (d.lazy) { const L = (this._lazy || {})[d.id]; if (!L || L.loading) { this._rRoot = el; el.innerHTML = '<p style="font:400 15px var(--sans);color:var(--mut)">Loading the transcript…</p>'; this.loadLazyBody(d); this._rKey = null; return; } }
       this._rRoot = el; el.innerHTML = (d.lazy && ((this._lazy || {})[d.id] || {}).html) || d.html || ''; this._ptr = { S: 0, M: 0 }; const nodes = []; walkText(el, (n, o) => nodes.push([n, o]));
       if (!d.lazy) nodes.forEach(([n, o]) => { const fr = this.makeFrag(n.data, o, R, false, A); if (fr) n.parentNode.replaceChild(fr, n); });
+      if (d.media) this.phLoad();
       if (d.media) el.querySelectorAll('[data-t]').forEach(p => { const t = +p.getAttribute('data-t'); const b = document.createElement('button'); b.textContent = fmtT(t); b.title = 'Play from here';
         b.style.cssText = "float:left;margin:4px 12px 0 -4px;background:var(--s2);border:1px solid var(--line2);border-radius:6px;padding:0 7px;cursor:pointer;font:500 12px/20px var(--mono),monospace;color:var(--date)";
         b.onclick = e => { e.stopPropagation(); e.preventDefault(); this.ytSeek(t); }; p.insertBefore(b, p.firstChild);
-        p.style.cursor = 'pointer'; p.title = 'Play from ' + fmtT(t); p.addEventListener('click', e => { if (e.target.closest('[data-name],a')) return; const sel = window.getSelection && window.getSelection(); if (sel && String(sel).trim()) return; e.stopPropagation(); e.preventDefault(); this.ytSeek(t); }); });
+        p.style.cursor = 'pointer'; p.title = 'Play from ' + fmtT(t); p.addEventListener('click', e => { if (e.target.closest('[data-name],a')) return; const sel = window.getSelection && window.getSelection(); if (sel && String(sel).trim()) return; e.stopPropagation(); e.preventDefault(); this.ytSeek(this.timeAtClick(p, t, e)); }); });
     }
     try { this.repairLoops(d); } catch (e) { /* as it was */ }
     try { this.paintTranscriptSlider(el, d, A); } catch (e) { this._txErr = e; }
