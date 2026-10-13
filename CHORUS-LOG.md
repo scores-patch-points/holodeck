@@ -183,3 +183,12 @@ fast: 12 files · 3 affected test files, 24 pass · law: ok
 clean: Diaconis, Feynman, Dijkstra, Simon/Chekhov reported above; Marshall not routed — no law edited or cited
 bug found only by the integration chain, not the unit tests: window.postMessage to oneself is delivered to the sender's own listener, so the page took its ping for the extension's answer and reported "not installed"; fixed by matching the reply type, and the test stub now echoes like a browser.
 checked live (not by a test): real content.js + real reader + real network + the page's transcriptOutcome, in one process: 4 of 4 videos through rung=extension in ~0.5 s each. NOT checked: the extension loaded unpacked in a real Chrome (no way to do that from here).
+
+## 2026-10-13 — Fix names: bulk typo renames + hand SYN/SEG/CON over referents, full-screen activity (main, staged)
+fast: 4 files · 1 affected test file (12) pass · law: ok (no citations)
+| lens | citation | file:line | verdict | one line |
+| Dijkstra/Greenberg | — | holodeck-referents.js shape/rarity witnesses | fixed | QWERTY + English sound + Latin tokenizer scope now declared; other scripts go silent, not guessed |
+| Pearl | — | holodeck-referents.js mentions vs rarity | noted | mentions witness speaks only when rarity is silent, so frequency is not counted twice |
+| Simon/Chekhov | — | holodeck-referents-panel.js | noted | DOM panel has no unit test; verified live (fold, SEG, CON, undo, wide + 375px) |
+| Frankfurt | — | holodeck-referents-panel.js:147 | false-positive-on-review | HTML placeholder attribute, not a stand-in value |
+clean: Diaconis, Feynman, Holmes, Ostrom
