@@ -1,0 +1,206 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Contract page — Metro contracts</title>
+<style>
+:root{--bg:#17171a;--s1:#1c1c20;--s2:#29292e;--line:#2e2e33;--line2:#3f3f46;--ink:#f4f4f6;--ink2:#c9c9d2;--mut:#9d9da8;--dim:#9494a0;--acc:#8ab4ff;--amber:#f0b429;--date:#8ab4ff;--green:#56d364;--serif:Georgia,"Times New Roman",serif;--sans:Inter,system-ui,sans-serif;--mono:ui-monospace,SFMono-Regular,Menlo,monospace;color-scheme:dark}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 15px/1.5 var(--sans)}
+a{color:var(--acc)}
+.wrap{max-width:1460px;margin:0 auto;padding:18px;display:flex;gap:16px;align-items:flex-start}
+.list{flex:0 0 270px;max-height:90vh;overflow:auto;border:1px solid var(--line);border-radius:12px;background:var(--s1);position:sticky;top:18px}
+.list input{width:100%;box-sizing:border-box;background:var(--bg);border:0;border-bottom:1px solid var(--line);color:var(--ink);padding:10px 13px;outline:none;font:400 13.5px var(--sans)}
+.item{display:block;width:100%;text-align:left;background:none;border:0;border-bottom:1px solid var(--line);color:var(--ink);padding:8px 13px;cursor:pointer;font:500 13px/1.3 var(--sans)}
+.item:hover{background:var(--s2)}.item.on{background:var(--s2);box-shadow:inset 3px 0 0 var(--acc)}
+.item small{display:block;color:var(--mut);font:400 11px var(--mono);margin-top:2px}
+.page{flex:1 1 640px;min-width:340px}
+.sec{background:var(--s1);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:12px}
+.sec-h{font:600 11.5px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--acc);margin:0 0 8px;display:flex;justify-content:space-between;align-items:baseline}
+.sec-h .tag{color:var(--dim);font-weight:400;letter-spacing:0;text-transform:none}
+.hd .id{font:600 12px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--acc)}
+.hd h2{font:500 25px/1.2 var(--serif);margin:2px 0 6px}
+.ess{display:flex;flex-wrap:wrap;gap:4px 20px;font:400 14px var(--sans);color:var(--ink2)}
+.ess i{color:var(--dim);font-style:normal}
+.f{display:flex;justify-content:space-between;gap:14px;align-items:baseline;padding:7px 6px;border-bottom:1px solid var(--line);border-radius:6px;cursor:pointer}
+.f:hover{background:var(--s2)}
+.f .k{font:500 13.5px var(--sans);color:var(--ink2);min-width:0}
+.f .v{font:600 14.5px var(--mono);white-space:nowrap}
+.f .v.amount{color:var(--amber)}.f .v.date{color:var(--date)}
+.pas{font:400 15px/1.6 var(--serif);color:var(--ink2);padding:6px;cursor:pointer;border-bottom:1px solid var(--line)}
+.pas:hover{background:var(--s2)}
+.get{color:var(--dim);font:400 13px var(--sans);padding:6px 4px}
+.tabs{display:flex;gap:6px}
+.tabs button{background:var(--s2);border:1px solid var(--line2);color:var(--mut);border-radius:8px;padding:4px 12px;cursor:pointer;font:500 13px var(--sans)}
+.tabs button.on{color:var(--ink);border-color:var(--acc);background:var(--sel)}
+.viewer{background:var(--s1);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.doc{max-height:76vh;overflow:auto;max-width:840px;margin:0 auto;padding:6px 4px;font:400 16px/1.75 var(--serif);color:var(--ink2)}
+.doc h1{font:700 22px/1.25 var(--serif);color:var(--ink);margin:22px 0 8px;padding-bottom:5px;border-bottom:1px solid var(--line)}
+.doc h2{font:600 13px/1.3 var(--sans);color:var(--ink);margin:18px 0 6px;letter-spacing:.05em;text-transform:uppercase}
+.doc h3{font:600 14.5px/1.35 var(--sans);color:var(--ink2);margin:14px 0 4px}
+.doc .par{margin:0 0 10px;text-wrap:pretty}
+.doc .fld{display:flex;justify-content:space-between;gap:16px;align-items:baseline;padding:4px 2px;border-bottom:1px dotted var(--line);cursor:pointer;font-family:var(--sans);font-size:14px}
+.doc .fld:hover{background:var(--s2)}
+.doc .fld .k{color:var(--mut)}
+.doc .fld .v{font:600 14px var(--mono);color:var(--ink2);white-space:nowrap}
+.doc .fld .v.amount{color:var(--amber)}.doc .fld .v.date{color:var(--date)}
+.doc .tbl{margin:10px 0}
+.tbl{width:100%;border-collapse:collapse;font:400 13px var(--mono);margin:4px 0 8px}
+.tbl th,.tbl td{border-bottom:1px solid var(--line);padding:4px 8px;text-align:left;color:var(--ink2)}
+.tbl th{color:var(--mut);font-weight:600}
+.pdfwrap{position:relative;background:#fff;border:1px solid var(--line2);border-radius:8px;overflow:hidden;margin:0 auto 12px}
+.pdfwrap canvas{display:block;width:100%;height:auto}
+.ov{position:absolute;inset:0}
+.ov .t{position:absolute;white-space:pre;color:transparent;transform-origin:0 0}
+.hl{position:absolute;background:rgba(240,180,41,.42);outline:1px solid var(--amber);border-radius:2px}
+.pnav{display:flex;gap:10px;align-items:center;justify-content:center;font:400 12.5px var(--mono);color:var(--mut);margin-bottom:8px}
+.pnav button{background:var(--s2);border:1px solid var(--line2);color:var(--ink);border-radius:6px;padding:3px 12px;cursor:pointer}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="list" id="list"></div>
+  <div class="page" id="page"></div>
+</div>
+
+<script type="module">
+const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const norm = s => String(s || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+const $ = s => document.querySelector(s);
+const tokenOf = d => String(d.id || '').replace(/^nash-/, '');
+let seed = [], perDoc = {}, cur = null, curTok = null, rec = null, doc = null, mode = 'extracted';
+let pdf = null, pdfjs = null, ocrPages = [], pageNo = 1;
+
+const [s, k] = await Promise.all([
+  fetch('nashville-contracts-seed.json').then(r => r.ok ? r.json() : []).catch(() => []),
+  fetch('figures/_kinds.json').then(r => r.ok ? r.json() : null).catch(() => null),
+]);
+seed = s || []; perDoc = (k && k.perDoc) || {};
+
+// ── list ──────────────────────────────────────────────────────────────────────
+$('#list').innerHTML = '<input placeholder="Search contracts…" id="q"><div id="rows"></div>';
+const rowsEl = $('#rows');
+function renderList(q = '') { q = q.trim().toLowerCase();
+  const items = seed.filter(d => !q || (d.title||'').toLowerCase().includes(q) || (d.vendor||'').toLowerCase().includes(q) || (d.dept||'').toLowerCase().includes(q) || String(d.contractNo||'').toLowerCase().includes(q));
+  rowsEl.innerHTML = items.slice(0, 400).map(d => '<button class="item'+(cur===tokenOf(d)?' on':'')+'" data-t="'+esc(tokenOf(d))+'">'+esc(d.title)+'<small>'+esc([d.dept,d.contractNo].filter(Boolean).join(' · '))+'</small></button>').join('') || '<div class="get" style="padding:12px">No match.</div>';
+  rowsEl.querySelectorAll('[data-t]').forEach(b => b.onclick = () => open(b.getAttribute('data-t')));
+}
+$('#q').oninput = e => renderList(e.target.value);
+renderList();
+const h = decodeURIComponent(location.hash.replace(/^#/, '')); if (h) open(h);
+window.addEventListener('hashchange', () => { const t = decodeURIComponent(location.hash.replace(/^#/, '')); if (t) open(t); });
+
+// ── helpers ───────────────────────────────────────────────────────────────────
+const VCLASS = k => k === 'amount' ? 'v amount' : k === 'date' ? 'v date' : 'v';
+const fieldHtml = k => '<div class="f" data-f=\'' + esc(JSON.stringify(k)) + '\'><span class="k">' + esc(k.key) + '</span><span class="' + VCLASS(k.kind) + '">' + esc(k.value) + '</span></div>';
+const paraHtml = p => '<div class="pas" data-f=\'' + esc(JSON.stringify(p)) + '\'>' + esc((p.snip || p.key || '').slice(0, 260)) + '</div>';
+const tableHtml = t => '<table class="tbl"><tbody>' + t.rows.slice(0, 14).map((r, ri) => '<tr>' + r.map(c => '<' + (ri===0?'th':'td') + '>' + esc(c) + '</' + (ri===0?'th':'td') + '>').join('') + '</tr>').join('') + '</tbody></table>';
+const tablesOf = r => { const t = []; r.sections.forEach(s => (s.blocks||[]).forEach(b => { if (b.type==='table') t.push(b); })); return t; };
+const atomsOf = r => { const out = []; r.sections.forEach(s => { (s.keys||[]).forEach(k => out.push(k)); (s.blocks||[]).forEach(b => { if (b.type==='para') out.push({ _para:true, key:b.text.slice(0,64), value:'', kind:'text', evidence:b.evidence, snip:b.text }); }); }); return out; };
+
+// Mechanical selection: score each verbatim passage for each question's cues,
+// take the strongest — the document's OWN words. Snip, never restate.
+const PAY_RE = /pay|invoic|net\s?\d|remit|compensat|\brate\b|hourly|monthly|t&m|time and material|not to exceed|task order|reimburse|retainage|progress payment|\bfee\b/i;
+const SCOPE_RE = /scope|services|deliver|statement of work|shall perform|provide|furnish|install|construct|maintain|supply|operate|the contractor shall|purpose|duties|responsibilit|agrees to/i;
+const SPEND_RE = /amount|total|value|price|cost|\$|budget|account|fund|appropriat|expenditur|line item|unit price|payment schedule/i;
+// The template's sections. Extract the contract's OWN section whose heading
+// matches the learned name (the corpus was trained to know them).
+const TEMPLATE = [
+  ['(1) Payment methodology', /compensat|payment|\bfee|price|consideration|remunerat|invoice/i],
+  ['(2) Scope of services', /scope|services|statement of work|services to be performed|work to be performed|deliver/i],
+  ['(3) Spending lines', /compensat|price|\bfee|pricing|exhibit a|rates|payment schedule|budget|cost|line item/i],
+];
+function sectionPanels(r) { const secs = r.sections.filter(s => s.heading); return TEMPLATE.map(([name, re]) => ({ name, hits: secs.filter(s => re.test(s.heading)) })); }
+const snip = a => (a.snip || a.key || '').slice(0, 320);
+
+// ── the page ──────────────────────────────────────────────────────────────────
+async function open(tok) {
+  cur = tok; renderList($('#q').value);
+  pageNo = 1; pdf = null; ocrPages = []; mode = 'extracted';
+  $('#page').innerHTML = '<div class="sec"><span class="get">Loading…</span></div>';
+  doc = seed.find(x => tokenOf(x) === tok) || {};
+  rec = await fetch('figures/'+tok+'.json').then(r => r.ok ? r.json() : null).catch(() => null);
+  const kd = perDoc[tok];
+  const ess = [['contract', doc.contractNo], ['vendor', doc.vendor], ['department', doc.dept], ['value', doc.amount], ['expires', doc.expires]].filter(x => x[1]);
+  let html = '<div class="sec hd"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap"><div><span class="id">'+esc(doc.contractNo||tok)+'</span>'+(kd?' <span class="id" style="color:var(--mut)">· '+esc(kd.label)+'</span>':'')+'<h2>'+esc(doc.title||tok)+'</h2></div><div class="tabs"><button id="m-ex" class="on">Extracted</button><button id="m-pdf">PDF</button></div></div>'
+    + '<div class="ess">' + ess.map(x => '<span><i>'+esc(x[0])+'</i> '+esc(x[1])+'</span>').join('') + '</div></div>';
+
+  if (!rec) { $('#page').innerHTML = html + '<div class="sec"><span class="get">No structured extraction for this contract yet.</span></div>'; return; }
+  const panels = sectionPanels(rec);
+  const secHtml = s => { const atom = { key: s.heading, value: '', snip: s.text || '', evidence: { s: s.s || 0, e: (s.s || 0) + (s.text || '').length } }; return '<div class="pas" data-f=\'' + esc(JSON.stringify(atom)) + '\'><b>' + esc(s.heading) + '</b> — ' + esc((s.text || '').replace(/\s+/g, ' ').slice(0, 420)) + '</div>'; };
+  for (const p of panels) {
+    html += '<div class="sec"><div class="sec-h"><span>' + esc(p.name) + '</span><span class="tag">the contract’s own section ▸ click → PDF span</span></div>'
+      + (p.hits.length ? p.hits.map(secHtml).join('') : '<span class="get">⚑ GET — no matching section found</span>') + '</div>';
+  }
+
+  // the full viewer
+  html += '<div class="viewer"><div class="sec-h"><span>The document</span><span class="tag">click anywhere → the exact PDF span</span></div><div id="viewer"></div></div>';
+  $('#page').innerHTML = html;
+  $('#page').querySelectorAll('[data-f]').forEach(n => n.onclick = () => jump(JSON.parse(n.getAttribute('data-f'))));
+  $('#m-ex').onclick = () => setMode('extracted');
+  $('#m-pdf').onclick = () => setMode('pdf');
+  setMode('extracted');
+}
+
+function setMode(m) {
+  mode = m;
+  $('#m-ex').classList.toggle('on', m === 'extracted');
+  $('#m-pdf').classList.toggle('on', m === 'pdf');
+  if (m === 'extracted') renderExtracted(); else renderPdf();
+}
+
+// EXTRACTED — the document recreated from the extract; click anything → PDF span
+function renderExtracted() {
+  if (!rec) { $('#viewer').innerHTML = '<span class="get">No extraction.</span>'; return; }
+  const out = [];
+  for (const sec of rec.sections) {
+    const lv = Math.min(3, Math.max(1, sec.level || 2));
+    if (sec.heading) out.push('<h' + lv + '>' + esc(sec.heading) + '</h' + lv + '>');
+    for (const b of (sec.blocks || sec.keys || [])) {
+      const ind = b.depth ? ' style="margin-left:' + (b.depth * 18) + 'px"' : '';
+      if (b.type === 'field') out.push('<div class="fld" data-f=\'' + esc(JSON.stringify(b)) + '\'' + ind + '><span class="k">' + esc(b.key) + '</span><span class="' + VCLASS(b.kind) + '">' + esc(b.value) + '</span></div>');
+      else if (b.type === 'para') { const atom = { value: '', snip: b.text || '', key: (b.text || '').slice(0, 64), evidence: b.evidence }; out.push('<p class="par" data-f=\'' + esc(JSON.stringify(atom)) + '\'' + ind + '>' + esc(b.text || '') + '</p>'); }
+      else if (b.type === 'table') out.push(tableHtml(b));
+    }
+  }
+  $('#viewer').innerHTML = '<div class="doc">' + out.join('') + '</div>';
+  $('#viewer').querySelectorAll('[data-f]').forEach(n => n.onclick = () => jump(JSON.parse(n.getAttribute('data-f'))));
+}
+
+// PDF — the page + an invisible, selectable text layer; the span lit
+async function renderPdf(atom) {
+  const v = $('#viewer');
+  v.innerHTML = '<div class="pnav"><button id="prev">↑</button><span>page ' + pageNo + '</span><button id="next">↓</button></div><div id="pdfwrap"><span class="get">Rendering the page…</span></div>';
+  if (!ocrPages.length) { try { const o = await fetch('ocr/'+curTok+'.json').then(r=>r.ok?r.json():null); ocrPages = o || []; } catch (e) {} }
+  if (!pdf) { try { pdf = await loadPdf('/epav/'+curTok+'.pdf'); } catch (e) {} }
+  const wrap = $('#pdfwrap');
+  if (!pdf) { wrap.innerHTML = '<span class="get">The PDF isn’t reachable for this contract.</span>'; return; }
+  const pg = await pdf.getPage(pageNo); const vp = pg.getViewport({ scale: 1.5 }); const scale = vp.width / pg.getViewport({ scale: 1 }).width;
+  const cv = document.createElement('canvas'); cv.width = vp.width; cv.height = vp.height;
+  await pg.render({ canvasContext: cv.getContext('2d'), viewport: vp }).promise;
+  const box = document.createElement('div'); box.className = 'pdfwrap'; box.appendChild(cv);
+  const layer = document.createElement('div'); layer.className = 'ov'; box.appendChild(layer);
+  const tc = await pg.getTextContent();
+  const vv = atom ? norm(atom.value) : '', sn = atom ? norm(atom.snip || '') : ''; let hits = 0;
+  for (const it of tc.items) {
+    const str = it.str || ''; if (!str.trim()) continue;
+    const tx = pdfjs.Util.transform(vp.transform, it.transform); const hh = Math.hypot(tx[2], tx[3]) || 10; const w = (it.width || 0) * scale;
+    const sp = document.createElement('span'); sp.className = 't'; sp.textContent = str;
+    sp.style.cssText = 'left:' + tx[4] + 'px;top:' + (tx[5] - hh) + 'px;font:' + hh + 'px sans-serif';
+    const t = norm(str);
+    if (t.length >= 2 && (vv.includes(t) || (sn && sn.includes(t)))) { sp.classList.add('hl'); hits++; }
+    layer.appendChild(sp);
+  }
+  wrap.replaceWith(box);
+  $('#prev').onclick = () => { pageNo = Math.max(1, pageNo - 1); renderPdf(atom); };
+  $('#next').onclick = () => { pageNo = Math.min(pdf.numPages, pageNo + 1); renderPdf(atom); };
+  if (hits && layer.firstChild) layer.firstChild.scrollIntoView({ block: 'center' });
+}
+
+function pageForOffset(off) { let acc = 0; for (let i = 0; i < ocrPages.length; i++) { const len = (ocrPages[i].text || '').length; if (off <= acc + len) return i + 1; acc += len + 1; } return 1; }
+function jump(atom) { pageNo = atom && atom.evidence ? pageForOffset(atom.evidence.s) : 1; mode = 'pdf'; $('#m-ex').classList.remove('on'); $('#m-pdf').classList.add('on'); renderPdf(atom); }
+
+async function loadPdf(url) { if (!pdfjs) { pdfjs = await import('https://cdn.jsdelivr.net/npm/pdfjs-dist@4.4.168/build/pdf.min.mjs'); pdfjs.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.4.168/build/pdf.worker.min.mjs'; } const buf = await (await fetch(url)).arrayBuffer(); return await pdfjs.getDocument({ data: new Uint8Array(buf).slice() }).promise; }
+</script>
+</body>
+</html>

@@ -165,3 +165,36 @@ export async function audioFor(id) {
   if (!r.ok) throw new Error('the yt-dlp helper answered ' + r.status);
   return { buf: await r.arrayBuffer(), mime: r.headers.get('content-type') || 'audio/mp4' };
 }
+
+// --- snip / stitch -----------------------------------------------------------
+// A clip is real bytes cut on the reader's own machine (yt-dlp --download-sections)
+// and written under clips/, where the surface's static server plays it back. The helper
+// returns a manifest; the caller composes the playback URL from its own origin.
+
+async function clipJson(url, ms) {
+  const c = new AbortController(); const id = setTimeout(() => c.abort(), ms || 60000);
+  try {
+    const r = await fetch(url, { signal: c.signal });
+    if (!r.ok) throw new Error('the yt-dlp helper answered HTTP ' + r.status);
+    return await r.json();
+  } finally { clearTimeout(id); }
+}
+
+/** One snipped range of one video -> {kind:'clip', name, url:'/clips/x.mp4', segments, duration, size}. */
+export function clipFor(id, start, end, name) {
+  const q = 'id=' + encodeURIComponent(id) + '&start=' + encodeURIComponent(String(start)) +
+    '&end=' + encodeURIComponent(String(end)) + '&name=' + encodeURIComponent(name || 'clip');
+  return clipJson(ytdlBase() + '/clip?' + q, 60000);
+}
+
+/** Several ranges of one video joined in order -> {kind:'stitch', name, url, segments, duration, size}. */
+export function stitchFor(id, segments, name) {
+  const seg = (segments || []).map(s => 'seg=' + encodeURIComponent(s.start + '-' + s.end)).join('&');
+  const q = 'id=' + encodeURIComponent(id) + '&name=' + encodeURIComponent(name || 'stitch') + (seg ? '&' + seg : '');
+  return clipJson(ytdlBase() + '/stitch?' + q, 60000);
+}
+
+/** The playback URL for a helper manifest, on whatever surface is reading. */
+export function clipUrl(manifest, base) {
+  return (base || location.origin) + (manifest.url || '');
+}
