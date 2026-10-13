@@ -302,7 +302,7 @@ const ordinance = () => mkDoc('code', 'Metro Code 13.08.080', [
 
 test('finding: a denial against a statement over the same terms is flagged as a denial, with both quotes', () => {
   const W = world([packet(), agreement(), ...filler(), ...bulk()]);
-  const S = R.seamOf(W, 'packet', 'agree');
+  const S = R.seamOf(W, 'packet', 'agree', R.buildIndex(W, { cues: true }));
   const row = S.rows.find((r) => r.a && r.a.id === 'packet:1');
   assert.ok(row && row.link, 'the certification pairs with something');
   assert.equal(row.link.finding.kind, 'polarity');
@@ -353,8 +353,9 @@ test('collect: every link a reader is shown carries a finding or says why not', 
   shown.forEach((l) => assert.ok(l.finding && l.finding.headline, l.source + ' ' + l.relation + ' has no finding'));
 });
 
-// ── scope and absence: the two things the Motorola record turns on ──────────────────────────────────────────────────
-// Lines of a source are its statements; blank lines stay in the text, so paragraphs can be told apart.
+// ── the engine's reading across sources, as links ─────────────────────────────────────────────────────────────────
+// The result below has the shape of POST /v1/read-across (EOReadAcross@1). This module reads no cue word: it only
+// turns what the engine returned into links, and refuses anything that does not point into a document it holds.
 function mkLines(id, title, text) {
   const sts = []; let off = 0;
   text.split('\n').forEach((line, i) => {
@@ -364,70 +365,63 @@ function mkLines(id, title, text) {
   });
   return { doc: { id, title, text }, sts };
 }
-const resolution = () => mkLines('res', 'RS2026-2264 resolution and certification', [
-  'WHEREAS, the Purchasing Agent desires to participate in the master agreement between Sourcewell, a governmental agency,',
-  'and Motorola Solutions, Inc., a copy of which is attached hereto and incorporated herein; and,',
-  '',
-  'WHEREAS, this agreement was requested by the Department of Emergency Communications for computer aided dispatch;',
-  '',
-  'Section 1. That the master agreement between Sourcewell and Motorola Solutions, a copy of which is attached hereto, is hereby approved.',
-].join('\n'));
-const exhibit = () => mkLines('exh', 'Sourcewell master agreement 030425 with Motorola Solutions', [
-  'Computer Aided Dispatch',
-  'Records Management System',
-  'Drone Software and Hardware',
-  'Public Safety Video Surveillance Solutions',
-  'Data Migration Services',
-  'Fleet Telematics Platform',
-  'Payment is due within forty five days of each invoice.',
-].join('\n'));
-const debate = () => mkLines('deb', 'Council debate on RS2026-2264', [
-  'I am worried about how long the vote will take tonight.',
-  'In this exhibit, there are drones that may be purchased with this.',
-  'Why is the existing contract not on a government website?',
-  'The meeting was adjourned after the vote.',
-].join('\n'));
+const engineWorld = () => {
+  const res = mkLines('res', 'The approval', 'Section one accepts the Sourcewell master agreement with Motorola.\nIt takes effect on adoption.');
+  const exh = mkLines('exh', 'Sourcewell master agreement with Motorola', 'Drone Software and Hardware\nRecords Management System');
+  const deb = mkLines('deb', 'The debate', 'There are drones in this exhibit.\nThe existing contract is not on the website.');
+  return { W: world([res, exh, deb]), res, exh, deb };
+};
+const at = (text, needle) => { const i = text.indexOf(needle); return [i, i + needle.length]; };
+const engineResult = ({ res, exh, deb }) => {
+  const rs = res.doc.text, es = exh.doc.text, ds = deb.doc.text;
+  const [ns, ne] = at(rs, 'Section one accepts the Sourcewell master agreement with Motorola.');
+  const [ms, me] = at(rs, 'Sourcewell master agreement');
+  const [ws, we] = at(es, 'Drone Software and Hardware'); const [ds0, de0] = at(es, 'Drone');
+  const [rs0, re0] = at(ds, 'drones'); const [rss, rse] = at(ds, 'There are drones in this exhibit.');
+  const [as, ae] = at(ds, 'The existing contract is not on the website.'); const [ps, pe] = at(ds, 'existing contract');
+  return { schema: 'EOReadAcross@1', basis: 'x', gaps: [], sources: ['res', 'exh', 'deb'],
+    findings: [
+      { kind: 'names', from: 'res', to: 'exh', tier: 'licensed', basis: '3 of 5 title forms in one sentence; null deepest 1', statements: [{ doc: 'res', s: ns, e: ne, text: rs.slice(ns, ne) }], marks: [{ doc: 'res', s: ms, e: me, text: rs.slice(ms, me), role: 'names' }] },
+    ],
+    candidates: [
+      { kind: 'left-out', from: 'res', to: 'exh', form: 'drone', tier: 'possible', inB: 1, attendedBy: ['deb'], raised: [{ doc: 'deb', s: rss, e: rse, text: ds.slice(rss, rse) }],
+        where: { doc: 'exh', s: ws, e: we, text: es.slice(ws, we) }, set: '1 omitted form carried by two or more other sources; independent sources would share 1 at most (60 draws)',
+        marks: [{ doc: 'exh', s: ds0, e: de0, text: 'Drone', role: 'in-source' }, { doc: 'deb', s: rs0, e: re0, text: 'drones', role: 'raised' }], basis: 'res names exh and never writes “drone”' },
+      { kind: 'absent', from: 'deb', to: null, form: 'contract', tier: 'possible', heldBy: ['res'], instances: 2, phrases: [{ phrase: 'existing contract', times: 1, at: { doc: 'deb', s: as, e: ae, text: ds.slice(as, ae) } }, { phrase: 'new contract', times: 1, at: { doc: 'deb', s: as, e: ae, text: '' } }],
+        marks: [{ doc: 'deb', s: ps, e: pe, text: 'existing contract', role: 'spoken-of' }], basis: 'deb speaks of “contract” in 2 differently-modified ways' },
+    ] };
+};
 
-test('scope: what the resolution approves against what the exhibit lists, led by what another source raised', () => {
-  const W = world([resolution(), exhibit(), debate(), ...filler()]);
-  const ix = R.buildIndex(W);
-  const L = R.scopeLinks(W, ix);
-  const main = L.find((l) => l.from.doc === 'res' && l.to.doc === 'exh' && l.to.kind === 'whole');
-  assert.ok(main, 'the resolution is linked to the exhibit it attaches');
-  assert.equal(main.finding.kind, 'scope');
-  assert.match(main.finding.headline, /Drone Software and Hardware/);
-  assert.match(main.finding.headline, /resolution never names/);
-  const raised = L.find((l) => l.from.doc === 'deb' && l.to.doc === 'exh');
-  assert.ok(raised, 'the statement that points at the exhibit is linked to the heading it names');
-  assert.match(W.docs.find((d) => d.id === 'exh').text.slice(raised.to.s, raised.to.e), /^Drone Software/);
-  assert.match(W.docs.find((d) => d.id === 'deb').text.slice(raised.from.s, raised.from.e).toLowerCase(), /^drone/);
-  // an entry the resolution does name is not omitted
-  assert.ok(!L.some((l) => l.finding && /Computer Aided Dispatch/.test(l.finding.headline) && /never names it/.test(l.finding.headline)));
-  assert.ok(L.every((l) => l.finding && l.finding.marks), 'every one marks the words');
+test('engine findings become links: names is computed, a candidate is inferred and says it is not licensed', () => {
+  const E = engineWorld(); const L = R.importReadAcross(E.W, engineResult(E));
+  assert.equal(L.length, 3);
+  const names = L.find((l) => l.finding.kind === 'names');
+  assert.equal(names.provenance, 'computed'); assert.equal(names.to.kind, 'whole'); assert.equal(names.source, 'engine');
+  const scope = L.find((l) => l.finding.kind === 'scope');
+  assert.equal(scope.provenance, 'inferred');
+  assert.match(scope.finding.headline, /“drone” is in/); assert.match(scope.finding.headline, /not licensed/);
+  assert.equal(E.exh.doc.text.slice(scope.to.s, scope.to.e), 'Drone Software and Hardware');
+  assert.match(E.deb.doc.text.slice(scope.from.s, scope.from.e), /^drones$/);
+  const absent = L.find((l) => l.finding.kind === 'absent');
+  assert.equal(absent.provenance, 'inferred'); assert.equal(absent.to.doc, 'res');
+  assert.deepEqual(absent.finding.marks.from.map(([a, b]) => E.deb.doc.text.slice(a, b)), ['existing contract']);
 });
 
-test('scope: a statement that only shares a word with a heading, without pointing at the exhibit, raises nothing', () => {
-  const quiet = mkLines('deb', 'Council debate', ['Drones were discussed for an hour.', 'The vote was held after the meeting.'].join('\n'));
-  const L = R.scopeLinks(world([resolution(), exhibit(), quiet, ...filler()]), R.buildIndex(world([resolution(), exhibit(), quiet, ...filler()])));
-  assert.ok(!L.some((l) => l.from.doc === 'deb'));
-  assert.doesNotMatch(L.find((l) => l.from.doc === 'res').finding.headline, /raised elsewhere/);
+test('engine findings: a result that points at a document this workspace does not hold, or at nothing, makes no link', () => {
+  const E = engineWorld(); const r = engineResult(E);
+  r.findings[0].from = 'gone'; r.candidates.forEach((c) => { c.where && (c.where.doc = 'gone'); });
+  r.candidates[0].to = 'gone';
+  assert.equal(R.importReadAcross(E.W, r).filter((l) => l.finding.kind !== 'absent').length, 0);
+  assert.deepEqual(R.importReadAcross(E.W, { schema: 'other' }), []);
+  assert.deepEqual(R.importReadAcross(E.W, null), []);
 });
 
-test('absent: a source says the existing contract is not available; the link says nothing here is that contract', () => {
-  const W = world([resolution(), exhibit(), debate(), ...filler()]);
-  const L = R.absentLinks(W, R.buildIndex(W));
-  assert.equal(L.length, 1);
-  assert.equal(L[0].finding.kind, 'absent');
-  assert.equal(L[0].to.doc, 'exh');
-  assert.match(L[0].finding.headline, /existing contract is not available/);
-  const m = L[0].finding.marks.from; const t = W.docs.find((d) => d.id === 'deb').text;
-  assert.deepEqual(m.map(([a, b]) => t.slice(a, b).toLowerCase()), ['existing contract', 'not on']);
-});
-
-test('absent: an ordinary reference to "the contract" is not a claim that one is missing', () => {
-  const quiet = mkLines('deb', 'Debate', ['The contract is on the agenda tonight.', 'The existing contract expired in June.'].join('\n'));
-  const W = world([resolution(), exhibit(), quiet, ...filler()]);
-  assert.equal(R.absentLinks(W, R.buildIndex(W)).length, 0);
+test('collect: the engine result is imported, and the cue-phrase finders are off by default', () => {
+  const E = engineWorld(); const r = engineResult(E);
+  const on = R.collect(E.W, { inferred: false, readAcross: r });
+  assert.ok(on.links.some((l) => l.finding && l.finding.kind === 'names'));
+  const cue = R.collect(world([...filler(), packet(), agreement(), ...bulk()]), { inferred: false });
+  assert.ok(!cue.links.some((l) => l.source === 'denial' || l.source === 'definition'), 'no English cue finder runs unless asked');
 });
 
 test('definitions: a lone generic word in a definition is not an example', () => {

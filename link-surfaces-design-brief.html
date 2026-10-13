@@ -69,6 +69,7 @@ mark.bad { background: var(--bad-bg); }
 .view dt { font: 600 11px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--mut); padding-top: 3px; }
 .view dd { margin: 0; color: var(--ink2); min-width: 0; }
 .view dd ul { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 3px; }
+@media print { body { background: #fff; padding-block: 0; } .tablewrap { overflow: visible; } table { min-width: 0; } }
 @media (max-width: 420px) { .view dl { grid-template-columns: 1fr; gap: 2px; } .view dd { margin-bottom: 8px; } }
 .two { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 12px; }
 .note { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; font-size: 14px; color: var(--ink2); }
@@ -106,14 +107,16 @@ ul.plain { margin: 0; padding-left: 18px; display: flex; flex-direction: column;
 
   <section aria-labelledby="kinds">
     <h2 id="kinds">The kinds of finding a layout has to tell apart</h2>
+    <p style="margin-bottom:14px">Findings come from the engine’s own reading across the sources, not from phrases written into the interface. Each is either <b>licensed</b>, because it cleared a null, or <b>possible</b>, a candidate the engine holds below the line. The layout must make that difference visible on every card, every line and every underline.</p>
     <div class="tablewrap">
       <table>
         <thead><tr><th>Label</th><th>What it says</th><th>Marked words</th><th>Weight</th></tr></thead>
         <tbody>
           <tr><td><span class="chip bad">Different figures</span></td><td>The same thing is stated with two different numbers or dates.</td><td>Both figures.</td><td>Highest. Act on it.</td></tr>
           <tr><td><span class="chip bad">Denied</span></td><td>One source denies what the other states, over the same subject.</td><td>The negation and the subject words, both sides.</td><td>Highest.</td></tr>
-          <tr><td><span class="chip amb">Not on file</span></td><td>A source says a document is not available, and nothing in the workspace is that document.</td><td>The document and the “not available” words.</td><td>High. The thing is absent, so it needs its own visual place.</td></tr>
-          <tr><td><span class="chip amb">Not named</span></td><td>A resolution approves an attached text, and that text contains headings the resolution never names.</td><td>The attaching words, and the omitted headings in the attachment.</td><td>High. A whole-source relation with many marks on one side.</td></tr>
+          <tr><td><span class="chip amb">Spoken of, not held</span></td><td>A source speaks of a thing in several differently-modified ways (the existing contract, the new contract), and no source says any of them.</td><td>The modified phrases.</td><td>High interest, but never licensed: the engine can only say it is a candidate. It needs its own visual place, because the thing has no passage to point at.</td></tr>
+          <tr><td><span class="chip amb">Not named</span></td><td>A source names another source (by carrying its title), and that source holds words the naming source never writes while two or more other sources return to them.</td><td>The word in the named text, and where the other source raised it.</td><td>High. Licensed only when the set beats chance; otherwise shown as “possible”. A whole-source relation with a few marks on one side.</td></tr>
+          <tr><td><span class="chip">Refers to</span></td><td>One passage carries most of another source’s title, so it names that source without any cue phrase.</td><td>The title words inside the passage.</td><td>Structural. It is what makes the “Not named” finding possible.</td></tr>
           <tr><td><span class="chip acc">Defined as</span></td><td>A phrase is named inside the definition of a term in another source (an ordinance defining “surveillance technology”).</td><td>The phrase, and the definition.</td><td>Medium.</td></tr>
           <tr><td><span class="chip">Both state</span></td><td>The same figure or date appears in both.</td><td>The figure.</td><td>Confirms. Quiet.</td></tr>
           <tr><td><span class="chip">Same subject</span></td><td>The two share distinctive words and nothing stronger.</td><td>The shared words.</td><td>Lowest. Never leads.</td></tr>
@@ -136,7 +139,7 @@ ul.plain { margin: 0; padding-left: 18px; display: flex; flex-direction: column;
         <p style="font-size:13.5px;color:var(--mut)">Four sources are involved: the resolution, the attachment, the certification and the debate. One finding needs to connect all four.</p>
       </article>
       <article class="find">
-        <span class="chip amb">Not on file</span>
+        <span class="chip amb">Spoken of, not held</span>
         <h3>There was no prior contract on file</h3>
         <p>Council members asked for the <mark>existing contract</mark> to compare with the new one, and it was <mark>not on a government website</mark>. The last one on the portal dates from 2009, and the record shows work continuing without a contract since June. The only Motorola contract in this workspace is the new one.</p>
         <q>“I don't feel comfortable right now having not reviewed the existing contract because it's not available.” <small>council member, debate record</small></q>
