@@ -152,3 +152,15 @@ it were punctuation. Crop the page from the PDF at the OCR's own resolution (the
 box several times the page's type height is handwriting, not a word to repair. Letters are \p{L}, not [A-Za-z].
 The address bar is part of the interface: ?doc=<contract>&view=original|map|extracted[&level=] opens straight to that
 contract and view and follows the page with replaceState, so a copied URL reproduces what you were looking at.
+
+## 23. A valid word the sample has not seen is not a misread
+
+Checking repairs against the scan found the fold changing real words: "to elevate" became "elevated", "(mitigated)"
+became "(mitigate)", "HOOKING UP" became "COOKING". A held-out test that corrupts known words cannot see this, because
+the corruption is nearly always a non-word. Two measured guards: (1) a form whose stem family the sample has
+established is a valid form, not a misread (elevate beside elevated), and it is left as read, which fails safe where
+"remove the inflected candidate" failed wrong; (2) the document's own clean reads of a word count as a witness only
+for words of eight letters or more (shorter ones gave wrong repairs in the held-out). A repair that rests on a
+neighbour pair the sample has never seen is refused, and a form that recurs identically is disclosed as possibly
+printed that way: the scan itself prints "SPECIFICATGIONS" on 14 pages. The engine's ethos, logos and pathos organs
+are a conduct clearance, a claim-cycle lint and a felt-shape reader; none proposes a correction to a token.

@@ -9731,7 +9731,9 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
     const third = 100 / 3;
     const setAct = (a, on) => { const r = a.r, sp = a.sp; a.on = on;
       if (a.kind === 'rep') { sp.textContent = (on ? r.to : a.orig) + ' '; sp.classList.toggle('xf-rep', on);
-        if (on) sp.setAttribute('data-why', 'The scan reads “' + a.orig + '”. Folded to “' + r.to + '”: ' + r.vouched + ' other contract' + (r.vouched === 1 ? '' : 's') + ' read it, and the words beside it have been read together ' + r.pairs + ' time' + (r.pairs === 1 ? '' : 's') + ' in the sample.'); else sp.removeAttribute('data-why'); }
+        if (on) sp.setAttribute('data-why', 'The scan reads “' + a.orig + '”. Folded to “' + r.to + '”: ' + r.vouched + ' other contract' + (r.vouched === 1 ? '' : 's') + ' read it, and the words beside it have been read together ' + r.pairs + ' time' + (r.pairs === 1 ? '' : 's') + ' in the sample.'
+          + (r.self ? ' This document itself reads it cleanly ' + r.self + ' time' + (r.self === 1 ? '' : 's') + '.' : '')
+          + (r.recurs >= 3 ? ' This exact form appears ' + r.recurs + ' times here, so it may be printed that way in the source.' : '')); else sp.removeAttribute('data-why'); }
       else if (a.kind === 'typ') { sp.classList.toggle('xf-typ', on); if (on) sp.setAttribute('data-why', 'The engine reads this as ' + r.meaning.label + (r.meaning.n > 1 ? ' (' + r.meaning.n + ' mentions)' : '') + '.'); else sp.removeAttribute('data-why'); }
       else if (a.kind === 'ref') { sp.classList.toggle('xf-ref', on); if (on) sp.setAttribute('data-why', 'Left as read: ' + r.why + '.'); else sp.removeAttribute('data-why'); }
       else if (a.kind === 'junk') { if (r.drop) sp.style.display = on ? 'none' : ''; else sp.textContent = (on ? r.cleanTo : a.orig) + ' ';
