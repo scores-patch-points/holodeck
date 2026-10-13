@@ -543,6 +543,14 @@ button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visi
             <sc-for list="{{ svTabs }}" as="t" hint-placeholder-count="4"><button class="hd-chip {{ t.cls }}" onClick="{{ t.onClick }}">{{ t.label }} <span style="color:var(--dim)">{{ t.n }}</span></button></sc-for>
             <span style="flex:1"></span>
             <select value="{{ drv.sort }}" onChange="{{ drv.onSort }}" title="Order" style="background:var(--s2);border:1px solid var(--line2);border-radius:8px;color:var(--ink);font:500 13px var(--sans);padding:5px 8px;outline:none"><sc-for list="{{ drv.sorts }}" as="o" hint-placeholder-count="4"><option value="{{ o.v }}">{{ o.l }}</option></sc-for></select>
+            <sc-if value="{{ drv.hasFieldPick }}" hint-placeholder-val="{{ false }}">
+              <details class="hd-drive-menu"><summary title="Columns taken from fields that recur across your sources (contract id, expiry, vendor…) — shown in Table view and sortable" style="width:auto;padding:0 11px;border:1px solid var(--line2);border-radius:8px;font:500 13px var(--sans);height:30px">Fields · {{ drv.fieldsOn }}</summary>
+                <div class="hd-drive-menu-panel" style="min-width:340px;max-height:60vh;overflow:auto;padding:8px">
+                  <span style="font:400 12px/1.45 var(--sans);color:var(--dim);padding:2px 6px 8px">Labels that recur across sources, with the type read from their own values. Tick one to make it a column and a sort.</span>
+                  <sc-for list="{{ drv.fieldPick }}" as="f" hint-placeholder-count="5"><label title="{{ f.tip }}" style="display:flex;gap:8px;align-items:center;padding:5px 6px;border-radius:6px;cursor:pointer;font:400 14px var(--sans);color:var(--ink)"><input type="checkbox" checked="{{ f.on }}" onChange="{{ f.onToggle }}"></input><span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ f.label }}</span><span style="font:500 11px var(--mono);color:var(--acc);text-transform:uppercase">{{ f.tag }}</span><span style="font:400 12px var(--mono);color:var(--dim);white-space:nowrap">{{ f.cover }}</span></label></sc-for>
+                </div>
+              </details>
+            </sc-if>
             <div style="display:flex;border:1px solid var(--line2);border-radius:8px;overflow:hidden"><sc-for list="{{ svModes }}" as="k" hint-placeholder-count="3"><button onClick="{{ k.onClick }}" style="border:0;background:{{ k.bg }};color:{{ k.col }};padding:5px 12px;cursor:pointer;font:500 13px var(--sans);white-space:nowrap">{{ k.label }}</button></sc-for></div>
           </div>
           <sc-if value="{{ drv.hasFolders }}" hint-placeholder-val="{{ false }}">
@@ -591,6 +599,7 @@ button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visi
                         <td style="padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top;font:400 14px/1.4 var(--sans);color:var(--ink2);text-align:right;font-family:var(--mono);font-size:13px">{{ r.stsS }}</td>
                         <td style="padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top;font:400 14px/1.4 var(--sans);color:var(--ink2);text-align:right;font-family:var(--mono);font-size:13px">{{ r.namesS }}</td>
                         <td style="padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top;font:400 14px/1.4 var(--sans);color:var(--ink2);color:{{ r.ccol }};font-size:13px">{{ r.custody }}</td>
+                        <sc-for list="{{ r.xcells }}" as="x" hint-placeholder-count="0"><td style="padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top;font:400 13px/1.4 var(--mono);color:var(--ink2);white-space:nowrap">{{ x.v }}</td></sc-for>
                         <td style="padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top;font:400 14px/1.4 var(--sans);color:var(--ink2);white-space:nowrap"><span style="display:flex;gap:10px;font:500 13px var(--sans)"><sc-if value="{{ r.hasVideo }}" hint-placeholder-val="{{ false }}"><a href="{{ r.videoUrl }}" target="_blank" rel="noopener" style="color:var(--acc);text-decoration:none">Video ↗</a></sc-if><button onClick="{{ r.onFocus }}" style="all:unset;cursor:pointer;color:var(--mut)" style-hover="color:var(--ink)">Only this</button></span></td>
                       </tr>
                     </sc-for>
@@ -608,6 +617,7 @@ button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visi
                 <button class="hd-drive-prev" onClick="{{ d.onRead }}" title="Open {{ d.title }}">
                   <sc-if value="{{ d.isVid }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;inset:0;background-image:{{ d.thumbBg }};background-size:cover;background-position:center;opacity:.85"></span></sc-if>
                   <sc-if value="{{ d.noVid }}" hint-placeholder-val="{{ true }}"><span class="hd-drive-snip">{{ d.dvSnippet }}</span></sc-if>
+                  <sc-if value="{{ d.hasPdfThumb }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;inset:0;background-color:transparent;background-image:{{ d.pdfThumb }};background-size:cover;background-position:top center;background-repeat:no-repeat"></span></sc-if>
                   <span class="hd-drive-badge" style="background:{{ d.dvColor }}">{{ d.dvGlyph }}</span>
                 </button>
                 <label class="hd-drive-check {{ d.checkCls }}"><input type="checkbox" checked="{{ d.selected }}" onChange="{{ d.onToggleSel }}" title="Select"></input></label>
@@ -4200,6 +4210,73 @@ const short = (t, n) => { t = clean(t); return t.length > n ? t.slice(0, n - 1) 
 // doc's own address so a doc stored before pdfSrc existed still renders its PDF.
 function epavTokenOf(d) { const m = /\/(?:Document|Open)\/([A-Za-z0-9]+)/.exec((d && d.url) || ''); if (m) return m[1]; const id = String((d && d.id) || ''); return id.startsWith('nash-') ? id.slice(5) : null; }
 function withPdfSrc(d) { if (d && !d.pdfSrc) { const t = epavTokenOf(d); if (t) return { ...d, pdfSrc: '/epav/' + t + '.pdf' }; } return d; }
+// ---- emergent recurring fields ----------------------------------------------
+// Nothing is declared in advance. A "field" is a label that recurs across sources
+// with a value beside it: a structured key a source carries (contractNo, vendor,
+// expires) or a "Label: value" / "Label No. value" run in its own text. A label is
+// a field because it recurs in two or more sources; its TYPE (id / date / amount /
+// number / text) is read off its own values, by plurality. Spellings of one label
+// ("Contract Number", "Contract No.", "Contract #", contractNo) share one key, so
+// they land in one column. The catalogue is a pure function of the sources.
+const FIELD_META_SKIP = new Set(['id', 'title', 'type', 'format', 'url', 'pages', 'text', 'note', 'pdfSrc', 'html', 'kind', 'medium', 'published', 'pubLabel', 'year', 'custody', 'custodyStatus', 'faithful', 'binPath', 'media', 'pdf', 'figures', 'needsRead', 'addedAt', 'hasImg', 'ocr', 'eyes', 'eyesDetail', 'ignored', 'transcribed', 'standing', 'publisher', 'measured', 'screen', 'group', 'hasHtml', 'ocrModel', 'imgSrc', 'lang']);
+const FIELD_TEXT_RE = /(?:^|[\n.;|])\s*([A-Z][A-Za-z]+(?:[ \/-][A-Za-z&]+){0,3})\s*(?:(?:No\.?|Number|Num\.?|#|ID)\s*[:#]?|:)\s*([A-Z0-9$][^\n;|]{0,48})/g;
+function fieldKey(label) { const s = String(label).replace(/([a-z])([A-Z])/g, '$1 $2').toLowerCase().replace(/[^a-z0-9 ]+/g, ' ').replace(/\s+/g, ' ').trim(); return s.replace(/\s+(no|num|number|id|ref|reference)$/, '') || s; }
+function fieldLabel(key) { return key.charAt(0).toUpperCase() + key.slice(1); }
+function fieldDateIso(v) {
+  const s = String(v).trim(); let m;
+  if ((m = /^(\d{1,2})\/(\d{1,2})\/(\d{2,4})(?:\s|$)/.exec(s))) { const y = m[3].length === 2 ? (+m[3] > 40 ? '19' : '20') + m[3] : m[3]; return y + '-' + m[1].padStart(2, '0') + '-' + m[2].padStart(2, '0'); }
+  if ((m = /^(\d{4})-(\d{2})-(\d{2})/.exec(s))) return m[1] + '-' + m[2] + '-' + m[3];
+  if (/^[A-Z][a-z]+\.? \d{1,2},? \d{4}$/.test(s)) { const t = Date.parse(s); if (!isNaN(t)) return new Date(t).toISOString().slice(0, 10); }
+  return '';
+}
+function fieldTypeOf(vals) {
+  const votes = { date: 0, amount: 0, number: 0, id: 0, text: 0 };
+  for (const v0 of vals) {
+    const v = String(v0).trim();
+    if (fieldDateIso(v)) votes.date++;
+    else if (/^\$\s?[\d,]+(\.\d+)?$/.test(v)) votes.amount++;
+    else if (/^-?[\d,]+(\.\d+)?$/.test(v)) votes.number++;
+    else if (v.length <= 24 && !/\s/.test(v) && /\d/.test(v) && /^[A-Za-z0-9][A-Za-z0-9\-\/_.]*$/.test(v)) votes.id++;
+    else votes.text++;
+  }
+  const best = Object.entries(votes).sort((a, b) => b[1] - a[1]);
+  return best[0][1] > 0 && best[0][1] !== (best[1] || [0, 0])[1] ? best[0][0] : 'text';
+}
+function fieldSortKey(type, v) {
+  if (v == null || v === '') return null;
+  if (type === 'date') return fieldDateIso(v) || null;
+  if (type === 'amount' || type === 'number') { const n = parseFloat(String(v).replace(/[$,]/g, '')); return isNaN(n) ? null : n; }
+  return String(v).toLowerCase();
+}
+function fieldCatalog(docs) {
+  const per = new Map(), surf = new Map();
+  const put = (docId, label, value) => {
+    const v = String(value == null ? '' : value).replace(/\s+/g, ' ').trim(); if (!v || v.length > 120) return;
+    const key = fieldKey(label); if (!key || key.length > 40) return;
+    let o = per.get(docId); if (!o) per.set(docId, o = {});
+    if (o[key] == null) o[key] = v;
+    const sf = surf.get(key) || surf.set(key, new Map()).get(key); sf.set(label, (sf.get(label) || 0) + 1);
+  };
+  for (const d of docs) {
+    for (const k of Object.keys(d)) { if (FIELD_META_SKIP.has(k)) continue; const v = d[k]; if (typeof v === 'string' || typeof v === 'number') put(d.id, k, v); }
+    const t = String(d.text || '').slice(0, 60000); FIELD_TEXT_RE.lastIndex = 0; let m;
+    while ((m = FIELD_TEXT_RE.exec(t))) put(d.id, m[1], m[2].replace(/\s{2,}.*$/, ''));
+  }
+  const byKey = new Map();
+  for (const [docId, o] of per) for (const [k, v] of Object.entries(o)) { const e = byKey.get(k) || byKey.set(k, { key: k, vals: [], docs: 0 }).get(k); e.vals.push(v); e.docs++; }
+  const fields = [...byKey.values()].filter(e => e.docs >= 2).map(e => {
+    let type = fieldTypeOf(e.vals.slice(0, 300)); const distinct = new Set(e.vals).size;
+    // a plain-number field whose values are mostly each their own (more distinct values than repeats) is an identifier
+    if (type === 'number' && distinct * 2 > e.docs) type = 'id';
+    const sf = [...surf.get(e.key).entries()].sort((a, b) => b[1] - a[1])[0][0];
+    return { key: e.key, label: fieldLabel(e.key), type, n: e.docs, distinct, surface: sf };
+  }).sort((a, b) => b.n - a.n || a.key.localeCompare(b.key));
+  const keep = new Set(fields.map(f => f.key)), byDoc = new Map();
+  for (const [docId, o] of per) { const r = {}; for (const k of Object.keys(o)) if (keep.has(k)) r[k] = o[k]; byDoc.set(docId, r); }
+  // default columns: the best-covered field of each type — no cutoff constant, just the leader per kind
+  const dflt = []; for (const ty of ['id', 'date', 'amount']) { const f = fields.find(x => x.type === ty); if (f) dflt.push(f.key); }
+  return { fields, byDoc, dflt };
+}
 function loadAdded() {
   try { const a = JSON.parse(localStorage.getItem('fold-explorer-added') || 'null'); if (a) { const out = {}; for (const k in a) out[k] = Array.isArray(a[k]) ? a[k].map(withPdfSrc) : []; return out; } const c = JSON.parse(localStorage.getItem('fold-explorer-custom') || 'null'); return { custom: (c ? c.docs : []).map(withPdfSrc) }; } catch (e) { return {}; }
 }
@@ -8174,7 +8251,7 @@ class Component extends DCLogic {
       const badges = [...(d.medium ? [{ label: d.medium === 'Video' || d.medium === 'Audio' ? d.medium + (d.transcribed ? ' · machine transcript' : ' · not transcribed') : d.medium, color: MEDIUM_C[d.medium] || 'var(--mut)' }] : []), ...(d.standing ? [{ label: d.standing, color: STANDING_C[d.standing] || 'var(--mut)' }] : []), ...((d.recordings || []).map(r => ({ label: 'Video linked · not transcribed', color: 'var(--date)' }))), ...(d.sameAs ? [{ label: 'Same bytes as ' + short(d.sameAsTitle || '', 36), color: 'var(--amber)' }] : []), ...(d.custodyStatus && d.custodyStatus !== 'captured' ? [{ label: d.custody, color: /missing|failed|not-located|no-text/.test(d.custodyStatus) ? 'var(--bad)' : 'var(--amber)' }] : [])];
       const vid = !!(d.media && d.media.kind === 'youtube');
       const tr = this.traceFor(d.id);
-      return { ...c, op: 1, isVid: vid, noVid: !vid, thumbBg: vid ? 'url(https://i.ytimg.com/vi/' + d.media.id + '/hqdefault.jpg)' : 'none', readLabel: 'Open source', ...(vid ? { onSelect: () => this.read(d.id) } : {}), badges, hasBadges: badges.length > 0, hasDistinct: !!dd, distinct: dd ? dd.label + ' · ' + pct(dd.a) + ' of its statements vs ' + pct(dd.b) + ' elsewhere' : '', hasFold: this._fold.length > 0, fold: inF + ' of ' + all.length + ' statements touch the topic', stats: (narrowed ? ((FbyDoc[d.id] || []).length).toLocaleString() + ' of ' + plural(all.length, 'statement') + ' in this selection' : plural(all.length, 'statement')) + ' · ' + plural(nm.size, 'name'), isSeen: m.status === 'seen', isKept: m.status !== 'seen', hasReplay: !!tr, onReplay: () => tr && import(new URL('holodeck-ingest-player.js', location.href).href).then(M => M.open(tr)), canUnkeep: m.status !== 'seen' && !this.baseDocs(this.corpusId()).some(x => x.id === d.id), needsRead: !!d.needsRead, onProcess: () => this.processRead(d.id), canProcess: !!(d.type === 'Image' || d.type === 'PDF' || d.format === 'pdf' || d.pdf || d.hasImg), ...(() => { const ec = (d.type === 'Image' || d.type === 'PDF' || d.format === 'pdf' || d.pdf || d.hasImg) ? this.eyesCard(d) : null; return { hasEyes: !!ec, eyesRows: ec ? ec.rows : [], eyesNote: ec ? ec.note : '' }; })(), canTranscribe: !!((d.medium === 'Audio' || d.medium === 'Video' || d.type === 'Audio' || d.type === 'Video' || (d.media && (d.media.kind === 'local' || d.media.kind === 'youtube'))) && !d.transcribed), onTranscribe: () => this.transcribeCard(d), cardStyle: 'border-color:' + (c.bd || 'var(--line)') + ';opacity:' + ((S.solo && S.solo.length && !S.solo.includes(d.id)) ? '0.28' : '1') + ';transition:opacity .25s ease', soloOn: !!(S.solo && S.solo.includes(d.id)), soloLabel: (S.solo && S.solo.includes(d.id)) ? 'Showing only this source' : 'Only this source', onSolo: () => this.setState(s => { const cur = Array.isArray(s.solo) ? s.solo : []; return { solo: cur.includes(d.id) ? cur.filter(x => x !== d.id) : [...cur, d.id] }; }),
+      return { ...c, op: 1, isVid: vid, noVid: !vid, ...(() => { const pt = (d.pdfSrc || d.format === 'pdf' || d.type === 'PDF') ? epavTokenOf(d) : null; return { hasPdfThumb: !!pt, pdfThumb: pt ? 'url(thumbs/' + pt + '.jpg)' : 'none' }; })(), thumbBg: vid ? 'url(https://i.ytimg.com/vi/' + d.media.id + '/hqdefault.jpg)' : 'none', readLabel: 'Open source', ...(vid ? { onSelect: () => this.read(d.id) } : {}), badges, hasBadges: badges.length > 0, hasDistinct: !!dd, distinct: dd ? dd.label + ' · ' + pct(dd.a) + ' of its statements vs ' + pct(dd.b) + ' elsewhere' : '', hasFold: this._fold.length > 0, fold: inF + ' of ' + all.length + ' statements touch the topic', stats: (narrowed ? ((FbyDoc[d.id] || []).length).toLocaleString() + ' of ' + plural(all.length, 'statement') + ' in this selection' : plural(all.length, 'statement')) + ' · ' + plural(nm.size, 'name'), isSeen: m.status === 'seen', isKept: m.status !== 'seen', hasReplay: !!tr, onReplay: () => tr && import(new URL('holodeck-ingest-player.js', location.href).href).then(M => M.open(tr)), canUnkeep: m.status !== 'seen' && !this.baseDocs(this.corpusId()).some(x => x.id === d.id), needsRead: !!d.needsRead, onProcess: () => this.processRead(d.id), canProcess: !!(d.type === 'Image' || d.type === 'PDF' || d.format === 'pdf' || d.pdf || d.hasImg), ...(() => { const ec = (d.type === 'Image' || d.type === 'PDF' || d.format === 'pdf' || d.pdf || d.hasImg) ? this.eyesCard(d) : null; return { hasEyes: !!ec, eyesRows: ec ? ec.rows : [], eyesNote: ec ? ec.note : '' }; })(), canTranscribe: !!((d.medium === 'Audio' || d.medium === 'Video' || d.type === 'Audio' || d.type === 'Video' || (d.media && (d.media.kind === 'local' || d.media.kind === 'youtube'))) && !d.transcribed), onTranscribe: () => this.transcribeCard(d), cardStyle: 'border-color:' + (c.bd || 'var(--line)') + ';opacity:' + ((S.solo && S.solo.length && !S.solo.includes(d.id)) ? '0.28' : '1') + ';transition:opacity .25s ease', soloOn: !!(S.solo && S.solo.includes(d.id)), soloLabel: (S.solo && S.solo.includes(d.id)) ? 'Showing only this source' : 'Only this source', onSolo: () => this.setState(s => { const cur = Array.isArray(s.solo) ? s.solo : []; return { solo: cur.includes(d.id) ? cur.filter(x => x !== d.id) : [...cur, d.id] }; }),
         ...(() => { const on = this._inf[d.id] || null;
           return { originText: on ? on.why + ' ' + short(A.docById[on.of].title, 40) : 'Independent · shares no claims or outlet with another source', originDep: !!on, originCol: on ? 'var(--amber)' : 'var(--mut)' }; })(),
         drawsX: 0, drawOptions: drawOpts,
@@ -8225,11 +8302,20 @@ class Component extends DCLogic {
     const svTab = tabs.some(t => t.id === S.svTab) ? S.svTab : '__all';
     const tCols = [['title', 'Source'], ['kind', 'Kind'], ['medium', 'Medium'], ['date', 'Date'], ['publisher', 'Publisher'], ['standing', 'Standing'], ['sts', 'Statements'], ['names', 'Names'], ['custody', 'Custody']];
     const svSort = S.svSort || 'date', svDir = S.svDir || -1;
+    // emergent recurring fields (contract id, expiry, vendor…): catalogued from the sources themselves, chosen as columns
+    const FC = this._fc && this._fc.A === A ? this._fc : (this._fc = { A, ...fieldCatalog(A.docs) });
+    let fcSel = Array.isArray(S.svFields) ? S.svFields : null;
+    if (!fcSel) { try { const j = JSON.parse(localStorage.getItem('holodeck-sv-fields') || 'null'); if (Array.isArray(j)) fcSel = j; } catch (e) {} }
+    const fcBy = new Map(FC.fields.map(f => [f.key, f])); fcSel = (fcSel || FC.dflt).filter(k => fcBy.has(k));
     const rowOf = x => { const it = x.it; const d = A.docById[it.id] || docByTitle.get(it.title) || {}; const all = A.stsByDoc[d.id] || []; const nm = new Set(all.flatMap(s => s.names));
-      return { it, id: d.id, addedAt: this.addedAtOf(d), group: x.g, title: d.title || it.title, kind: d.kind || x.g, medium: d.medium || 'Text', date: d.pubLabel || (d.year ? String(d.year) : ''), iso: d.published || (d.year ? String(d.year) : ''), publisher: d.publisher || '', standing: d.standing || '', sts: all.length, names: nm.size, custody: d.custody || (it.isSeen ? 'seen, not kept' : ''),
+      const fvals = FC.byDoc.get(d.id) || {};
+      return { it, id: d.id, fvals, xcells: fcSel.map(k => ({ v: fvals[k] || '' })), addedAt: this.addedAtOf(d), group: x.g, title: d.title || it.title, kind: d.kind || x.g, medium: d.medium || 'Text', date: d.pubLabel || (d.year ? String(d.year) : ''), iso: d.published || (d.year ? String(d.year) : ''), publisher: d.publisher || '', standing: d.standing || '', sts: all.length, names: nm.size, custody: d.custody || (it.isSeen ? 'seen, not kept' : ''),
         hasVideo: !!(d.media && d.media.url), videoUrl: d.media && d.media.url ? d.media.url : '', mcol: MEDIUM_C[d.medium] || 'var(--mut)', ccol: /missing|failed|not-located|no-text/.test(d.custodyStatus || '') ? 'var(--bad)' : d.custodyStatus && d.custodyStatus !== 'captured' ? 'var(--amber)' : 'var(--mut)' }; };
     const sKey = { title: r => r.title.toLowerCase(), kind: r => r.kind, medium: r => r.medium, date: r => r.iso || '0', publisher: r => r.publisher.toLowerCase(), standing: r => r.standing, sts: r => r.sts, names: r => r.names, custody: r => r.custody };
-    const sortRows = L => L.sort((a, b) => { const ka = sKey[svSort](a), kb = sKey[svSort](b); return (ka < kb ? -1 : ka > kb ? 1 : 0) * svDir || a.title.localeCompare(b.title); });
+    const svFld = svSort.startsWith('f:') ? fcBy.get(svSort.slice(2)) : null;
+    const sK = svFld ? (r => fieldSortKey(svFld.type, r.fvals[svFld.key])) : (sKey[svSort] || sKey.date);
+    // sources with no value for the field always sort last, whichever way it runs
+    const sortRows = L => L.sort((a, b) => { const ka = sK(a), kb = sK(b); if (ka == null || kb == null) return ka == null && kb == null ? a.title.localeCompare(b.title) : ka == null ? 1 : -1; return (ka < kb ? -1 : ka > kb ? 1 : 0) * svDir || a.title.localeCompare(b.title); });
     const rowsAll = allSrcItems.map(rowOf); const mkRows = L => sortRows(L).map(r => ({ ...r, stsS: String(r.sts), namesS: String(r.names), onRead: r.it.onRead, onSelect: r.it.onSelect, onFocus: r.it.onFocus }));
     const tables = svGroup === 'one' ? [{ label: '', hasLabel: false, rows: mkRows(rowsAll.slice()) }]
       : svGroup === 'tabs' ? [{ label: '', hasLabel: false, rows: mkRows(rowsAll.filter(r => svTab === '__all' || FAM(r.group) === svTab)) }]
@@ -8239,14 +8325,17 @@ class Component extends DCLogic {
     const svVals = { ...meetVals, srcHiddenNote: this._srcHidden ? plural(this._srcHidden, 'other source') + ' with nothing in this selection ' + (this._srcHidden === 1 ? 'is' : 'are') + ' hidden' : '', svCards: svMode === 'cards', svTable: svMode === 'table', svTabsOn: svGroup === 'tabs',
       svModes: [['grid', 'Grid'], ['list', 'List'], ['table', 'Table']].map(([k, l]) => ({ label: l, ...seg(svMode === k || (k === 'grid' && svMode === 'cards')), onClick: () => this.setState({ svMode: k }) })),
       svTabs: tabs.map(t => ({ label: t.label, n: t.n, cls: t.id === svTab ? 'on' : '', bd: t.id === svTab ? 'var(--acc2)' : 'transparent', col: t.id === svTab ? 'var(--ink)' : 'var(--mut)', onClick: () => this.setState({ svTab: t.id }) })),
-      svCols: tCols.map(([k, l]) => ({ label: l + (svSort === k ? (svDir > 0 ? ' ↑' : ' ↓') : ''), onClick: () => this.setState({ svSort: k, svDir: svSort === k ? -svDir : (k === 'title' || k === 'publisher' ? 1 : -1) }) })),
+      svCols: [...tCols, ...fcSel.map(k => ['f:' + k, fcBy.get(k).label])].map(([k, l]) => ({ label: l + (svSort === k ? (svDir > 0 ? ' ↑' : ' ↓') : ''), onClick: () => this.setState({ svSort: k, svDir: svSort === k ? -svDir : (k === 'title' || k === 'publisher' || (k.startsWith('f:') && ['text', 'id'].includes(fcBy.get(k.slice(2)).type)) ? 1 : -1) }) })),
       svTables: tables, svCardGroups: svGroup === 'one' ? [{ label: 'All sources', n: String(allSrcItems.length), desc: '', items: allSrcItems.map(x => x.it), hasMore: false }] : svGroup === 'tabs' ? (svTab === '__all' ? srcGroups : svTab === 'Recordings' ? (() => { const vg = srcGroups.filter(g => /^(Video|Meeting recording)$/.test(g.label)); const items = vg.flatMap(g => g.items).map(it => ({ it, d: docByTitle.get(it.title) || {} })).sort((x, y) => (y.d.published || String(y.d.year || '')).localeCompare(x.d.published || String(x.d.year || ''))).map(x => x.it); return [...(items.length ? [{ label: 'Video', n: String(items.length), desc: 'Meetings and other recordings. Open one to watch it with its transcript beside it.', items, hasMore: false }] : []), ...srcGroups.filter(g => FAM(g.label) === 'Recordings' && !/^(Video|Meeting recording)$/.test(g.label))]; })() : srcGroups.filter(g => FAM(g.label) === svTab)) : srcGroups };
     // ---- the Drive-style files view: one flat list, typed icons, folders you can drop onto, a selection bar ----
     const dvQ = (S.dvQ || '').trim().toLowerCase(), dvSel = S.dvSel || {}, dvSortK = S.dvSort || 'added', dvFl = this.foldersFor(), dvCurF = S.folder;
-    const dvKey = { added: r => r.addedAt || 0, title: r => r.title.toLowerCase(), date: r => r.iso || '', sts: r => r.sts }[dvSortK] || (r => r.addedAt || 0);
-    const dvDir = dvSortK === 'title' ? 1 : -1;
+    // sort values: added | title | date | dateAsc | sts | f:<field> | f:<field>:asc
+    const dvAsc = /:asc$/.test(dvSortK) || dvSortK === 'dateAsc', dvBase = dvSortK.replace(/:asc$/, '').replace(/^dateAsc$/, 'date');
+    const dvFld = dvBase.startsWith('f:') ? fcBy.get(dvBase.slice(2)) : null;
+    const dvKey = dvFld ? (r => fieldSortKey(dvFld.type, (r.fvals || {})[dvFld.key])) : ({ added: r => r.addedAt || 0, title: r => r.title.toLowerCase(), date: r => r.iso || null, sts: r => r.sts }[dvBase] || (r => r.addedAt || 0));
+    const dvDir = dvAsc || dvBase === 'title' ? 1 : -1;
     const dvRows = rowsAll.filter(r => (svTab === '__all' || FAM(r.group) === svTab) && (!dvQ || r.title.toLowerCase().includes(dvQ)))
-      .sort((a, b) => { const x = dvKey(a), y = dvKey(b); return ((x < y ? -1 : x > y ? 1 : 0) * dvDir) || a.title.localeCompare(b.title); });
+      .sort((a, b) => { const x = dvKey(a), y = dvKey(b); if (x == null || y == null) return x == null && y == null ? a.title.localeCompare(b.title) : x == null ? 1 : -1; return ((x < y ? -1 : x > y ? 1 : 0) * dvDir) || a.title.localeCompare(b.title); });
     const dvAgo = ms => { if (!ms) return ''; const dd = new Date(ms), days = Math.floor((Date.now() - ms) / 864e5); return days < 1 ? 'Today' : days < 2 ? 'Yesterday' : days < 30 ? days + ' days ago' : dd.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: dd.getFullYear() === new Date().getFullYear() ? undefined : 'numeric' }); };
     const dvClose = fn => e => { try { const dt = e && e.target && e.target.closest ? e.target.closest('details') : null; if (dt) dt.open = false; } catch (x) {} fn(); };
     const dvOwn = new Set((S.added[this.corpusId()] || []).map(x => x.id));
@@ -8271,7 +8360,16 @@ class Component extends DCLogic {
         onOver: e => { try { e.preventDefault(); } catch (x) {} }, onDrop: e => { try { e.preventDefault(); String(e.dataTransfer.getData('text/plain')).split(',').filter(Boolean).forEach(id => this.setDocFolder(id, f.id)); } catch (x) {} } }))];
     const drv = { q: S.dvQ || '', onQ: e => this.setState({ dvQ: e.target.value }), onHome: () => this.setState({ folder: null, dvQ: '' }),
       inFolder: !!(dvCurF && dvFl.some(f => f.id === dvCurF)), folderName: (dvFl.find(f => f.id === dvCurF) || {}).name || '',
-      sort: dvSortK, sorts: [['added', 'Recently added'], ['title', 'Name'], ['date', 'Date of source'], ['sts', 'Most statements']].map(([v, l]) => ({ v, l })), onSort: e => this.setState({ dvSort: e.target.value }),
+      sort: dvSortK,
+      sorts: [['added', 'Recently added'], ['title', 'Name'], ['date', 'Date of source — newest'], ['dateAsc', 'Date of source — oldest'], ['sts', 'Most statements'],
+        ...fcSel.map(k => fcBy.get(k)).flatMap(f => f.type === 'date' ? [['f:' + f.key, f.label + ' — latest'], ['f:' + f.key + ':asc', f.label + ' — earliest']]
+          : f.type === 'amount' || f.type === 'number' ? [['f:' + f.key, f.label + ' — highest'], ['f:' + f.key + ':asc', f.label + ' — lowest']]
+          : [['f:' + f.key + ':asc', f.label + ' A–Z'], ['f:' + f.key, f.label + ' Z–A']])].map(([v, l]) => ({ v, l })),
+      onSort: e => { const v = e.target.value, base = v.replace(/:asc$/, '').replace(/^dateAsc$/, 'date'), asc = /:asc$/.test(v) || v === 'dateAsc' || v === 'title'; this.setState({ dvSort: v, ...(v === 'added' ? {} : { svSort: base, svDir: asc ? 1 : -1 }) }); },
+      // the recurring-field picker: every label that recurs across sources, with its read type and how many sources carry it
+      fieldsOn: String(fcSel.length), hasFieldPick: FC.fields.length > 0,
+      fieldPick: FC.fields.map(f => ({ label: f.label, tag: f.type, cover: f.n + ' of ' + A.docs.length, on: fcSel.includes(f.key), tip: 'Written ' + f.surface + ' · ' + f.distinct + ' distinct values',
+        onToggle: () => { const cur = fcSel.includes(f.key) ? fcSel.filter(k => k !== f.key) : [...fcSel, f.key]; try { localStorage.setItem('holodeck-sv-fields', JSON.stringify(cur)); } catch (e) {} this.setState({ svFields: cur }); } })),
       hasFolders: dvFl.length > 0, folders: dvFolderTiles, tiles: dvTiles, empty: dvTiles.length === 0,
       emptyText: dvQ ? 'No source matches “' + (S.dvQ || '').trim() + '”.' : dvCurF ? 'This folder is empty — drag sources onto it from “All sources”.' : 'Nothing here yet. Add a source to start.',
       hasSel: dvSelIds.length > 0, selLabel: plural(dvSelIds.length, 'source') + ' selected', onClearSel: () => this.setState({ dvSel: {}, dvBulkAsk: false }),
