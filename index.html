@@ -2850,7 +2850,7 @@ button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visi
           <section style="background:var(--s1);border:1px solid var(--line);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:10px">
             <span style="font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mut)">Account &amp; sync</span>
             <button onClick="{{ ing.onShareRepo }}" style="align-self:flex-start;background:var(--acc2);border:0;color:#fff;border-radius:8px;padding:7px 16px;cursor:pointer;font:600 14px var(--sans)">Invite people…</button>
-            <span style="font:400 13px/1.45 var(--sans);color:var(--mut);text-wrap:pretty">Invite people to read or edit this workspace through encrypted Matrix rooms. The server cannot read the content; it can see who is a member and when.</span>
+            <span style="font:400 13px/1.45 var(--sans);color:var(--mut);text-wrap:pretty">Invite people to read or edit this workspace. Their names, your private work and who is viewing what are sealed on your device with a key the server never has. The server can still see who is a member, when they were active, and room names.</span>
             <sc-if value="{{ ing.notSignedIn }}" hint-placeholder-val="{{ true }}">
               <span style="font:400 14px/1.5 var(--sans);color:var(--mut)">Your work stays in this browser until you sign in. Sign in with your own Matrix account to sync it and share it.</span>
               <div style="display:flex;gap:8px;flex-wrap:wrap">
@@ -5836,6 +5836,17 @@ class Component extends DCLogic {
     import(new URL('holodeck-people-panel.js', location.href).href).then(M => M.openPeoplePanel({ ...this.shareCtx(null), inviteRaw: emailInvite ? code : null })).catch(e => this.ilog('The people panel could not open: ' + ((e && e.message) || e), 'bad'));
   }
   async netInit() { if (this._netInit) return; this._netInit = true; const N = await this.net();
+    if (/#vault=v1\./.test(location.hash)) {                       // the owner's other device: the workspace key, in the fragment, never sent anywhere
+      try {
+        const m = location.hash.match(/vault=(v1\.[A-Za-z0-9_-]+)/), s0 = (this._net && this._net.s) || N.loadSession();
+        if (!s0 || s0.guest) this.toast('Sign in as the workspace owner, then open this device link again.');
+        else if (m) {
+          history.replaceState(null, '', location.pathname + location.search);
+          import(new URL('holodeck-vault.js', location.href).href).then(async V => { const r = await V.deviceKeyring(s0.user).importRing(m[1]); if (r.scope && !this.wsRooms().priv) this.setWsRooms({ priv: r.scope }); this.toast('This device can now read the workspace’s private work.'); this.refreshRoom && this.refreshRoom().catch(() => {}); })
+            .catch(e => this.ilog('The device link could not be used: ' + (e.why || e.message), 'bad'));
+        }
+      } catch (e) {}
+    }
     if (/#join=/.test(location.hash)) { const raw = location.hash; const email = /join=[a-z0-9]{16}(&|$)/i.test(raw); const c = (raw.match(/join=([a-z0-9]{5})(&|$)/i) || [])[1]; history.replaceState(null, '', location.pathname + location.search); this.openShareRepo(email ? raw : c); }
     else { try { import(new URL('holodeck-people-panel.js', location.href).href).then(M => { const s = (this._net && this._net.s) || N.loadSession(); if (s && !s.guest && this.wsRooms().priv) M.resumePresence(this.shareCtx(null)); }).catch(() => {}); } catch (e) {} }
     if (/fx-share=/.test(location.hash)) { try { const r = await N.consumeShare(); if (r) { this.setWsRooms({ priv: r.rooms[0] || null, pub: r.rooms[1] || this.wsRooms().pub || null }); this._net = { ...(this._net || {}), s: r.pending || r.s, shareTemp: r.pending ? r.s : null }; this.toast('Opened a workspace shared by ' + (r.from || 'someone')); if (!r.pending) { try { const d = await N.loadPrivate(r.s, r.rooms[0], 'work'); if (d && d.pins) this.savePins(d.pins); } catch (e) {} } } } catch (e) { this.ilog('Shared link could not be opened: ' + e.message, 'bad'); } }
@@ -5956,7 +5967,7 @@ class Component extends DCLogic {
     if (r.ok) this._hdCode = ''; this.forceUpdate(); return r;
   }); }
   async heimdallCopy() { try { await navigator.clipboard.writeText(this._hd && this._hd.link); this.ilog('Invite link copied: ' + (this._hd && this._hd.link)); } catch (e) { this.ilog('Could not copy: ' + e.message, 'bad'); } }
-  syncPrivate(now) { const s = this._net && this._net.s; const room = this.wsRooms().priv; if (!s || s.guest || !room) return; clearTimeout(this._privT); this._privT = setTimeout(async () => { try { const N = await this.net(); await N.savePrivate(s, room, 'work', { pins: this.rawPins(), filters: this.state.f || {}, forWhoms: this.state.fw || {}, meta: (this.metaAll() || {})[this.corpusId()] || {}, readLog: this.readLog() }); this._net.privAt = new Date().toLocaleTimeString(); this.forceUpdate(); } catch (e) {} }, now ? 0 : 2500); }
+  syncPrivate(now) { const s = this._net && this._net.s; const room = this.wsRooms().priv; if (!s || s.guest || !room) return; clearTimeout(this._privT); this._privT = setTimeout(async () => { try { const N = await this.net(); await N.savePrivate(s, room, 'work', { pins: this.rawPins(), filters: this.state.f || {}, forWhoms: this.state.fw || {}, meta: (this.metaAll() || {})[this.corpusId()] || {}, readLog: this.readLog() }); this._net.privAt = new Date().toLocaleTimeString(); this.forceUpdate(); } catch (e) { if (e && e.vault && !this._vaultSaid) { this._vaultSaid = true; this.ilog(e.why || e.message, 'bad'); } } }, now ? 0 : 2500); }
   async loadPrivateWork() { return this.netDo('Load private work', async N => { const d = await N.loadPrivate(this._net.s, this.wsRooms().priv, 'work'); if (!d) throw new Error('nothing saved yet'); if (d.pins) this.savePins(d.pins); if (d.filters) this.setState({ f: d.filters }); if (d.forWhoms) this.setState({ fw: d.forWhoms }); this.ilog('Loaded your pins, drafts and filters from the private room.'); }); }
   knownIds(A) { const s = new Set(); A.docs.forEach(d => { if (d.media && d.media.id) s.add(d.media.id); if (d.url) s.add(d.url.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '')); }); return s; }
   async findNew() { return this.netDo('Search', async N => { const cfg = this.netCfg(); const W = (this._net && this._net.cfg && this._net.cfg.watches) || []; if (!W.length) throw new Error('add a watch first (saved in the public room)'); const A = this.analysis(); const known = this.knownIds(A); const out = [];

@@ -346,3 +346,99 @@ exercises the real gate passes unchanged apart from passing `rooms` to `sweep`/`
 table above is the first design's; I1–I7 now describe the second, and the claim "nothing secret is stored on the
 owner's side" is checked directly (the owner's store holds no key once the person is in; the server holds the public
 key and not the link's private key).
+
+---
+
+# Part III — sealing: private content leaves the device encrypted, and the key never goes to the server
+
+Written 2026-10-13, after the owner asked that all subsequent Holodeck content be encrypted and chose "key in the
+invite link" over Matrix-native Megolm. **Order of events, stated plainly:** the module (`holodeck-vault.js`) and its
+unit tests were drafted together, and the predictions below were fixed against that draft before the integrated tests
+(`holodeck-vault-store.test.mjs`, the updated `holodeck-invites.test.mjs` and `holodeck-rest-matrix.test.mjs`) were
+run or the existing ones changed. They are not pre-registered in the strong sense Parts I–II are: the unit tier saw the
+code first. The integrated tier and the browser run did not.
+
+## What each party can read after this
+
+| | can read | cannot read |
+|---|---|---|
+| a member holding the key | names, the registry, private work, who is viewing what | — |
+| the homeserver / its operator | membership, room names, event types and state keys, timing, value *size* to a bucket, the door aliases | names, titles, pins, drafts, the registry, any key |
+| a device with no key | membership and room names (what any member's client shows) | everything sealed — and it writes none of it |
+| a removed member | everything they held a key for before removal | anything sealed under a key issued after |
+
+## Falsifiers
+
+* **V1** — a sealed value contains no word of its plaintext, in the event or the raw ciphertext; a probe is shown to see
+  the plaintext when it is there (control).
+* **V2** — a sealed value moved to another room, event type, state key or sender does not open; any changed bit of the
+  ciphertext, nonce, key id or compression flag is refused; a device without the key is told it is *locked*, never given
+  a guess.
+* **V3** — values of different small sizes seal to the same length (control: a value in the next bucket does not).
+* **V4** — a large compressible value fits under Matrix's 64 KiB event (control: unsealed it does not); a value that
+  inflates past the limit is refused.
+* **V5** — the first key is made once and kept; a key the browser cannot keep is never used to seal; a device link
+  carries the keyring, scoped to its workspace, and a damaged or foreign one is refused; the keyring is per account.
+* **V6** — a rotation reaches a member holding the old key, through several rotations and out of order; one from an
+  untrusted sender, with a forged key id or sealed for another room, is ignored (control: the real one is taken).
+* **V7** — both ends derive the same grant key from the link's seed and alias; another seed or alias cannot open it.
+* **V8** — private work is sent and stored sealed (every request body the server received, and everything it stores),
+  and reads back exactly; an older unsealed snapshot is read until a key exists and the next save seals it.
+* **V9** — a device without the key is locked and does not start a key beside the first device's; only the owner starts
+  a key; a member with the key from her grant reads what the owner saved.
+* **V10** — with a key held, a plaintext snapshot is refused (a forged one cannot be slipped in); sealed content moved
+  to another key does not open; a rotation is believed from the owner and not from a member, even with a higher epoch.
+* **S1 (invites)** — through the REST stack with the real gate: no request body the server received and nothing it
+  stores contains the typed name, the page title, the workspace key or the link's seed.
+
+## Not established in advance
+
+A real Synapse (all runs are against the in-test HTTP double); the page driven end to end by a person rather than the
+demo harness; two browsers on two machines; the 64 KiB limit with a *real* user's read log (a synthetic one near the
+cap was used); clock and `localStorage` quota behaviour in private windows (the keyring refuses to seal when it cannot
+keep the key, tested with stores that refuse or forget).
+
+## Part III results (run 2026-10-13)
+
+Unit tier, `holodeck-vault.test.mjs`: **15 of 15** pass. First run **13 of 14**: V3's *control* was wrong, not the module
+(300 repeated characters compress to nothing and land in the same bucket); the control now uses incompressible bytes.
+`holodeck-vault-store.test.mjs`: **6 of 6** (first run 5 of 6 — the failing test assumed a plain member can write the
+private snapshot; in the `private_chat` preset only moderators can set state, which is the room's own rule and was true
+before sealing; the test now asserts what a member can do: read). `holodeck-invites.test.mjs` 13 and
+`holodeck-rest-matrix.test.mjs` 5 pass after being changed, below. Whole set (`holodeck-vault`, `-vault-store`,
+`-invite-core`, `-invites`, `-rest-matrix`, `-qr`, `gate`): **58 of 58**. `index.html`'s two inline scripts parse. The
+demo (real panels, real gate, in-test homeserver) was driven in the browser pane: the server held `{v, vault, kid, z, iv,
+ct}` for the registry and two presence beats and no occurrence of the typed name, the page title or id, the workspace key
+or the link's seed; the invitee received the key in the grant and read her name; the owner's second device showed the
+locked notice with the invite box hidden.
+
+### Defects found by running it (that the design alone did not show)
+
+1. **The keyring was per workspace, not per account.** A second account on the same browser would have inherited the
+   key. The existing test of the invitation copy ("per account") caught the shape of this. The key is now stored under
+   the account as well, and a unit test pins it.
+2. **Rotating before sending the rotation event** could strand a device on a key nobody else has. Rotation is now
+   planned, the event is sent, and only then is the key adopted locally.
+3. **Two devices could each start a key.** A device with no key now looks at every sealed slot (`SEALED_SLOTS`: the
+   registry, the names, the private snapshot) before it starts one, and only the workspace's creator may.
+4. **Existing tests encoded the old assumption** (reading the registry and beats in the clear, a second device with an
+   empty store admitting someone). They were changed to assert the new truth, and the second-device test now shows
+   *locked*, then *ready after the device link*. This is a deliberate loss of a property the owner liked ("not tied to
+   one device") and is documented under "Sealed on your device".
+
+### Changed behaviour the owner should know
+
+* An owner's **second browser is locked** until they open the device link from the first. Clearing site data on the only
+  device that holds the key **loses the sealed content**: there is no server copy of the key, by design.
+* Invitations made **before** this change cannot carry the key; the panel says to cancel and re-make them.
+* Guests who joined a workspace by the older disposable-account path hold no key and cannot save private work until the
+  owner invites them again.
+* The workspace's own `social.hyphae.fold.private` history on the server still holds anything written before sealing.
+
+### Not established
+
+Everything under "Not established in advance", and: that no *other* part of the page writes private content to Matrix in
+the clear (the audited writers are the private snapshot, the invitation registry, the names and presence; the public
+room and its blocks are public by design; attachments for private rooms were not audited); that a user who loses the
+only key-holding device has a recovery path (there is none).
+

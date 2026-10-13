@@ -10,12 +10,14 @@ import assert from 'node:assert/strict';
 import { createFakeServer } from './holodeck-fake-matrix.js';
 import { makeInvites, EVT, STATE, REFUSE, workspaceInviteLink, parseWorkspaceInvite } from './holodeck-invites.js';
 import { newInviteKey, signInvite, verifyInvite, newDoorAlias, ONLINE_MS } from './holodeck-invite-core.js';
+import { makeKeyring, isSealed, EPOCH_EVENT } from './holodeck-vault.js';
 
 const HS = 'test.local';
 const BASE = 'https://example.test/holodeck/';
 const U = { owner: '@owner:' + HS, ana: '@ana:' + HS, bob: '@bob:' + HS, cy: '@cy:' + HS, eve: '@eve:' + HS };
 const CANARY = 'Ana-Q7-the-accountant-canary';
 const LINKS = (u) => 'hd:invite-links:v1:' + u;
+const ringOf = (w, who) => makeKeyring(w.mkStore(who), { account: U[who] });   // a participant's own device keyring
 
 function world({ enrolled = new Set(Object.values(U)), gate = 'on' } = {}) {
   let tick = 1_700_000_000_000;
@@ -68,12 +70,13 @@ test('a name in, a link out; an enrolled account opens it; the owner’s device 
   const acc = await w.I.ana.open({ input: inv.link });
   assert.equal(acc.owner, U.owner);
   assert.equal(await memberOf(w, rooms.priv, 'ana'), undefined, 'opening is not being let in');
-  await assert.rejects(() => w.I.ana.claim({ door: acc.door }), (e) => e.code === REFUSE.NoGrantYet);
+  await assert.rejects(() => w.I.ana.claim({ door: acc.door, input: inv.link }), (e) => e.code === REFUSE.NoGrantYet);
   assert.equal((await w.I.owner.sweep({ rooms }))[0].state, 'admitted');
   assert.deepEqual(w.asked, [U.ana], 'the gate was asked about exactly that account');
   assert.equal(await memberOf(w, rooms.priv, 'ana'), 'invite');
-  const got = await w.I.ana.claim({ door: acc.door });
+  const got = await w.I.ana.claim({ door: acc.door, input: inv.link });
   assert.deepEqual(got.rooms, rooms);
+  assert.equal(got.vault, 'ready', 'the workspace key arrived inside the grant');
   assert.equal(await memberOf(w, rooms.priv, 'ana'), 'join');
   assert.equal(await memberOf(w, rooms.pub, 'ana'), 'join');
   await w.mxs.ana.sendEvent(rooms.priv, 'io.holodeck.note', { text: 'hello' });
@@ -84,20 +87,31 @@ test('a name in, a link out; an enrolled account opens it; the owner’s device 
   await assert.rejects(() => w.I.bob.open({ input: inv.link }), (e) => e.code === REFUSE.InviteNotFound, 'the link is dead once used');
 });
 
-test('any browser signed in as the owner can let people in: a second device with an EMPTY store admits the person, because nothing secret was ever stored', async () => {
+test('a second device of the owner starts LOCKED — it can read and write nothing sealed and admits nobody — until it is given the device key; then it admits the person', async () => {
   const w = world();
   const rooms = await workspace(w);
   const inv = await make(w, rooms, 'Ana');
   const acc = await w.I.ana.open({ input: inv.link });
-  const elsewhere = makeInvites({ mx: w.mxs.owner, gate: w.gateObj, store: { get: async () => null, set: async () => {} }, now: w.now });   // another browser, same account, nothing stored
+  const elsewhere = makeInvites({ mx: w.mxs.owner, gate: w.gateObj, store: w.mkStore('owner-2nd-device'), now: w.now });   // another browser, same account, no key
+  assert.equal((await elsewhere.status({ rooms })).vault, 'locked');
+  assert.deepEqual(await elsewhere.outstanding({ rooms }), [], 'a locked device sees no names');
+  assert.deepEqual(await elsewhere.sweep({ rooms }), [], 'and admits nobody');
+  assert.equal(await memberOf(w, rooms.priv, 'ana'), undefined);
+  await assert.rejects(() => elsewhere.invite({ name: 'New', rooms, base: BASE }), (e) => e.code === 'vault-locked', 'it does not start a key of its own beside the first device’s');
+  await assert.rejects(() => elsewhere.setName({ rooms, user: U.owner, name: 'x' }), (e) => e.code === 'vault-locked');
+  const before = w.server.storedJSON();
+  assert.equal(before.includes('"vault-locked"'), false);
+  // control: the same device, given the key from the first device, does all of it
+  const text = await w.I.owner.deviceKey({ rooms });
+  assert.deepEqual(await elsewhere.useDeviceKey({ text, rooms }), { scope: rooms.priv, added: 1 });
+  assert.equal((await elsewhere.status({ rooms })).vault, 'ready');
   assert.equal((await elsewhere.outstanding({ rooms }))[0].name, 'Ana', 'it can see who is pending');
   assert.equal((await elsewhere.sweep({ rooms }))[0].state, 'admitted');
   assert.equal(await memberOf(w, rooms.priv, 'ana'), 'invite');
-  await w.I.ana.claim({ door: acc.door });
-  // the device that made the invitation still has its convenience copy of the link, but it is no longer listed: pending
-  // invitations are room state, so what the first device shows follows what the second one did
+  await w.I.ana.claim({ door: acc.door, input: inv.link });
   assert.deepEqual(await w.I.owner.outstanding({ rooms }), []);
   assert.deepEqual(await w.I.owner.sweep({ rooms }), []);
+  await assert.rejects(() => elsewhere.useDeviceKey({ text, rooms: { priv: '!another:test.local' } }), (e) => e.code === 'vault-bad-ring', 'a key for another workspace is refused');
 });
 
 test('I1 — an invitation is not a credential: the owner holds no password or authenticator, and the server holds the PUBLIC key only', async () => {
@@ -105,12 +119,15 @@ test('I1 — an invitation is not a credential: the owner holds no password or a
   const rooms = await workspace(w);
   const inv = await make(w, rooms, CANARY);
   const seed = parseWorkspaceInvite(inv.link).secret;
-  const reg = await w.mxs.owner.getState(rooms.priv, STATE.invites, '');
+  const ownerRing = ringOf(w, 'owner');
+  const onWire = await w.mxs.owner.getState(rooms.priv, STATE.invites, '');
+  assert.ok(isSealed(onWire) && onWire.invites === undefined, 'the registry on the server is sealed');
+  const reg = await ownerRing.openFor(rooms.priv, onWire, { type: STATE.invites, key: '' });
   const pubKey = reg.invites[inv.door].pub;
   assert.notEqual(pubKey, seed, 'room state carries the public half, not the link’s key');
   const acc = await w.I.ana.open({ input: inv.link });
   await w.I.owner.sweep({ rooms });
-  await w.I.ana.claim({ door: acc.door });
+  await w.I.ana.claim({ door: acc.door, input: inv.link });
   await w.I.ana.announce({ rooms, viewing: 'doc:1', title: 'Lease.pdf' });
   const ownerKeep = JSON.stringify([...w.stores.owner.entries()]);
   for (const bad of ['password', 'totp', 'otpauth', 'authenticator']) assert.ok(!ownerKeep.toLowerCase().includes(bad), 'the owner’s store holds no ' + bad);
@@ -118,10 +135,18 @@ test('I1 — an invitation is not a credential: the owner holds no password or a
   const dump = w.server.storedJSON();
   assert.equal(dump.split(seed).length - 1, 0, 'the server never held the link’s private key');
   assert.ok(!/password|otpauth|totp/i.test(dump.replace(/Fold · Case/g, '')), 'no password or authenticator material anywhere on the server');
-  assert.ok(dump.split(CANARY).length - 1 >= 1, 'the name IS in room state — the scan is not blind');
-  // control: a build that kept the link's private key in room state is caught by the same scan
-  await w.mxs.owner.setState(rooms.priv, 'io.holodeck.leak', '', { k: seed });
-  assert.ok(w.server.storedJSON().includes(seed), 'control: the scanner sees a secret when one is there');
+  // what the server must NOT hold: the name, the title being viewed, the link's key, the grant key, the workspace key
+  const wsKey = (await ownerRing.current(rooms.priv)).key;
+  const grantKey = reg.invites[inv.door].grant;
+  for (const [what, needle] of [['the name typed at invite time', CANARY], ['the title being viewed', 'Lease.pdf'], ['the link key', seed], ['the grant key', grantKey], ['the workspace key', wsKey]]) {
+    assert.equal(dump.split(needle).length - 1, 0, 'the server never held ' + what);
+  }
+  assert.ok(dump.includes(U.ana) && dump.includes('io.holodeck.people'), 'it does hold who is a member and the type of the state — the scan is not blind');
+  // control: a build that kept any of them in the clear is caught by the same scan
+  for (const needle of [CANARY, 'Lease.pdf', seed, grantKey, wsKey]) {
+    await w.mxs.owner.setState(rooms.priv, 'io.holodeck.leak', '', { leaked: needle });
+    assert.ok(w.server.storedJSON().includes(needle), 'control: the scanner sees ' + needle.slice(0, 8) + '… when it is there');
+  }
 });
 
 test('I2 — admission needs an enrolled account: the gate says no and nobody is admitted and the invitation stays open; a gate that cannot be reached admits nobody; with no gate configured it is the owner’s stated choice', async () => {
@@ -161,7 +186,7 @@ test('I3 — a signature cannot be replayed for another account or in another in
   const rooms = await workspace(w);
   const a = await make(w, rooms, 'A'), b = await make(w, rooms, 'B');
   const seedA = parseWorkspaceInvite(a.link).secret;
-  const reg = await w.mxs.owner.getState(rooms.priv, STATE.invites, '');
+  const reg = await ringOf(w, 'owner').openFor(rooms.priv, await w.mxs.owner.getState(rooms.priv, STATE.invites, ''), { type: STATE.invites, key: '' });
   const good = await signInvite(seedA, { door: a.door, user: U.ana });
   await w.mxs.eve.join(a.door);
   await w.mxs.eve.sendEvent(a.door, EVT.request, { v: 1, sig: good });             // (1) another account, same door
@@ -226,7 +251,7 @@ async function join(w, rooms, who, name) {
   const inv = await make(w, rooms, name);
   const acc = await w.I[who].open({ input: inv.link });
   await w.I.owner.sweep({ rooms });
-  await w.I[who].claim({ door: acc.door });
+  await w.I[who].claim({ door: acc.door, input: inv.link });
 }
 
 test('I6 — who is here, under the names the owner gave: from room state by authenticated sender, never from the heartbeat; removed, stale and spoofed are not shown', async () => {
@@ -247,19 +272,25 @@ test('I6 — who is here, under the names the owner gave: from room state by aut
   await w.I.owner.setName({ rooms, user: U.owner, name: 'Michael (owner)' });
   assert.ok((await w.I.bob.presence({ rooms })).some((p) => p.name === 'Michael (owner)'));
 
-  await w.mxs.bob.sendEvent(rooms.priv, EVT.presence, { v: 1, viewing: 'doc:secret', title: 'x', name: 'Michael (owner)', user: U.owner });
+  await w.mxs.bob.sendEvent(rooms.priv, EVT.presence, { v: 1, viewing: 'doc:secret', title: 'x', name: 'Michael (owner)', user: U.owner });    // plaintext, as a stranger or a build without the vault would send
+  // and one SEALED by bob, copied by bob into an event as if it were the owner's: it does not open for that sender
+  const bobRing = ringOf(w, 'bob');
+  await w.mxs.bob.sendEvent(rooms.priv, EVT.presence, await bobRing.sealFor(rooms.priv, { v: 1, viewing: 'doc:forged', title: 'forged' }, { type: EVT.presence, key: '', sender: U.owner }));
   const afterSpoof = await w.I.owner.presence({ rooms });
+  assert.ok(!afterSpoof.some((p) => p.viewing === 'doc:secret' || p.viewing === 'doc:forged'), 'neither the plaintext nor the mis-attributed beat is shown');
   assert.equal(afterSpoof.find((p) => p.user === U.bob).name, 'Bob from the bank');
   assert.equal(afterSpoof.filter((p) => p.name === 'Michael (owner)').length, 1);
   const naive = (evs) => evs.filter((e) => e.type === EVT.presence).map((e) => ({ user: e.sender, name: e.content.name || e.sender }));
   assert.ok(naive(await w.mxs.owner.readEvents(rooms.priv)).some((p) => p.user === U.bob && p.name === 'Michael (owner)'), 'control: the naive reading attributes Bob’s heartbeat to the owner');
+  assert.ok((await w.mxs.owner.readEvents(rooms.priv)).filter((e) => e.type === EVT.presence && e.sender !== U.bob).every((e) => isSealed(e.content)), 'every honest beat is sealed on the wire');
 
   w.advance(ONLINE_MS + 10_000);
   assert.deepEqual(await w.I.owner.presence({ rooms }), []);
   await w.I.ana.announce({ rooms, viewing: 'doc:lease', title: 'Lease 2024.pdf' });
   assert.deepEqual((await w.I.owner.presence({ rooms })).map((p) => p.name), ['Ana (accountant)']);
 
-  await w.I.owner.remove({ rooms, user: U.ana });
+  const rot = await w.I.owner.remove({ rooms, user: U.ana });
+  assert.ok(rot.includes('rotated'), 'removing a person rotates the workspace key');
   await w.mxs.ana.sendEvent(rooms.priv, EVT.presence, { v: 1, viewing: 'doc:lease', title: '' }).catch(() => {});
   assert.deepEqual(await w.I.owner.presence({ rooms }), []);
   assert.equal((await w.I.owner.people({ rooms })).some((p) => p.user === U.ana), false);
@@ -272,10 +303,11 @@ test('I6 — heartbeats replace each other, carry no name, and a viewer whose cl
   for (let i = 0; i < 60; i++) await w.I.ana.announce({ rooms, viewing: 'doc:' + i, title: 'item ' + i });
   const live = (await w.mxs.owner.readEvents(rooms.priv)).filter((e) => e.type === EVT.presence && e.sender === U.ana && e.decrypted);
   assert.ok(live.length <= 2, 'at most 2 live heartbeats from one member, got ' + live.length);
-  assert.equal(live[live.length - 1].content.viewing, 'doc:59');
-  assert.ok(!JSON.stringify(live).includes(CANARY));
+  assert.ok(live.every((e) => isSealed(e.content)) && !JSON.stringify(live).includes('doc:59') && !JSON.stringify(live).includes(CANARY), 'a heartbeat on the wire names neither the page nor the person');
+  const ownerRing = ringOf(w, 'owner');
+  assert.equal((await ownerRing.openFor(rooms.priv, live[live.length - 1].content, { type: EVT.presence, key: '', sender: U.ana })).viewing, 'doc:59');
   for (const skew of [3_600_000, -86_400_000]) {
-    const skewed = makeInvites({ mx: w.mxs.owner, store: null, now: () => w.now() + skew });
+    const skewed = makeInvites({ mx: w.mxs.owner, store: w.mkStore('owner'), now: () => w.now() + skew });   // the owner's own device, with a wrong clock
     await skewed.announce({ rooms, viewing: 'view:summary', title: 'Summary' });
     assert.ok((await skewed.presence({ rooms })).some((p) => p.name === CANARY), 'shown despite a ' + skew + ' ms clock error');
   }
@@ -295,7 +327,7 @@ test('I7 — three enrolled people join by link and appear online under the name
   await w.I.eve.open({ input: inv.ana.link }).catch(() => {});                       // eve has ana's link, no authenticator
   const out = await w.I.owner.sweep({ rooms });
   assert.deepEqual(out.map((o) => o.state).sort(), ['admitted', 'admitted', 'admitted']);
-  for (const who of ['ana', 'bob', 'cy']) { await w.I[who].claim({ door: acc[who].door }); await w.I[who].announce({ rooms, viewing: 'doc:' + who, title: 'what ' + who + ' reads' }); }
+  for (const who of ['ana', 'bob', 'cy']) { await w.I[who].claim({ door: acc[who].door, input: inv[who].link }); await w.I[who].announce({ rooms, viewing: 'doc:' + who, title: 'what ' + who + ' reads' }); }
   const here = await w.I.owner.presence({ rooms });
   assert.deepEqual(here.map((p) => p.name), ['Ana (accountant)', 'Bob (lawyer)', 'Cy (cousin)']);
   assert.ok(!here.some((p) => p.user === U.eve));
@@ -307,9 +339,10 @@ test('the convenience copy of links is per account: a second person on the same 
   const rooms = await workspace(w);
   const shared = new Map();
   const mk = (who) => makeInvites({ mx: w.mxs[who], store: { get: async (k) => shared.get(k) ?? null, set: async (k, v) => { shared.set(k, JSON.parse(JSON.stringify(v))); } }, now: w.now });
-  const owner = mk('owner'), other = mk('bob');
+  const owner = mk('owner'), other = mk('bob');   // one browser's store, two accounts: the keyring is per workspace, the link copy per account
   const inv = await owner.invite({ name: 'Z', rooms, base: BASE });
   assert.equal((await owner.outstanding({ rooms }))[0].link, inv.link);
-  assert.equal((await other.outstanding({ rooms }))[0].link, '', 'the other account sees the pending name (room state) but not the link');
-  assert.ok([...shared.keys()].every((k) => k.endsWith(':' + U.owner)));
+  assert.deepEqual(await other.outstanding({ rooms }), [], 'the other account on this browser holds no key, so it sees no pending names and no link');
+  assert.ok([...shared.keys()].every((k) => k.endsWith(':' + U.owner) || k.startsWith('hd:vault:v1:' + U.owner + '|')), 'everything kept on this browser is the owner’s: link copy and key both carry the account');
+  assert.ok([...shared.keys()].some((k) => k.startsWith('hd:vault:v1:')), 'control: the key is there, so the check above is not vacuous');
 });

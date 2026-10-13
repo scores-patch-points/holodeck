@@ -1,4 +1,5 @@
 // fold-net.js — Matrix (hyphae.social) workspace rooms, hash-chained blocks, archive.org, search, in-browser Whisper.
+import { deviceKeyring, isSealed, anySealed, VaultError, CODE as VCODE, EPOCH_EVENT } from './holodeck-vault.js';
 const BLOCK = 'social.hyphae.fold.block', CONFIG = 'social.hyphae.fold.config', PRIV = 'social.hyphae.fold.private';
 const enc = new TextEncoder();
 export const hex = buf => [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, '0')).join('');
@@ -153,8 +154,47 @@ export async function appendBlock(s, room, bytes, meta, head) {
 }
 
 // ---------- private room snapshots ----------
-export async function savePrivate(s, room, key, data) { return setState(s, room, PRIV, key, { v: 1, at: new Date().toISOString(), data }); }
-export async function loadPrivate(s, room, key) { const c = await getState(s, room, PRIV, key); return c && c.data; }
+// What a person pinned, drafted and read. It is SEALED on the device before it is sent (holodeck-vault.js), with a key
+// that is never sent to the homeserver: the server holds ciphertext it cannot open. A device that does not hold the
+// workspace key neither reads nor writes the snapshot — it does not fall back to plaintext — and only the workspace's
+// owner starts a key, so two devices never seal one workspace under two keys that cannot read each other.
+async function roomPeople(s, room) {       // who made the room, and who has moderator power in it (from its state)
+  const evs = await api(s, 'GET', '/_matrix/client/v3/rooms/' + encodeURIComponent(room) + '/state');
+  const create = (evs || []).find(e => e.type === 'm.room.create');
+  const pl = (evs || []).find(e => e.type === 'm.room.power_levels' && (e.state_key === '' || e.state_key === undefined));
+  const users = ((pl && pl.content) || {}).users || {};
+  return { creator: create ? create.sender : null, mods: Object.entries(users).filter(([, n]) => Number(n) >= 50).map(([u]) => u) };
+}
+async function absorbRotations(s, room, ring) {   // the next key, when the owner rotated it after removing someone
+  const [who, evs] = await Promise.all([roomPeople(s, room), events(s, room, EPOCH_EVENT)]);
+  return ring.absorb(room, evs.map(e => ({ type: e.type, sender: e.sender, content: e.content })), { trusted: u => u === who.creator || who.mods.includes(u) });
+}
+export async function savePrivate(s, room, key, data, ring = deviceKeyring(s && s.user)) {
+  if (!(await ring.has(room))) {
+    if (await anySealed((t, k) => getState(s, room, t, k))) throw new VaultError(VCODE.Locked, 'This device does not hold the workspace key, so it cannot save private work. Open the device link from the device that started the workspace, or ask the owner for a new invitation.');
+    const who = await roomPeople(s, room);
+    if (who.creator !== s.user) throw new VaultError(VCODE.NotOwner, 'Private work is saved sealed, and the key comes from the person who made the workspace. Open the invitation or device link they send.');
+    await ring.ensure(room);
+  }
+  const content = await ring.sealFor(room, { at: new Date().toISOString(), data }, { type: PRIV, key: key || '' });
+  return setState(s, room, PRIV, key, content);
+}
+export async function loadPrivate(s, room, key, ring = deviceKeyring(s && s.user)) {
+  const c = await getState(s, room, PRIV, key);
+  if (!c || (typeof c === 'object' && !Object.keys(c).length)) return null;
+  const ctx = { type: PRIV, key: key || '' };
+  if (isSealed(c)) {
+    try { return (await ring.openFor(room, c, ctx)).data; }
+    catch (e) {
+      if (e && e.code === VCODE.Locked && (await absorbRotations(s, room, ring).catch(() => 0))) return (await ring.openFor(room, c, ctx)).data;
+      throw e;
+    }
+  }
+  // Plaintext. A device that already holds the workspace key never takes it back: anyone who can write the room could
+  // put a forged snapshot there. A workspace with no key yet is read as it is, and its next save seals it.
+  if (await ring.has(room)) throw new VaultError(VCODE.Downgrade, 'The private snapshot is not sealed, so it was ignored.');
+  return c.data;
+}
 
 // ---------- archive.org ----------
 export function saveToArchive(url) { if (!/^https?:\/\//.test(url || '')) return Promise.resolve(false); return fetch('https://web.archive.org/save/' + url, { mode: 'no-cors' }).then(() => true, () => false); }
