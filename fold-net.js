@@ -177,6 +177,11 @@ let _asr = null, _asrModel = null;
 // `decoder_input_ids`; on the WebGPU path that threw ("Cannot convert [object Object] to a BigInt", and in the
 // app "Session mismatch"), so every transcription that listened with the default prior died in the decoder.
 // Plain transcription is what transformers.js supports, and it is what runs.
+//
+// Resumable: opts.onCheckpoint({ segs, upTo, total }) is called after every finished 30 s window with the raw
+// segments heard so far and the second they run up to; opts.resume = { segs, upTo } feeds that back in, and the
+// windows that end at or before `upTo` are not given to the recognizer again. A long run that dies (tab closed,
+// out of memory, a decoder error) therefore loses at most one window.
 export async function transcribe(fileOrBuf, onProgress, model, opts) {
   opts = opts || {}; model = model || 'onnx-community/whisper-base';
   onProgress && onProgress({ stage: 'loading model' });
@@ -188,7 +193,9 @@ export async function transcribe(fileOrBuf, onProgress, model, opts) {
   const P = await import(new URL('holodeck-pcm.js', import.meta.url).href);
   const buf = fileOrBuf instanceof ArrayBuffer || ArrayBuffer.isView(fileOrBuf) ? fileOrBuf : await fileOrBuf.arrayBuffer();
   const total = (await P.audioDuration(buf)) || null;
-  const CH = 30 * 16000, segs = [];
+  const CH = 30 * 16000;
+  const resume = opts.resume && Array.isArray(opts.resume.segs) && opts.resume.upTo > 0 ? opts.resume : null;
+  const segs = resume ? resume.segs.map(x => ({ ...x })) : [];
   const lang = opts.language && opts.language !== 'auto' ? opts.language : null;
   const englishOnly = /\.en$/.test(model);
   const extra = { return_timestamps: true, chunk_length_s: 30 };
@@ -196,15 +203,18 @@ export async function transcribe(fileOrBuf, onProgress, model, opts) {
   // A recognizer that loses the signal writes the same word again until the window ends ("hum, hum, hum…" three hundred
   // times). Nothing downstream should ever see that as something said: it is collapsed here, with the count kept.
   const { collapseLoops } = await import(new URL('holodeck-loops.js', import.meta.url).href);
-  const nChunks = total ? Math.max(1, Math.ceil(total / 30)) : null; let ci = 0, heard = 0;
-  onProgress && onProgress({ stage: 'transcribing', pct: 0, i: 1, n: nChunks });
+  const nChunks = total ? Math.max(1, Math.ceil(total / 30)) : null; let ci = 0, heard = resume ? resume.upTo : 0;
+  onProgress && onProgress({ stage: 'transcribing', pct: total && resume ? Math.min(100, Math.round(heard / total * 100)) : 0, i: 1, n: nChunks, resumedAt: resume ? resume.upTo : null, partial: resume ? collapseLoops(segs).segs : undefined });
   for await (const w of P.pcm16k(buf, { winSec: 30, signal: opts.signal })) {
+    // a window the earlier run already finished: stepped over, not heard twice
+    if (resume && w.start + w.pcm.length / 16000 <= resume.upTo + 0.01) { ci++; continue; }
     const r = await _asr(w.pcm, extra); ci++;
     const base = w.start; heard = w.start + w.pcm.length / 16000;
     (r.chunks || [{ timestamp: [0, w.pcm.length / 16000], text: r.text }]).forEach(c => { const t = (c.text || '').trim(); if (t) segs.push({ start: +(base + (c.timestamp[0] || 0)).toFixed(2), end: +(base + (c.timestamp[1] || c.timestamp[0] || 0)).toFixed(2), text: t }); });
     // The text is visible while it streams: each finished chunk hands back what has been
     // heard so far (only the new segments — the caller keeps the list), so the surface can
     // show the words appearing without copying a three-hour transcript every 30 seconds.
+    try { opts.onCheckpoint && opts.onCheckpoint({ segs, upTo: heard, total }); } catch (e) {}
     onProgress && onProgress({ stage: 'transcribing', pct: total ? Math.min(100, Math.round(heard / total * 100)) : null, i: ci + (total && heard < total ? 1 : 0), n: nChunks || ci, partial: collapseLoops(segs).segs }); }
   const clean = collapseLoops(segs);
   onProgress && onProgress({ stage: 'done', pct: 100, partial: clean.segs });

@@ -2572,7 +2572,7 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
                     <button onClick="{{ rdMedia.onStopRecord }}" title="Stop — pause, rewind to the start, and clear the marking so you can read the transcript" style="background:none;border:1px solid var(--line2);border-radius:8px;height:30px;padding:0 11px;cursor:pointer;font:500 13px var(--sans);color:var(--ink2)" style-hover="border-color:var(--bad)">■ Stop</button>
                     <span id="fx-tm" style="font:600 12.5px var(--mono);color:var(--ink2);white-space:nowrap">{{ rdMedia.timeLabel }}</span>
                     <span id="fx-st" style="font:500 12px var(--sans);color:var(--mut);white-space:nowrap">{{ rdMedia.statusLabel }}</span>
-                    <sc-if value="{{ rdMedia.canTx }}" hint-placeholder-val="{{ false }}"><button onClick="{{ rdMedia.onTx }}" aria-label="Transcribe this recording here, in this browser" style="margin-left:auto;height:30px;padding:0 14px;border:0;border-radius:8px;background:var(--acc2);color:#fff;cursor:pointer;font:600 13px var(--sans);white-space:nowrap">Transcribe</button></sc-if>
+                    <sc-if value="{{ rdMedia.canTx }}" hint-placeholder-val="{{ false }}"><button onClick="{{ rdMedia.onTx }}" aria-label="Transcribe this recording here, in this browser" style="margin-left:auto;height:30px;padding:0 14px;border:0;border-radius:8px;background:var(--acc2);color:#fff;cursor:pointer;font:600 13px var(--sans);white-space:nowrap">{{ rdMedia.txLabel }}</button></sc-if>
                   </div>
                 </sc-if>
                 <sc-if value="{{ rdMedia.ytOnly }}" hint-placeholder-val="{{ false }}">
@@ -2655,7 +2655,8 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
                   <sc-if value="{{ rdMedia.noAsk }}" hint-placeholder-val="{{ true }}">
                     <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
                       <button onClick="{{ rdMedia.onAsk }}" style="border:1px solid var(--line2);background:transparent;color:var(--ink2);border-radius:8px;padding:5px 12px;cursor:pointer;font:500 13px var(--sans)">Language and recognizer…</button>
-                      <span style="font:400 12.5px var(--sans);color:var(--mut)">Transcription runs in this browser; the recording does not leave this machine.</span>
+                      <sc-if value="{{ rdMedia.hasWip }}" hint-placeholder-val="{{ false }}"><span style="font:500 12.5px var(--sans);color:var(--acc)">{{ rdMedia.wipNote }}</span></sc-if>
+                      <span style="font:400 12.5px var(--sans);color:var(--mut)">Transcription runs in this browser; the recording does not leave this machine. It is saved as it goes, so it can be stopped and resumed.</span>
                     </div>
                   </sc-if>
                 </sc-if>
@@ -2666,6 +2667,7 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
                       <sc-if value="{{ rdMedia.tp.hasMeta }}" hint-placeholder-val="{{ false }}"><span style="font:500 12px var(--mono);color:var(--mut);white-space:nowrap">{{ rdMedia.tp.meta }}</span></sc-if>
                     </div>
                     <div class="hd-tx-track"><div class="{{ rdMedia.tp.barClass }}" style="width:{{ rdMedia.tp.bar }}"></div></div>
+                    <div><button onClick="{{ rdMedia.onStopTx }}" aria-label="Stop transcribing; what has been heard is kept and can be resumed" style="border:1px solid var(--line2);background:transparent;color:var(--ink2);border-radius:8px;padding:4px 12px;cursor:pointer;font:500 12.5px var(--sans)">Stop and keep what’s heard</button></div>
                   </div>
                 </sc-if>
                 <sc-if value="{{ rdMedia.hasUrl }}" hint-placeholder-val="{{ false }}"><a href="{{ rdMedia.url }}" target="_blank" rel="noopener" style="font:500 13px var(--sans);color:var(--acc);text-decoration:none">Open on YouTube ↗</a></sc-if>
@@ -5656,6 +5658,8 @@ class Component extends DCLogic {
       // A recording opened but never classified gets its sound map on first sight (an
       // older stored recording, or one added before the classifier existed); the work
       // is the same in-browser rung, guarded so it happens once until it lands.
+      // a transcription that was stopped part-way left its checkpoint behind; the reader offers to carry on from it
+      if (!(this._txWipAsked = this._txWipAsked || {})[rd0.id]) { this._txWipAsked[rd0.id] = 1; idbGet('txwip:' + rd0.id).then(w => { (this._txWipInfo = this._txWipInfo || {})[rd0.id] = w && w.v === 1 && w.upTo > 0 && Array.isArray(w.segs) ? { upTo: w.upTo, n: w.segs.length, total: w.total || null } : null; this.forceUpdate(); }).catch(() => {}); }
       if (this.clsOn() && !this.state.txBusy && !rd0.soundSpans && !this.clsBusy(rd0.id) && !(rd0.media.dur != null && rd0.media.dur > 6 * 3600)) {
         (this._clsQueued = this._clsQueued || {});
         if (!this._clsQueued[rd0.id]) { this._clsQueued[rd0.id] = 1; this.classifyDoc(rd0).catch(() => {}); }
@@ -6711,7 +6715,27 @@ class Component extends DCLogic {
   // surface reports one live line: the stage, the chunk, the percent, and how
   // long it has been going (with an estimate once there is a percent to pace
   // against). The bar is indeterminate until the recognizer reports a percent.
+  // The run is saved as it goes. Every finished 30 s window is a checkpoint (the raw segments heard and the second they
+  // run up to), kept in IndexedDB under txwip:<doc> at most every few seconds; a run that stops — the Stop button, a
+  // closed tab, a failed decode — leaves it there, and the next Transcribe picks up at that second instead of at zero.
+  // It is only reused for the same recording bytes, model and language; anything else starts clean.
+  async txWipLoad(id, model, lang, size) {
+    try { const w = await idbGet('txwip:' + id); return w && w.v === 1 && w.model === model && w.lang === lang && w.size === size && Array.isArray(w.segs) && w.upTo > 0 ? w : null; } catch (e) { return null; }
+  }
+  txWipSaver(id, model, lang, size) {
+    let last = 0, pending = null;
+    const flush = () => {
+      if (!pending) return Promise.resolve(); const cp = pending; pending = null; last = Date.now();
+      (this._txWipInfo = this._txWipInfo || {})[id] = { upTo: cp.upTo, n: cp.segs.length, total: cp.total || null };
+      return idbPut('txwip:' + id, { v: 1, model, lang, size, upTo: cp.upTo, total: cp.total || null, segs: cp.segs.slice(), at: Date.now() }).catch(() => {});
+    };
+    const save = cp => { pending = cp; if (Date.now() - last >= 5000) flush(); };
+    save.flush = flush; return save;
+  }
+  txWipClear(id) { if (this._txWipInfo) this._txWipInfo[id] = null; return idbDel('txwip:' + id).catch(() => {}); }
+  txStop() { if (this._txAbort) this._txAbort.abort(); }
   txReset(docId) {
+    this._txAbort = new AbortController();
     if (this._txTick) clearInterval(this._txTick);
     this._txStart = Date.now();
     this._txSegs = null; this._txLive = null;
@@ -6721,6 +6745,7 @@ class Component extends DCLogic {
   txOnProgress(p) {
     p = p || {}; const cur = this.state.txProgress || {}; const next = { ...cur };
     if (p.stage) next.stage = p.stage;
+    if (p.resumedAt != null) next.resumedAt = p.resumedAt;
     if (p.pct != null) next.pct = Math.max(0, Math.min(100, Math.round(p.pct)));
     if (p.i != null) next.i = p.i;
     if (p.n != null) next.n = p.n;
@@ -6742,7 +6767,7 @@ class Component extends DCLogic {
     this.setState({ txBusy: false, txProgress: null, txProg: '' });
   }
   txProgVals() {
-    const pr = this.state.txProgress; if (!this.state.txBusy || !pr) return { busy: false, tp: { label: '', meta: '', hasMeta: false, bar: '0%', barClass: 'hd-tx-fill' } };
+    const pr = this.state.txProgress; if (!this.state.txBusy || !pr) return { busy: false, onStopTx: () => this.txStop(), tp: { label: '', meta: '', hasMeta: false, bar: '0%', barClass: 'hd-tx-fill' } };
     const STAGE = { starting: 'Starting…', 'loading model': 'Loading the recognizer…', 'downloading model': 'Downloading the recognizer', 'decoding audio': 'Decoding the audio', transcribing: 'Transcribing', 'sending to the local transcriber': 'Sending to the local transcriber…', done: 'Finishing…' };
     const base = STAGE[pr.stage] || (pr.stage ? pr.stage.charAt(0).toUpperCase() + pr.stage.slice(1) : 'Working…');
     const chunk = (pr.i != null && pr.n != null) ? ' · chunk ' + pr.i + ' of ' + pr.n : '';
@@ -6751,7 +6776,7 @@ class Component extends DCLogic {
     let eta = '';
     if (pr.pct != null && pr.pct >= 4 && elapsed >= 2) eta = ' · ~' + fmtT(Math.max(0, elapsed / (pr.pct / 100) - elapsed)) + ' left';
     const meta = (elapsed >= 1 ? fmtT(elapsed) + ' elapsed' : '') + eta;
-    return { busy: true, tp: { label: base + chunk + pctS, meta, hasMeta: !!meta, bar: pr.pct != null ? pr.pct + '%' : '100%', barClass: pr.pct != null ? 'hd-tx-fill' : 'hd-tx-fill hd-tx-indet' } };
+    return { busy: true, onStopTx: () => this.txStop(), tp: { label: base + (pr.resumedAt ? ' (resumed at ' + fmtT(pr.resumedAt) + ')' : '') + chunk + pctS, meta, hasMeta: !!meta, bar: pr.pct != null ? pr.pct + '%' : '100%', barClass: pr.pct != null ? 'hd-tx-fill' : 'hd-tx-fill hd-tx-indet' } };
   }
   async transcribeFile(file, forDoc) { return this.netDo('Transcribe', async N => { this.txReset(forDoc ? forDoc.id : ('file:' + (file.name || 'audio'))); try { const r = await this.transcribeAny(file, p => { this._net.asr = p; this.txOnProgress(p); }); const title = forDoc ? forDoc.title : file.name.replace(/\.[^.]+$/, ''); const html = ohsSegmentsHtml(r.segments, title);
     const extra = { format: 'html', media: forDoc && forDoc.media ? { ...forDoc.media, segN: r.segments.length, model: r.model } : null, kind: 'Meeting recording', medium: forDoc && forDoc.media ? 'Video' : 'Audio', transcribed: true };
@@ -6777,9 +6802,12 @@ class Component extends DCLogic {
     const prompt = null, priorNote = 'no vocabulary prior';
     const lang = this.state.txLang || 'en';
     const model = this.state.txModel === 'small' ? 'onnx-community/whisper-small' : this.state.txModel === 'smallen' ? 'onnx-community/whisper-small.en' : 'onnx-community/whisper-base';
+    const wip = await this.txWipLoad(d0.id, model, lang, buf.byteLength || buf.size || 0);
+    const save = this.txWipSaver(d0.id, model, lang, buf.byteLength || buf.size || 0);
     this.txReset(d0.id); this.setState({ txAsk: null });
+    if (wip) this.ilog('Resuming the transcription at ' + fmtT(wip.upTo) + ' — ' + plural(wip.segs.length, 'segment') + ' already heard are kept.');
     try {
-      const r = await this.transcribeAny(buf, p => this.txOnProgress(p), model, { prompt, language: lang });
+      const r = await this.transcribeAny(buf, p => this.txOnProgress(p), model, { prompt, language: lang, resume: wip ? { segs: wip.segs, upTo: wip.upTo } : null, onCheckpoint: save, signal: this._txAbort.signal });
       const html = ohsSegmentsHtml(r.segments, d0.title);
       const media = { ...d0.media, segN: r.segments.length, model: r.model, priors: r.priors || { prompt: prompt ? priorNote : 'none', language: lang } };
       this._html[d0.id] = html; idbPut('html:' + d0.id, html).catch(() => {});
@@ -6789,10 +6817,19 @@ class Component extends DCLogic {
       // them reach every surface (Names, Connections, Lanes, Margin, Seam, Orbit, Fields, Review)
       hdEngineRead(d0.title, htmlToText(html)).then(got => { if (got) this.replaceAddedDoc(d0.id, { eng: hdEngineCompact(got.host, got.read), engTried: true }); else this.replaceAddedDoc(d0.id, { engTried: true }); }).catch(() => {});
       this.ilog('Transcribed ' + plural(r.segments.length, 'segment') + ' via ' + (r.source === 'local-mlx-whisper' ? 'the local transcriber' : 'the in-browser recognizer') + ' (' + r.model.split('/').pop() + '), listening with ' + priorNote + '.');
-      this.txDone();
+      this.txDone(); this.txWipClear(d0.id);
       const bytes = JSON.stringify({ source: r.source, model: r.model, segments: r.segments, priors: r.priors || { prompt: prompt ? priorNote : 'none', language: lang } });
       if (this._net && this._net.s && !this._net.s.guest && this.wsRooms().pub) this.publish({ bytes, meta: { kind: 'transcript', title: d0.title, url: null, mime: 'application/json', filename: d0.title.replace(/[^\w-]+/g, '-').slice(0, 60) + '.segments.json' } }).catch(() => {});
-    } catch (e) { this.txDone(); this.setState({ note: 'Transcription failed: ' + (e && e.message || e) }); }
+    } catch (e) { await this.txStopped(d0.id, e, save); }
+  }
+  // A run that did not finish keeps what it heard. Said plainly: paused by the person, or failed — either way resumable.
+  async txStopped(id, e, save) {
+    const stopped = !!(this._txAbort && this._txAbort.signal.aborted) || /^stopped$/.test(String(e && e.message || e));
+    try { await save.flush(); } catch (x) {}
+    this.txDone();
+    const w = this._txWipInfo && this._txWipInfo[id];
+    const kept = w ? ' The ' + plural(w.n, 'segment') + ' heard up to ' + fmtT(w.upTo) + ' are kept — Transcribe again to carry on from there.' : '';
+    this.setState({ note: (stopped ? 'Transcription paused.' : 'Transcription stopped: ' + (e && e.message || e) + '.') + kept });
   }
   pickYtFile(d0) {
     const inp = document.createElement('input'); inp.type = 'file'; inp.accept = 'audio/*,video/*';
@@ -6805,17 +6842,20 @@ class Component extends DCLogic {
     const prompt = null, priorNote = 'no vocabulary prior';
     const lang = this.state.txLang || 'en';
     const model = this.state.txModel === 'small' ? 'onnx-community/whisper-small' : this.state.txModel === 'smallen' ? 'onnx-community/whisper-small.en' : 'onnx-community/whisper-base';
+    const wip = await this.txWipLoad(d0.id, model, lang, file.size || 0);
+    const save = this.txWipSaver(d0.id, model, lang, file.size || 0);
     this.txReset(d0.id); this.setState({ txAsk: null });
+    if (wip) this.ilog('Resuming the transcription at ' + fmtT(wip.upTo) + ' — ' + plural(wip.segs.length, 'segment') + ' already heard are kept.');
     try {
-      const r = await this.transcribeAny(file, p => this.txOnProgress(p), model, { prompt, language: lang });
+      const r = await this.transcribeAny(file, p => this.txOnProgress(p), model, { prompt, language: lang, resume: wip ? { segs: wip.segs, upTo: wip.upTo } : null, onCheckpoint: save, signal: this._txAbort.signal });
       const title = d0.title; const html = ohsSegmentsHtml(r.segments, title);
       const extra = { format: 'html', media: { ...d0.media, segN: r.segments.length, model: r.model, priors: r.priors || { prompt: prompt ? priorNote : 'none', language: lang } }, kind: 'Meeting recording', medium: 'Video', transcribed: true };
       this.addDocs([{ title, html, format: 'html', text: htmlToText(html), url: d0.url, extra }], { open: true });
       this.ilog('Transcribed ' + plural(r.segments.length, 'segment') + ' via ' + (r.source === 'local-mlx-whisper' ? 'the local transcriber' : 'the in-browser recognizer') + ' (' + r.model.split('/').pop() + '), listening with ' + priorNote + '.');
-      this.txDone();
+      this.txDone(); this.txWipClear(d0.id);
       const bytes = JSON.stringify({ source: r.source, model: r.model, video_id: d0.media.id, segments: r.segments, priors: r.priors || { prompt: prompt ? priorNote : 'none', language: lang } });
       if (this._net && this._net.s && !this._net.s.guest && this.wsRooms().pub) this.publish({ bytes, meta: { kind: 'transcript', title, url: d0.url, ytid: d0.media.id, mime: 'application/json', filename: title.replace(/[^\w-]+/g, '-').slice(0, 60) + '.segments.json' } }).catch(() => {});
-    } catch (e) { this.txDone(); this.setState({ note: 'Transcription failed: ' + (e && e.message || e) }); }
+    } catch (e) { await this.txStopped(d0.id, e, save); }
   }
   // Who is editing: the signed-in account, else this device. The attribution an
   // alteration carries (the permissions stub stands in for a real model).
@@ -9602,6 +9642,7 @@ onAsk: () => { this.setState({ txAsk: d0.id }); this.pickYtFile(d0); }, onCancel
           txTitle: timed ? 'Transcript · click a timecode to play from there' : txHere ? 'Transcribing — words appear below as they are heard' : 'Transcript',
           note: timed ? 'Machine transcript (' + (m.model || 'Whisper').split('/').pop() + '), not checked by a person' + (m.priors ? ' · transcribed with the prior: ' + (PRIOR_LABEL[m.priors.prompt] || m.priors.prompt || 'none') + ', language ' + (m.priors.language || 'auto') : '') + '. Quote from the recording, not the transcript.' : 'The recording is kept in this browser; nothing in it has been read until it is transcribed. A transcript is a machine reading of the sound, not checked by a person.',
           canAsk: !timed, ask: S.txAsk === d0.id, noAsk: !timed && S.txAsk !== d0.id, canTx: !timed && !txHere && S.txAsk !== d0.id,
+          ...(() => { const wi = !timed && !txHere && this._txWipInfo && this._txWipInfo[d0.id]; return wi ? { txLabel: 'Resume', hasWip: true, wipNote: 'Paused at ' + fmtT(wi.upTo) + (wi.total ? ' of ' + fmtT(wi.total) : '') + ' · ' + plural(wi.n, 'segment') + ' kept. Resume carries on from there.' } : { txLabel: 'Transcribe', hasWip: false, wipNote: '' }; })(),
           onAsk: () => { this.setState({ txAsk: d0.id }); this.transcribeLocal(d0); }, onCancelAsk: () => this.setState({ txAsk: null }),
           prior: prior, pw: prior === 'workspace', pn: prior === 'none', pm: prior === 'mine', onPriorW: () => this.setState({ txPrior: 'workspace' }), onPriorN: () => this.setState({ txPrior: 'none' }), onPriorM: () => this.setState({ txPrior: 'mine' }),
           lang: S.txLang || 'en', onLang: e => this.setState({ txLang: e.target.value }), langs: [['en', 'English'], ['es', 'Spanish'], ['fr', 'French'], ['de', 'German'], ['pt', 'Portuguese'], ['it', 'Italian'], ['nl', 'Dutch'], ['pl', 'Polish'], ['ru', 'Russian'], ['uk', 'Ukrainian'], ['ar', 'Arabic'], ['hi', 'Hindi'], ['zh', 'Chinese'], ['ja', 'Japanese'], ['ko', 'Korean']].map(([v, l]) => ({ v, l })),
