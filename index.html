@@ -5578,6 +5578,55 @@ class Component extends DCLogic {
   // The links a contract's profile shows, from contract-links.json (made by tools/link-contracts.mjs): legislation
   // that names its contracting party, and the contracts it replaces or is replaced by. Each says on what basis it
   // was made. None, when the file or the entry is missing.
+  // Every link that touches these statements (or, for a whole source, that has the source at either end), led by what
+  // each establishes. One reading serves every profile: a name, a statement, a source, a measure, a pair of names.
+  linkItems(sts, docWhole, A) {
+    try {
+      const LS = this._lkSet; if (!LS || !LS.links) return [];
+      const byDoc = new Map(); (sts || []).forEach(x => { if (!byDoc.has(x.doc)) byDoc.set(x.doc, []); byDoc.get(x.doc).push(x); });
+      const touches = sp => { if (!sp || sp.kind === 'whole' || sp.axis === 'time' || !Number.isFinite(sp.s)) return false; const L = byDoc.get(sp.doc); return !!L && L.some(x => x.s < sp.e && sp.s < x.e); };
+      const seen = new Set(), out = [];
+      for (const L of LS.links) {
+        if (L.rejected || L.from.doc === L.to.doc) continue;
+        let mine = null;
+        if (docWhole && (L.from.doc === docWhole || L.to.doc === docWhole)) mine = L.from.doc === docWhole ? L.from : L.to;
+        else mine = touches(L.from) ? L.from : touches(L.to) ? L.to : null;
+        if (!mine) continue;
+        const other = mine === L.from ? L.to : L.from; const od = A.docById[other.doc]; if (!od) continue;
+        const kind = (L.finding && L.finding.kind) || (L.verdict === 'differs' ? 'differs' : 'terms');
+        const key = L.id || (kind + '|' + other.doc + '|' + (other.s || 0)); if (seen.has(key)) continue; seen.add(key);
+        const kindL = (HD_KIND_PLAIN[kind] || kind) + (L.finding && L.finding.licensed === false ? ' · possible' : '');
+        const how = L.provenance === 'confirmed' ? 'confirmed' : L.provenance === 'computed' ? 'computed' : 'inferred';
+        const open = () => this.setState({ view: 'seam', lkPair: [mine.doc, other.doc], readDoc: null, sel: null });
+        out.push({ rank: HD_KIND_RANK[kind] ?? 9, kind: kindL, source: od.title, headline: L.finding ? L.finding.headline : (L.why || 'Linked'), onOpen: open,
+          label: kindL, sub: L.finding ? L.finding.headline : (L.why || 'Linked'), why: 'with ' + od.title + ' · ' + how, onClick: open });
+      }
+      return out.sort((a, b) => a.rank - b.rank);
+    } catch (e) { return []; }
+  }
+  // The links and the connections of a selection, as the groups the details panel already draws.
+  connectionGroups(sel, A, D) {
+    const groups = [];
+    try {
+      let sts = [], docWhole = null;
+      if (sel.type === 'name' && A.names[sel.id]) sts = A.names[sel.id].sts.map(id => A.byId[id]).filter(Boolean);
+      else if (sel.type === 'statement' && A.byId[sel.id]) sts = [A.byId[sel.id]];
+      else if (sel.type === 'doc' && A.docById[sel.id]) { sts = A.stsByDoc[sel.id] || []; docWhole = sel.id; }
+      else if (sel.type === 'unit') sts = A.sts.filter(st => (st.figs || []).some(g => g.unit === sel.id));
+      else if (sel.type === 'pair') { const [a, b] = String(sel.id).split('|'); sts = A.sts.filter(st => st.names.includes(a) && st.names.includes(b)); }
+      const li = this.linkItems(sts, docWhole, A);
+      if (li.length) groups.push({ title: 'Links to other sources · ' + li.length, note: 'What the sources establish together about this: a finding first, then plain ties. Each opens the two sources side by side.', items: li.slice(0, 20) });
+      // the Connections view's own pairs: names that share statements
+      const E = (D && D.edgeList) || []; let es = [];
+      if (sel.type === 'name') es = E.filter(e => e.a === sel.id || e.b === sel.id);
+      else if (sel.type === 'statement' && A.byId[sel.id]) { const nm = new Set(A.byId[sel.id].names); es = E.filter(e => nm.has(e.a) && nm.has(e.b)); }
+      else if (sel.type === 'doc') { const inDoc = new Set((A.stsByDoc[sel.id] || []).map(x => x.id)); es = E.map(e => ({ ...e, sts: e.sts.filter(id => inDoc.has(id.id || id)) })).filter(e => e.sts.length); }
+      es = es.slice().sort((x, y) => y.sts.length - x.sts.length).slice(0, 12);
+      if (es.length) groups.push({ title: 'Connections · ' + es.length, note: 'Names that appear together in the same statements. Each opens that pair.',
+        items: es.map(e => ({ label: sel.type === 'name' ? (e.a === sel.id ? e.b : e.a) : e.a + ' · ' + e.b, sub: plural(e.sts.length, 'statement') + ' together', why: '', onClick: () => this.sel('pair', e.a + '|' + e.b) })) });
+    } catch (e) { /* the profile stands without them */ }
+    return groups;
+  }
   linkGroupsFor(id, A) {
     const CL = (this._contractLinks || {})[id];
     if (!CL) return [];
@@ -9470,7 +9519,7 @@ class Component extends DCLogic {
     const suF = SU ? SU.list.filter(x => Fid.has(x.st.id)) : [];
     const juncMode = S.suMode !== 'belief'; const JN = isEmpty ? [] : this.junctions(A, Fid);
     const gHi = on => ({ bg: on ? 'var(--sel)' : 'transparent', bd: on ? 'var(--acc2)' : 'transparent', weight: on ? 600 : 500 });
-    const NAVG = [['', [['summary', 'Sources'], ['ask', 'Ask'], ['inbox', 'Inbox'], ['draft', 'Draft']]], ['Read closely', [['names', 'Names'], ['records', 'Assertions']]], ['Explore', [['connections', 'Connections'], ['overview', 'Evidence overview']]], ['Manage', [['ingest', 'Add & publish']]], ['Links', [['lanes', 'Lanes'], ['margin', 'Margin'], ['seam', 'Seam'], ['orbit', 'Orbit'], ['fields', 'Fields'], ['review', 'Review']]]];
+    const NAVG = [['', [['summary', 'Sources'], ['ask', 'Ask'], ['draft', 'Draft']]], ['Read closely', [['names', 'Names'], ['records', 'Assertions']]], ['Explore', [['connections', 'Connections'], ['overview', 'Evidence overview']]], ['Manage', [['ingest', 'Add & publish']]], ['Links', [['lanes', 'Lanes'], ['margin', 'Margin'], ['seam', 'Seam'], ['orbit', 'Orbit'], ['fields', 'Fields'], ['review', 'Review']]]];
     // extra screens from screens.json (see componentDidMount): beside Sources, Ask, Inbox and Draft at the top of the
     // sidebar, where they are seen, not inside the collapsed "Explore & manage" group
     const SCREENS = this._screens || [];
@@ -10978,21 +11027,7 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
     const pr = this.profileRows(A, n.name);
     // Connections: what the link surfaces say about the statements this name sits in, so a click on a name shows what
     // ties it to other sources (a finding first, then plain ties), and each opens the Seam on that pair of sources.
-    const conns = (() => { try {
-      const LS = this._lkSet; if (!LS || !LS.links || !sts.length) return [];
-      const touches = sp => !!sp && sp.kind !== 'whole' && sp.axis !== 'time' && Number.isFinite(sp.s) && sts.some(x => x.doc === sp.doc && x.s < sp.e && sp.s < x.e);
-      const seen = new Set(), out = [];
-      for (const L of LS.links) {
-        if (L.rejected || L.from.doc === L.to.doc) continue;
-        const mine = touches(L.from) ? L.from : touches(L.to) ? L.to : null; if (!mine) continue;
-        const other = mine === L.from ? L.to : L.from; const od = A.docById[other.doc]; if (!od) continue;
-        const kind = (L.finding && L.finding.kind) || (L.verdict === 'differs' ? 'differs' : 'terms');
-        const key = kind + '|' + other.doc; if (seen.has(key)) continue; seen.add(key);
-        out.push({ rank: HD_KIND_RANK[kind] ?? 9, kind: (HD_KIND_PLAIN[kind] || kind) + (L.finding && L.finding.licensed === false ? ' · possible' : ''), source: od.title,
-          headline: L.finding ? L.finding.headline : (L.why || 'Linked'), onOpen: () => this.setState({ view: 'seam', lkPair: [mine.doc, other.doc], readDoc: null, sel: null }) });
-      }
-      return out.sort((a, b) => a.rank - b.rank).slice(0, 8);
-    } catch (e) { return []; } })();
+    const conns = this.linkItems(sts, null, A).slice(0, 20);
     // Referents the SOURCE itself named for this name, via its hyperlinks.
     const seenRef = new Set(); const refs = [];
     ((A.nameLinks || {})[n.name] || []).forEach(L => { if (seenRef.has(L.href)) return; seenRef.add(L.href);
@@ -11071,6 +11106,7 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
     }
     if (!d) return none;
     if (!d.linkGroups) d.linkGroups = [];
+    d.linkGroups = d.linkGroups.concat(this.connectionGroups(sel, A, D));
     if (narrowed) { d.hasScope = true; d.scope = 'Narrowed to ' + chips.map(c => c.k.toLowerCase() + ' ' + c.v).join(' · ');
       if (scopeN) { d.scopeCount = scopeN.k + ' of ' + scopeN.n + ' match your filters'; d.listTitle = (d.listTitle || '') + ' · ' + scopeN.k + ' of ' + scopeN.n + ' in view'; }
       else { const inV = sel.type === 'statement' ? Fs.has(sel.id) : null; d.scopeCount = inV === false ? 'Outside your filters' : inV ? 'Matches your filters' : 'Filters active'; } }
