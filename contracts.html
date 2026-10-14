@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Metro Contracts</title>
+<style>
+  :root { --bg:#fff; --s1:#f6f6f8; --ink:#1b1b22; --mut:#6a6a78; --line:#e2e2e8; --acc:#3b4cca; --ok:#1c7c4a; --bad:#b3261e;
+          --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; --mono: ui-monospace, Menlo, monospace; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#14141a; --s1:#1d1d26; --ink:#ececf2; --mut:#9a9aaa; --line:#2c2c38; --acc:#8c98ff; --ok:#5fcf98; --bad:#ff8a80; } }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:15px/1.45 var(--sans); }
+  header { position:sticky; top:0; z-index:5; background:var(--bg); border-bottom:1px solid var(--line); padding:12px 16px; display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+  h1 { font:600 16px var(--sans); margin:0 8px 0 0; }
+  select, input { font:inherit; color:var(--ink); background:var(--s1); border:1px solid var(--line); border-radius:8px; padding:7px 10px; min-width:0; }
+  input[type=search] { flex:1 1 260px; }
+  .meta { color:var(--mut); font-size:13px; margin-left:auto; }
+  main { padding:0 16px 40px; }
+  table { width:100%; border-collapse:collapse; }
+  th { text-align:left; font:600 12px var(--mono); letter-spacing:.05em; text-transform:uppercase; color:var(--mut); padding:10px 8px; border-bottom:1px solid var(--line); cursor:pointer; white-space:nowrap; }
+  td { padding:9px 8px; border-bottom:1px solid var(--line); vertical-align:top; }
+  tr.row { cursor:pointer; } tr.row:hover { background:var(--s1); }
+  .num { font-family:var(--mono); font-size:13px; white-space:nowrap; }
+  .tag { font:600 11px var(--mono); padding:1px 6px; border-radius:99px; border:1px solid var(--line); color:var(--mut); }
+  .tag.ok { color:var(--ok); border-color:var(--ok); }
+  .pager { display:flex; gap:10px; align-items:center; padding:14px 0; color:var(--mut); }
+  button { font:inherit; color:var(--ink); background:var(--s1); border:1px solid var(--line); border-radius:8px; padding:6px 12px; cursor:pointer; }
+  button[disabled] { opacity:.4; cursor:default; }
+  #detail { position:fixed; inset:0 0 0 auto; width:min(760px,100vw); background:var(--bg); border-left:1px solid var(--line); box-shadow:-12px 0 40px rgba(0,0,0,.18); transform:translateX(102%); transition:transform .18s; z-index:10; display:flex; flex-direction:column; }
+  #detail.open { transform:none; }
+  #dhead { padding:14px 16px; border-bottom:1px solid var(--line); display:flex; gap:10px; align-items:flex-start; }
+  #dhead h2 { font:600 16px var(--sans); margin:0; flex:1; }
+  #dbody { overflow:auto; padding:0 16px 24px; flex:1; }
+  iframe { width:100%; height:70vh; border:1px solid var(--line); border-radius:8px; margin-top:12px; }
+  .obs { border-left:3px solid var(--line); padding:4px 10px; margin:8px 0; font-size:14px; }
+  .obs b { font:600 11px var(--mono); text-transform:uppercase; color:var(--mut); display:block; }
+  .err { color:var(--bad); padding:16px 0; }
+  @media (max-width:640px) { .hide-s { display:none; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>Metro contracts</h1>
+  <select id="dept" aria-label="Department"><option value="">All departments</option></select>
+  <input id="q" type="search" placeholder="Search vendor, number, description, or contract text" aria-label="Search">
+  <span class="meta" id="meta"></span>
+</header>
+<main>
+  <table>
+    <thead><tr>
+      <th data-sort="party">Vendor</th><th data-sort="number">Number</th><th class="hide-s">Description</th><th class="hide-s" data-sort="expires">Expires</th><th>PDF</th>
+    </tr></thead>
+    <tbody id="rows"></tbody>
+  </table>
+  <div id="err" class="err" hidden></div>
+  <div class="pager"><button id="prev">← Prev</button><span id="range"></span><button id="next">Next →</button></div>
+</main>
+<aside id="detail" aria-hidden="true">
+  <div id="dhead"><h2 id="dtitle"></h2><button id="dclose">Close</button></div>
+  <div id="dbody"></div>
+</aside>
+<script>
+// The contracts API runs on the VM next to the data (reading and indexing happened there once), so this page is a thin client:
+// every call is a lookup. ?api= overrides the base for testing.
+const API = new URLSearchParams(location.search).get('api') || 'https://watch.hyphae.social/contracts-api';
+const PAGE = 50;
+const S = { dept: '', q: '', sort: 'party', offset: 0, total: 0 };
+const $ = id => document.getElementById(id);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+let seq = 0;
+
+async function get(path) {
+  const t0 = performance.now();
+  const r = await fetch(API + path);
+  if (!r.ok) throw new Error((await r.json().catch(() => ({}))).error || 'HTTP ' + r.status);
+  const j = await r.json(); j._ms = Math.round(performance.now() - t0); return j;
+}
+function readUrl() { const p = new URLSearchParams(location.hash.slice(1)); S.dept = p.get('dept') || ''; S.q = p.get('q') || ''; S.sort = p.get('sort') || 'party'; S.offset = +(p.get('o') || 0); }
+function writeUrl() { const p = new URLSearchParams(); if (S.dept) p.set('dept', S.dept); if (S.q) p.set('q', S.q); if (S.sort !== 'party') p.set('sort', S.sort); if (S.offset) p.set('o', S.offset); history.replaceState(null, '', '#' + p); }
+
+async function load() {
+  const my = ++seq; writeUrl();
+  const qs = new URLSearchParams({ dept: S.dept, q: S.q, sort: S.sort, limit: PAGE, offset: S.offset });
+  try {
+    const j = await get('/contracts?' + qs);
+    if (my !== seq) return;
+    S.total = j.total; $('err').hidden = true;
+    $('rows').innerHTML = j.rows.map(r => '<tr class="row" data-t="' + r.token + '"><td>' + esc(r.party) + '<div class="hide-s" style="color:var(--mut);font-size:12px">' + esc(r.department) + '</div></td><td class="num">' + esc(r.number) + '</td><td class="hide-s">' + esc(r.description) + '</td><td class="num hide-s">' + esc(r.expires) + '</td><td>' + (r.archived ? '<span class="tag ok">on archive.org</span>' : '<span class="tag">pending</span>') + '</td></tr>').join('') || '<tr><td colspan="5" style="color:var(--mut);padding:24px 8px">No contracts match.</td></tr>';
+    $('range').textContent = j.total ? (S.offset + 1) + '–' + Math.min(S.offset + PAGE, j.total) + ' of ' + j.total.toLocaleString() : '0';
+    $('prev').disabled = S.offset === 0; $('next').disabled = S.offset + PAGE >= j.total;
+    $('meta').textContent = j._ms + ' ms';
+  } catch (e) { if (my === seq) { $('err').hidden = false; $('err').textContent = 'Could not load contracts (' + e.message + ').'; } }
+}
+
+async function openDetail(tok) {
+  $('detail').classList.add('open'); $('detail').setAttribute('aria-hidden', 'false');
+  $('dtitle').textContent = 'Loading…'; $('dbody').innerHTML = '';
+  try {
+    const d = await get('/contract/' + tok);
+    $('dtitle').textContent = (d.party || tok) + (d.number ? ' — ' + d.number : '');
+    const byKind = {}; d.observations.forEach(o => (byKind[o.kind || 'text'] = byKind[o.kind || 'text'] || []).push(o));
+    $('dbody').innerHTML = '<p style="color:var(--mut)">' + esc(d.department) + ' · ' + esc(d.description) + (d.expires ? ' · expires ' + esc(d.expires) : '') + '</p>'
+      + '<p><a href="' + API + '/contract/' + tok + '/pdf" target="_blank" rel="noopener">Open PDF in a new tab ↗</a>' + (d.archive_url ? ' · <a href="' + esc(d.archive_url) + '" target="_blank" rel="noopener">archive.org ↗</a>' : '') + '</p>'
+      + '<iframe src="' + API + '/contract/' + tok + '/pdf" title="Contract PDF"></iframe>'
+      + '<h3 style="font:600 14px var(--sans);margin:18px 0 4px">What the reader found (' + d.observations.length + ')</h3>'
+      + (d.observations.length ? Object.entries(byKind).map(([k, os]) => os.map(o => '<div class="obs"><b>' + esc(k) + (o.fields && o.fields.section ? ' · ' + esc(o.fields.section) : '') + '</b>' + esc(o.verbatim).slice(0, 600) + '</div>').join('')).join('') : '<p style="color:var(--mut)">Not read yet.</p>');
+  } catch (e) { $('dtitle').textContent = 'Could not open this contract'; $('dbody').innerHTML = '<p class="err">' + esc(e.message) + '</p>'; }
+}
+
+let tmr;
+$('q').addEventListener('input', e => { clearTimeout(tmr); tmr = setTimeout(() => { S.q = e.target.value.trim(); S.offset = 0; load(); }, 160); });
+$('dept').addEventListener('change', e => { S.dept = e.target.value; S.offset = 0; load(); });
+$('prev').addEventListener('click', () => { S.offset = Math.max(0, S.offset - PAGE); load(); window.scrollTo(0, 0); });
+$('next').addEventListener('click', () => { S.offset += PAGE; load(); window.scrollTo(0, 0); });
+document.querySelector('thead').addEventListener('click', e => { const s = e.target.dataset.sort; if (s) { S.sort = s; S.offset = 0; load(); } });
+$('rows').addEventListener('click', e => { const tr = e.target.closest('tr.row'); if (tr) openDetail(tr.dataset.t); });
+$('dclose').addEventListener('click', () => { $('detail').classList.remove('open'); $('dbody').innerHTML = ''; });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') $('dclose').click(); });
+
+(async () => {
+  readUrl(); $('q').value = S.q;
+  try {
+    const ds = await get('/departments');
+    $('dept').innerHTML = '<option value="">All departments (' + ds.reduce((n, d) => n + d.n, 0).toLocaleString() + ')</option>' + ds.map(d => '<option value="' + esc(d.department) + '">' + esc(d.department) + ' (' + d.n.toLocaleString() + ')</option>').join('');
+    $('dept').value = S.dept;
+  } catch (e) {}
+  load();
+})();
+</script>
+</body>
+</html>
