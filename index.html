@@ -2539,6 +2539,40 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
             <sc-if value="{{ rdPins.has }}" hint-placeholder-val="{{ false }}"><button onClick="{{ goDraft }}" style="all:unset;cursor:pointer;font:600 14px var(--sans);color:var(--acc);white-space:nowrap" style-hover="text-decoration:underline">{{ rdPins.label }}</button></sc-if>
           </div>
           </div>
+          <sc-if value="{{ rel.on }}" hint-placeholder-val="{{ false }}">
+            <details class="hd-disclosure" style="border-top:1px solid var(--line);padding:4px 34px 0;background:var(--s2)">
+              <summary>Related <span style="color:var(--mut);font-weight:400">· {{ rel.summary }}</span></summary>
+              <div style="display:flex;flex-direction:column;gap:14px;padding:8px 0 14px">
+                <sc-if value="{{ rel.hasLineage }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex;flex-direction:column;gap:6px">
+                    <span style="font:600 12px var(--mono);color:var(--mut)">{{ rel.basis }}</span>
+                    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:8px">
+                      <sc-for list="{{ rel.cards }}" as="c" hint-placeholder-count="3">
+                        <button onClick="{{ c.onOpen }}" style="all:unset;cursor:pointer;box-sizing:border-box;border:1px solid var(--line2);border-radius:10px;padding:9px 12px;background:var(--s1);display:flex;flex-direction:column;gap:2px;min-width:0">
+                          <span style="font:600 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--acc)">{{ c.title }}</span>
+                          <span style="font:500 14px var(--sans);color:var(--ink)">{{ c.number }}</span>
+                          <span style="font:400 13px var(--sans);color:var(--ink2)">{{ c.what }}</span>
+                          <span style="font:400 12.5px var(--mono);color:var(--mut)">{{ c.meta }}</span>
+                        </button>
+                      </sc-for>
+                    </div>
+                  </div>
+                </sc-if>
+                <sc-for list="{{ rel.groups }}" as="g" hint-placeholder-count="3">
+                  <div style="display:flex;flex-direction:column;gap:3px">
+                    <span style="font:600 13px var(--sans);color:var(--ink)">{{ g.label }} <span style="color:var(--mut);font-weight:400">· {{ g.n }} {{ g.note }}</span></span>
+                    <sc-for list="{{ g.items }}" as="it" hint-placeholder-count="3">
+                      <button onClick="{{ it.onOpen }}" title="{{ it.sub }}" style="all:unset;cursor:pointer;display:flex;gap:10px;align-items:baseline;padding:3px 6px;border-radius:6px;min-width:0" style-hover="background:var(--s1)">
+                        <span style="font:500 13.5px var(--sans);color:var(--acc);white-space:nowrap">{{ it.title }}</span>
+                        <span style="font:400 12.5px var(--sans);color:var(--mut);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0">{{ it.sub }}</span>
+                      </button>
+                    </sc-for>
+                  </div>
+                </sc-for>
+                <sc-if value="{{ rel.dept.has }}" hint-placeholder-val="{{ false }}"><button onClick="{{ rel.dept.onOpen }}" style="all:unset;cursor:pointer;font:500 13.5px var(--sans);color:var(--acc)">{{ rel.dept.label }} →</button></sc-if>
+              </div>
+            </details>
+          </sc-if>
           <sc-if value="{{ rdProv.has }}" hint-placeholder-val="{{ false }}">
             <details class="hd-disclosure" style="border-top:1px solid var(--line);padding:4px 34px 0;background:var(--s2)">
               <summary>How this was read &amp; altered</summary>
@@ -10147,6 +10181,7 @@ onAsk: () => { this.setState({ txAsk: d0.id }); this.pickYtFile(d0); }, onCancel
         return { hasFaithful: hf, noFaithful: !hf, modeR: pill(onR), modeReading: () => this.setState({ readMode: 'reading' }),
           rdFaith: hf && S.readMode === 'original' ? { has: true, note: (d0.pdfSrc ? 'The PDF exactly as captured' + (d0.custody ? ' (' + d0.custody + ')' : '') + '.' : 'The page as captured' + (d0.custody ? ' (' + d0.custody + ')' : '') + '. Layout and styles load from ' + ohsPublisher(d0.url) + ' today and may have changed since; the words are the captured bytes.') + (this._faithFound ? ' ' + this._faithFound.found + ' of ' + plural(this._faithFound.total, 'statement') + ' located and marked; the rest differ in wording or layout — see Reading.' : '') } : { has: false }, _o: onO }; })(),
       showRestated: !(S.readDoc && A.docById[S.readDoc] && A.docById[S.readDoc].vm),
+      rel: this.relatedVals(S.readDoc && A.docById[S.readDoc]),
       modeO: (() => { const d0 = S.readDoc && A.docById[S.readDoc]; const hf = !!(d0 && (d0.faithful || d0.binPath || d0.pdfSrc)); const on = S.readMode === 'original' || (!hf && S.readMode === 'reading'); return { bg: on ? 'var(--sel)' : 'transparent', color: on ? 'var(--ink)' : 'var(--mut)', label: d0 && d0.transcribed ? 'As heard' : 'Original' }; })(), modeP: { bg: S.readMode === 'plain' ? 'var(--sel)' : 'transparent', color: S.readMode === 'plain' ? 'var(--ink)' : 'var(--mut)' }, modeS: (() => { const d0 = S.readDoc && A.docById[S.readDoc]; const hf = !!(d0 && (d0.faithful || d0.binPath || d0.pdfSrc)); const on = ['restated', 'figures', 'summary'].includes(S.readMode) || (hf && S.readMode === 'reading'); return { bg: on ? 'var(--sel)' : 'transparent', color: on ? 'var(--ink)' : 'var(--mut)' }; })(), modeRestated: () => this.setState({ readMode: 'restated' }),
 modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S.readMode === 'summary' ? 'var(--ink)' : 'var(--mut)' }, modeSummary: () => this.setState({ readMode: 'summary' }),
       hasScreen: !!(S.readDoc && A.docById[S.readDoc] && A.docById[S.readDoc].screen && A.docById[S.readDoc].screen.elements && A.docById[S.readDoc].screen.elements.length),
@@ -10266,6 +10301,49 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
     const V = this._vm, L = SAMPLES['metro-vm'].docs; if (!V || L.some(d => d.id === id)) return;
     try { const j = await V.M.detail(id.replace(/^nash-/, '')); const d = V.M.toDoc(j); d.text = V.M.textOf(j); d.readState = j.read || ''; d._read = true; L.unshift(d); this._key = null; this.forceUpdate(); } catch (e) {}
   }
+  // what a contract is related to (vendor, signers, similar topics, its vendor's prior/next), from the VM: the reader
+  // holds one page of contracts, the relations live across all of them
+  async vmRelated(id) {
+    const V = this._vm; if (!V || !V.M.related) return; const tok = id.replace(/^nash-/, ''); this._rel = this._rel || {};
+    if (this._rel[tok]) return;
+    try { this._rel[tok] = await V.M.related(tok); this.forceUpdate(); } catch (e) { /* a source without relations shows none */ }
+  }
+  async vmGo(id) { await this.vmEnsure(id); this.read(id); }
+  relatedVals(d0) {
+    const R = d0 && d0.vm && this._rel && this._rel[String(d0.id).replace(/^nash-/, '')];
+    if (d0 && !d0.vm) {
+      // Any workspace: sources sharing a value of one of its own recurring fields (vendor, department, author…), each
+      // group named by the field and capped. A value shared by more than ~sqrt(N) sources says nothing about THIS one.
+      try {
+        const A = this._A, FC = this._fc && this._fc.A === A ? this._fc : null;
+        if (A && FC && FC.byDoc) {
+          const mine = FC.byDoc.get(d0.id) || {}, cap = Math.max(3, Math.ceil(Math.sqrt(A.docs.length)) + 1), groups = [];
+          for (const f of FC.fields) {
+            if (groups.length >= 4) break; const v = mine[f.key]; if (!v || f.type !== 'text') continue;
+            const others = A.docs.filter(o => o.id !== d0.id && (FC.byDoc.get(o.id) || {})[f.key] === v);
+            if (!others.length || others.length + 1 > cap) continue;
+            groups.push({ label: 'Same ' + String(f.label).toLowerCase(), n: others.length, note: v, items: others.slice(0, 6).map(o => ({ title: o.title, sub: '', onOpen: () => this.read(o.id) })), more: 0 });
+          }
+          if (groups.length) return { on: true, summary: groups.map(g => g.n + ' ' + g.label.toLowerCase()).join(' · '), groups, dept: { has: false }, hasLineage: false, basis: '', cards: [] };
+        }
+      } catch (e) { /* no relations shown rather than a broken reader */ }
+    }
+    if (!R) return { on: false, groups: [], hasLineage: false, summary: '' };
+    const money = n => n == null ? '—' : '$' + Math.round(n).toLocaleString();
+    const item = x => ({ title: (x.number ? x.number + ' — ' : '') + (x.party || ''), sub: [x.description, x.expires && 'expires ' + x.expires].filter(Boolean).join(' · '), onOpen: () => this.vmGo('nash-' + x.token) });
+    const groups = [];
+    if (R.vendor && R.vendor.total) groups.push({ label: 'Same vendor', n: R.vendor.total, note: R.vendor.label, items: R.vendor.items.map(item), more: R.vendor.total > R.vendor.items.length ? R.vendor.total - R.vendor.items.length : 0,
+      onAll: () => { this.setState({ view: 'summary', readDoc: null }); this.vmLoad({ dept: '', q: R.vendor.label }); } });
+    // the people on this contract: the few with a specific footprint first (a vendor's director), the many-contract Metro approvers last, three at most
+    (R.signers || []).slice().sort((a, b) => a.total - b.total).slice(0, 3).forEach(sg => groups.push({ label: 'Also signed by ' + sg.name, n: sg.total, note: sg.total >= 40 ? '40+ contracts' : '', items: sg.items.map(item), more: 0 }));
+    if (R.topics && R.topics.items.length) groups.push({ label: 'Similar topics', n: R.topics.items.length, note: R.topics.words.join(', '), items: R.topics.items.map(item), more: 0 });
+    const L = R.lineage;
+    const card = (x, title) => x ? { has: true, title, number: x.number, expires: x.expires || '—', amount: money(x.amount), what: x.description || '', meta: [x.expires, money(x.amount)].filter(Boolean).join(' · '), onOpen: () => this.vmGo('nash-' + x.token) } : { has: false, title, number: '', expires: '', amount: '', meta: '', what: 'None found for this vendor', onOpen: () => {} };
+    const bits = []; if (R.vendor && R.vendor.total) bits.push(R.vendor.total + ' same vendor'); if (R.topics && R.topics.items.length) bits.push(R.topics.items.length + ' similar'); if ((R.signers || []).length) bits.push(R.signers.length + ' signers');
+    return { on: true, summary: bits.join(' · ') + (L && (L.prior || L.next) ? ' · prior/next' : ''), groups,
+      dept: R.department ? { has: true, label: 'All ' + R.department.name + ' contracts (' + R.department.total.toLocaleString() + ')', onOpen: () => { this.setState({ view: 'summary', readDoc: null }); this.vmLoad({ dept: R.department.name, q: '' }); } } : { has: false },
+      hasLineage: !!(L && (L.prior || L.next)), basis: L ? L.basis : '', cards: L ? [card(L.prior, 'Prior'), card(L.self, 'This contract'), card(L.next, 'Subsequent')] : [] };
+  }
   async vmOpenText(id) {
     const V = this._vm, d = V && SAMPLES['metro-vm'] && SAMPLES['metro-vm'].docs.find(x => x.id === id);
     if (!d || !d.vm || d._read) return;
@@ -10327,7 +10405,7 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
   }
 
   readLog() { if (!this._rlog) { try { this._rlog = JSON.parse(localStorage.getItem('fold-explorer-readlog') || '{}'); } catch (e) { this._rlog = {}; } } return this._rlog[this.corpusId()] || {}; }
-  markRead(docId) { if (this._vm && this.corpusId() === 'metro-vm') { this.vmOpenText(docId); if (this.state.readMode === 'restated') this.setState({ readMode: 'original' }); } const rl = this.readLog(); if (rl[docId]) return; this._rlog[this.corpusId()] = { ...rl, [docId]: Date.now() }; try { localStorage.setItem('fold-explorer-readlog', JSON.stringify(this._rlog)); } catch (e) {} }
+  markRead(docId) { if (this._vm && this.corpusId() === 'metro-vm') { this.vmOpenText(docId); this.vmRelated(docId); if (this.state.readMode === 'restated') this.setState({ readMode: 'original' }); } const rl = this.readLog(); if (rl[docId]) return; this._rlog[this.corpusId()] = { ...rl, [docId]: Date.now() }; try { localStorage.setItem('fold-explorer-readlog', JSON.stringify(this._rlog)); } catch (e) {} }
   surprise(A) {
     const cur = SU_CURSORS.some(c => c.id === this.state.cursor) ? this.state.cursor : 'pub';
     const lens = this.state.suLens; const base = null;

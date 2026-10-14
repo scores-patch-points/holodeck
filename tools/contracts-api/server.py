@@ -10,6 +10,7 @@
   GET /contract/<token>/pdf           the filed PDF: local copy, else archive.org twin, else ePAV; cached
   GET /contract/<token>/thumb.jpg     first page as a small JPEG (made once, cached)
   GET /contract/<token>/layout        the pages' text with its boxes (build_layouts.py): paints before the PDF arrives
+  GET /contract/<token>/related       what this contract is related to: vendor, signers, similar topics, department, prior/next
 
 The fold's work (reading, observation extraction) happened once on this host and is in the index;
 a request is a lookup, so a department's whole list comes back in milliseconds. Every response
@@ -111,6 +112,62 @@ def _search(p):
         out.append(r)
     return {'total': total, 'offset': offset, 'limit': limit, 'rows': out}
 
+STOPWORDS = set('and the for with of to in on at by or a an agreement contract services service amendment inc llc co corp'.split())
+def _date_key(s):
+    m = re.match(r'^(\d{1,2})/(\d{1,2})/(\d{4})$', (s or '').strip())
+    return (int(m.group(3)), int(m.group(1)), int(m.group(2))) if m else None
+
+def _brief(x): return {'token': x['token'], 'number': x['number'], 'party': x['party'], 'description': x['description'], 'expires': x['expires'], 'department': x['department']}
+
+def _amount(c, tok):
+    best = None
+    for (f,) in c.execute("SELECT fields FROM obs WHERE token=? AND kind='amount'", (tok,)):
+        m = re.search(r'\$([\d,]+(?:\.\d+)?)', json.loads(f or '{}').get('amount', '') or '')
+        if m:
+            v = float(m.group(1).replace(',', ''))
+            if best is None or v > best: best = v
+    return best
+
+def related(tok):
+    """Related contracts, each with the reason it is related, none of it inferred: same vendor string, same department,
+    a signer's e-mail on both, words of the description shared (full-text), and the vendor's own sequence by expiry."""
+    c = conn(); me = c.execute('SELECT * FROM contracts WHERE token=?', (tok,)).fetchone()
+    if not me: return None
+    out = {'token': tok}
+    # same vendor
+    if me['party']:
+        rows = c.execute('SELECT * FROM contracts WHERE party=? COLLATE NOCASE AND token!=? ORDER BY substr(expires,-4) DESC, expires DESC', (me['party'], tok)).fetchall()
+        out['vendor'] = {'label': me['party'], 'total': len(rows), 'items': [_brief(x) for x in rows[:6]]}
+    # same department (a count and a way in, not a list)
+    if me['department']:
+        out['department'] = {'name': me['department'], 'total': c.execute('SELECT COUNT(*) FROM contracts WHERE department=?', (me['department'],)).fetchone()[0]}
+    # same signers
+    sg = []
+    for name, email in c.execute('SELECT name, email FROM signers WHERE token=?', (tok,)).fetchall():
+        rs = c.execute('SELECT DISTINCT c.* FROM signers s JOIN contracts c ON c.token = s.token WHERE s.email=? AND s.token!=? ORDER BY substr(c.expires,-4) DESC LIMIT 40', (email, tok)).fetchall()
+        if rs: sg.append({'name': name, 'email': email, 'total': len(rs), 'items': [_brief(x) for x in rs[:5]]})
+    out['signers'] = sg
+    # similar topics: the description's own words, matched against other contracts' fields (best match first)
+    words = [w for w in dict.fromkeys(re.findall(r'[A-Za-z]{4,}', me['description'] or '')) if w.lower() not in STOPWORDS][:6]
+    if words:
+        expr = ' OR '.join('"%s"' % w for w in words)
+        try:
+            rs = c.execute('SELECT c.* FROM contracts_fts f JOIN contracts c ON c.rowid = f.rowid WHERE contracts_fts MATCH ? AND c.token != ? AND c.party != ? ORDER BY bm25(contracts_fts) LIMIT 6',
+                           (expr, tok, me['party'] or '')).fetchall()
+        except sqlite3.OperationalError:
+            rs = []
+        out['topics'] = {'words': words, 'items': [_brief(x) for x in rs]}
+    # prior / subsequent in this vendor's own sequence, by expiry
+    mine = _date_key(me['expires'])
+    if mine and me['party']:
+        seq = [(k, x) for x in c.execute('SELECT * FROM contracts WHERE party=? COLLATE NOCASE AND token!=?', (me['party'], tok)) for k in [_date_key(x['expires'])] if k]
+        prior = max((p for p in seq if p[0] <= mine), key=lambda p: p[0], default=None)
+        nxt = min((p for p in seq if p[0] > mine), key=lambda p: p[0], default=None)
+        def card(x): d = _brief(x['x'] if isinstance(x, dict) else x); d['amount'] = _amount(c, d['token']); return d
+        out['lineage'] = {'basis': "this vendor's contracts, ordered by expiry", 'self': dict(_brief(me), amount=_amount(c, tok)),
+                          'prior': card(prior[1]) if prior else None, 'next': card(nxt[1]) if nxt else None}
+    return out
+
 def detail(tok):
     c = conn(); x = c.execute('SELECT * FROM contracts WHERE token=?', (tok,)).fetchone()
     if not x: return None
@@ -191,8 +248,11 @@ class H(BaseHTTPRequestHandler):
                 return self.send(200, {'ok': True, 'contracts': int(m.get('contracts', 0)), 'observations': c.execute('SELECT COUNT(*) FROM obs').fetchone()[0], 'built_at': m.get('built_at')}, t0=t0)
             if path == '/departments': return self.send(200, departments(), t0=t0)
             if path == '/contracts': return self.send(200, search(p), t0=t0)
-            m = re.match(r'^/contract/([A-Za-z0-9]+)(/pdf|/thumb\.jpg|/layout)?$', path)
+            m = re.match(r'^/contract/([A-Za-z0-9]+)(/pdf|/thumb\.jpg|/layout|/related)?$', path)
             if m and TOK.match(m.group(1)):
+                if m.group(2) == '/related':
+                    r = related(m.group(1))
+                    return self.send(200, r, t0=t0) if r else self.send(404, {'error': 'unknown contract'}, t0=t0)
                 if m.group(2) == '/layout':
                     lp = os.path.join(LAYOUT, m.group(1) + '.json')
                     if not os.path.exists(lp): return self.send(404, {'error': 'no layout yet'}, extra={'Cache-Control': 'public, max-age=60'}, t0=t0)

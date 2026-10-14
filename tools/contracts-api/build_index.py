@@ -33,6 +33,10 @@ CREATE TABLE IF NOT EXISTS obs(
   id INTEGER PRIMARY KEY, token TEXT, kind TEXT, a INTEGER, b INTEGER, verbatim TEXT, fields TEXT);
 CREATE INDEX IF NOT EXISTS obs_token ON obs(token);
 CREATE TABLE IF NOT EXISTS gist(token TEXT PRIMARY KEY, obs_n INTEGER, gist TEXT, read TEXT);
+CREATE TABLE IF NOT EXISTS signers(token TEXT, name TEXT, email TEXT);
+CREATE INDEX IF NOT EXISTS signers_tok ON signers(token);
+CREATE INDEX IF NOT EXISTS signers_email ON signers(email);
+CREATE TABLE IF NOT EXISTS signers_done(token TEXT PRIMARY KEY, mtime REAL);
 CREATE VIRTUAL TABLE IF NOT EXISTS obs_fts USING fts5(verbatim, content='obs', content_rowid='id', tokenize='porter unicode61');
 ''')
 
@@ -116,5 +120,40 @@ for tok in todo:
     if (have.get(tok), ) != (rd,) or tok in touched or g:
         db.execute('INSERT OR REPLACE INTO gist VALUES (?,?,?,?)', (tok, n_obs, g, rd)); gn += 1
 db.commit()
+# ---- signers: who signed, from the DocuSign certificate's "Signer Events" block (deterministic: a name line above
+# an e-mail line). Only for contracts whose text changed since last run. Read as: this person's e-mail appears
+# as a signer of this contract; nothing is inferred beyond that. ----
+EMAIL = re.compile(r'^[\w.+\-]+@[\w\-]+(?:\.[\w\-]+)+$')
+STOP = re.compile(r'^(in person signer events|editor delivery events|agent delivery events|intermediary delivery events|'
+                  r'certified delivery events|carbon copy events|witness events|notary events|envelope summary events|payment events)', re.I)
+SKIP = re.compile(r'^(signature|timestamp|signer events|\(none\)|sent|viewed|signed|accepted|resent|status|security level|using ip address)', re.I)
+def signers_of(text):
+    ls = [l.strip() for l in text.splitlines()]; out = {}
+    for i, l in enumerate(ls):
+        if l.lower() != 'signer events': continue
+        j = i + 1
+        while j < len(ls) and not STOP.match(ls[j]):
+            if EMAIL.match(ls[j]):
+                k = j - 1
+                while k > i and not ls[k]: k -= 1
+                nm = ls[k] if k > i else ''
+                if nm and not SKIP.match(nm) and 2 <= len(nm.split()) <= 5 and re.match(r"^[A-Za-z][A-Za-z.'\- ]+$", nm): out[ls[j].lower()] = nm
+            j += 1
+        break
+    return out
+done = dict(db.execute('SELECT token, mtime FROM signers_done'))
+db.execute('BEGIN'); sn = 0
+for tok, idn in ident.items():
+    tp = os.path.join(a.data, 'deployed', idn or '-', 'extracted-text.txt')
+    try: mt = os.path.getmtime(tp)
+    except OSError: continue
+    if done.get(tok) == mt: continue
+    try:
+        with open(tp, encoding='utf-8', errors='replace') as fh: txt = fh.read()
+    except OSError: continue
+    db.execute('DELETE FROM signers WHERE token=?', (tok,))
+    for em, nm in signers_of(txt).items(): db.execute('INSERT INTO signers VALUES (?,?,?)', (tok, nm, em)); sn += 1
+    db.execute('INSERT OR REPLACE INTO signers_done VALUES (?,?)', (tok, mt))
+db.commit()
 meta_set('ledger_offset', off); meta_set('built_at', time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())); db.commit()
-print(json.dumps({'contracts': len(rows), 'gists_refreshed': gn, 'new_observations': n, 'ledger_offset': off, 'seconds': round(time.time() - t0, 1)}))
+print(json.dumps({'contracts': len(rows), 'gists_refreshed': gn, 'signers_added': sn, 'new_observations': n, 'ledger_offset': off, 'seconds': round(time.time() - t0, 1)}))

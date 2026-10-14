@@ -24,6 +24,7 @@ async function get(path) {
 
 export const departments = () => get('/departments');
 export const detail = tok => get('/contract/' + encodeURIComponent(tok));
+export const related = tok => get('/contract/' + encodeURIComponent(tok) + '/related');
 export const pdfUrl = tok => API + '/contract/' + encodeURIComponent(tok) + '/pdf';
 export function page({ dept = '', q = '', sort = 'party', offset = 0, limit = 200 } = {}) {
   const p = new URLSearchParams({ dept, q, sort, offset, limit });
