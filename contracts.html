@@ -121,7 +121,7 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') $('dclose').
   readUrl(); $('q').value = S.q;
   try {
     const ds = await get('/departments');
-    $('dept').innerHTML = '<option value="">All departments (' + ds.reduce((n, d) => n + d.n, 0).toLocaleString() + ')</option>' + ds.map(d => '<option value="' + esc(d.department) + '">' + esc(d.department) + ' (' + d.n.toLocaleString() + ')</option>').join('');
+    $('dept').innerHTML = '<option value="">All departments (' + ds.reduce((n, d) => n + d.n, 0).toLocaleString() + ')</option>' + ds.slice().sort((a, b) => a.department.localeCompare(b.department)).map(d => '<option value="' + esc(d.department) + '">' + esc(d.department) + ' (' + d.n.toLocaleString() + ')</option>').join('');
     $('dept').value = S.dept;
   } catch (e) {}
   load();

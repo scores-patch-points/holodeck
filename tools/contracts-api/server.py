@@ -54,7 +54,7 @@ _dept = {'t': 0, 'v': None}
 def departments():
     st = os.stat(DB).st_mtime
     if _dept['v'] is None or _dept['t'] != st:
-        r = conn().execute("SELECT department, COUNT(*) n FROM contracts WHERE department != '' GROUP BY department ORDER BY n DESC").fetchall()
+        r = conn().execute("SELECT department, COUNT(*) n FROM contracts WHERE department != '' GROUP BY department ORDER BY department COLLATE NOCASE").fetchall()
         _dept['v'] = [{'department': x['department'], 'n': x['n']} for x in r]; _dept['t'] = st
     return _dept['v']
 
