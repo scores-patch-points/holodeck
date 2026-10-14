@@ -654,6 +654,7 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
           </sc-if>
           <sc-if value="{{ srcHiddenNote }}" hint-placeholder-val="{{ false }}"><span style="font:400 13px var(--sans);color:var(--dim)">{{ srcHiddenNote }}</span></sc-if>
         </div>
+        <div id="hd-brief-sources"></div>
         <sc-if value="{{ svTable }}" hint-placeholder-val="{{ false }}">
           <sc-for list="{{ svTables }}" as="tb" hint-placeholder-count="1">
             <section style="display:flex;flex-direction:column;gap:6px">
@@ -1632,6 +1633,7 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
               <button onClick="{{ pf.narrow.onClick }}" style="background:none;border:1px solid var(--line2);border-radius:8px;padding:5px 12px;cursor:pointer;font:500 13px var(--sans);color:var(--ink2)" style-hover="border-color:var(--acc)">{{ pf.narrow.label }}</button>
               <button onClick="{{ pfCo.toggle }}" style="background:none;border:1px solid var(--line2);border-radius:8px;padding:5px 12px;cursor:pointer;font:500 13px var(--sans);color:var(--ink2)" style-hover="border-color:var(--acc)">{{ pfCo.label }}</button>
             </div>
+            <div id="hd-brief-profile"></div>
             <sc-if value="{{ pf.sum.has }}" hint-placeholder-val="{{ false }}">
               <section style="background:var(--s1);border:1px solid var(--line);border-radius:14px;padding:14px 18px;display:flex;flex-direction:column;gap:7px">
                 <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
@@ -5350,6 +5352,44 @@ class Component extends DCLogic {
     }));
     return this._inboxP;
   }
+  // IN BRIEF (holodeck-brief.js over holodeck-fold-anything.js): the mechanical fold of whatever is in
+  // view — the workspace, a topic, a filter, a folder — atop Sources, and of everything said about a
+  // name on its profile. No model: every line is a source sentence, unchanged. Folded after the render,
+  // and only when the scope changes.
+  syncBrief() {
+    const mounts = [['hd-brief-sources', () => this.briefScopeSources()], ['hd-brief-profile', () => this.briefScopeProfile()]];
+    for (const [id, scopeOf] of mounts) {
+      const root = document.getElementById(id); if (!root) continue;
+      let sc; try { sc = scopeOf(); } catch (e) { sc = null; }
+      if (!sc || sc.sts.length < 3) { if (root.firstChild) root.replaceChildren(); root.__briefKey = null; continue; }
+      if (root.__briefKey === sc.key && root.firstChild) continue;
+      root.__briefKey = sc.key;
+      const go = () => (this._briefM || (this._briefM = import(new URL('holodeck-brief.js', location.href).href))).then(M => { if (root.isConnected && root.__briefKey === sc.key) M.mountBrief(root, { key: sc.key, scopeLabel: sc.label, unfiltered: !!sc.unfiltered, A: sc.A, sts: sc.sts, onOpen: l => this.read(l.doc, l.id) }); }).catch(() => {});
+      if (window.requestIdleCallback) window.requestIdleCallback(go, { timeout: 400 }); else setTimeout(go, 0);
+    }
+  }
+  briefScopeSources() {
+    const S = this.state; if (S.view !== 'summary') return null;
+    const A = this.analysis(); if (!A || !A.sts || !A.sts.length) return null;
+    const sts = A.sts.filter(st => this.match(st, A));
+    const f = S.f || {}; const bits = [];
+    if (f.topicGroup) bits.push(f.topicGroup.label);
+    if (f.name) bits.push(f.name);
+    if (f.doc && A.docById[f.doc]) bits.push(A.docById[f.doc].title);
+    if (S.folder) { const fo = (this.foldersFor ? this.foldersFor() : []).find(x => x.id === S.folder); bits.push(fo ? fo.name : 'this folder'); }
+    if ((S.q || '').trim()) bits.push('“' + S.q.trim() + '”');
+    const conds = (this.fxOf().conds || []).filter(c => c.value !== '' && c.value != null).length; const off = Object.values(S.offDocs || {}).filter(Boolean).length;
+    if (conds) bits.push(conds === 1 ? '1 filter' : conds + ' filters');
+    if (off) bits.push(off + ' source' + (off === 1 ? '' : 's') + ' switched off');
+    const label = !bits.length ? 'All of “' + this.corpusName() + '”' : 'What is in view: ' + bits.join(' · ');
+    return { A, sts, label, unfiltered: !bits.length, key: this.corpusId() + '|' + sts.length + '|' + (sts[0] && sts[0].id) + '|' + (sts[sts.length - 1] && sts[sts.length - 1].id) + '|' + label };
+  }
+  briefScopeProfile() {
+    const S = this.state; if (S.view !== 'profile' || !S.sel || S.sel.type !== 'name') return null;
+    const A = this.analysis(); const n = A && A.names && A.names[S.sel.id]; if (!n) return null;
+    const sts = n.sts.map(id => A.byId[id]).filter(Boolean);
+    return { A, sts, label: 'What the sources say about ' + S.sel.id, key: this.corpusId() + '|name|' + S.sel.id + '|' + sts.length };
+  }
   syncInbox() {
     const root = document.getElementById('inbox-surface');
     if (!root) { if (this._inboxMount) { try { this._inboxMount.destroy(); } catch (e) {} this._inboxMount = null; this._inboxRoot = null; } return; }
@@ -5708,7 +5748,7 @@ class Component extends DCLogic {
     window.addEventListener('resize', go);
     window.addEventListener('scroll', go, { passive: true });
   }
-  componentDidUpdate() { try { this.urlSync(); } catch (e) {} try { this.paintExtracted(); } catch (e) {} try { const c = this.corpusId(); if (c !== this._wsSeen) { this._wsSeen = c; touchWs(c); } } catch (e) {} this.installFill(); this.fitFill(); this.syncOverview(); this.syncInbox(); this.syncLinks(); this.ensureLinks(); this.applyTheme(); this.measureHdr(); try { const ff = document.getElementById('fold-folder-input'); if (ff && !ff.multiple) { ff.webkitdirectory = true; ff.setAttribute('webkitdirectory', ''); ff.multiple = true; ff.setAttribute('multiple', ''); } } catch (e) {} if (this._prevCorpus !== this.state.corpus || this._prevAdded !== this.state.added) { this._prevCorpus = this.state.corpus; this._prevAdded = this.state.added; this.loadHtml(); this.akAutoLoad(); } const rd0 = this.state.readDoc && this.analysis().docById[this.state.readDoc]; if (rd0 && rd0.media && rd0.media.kind === 'local') { this.ensureMediaUrl(rd0);
+  componentDidUpdate() { try { this.urlSync(); } catch (e) {} try { this.paintExtracted(); } catch (e) {} try { const c = this.corpusId(); if (c !== this._wsSeen) { this._wsSeen = c; touchWs(c); } } catch (e) {} this.installFill(); this.fitFill(); this.syncOverview(); this.syncInbox(); this.syncBrief(); this.syncLinks(); this.ensureLinks(); this.applyTheme(); this.measureHdr(); try { const ff = document.getElementById('fold-folder-input'); if (ff && !ff.multiple) { ff.webkitdirectory = true; ff.setAttribute('webkitdirectory', ''); ff.multiple = true; ff.setAttribute('multiple', ''); } } catch (e) {} if (this._prevCorpus !== this.state.corpus || this._prevAdded !== this.state.added) { this._prevCorpus = this.state.corpus; this._prevAdded = this.state.added; this.loadHtml(); this.akAutoLoad(); } const rd0 = this.state.readDoc && this.analysis().docById[this.state.readDoc]; if (rd0 && rd0.media && rd0.media.kind === 'local') { this.ensureMediaUrl(rd0);
       // A recording opened but never classified gets its sound map on first sight (an
       // older stored recording, or one added before the classifier existed); the work
       // is the same in-browser rung, guarded so it happens once until it lands.
@@ -7439,9 +7479,44 @@ class Component extends DCLogic {
   // A question is answered, never briefed: with ground and a ready model, straight to the Ask
   // pipeline; with ground but no model loaded, the record's own answer; with no ground at all, a
   // cited refusal (II.3, the descent test — resolution, never invention) that offers to gather, keep, or add — never a silent conversion to ingest.
+  // A SUMMARY ASK IS FOLDED, NOT GENERATED: "summarise this", "tl;dr", "what is this about", "what do the
+  // sources say about X" are answered by holodeck-fold-anything.js over that scope — every line a source
+  // sentence, unchanged, gated by Houdini and the English parser — with no model, whether or not one is loaded.
+  summaryScope(q, A) {
+    const m = String(q).match(/^\s*(?:please\s+)?(summari[sz]e|sum up|summary( of)?|give me (?:a|the) (?:summary|gist|rundown|brief)( of)?|brief me( on)?|tl;?dr|in brief|what(?:'s| is) (?:this|it|all this|the workspace) about|what (?:do|does) (?:the |my |these |this )?(?:sources?|documents?|it|they|record) say about)\b\s*(.*)$/i);
+    if (!m) return null;
+    const rest = (m[m.length - 1] || '').replace(/[?.!]+$/, '').replace(/^(?:of|on|about|for)\s+/i, '').replace(/^(?:the|this|these|my|our)\s+(?:workspace|sources?|documents?|meeting|material)\s*$/i, '').trim();
+    if (!rest || /^(it|this|that|everything|all( of)?( this| it)?)$/i.test(rest)) return { label: 'what is in view', sts: A.sts.filter(st => this.match(st, A)) };
+    const name = Object.keys(A.names || {}).filter(n => n.toLowerCase() === rest.toLowerCase() || rest.toLowerCase().includes(n.toLowerCase()) && n.length > 3).sort((a, b) => b.length - a.length)[0];
+    if (name) return { label: 'what the sources say about ' + name, sts: A.names[name].sts.map(id => A.byId[id]).filter(Boolean) };
+    // the ask's words the material actually carries (3+ statements each); all of them if that leaves enough, else the one it carries most
+    const pool = A.sts.filter(st => !st.ref); const has = w => pool.filter(st => st.text.toLowerCase().includes(w));
+    const words = rest.toLowerCase().split(/[^\p{L}\p{N}'’-]+/u).filter(w => w.length > 2 && !/^(the|and|for|with|from|that|this|what|about|into|over)$/.test(w)).map(w => ({ w, hits: has(w) })).filter(x => x.hits.length >= 3);
+    if (!words.length) return { label: 'statements that mention “' + rest + '”', sts: [] };
+    const all = pool.filter(st => words.every(x => st.text.toLowerCase().includes(x.w)));
+    if (all.length >= 3) return { label: 'statements that mention ' + words.map(x => '“' + x.w + '”').join(' and '), sts: all };
+    const top = words.slice().sort((a, b) => b.hits.length - a.hits.length)[0];
+    return { label: 'statements that mention “' + top.w + '”', sts: top.hits };
+  }
+  async answerBrief(q, scope) {
+    const t0 = Date.now(); const A = this.analysis();
+    this.setState({ akPending: q, akQ: '', akRefuse: null, akBusy: 'folding', view: 'ask', readDoc: null });
+    let F; try { const FA = await import(new URL('holodeck-fold-anything.js', location.href).href); F = await FA.foldAnythingChecked(A, scope.sts, { size: 5 }); } catch (e) { F = { ok: false, lines: [], note: 'The fold could not run: ' + ((e && e.message) || e), scope: { statements: 0, sources: 0 } }; }
+    if (!this._conv) { try { const M = await this.askMod(); this._conv = M.emptyConv(); } catch (e) { this._conv = { summary: { records: [], turnCount: 0 }, history: [], turns: [] }; } }
+    const attr = F.ok ? F.lines.map(l => ({ text: l.text, ref: 'st:' + l.id })) : [{ text: F.note || 'Nothing here to fold.', ref: null }];
+    const conv = this._conv; const n = (conv.turns.length ? parseInt(conv.turns[conv.turns.length - 1].n) : 0) + 1;
+    const answer = attr.map(a => a.text).join(' ');
+    const turn = { n, question: q, answer, attr, used: [], offered: [], findings: [], record: { refs: attr.filter(a => a.ref).map(a => a.ref), unsupported: [], open: [] },
+      foldLine: F.ok ? 'Folded with no model from ' + plural(F.scope.statements, 'statement') + (F.scope.sources > 1 ? ' in ' + plural(F.scope.sources, 'source') : '') + ' — ' + scope.label + '. Every line is a source sentence, unchanged' + (F.grammarChecked ? ', each checked by the English parser' : '') + '; ' + plural(F.folded.length, 'line') + ' set aside.' : '',
+      sentChars: 0, transcriptChars: 0, noModel: true, model: 'the Fold (no model)', ms: Date.now() - t0, brief: true };
+    this._conv = { ...conv, history: [...(conv.history || []), { role: 'user', content: q }, { role: 'assistant', content: answer }], turns: [...conv.turns, turn] };
+    try { this.saveConv(); } catch (e) {}
+    this.setState({ akBusy: '', akPending: '', akStream: '' });
+  }
   askQuestion(qIn) {
     const q = String(qIn || '').trim(); if (!q) return;
     const A = this.analysis();
+    if (A.docs.some(d => this.counted(d))) { const sc = this.summaryScope(q, A); if (sc) { this.setState({ q: '', qDraft: undefined }); this.answerBrief(q, sc); return; } }
     if (!A.docs.some(d => this.counted(d))) { this.setState({ q, qDraft: undefined, view: 'ask', readDoc: null, akRefuse: { q }, akErr: '' }); return; }
     if (this.askReady()) { this.setState({ q, qDraft: undefined, view: 'ask', readDoc: null, akRefuse: null, akErr: '' }); setTimeout(() => this.askSend(q), 0); return; }
     this.setState(s => ({ q, qDraft: undefined, view: 'search', readDoc: null, srN: 25, qaN: 0, prevView: s.view === 'search' || s.view === 'reader' ? (s.prevView || 'summary') : s.view }));
@@ -7458,6 +7533,7 @@ class Component extends DCLogic {
     const M = await this.askMod();
     const A0 = this.analysis();
     const hasDocs = A0.docs.some(d => this.counted(d));
+    if (hasDocs) { const sc = this.summaryScope(q, A0); if (sc) return this.answerBrief(q, sc); }
     // Plain conversation is answered conversationally, never refused for
     // lacking ground it never claimed. A substantive question with no kept
     // source is still refused under II.3 (the descent test — resolution,
@@ -7531,7 +7607,7 @@ class Component extends DCLogic {
     const O = this._oll || {}; const conv = this._conv || { summary: { topic: null, flow: null, entities: [], context: null, records: [], folds: [], turnCount: 0 }, history: [], turns: [] };
     const model = this.akModel(); const ms = this.akModels(); const MM = this._askM; const isWL = model.startsWith('webllm:'); const gpu = !!(MM && MM.webgpu()); const loaded = !!(MM && isWL && MM.webllmLoaded(model.slice(7))); const mInfo = ms.find(m => m.v === model) || { name: model, size: '' }; const LD = S.akLoad;
     const docOfName = n => this._ix && this._ix.docOf[n];
-    const refInfo = ref => { const m = String(ref).match(/^(.*)#(\d+)-(\d+)$/); if (!m) return null; const id = docOfName(m[1]); const d = id && A.docById[id]; if (!d) return null; const a = +m[2], b = +m[3]; const st = (A.stsByDoc[id] || []).find(x => x.e > a && x.s < b) || null; return { id, d, st, a, b }; };
+    const refInfo = ref => { const k = String(ref).match(/^st:(.+)$/); if (k) { const st = A.byId[k[1]]; const d = st && A.docById[st.doc]; return d ? { id: st.doc, d, st, a: st.s, b: st.e } : null; } const m = String(ref).match(/^(.*)#(\d+)-(\d+)$/); if (!m) return null; const id = docOfName(m[1]); const d = id && A.docById[id]; if (!d) return null; const a = +m[2], b = +m[3]; const st = (A.stsByDoc[id] || []).find(x => x.e > a && x.s < b) || null; return { id, d, st, a, b }; };
     const turns = conv.turns.map((t, i) => {
       const num = new Map(); (t.attr || []).forEach(x => { if (x.ref && !num.has(x.ref)) num.set(x.ref, num.size + 1); });
       const bad = (t.findings || []).filter(f => !f.echoesQuestion);
@@ -7542,7 +7618,7 @@ class Component extends DCLogic {
       const r = t.record || {}; const recBits = [plural((r.refs || []).length, 'address', 'addresses') + ' checked', (r.unsupported || []).length ? (r.unsupported || []).length + ' not in the material' : 'nothing unsupported', ...(r.open || [])];
       const C = t.computed;
       const gen = t.attr && t.attr.some(x => x.ref && this._ix && this._ix.docOf[(String(x.ref).match(/^(.*)#/) || [])[1]]);
-      return { n: String(t.n), q: t.question, sents, srcs, hasSrcs: srcs.length > 0, bad: bad.map(f => f.text).join(' · '), hasBad: bad.length > 0, noMaterial: !(t.offered || []).length,
+      return { n: String(t.n), q: t.question, sents, srcs, hasSrcs: srcs.length > 0, bad: bad.map(f => f.text).join(' · '), hasBad: bad.length > 0, noMaterial: !t.brief && !(t.offered || []).length,
         hasRes: !!(t.resolved && t.resolved.length), resLines: (t.resolved || []).map(r => ({ t: r.mode === 'nearmiss' ? 'Read “' + r.from + '” as ' + r.to + ': one letter off it, and off no other name.' : 'Did not guess who “' + r.from + '” is: ' + r.why + '.', col: r.mode === 'nearmiss' ? 'var(--acc)' : 'var(--amber)' })),
         hasSyn: !!(t.synopsis && t.synopsis.docs && t.synopsis.docs.length), synDocs: ((t.synopsis && t.synopsis.docs) || []).map(d => ({ title: d.title, one: d.one, five: d.five.map(l => ({ l })), n: d.n, forWhom: d.forWhom })), synOne: (t.synopsis && t.synopsis.docs && t.synopsis.docs[0]) ? t.synopsis.docs[0].one : '', hasNotes: !!(t.notes && t.notes.lines && t.notes.lines.length), notesLines: ((t.notes && t.notes.lines) || []).map(l => ({ l })), notesLine: t.notes ? (t.notes.empty ? 'The reader made no notes on these passages, and the model was told so.' : plural(t.notes.lines.length, 'note') + ' from ' + t.notes.coverage + '% of the sentences read · ' + plural(t.notes.spans, 'span') + ' of source text sent with them' + (t.notes.omitted ? ' · ' + t.notes.omitted + ' lower-ranked notes held back' : '')) : '', hasNotesLine: !!t.notes, hasRd: !!(t.reading && t.reading.lines && t.reading.lines.length), rdLines: ((t.reading && t.reading.lines) || []).map(l => ({ t: l.text, onClick: () => A.names[l.name] ? this.openProfile(l.name) : null })), hasComp: !!C, compHead: C ? C.head : '', compLines: C ? C.lines.map(l => ({ l })) : [], compSaid: C ? C.said : '', onComp: () => this.setState({ view: 'records', readDoc: null, dbT: C && C.type, dbAskDraft: C && C.q, dbRes: null }, () => C && this.dbRun(C.q)),
         rec: 'On record · turn ' + t.n + ' · ' + recBits.join(' · '), fold: t.foldLine, meter: 'Sent ' + t.sentChars.toLocaleString() + ' characters in place of a ' + t.transcriptChars.toLocaleString() + '-character transcript', meta: (t.noModel ? 'the Fold · no model' : t.model) + (t.tokens && t.tokens.secs ? ' · ' + t.tokens.secs.toFixed(1) + ' s' : '') + (t.refresh && !t.refresh.ok && t.refresh.why ? ' · summary kept: ' + short(t.refresh.why, 120) : ''),
