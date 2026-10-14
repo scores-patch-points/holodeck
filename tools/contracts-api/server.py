@@ -8,12 +8,13 @@
                                       description AND the verbatim text the reading lane extracted.
   GET /contract/<token>               metadata + the reading lane's observations (clauses, figures …)
   GET /contract/<token>/pdf           the filed PDF: local copy, else archive.org twin, else ePAV; cached
+  GET /contract/<token>/thumb.jpg     first page as a small JPEG (made once, cached)
 
 The fold's work (reading, observation extraction) happened once on this host and is in the index;
 a request is a lookup, so a department's whole list comes back in milliseconds. Every response
 carries X-Ms, the server-side time. Bound to loopback; nginx fronts it.
 """
-import json, os, re, sqlite3, sys, threading, time, urllib.request, urllib.parse
+import json, os, re, sqlite3, subprocess, sys, threading, time, urllib.request, urllib.parse
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 DB = os.environ.get('CONTRACTS_DB', '/mnt/watch/contracts-api/contracts.db')
@@ -22,7 +23,8 @@ CACHE = os.environ.get('CONTRACTS_PDFCACHE', '/mnt/watch/contracts-api/pdfcache'
 PORT = int(os.environ.get('PORT', sys.argv[1] if len(sys.argv) > 1 else 8840))
 UA = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124 Safari/537.36'
 TOK = re.compile(r'^[A-Za-z0-9]{3,32}$')
-os.makedirs(CACHE, exist_ok=True)
+THUMBS = os.environ.get('CONTRACTS_THUMBS', '/mnt/watch/contracts-api/thumbs')
+os.makedirs(CACHE, exist_ok=True); os.makedirs(THUMBS, exist_ok=True)
 
 _local = threading.local()
 def conn():
@@ -66,7 +68,16 @@ def search(p):
     c = conn()
     total = c.execute('SELECT COUNT(*) FROM contracts c' + w, args).fetchone()[0]
     rs = c.execute('SELECT c.* FROM contracts c' + w + ' ORDER BY ' + sort + ' LIMIT ? OFFSET ?', args + [limit, offset]).fetchall()
-    return {'total': total, 'offset': offset, 'limit': limit, 'rows': [row(x) for x in rs]}
+    out = [row(x) for x in rs]
+    # what the reading lane holds for each row: how many observations, and the opening of the reading as a
+    # gist — enough for the reader to show real statements on a card without a request per contract.
+    for r in out:
+        r['obs'] = c.execute('SELECT COUNT(*) FROM obs WHERE token=?', (r['token'],)).fetchone()[0]
+        r['gist'] = ''
+        if r['obs']:
+            g = ' '.join(o[0] for o in c.execute('SELECT verbatim FROM obs WHERE token=? ORDER BY a LIMIT 14', (r['token'],)).fetchall())
+            r['gist'] = re.sub(r'\s+', ' ', g)[:1600]
+    return {'total': total, 'offset': offset, 'limit': limit, 'rows': out}
 
 def detail(tok):
     c = conn(); x = c.execute('SELECT * FROM contracts WHERE token=?', (tok,)).fetchone()
@@ -85,6 +96,34 @@ def grab(url, timeout=25):
         return None
 
 _pdf_lock = threading.Lock()
+def pdf_path(tok):
+    """A file path to the contract's PDF (cache, VM-local, else fetched into the cache), or None."""
+    cp = os.path.join(CACHE, tok + '.pdf')
+    if os.path.exists(cp): return cp
+    lp = os.path.join(DATA, '.epav-local', tok, 'source.pdf')
+    if os.path.exists(lp): return lp
+    b, _ = pdf_bytes(tok)
+    return cp if b else None
+
+_thumb_sem = threading.BoundedSemaphore(4)
+_thumb_miss = {}
+def thumb_path(tok):
+    tp = os.path.join(THUMBS, tok + '.jpg')
+    if os.path.exists(tp): return tp
+    if _thumb_miss.get(tok, 0) > time.time(): return None
+    with _thumb_sem:
+        if os.path.exists(tp): return tp
+        src = pdf_path(tok)
+        if src:
+            try:
+                subprocess.run(['pdftoppm', '-jpeg', '-jpegopt', 'quality=72', '-f', '1', '-l', '1', '-scale-to-x', '360', '-scale-to-y', '-1', '-singlefile', src, os.path.join(THUMBS, tok)],
+                               check=True, timeout=40, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            except Exception:
+                pass
+        if os.path.exists(tp): return tp
+        _thumb_miss[tok] = time.time() + 600   # don't re-fetch a PDF that is not there yet on every card paint
+        return None
+
 def pdf_bytes(tok):
     cp = os.path.join(CACHE, tok + '.pdf')
     if os.path.exists(cp): return open(cp, 'rb').read(), 'cache'
@@ -118,8 +157,12 @@ class H(BaseHTTPRequestHandler):
                 return self.send(200, {'ok': True, 'contracts': int(m.get('contracts', 0)), 'observations': c.execute('SELECT COUNT(*) FROM obs').fetchone()[0], 'built_at': m.get('built_at')}, t0=t0)
             if path == '/departments': return self.send(200, departments(), t0=t0)
             if path == '/contracts': return self.send(200, search(p), t0=t0)
-            m = re.match(r'^/contract/([A-Za-z0-9]+)(/pdf)?$', path)
+            m = re.match(r'^/contract/([A-Za-z0-9]+)(/pdf|/thumb\.jpg)?$', path)
             if m and TOK.match(m.group(1)):
+                if m.group(2) == '/thumb.jpg':
+                    tp = thumb_path(m.group(1))
+                    if not tp: return self.send(404, {'error': 'no thumbnail yet'}, extra={'Cache-Control': 'public, max-age=300'}, t0=t0)
+                    return self.send(200, open(tp, 'rb').read(), 'image/jpeg', {'Cache-Control': 'public, max-age=604800, immutable'}, t0=t0)
                 if m.group(2):
                     b, via = pdf_bytes(m.group(1))
                     if not b: return self.send(404, {'error': 'no PDF for ' + m.group(1) + ' yet (not on archive.org or ePAV)'}, t0=t0)
