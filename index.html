@@ -4550,6 +4550,8 @@ const FIELD_TEXT_RE = /(?:^|[\n.;|])\s*([A-Z][A-Za-z]+(?:[ \/-][A-Za-z&]+){0,3})
 // explicit columns, always present and always sortable -- not left to be discovered as one recurring label among many.
 const FIELD_EXPLICIT_DEPT = ['dept', 'department', 'agency'];
 const FIELD_EXPLICIT_EXP = ['expires', 'expiration', 'expiration date', 'expiry'];
+// the party on the other side of a contract: a primary field wherever one is stated, led with in tables and facts
+const FIELD_EXPLICIT_VENDOR = ['vendor', 'contractor', 'supplier', 'contracting party', 'party'];
 function fieldKey(label) { const s = String(label).replace(/([a-z])([A-Z])/g, '$1 $2').toLowerCase().replace(/[^a-z0-9 ]+/g, ' ').replace(/\s+/g, ' ').trim(); return s.replace(/\s+(no|num|number|id|ref|reference)$/, '') || s; }
 function fieldLabel(key) { return key.charAt(0).toUpperCase() + key.slice(1); }
 function fieldDateIso(v) {
@@ -4608,7 +4610,7 @@ function fieldCatalog(docs) {
     return { key: e.key, label: fieldLabel(e.key), type, n: e.docs, distinct, surface: sf, score };
   }).sort((a, b) => b.score - a.score || b.n - a.n || a.key.localeCompare(b.key));
   // the two fields the extraction names explicitly get plain names, whatever the source spelled them
-  for (const f of fields) { if (FIELD_EXPLICIT_DEPT.includes(f.key)) f.label = 'Department'; else if (FIELD_EXPLICIT_EXP.includes(f.key)) f.label = 'Expires'; }
+  for (const f of fields) { if (FIELD_EXPLICIT_DEPT.includes(f.key)) f.label = 'Department'; else if (FIELD_EXPLICIT_EXP.includes(f.key)) f.label = 'Expires'; else if (FIELD_EXPLICIT_VENDOR.includes(f.key)) f.label = 'Vendor'; }
   const keep = new Set(fields.map(f => f.key)), byDoc = new Map();
   for (const [docId, o] of per) { const r = {}; for (const k of Object.keys(o)) if (keep.has(k)) r[k] = o[k]; byDoc.set(docId, r); }
   // default columns: the best-covered field of each type — no cutoff constant, just the leader per kind
@@ -9486,7 +9488,7 @@ class Component extends DCLogic {
     if (!fcSel) { try { const j = JSON.parse(localStorage.getItem('holodeck-sv-fields') || 'null'); if (Array.isArray(j)) fcSel = j; } catch (e) {} }
     const fcBy = new Map(FC.fields.map(f => [f.key, f])); fcSel = (fcSel || FC.dflt).filter(k => fcBy.has(k));
     // explicit fields lead the columns and cannot be unticked
-    const fcPinned = [FIELD_EXPLICIT_DEPT, FIELD_EXPLICIT_EXP].map(c => c.find(k => fcBy.has(k))).filter(Boolean);
+    const fcPinned = [FIELD_EXPLICIT_VENDOR, FIELD_EXPLICIT_DEPT, FIELD_EXPLICIT_EXP].map(c => c.find(k => fcBy.has(k))).filter(Boolean);
     fcSel = [...fcPinned, ...fcSel.filter(k => !fcPinned.includes(k))];
     const rowOf = x => { const it = x.it; const d = A.docById[it.id] || docByTitle.get(it.title) || {}; const all = A.stsByDoc[d.id] || []; const nm = new Set(all.flatMap(s => s.names));
       const fvals = FC.byDoc.get(d.id) || {};
@@ -10636,11 +10638,11 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
   statedFacts(d, A) {
     try {
       const FC = this._fc && this._fc.A === A ? this._fc : (this._fc = { A, ...fieldCatalog(A.docs) });
-      const rank = new Map(FC.fields.map((f, i) => [f.key, i])), explicit = [...FIELD_EXPLICIT_DEPT, ...FIELD_EXPLICIT_EXP];
+      const rank = new Map(FC.fields.map((f, i) => [f.key, i])), explicit = [...FIELD_EXPLICIT_VENDOR, ...FIELD_EXPLICIT_DEPT, ...FIELD_EXPLICIT_EXP];
       const out = [];
       for (const k of Object.keys(d)) { if (FIELD_META_SKIP.has(k) || typeof d[k] !== 'string') continue;
         const v = d[k].replace(/\s+/g, ' ').trim(), fk = fieldKey(k); if (!v || v.length > 160 || !rank.has(fk)) continue;
-        out.push({ fk, label: FIELD_EXPLICIT_DEPT.includes(fk) ? 'Department' : FIELD_EXPLICIT_EXP.includes(fk) ? 'Expires' : fieldLabel(fk), value: v, r: explicit.includes(fk) ? -1 : rank.get(fk) }); }
+        out.push({ fk, label: FIELD_EXPLICIT_VENDOR.includes(fk) ? 'Vendor' : FIELD_EXPLICIT_DEPT.includes(fk) ? 'Department' : FIELD_EXPLICIT_EXP.includes(fk) ? 'Expires' : fieldLabel(fk), value: v, r: FIELD_EXPLICIT_VENDOR.includes(fk) ? -3 : explicit.includes(fk) ? -1 : rank.get(fk) }); }
       out.sort((a, b) => a.r - b.r);
       return out.slice(0, 8).map(f => ({ label: f.label, value: f.value }));
     } catch (e) { return []; }
