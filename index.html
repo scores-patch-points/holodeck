@@ -1347,7 +1347,7 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:16px;align-items:start">
           <section style="background:var(--s1);border:1px solid var(--line);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:10px">
             <span style="font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mut)">Find new material</span>
-            <span style="font:400 14px/1.5 var(--sans);color:var(--mut)">Watches are saved in the public room, so they belong to this workspace. Browsers can’t query search engines directly; searches go through a SearXNG instance you run or trust.</span>
+            <span style="font:400 14px/1.5 var(--sans);color:var(--mut)">Watches are kept in this browser, for this workspace. Browsers can’t query search engines directly; searches go through a SearXNG instance you run or trust.</span>
             <sc-for list="{{ ing.watches }}" as="w" hint-placeholder-count="1"><div style="display:flex;gap:10px;align-items:baseline"><span style="font:600 12px var(--mono);color:var(--acc)">{{ w.kind }}</span><span style="flex:1;font:500 14px var(--sans);color:var(--ink)">{{ w.q }}</span><button onClick="{{ w.onRemove }}" style="all:unset;cursor:pointer;font:500 13px var(--sans);color:var(--dim)">Remove</button></div></sc-for>
             <div style="display:flex;gap:8px;flex-wrap:wrap"><input onChange="{{ ing.onWatchQ }}" placeholder="search terms or a YouTube search URL" style="flex:1 1 200px;min-width:0;background:var(--s2);border:1px solid var(--line2);border-radius:8px;padding:6px 10px;font:500 14px var(--sans);color:var(--ink);outline:none"></input><button onClick="{{ ing.onAddYt }}" style="background:none;border:1px solid var(--line2);border-radius:8px;padding:5px 12px;cursor:pointer;font:500 14px var(--sans);color:var(--ink2);white-space:nowrap">+ YouTube watch</button><button onClick="{{ ing.onAddWeb }}" style="background:none;border:1px solid var(--line2);border-radius:8px;padding:5px 12px;cursor:pointer;font:500 14px var(--sans);color:var(--ink2);white-space:nowrap">+ Web watch</button></div>
             <div style="display:flex;gap:8px;flex-wrap:wrap"><input defaultValue="{{ ing.proxy }}" onChange="{{ ing.onProxy }}" placeholder="http://localhost:8888 (SearXNG, JSON on)" style="flex:1 1 200px;min-width:0;background:var(--s2);border:1px solid var(--line2);border-radius:8px;padding:6px 10px;font:500 13px var(--mono);color:var(--ink);outline:none"></input><button onClick="{{ ing.onFind }}" style="background:var(--acc2);border:0;color:#fff;border-radius:8px;padding:6px 14px;cursor:pointer;font:600 14px var(--sans);white-space:nowrap">Find new</button></div>
@@ -1355,7 +1355,7 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
               <sc-for list="{{ ing.cand }}" as="c" hint-placeholder-count="3">
                 <div style="display:grid;grid-template-columns:96px minmax(0,1fr);gap:10px;border-top:1px solid var(--line);padding-top:8px">
                   <span style="aspect-ratio:16/9;border-radius:6px;background:var(--s2);background-image:{{ c.thumbBg }};background-size:cover;background-position:center"></span>
-                  <div style="display:flex;flex-direction:column;gap:3px;min-width:0"><a href="{{ c.url }}" target="_blank" rel="noopener" style="font:500 15px/1.3 var(--serif);color:var(--ink);text-decoration:none">{{ c.title }}</a><span style="font:400 12px var(--sans);color:var(--mut)">{{ c.meta }}</span><span style="display:flex;gap:12px;font:600 13px var(--sans)"><button onClick="{{ c.onAdd }}" style="all:unset;cursor:pointer;color:var(--acc)">Add</button><button onClick="{{ c.onAddPub }}" style="all:unset;cursor:pointer;color:var(--acc)">Add and publish</button></span></div>
+                  <div style="display:flex;flex-direction:column;gap:3px;min-width:0"><a href="{{ c.url }}" target="_blank" rel="noopener" style="font:500 15px/1.3 var(--serif);color:var(--ink);text-decoration:none">{{ c.title }}</a><span style="font:400 12px var(--sans);color:var(--mut)">{{ c.meta }}</span><span style="display:flex;gap:12px;font:600 13px var(--sans)"><button onClick="{{ c.onAdd }}" style="all:unset;cursor:pointer;color:var(--acc)">Add</button></span></div>
                 </div>
               </sc-for>
             </sc-if>
@@ -1384,12 +1384,7 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
           </section>
           </sc-if>
           <section style="background:var(--s1);border:1px solid var(--line);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:10px">
-            <div style="display:flex;gap:10px;align-items:baseline;flex-wrap:wrap"><span style="font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mut);margin-right:auto">Public record</span><button onClick="{{ ing.onRefresh }}" style="all:unset;cursor:pointer;font:500 13px var(--sans);color:var(--mut)">Refresh</button><button onClick="{{ ing.onLoadRoom }}" style="background:none;border:1px solid var(--line2);border-radius:8px;padding:4px 12px;cursor:pointer;font:500 13px var(--sans);color:var(--ink2)">Load into workspace</button></div>
-            <sc-if value="{{ ing.canPubAll }}" hint-placeholder-val="{{ false }}"><div style="display:flex;flex-direction:column;gap:6px;border-top:1px solid var(--line);padding-top:8px"><button onClick="{{ ing.onPubAll }}" style="align-self:flex-start;background:var(--acc2);border:0;color:#fff;border-radius:8px;padding:6px 14px;cursor:pointer;font:600 14px var(--sans)">{{ ing.pubAllLabel }}</button><span style="font:400 13px/1.45 var(--sans);color:var(--mut);text-wrap:pretty">{{ ing.pubAllLine }}</span></div></sc-if>
-            <sc-if value="{{ ing.hasChain }}" hint-placeholder-val="{{ false }}">
-              <span style="font:500 13px var(--sans);color:var(--ink2)">{{ ing.chainLine }}</span>
-              <sc-for list="{{ ing.chain }}" as="b" hint-placeholder-count="3"><div style="display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 10px;border-top:1px solid var(--line);padding-top:6px"><span style="font:500 14px var(--sans);color:var(--ink);min-width:0">{{ b.title }}</span><span style="font:600 12px var(--mono);color:{{ b.okCol }}">{{ b.ok }}</span><span style="grid-column:1 / -1;font:400 12px var(--mono);color:var(--dim);overflow-wrap:anywhere">{{ b.kind }} · {{ b.hash }} ← {{ b.prev }} · {{ b.by }}</span></div></sc-for>
-            </sc-if>
+            <span style="font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mut)">Activity</span>
             <sc-if value="{{ ing.hasLog }}" hint-placeholder-val="{{ false }}"><div style="display:flex;flex-direction:column;gap:3px;border-top:1px solid var(--line);padding-top:8px"><sc-for list="{{ ing.log }}" as="l" hint-placeholder-count="2"><span style="font:400 12px/1.4 var(--mono);color:{{ l.col }}">{{ l.t }} {{ l.msg }}</span></sc-for></div></sc-if>
             <sc-if value="{{ ing.isBusy }}" hint-placeholder-val="{{ false }}"><span style="font:500 13px var(--sans);color:var(--acc)">{{ ing.busy }}…</span></sc-if>
           </section>
@@ -3025,18 +3020,22 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
               </div>
             </sc-if>
             <sc-if value="{{ ing.signedIn }}" hint-placeholder-val="{{ false }}"><div style="display:flex;gap:10px;align-items:baseline;flex-wrap:wrap"><span style="font:500 14px var(--mono);color:var(--ink)">{{ ing.who }}</span><button onClick="{{ ing.onLogout }}" style="all:unset;cursor:pointer;font:500 13px var(--sans);color:var(--mut)">Sign out</button></div></sc-if>
+            <sc-if value="{{ ing.canWrite }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;flex-direction:column;gap:8px;border:1px solid var(--line);border-radius:10px;padding:10px 12px">
+                <span style="font:600 12px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--mut)">Backup</span>
+                <span style="font:400 14px/1.5 var(--sans);color:var(--ink);text-wrap:pretty">{{ ing.backupLine }}</span>
+                <div style="display:flex;gap:8px;flex-wrap:wrap">
+                  <button onClick="{{ ing.onBackup }}" style="background:var(--acc2);border:0;color:#fff;border-radius:8px;padding:7px 16px;cursor:pointer;font:600 14px var(--sans)">Back up now</button>
+                </div>
+                <span style="font:400 12px/1.45 var(--sans);color:var(--dim);text-wrap:pretty">Your sources and their records are sealed on this device and kept in your account’s media store. The server holds ciphertext it cannot open; it can see how many files there are and how large. People you invite receive the key with the invitation.</span>
+              </div>
+            </sc-if>
             <sc-if value="{{ ing.isTemp }}" hint-placeholder-val="{{ false }}">
               <div style="border:1px dashed var(--line2);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:8px">
                 <span style="font:400 13px/1.5 var(--sans);color:var(--mut);text-wrap:pretty">{{ ing.tempNote }}</span>
                 <div style="display:flex;gap:8px;flex-wrap:wrap"><input onChange="{{ ing.onKeepName }}" placeholder="your name" style="flex:1 1 120px;min-width:0;background:var(--s2);border:1px solid var(--line2);border-radius:8px;padding:5px 10px;font:500 13px var(--sans);color:var(--ink);outline:none"></input><input type="password" onChange="{{ ing.onKeepPw }}" placeholder="new password" autocomplete="new-password" style="flex:1 1 120px;min-width:0;background:var(--s2);border:1px solid var(--line2);border-radius:8px;padding:5px 10px;font:500 13px var(--sans);color:var(--ink);outline:none"></input><button onClick="{{ ing.onKeep }}" style="background:none;border:1px solid var(--line2);border-radius:8px;padding:4px 12px;cursor:pointer;font:500 13px var(--sans);color:var(--ink2);white-space:nowrap">Keep this account</button></div>
                 <div style="display:flex;gap:8px;flex-wrap:wrap"><input onChange="{{ ing.onMergeU }}" placeholder="existing username" style="flex:1 1 120px;min-width:0;background:var(--s2);border:1px solid var(--line2);border-radius:8px;padding:5px 10px;font:500 13px var(--sans);color:var(--ink);outline:none"></input><input type="password" onChange="{{ ing.onMergeP }}" placeholder="its password" style="flex:1 1 120px;min-width:0;background:var(--s2);border:1px solid var(--line2);border-radius:8px;padding:5px 10px;font:500 13px var(--sans);color:var(--ink);outline:none"></input><button onClick="{{ ing.onMerge }}" style="background:none;border:1px solid var(--line2);border-radius:8px;padding:4px 12px;cursor:pointer;font:500 13px var(--sans);color:var(--ink2);white-space:nowrap">Merge into it</button></div>
               </div>
-            </sc-if>
-            <span style="font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mut);padding-top:8px">Public room for this workspace</span>
-            <sc-if value="{{ ing.hasPub }}" hint-placeholder-val="{{ false }}"><span style="font:500 13px var(--mono);color:var(--ink2);overflow-wrap:anywhere">{{ ing.pub }}</span></sc-if>
-            <sc-if value="{{ ing.noPub }}" hint-placeholder-val="{{ true }}">
-              <span style="font:400 14px/1.5 var(--sans);color:var(--mut)">Workspaces are private until you make one public. A public room is readable by anyone; every item published to it is a block that carries the sha256 of the block before.</span>
-              <div style="display:flex;gap:8px;flex-wrap:wrap"><sc-if value="{{ ing.canWrite }}" hint-placeholder-val="{{ false }}"><button onClick="{{ ing.onCreatePub }}" style="background:var(--acc2);border:0;color:#fff;border-radius:8px;padding:6px 14px;cursor:pointer;font:600 14px var(--sans)">Make this workspace public</button></sc-if><input onChange="{{ ing.onJoinAlias }}" placeholder="#room:hyphae.social" style="flex:1 1 180px;min-width:0;background:var(--s2);border:1px solid var(--line2);border-radius:8px;padding:6px 10px;font:500 13px var(--mono);color:var(--ink);outline:none"></input><button onClick="{{ ing.onJoin }}" style="background:none;border:1px solid var(--line2);border-radius:8px;padding:5px 12px;cursor:pointer;font:500 14px var(--sans);color:var(--ink2)">Join</button></div>
             </sc-if>
             <span style="font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mut);padding-top:8px">Your private room</span>
             <sc-if value="{{ ing.noPriv }}" hint-placeholder-val="{{ true }}"><span style="font:400 14px/1.5 var(--sans);color:var(--mut)">Your pins, drafts, filters and reading history sync here. Only people you invite can see it.</span><sc-if value="{{ ing.canWrite }}" hint-placeholder-val="{{ false }}"><button onClick="{{ ing.onCreatePriv }}" style="align-self:flex-start;background:none;border:1px solid var(--line2);border-radius:8px;padding:5px 12px;cursor:pointer;font:500 14px var(--sans);color:var(--ink2)">Create private room</button></sc-if></sc-if>
@@ -3073,7 +3072,7 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
         <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
           <div style="display:flex;flex-direction:column;gap:4px">
             <h2 style="margin:0;font:600 20px var(--sans);color:var(--ink)">Sign in</h2>
-            <span style="font:400 13px/1.45 var(--sans);color:var(--mut);text-wrap:pretty">Use your own Matrix account. Your work stays on this device until you sign in — then it syncs and shares through your homeserver. If your account uses an authenticator app, type its six digits straight after your password.</span>
+            <span style="font:400 13px/1.45 var(--sans);color:var(--mut);text-wrap:pretty">Sign in with your Matrix account and everything in this workspace is backed up to it, sealed on this device so the server cannot read it. Then you can invite people to it.</span>
           </div>
           <button onClick="{{ closeLogin }}" title="Close" style="flex:none;background:none;border:0;color:var(--mut);cursor:pointer;font-size:18px;line-height:1">✕</button>
         </div>
@@ -3085,25 +3084,32 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
           </div>
         </sc-if>
         <sc-if value="{{ mxNotSignedIn }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex;gap:8px;align-items:baseline;flex-wrap:wrap"><span style="font:400 13px var(--sans);color:var(--mut)">Signing in to <b style="font:500 13px var(--mono);color:var(--ink)">{{ mxServer }}</b></span><button onClick="{{ onMxServerToggle }}" style="all:unset;cursor:pointer;font:500 13px var(--sans);color:var(--acc)">{{ mxServerToggleLabel }}</button></div>
+          <sc-if value="{{ mxServerShown }}" hint-placeholder-val="{{ false }}">
           <label style="display:flex;flex-direction:column;gap:6px">
             <span style="font:600 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mut)">Homeserver</span>
             <input defaultValue="{{ mxServer }}" onChange="{{ onMxServer }}" placeholder="hyphae.social" autocapitalize="none" autocorrect="off" spellcheck="false" style="background:var(--s2);border:1px solid var(--line2);border-radius:var(--r-sm);padding:8px 10px;font:500 14px var(--mono);color:var(--ink);outline:none"></input>
             <span style="font:400 12px var(--sans);color:var(--dim)">Your own server, e.g. hyphae.social or localhost:8448.</span>
           </label>
+          </sc-if>
           <label style="display:flex;flex-direction:column;gap:6px">
             <span style="font:600 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mut)">Username</span>
-            <input id="fold-mx-user" onChange="{{ onMxUser }}" onKeyDown="{{ onMxKey }}" placeholder="you" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false" style="background:var(--s2);border:1px solid var(--line2);border-radius:var(--r-sm);padding:8px 10px;font:500 14px var(--sans);color:var(--ink);outline:none"></input>
+            <input id="fold-mx-user" defaultValue="{{ mxUser }}" onChange="{{ onMxUser }}" onKeyDown="{{ onMxKey }}" placeholder="you" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false" style="background:var(--s2);border:1px solid var(--line2);border-radius:var(--r-sm);padding:8px 10px;font:500 14px var(--sans);color:var(--ink);outline:none"></input>
           </label>
           <label style="display:flex;flex-direction:column;gap:6px">
             <span style="font:600 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mut)">Password</span>
             <input type="password" onChange="{{ onMxPass }}" onKeyDown="{{ onMxKey }}" placeholder="••••••••" autocomplete="current-password" style="background:var(--s2);border:1px solid var(--line2);border-radius:var(--r-sm);padding:8px 10px;font:500 14px var(--sans);color:var(--ink);outline:none"></input>
+          </label>
+          <label style="display:flex;flex-direction:column;gap:6px">
+            <span style="font:600 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mut)">Authenticator code <span style="text-transform:none;letter-spacing:0;font-weight:400;color:var(--dim)">— only if you set one up</span></span>
+            <input onChange="{{ onMxCode }}" onKeyDown="{{ onMxKey }}" inputmode="numeric" maxlength="6" placeholder="6 digits" autocomplete="one-time-code" style="background:var(--s2);border:1px solid var(--line2);border-radius:var(--r-sm);padding:8px 10px;font:500 14px var(--mono);color:var(--ink);outline:none;letter-spacing:.2em"></input>
           </label>
           <sc-if value="{{ mxErr }}" hint-placeholder-val="{{ '' }}"><span style="font:400 13px/1.45 var(--sans);color:var(--bad);text-wrap:pretty">{{ mxErr }}</span></sc-if>
           <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
             <button onClick="{{ doLogin }}" style="background:var(--acc2);border:0;color:#fff;border-radius:8px;padding:8px 18px;cursor:pointer;font:600 14px var(--sans)" style-hover="background:var(--acc3)">{{ mxSubmit }}</button>
             <button onClick="{{ doGuest }}" style="background:none;border:1px solid var(--line2);border-radius:8px;padding:7px 14px;cursor:pointer;font:500 14px var(--sans);color:var(--ink2)" style-hover="border-color:var(--acc)">Continue as guest</button>
           </div>
-          <span style="font:400 12px/1.45 var(--sans);color:var(--dim);text-wrap:pretty">A guest can read and add, but cannot create rooms or publish. Your password goes only to the homeserver you name.</span>
+          <span style="font:400 12px/1.45 var(--sans);color:var(--dim);text-wrap:pretty">A guest can read and add, but cannot create rooms. Your password goes only to the homeserver you name.</span>
         </sc-if>
       </div>
     </div>
@@ -5364,7 +5370,7 @@ class Component extends DCLogic {
       if (!sc || sc.sts.length < 3) { if (root.firstChild) root.replaceChildren(); root.__briefKey = null; continue; }
       if (root.__briefKey === sc.key && root.firstChild) continue;
       root.__briefKey = sc.key;
-      const go = () => (this._briefM || (this._briefM = import(new URL('holodeck-brief.js', location.href).href))).then(M => { if (root.isConnected && root.__briefKey === sc.key) M.mountBrief(root, { key: sc.key, scopeLabel: sc.label, unfiltered: !!sc.unfiltered, A: sc.A, sts: sc.sts, onOpen: l => this.read(l.doc, l.id) }); }).catch(() => {});
+      const go = () => (this._briefM || (this._briefM = import(new URL('holodeck-brief.js', location.href).href))).then(M => { if (root.isConnected && root.__briefKey === sc.key) M.mountBrief(root, { key: sc.key, scopeLabel: sc.label, unfiltered: !!sc.unfiltered, A: sc.A, sts: sc.sts, onOpen: l => this.read(l.doc, l.id), readIds: () => Object.keys(this.readLog() || {}), titleOf: id => { const d = (sc.A.docById || {})[id]; return d ? d.title : id; } }); }).catch(() => {});
       if (window.requestIdleCallback) window.requestIdleCallback(go, { timeout: 400 }); else setTimeout(go, 0);
     }
   }
@@ -6667,7 +6673,7 @@ class Component extends DCLogic {
     onLogin: () => this.openLogin(),
     onAllWorkspaces: () => this.openWorkspacesHero(),
     onSession: s => { this._net = { ...(this._net || {}), s }; this.forceUpdate(); },
-    onJoined: rooms => { this.refreshRoom().catch(() => {}); this.net().then(async N => { try { const s = this._net.s; const d = await N.loadPrivate(s, rooms.priv, 'work'); if (d && d.pins) this.savePins(d.pins); } catch (e) {} this.forceUpdate(); }); },
+    onJoined: rooms => { this.refreshRoom().catch(() => {}); this.net().then(async N => { try { const s = this._net.s; const d = await N.loadPrivate(s, rooms.priv, 'work'); if (d && d.pins) this.savePins(d.pins); } catch (e) {} this.forceUpdate(); this.autoBackup({ room: rooms.priv }); }); },
     // what this person is looking at right now: it is what people in the workspace see next to their name while they are here
     viewing: () => { try { const S = this.state; if (this._heroOpen) return { viewing: 'view:workspaces', title: 'Workspaces' }; if (S.view === 'reader' && S.readDoc) { const d = (this.analysis().docById || {})[S.readDoc] || {}; return { viewing: 'doc:' + S.readDoc, title: String(d.title || S.readDoc) }; } return { viewing: 'view:' + String(S.view || ''), title: String(S.view || '') }; } catch (e) { return {}; } } }; }
   // Workspaces: every workspace on one screen, with everyone in each and the invitations still open (holodeck-workspaces-hero.js).
@@ -6719,7 +6725,7 @@ class Component extends DCLogic {
     }
     if (/#join=/.test(location.hash)) { const raw = location.hash; const email = /join=[a-z0-9]{16}(&|$)/i.test(raw); const c = (raw.match(/join=([a-z0-9]{5})(&|$)/i) || [])[1]; history.replaceState(null, '', location.pathname + location.search); this.openShareRepo(email ? raw : c); }
     else { try { import(new URL('holodeck-people-panel.js', location.href).href).then(M => { const s = (this._net && this._net.s) || N.loadSession(); if (s && !s.guest && this.wsRooms().priv) M.resumePresence(this.shareCtx(null)); }).catch(() => {}); } catch (e) {} }
-    if (/fx-share=/.test(location.hash)) { try { const r = await N.consumeShare(); if (r) { this.setWsRooms({ priv: r.rooms[0] || null, pub: r.rooms[1] || this.wsRooms().pub || null }); this._net = { ...(this._net || {}), s: r.pending || r.s, shareTemp: r.pending ? r.s : null }; this.toast('Opened a workspace shared by ' + (r.from || 'someone')); if (!r.pending) { try { const d = await N.loadPrivate(r.s, r.rooms[0], 'work'); if (d && d.pins) this.savePins(d.pins); } catch (e) {} } } } catch (e) { this.ilog('Shared link could not be opened: ' + e.message, 'bad'); } }
+    if (/fx-share=/.test(location.hash)) { try { const r = await N.consumeShare(); if (r) { this.setWsRooms({ priv: r.rooms[0] || null, pub: r.rooms[1] || this.wsRooms().pub || null }); this._net = { ...(this._net || {}), s: r.pending || r.s, shareTemp: r.pending ? r.s : null }; this.toast('Opened a workspace shared by ' + (r.from || 'someone')); if (!r.pending) { try { const d = await N.loadPrivate(r.s, r.rooms[0], 'work'); if (d && d.pins) this.savePins(d.pins); } catch (e) {} this.autoBackup({ room: r.rooms[0] }); } } } catch (e) { this.ilog('Shared link could not be opened: ' + e.message, 'bad'); } }
     if (/fx-mail=/.test(location.hash)) this.consumeEmailShare();
     const s = (this._net && this._net.s) || N.loadSession(); this._net = { ...(this._net || {}), s }; const R = this.wsRooms(); if (s && R.pub) { this.refreshRoom().catch(() => {}); } this.forceUpdate(); }
   consumeEmailShare() {
@@ -6765,7 +6771,8 @@ class Component extends DCLogic {
   closeLogin() { this._heroAfterLogin = false; this.setState({ mxOpen: false, mxErr: '' }); }
   async doLogin() {
     const server = ((this._mxSrv != null ? this._mxSrv : this.netCfg().server) || 'hyphae.social').trim().replace(/\/+$/, '');
-    const user = (this._mxU || '').trim(); const pass = this._mxP || '';
+    const user = (this._mxU != null ? this._mxU : this._mxRemembered()).trim();
+    const code = String(this._mxC || '').replace(/\D/g, ''); const pass = (this._mxP || '') + (code.length === 6 ? code : '');   // the gate takes the six digits straight after the password
     if (!server) { this.setState({ mxErr: 'Name a homeserver.' }); return; }
     if (!user) { this.setState({ mxErr: 'Enter your username.' }); return; }
     this.setNetCfg({ server });
@@ -6775,8 +6782,11 @@ class Component extends DCLogic {
       const s = await N.login(server, user, pass);
       this._net = { ...(this._net || {}), s }; this._mxP = '';
       this.ilog('Signed in as ' + s.user);
+      try { localStorage.setItem('hd:mx-user', user); } catch (e) {}
+      this._mxC = '';
       this.setState({ mxBusy: false, mxOpen: false, mxErr: '' });
       if (this._heroAfterLogin) { this._heroAfterLogin = false; this.openWorkspacesHero(); }
+      this.autoBackup();
       if (this.wsRooms().pub) await this.refreshRoom();
     } catch (e) { this.setState({ mxBusy: false, mxErr: this._mxErrText(e) }); }
   }
@@ -6794,6 +6804,7 @@ class Component extends DCLogic {
       if (this.wsRooms().pub) await this.refreshRoom();
     } catch (e) { this.setState({ mxBusy: false, mxErr: this._mxErrText(e) }); }
   }
+  _mxRemembered() { try { return localStorage.getItem('hd:mx-user') || ''; } catch (e) { return ''; } }
   _mxErrText(e) {
     const m = (e && e.message) || String(e || 'Sign-in failed.');
     if (/Failed to fetch|NetworkError|Load failed/i.test(m)) return 'Could not reach that homeserver. Check the address — a browser can only reach servers that allow it (CORS).';
@@ -6802,13 +6813,11 @@ class Component extends DCLogic {
     return m;
   }
   signOut() { this.net().then(N => N.logout()); this._net = { ...(this._net || {}), s: null }; this.forceUpdate(); }
-  async createPublic() { return this.netDo('Create public room', async N => { const s = this._net.s; if (!s || s.guest) throw new Error('sign in with an account to create rooms'); const nm = this.corpusName().replace(/ · .*$/, ''); const alias = 'fold-' + nm.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 40);
-    let room; try { room = await N.createWorkspace(s, { name: 'Fold · ' + nm, alias, isPublic: true, config: { v: 1, watches: [] } }); } catch (e) { if (e.errcode === 'M_ROOM_IN_USE') room = await N.join(s, '#' + alias + ':' + s.host); else throw e; }
-    this.setWsRooms({ pub: room }); this.ilog('Public room ready: #' + alias + ':' + s.host); await this.refreshRoom(); }); }
   async createPrivate() { return this.netDo('Create private room', async N => { const s = this._net.s; if (!s || s.guest) throw new Error('sign in with an account first'); const room = await N.createWorkspace(s, { name: 'Fold · ' + this.corpusName().replace(/ · .*$/, '') + ' (private)', isPublic: false, config: { v: 1 } }); this.setWsRooms({ priv: room }); this.ilog('Private room created. Only people you invite can see it.'); this.syncPrivate(true); }); }
-  async joinPublic(alias) { return this.netDo('Join room', async N => { const s = this._net.s; if (!s) throw new Error('sign in or continue as guest first'); const room = await N.join(s, alias.trim()); this.setWsRooms({ pub: room }); await this.refreshRoom(); }); }
   async refreshRoom() { const N = await this.net(); const s = this._net && this._net.s; const room = this.wsRooms().pub; if (!s || !room) return; const cfg = (await N.getConfig(s, room)) || { v: 1, watches: [] }; const ch = await N.readChain(s, room); this._net = { ...this._net, cfg, chain: ch.chain, chainOk: ch.ok, head: ch.head }; this.forceUpdate(); }
-  async saveWatches(watches) { return this.netDo('Save watches', async N => { const s = this._net.s; const room = this.wsRooms().pub; const cfg = { ...(this._net.cfg || { v: 1 }), watches }; await N.setConfig(s, room, cfg); this._net.cfg = cfg; this.ilog('Watches saved to the room.'); }); }
+  // Saved searches for finding new material are kept in this browser, per workspace: there is no public room to hold them.
+  watchList() { try { const v = JSON.parse(localStorage.getItem('hd:watches:' + this.corpusId()) || 'null'); if (Array.isArray(v)) return v; } catch (e) {} return (this._net && this._net.cfg && this._net.cfg.watches) || []; }
+  saveWatches(watches) { try { localStorage.setItem('hd:watches:' + this.corpusId(), JSON.stringify(watches)); } catch (e) {} this.ilog('Watches saved in this browser.'); this.forceUpdate(); }
   async invitePriv(uid) { return this.netDo('Invite', async N => { await N.invite(this._net.s, this.wsRooms().priv, uid.trim()); this.ilog('Invited ' + uid + ' to your private room.'); }); }
   heimdallMod() { if (!this._hdP) this._hdP = import(new URL('holodeck-heimdall.js', location.href).href); return this._hdP; }
   // Heimdall compute invite: mint a fleet room under THIS account with a short
@@ -6841,13 +6850,127 @@ class Component extends DCLogic {
   async heimdallCopy() { try { await navigator.clipboard.writeText(this._hd && this._hd.link); this.ilog('Invite link copied: ' + (this._hd && this._hd.link)); } catch (e) { this.ilog('Could not copy: ' + e.message, 'bad'); } }
   syncPrivate(now) { const s = this._net && this._net.s; const room = this.wsRooms().priv; if (!s || s.guest || !room) return; clearTimeout(this._privT); this._privT = setTimeout(async () => { try { const N = await this.net(); await N.savePrivate(s, room, 'work', { pins: this.rawPins(), filters: this.state.f || {}, forWhoms: this.state.fw || {}, meta: (this.metaAll() || {})[this.corpusId()] || {}, readLog: this.readLog() }); this._net.privAt = new Date().toLocaleTimeString(); this.forceUpdate(); } catch (e) { if (e && e.vault && !this._vaultSaid) { this._vaultSaid = true; this.ilog(e.why || e.message, 'bad'); } } }, now ? 0 : 2500); }
   async loadPrivateWork() { return this.netDo('Load private work', async N => { const d = await N.loadPrivate(this._net.s, this.wsRooms().priv, 'work'); if (!d) throw new Error('nothing saved yet'); if (d.pins) this.savePins(d.pins); if (d.filters) this.setState({ f: d.filters }); if (d.forWhoms) this.setState({ fw: d.forWhoms }); this.ilog('Loaded your pins, drafts and filters from the private room.'); }); }
+  // ---- backup: every source's bytes and the record list, sealed here and kept in the account's Matrix media store.
+  // holodeck-media-store.js does the work; these are the page's two crossings (Matrix, and this browser's stores).
+  storeMod() { if (!this._storeP) this._storeP = import(new URL('holodeck-media-store.js', location.href).href); return this._storeP; }
+  _setBackup(b) { this._net = { ...(this._net || {}), backup: b }; this.forceUpdate(); }
+  _storeWhy(e) { return (e && (e.why || e.message)) ? String(e.why || e.message) : 'it did not finish'; }
+  async _storeRoom(N, s, make) {
+    let room = this.wsRooms().priv;
+    if (!room && make) { room = await N.createWorkspace(s, { name: 'Fold · ' + this.corpusName().replace(/ · .*$/, '') + ' (private)', isPublic: false, config: { v: 1 } }); this.setWsRooms({ priv: room }); this.ilog('A private room was made for this workspace.'); }
+    return room;
+  }
+  storeNet(N, s, room) {
+    const ring = N.keyring(s);
+    return {
+      upload: u8 => N.upload(s, u8, 'blob', 'application/octet-stream'),
+      download: mxc => N.download(s, mxc),
+      loadPointer: () => N.loadPrivate(s, room, 'store', ring),
+      savePointer: p => N.savePrivate(s, room, 'store', p, ring),
+      // the owner starts the workspace key; re-saving the same pointer is how savePrivate does that, and it tells anyone else why not
+      ensureKey: async () => { const cur = await N.loadPrivate(s, room, 'store', ring); await N.savePrivate(s, room, 'store', cur || { v: 1, empty: true }, ring); },
+      limit: () => N.mediaLimit(s),
+    };
+  }
+  storeLocal(M) {
+    const cid = this.corpusId(); const buf = [];
+    const slim = d => { let x = d; if (d.ocr || d.eyesDetail) { const { ocr, eyesDetail, ...r } = d; x = r; } if (d.screen) { const { model, ...sc } = d.screen; x = { ...x, screen: sc }; } return x; };
+    const u8 = v => v == null ? null : v instanceof Uint8Array ? v : v instanceof ArrayBuffer ? new Uint8Array(v) : ArrayBuffer.isView(v) ? new Uint8Array(v.buffer, v.byteOffset, v.byteLength) : null;
+    return {
+      buf,
+      docs: async () => (this.state.added[cid] || []).map(slim),
+      has: async id => (this.state.added[cid] || []).some(d => d.id === id) || buf.some(r => r.id === id),
+      removed: async () => { try { return JSON.parse(localStorage.getItem('hd:store-gone:' + cid) || '[]'); } catch (e) { return []; } },
+      bytesOf: async rec => {
+        const out = []; const id = rec.id;
+        let h = (this._html || {})[id]; if (h == null) { try { h = await idbGet('html:' + id); } catch (e) {} }
+        if (typeof h === 'string' && h) out.push({ kind: 'html', mime: 'text/html', enc: 'utf8', bytes: M.textToBytes(h) });
+        try { const p = u8(await idbGet('pdf:' + id)); if (p && p.length) out.push({ kind: 'pdf', mime: 'application/pdf', enc: 'bin', bytes: p }); } catch (e) {}
+        if (rec.media && rec.media.kind === 'local') { try { const m = u8(await mediaBytes(id)); if (m && m.length) out.push({ kind: 'media', mime: rec.media.mime || 'application/octet-stream', enc: 'bin', bytes: m }); } catch (e) {} }
+        try { let im = (this._html || {})['img:' + id]; if (im == null) im = await idbGet('img:' + id); if (typeof im === 'string' && im) out.push({ kind: 'img', mime: 'text/plain', enc: 'utf8', bytes: M.textToBytes(im) }); } catch (e) {}
+        return out;
+      },
+      restore: async (rec, blobs) => { buf.push({ id: rec.id, rec, blobs }); },
+    };
+  }
+  // Put restored documents where the page keeps them (one write, however many), and show them.
+  async storeCommit(M, local) {
+    const got = local.buf.splice(0); if (!got.length) return 0;
+    const cid = this.corpusId(); this._html = this._html || {};
+    const ab = u => u.buffer.slice(u.byteOffset, u.byteOffset + u.byteLength);
+    for (const r of got) for (const b of r.blobs) {
+      const id = r.id;
+      try {
+        if (b.kind === 'html') { const t = M.bytesToText(b.bytes); this._html[id] = t; await idbPut('html:' + id, t); }
+        else if (b.kind === 'img') { const t = M.bytesToText(b.bytes); this._html['img:' + id] = t; await idbPut('img:' + id, t); }
+        else if (b.kind === 'pdf') await idbPut('pdf:' + id, ab(b.bytes));
+        else if (b.kind === 'media') { const buf = ab(b.bytes); await idbPut('media:' + id, buf).catch(() => {}); await opfsWrite('media/' + id, buf); }
+      } catch (e) {}
+    }
+    const have = this.state.added[cid] || []; const seen = new Set(have.map(d => d.id));
+    const add = got.filter(r => !seen.has(r.id)).map(r => withDocNorm(r.rec));
+    if (!add.length) return 0;
+    const added = { ...this.state.added, [cid]: [...have, ...add] }; this.saveAdded(added, { restoring: true }); this._key = null;
+    this.setState(st => ({ added, htmlVer: (st.htmlVer || 0) + 1 }));
+    return add.length;
+  }
+  // Bring this device up to date with the account's backup, then add what the account lacks. `pushOnly` skips the
+  // download (a change on this device does not need the manifest pulled again); `room` is a workspace just joined.
+  async autoBackup(o = {}) {
+    const s = this._net && this._net.s; if (!s || s.guest || this._storeBusy) return;
+    this._storeBusy = true;
+    try {
+      const N = await this.net(); const M = await this.storeMod();
+      const local = this.storeLocal(M);
+      const room = o.room || await this._storeRoom(N, s, (await local.docs()).length > 0);
+      if (!room) { this._setBackup(null); return; }
+      const ring = N.keyring(s); const net = this.storeNet(N, s, room);
+      const onProgress = p => { this._setBackup({ state: 'running', phase: p.phase, i: p.i, n: p.n }); };
+      if (!o.pushOnly) {
+        const st = await M.storeStatus({ scope: room, ring, net }).catch(e => { if (e && e.vault) return { has: true, held: false }; return { has: false }; });
+        if (st.has && !st.held) { this._setBackup({ state: 'locked' }); return; }
+        if (st.has) {
+          this._setBackup({ state: 'running', phase: 'pull', i: 0, n: st.docs || 0 });
+          const p = await M.pullWorkspace({ scope: room, ring, net, local, onProgress });
+          const n = await this.storeCommit(M, local);
+          if (n) this.toast('Loaded ' + plural(n, 'source') + ' from your account');
+          if (p.missing && p.missing.length) this.ilog(plural(p.missing.length, 'source') + ' could not be loaded: ' + p.missing.map(m => m.why).filter((v, i, a) => a.indexOf(v) === i).join('; '), 'bad');
+        }
+      }
+      if ((await local.docs()).length || (await local.removed()).length) {
+        this._setBackup({ state: 'running', phase: 'push', i: 0, n: 0 });
+        const r = await M.pushWorkspace({ scope: room, ring, net, local, onProgress });
+        this._setBackup({ state: 'saved', at: r.at, docs: r.docs, bytes: r.bytes });
+        this.ilog('Backed up ' + plural(r.docs, 'source') + ' to your account' + (r.uploaded ? ' (' + r.uploaded + ' new file' + (r.uploaded === 1 ? '' : 's') + ').' : ' (nothing new).'));
+      } else this._setBackup(this._net && this._net.backup && this._net.backup.state === 'running' ? { state: 'saved', at: new Date().toISOString(), docs: 0, bytes: 0 } : this._net.backup);
+    } catch (e) {
+      this._setBackup(e && e.vault && e.code === 'vault-locked' ? { state: 'locked' } : { state: 'error', why: this._storeWhy(e) });
+      this.ilog('Backup: ' + this._storeWhy(e), 'bad');
+    } finally { this._storeBusy = false; this.forceUpdate(); }
+  }
+  // A change on this device is sent a little later, once, however many sources it touched.
+  scheduleBackup() {
+    const s = this._net && this._net.s; if (!s || s.guest || !this.wsRooms().priv) return;
+    clearTimeout(this._storeT); this._storeT = setTimeout(() => this.autoBackup({ pushOnly: true }), 20000);
+  }
+  backupLine() {
+    const b = (this._net && this._net.backup) || null; const s = this._net && this._net.s;
+    if (!s || s.guest) return '';
+    if (!b) return 'Everything you add is backed up to your account automatically once you are signed in.';
+    if (b.state === 'running') return (b.phase === 'pull' ? 'Loading from your account' : 'Backing up') + (b.n ? ' — ' + b.i + ' of ' + b.n : '…');
+    if (b.state === 'saved') return 'Backed up ' + new Date(b.at).toLocaleTimeString() + (b.docs ? ' · ' + plural(b.docs, 'source') : '');
+    if (b.state === 'locked') return 'This device does not hold the workspace key yet. Open the device link from the device that started this workspace, or accept an invitation to it.';
+    return 'The backup did not finish: ' + (b.why || 'unknown') + '.';
+  }
   knownIds(A) { const s = new Set(); A.docs.forEach(d => { if (d.media && d.media.id) s.add(d.media.id); if (d.url) s.add(d.url.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '')); }); return s; }
-  async findNew() { return this.netDo('Search', async N => { const cfg = this.netCfg(); const W = (this._net && this._net.cfg && this._net.cfg.watches) || []; if (!W.length) throw new Error('add a watch first (saved in the public room)'); const A = this.analysis(); const known = this.knownIds(A); const out = [];
+  async findNew() { return this.netDo('Search', async N => { const cfg = this.netCfg(); const W = this.watchList(); if (!W.length) throw new Error('add a watch first'); const A = this.analysis(); const known = this.knownIds(A); const out = [];
     for (const w of W) { const res = await N.search(cfg.searchProxy, w.q, { videos: w.kind === 'youtube' }); res.forEach(r => { if (w.kind === 'youtube' && !r.ytid) return; const k = r.ytid || r.url.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, ''); if (known.has(k) || out.some(o => (o.ytid || o.url) === (r.ytid || r.url))) return; out.push({ ...r, watch: w.q }); }); }
     this._net.cand = out; this.ilog(out.length ? 'Found ' + plural(out.length, 'new item') + ' not in the workspace.' : 'Nothing new.'); }); }
   async addCandidate(c, pub) { return this.netDo('Add', async N => { const meta = c.ytid ? await N.ytMeta(c.url) : null; const title = (meta && meta.title) || c.title || c.url; const x = { title, url: c.url, text: title + '. ' + (c.snippet || '') + (meta && meta.author_name ? ' Published on YouTube by ' + meta.author_name + '.' : ''), extra: c.ytid ? { media: { kind: 'youtube', id: c.ytid, url: c.url, segN: 0 }, kind: 'Meeting recording', medium: 'Video', published: c.published || '', pubLabel: c.published ? String(c.published).slice(0, 10) : '' } : {} };
     this.addDocs([x]); this._net.cand = (this._net.cand || []).filter(o => o !== c); N.saveToArchive(c.url).then(ok => ok && this.ilog('Asked archive.org to save ' + c.url)); if (pub) await this.publish({ bytes: JSON.stringify({ title, url: c.url, ytid: c.ytid || null, found: c.watch || null }), meta: { kind: c.ytid ? 'video-link' : 'link', title, url: c.url, ytid: c.ytid || null, mime: 'application/json', filename: (c.ytid || 'link') + '.json' } }); }); }
-  async publish({ bytes, meta }, noRefresh) { const N = await this.net(); const s = this._net && this._net.s; const room = this.wsRooms().pub; if (!s || s.guest) throw new Error('sign in with an account to publish'); if (!room) throw new Error('create or join the public room first'); if (!noRefresh) await this.refreshRoom(); const b = await N.appendBlock(s, room, bytes, meta, this._net.head); this._net.head = b.block; (this._net.chain = this._net.chain || []).push({ ...b, linked: true, self: true, ts: Date.now(), sender: s.user }); this.ilog('Published block ' + b.block.slice(0, 12) + ' · ' + (meta.title || meta.filename)); this.forceUpdate(); return b; }
+  // Publishing to a public room is not offered anywhere: a workspace is private. An older workspace may still hold a
+  // public room id; nothing is sent to it.
+  async publish() { return null; }
   asrMod() { if (!this._asrP) this._asrP = import(new URL('holodeck-asr.js', location.href).href); return this._asrP; }
   asrUrl() { try { const v = localStorage.getItem('hd:asr'); if (!v || v === 'off') return null; return v; } catch (e) { return null; } }
   async transcribeAny(buf, onProgress, model, opts) {
@@ -7809,23 +7932,8 @@ class Component extends DCLogic {
     if (d.pdfSrc) { try { const r = await fetch(d.pdfSrc); if (r.ok) return { buf: await r.arrayBuffer(), rel: (d.pdfSrc || '').split('/').pop(), mime: 'application/pdf' }; } catch (e) {} }
     return { buf: new TextEncoder().encode(d.text || '').buffer, rel: null, mime: 'text/plain' };
   }
-  async publishAll() {
-    if (this._pubAll) { this._pubAll.stop = true; return; }
-    const run = this._pubAll = { stop: false, done: 0, skipped: 0, failed: 0, total: 0 };
-    try { await this.refreshRoom(); const s = this._net && this._net.s; if (!s || s.guest) throw new Error('sign in to publish'); if (!this.wsRooms().pub) throw new Error('make the workspace public first');
-      const have = new Set((this._net.chain || []).map(b => b.meta && (b.meta.srcId || b.meta.url)).filter(Boolean));
-      const A = this.analysis(); const docs = A.docs.filter(d => this.counted(d)); run.total = docs.length;
-      for (const d of docs) { if (run.stop) break; const key = d.ohsId || d.id; if (have.has(key) || (d.url && have.has(d.url))) { run.skipped++; this.forceUpdate(); continue; }
-        try { const src = await this.sourceBytes(d); const ext = src.mime === 'application/pdf' ? '.pdf' : src.mime === 'application/json' ? '.json' : src.mime === 'text/plain' ? '.txt' : '.bin';
-          await this.publish({ bytes: src.buf, meta: { kind: d.media ? (d.bodyBase ? 'transcript' : 'video-link') : 'source', srcId: key, title: d.title, url: d.url || null, ytid: d.media && d.media.id || null, published: d.published || null, docKind: d.kind || null, from: 'workspace text', mime: src.mime, filename: key.replace(/[^\w-]+/g, '-').slice(0, 80) + ext } }, true);
-          if (d.url && !d.media) (await this.net()).saveToArchive(d.url); run.done++; }
-        catch (e) { run.failed++; this.ilog('Could not publish ' + short(d.title, 50) + ': ' + e.message, 'bad'); if (e.status === 429) await new Promise(r => setTimeout(r, 5000)); }
-        this.forceUpdate(); await new Promise(r => setTimeout(r, 250)); }
-      this.ilog('Published ' + run.done + ', skipped ' + run.skipped + ' already in the chain' + (run.failed ? ', ' + run.failed + ' failed' : '') + '.');
-    } catch (e) { this.ilog('Publish all: ' + e.message, 'bad'); } finally { this._pubAll = null; this.forceUpdate(); }
-  }
   netVals(A, view) {
-    if (view !== 'ingest' && !this.state.showSettings) return { ing: { on: false } }; this.netInit(); const S = this.state; const n = this._net || {}; const s = n.s; const R = this.wsRooms(); const cfg = this.netCfg(); const W = (n.cfg && n.cfg.watches) || [];
+    if (view !== 'ingest' && !this.state.showSettings) return { ing: { on: false } }; this.netInit(); const S = this.state; const n = this._net || {}; const s = n.s; const R = this.wsRooms(); const cfg = this.netCfg(); const W = this.watchList();
     const txNeeded = A.docs.filter(d => d.media && d.media.kind === 'youtube' && !d.media.segN && !d.lazy).slice(0, 20);
     const tpv = this.txProgVals();
     return { ing: { on: view === 'ingest', showTx: true, busy: S.netBusy || '', isBusy: !!S.netBusy,
@@ -7834,14 +7942,14 @@ class Component extends DCLogic {
       onShare: () => this.makeShare(), share: n.share || '', hasShare: !!n.share, server: cfg.server || 'hyphae.social',
       onShareEmail: e => { this._shareEmail = e.target.value; }, onShareMail: () => this.mailShare(this._shareEmail), shareMailLabel: (n.mailBusy ? 'Sending…' : 'Send invite'), mailBusy: !!n.mailBusy, hasMailShare: !!this._mailShareNote, mailShareNote: this._mailShareNote || '',
       onServer: e => this.setNetCfg({ server: e.target.value.trim() }), onUser: e => { this._mxU = e.target.value; }, onPass: e => { this._mxP = e.target.value; },
+      backupLine: this.backupLine(), onBackup: () => this.autoBackup(), onRestore: () => this.autoBackup(),
       onLogin: () => this.openLogin(), onGuest: () => this.doGuest(), onLogout: () => this.signOut(), onShareRepo: () => this.openShareRepo(), onAllWorkspaces: () => { this.setState({ showSettings: false }); this.openWorkspacesHero(); },
-      hasPub: !!R.pub, noPub: !R.pub, pub: R.pub || '', onCreatePub: () => this.createPublic(), onJoinAlias: e => { this._mxA = e.target.value; }, onJoin: () => this._mxA && this.joinPublic(this._mxA),
       hasPriv: !!R.priv, noPriv: !R.priv, priv: R.priv || '', onCreatePriv: () => this.createPrivate(), onInviteId: e => { this._mxI = e.target.value; }, onInvite: () => this._mxI && this.invitePriv(this._mxI), onLoadPriv: () => this.loadPrivateWork(), privAt: n.privAt ? 'Last synced ' + n.privAt : 'Syncs pins, drafts, filters and reading history a few seconds after each change.',
       hd: this._hd || {}, hasHd: !!(this._hd && this._hd.link), hdLink: (this._hd && this._hd.link) || '', hdNote: (this._hd && this._hd.note) || '', hdBusy: S.netBusy === 'Heimdall invite' || S.netBusy === 'Record code', onHdMint: () => this.heimdallMint(), onHdCopy: () => this.heimdallCopy(), onHdCode: e => { this._hdCode = e.target.value; }, onHdRecord: () => this.heimdallRecord(),
       watches: W.map((w, i) => ({ q: w.q, kind: w.kind === 'youtube' ? 'YouTube' : 'Web', onRemove: () => this.saveWatches(W.filter((_, j) => j !== i)) })), hasWatches: W.length > 0, onWatchQ: e => { this._wq = e.target.value; }, onAddWatch: kind => () => { const q = (this._wq || '').trim(); if (q) this.saveWatches([...W, { q, kind }]); },
       onAddYt: () => { const q = (this._wq || '').trim(); if (q) this.saveWatches([...W, { q: q.replace(/^https?:\/\/www\.youtube\.com\/results\?search_query=/, '').replace(/\+/g, ' '), kind: 'youtube' }]); }, onAddWeb: () => { const q = (this._wq || '').trim(); if (q) this.saveWatches([...W, { q, kind: 'web' }]); },
       proxy: cfg.searchProxy || '', onProxy: e => this.setNetCfg({ searchProxy: e.target.value.trim() }), onFind: () => this.findNew(),
-      cand: (n.cand || []).map(c => ({ title: c.title, url: c.url, meta: [c.ytid ? 'YouTube' : 'Web', c.published ? String(c.published).slice(0, 10) : '', 'from “' + c.watch + '”'].filter(Boolean).join(' · '), thumbBg: c.ytid ? 'url(https://i.ytimg.com/vi/' + c.ytid + '/mqdefault.jpg)' : 'none', isYt: !!c.ytid, onAdd: () => this.addCandidate(c, false), onAddPub: () => this.addCandidate(c, true) })), hasCand: !!(n.cand && n.cand.length),
+      cand: (n.cand || []).map(c => ({ title: c.title, url: c.url, meta: [c.ytid ? 'YouTube' : 'Web', c.published ? String(c.published).slice(0, 10) : '', 'from “' + c.watch + '”'].filter(Boolean).join(' · '), thumbBg: c.ytid ? 'url(https://i.ytimg.com/vi/' + c.ytid + '/mqdefault.jpg)' : 'none', isYt: !!c.ytid, onAdd: () => this.addCandidate(c, false) })), hasCand: !!(n.cand && n.cand.length),
       onPaste: e => { this._paste = e.target.value; }, onAddPasted: () => { const urls = (this._paste || '').match(/https?:\/\/\S+/g) || []; urls.forEach(u => { const yt = (u.match(/[?&]v=([\w-]{11})|youtu\.be\/([\w-]{11})/) || []); this.addCandidate({ url: u, ytid: yt[1] || yt[2] || null, title: u, watch: 'pasted' }, !!(s && !s.guest && R.pub)); }); },
       onFile: e => { const f = e.target.files && e.target.files[0]; if (f) this.transcribeFile(f, null); e.target.value = ''; },
       asr: tpv.busy ? tpv.tp.label : (n.asr ? n.asr.stage + (n.asr.pct != null ? ' ' + n.asr.pct + '%' : '') : ''), hasAsr: tpv.busy || !!(n.asr && n.asr.stage !== 'done'), asrMeta: tpv.busy ? tpv.tp.meta : '', asrBar: tpv.busy ? tpv.tp.bar : '100%', asrBarClass: tpv.busy ? tpv.tp.barClass : 'hd-tx-fill', webgpu: typeof navigator !== 'undefined' && navigator.gpu ? 'WebGPU available: transcription runs on your graphics card.' : 'No WebGPU in this browser: transcription runs on the CPU and will be slow.',
@@ -7863,7 +7971,7 @@ class Component extends DCLogic {
       llmModel: this.llmCfg().model, onLlmModel: e => this.setLlm({ model: e.target.value.trim() }), onLlmTest: () => this.testLLM(), llmTest: S.llmTest || '',
       txNeeded: txNeeded.map(d => ({ title: d.title, onPick: e => { const f = e.target.files && e.target.files[0]; if (f) this.transcribeFile(f, d); e.target.value = ''; } })), hasTx: txNeeded.length > 0,
       chain: (n.chain || []).slice().reverse().slice(0, 40).map(b => ({ title: (b.meta && (b.meta.title || b.meta.filename)) || 'block', kind: (b.meta && b.meta.kind) || '', hash: b.block ? b.block.slice(0, 16) : '', prev: b.prev ? b.prev.slice(0, 10) : 'genesis', by: b.sender || '', ok: b.linked && b.self ? 'linked' : 'broken', okCol: b.linked && b.self ? 'var(--ok)' : 'var(--bad)' })), hasChain: !!(n.chain && n.chain.length), chainLine: n.chain ? plural(n.chain.length, 'block') + ' · ' + (n.chainOk === false ? 'the chain is broken somewhere' : 'every block links to the one before') : '', onLoadRoom: () => this.loadFromRoom(), onRefresh: () => this.netDo('Refresh', () => this.refreshRoom()),
-      onPubAll: () => this.publishAll(), pubAllLabel: this._pubAll ? 'Stop publishing' : 'Publish every source', pubAllLine: this._pubAll ? 'Publishing ' + (this._pubAll.done + this._pubAll.skipped + this._pubAll.failed) + ' of ' + this._pubAll.total + ' · ' + this._pubAll.done + ' new, ' + this._pubAll.skipped + ' already in the chain' : 'Adds each source’s original bytes (capture, PDF, transcript) as a block, and sends web sources to archive.org. Sources already in the chain are skipped, so it can be stopped and resumed.', canPubAll: !!(s && !s.guest && R.pub),
+      pubAllLabel: this._pubAll ? 'Stop publishing' : 'Publish every source', pubAllLine: this._pubAll ? 'Publishing ' + (this._pubAll.done + this._pubAll.skipped + this._pubAll.failed) + ' of ' + this._pubAll.total + ' · ' + this._pubAll.done + ' new, ' + this._pubAll.skipped + ' already in the chain' : 'Adds each source’s original bytes (capture, PDF, transcript) as a block, and sends web sources to archive.org. Sources already in the chain are skipped, so it can be stopped and resumed.', canPubAll: !!(s && !s.guest && R.pub),
       log: (this._ilog || []).slice(0, 12).map(l => ({ ...l, col: l.kind === 'bad' ? 'var(--bad)' : 'var(--mut)' })), hasLog: !!(this._ilog && this._ilog.length) } };
   }
   createWorkspace(name, opts) {
@@ -8646,6 +8754,7 @@ class Component extends DCLogic {
     const cid = this.corpusId(); const have = this.state.added[cid] || []; const set = new Set((ids || []).filter(id => have.some(d => d.id === id)));
     if (!set.size) return;
     const titles = have.filter(d => set.has(d.id)).map(d => d.title);
+    try { const k = 'hd:store-gone:' + cid; const g = new Set(JSON.parse(localStorage.getItem(k) || '[]')); set.forEach(id => g.add(id)); localStorage.setItem(k, JSON.stringify([...g])); } catch (e) {}
     const added = { ...this.state.added, [cid]: have.filter(d => !set.has(d.id)) }; this.saveAdded(added);
     set.forEach(id => { try { this.setDocFolder(id, ''); } catch (e) {} this.purgeDocBytes(id); });
     this._key = null;
@@ -8660,7 +8769,7 @@ class Component extends DCLogic {
   sel(type, id) { const S0 = this.state; if (type === 'name' && S0.view === 'reader' && !(S0.sel && S0.sel.type === 'name' && S0.sel.id === id)) this.pushHist(); if (type === 'doc') this.markRead(id); this.setState(s => (s.sel && s.sel.type === type && s.sel.id === id) ? { sel: null, selAll: false, pfIdx: 0, pfAll: false } : { sel: { type, id }, selAll: false, pfIdx: 0, pfAll: false }); }
   go(view) { this.setState({ view, readDoc: null }); }
   read(docId, stId) { const S0 = this.state; if (S0.view !== 'reader' || docId !== S0.readDoc || (S0.sel && S0.sel.type === 'name')) this.pushHist(); this.markRead(docId); const live = this.isLiveDoc(this.analysis().docById[docId]); if (docId !== this.state.readDoc) { this.state.seekT = 0; this._faithFound = null; } this.setState({ view: 'reader', readDoc: docId, narrowDetail: false, sel: stId ? { type: 'statement', id: stId } : { type: 'doc', id: docId }, ...(live ? { readMode: 'original' } : {}) }); }
-  saveAdded(added) {
+  saveAdded(added, opts) {
     // The bytes go to IndexedDB as a gzipped binary blob, not localStorage: a big
     // corpus is stored compact, and the page only carries a small pointer. The
     // sidecar on the doc stays the addressable model (elements/tokens/gaps/text),
@@ -8676,6 +8785,7 @@ class Component extends DCLogic {
       }
       localStorage.setItem('fold-explorer-added', JSON.stringify(local));
     } catch (e) {}
+    if (!(opts && opts.restoring)) this.scheduleBackup();
   }
   // Load any corpus whose body lives gzipped in IndexedDB, then swap the full
   // workspace in. The pointer in localStorage told us which ones to pull.
@@ -9989,7 +10099,8 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
       mxSignedIn: !!(this._net && this._net.s && !this._net.s.guest), mxNotSignedIn: !(this._net && this._net.s),
       mxWho: (this._net && this._net.s) ? (this._net.s.guest ? 'Guest · ' + this._net.s.user + ' · read only' : (this._net.s.ephemeral ? 'Temporary account · ' + this._net.s.user : this._net.s.user)) : '',
       mxServer: this.netCfg().server || 'hyphae.social',
-      onMxServer: e => { this._mxSrv = e.target.value; }, onMxUser: e => { this._mxU = e.target.value; }, onMxPass: e => { this._mxP = e.target.value; },
+      onMxServer: e => { this._mxSrv = e.target.value; }, onMxUser: e => { this._mxU = e.target.value; }, onMxPass: e => { this._mxP = e.target.value; }, onMxCode: e => { this._mxC = e.target.value; },
+      mxUser: this._mxU != null ? this._mxU : this._mxRemembered(), mxServerShown: !!S.mxSrvOpen, mxServerToggleLabel: S.mxSrvOpen ? 'use the default' : 'change', onMxServerToggle: () => this.setState({ mxSrvOpen: !this.state.mxSrvOpen }),
       onMxKey: e => { if (e.key === 'Enter') this.doLogin(); },
       doLogin: () => this.doLogin(), doGuest: () => this.doGuest(), doLogout: () => { this.signOut(); this.setState({ mxOpen: false }); },
       openLogin: () => this.openLogin(), closeLogin: () => this.closeLogin(), closeLoginBg: e => { if (e.target === e.currentTarget) this.closeLogin(); },

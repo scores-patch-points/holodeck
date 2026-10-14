@@ -138,6 +138,16 @@ export async function download(s, mxc) {
   throw new Error('media not reachable');
 }
 
+// The largest single upload this homeserver takes, or null when it will not say (Synapse defaults to 50 MiB).
+export async function mediaLimit(s) {
+  for (const p of ['/_matrix/client/v1/media/config', '/_matrix/media/v3/config']) {
+    try { const j = await api(s, 'GET', p); const n = j && j['m.upload.size']; if (Number.isFinite(n) && n > 0) return n; } catch (e) {}
+  }
+  return null;
+}
+// The keyring this browser uses for an account: one object shared by everything on the page that seals or opens.
+export const keyring = (s) => deviceKeyring(s && s.user);
+
 // ---------- hash chain ----------
 export async function blockHash(b) { return sha256(canon({ v: b.v, sha256: b.sha256, prev: b.prev || '', meta: canon(b.meta || {}) })); }
 export async function readChain(s, room) {

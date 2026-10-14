@@ -7,7 +7,7 @@
 import http from 'node:http';
 
 const CORS = { 'access-control-allow-origin': '*', 'access-control-allow-headers': 'authorization,content-type', 'access-control-allow-methods': 'GET,POST,PUT,DELETE,OPTIONS' };
-export function homeserver({ name = 'rest.local', registration = 'dummy', port = 0 } = {}) {
+export function homeserver({ name = 'rest.local', registration = 'dummy', port = 0, mediaLimit = 50 * 1024 * 1024 } = {}) {
   let n = 1, ts = Date.now();
   const tick = () => (ts = Math.max(ts + 1, Date.now()));       // a homeserver stamps with the real clock, strictly increasing
   const tokens = new Map();            // token -> user
@@ -16,6 +16,7 @@ export function homeserver({ name = 'rest.local', registration = 'dummy', port =
   const rooms = new Map();             // id -> { state: Map(type|key -> event), timeline: [], members: Map }
   const aliases = new Map();
   const seen = [];                     // every request: { method, path, auth, body }
+  const media = new Map();             // media id -> { bytes: Buffer, type } — the media repository, uploads kept as sent
   const sid = (p) => p + (n++).toString(36);
   const mkUser = (local) => { const u = `@${local}:${name}`; const t = 'tok_' + sid('t'); tokens.set(t, u); return { user: u, token: t }; };
   const stateEv = (r, type, key, content, sender) => { const e = { type, state_key: key, content, sender, event_id: '$' + sid('s'), origin_server_ts: tick() }; r.state.set(type + '|' + key, e); r.timeline.push(e); return e; };
@@ -24,13 +25,29 @@ export function homeserver({ name = 'rest.local', registration = 'dummy', port =
   const server = http.createServer(async (req, res) => {
     if (req.method === 'OPTIONS') { res.writeHead(204, CORS); return res.end(); }
     const u = new URL(req.url, 'http://x');
-    const raw = await new Promise((ok) => { let b = ''; req.on('data', (c) => { b += c; }); req.on('end', () => ok(b)); });
+    const rawBuf = await new Promise((ok) => { const parts = []; req.on('data', (c) => { parts.push(c); }); req.on('end', () => ok(Buffer.concat(parts))); });
+    const raw = rawBuf.toString('utf8');
     let body = {}; try { body = raw ? JSON.parse(raw) : {}; } catch { /* none */ }
     const auth = String(req.headers.authorization || '').replace(/^Bearer /, '');
     seen.push({ method: req.method, path: u.pathname + u.search, auth, body, xff: req.headers['x-forwarded-for'] || null });
     const out = (code, obj) => { res.writeHead(code, { 'content-type': 'application/json', ...CORS }); res.end(JSON.stringify(obj)); };
     const err = (code, errcode, error) => out(code, { errcode, error });
     const p = decodeURIComponent(u.pathname);
+
+    // media repository: the upload is stored byte for byte; a download needs a token on the authenticated route
+    if (/^\/_matrix\/(client\/v1\/media|media\/v3)\/config$/.test(p) && req.method === 'GET') return out(200, { 'm.upload.size': mediaLimit });
+    if (p === '/_matrix/media/v3/upload' && req.method === 'POST') {
+      if (!tokens.has(auth)) return err(401, 'M_UNKNOWN_TOKEN', 'Unrecognised access token');
+      if (rawBuf.length > mediaLimit) return err(413, 'M_TOO_LARGE', 'Cannot upload files larger than ' + mediaLimit + ' bytes');
+      const id = sid('md'); media.set(id, { bytes: rawBuf, type: req.headers['content-type'] || 'application/octet-stream' });
+      return out(200, { content_uri: `mxc://${name}/${id}` });
+    }
+    const dl = p.match(/^\/_matrix\/(client\/v1\/media|media\/v3)\/download\/([^/]+)\/(.+)$/);
+    if (dl && req.method === 'GET') {
+      if (dl[1] === 'client/v1/media' && !tokens.has(auth)) return err(401, 'M_MISSING_TOKEN', 'Missing access token');
+      const m = media.get(dl[3]); if (!m) return err(404, 'M_NOT_FOUND', 'Not found');
+      res.writeHead(200, { 'content-type': m.type, ...CORS }); return res.end(m.bytes);
+    }
 
     if (p === '/.well-known/matrix/client') return err(404, 'M_NOT_FOUND', 'none');
     if (p === '/_matrix/client/v3/register' && req.method === 'POST') {
@@ -161,6 +178,7 @@ export function homeserver({ name = 'rest.local', registration = 'dummy', port =
   });
   return new Promise((ok) => server.listen(port, '127.0.0.1', () => ok({
     base: 'http://127.0.0.1:' + server.address().port, name, seen, user: mkUser, rooms, aliases, passwords,
+    media,
     close: () => new Promise((r) => { server.closeAllConnections?.(); server.close(r); }),
   })));
 }
