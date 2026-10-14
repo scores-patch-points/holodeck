@@ -64,6 +64,8 @@ button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visi
 .hd-drive-search:focus{border-color:var(--acc);background:var(--s1)}
 .hd-drive-add{background:var(--acc2);border:0;color:#fff;border-radius:999px;padding:8px 18px;cursor:pointer;font:600 14px var(--sans);white-space:nowrap}
 .hd-drive-tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+/* the direct Metro contracts address shows that content only: no workspace switcher, no adding sources */
+html[data-metro] .hd-workspace,html[data-metro] .hd-topadd,html[data-metro] .hd-railadd,html[data-metro] .hd-drive-add{display:none!important}
 .hd-chip{all:unset;cursor:pointer;border:1px solid var(--line2);border-radius:8px;padding:5px 12px;font:500 13px var(--sans);color:var(--ink2);white-space:nowrap}
 .hd-chip:hover{background:var(--s2)}
 .hd-chip.on{background:var(--sel);border-color:var(--acc2);color:var(--ink)}
@@ -3770,7 +3772,10 @@ import(new URL('holodeck-holders.js', location.href)).then(M => { HD_ATTR = M; }
 // Airtable-style filters for the Sources table (nested AND/OR groups); the render is synchronous, so the module is preloaded
 let HD_FLT = null; const hdFltP = import(new URL('holodeck-filters.js', location.href)).then(M => { HD_FLT = M; return M; }).catch(() => null);
 // The Metro contracts workspace is served by the VM (tools/contracts-api); the module is only the thin client
-const hdVmP = import(new URL('holodeck-vm-contracts.js', location.href)).catch(() => null);
+// ...and only when the address asks for it (metro.html / ?ws=metro): the workspace is not a default option anywhere else
+const HD_METRO = (() => { try { return /^(metro|metro-vm)$/.test(new URLSearchParams(location.search).get('ws') || ''); } catch (e) { return false; } })();
+if (HD_METRO) { try { document.documentElement.setAttribute('data-metro', '1'); } catch (e) {} }
+const hdVmP = HD_METRO ? import(new URL('holodeck-vm-contracts.js', location.href)).catch(() => null) : Promise.resolve(null);
 const hdAttrReady = () => !!HD_ATTR;
 // THE FRONT LEG of the holder read: NL → this language's OWN grammar → EOT.
 // relations-language.js::relationExtractorsFor under the language's RoleConfig@1
@@ -9718,6 +9723,7 @@ class Component extends DCLogic {
     const wsRecent = loadWsRecent();
     const wsAll = [{ id: 'custom', name: 'Your content', fixed: true }].concat(Object.keys(S.added).filter(k => wsNames[k]).map(k => ({ id: k, name: wsNames[k] }))).map(w => ({ ...w, n: addN(w.id), at: wsRecent[w.id] || 0 }))
       .concat(this._vm && SAMPLES['metro-vm'] ? [{ id: 'metro-vm', name: 'Metro contracts (live)', fixed: true, n: this._vm.depts.reduce((n, d) => n + d.n, 0), at: wsRecent['metro-vm'] || 0 }] : []);
+    if (HD_METRO && this._vm) { const keep = x => x.id === 'metro-vm'; opts.splice(0, opts.length, ...opts.filter(keep)); wsAll.splice(0, wsAll.length, ...wsAll.filter(keep)); }   // the direct address: only this content
     const wsOpenIt = id => { this.setState({ corpus: id, view: 'summary', sel: null, f: {}, readDoc: null, folder: null, folderDraft: '' }); if (id === 'metro-vm' && this._vm && !SAMPLES['metro-vm'].docs.length) this.vmLoad(); };
     // segmenting: the workspace's own discovered topics, computed once and driving the left-rail Topics
     // section, the global scope strip, and the Overview page's cards. A topic segment is source-based
@@ -10147,6 +10153,7 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
   // Nothing is ingested: a page of rows is light in-memory docs (SAMPLES['metro-vm']), a contract's text is fetched
   // when it is opened, and the department / search / paging are lookups on the VM.
   async vmInit() {
+    if (!HD_METRO) return;   // not a default option: the address has to ask for it
     const P = new URL(location.href).searchParams;   // read before anything can rewrite the address
     try {
       const M = await hdVmP; if (!M) return;
