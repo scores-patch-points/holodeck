@@ -3812,6 +3812,26 @@ let HD_FLT = null; const hdFltP = import(new URL('holodeck-filters.js', location
 const HD_METRO = (() => { try { return /^(metro|metro-vm)$/.test(new URLSearchParams(location.search).get('ws') || ''); } catch (e) { return false; } })();
 if (HD_METRO) { try { document.documentElement.setAttribute('data-metro', '1'); } catch (e) {} }
 const hdVmP = HD_METRO ? import(new URL('holodeck-vm-contracts.js', location.href)).catch(() => null) : Promise.resolve(null);
+// ?diag=1 — a small readout for finding out why a page misbehaves in someone's browser: errors, the click that landed,
+// what the sources list holds, which topic filter is on. Nothing is sent anywhere; it is only drawn on the page.
+if (/[?&]diag(=|&|$)/.test(location.search)) {
+  const box = document.createElement('pre');
+  box.style.cssText = 'position:fixed;left:6px;bottom:6px;z-index:99999;max-width:min(560px,94vw);max-height:42vh;overflow:auto;margin:0;padding:8px 10px;background:#111;color:#9fe;font:11px/1.35 ui-monospace,Menlo,monospace;border-radius:8px;white-space:pre-wrap;opacity:.94';
+  const log = []; const add = m => { log.push(new Date().toISOString().slice(11, 19) + ' ' + m); if (log.length > 14) log.shift(); };
+  window.addEventListener('error', e => add('ERROR ' + e.message + ' @' + String(e.filename || '').split('/').pop() + ':' + e.lineno));
+  window.addEventListener('unhandledrejection', e => add('REJECT ' + String((e.reason && e.reason.message) || e.reason).slice(0, 120)));
+  document.addEventListener('click', e => { const t = e.target; const b = t.closest && t.closest('button, summary, a, select');
+    add('CLICK <' + t.tagName.toLowerCase() + '> "' + String(t.textContent || '').trim().replace(/\s+/g, ' ').slice(0, 36) + '" in ' + (b ? b.tagName.toLowerCase() : '-') + (t.closest && t.closest('details') ? ' [details:' + String((t.closest('details').querySelector('summary') || {}).textContent || '').trim().slice(0, 14) + ']' : '')); }, true);
+  const draw = () => { try {
+    const app = window.__hdApp, st = app && app.state, f = (st && st.f) || {}, A = window.__holodeckA;
+    box.textContent = ['diag · ' + navigator.userAgent.replace(/^Mozilla\/5.0 /, '').slice(0, 90), 'viewport ' + innerWidth + 'x' + innerHeight + ' · dpr ' + devicePixelRatio,
+      'view=' + (st && st.view) + ' layout=' + (st && st.svMode) + ' corpus=' + (st && st.corpus) + ' metro=' + HD_METRO,
+      'rows(tbody tr)=' + document.querySelectorAll('tbody tr').length + ' tiles=' + document.querySelectorAll('.hd-drive-tile').length + ' docs=' + (A && A.docs ? A.docs.length : '?'),
+      'f.topicGroup=' + (f.topicGroup ? f.topicGroup.label + ' (' + f.topicGroup.docs.length + (f.topicGroup.invert ? ', inverted' : '') + ')' : 'none') + ' f.topic=' + (f.topic || 'none'),
+      'chip: ' + ((document.body.innerText.match(/Segment[^\n]*/) || ['none'])[0].slice(0, 60)), '— events —'].concat(log).join('\n'); } catch (e) { box.textContent = 'diag error ' + e.message; } };
+  const mount = () => { if (!document.body) return setTimeout(mount, 50); document.body.appendChild(box); draw(); setInterval(draw, 700); };
+  mount();
+}
 const hdAttrReady = () => !!HD_ATTR;
 // THE FRONT LEG of the holder read: NL → this language's OWN grammar → EOT.
 // relations-language.js::relationExtractorsFor under the language's RoleConfig@1
