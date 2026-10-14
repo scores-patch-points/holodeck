@@ -1,0 +1,15 @@
+[Unit]
+Description=Metro contract DB - OCR backfill (read the scanned contracts the fast lane could not)
+After=network.target
+
+[Service]
+User=admin
+WorkingDirectory=/mnt/watch/contracts-api
+ExecStart=/mnt/watch/nashville-legistar-archive/.venv/bin/python /mnt/watch/contracts-api/ocr_backfill.py --workers 6 --max-pages 12
+Restart=on-failure
+RestartSec=60
+Nice=12
+IOSchedulingClass=idle
+
+[Install]
+WantedBy=multi-user.target

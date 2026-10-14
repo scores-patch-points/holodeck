@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Metro contracts</title>
+<meta http-equiv="refresh" content="0; url=index.html?ws=metro">
+<script>
+// The address for the Metro contracts workspace. Anything after it is carried through:
+//   metro.html?dept=POLICE&q=surveillance        a department / a search
+//   metro.html?doc=nash-<token>&view=original    one contract
+var q = new URLSearchParams(location.search); q.set('ws', 'metro');
+location.replace('index.html?' + q.toString());
+</script>
+</head>
+<body><p><a href="index.html?ws=metro">Open the Metro contracts workspace</a></p></body>
+</html>

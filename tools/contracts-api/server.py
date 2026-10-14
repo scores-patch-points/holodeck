@@ -26,6 +26,16 @@ TOK = re.compile(r'^[A-Za-z0-9]{3,32}$')
 THUMBS = os.environ.get('CONTRACTS_THUMBS', '/mnt/watch/contracts-api/thumbs')
 os.makedirs(CACHE, exist_ok=True); os.makedirs(THUMBS, exist_ok=True)
 
+def extracted_text(ident, limit):
+    """The pipeline's own extracted text for a contract (text layer or OCR), or ''."""
+    if not ident or '/' in ident: return ''
+    p = os.path.join(DATA, 'deployed', ident, 'extracted-text.txt')
+    try:
+        with open(p, encoding='utf-8', errors='replace') as f: t = f.read(limit)
+        return t if len(t.strip()) >= 40 else ''
+    except OSError:
+        return ''
+
 _local = threading.local()
 def conn():
     c = getattr(_local, 'c', None)
@@ -69,14 +79,19 @@ def search(p):
     total = c.execute('SELECT COUNT(*) FROM contracts c' + w, args).fetchone()[0]
     rs = c.execute('SELECT c.* FROM contracts c' + w + ' ORDER BY ' + sort + ' LIMIT ? OFFSET ?', args + [limit, offset]).fetchall()
     out = [row(x) for x in rs]
+    idents = {x['token']: x['identifier'] for x in rs}
     # what the reading lane holds for each row: how many observations, and the opening of the reading as a
     # gist — enough for the reader to show real statements on a card without a request per contract.
     for r in out:
         r['obs'] = c.execute('SELECT COUNT(*) FROM obs WHERE token=?', (r['token'],)).fetchone()[0]
-        r['gist'] = ''
+        r['gist'] = ''; r['read'] = ''
         if r['obs']:
             g = ' '.join(o[0] for o in c.execute('SELECT verbatim FROM obs WHERE token=? ORDER BY a LIMIT 14', (r['token'],)).fetchall())
-            r['gist'] = re.sub(r'\s+', ' ', g)[:1600]
+            r['gist'] = re.sub(r'\s+', ' ', g)[:1600]; r['read'] = 'ledger'
+        else:
+            # read as text (a text layer, or the OCR lane) but the deterministic extractor found no clause rows
+            t = extracted_text(idents.get(r['token']), 4000)
+            if t: r['gist'] = re.sub(r'\s+', ' ', t)[:1600]; r['read'] = 'text'
     return {'total': total, 'offset': offset, 'limit': limit, 'rows': out}
 
 def detail(tok):
@@ -85,6 +100,8 @@ def detail(tok):
     obs = c.execute('SELECT kind, a, b, verbatim, fields FROM obs WHERE token=? ORDER BY a LIMIT 1000', (tok,)).fetchall()
     out = row(x); out['epav_url'] = x['epav_url']
     out['observations'] = [{'kind': o['kind'], 'at': [o['a'], o['b']], 'verbatim': o['verbatim'], 'fields': json.loads(o['fields'] or '{}')} for o in obs]
+    out['text'] = extracted_text(x['identifier'], 60000)
+    out['read'] = 'ledger' if obs else ('text' if out['text'] else '')
     return out
 
 def grab(url, timeout=25):

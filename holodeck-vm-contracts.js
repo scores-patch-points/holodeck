@@ -38,7 +38,7 @@ export function toDoc(r) {
     id: 'nash-' + r.token,
     title: ((r.number || r.token) + ' — ' + (r.party || '')).replace(/\s*[—-]\s*$/, ''),
     year: yr ? +yr[1] : null,
-    type: 'Contract', format: 'text', pages: null, text: r.gist || '', obs: r.obs || 0,
+    type: 'Contract', format: 'text', pages: null, text: r.gist || '', obs: r.obs || 0, readState: r.read || '',
     thumb: API + '/contract/' + encodeURIComponent(r.token) + '/thumb.jpg',
     url: 'http://documents.nashville.gov/Request/Document/' + r.token,
     pdfSrc: pdfUrl(r.token), archiveUrl: r.archive_url || '',
@@ -52,6 +52,7 @@ export function toDoc(r) {
 // The reading lane's observations, in document order, with overlapping spans dropped — the text the
 // Extracted view and the statements are made from.
 export function textOf(d) {
+  if (d && !(d.observations || []).length) return d.text || '';   // read as plain text (no clause rows)
   const obs = (d && d.observations || []).slice().sort((x, y) => (x.at[0] || 0) - (y.at[0] || 0));
   const out = []; let end = -1;
   for (const o of obs) { const [a, b] = o.at; if (a != null && a < end && b != null && b <= end) continue; out.push(o.verbatim); if (b != null) end = Math.max(end, b); }

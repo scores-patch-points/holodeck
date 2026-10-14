@@ -9428,7 +9428,7 @@ class Component extends DCLogic {
         renaming: S.dvRename === id, notRenaming: S.dvRename !== id, rnDraft: S.dvRenameDraft != null ? S.dvRenameDraft : r.title,
         onRnDraft: e => this.setState({ dvRenameDraft: e.target.value }), onRnSave: saveName, onRnKey: e => { if (e.key === 'Enter') saveName(); else if (e.key === 'Escape') this.setState({ dvRename: null, dvRenameDraft: null }); },
         when: dvAgo(r.addedAt) || r.date || 'Undated', stsS: String(r.sts), ...this.linkTile(id),
-        sub: [dvAgo(r.addedAt), r.date && r.date !== dvAgo(r.addedAt) ? 'source ' + r.date : '', (dv0 => dv0 && dv0.vm && !dv0.obs ? 'not read yet' : plural(r.sts, 'statement'))(A.docById[r.id]), (dd => dd && dd.captionsWhy && !dd.transcribed ? 'no captions — ' + ({ 'helper-unreachable': 'helper not reachable', 'helper-error': 'helper could not read it', 'extension-error': 'extension could not read it', 'no-track': 'no caption track' }[dd.captionsWhy] || 'not read') : '')(A.docById[id]), this.commentsOf(id).total ? '💬 ' + this.commentsOf(id).total + (this.commentsOf(id).unread ? ' ●' : '') : ''].filter(Boolean).join(' · '),
+        sub: [dvAgo(r.addedAt), r.date && r.date !== dvAgo(r.addedAt) ? 'source ' + r.date : '', (dv0 => dv0 && dv0.vm && !dv0.readState ? 'not read yet' : plural(r.sts, 'statement'))(A.docById[r.id]), (dd => dd && dd.captionsWhy && !dd.transcribed ? 'no captions — ' + ({ 'helper-unreachable': 'helper not reachable', 'helper-error': 'helper could not read it', 'extension-error': 'extension could not read it', 'no-track': 'no caption track' }[dd.captionsWhy] || 'not read') : '')(A.docById[id]), this.commentsOf(id).total ? '💬 ' + this.commentsOf(id).total + (this.commentsOf(id).unread ? ' ●' : '') : ''].filter(Boolean).join(' · '),
         menu: [{ label: 'Open', onClick: dvClose(it.onRead) }, { label: 'Comment' + (this.commentsOf(id).total ? ' (' + this.commentsOf(id).total + ')' : ''), onClick: dvClose(() => this.commentOn({ kind: 'source', doc: 'src:' + id })) }, ...(own ? [{ label: 'Rename', onClick: dvClose(() => this.setState({ dvRename: id, dvRenameDraft: r.title })) }] : []), { label: 'Details', onClick: dvClose(() => this.setState({ dvOpen: id })) },
           { label: it.soloLabel || 'Only this source', onClick: dvClose(it.onSolo) },
           ...(it.canTranscribe ? [{ label: 'Transcribe it', onClick: dvClose(it.onTranscribe) }] : []), ...(it.canProcess ? [{ label: 'Read it', onClick: dvClose(it.onProcess) }] : []),
@@ -10147,13 +10147,25 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
   // Nothing is ingested: a page of rows is light in-memory docs (SAMPLES['metro-vm']), a contract's text is fetched
   // when it is opened, and the department / search / paging are lookups on the VM.
   async vmInit() {
+    const P = new URL(location.href).searchParams;   // read before anything can rewrite the address
     try {
       const M = await hdVmP; if (!M) return;
       const depts = await M.departments();
-      this._vm = { M, depts, dept: '', q: '', total: 0, offset: 0, loading: false, seq: 0 };
+      const want = /^(metro|metro-vm)$/.test(P.get('ws') || '');
+      this._vm = { M, depts, dept: want ? (P.get('dept') || '') : '', q: want ? (P.get('q') || '') : '', total: 0, offset: 0, loading: false, seq: 0 };
       SAMPLES['metro-vm'] = { name: 'Metro contracts', docs: [] };
+      if (want) { this._key = null; this.setState({ corpus: 'metro-vm', view: 'summary', sel: null, f: {}, readDoc: null }); }
       this.forceUpdate();
-      if (this.corpusId() === 'metro-vm') this.vmLoad();
+      if (this.corpusId() === 'metro-vm' || want) {
+        await this.vmLoad();
+        const id = want ? P.get('doc') : null;   // a contract by address: ?ws=metro&doc=nash-<token>
+        if (id && /^nash-[A-Za-z0-9]+$/.test(id)) {
+          await this.vmEnsure(id);
+          // the address was read at the top: urlSync has already rewritten it by now, so open from what we captured
+          const MV = { original: 'original', map: 'map', extracted: 'restated', reading: 'reading', figures: 'figures', summary: 'summary', plain: 'plain' }, m = MV[P.get('view')];
+          this.read(id); if (m) this.setState({ readMode: m });
+        }
+      }
     } catch (e) { this._vm = null; }
   }
   async vmLoad(o = {}) {
@@ -10170,6 +10182,11 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
       V.total = j.total; V.offset = off + j.rows.length;
     } catch (e) { try { this.toast('Could not reach the contracts service (' + e.message + ').'); } catch (x) {} }
     if (this._vm === V) { V.loading = false; this._key = null; this.forceUpdate(); }
+  }
+  // a contract named by address that is not on the loaded page: fetch it and put it first
+  async vmEnsure(id) {
+    const V = this._vm, L = SAMPLES['metro-vm'].docs; if (!V || L.some(d => d.id === id)) return;
+    try { const j = await V.M.detail(id.replace(/^nash-/, '')); const d = V.M.toDoc(j); d.text = V.M.textOf(j); d.readState = j.read || ''; d._read = true; L.unshift(d); this._key = null; this.forceUpdate(); } catch (e) {}
   }
   async vmOpenText(id) {
     const V = this._vm, d = V && SAMPLES['metro-vm'] && SAMPLES['metro-vm'].docs.find(x => x.id === id);
@@ -10573,9 +10590,11 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
       const VM = { original: 'original', map: 'map', restated: 'extracted', reading: 'reading', figures: 'figures', summary: 'summary', plain: 'plain' };
       const want = { doc: reader ? S.readDoc : null, view: reader ? (VM[S.readMode] || 'original') : null,
         level: reader && S.readMode === 'restated' && this._foldP != null && Math.round(this._foldP) !== 100 ? String(Math.round(this._foldP)) : null,
-        layout: !reader && S.svMode === 'table' ? 'table' : null };
+        layout: !reader && S.svMode === 'table' ? 'table' : null,
+        // undefined = leave it alone: until the VM workspace is up, ?ws= / ?dept= / ?q= are not ours to strip
+        ws: !this._vm ? undefined : this.corpusId() === 'metro-vm' ? 'metro' : null, dept: !this._vm ? undefined : this.corpusId() === 'metro-vm' && this._vm.dept ? this._vm.dept : null, q: !this._vm ? undefined : this.corpusId() === 'metro-vm' && this._vm.q ? this._vm.q : null };
       let changed = false;
-      for (const [k, v] of Object.entries(want)) { const cur = q.get(k);
+      for (const [k, v] of Object.entries(want)) { const cur = q.get(k); if (v === undefined) continue;
         if (v == null) { if (cur != null) { q.delete(k); changed = true; } } else if (cur !== v) { q.set(k, v); changed = true; } }
       if (changed) history.replaceState(history.state, '', u.pathname + (q.toString() ? '?' + q.toString() : '') + u.hash);
     } catch (e) { /* the address bar is a convenience; never break the page for it */ }
