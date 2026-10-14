@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Metro contract reports</title>
+<style>
+  :root { --bg:#fff; --s1:#f6f6f8; --ink:#1b1b22; --mut:#6a6a78; --line:#e2e2e8; --acc:#3b4cca; --heat:59,76,202; --bad:#b3261e;
+          --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; --mono:ui-monospace,Menlo,monospace; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#14141a; --s1:#1d1d26; --ink:#ececf2; --mut:#9a9aaa; --line:#2c2c38; --acc:#8c98ff; --heat:140,152,255; --bad:#ff8a80; } }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:15px/1.45 var(--sans); }
+  header { padding:14px 16px 10px; border-bottom:1px solid var(--line); display:flex; gap:14px; align-items:baseline; flex-wrap:wrap; }
+  h1 { font:600 17px var(--sans); margin:0; }
+  header a { color:var(--acc); text-decoration:none; font-size:13px; }
+  .bar { padding:12px 16px; display:flex; gap:10px 14px; flex-wrap:wrap; align-items:flex-end; border-bottom:1px solid var(--line); background:var(--s1); }
+  label { display:flex; flex-direction:column; gap:3px; font:600 11px var(--mono); letter-spacing:.05em; text-transform:uppercase; color:var(--mut); }
+  select, input, button { font:14px var(--sans); color:var(--ink); background:var(--bg); border:1px solid var(--line); border-radius:8px; padding:7px 9px; min-width:0; }
+  button { cursor:pointer; } button.pri { background:var(--acc); color:#fff; border-color:var(--acc); }
+  .chips { padding:8px 16px 0; display:flex; gap:8px; flex-wrap:wrap; }
+  .chip { font:500 13px var(--sans); border-radius:99px; padding:4px 11px; background:var(--s1); }
+  .filters { padding:8px 16px 0; display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+  .note { padding:10px 16px 0; color:var(--mut); font-size:13px; }
+  .out { padding:12px 16px 40px; overflow:auto; }
+  table { border-collapse:collapse; font-size:13.5px; }
+  th, td { border:1px solid var(--line); padding:6px 10px; text-align:right; white-space:nowrap; }
+  th { background:var(--s1); font-weight:600; position:sticky; top:0; z-index:1; }
+  th:first-child, td:first-child { text-align:left; position:sticky; left:0; background:var(--bg); z-index:2; max-width:320px; overflow:hidden; text-overflow:ellipsis; }
+  th:first-child { background:var(--s1); z-index:3; }
+  td.cell { cursor:pointer; } td.cell:hover { outline:2px solid var(--acc); outline-offset:-2px; }
+  tr.tot td, td.tot { font-weight:600; background:var(--s1); }
+  #drawer { position:fixed; inset:0 0 0 auto; width:min(640px,100vw); background:var(--bg); border-left:1px solid var(--line); box-shadow:-12px 0 40px rgba(0,0,0,.2); transform:translateX(102%); transition:transform .16s; z-index:10; display:flex; flex-direction:column; }
+  #drawer.open { transform:none; }
+  #dh { padding:12px 14px; border-bottom:1px solid var(--line); display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+  #dh h2 { font:600 15px var(--sans); margin:0; flex:1; min-width:200px; }
+  #db { overflow:auto; padding:0 14px 20px; flex:1; }
+  .it { padding:8px 0; border-bottom:1px solid var(--line); } .it b { font-weight:600; } .it small { display:block; color:var(--mut); }
+  .err { color:var(--bad); padding:16px; }
+  #meta { margin-left:auto; color:var(--mut); font-size:13px; }
+</style>
+</head>
+<body>
+<header><h1>Metro contract reports</h1><a href="metro.html">← Browse contracts</a><span id="meta"></span></header>
+<div class="bar">
+  <label>Rows<select id="rows"></select></label>
+  <label>Columns<select id="cols"></select></label>
+  <label>Measure<select id="measure"></select></label>
+  <label>Department<select id="dept"></select></label>
+  <label>Search text<input id="q" type="search" placeholder="vendor, number, text…" style="min-width:200px"></label>
+  <button id="addf">+ Filter</button>
+  <button id="csvp">Download pivot (CSV)</button>
+  <button id="csvc" class="pri">Download contracts (CSV)</button>
+  <button id="link">Copy link</button>
+</div>
+<div class="chips" id="presets"></div>
+<div class="filters" id="filters"></div>
+<div class="note" id="note"></div>
+<div class="out"><table id="tbl"></table><div id="err" class="err" hidden></div></div>
+<aside id="drawer"><div id="dh"><h2 id="dt"></h2><button id="dcsv" class="pri">Download CSV</button><button id="dx">Close</button></div><div id="db"></div></aside>
+<script>
+// A thin client: the pivot is computed on the VM next to the data, so every change is a lookup.
+const API = new URLSearchParams(location.search).get('api') || 'https://watch.hyphae.social/contracts-api';
+const $ = id => document.getElementById(id);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const S = { rows: 'department', cols: 'year', measure: 'count', dept: '', q: '', f: [] };   // f: [{k, v}]
+let DIMS = [], MEAS = [], last = null, seq = 0;
+
+const PRESETS = [
+  ['Contracts by department × expiry year', { rows: 'department', cols: 'year', measure: 'count' }],
+  ['Dollar amounts by vendor', { rows: 'vendor', cols: '', measure: 'amount' }],
+  ['Reading progress by department', { rows: 'department', cols: 'read', measure: 'count' }],
+  ['Archive status by department', { rows: 'department', cols: 'archive', measure: 'count' }],
+  ['Amount bands by year', { rows: 'amount_band', cols: 'year', measure: 'count' }],
+];
+
+async function get(path) { const r = await fetch(API + path); if (!r.ok) throw new Error((await r.json().catch(() => ({}))).error || 'HTTP ' + r.status); return r.json(); }
+function params(extra) {
+  const p = new URLSearchParams();
+  if (S.dept) p.append('dept', S.dept); if (S.q) p.set('q', S.q);
+  S.f.forEach(x => { if (x.k && x.v !== '') p.append(x.k, x.v); });
+  Object.entries(extra || {}).forEach(([k, v]) => { if (v !== '' && v != null) p.append(k, v); });
+  return p;
+}
+const fmt = (v, m) => v == null ? '' : (m === 'amount' || m === 'avg' || m === 'max') ? '$' + Math.round(v).toLocaleString() : Number(v).toLocaleString();
+function readHash() { try { Object.assign(S, JSON.parse(decodeURIComponent(location.hash.slice(1)) || '{}')); } catch (e) {} if (!Array.isArray(S.f)) S.f = []; }
+function writeHash() { history.replaceState(null, '', '#' + encodeURIComponent(JSON.stringify(S))); }
+
+function drawControls() {
+  const opt = (arr, cur, none) => (none ? '<option value="">' + none + '</option>' : '') + arr.map(d => '<option value="' + esc(d.key) + '"' + (d.key === cur ? ' selected' : '') + '>' + esc(d.label) + '</option>').join('');
+  $('rows').innerHTML = opt(DIMS, S.rows); $('cols').innerHTML = opt(DIMS, S.cols, '(none)'); $('measure').innerHTML = opt(MEAS, S.measure);
+  $('q').value = S.q;
+  $('presets').innerHTML = PRESETS.map((p, i) => '<button class="chip" data-p="' + i + '">' + esc(p[0]) + '</button>').join('');
+  $('filters').innerHTML = S.f.map((x, i) => '<span class="chip"><select data-fk="' + i + '">' + opt(DIMS.filter(d => d.key !== 'department'), x.k) + '</select> = <select data-fv="' + i + '"><option value="">…</option>' + (x._vals || []).map(v => '<option' + (v === x.v ? ' selected' : '') + '>' + esc(v) + '</option>').join('') + '</select> <button data-fx="' + i + '">×</button></span>').join('');
+}
+async function loadVals(i) { const x = S.f[i]; if (!x.k) return; const j = await get('/pivot?' + new URLSearchParams({ rows: x.k, measure: 'count' })); x._vals = j.row_labels; drawControls(); }
+
+async function run() {
+  const my = ++seq; writeHash(); $('err').hidden = true;
+  const p = params({ rows: S.rows, cols: S.cols, measure: S.measure });
+  try {
+    const t0 = performance.now(); const j = await get('/pivot?' + p); if (my !== seq) return;
+    last = j; render(j); $('meta').textContent = j.contracts.toLocaleString() + ' contracts · ' + Math.round(performance.now() - t0) + ' ms';
+  } catch (e) { if (my === seq) { $('err').hidden = false; $('err').textContent = 'Could not build this report (' + e.message + ').'; } }
+}
+function render(j) {
+  const m = j.measure, cols = j.col_labels; let max = 0;
+  j.cells.forEach(r => r.forEach(v => { if (v != null && v > max) max = v; }));
+  const heat = v => v == null || !max ? '' : ' style="background:rgba(var(--heat),' + (0.06 + 0.5 * v / max).toFixed(3) + ')"';
+  let h = '<thead><tr><th>' + esc(j.row_label) + (j.col_label ? ' ╲ ' + esc(j.col_label) : '') + '</th>' + cols.map(c => '<th>' + esc(c) + '</th>').join('') + (j.col_label ? '<th>Total</th>' : '') + '</tr></thead><tbody>';
+  j.row_labels.forEach((r, i) => {
+    h += '<tr><td title="' + esc(r) + '">' + esc(r) + '</td>' + j.cells[i].map((v, k) => '<td class="cell"' + heat(v) + ' data-r="' + i + '" data-c="' + k + '">' + fmt(v, m) + '</td>').join('')
+      + (j.col_label ? '<td class="tot cell" data-r="' + i + '" data-c="-1">' + fmt(j.row_totals[i], m) + '</td>' : '') + '</tr>';
+  });
+  if (j.col_label) h += '<tr class="tot"><td>Total</td>' + j.col_totals.map(v => '<td>' + fmt(v, m) + '</td>').join('') + '<td>' + fmt(j.grand, m) + '</td></tr>';
+  $('tbl').innerHTML = h + '</tbody>';
+  $('note').textContent = [j.note, j.truncated.rows ? 'Showing the top 300 rows.' : '', j.truncated.cols ? 'Showing the first 24 columns.' : ''].filter(Boolean).join(' ');
+}
+function csvEsc(v) { v = v == null ? '' : String(v); return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }
+function download(name, text) { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob(['﻿' + text], { type: 'text/csv' })); a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000); }
+
+$('csvp').onclick = () => {
+  if (!last) return; const j = last, m = j.measure, head = [j.row_label].concat(j.col_labels, j.col_label ? ['Total'] : []);
+  const lines = [head.map(csvEsc).join(',')];
+  j.row_labels.forEach((r, i) => lines.push([r].concat(j.cells[i].map(v => v == null ? '' : v), j.col_label ? [j.row_totals[i]] : []).map(csvEsc).join(',')));
+  if (j.col_label) lines.push(['Total'].concat(j.col_totals, [j.grand]).map(csvEsc).join(','));
+  download('metro-pivot-' + j.rows + (j.cols ? '-by-' + j.cols : '') + '-' + j.measure + '.csv', lines.join('\n') + '\n');
+};
+$('csvc').onclick = () => { location.href = API + '/export.csv?' + params(); };
+$('link').onclick = async () => { try { await navigator.clipboard.writeText(location.href); $('link').textContent = 'Copied'; setTimeout(() => $('link').textContent = 'Copy link', 1400); } catch (e) { prompt('Copy this link', location.href); } };
+$('addf').onclick = () => { S.f.push({ k: 'year', v: '' }); loadVals(S.f.length - 1); drawControls(); };
+['rows', 'cols', 'measure'].forEach(id => $(id).onchange = e => { S[id] = e.target.value; run(); });
+$('dept').onchange = e => { S.dept = e.target.value; run(); };
+let tm; $('q').oninput = e => { clearTimeout(tm); tm = setTimeout(() => { S.q = e.target.value.trim(); run(); }, 250); };
+$('presets').onclick = e => { const i = e.target.dataset.p; if (i == null) return; Object.assign(S, PRESETS[i][1]); drawControls(); run(); };
+$('filters').onchange = e => { const t = e.target; if (t.dataset.fk != null) { S.f[+t.dataset.fk] = { k: t.value, v: '' }; loadVals(+t.dataset.fk); } else if (t.dataset.fv != null) { S.f[+t.dataset.fv].v = t.value; run(); } };
+$('filters').onclick = e => { const i = e.target.dataset.fx; if (i == null) return; S.f.splice(+i, 1); drawControls(); run(); };
+
+// drill-down: the contracts behind a cell
+let dq = null;
+$('tbl').onclick = async e => {
+  const td = e.target.closest('td.cell'); if (!td || !last || !td.textContent.trim()) return;   // an empty cell has no contracts behind it
+  const r = +td.dataset.r, c = +td.dataset.c, extra = {}; extra[last.rows] = last.row_labels[r];
+  if (last.cols && c >= 0) extra[last.cols] = last.col_labels[c];
+  const p = params(extra); if (last.rows === 'department') { p.delete('dept'); p.append('dept', last.row_labels[r]); }
+  dq = p; $('drawer').classList.add('open'); $('dt').textContent = 'Loading…'; $('db').innerHTML = '';
+  try {
+    const j = await get('/contracts?' + new URLSearchParams([...p, ['limit', '50'], ['sort', 'party']]));
+    $('dt').textContent = last.row_labels[r] + (extra[last.cols] ? ' · ' + extra[last.cols] : '') + ' — ' + j.total.toLocaleString() + ' contracts';
+    $('db').innerHTML = j.rows.map(x => '<div class="it"><b>' + esc(x.party) + '</b> <span style="color:var(--mut)">' + esc(x.number) + '</span><small>' + esc(x.department) + ' · ' + esc(x.description) + (x.expires ? ' · expires ' + esc(x.expires) : '') + (x.amount ? ' · $' + Math.round(x.amount).toLocaleString() : '') + '</small><small><a href="metro.html?doc=nash-' + x.token + '&view=original" target="_blank" rel="noopener">Open contract ↗</a></small></div>').join('')
+      + (j.total > 50 ? '<p style="color:var(--mut)">Showing 50 of ' + j.total.toLocaleString() + '. Download the CSV for all of them.</p>' : '');
+  } catch (err) { $('dt').textContent = 'Could not load'; $('db').innerHTML = '<p class="err">' + esc(err.message) + '</p>'; }
+};
+$('dcsv').onclick = () => { if (dq) location.href = API + '/export.csv?' + dq; };
+$('dx').onclick = () => $('drawer').classList.remove('open');
+document.addEventListener('keydown', e => { if (e.key === 'Escape') $('dx').click(); });
+
+(async () => {
+  readHash();
+  try {
+    const [d, ds] = await Promise.all([get('/dims'), get('/departments')]);
+    DIMS = d.dims; MEAS = d.measures;
+    $('dept').innerHTML = '<option value="">All departments (' + ds.reduce((n, x) => n + x.n, 0).toLocaleString() + ')</option>' + ds.map(x => '<option value="' + esc(x.department) + '"' + (x.department === S.dept ? ' selected' : '') + '>' + esc(x.department) + ' (' + x.n.toLocaleString() + ')</option>').join('');
+  } catch (e) { $('err').hidden = false; $('err').textContent = 'Could not reach the contracts service (' + e.message + ').'; return; }
+  drawControls(); S.f.forEach((x, i) => loadVals(i)); run();
+})();
+</script>
+</body>
+</html>

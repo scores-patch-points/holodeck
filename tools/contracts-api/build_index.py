@@ -96,13 +96,15 @@ with open(lp, 'rb') as f:
         n += 1
         if len(batch) >= 5000: flush()
     flush()
+try: db.execute('ALTER TABLE gist ADD COLUMN amount REAL')   # largest dollar figure among the reading's amount observations; 0 = none found
+except sqlite3.OperationalError: pass
 # ---- gist: per contract, how many observations and the opening of the reading (what a card shows) ----
 # Kept in its own table so a list is one indexed SELECT, not two lookups per row. Refreshed for contracts whose
 # observations just arrived and for any not read as ledger yet (their extracted text may have appeared: OCR lane).
 import re
 ident = dict(db.execute('SELECT token, identifier FROM contracts'))
 have = dict(db.execute('SELECT token, read FROM gist'))
-todo = set(touched) | {t for t in ident if have.get(t) != 'ledger'}
+todo = set(touched) | {t for t in ident if have.get(t) != 'ledger'} | {r[0] for r in db.execute('SELECT token FROM gist WHERE amount IS NULL')}
 db.execute('BEGIN'); gn = 0
 for tok in todo:
     if tok not in ident: continue
@@ -117,8 +119,14 @@ for tok in todo:
             if len(t.strip()) >= 40: g = re.sub(r'\s+', ' ', t)[:1600]; rd = 'text'
         except OSError:
             pass
-    if (have.get(tok), ) != (rd,) or tok in touched or g:
-        db.execute('INSERT OR REPLACE INTO gist VALUES (?,?,?,?)', (tok, n_obs, g, rd)); gn += 1
+    amt = 0.0
+    if n_obs:
+        for (fj,) in db.execute("SELECT fields FROM obs WHERE token=? AND kind='amount'", (tok,)):
+            m = re.search(r'\$(\d[\d,]*(?:\.\d+)?)', (json.loads(fj or '{}').get('amount') or ''))
+            if m:
+                v = float(m.group(1).replace(',', ''))
+                if v > amt: amt = v
+    db.execute('INSERT OR REPLACE INTO gist(token, obs_n, gist, read, amount) VALUES (?,?,?,?,?)', (tok, n_obs, g, rd, amt)); gn += 1
 db.commit()
 # ---- signers: who signed, from the DocuSign certificate's "Signer Events" block (deterministic: a name line above
 # an e-mail line). Only for contracts whose text changed since last run. Read as: this person's e-mail appears

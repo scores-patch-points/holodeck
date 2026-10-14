@@ -11,12 +11,16 @@
   GET /contract/<token>/thumb.jpg     first page as a small JPEG (made once, cached)
   GET /contract/<token>/layout        the pages' text with its boxes (build_layouts.py): paints before the PDF arrives
   GET /contract/<token>/related       what this contract is related to: vendor, signers, similar topics, department, prior/next
+  GET /export.csv?<filters>           every contract matching the filters as CSV (UTF-8 with BOM, opens in Excel)
+  GET /pivot?rows=&cols=&measure=&<filters>   a pivot table computed here: rows x cols of count / sum / avg / max amount / vendors
+  GET /dims                           the fields a pivot can group by
+  filters (contracts, export, pivot): dept (repeatable), q, and any dimension as its own parameter, e.g. year=2027&read=unread
 
 The fold's work (reading, observation extraction) happened once on this host and is in the index;
 a request is a lookup, so a department's whole list comes back in milliseconds. Every response
 carries X-Ms, the server-side time. Bound to loopback; nginx fronts it.
 """
-import json, os, re, sqlite3, subprocess, sys, threading, time, urllib.request, urllib.parse
+import csv, io, json, os, re, sqlite3, subprocess, sys, threading, time, urllib.request, urllib.parse
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 DB = os.environ.get('CONTRACTS_DB', '/mnt/watch/contracts-api/contracts.db')
@@ -61,6 +65,41 @@ def departments():
         _dept['v'] = [{'department': x['department'], 'n': x['n']} for x in r]; _dept['t'] = st
     return _dept['v']
 
+BANDS = ('no amount found', '< $10k', '$10k–50k', '$50k–250k', '$250k–1M', '$1M+')
+DIMS = {
+    'department':  ('Department', "c.department"),
+    'vendor':      ('Vendor', "c.party"),
+    'year':        ('Expiry year', "CASE WHEN c.expires GLOB '*[12][09][0-9][0-9]' THEN substr(c.expires, -4) ELSE 'unknown' END"),
+    'status':      ('Status', "COALESCE(NULLIF(c.status, ''), 'unknown')"),
+    'read':        ('Reading', "CASE COALESCE(g.read, '') WHEN 'ledger' THEN 'read (clauses)' WHEN 'text' THEN 'read (text)' ELSE 'unread' END"),
+    'archive':     ('Archive.org', "CASE WHEN c.archive_url != '' THEN 'on archive.org' ELSE 'pending' END"),
+    'amount_band': ('Largest amount found', "CASE WHEN COALESCE(g.amount, 0) = 0 THEN 'no amount found' WHEN g.amount < 10000 THEN '< $10k' WHEN g.amount < 50000 THEN '$10k–50k' WHEN g.amount < 250000 THEN '$50k–250k' WHEN g.amount < 1000000 THEN '$250k–1M' ELSE '$1M+' END"),
+    'series':      ('Number series', "CASE WHEN c.number GLOB '[A-Za-z]*' THEN upper(substr(c.number, 1, 1)) ELSE 'numeric' END"),
+}
+MEASURES = {
+    'count':   ('Contracts', 'COUNT(*)'),
+    'amount':  ('Sum of largest amounts', 'ROUND(SUM(COALESCE(g.amount, 0)))'),
+    'avg':     ('Average largest amount', 'ROUND(AVG(NULLIF(g.amount, 0)))'),
+    'max':     ('Largest amount', 'ROUND(MAX(g.amount))'),
+    'vendors': ('Distinct vendors', 'COUNT(DISTINCT c.party)'),
+}
+FROM = ' FROM contracts c LEFT JOIN gist g ON g.token = c.token'
+
+def where_of(p):
+    """The filters every list, export and pivot share: department(s), a text query, any dimension as its own parameter."""
+    where, args = [], []
+    depts = [d for d in (p.get('dept') or []) if d]
+    if depts: where.append('c.department IN (%s)' % ','.join('?' * len(depts))); args += depts
+    q = (p.get('q') or [''])[0].strip()
+    if q:
+        m = fts(q)
+        if m: where.append('c.token IN (SELECT value FROM json_each(?))'); args.append(json.dumps(match_tokens(m)))
+    for k, (_label, expr) in DIMS.items():
+        if k == 'department': continue
+        for v in (p.get(k) or []):
+            if v != '': where.append('(%s) = ?' % expr); args.append(v)
+    return (' WHERE ' + ' AND '.join(where)) if where else '', args
+
 SORTS = {'party': 'c.party COLLATE NOCASE ASC', 'number': 'c.number ASC', 'expires': "substr(c.expires,-4) DESC, c.expires DESC", 'recent': 'c.fetched_at DESC'}
 def row(x): return {'token': x['token'], 'number': x['number'], 'party': x['party'], 'department': x['department'], 'description': x['description'],
                     'expires': x['expires'], 'status': x['status'], 'archived': bool(x['archive_url']), 'archive_url': x['archive_url'], 'destroyed': bool(x['destroyed'])}
@@ -91,26 +130,51 @@ def search(p):
     return r
 
 def _search(p):
-    dept = (p.get('dept') or [''])[0]; q = (p.get('q') or [''])[0].strip()
     sort = SORTS.get((p.get('sort') or ['party'])[0], SORTS['party'])
     limit = max(1, min(int((p.get('limit') or ['50'])[0]), 200)); offset = max(0, int((p.get('offset') or ['0'])[0]))
-    where, args = [], []
-    if dept: where.append('c.department = ?'); args.append(dept)
-    if q:
-        m = fts(q)
-        if m:
-            where.append('c.token IN (SELECT value FROM json_each(?))'); args.append(json.dumps(match_tokens(m)))
-    w = (' WHERE ' + ' AND '.join(where)) if where else ''
-    c = conn()
-    total = c.execute('SELECT COUNT(*) FROM contracts c' + w, args).fetchone()[0]
-    rs = c.execute('SELECT c.*, g.obs_n, g.gist, g.read FROM contracts c LEFT JOIN gist g ON g.token = c.token' + w +
-                   ' ORDER BY ' + sort + ' LIMIT ? OFFSET ?', args + [limit, offset]).fetchall()
+    w, args = where_of(p); c = conn()
+    total = c.execute('SELECT COUNT(*)' + FROM + w, args).fetchone()[0]
+    rs = c.execute('SELECT c.*, g.obs_n, g.gist, g.read, g.amount' + FROM + w + ' ORDER BY ' + sort + ' LIMIT ? OFFSET ?', args + [limit, offset]).fetchall()
     # obs / gist / read come from the index (build_index.py keeps them current), not from lookups per row
     out = []
     for x in rs:
-        r = row(x); r['obs'] = x['obs_n'] or 0; r['gist'] = x['gist'] or ''; r['read'] = x['read'] or ''
+        r = row(x); r['obs'] = x['obs_n'] or 0; r['gist'] = x['gist'] or ''; r['read'] = x['read'] or ''; r['amount'] = x['amount'] or None
         out.append(r)
     return {'total': total, 'offset': offset, 'limit': limit, 'rows': out}
+
+def export_csv(p):
+    sort = SORTS.get((p.get('sort') or ['party'])[0], SORTS['party'])
+    w, args = where_of(p)
+    rs = conn().execute('SELECT c.*, g.read, g.amount' + FROM + w + ' ORDER BY ' + sort + ' LIMIT 100000', args).fetchall()
+    buf = io.StringIO(); wr = csv.writer(buf)
+    wr.writerow(['contract_number', 'vendor', 'department', 'description', 'expires', 'status', 'reading', 'largest_amount_found', 'on_archive_org', 'archive_url', 'epav_token'])
+    for x in rs:
+        wr.writerow([x['number'], x['party'], x['department'], x['description'], x['expires'], x['status'], x['read'] or 'unread',
+                     int(x['amount']) if x['amount'] else '', 'yes' if x['archive_url'] else 'no', x['archive_url'], x['token']])
+    return '\ufeff' + buf.getvalue(), len(rs)
+
+def pivot(p):
+    rk = (p.get('rows') or ['department'])[0]; ck = (p.get('cols') or [''])[0]; mk = (p.get('measure') or ['count'])[0]
+    if rk not in DIMS or (ck and ck not in DIMS) or mk not in MEASURES: raise ValueError('unknown rows/cols/measure')
+    rexp = DIMS[rk][1]; cexp = DIMS[ck][1] if ck else "'All'"; mexp = MEASURES[mk][1]
+    w, args = where_of(p); c = conn()
+    cells = {}; rtot = {}; ctot = {}
+    for r_, c_, v in c.execute('SELECT %s, %s, %s%s%s GROUP BY 1, 2' % (rexp, cexp, mexp, FROM, w), args): cells[(r_, c_)] = v
+    for r_, v in c.execute('SELECT %s, %s%s%s GROUP BY 1' % (rexp, mexp, FROM, w), args): rtot[r_] = v
+    if ck:
+        for c_, v in c.execute('SELECT %s, %s%s%s GROUP BY 1' % (cexp, mexp, FROM, w), args): ctot[c_] = v
+    grand = c.execute('SELECT %s%s%s' % (mexp, FROM, w), args).fetchone()[0]
+    n = c.execute('SELECT COUNT(*)' + FROM + w, args).fetchone()[0]
+    def order(labels, dim, tot):
+        if dim == 'amount_band': return sorted(labels, key=lambda x: BANDS.index(x) if x in BANDS else 99)
+        if dim == 'year': return sorted(labels)
+        return sorted(labels, key=lambda x: (-(tot.get(x) or 0), str(x)))
+    rl = order(list(rtot), rk, rtot); cl = order(list(ctot), ck, ctot) if ck else ['All']
+    trunc = {'rows': len(rl) > 300, 'cols': len(cl) > 24}; rl, cl = rl[:300], cl[:24]
+    return {'rows': rk, 'cols': ck or None, 'measure': mk, 'measure_label': MEASURES[mk][0], 'row_label': DIMS[rk][0], 'col_label': DIMS[ck][0] if ck else None,
+            'contracts': n, 'row_labels': rl, 'col_labels': cl, 'cells': [[cells.get((r_, c_)) for c_ in cl] for r_ in rl],
+            'row_totals': [rtot.get(r_) for r_ in rl], 'col_totals': [ctot.get(c_) for c_ in cl] if ck else None, 'grand': grand, 'truncated': trunc,
+            'note': 'Amounts are the largest dollar figure the reading found in each contract, not an audited contract value.' if mk in ('amount', 'avg', 'max') else ''}
 
 STOPWORDS = set('and the for with of to in on at by or a an agreement contract services service amendment inc llc co corp'.split())
 def _date_key(s):
@@ -122,7 +186,7 @@ def _brief(x): return {'token': x['token'], 'number': x['number'], 'party': x['p
 def _amount(c, tok):
     best = None
     for (f,) in c.execute("SELECT fields FROM obs WHERE token=? AND kind='amount'", (tok,)):
-        m = re.search(r'\$([\d,]+(?:\.\d+)?)', json.loads(f or '{}').get('amount', '') or '')
+        m = re.search(r'\$(\d[\d,]*(?:\.\d+)?)', json.loads(f or '{}').get('amount', '') or '')
         if m:
             v = float(m.group(1).replace(',', ''))
             if best is None or v > best: best = v
@@ -247,6 +311,14 @@ class H(BaseHTTPRequestHandler):
                 c = conn(); m = dict(c.execute('SELECT k, v FROM meta').fetchall())
                 return self.send(200, {'ok': True, 'contracts': int(m.get('contracts', 0)), 'observations': c.execute('SELECT COUNT(*) FROM obs').fetchone()[0], 'built_at': m.get('built_at')}, t0=t0)
             if path == '/departments': return self.send(200, departments(), t0=t0)
+            if path == '/dims': return self.send(200, {'dims': [{'key': k, 'label': v[0]} for k, v in DIMS.items()], 'measures': [{'key': k, 'label': v[0]} for k, v in MEASURES.items()]}, t0=t0)
+            if path == '/pivot':
+                try: return self.send(200, pivot(p), t0=t0)
+                except ValueError as e: return self.send(400, {'error': str(e)}, t0=t0)
+            if path == '/export.csv':
+                text, n = export_csv(p); dn = (p.get('dept') or [''])[0] if len(p.get('dept') or []) == 1 else ''
+                fn = 'metro-contracts' + ('-' + re.sub(r'[^A-Za-z0-9]+', '-', dn).strip('-').lower() if dn else '') + '.csv'
+                return self.send(200, text.encode('utf-8'), 'text/csv; charset=utf-8', {'Content-Disposition': 'attachment; filename="%s"' % fn, 'X-Rows': str(n), 'Cache-Control': 'no-store'}, t0=t0)
             if path == '/contracts': return self.send(200, search(p), t0=t0)
             m = re.match(r'^/contract/([A-Za-z0-9]+)(/pdf|/thumb\.jpg|/layout|/related)?$', path)
             if m and TOK.match(m.group(1)):
