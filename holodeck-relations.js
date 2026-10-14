@@ -271,7 +271,10 @@ export function buildIndex(A, { onlyDocs = null, cues = false } = {}) {
     const { toks, vals } = bagOf(st);
     info.set(st.id, { st, toks, vals }); toks.forEach(t => df.set(t, (df.get(t) || 0) + 1));
   }
-  const N = sts.length || 1; const idf = t => Math.log2((N + 1) / (df.get(t) || 1)); // surprisal in bits: 0 for a token in every statement
+  const N = sts.length || 1; // surprisal in bits: 0 for a token in every statement
+  const idfTab = new Map(); df.forEach((c, t) => idfTab.set(t, Math.log2((N + 1) / c)));
+  const idf0 = Math.log2(N + 1);
+  const idf = t => { const v = idfTab.get(t); return v === undefined ? idf0 : v; };
   const inv = new Map(); info.forEach((x, id) => x.toks.forEach(t => { (inv.get(t) || inv.set(t, []).get(t)).push(id); }));
   const score = (a, b) => {
     const P = info.get(a), Q = info.get(b); if (!P || !Q) return 0;
@@ -305,9 +308,16 @@ export function pairDocs(ix, docA, docB, { draws = NULL_DRAWS, requireNull = fal
   const dfA = dfIn(la), dfB = dfIn(lb);
   // a token of the workspace's distribution, thinned by the share of its occurrences that sit outside `excl`
   const drawOutside = excl => { for (let i = 0; i < 64; i++) { const t = ix.draw(rnd()); const x = excl.get(t) || 0; if (!x || rnd() * ix.df.get(t) >= x) return t; } return null; };
-  const scoreSets = (toks, pool) => {
-    let bs = 0;
-    for (const b of pool) { let s = 0; const T = ix.info.get(b.id).toks; toks.forEach(t => { if (T.has(t)) s += ix.idf(t); }); if (s > bs) bs = s; }
+  // A pool's own inverted index (token -> positions of the statements holding it): scoring a drawn bag touches only
+  // the statements that share a token with it, instead of every statement of the pool against every drawn token.
+  const poolIndex = pool => {
+    const inv = new Map();
+    pool.forEach((b, i) => ix.info.get(b.id).toks.forEach(t => { const l = inv.get(t); if (l) l.push(i); else inv.set(t, [i]); }));
+    return { inv, n: pool.length };
+  };
+  const scoreSets = (toks, P, acc) => {
+    acc.fill(0); let bs = 0;
+    toks.forEach(t => { const l = P.inv.get(t); if (!l) return; const w = ix.idf(t); for (let q = 0; q < l.length; q++) { const v = (acc[l[q]] += w); if (v > bs) bs = v; } });
     return bs;
   };
   const best = (a, pool) => {
@@ -318,16 +328,24 @@ export function pairDocs(ix, docA, docB, { draws = NULL_DRAWS, requireNull = fal
   const fwd = new Map(), back = new Map();
   la.forEach(a => { const r = best(a, lb); if (r.b && r.score > 0) fwd.set(a.id, r); });
   lb.forEach(b => { const r = best(b, la); if (r.b && r.score > 0) back.set(b.id, r); });
-  const nullBest = (id, pool, excl) => {
-    const k = ix.info.get(id).toks.size; let m = 0;
-    for (let i = 0; i < draws; i++) { const t = new Set(); for (let j = 0; j < k; j++) { const x = drawOutside(excl); if (x != null) t.add(x); } const s = scoreSets(t, pool); if (s > m) m = s; }
+  const idxA = poolIndex(la), idxB = poolIndex(lb);
+  // `bar` is the observed score: a pair is kept only if it beats EVERY draw, so the first draw that reaches it settles
+  // the question and the rest are not run (the answer, beatsNull, is the same as running all of them).
+  const nullBest = (id, P, excl, bar) => {
+    const k = ix.info.get(id).toks.size; let m = 0; const acc = new Float64Array(P.n);
+    for (let i = 0; i < draws; i++) {
+      const t = new Set(); for (let j = 0; j < k; j++) { const x = drawOutside(excl); if (x != null) t.add(x); }
+      const s = scoreSets(t, P, acc); if (s > m) m = s;
+      if (m >= bar) return m;
+    }
     return m;
   };
   const out = new Map();
   fwd.forEach((r, aId) => {
     const bk = back.get(r.b.id); if (!bk || bk.b.id !== aId) return;                 // mutual best, so nothing is merged
     if (!(r.score > r.second) || !(bk.score > bk.second)) return;                       // a tie is not a best
-    const nullMax = Math.max(nullBest(aId, lb, dfB), nullBest(r.b.id, la, dfA));
+    const n1 = nullBest(aId, idxB, dfB, r.score);
+    const nullMax = n1 >= r.score ? n1 : Math.max(n1, nullBest(r.b.id, idxA, dfA, r.score));
     const beatsNull = r.score > nullMax;
     if (requireNull && !beatsNull) return;
     out.set(aId, { b: r.b, score: r.score, nullMax, beatsNull });
@@ -581,8 +599,13 @@ export function seamOf(A, docA, docB, ix = buildIndex(A)) {
 // `truncated` says so when the budget ran out: coverage is a property of what was read, never implied. Candidate
 // source pairs come from the inverted index over tokens that are rare by their own document frequency (no more
 // than the square root of the statement count).
-export function proposeAll(A, { budget = 3e6, maxPerDoc = 400 } = {}) {
+export function proposeAll(A, { budget = 3e6, maxPerDoc = 400, timeMs = null } = {}) {
   const ix = buildIndex(A); const links = [], weak = []; const seen = new Set(); let work = 0, truncated = false;
+  // A wall-clock bound, for a workspace big enough that the null tests would hold the page: the pairs sharing the
+  // rarest tokens come first, so what is shown is the best-supported links, and `truncated` says the rest was not read.
+  // Default: unbounded for a small workspace, ~1.5 s for a large one (measured: 40+ s unbounded on 200 contracts).
+  const nowMs = () => (typeof performance !== 'undefined' ? performance.now() : Date.now());
+  const limitMs = timeMs != null ? timeMs : (ix.docs.length > 40 ? 1500 : Infinity), t0 = nowMs();
   const hot = new Map();
   const cap = Math.max(2, Math.ceil(Math.sqrt(ix.N)));
   ix.inv.forEach(list => {
@@ -595,7 +618,7 @@ export function proposeAll(A, { budget = 3e6, maxPerDoc = 400 } = {}) {
   });
   const perDoc = new Map();
   for (const [k] of [...hot.entries()].sort((x, y) => y[1] - x[1] || (x[0] < y[0] ? -1 : 1))) {
-    if (work > budget * 2) { truncated = true; break; }
+    if (work > budget * 2 || nowMs() - t0 > limitMs) { truncated = true; break; }
     const [da, db] = k.split('\u0001');
     if ((perDoc.get(da) || 0) >= maxPerDoc || (perDoc.get(db) || 0) >= maxPerDoc) continue;
     const pairs = pairDocs(ix, da, db); work += (ix.byDoc.get(da) || []).length * (ix.byDoc.get(db) || []).length;

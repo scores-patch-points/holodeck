@@ -9,6 +9,7 @@
   GET /contract/<token>               metadata + the reading lane's observations (clauses, figures …)
   GET /contract/<token>/pdf           the filed PDF: local copy, else archive.org twin, else ePAV; cached
   GET /contract/<token>/thumb.jpg     first page as a small JPEG (made once, cached)
+  GET /contract/<token>/layout        the pages' text with its boxes (build_layouts.py): paints before the PDF arrives
 
 The fold's work (reading, observation extraction) happened once on this host and is in the index;
 a request is a lookup, so a department's whole list comes back in milliseconds. Every response
@@ -24,6 +25,7 @@ PORT = int(os.environ.get('PORT', sys.argv[1] if len(sys.argv) > 1 else 8840))
 UA = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124 Safari/537.36'
 TOK = re.compile(r'^[A-Za-z0-9]{3,32}$')
 THUMBS = os.environ.get('CONTRACTS_THUMBS', '/mnt/watch/contracts-api/thumbs')
+LAYOUT = os.environ.get('CONTRACTS_LAYOUT', '/mnt/watch/contracts-api/layout')
 os.makedirs(CACHE, exist_ok=True); os.makedirs(THUMBS, exist_ok=True)
 
 def extracted_text(ident, limit):
@@ -62,7 +64,32 @@ SORTS = {'party': 'c.party COLLATE NOCASE ASC', 'number': 'c.number ASC', 'expir
 def row(x): return {'token': x['token'], 'number': x['number'], 'party': x['party'], 'department': x['department'], 'description': x['description'],
                     'expires': x['expires'], 'status': x['status'], 'archived': bool(x['archive_url']), 'archive_url': x['archive_url'], 'destroyed': bool(x['destroyed'])}
 
+_mt = {}
+def match_tokens(m):
+    """Every contract a full-text expression hits: its own fields OR any observation of the reading. Computed once per
+    expression and index build (the same term is asked again for another department, page or sort), then handed to
+    SQL as a set; one pass over the observation index beats re-running it inside a per-row subquery (measured 100x)."""
+    k = (m, int(os.stat(DB).st_mtime))
+    r = _mt.get(k)
+    if r is None:
+        if len(_mt) > 128: _mt.clear()
+        c = conn()
+        ids = {x[0] for x in c.execute('SELECT c.token FROM contracts c WHERE c.rowid IN (SELECT rowid FROM contracts_fts WHERE contracts_fts MATCH ?)', (m,))}
+        ids |= {x[0] for x in c.execute('SELECT DISTINCT o.token FROM obs_fts f JOIN obs o ON o.id = f.rowid WHERE obs_fts MATCH ?', (m,))}
+        r = _mt[k] = sorted(ids)
+    return r
+
+_rc = {}
 def search(p):
+    """Cached per (query, index build): the same department page is asked for again and again."""
+    k = (urllib.parse.urlencode(sorted((a, tuple(b)) for a, b in p.items())), int(os.stat(DB).st_mtime))
+    r = _rc.get(k)
+    if r is None:
+        if len(_rc) > 400: _rc.clear()
+        r = _rc[k] = _search(p)
+    return r
+
+def _search(p):
     dept = (p.get('dept') or [''])[0]; q = (p.get('q') or [''])[0].strip()
     sort = SORTS.get((p.get('sort') or ['party'])[0], SORTS['party'])
     limit = max(1, min(int((p.get('limit') or ['50'])[0]), 200)); offset = max(0, int((p.get('offset') or ['0'])[0]))
@@ -71,27 +98,17 @@ def search(p):
     if q:
         m = fts(q)
         if m:
-            where.append('(c.rowid IN (SELECT rowid FROM contracts_fts WHERE contracts_fts MATCH ?) OR c.token IN '
-                         '(SELECT o.token FROM obs o WHERE o.id IN (SELECT rowid FROM obs_fts WHERE obs_fts MATCH ? LIMIT 20000)))')
-            args += [m, m]
+            where.append('c.token IN (SELECT value FROM json_each(?))'); args.append(json.dumps(match_tokens(m)))
     w = (' WHERE ' + ' AND '.join(where)) if where else ''
     c = conn()
     total = c.execute('SELECT COUNT(*) FROM contracts c' + w, args).fetchone()[0]
-    rs = c.execute('SELECT c.* FROM contracts c' + w + ' ORDER BY ' + sort + ' LIMIT ? OFFSET ?', args + [limit, offset]).fetchall()
-    out = [row(x) for x in rs]
-    idents = {x['token']: x['identifier'] for x in rs}
-    # what the reading lane holds for each row: how many observations, and the opening of the reading as a
-    # gist — enough for the reader to show real statements on a card without a request per contract.
-    for r in out:
-        r['obs'] = c.execute('SELECT COUNT(*) FROM obs WHERE token=?', (r['token'],)).fetchone()[0]
-        r['gist'] = ''; r['read'] = ''
-        if r['obs']:
-            g = ' '.join(o[0] for o in c.execute('SELECT verbatim FROM obs WHERE token=? ORDER BY a LIMIT 14', (r['token'],)).fetchall())
-            r['gist'] = re.sub(r'\s+', ' ', g)[:1600]; r['read'] = 'ledger'
-        else:
-            # read as text (a text layer, or the OCR lane) but the deterministic extractor found no clause rows
-            t = extracted_text(idents.get(r['token']), 4000)
-            if t: r['gist'] = re.sub(r'\s+', ' ', t)[:1600]; r['read'] = 'text'
+    rs = c.execute('SELECT c.*, g.obs_n, g.gist, g.read FROM contracts c LEFT JOIN gist g ON g.token = c.token' + w +
+                   ' ORDER BY ' + sort + ' LIMIT ? OFFSET ?', args + [limit, offset]).fetchall()
+    # obs / gist / read come from the index (build_index.py keeps them current), not from lookups per row
+    out = []
+    for x in rs:
+        r = row(x); r['obs'] = x['obs_n'] or 0; r['gist'] = x['gist'] or ''; r['read'] = x['read'] or ''
+        out.append(r)
     return {'total': total, 'offset': offset, 'limit': limit, 'rows': out}
 
 def detail(tok):
@@ -174,8 +191,12 @@ class H(BaseHTTPRequestHandler):
                 return self.send(200, {'ok': True, 'contracts': int(m.get('contracts', 0)), 'observations': c.execute('SELECT COUNT(*) FROM obs').fetchone()[0], 'built_at': m.get('built_at')}, t0=t0)
             if path == '/departments': return self.send(200, departments(), t0=t0)
             if path == '/contracts': return self.send(200, search(p), t0=t0)
-            m = re.match(r'^/contract/([A-Za-z0-9]+)(/pdf|/thumb\.jpg)?$', path)
+            m = re.match(r'^/contract/([A-Za-z0-9]+)(/pdf|/thumb\.jpg|/layout)?$', path)
             if m and TOK.match(m.group(1)):
+                if m.group(2) == '/layout':
+                    lp = os.path.join(LAYOUT, m.group(1) + '.json')
+                    if not os.path.exists(lp): return self.send(404, {'error': 'no layout yet'}, extra={'Cache-Control': 'public, max-age=60'}, t0=t0)
+                    return self.send(200, open(lp, 'rb').read(), extra={'Cache-Control': 'public, max-age=3600'}, t0=t0)
                 if m.group(2) == '/thumb.jpg':
                     tp = thumb_path(m.group(1))
                     if not tp: return self.send(404, {'error': 'no thumbnail yet'}, extra={'Cache-Control': 'public, max-age=300'}, t0=t0)

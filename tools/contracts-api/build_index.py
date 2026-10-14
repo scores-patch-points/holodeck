@@ -32,6 +32,7 @@ CREATE INDEX IF NOT EXISTS contracts_party ON contracts(party);
 CREATE TABLE IF NOT EXISTS obs(
   id INTEGER PRIMARY KEY, token TEXT, kind TEXT, a INTEGER, b INTEGER, verbatim TEXT, fields TEXT);
 CREATE INDEX IF NOT EXISTS obs_token ON obs(token);
+CREATE TABLE IF NOT EXISTS gist(token TEXT PRIMARY KEY, obs_n INTEGER, gist TEXT, read TEXT);
 CREATE VIRTUAL TABLE IF NOT EXISTS obs_fts USING fts5(verbatim, content='obs', content_rowid='id', tokenize='porter unicode61');
 ''')
 
@@ -64,7 +65,7 @@ lp = os.path.join(a.data, 'contract-ledger.jsonl')
 size = os.path.getsize(lp); off = int(meta_get('ledger_offset', 0))
 if size < off:  # file was rewritten: start over
     db.execute('DELETE FROM obs'); db.execute("INSERT INTO obs_fts(obs_fts) VALUES('delete-all')"); off = 0
-n = 0
+n = 0; touched = set()
 with open(lp, 'rb') as f:
     f.seek(off)
     batch = []
@@ -73,6 +74,7 @@ with open(lp, 'rb') as f:
         if not batch: return
         db.execute('BEGIN')
         for tok, kind, a0, b0, ver, flds in batch:
+            touched.add(tok)
             cur = db.execute('INSERT INTO obs(token,kind,a,b,verbatim,fields) VALUES (?,?,?,?,?,?)', (tok, kind, a0, b0, ver, flds))
             db.execute('INSERT INTO obs_fts(rowid, verbatim) VALUES (?,?)', (cur.lastrowid, ver))
         db.commit(); batch = []
@@ -90,5 +92,29 @@ with open(lp, 'rb') as f:
         n += 1
         if len(batch) >= 5000: flush()
     flush()
+# ---- gist: per contract, how many observations and the opening of the reading (what a card shows) ----
+# Kept in its own table so a list is one indexed SELECT, not two lookups per row. Refreshed for contracts whose
+# observations just arrived and for any not read as ledger yet (their extracted text may have appeared: OCR lane).
+import re
+ident = dict(db.execute('SELECT token, identifier FROM contracts'))
+have = dict(db.execute('SELECT token, read FROM gist'))
+todo = set(touched) | {t for t in ident if have.get(t) != 'ledger'}
+db.execute('BEGIN'); gn = 0
+for tok in todo:
+    if tok not in ident: continue
+    n_obs = db.execute('SELECT COUNT(*) FROM obs WHERE token=?', (tok,)).fetchone()[0]
+    g, rd = '', ''
+    if n_obs:
+        g = re.sub(r'\s+', ' ', ' '.join(r[0] for r in db.execute('SELECT verbatim FROM obs WHERE token=? ORDER BY a LIMIT 14', (tok,))))[:1600]; rd = 'ledger'
+    else:
+        tp = os.path.join(a.data, 'deployed', ident[tok] or '-', 'extracted-text.txt')
+        try:
+            with open(tp, encoding='utf-8', errors='replace') as fh: t = fh.read(4000)
+            if len(t.strip()) >= 40: g = re.sub(r'\s+', ' ', t)[:1600]; rd = 'text'
+        except OSError:
+            pass
+    if (have.get(tok), ) != (rd,) or tok in touched or g:
+        db.execute('INSERT OR REPLACE INTO gist VALUES (?,?,?,?)', (tok, n_obs, g, rd)); gn += 1
+db.commit()
 meta_set('ledger_offset', off); meta_set('built_at', time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())); db.commit()
-print(json.dumps({'contracts': len(rows), 'new_observations': n, 'ledger_offset': off, 'seconds': round(time.time() - t0, 1)}))
+print(json.dumps({'contracts': len(rows), 'gists_refreshed': gn, 'new_observations': n, 'ledger_offset': off, 'seconds': round(time.time() - t0, 1)}))
