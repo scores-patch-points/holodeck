@@ -639,6 +639,46 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
           <div class="hd-drive-tools">
             <sc-for list="{{ svTabs }}" as="t" hint-placeholder-count="4"><button class="hd-chip {{ t.cls }}" onClick="{{ t.onClick }}">{{ t.label }} <span style="color:var(--dim)">{{ t.n }}</span></button></sc-for>
             <span style="flex:1"></span>
+            <sc-if value="{{ drv.hasDept }}" hint-placeholder-val="{{ false }}">
+              <select value="{{ drv.deptVal }}" onChange="{{ drv.onDept }}" title="Show one department's contracts" style="background:var(--s2);border:1px solid var(--line2);border-radius:8px;color:var(--ink);font:500 13px var(--sans);padding:5px 8px;outline:none"><sc-for list="{{ drv.deptOpts }}" as="o" hint-placeholder-count="4"><option value="{{ o.v }}">{{ o.l }}</option></sc-for></select>
+            </sc-if>
+            <sc-if value="{{ drv.hasFlt }}" hint-placeholder-val="{{ false }}">
+              <details class="hd-drive-menu"><summary title="Filter by any field. Conditions stack; add a group to nest all-of / any-of" style="width:auto;padding:0 11px;border:1px solid var(--line2);border-radius:8px;font:500 13px var(--sans);height:30px">Filter{{ drv.fltBadge }}</summary>
+                <div class="hd-drive-menu-panel" style="min-width:min(560px,90vw);max-height:60vh;overflow:auto;padding:10px">
+                  <sc-for list="{{ drv.fltRows }}" as="fr" hint-placeholder-count="2">
+                    <sc-if value="{{ fr.isCond }}" hint-placeholder-val="{{ false }}">
+                      <div style="display:flex;gap:6px;align-items:center;margin:5px 0;{{ fr.pad }}">
+                        <span style="width:44px;flex:none;font:400 13px var(--sans);color:var(--mut)">{{ fr.lead }}</span>
+                        <select value="{{ fr.key }}" onChange="{{ fr.onKey }}" style="background:var(--s2);border:1px solid var(--line2);border-radius:8px;color:var(--ink);font:500 13px var(--sans);padding:5px 8px;outline:none;min-width:0"><sc-for list="{{ fr.keys }}" as="o" hint-placeholder-count="3"><option value="{{ o.v }}">{{ o.l }}</option></sc-for></select>
+                        <select value="{{ fr.op }}" onChange="{{ fr.onOp }}" style="background:var(--s2);border:1px solid var(--line2);border-radius:8px;color:var(--ink);font:500 13px var(--sans);padding:5px 8px;outline:none;min-width:0"><sc-for list="{{ fr.opsL }}" as="o" hint-placeholder-count="3"><option value="{{ o.v }}">{{ o.l }}</option></sc-for></select>
+                        <sc-if value="{{ fr.valSelect }}" hint-placeholder-val="{{ false }}"><select value="{{ fr.val }}" onChange="{{ fr.onVal }}" style="background:var(--s2);border:1px solid var(--line2);border-radius:8px;color:var(--ink);font:500 13px var(--sans);padding:5px 8px;outline:none;min-width:0"><sc-for list="{{ fr.vals }}" as="o" hint-placeholder-count="3"><option value="{{ o.v }}">{{ o.l }}</option></sc-for></select></sc-if>
+                        <sc-if value="{{ fr.valText }}" hint-placeholder-val="{{ false }}"><input value="{{ fr.val }}" onInput="{{ fr.onVal }}" placeholder="Value" style="background:var(--s2);border:1px solid var(--line2);border-radius:8px;color:var(--ink);font:500 13px var(--sans);padding:5px 8px;outline:none;min-width:0"></sc-if>
+                        <button onClick="{{ fr.onRemove }}" title="Remove this condition" style="all:unset;cursor:pointer;padding:2px 8px;color:var(--mut);font:500 16px var(--sans)">×</button>
+                      </div>
+                    </sc-if>
+                    <sc-if value="{{ fr.isGroup }}" hint-placeholder-val="{{ false }}">
+                      <div style="display:flex;gap:6px;align-items:center;margin:8px 0 2px;{{ fr.pad }}">
+                        <select value="{{ fr.op }}" onChange="{{ fr.onOp }}" style="background:var(--s2);border:1px solid var(--line2);border-radius:8px;color:var(--ink);font:500 13px var(--sans);padding:5px 8px;outline:none;min-width:0"><sc-for list="{{ fr.ops }}" as="o" hint-placeholder-count="2"><option value="{{ o.v }}">{{ o.l }}</option></sc-for></select>
+                        <button onClick="{{ fr.onRemove }}" title="Remove this group" style="all:unset;cursor:pointer;padding:2px 8px;color:var(--mut);font:500 16px var(--sans)">×</button>
+                      </div>
+                    </sc-if>
+                    <sc-if value="{{ fr.isAdd }}" hint-placeholder-val="{{ false }}">
+                      <div style="display:flex;gap:10px;margin:2px 0 6px;{{ fr.pad }}">
+                        <button onClick="{{ fr.onAddCond }}" style="all:unset;cursor:pointer;font:500 12px var(--sans);color:var(--acc)">+ Add condition</button>
+                        <button onClick="{{ fr.onAddGroup }}" style="all:unset;cursor:pointer;font:500 12px var(--sans);color:var(--acc)">+ Add group</button>
+                      </div>
+                    </sc-if>
+                  </sc-for>
+                  <div style="display:flex;gap:12px;align-items:center;margin-top:8px;border-top:1px solid var(--line);padding-top:8px">
+                    <button onClick="{{ drv.onFltAdd }}" style="all:unset;cursor:pointer;font:500 13px var(--sans);color:var(--acc)">+ Add condition</button>
+                    <button onClick="{{ drv.onFltAddGroup }}" style="all:unset;cursor:pointer;font:500 13px var(--sans);color:var(--acc)">+ Add condition group</button>
+                    <span style="flex:1"></span>
+                    <sc-if value="{{ drv.hasFltCount }}" hint-placeholder-val="{{ false }}"><span style="font:400 12px var(--sans);color:var(--mut)">{{ drv.fltCount }}</span></sc-if>
+                    <button onClick="{{ drv.onFltClear }}" style="all:unset;cursor:pointer;font:500 13px var(--sans);color:var(--ink2)">Clear</button>
+                  </div>
+                </div>
+              </details>
+            </sc-if>
             <select value="{{ drv.sort }}" onChange="{{ drv.onSort }}" title="Order" style="background:var(--s2);border:1px solid var(--line2);border-radius:8px;color:var(--ink);font:500 13px var(--sans);padding:5px 8px;outline:none"><sc-for list="{{ drv.sorts }}" as="o" hint-placeholder-count="4"><option value="{{ o.v }}">{{ o.l }}</option></sc-for></select>
             <sc-if value="{{ drv.hasFieldPick }}" hint-placeholder-val="{{ false }}">
               <details class="hd-drive-menu"><summary title="Columns taken from fields that recur across your sources (contract id, expiry, vendor…) — shown in Table view and sortable" style="width:auto;padding:0 11px;border:1px solid var(--line2);border-radius:8px;font:500 13px var(--sans);height:30px">Fields · {{ drv.fieldsOn }}</summary>
@@ -3757,6 +3797,8 @@ const hdReaderReady = () => !!(HD_PROF && HD_ASK && HD_READER);
 // cast. Absent the module or a prior, heldBy is a typed gap — never a guess.
 let HD_ATTR = null;
 import(new URL('holodeck-holders.js', location.href)).then(M => { HD_ATTR = M; }).catch(() => {});
+// Airtable-style filters for the Sources table (nested AND/OR groups); the render is synchronous, so the module is preloaded
+let HD_FLT = null; const hdFltP = import(new URL('holodeck-filters.js', location.href)).then(M => { HD_FLT = M; return M; }).catch(() => null);
 const hdAttrReady = () => !!HD_ATTR;
 // THE FRONT LEG of the holder read: NL → this language's OWN grammar → EOT.
 // relations-language.js::relationExtractorsFor under the language's RoleConfig@1
@@ -4431,6 +4473,23 @@ const short = (t, n) => { t = clean(t); return t.length > n ? t.slice(0, n - 1) 
 // doc's own address so a doc stored before pdfSrc existed still renders its PDF.
 function epavTokenOf(d) { const m = /\/(?:Document|Open)\/([A-Za-z0-9]+)/.exec((d && d.url) || ''); if (m) return m[1]; const id = String((d && d.id) || ''); return id.startsWith('nash-') ? id.slice(5) : null; }
 function withPdfSrc(d) { if (d && !d.pdfSrc) { const t = epavTokenOf(d); if (t) return { ...d, pdfSrc: '/epav/' + t + '.pdf' }; } return d; }
+// The public (static) host has no /epav route, so a same-origin fetch 404s there. Resolve a contract's PDF by trying the
+// same-origin route first (the dev server proxies it), then the archive.org twin through the CORS-open holodeck-proxy
+// worker. A body only counts if it is really a PDF, so a static host's 404 page or index fallback never reaches pdf.js.
+const EPAV_WORKER = 'https://holodeck-proxy.prometheoid.workers.dev/raw?url=';
+const epavTokenOfSrc = d => (/\/epav\/([A-Za-z0-9]+)\.pdf/.exec((d && d.pdfSrc) || '') || [])[1] || epavTokenOf(d);
+async function epavPdfBytes(d) {
+  const tok = epavTokenOfSrc(d); const tried = [];
+  const cands = [d.pdfSrc, d.archiveUrl && EPAV_WORKER + encodeURIComponent(d.archiveUrl), tok && EPAV_WORKER + encodeURIComponent('https://archive.org/download/nashville-epav-contract-' + tok + '/' + tok + '.pdf')].filter(Boolean);
+  for (const u of cands) {
+    try {
+      const r = await fetch(u); if (!r.ok) { tried.push('HTTP ' + r.status); continue; }
+      const b = await r.arrayBuffer(); if (new TextDecoder().decode(b.slice(0, 5)) === '%PDF-') return b;
+      tried.push('not a PDF');
+    } catch (e) { tried.push(String((e && e.message) || e)); }
+  }
+  throw new Error('HTTP ' + (tried[0] || '404') + ' — this contract is not on archive.org yet; open Extracted');
+}
 // A document's year is not "a date" until it says whose date it is. When the year is exactly the year of one date
 // the document itself states (its expiry, a signing), name it by that field: "Expires 2007", not a bare "2007" under
 // a "Date" header that means nothing. With no such field (or more than one) the year is left as it was.
@@ -7667,7 +7726,7 @@ class Component extends DCLogic {
   }
   async sourceBytes(d) {
     await this.net();
-    if (d.pdfSrc) { try { const r = await fetch(d.pdfSrc); if (r.ok) return { buf: await r.arrayBuffer(), rel: (d.pdfSrc || '').split('/').pop(), mime: 'application/pdf' }; } catch (e) {} }
+    if (d.pdfSrc) { try { return { buf: await epavPdfBytes(d), rel: (d.pdfSrc || '').split('/').pop(), mime: 'application/pdf' }; } catch (e) {} }
     return { buf: new TextEncoder().encode(d.text || '').buffer, rel: null, mime: 'text/plain' };
   }
   async publishAll() {
@@ -8259,7 +8318,7 @@ class Component extends DCLogic {
     el.innerHTML = '<p style="color:var(--mut);font:400 14px var(--sans);padding:24px">Loading the captured PDF…</p>';
     this._pdfBuf = this._pdfBuf || {};
     try {
-      let buf = this._pdfBuf[d.id]; if (!buf) { const r = await fetch(d.pdfSrc); if (!r.ok) throw new Error('HTTP ' + r.status); buf = this._pdfBuf[d.id] = await r.arrayBuffer(); }
+      let buf = this._pdfBuf[d.id]; if (!buf) { buf = this._pdfBuf[d.id] = await epavPdfBytes(d); }
       if (this._rKey !== key) return;
       const pdfjs = await pdfLib(); const pdf = await pdfjs.getDocument({ data: new Uint8Array(buf).slice() }).promise;
       const N = Math.min(pdf.numPages, PDF_MAX_PAGES); const pages = [], tcs = []; let pt = '';
@@ -9103,7 +9162,15 @@ class Component extends DCLogic {
     const sK = svFld ? (r => fieldSortKey(svFld.type, r.fvals[svFld.key])) : (sKey[svSort] || sKey.date);
     // sources with no value for the field always sort last, whichever way it runs
     const sortRows = L => L.sort((a, b) => { const ka = sK(a), kb = sK(b); if (ka == null || kb == null) return ka == null && kb == null ? a.title.localeCompare(b.title) : ka == null ? 1 : -1; return (ka < kb ? -1 : ka > kb ? 1 : 0) * svDir || a.title.localeCompare(b.title); });
-    const rowsAll = allSrcItems.map(rowOf);
+    const rowsAll0 = allSrcItems.map(rowOf);
+    // ---- filters (holodeck-filters.js): Department first, then any recurring field; groups nest and AND/OR ----
+    const fltOK = !!HD_FLT; if (!fltOK) hdFltP.then(M => { if (M) this.forceUpdate(); });
+    const fcDept = FIELD_EXPLICIT_DEPT.find(k => fcBy.has(k)) || null;
+    const fltFields = FC.fields.filter(f => f.key === fcDept || (!/^(date|amount|number)$/.test(f.type) && f.distinct > 1 && f.distinct <= 400)).map(f => ({ v: f.key, l: f.label }));
+    let fltRoot = S.svFlt || null;
+    if (fltOK && !fltRoot) { fltRoot = HD_FLT.newGroup('and'); if (fcDept) fltRoot = HD_FLT.addCond(fltRoot, [], fcDept); }
+    const fvOf = (r, k) => (r.fvals || {})[k];
+    const rowsAll = fltOK && fltRoot ? rowsAll0.filter(r => HD_FLT.evalGroup(fltRoot, k => fvOf(r, k))) : rowsAll0;
     // ---- columns: one ordered list, so any column can sit anywhere ----
     const TD = 'padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top;font:400 14px/1.4 var(--sans);color:var(--ink2)';
     const colDefs = [
@@ -9176,6 +9243,22 @@ class Component extends DCLogic {
         onOver: e => { try { e.preventDefault(); } catch (x) {} }, onDrop: e => { try { e.preventDefault(); String(e.dataTransfer.getData('text/plain')).split(',').filter(Boolean).forEach(id => this.setDocFolder(id, '')); } catch (x) {} } },
       ...dvFl.map(f => ({ id: f.id, label: f.name, icon: '📁', n: String((f.docs || []).length), cls: dvCurF === f.id ? 'on' : '', title: 'Open the folder — or drop sources here to move them in', onOpen: () => this.setState({ folder: dvCurF === f.id ? null : f.id }),
         onOver: e => { try { e.preventDefault(); } catch (x) {} }, onDrop: e => { try { e.preventDefault(); String(e.dataTransfer.getData('text/plain')).split(',').filter(Boolean).forEach(id => this.setDocFolder(id, f.id)); } catch (x) {} } }))];
+    const fltSet = nr => this.setState({ svFlt: nr });
+    const fltRowsT = fltOK ? HD_FLT.flatten(fltRoot).map(x => {
+      const pad = 'margin-left:' + (x.depth * 22) + 'px';
+      if (x.kind === 'add') return { isAdd: true, pad, onAddCond: () => fltSet(HD_FLT.addCond(fltRoot, x.path)), onAddGroup: () => fltSet(HD_FLT.addGroup(fltRoot, x.path)) };
+      if (x.kind === 'group') return { isGroup: true, pad, op: x.op, ops: [{ v: 'and', l: 'All of these' }, { v: 'or', l: 'Any of these' }], onOp: e => fltSet(HD_FLT.setOp(fltRoot, x.path, e.target.value)), onRemove: () => fltSet(HD_FLT.remove(fltRoot, x.path)) };
+      const c = x.cond, rest = HD_FLT.without(fltRoot, x.path);
+      const vals = c.k ? HD_FLT.facet(rowsAll0.filter(r => HD_FLT.evalGroup(rest, k => fvOf(r, k))), c.k, fvOf) : [];
+      const needs = HD_FLT.opNeedsValue(c.o), pick = needs && !/contains$/.test(c.o) && vals.length > 0 && vals.length <= 400;
+      return { isCond: true, pad, lead: x.index === 0 ? 'Where' : (x.op === 'or' ? 'or' : 'and'), key: c.k, keys: [{ v: '', l: 'Field…' }, ...fltFields],
+        onKey: e => fltSet(HD_FLT.patch(fltRoot, x.path, { k: e.target.value })), op: c.o, opsL: HD_FLT.OPS.map(([v, l]) => ({ v, l })), onOp: e => fltSet(HD_FLT.patch(fltRoot, x.path, { o: e.target.value })),
+        valSelect: pick, valText: needs && !pick, val: c.v, vals: [{ v: '', l: 'Choose…' }, ...vals.map(o => ({ v: o.v, l: o.v + ' (' + o.n + ')' }))],
+        onVal: e => fltSet(HD_FLT.patch(fltRoot, x.path, { v: e.target.value })), onRemove: () => fltSet(HD_FLT.remove(fltRoot, x.path)) };
+    }) : [];
+    const dIdx = fltOK && fcDept ? fltRoot.items.findIndex(x => x.t === 'c' && x.k === fcDept) : -1;
+    const deptVals = fltOK && fcDept ? HD_FLT.facet(dIdx >= 0 ? rowsAll0.filter(r => HD_FLT.evalGroup(HD_FLT.without(fltRoot, [dIdx]), k => fvOf(r, k))) : rowsAll0, fcDept, fvOf) : [];
+    const fltN = fltOK ? HD_FLT.activeCount(fltRoot) : 0;
     const drv = { q: S.dvQ || '', onQ: e => this.setState({ dvQ: e.target.value }), onHome: () => this.setState({ folder: null, dvQ: '' }),
       inFolder: !!(dvCurF && dvFl.some(f => f.id === dvCurF)), folderName: (dvFl.find(f => f.id === dvCurF) || {}).name || '',
       sort: dvSortK,
@@ -9191,6 +9274,10 @@ class Component extends DCLogic {
       // the recurring-field picker: every label that recurs across sources, with its read type and how many sources carry it
       onResetOrder: () => { try { localStorage.removeItem('holodeck-sv-colorder'); } catch (e) {} this.setState({ svColOrder: null }); },
       fieldsOn: String(fcSel.length), hasFieldPick: FC.fields.length > 0,
+      hasFlt: fltOK && fltFields.length > 0, fltRows: fltRowsT, fltBadge: fltN ? ' · ' + fltN : '', fltCount: fltN ? rowsAll.length + ' of ' + rowsAll0.length + ' sources' : '', hasFltCount: fltN > 0,
+      onFltAdd: () => fltSet(HD_FLT.addCond(fltRoot, [])), onFltAddGroup: () => fltSet(HD_FLT.addGroup(fltRoot, [])), onFltClear: () => this.setState({ svFlt: fcDept ? HD_FLT.addCond(HD_FLT.newGroup('and'), [], fcDept) : HD_FLT.newGroup('and') }),
+      hasDept: deptVals.length > 1, deptVal: dIdx >= 0 && fltRoot.items[dIdx].o === 'is' ? fltRoot.items[dIdx].v : '', deptOpts: [{ v: '', l: 'All departments' }, ...deptVals.map(o => ({ v: o.v, l: o.v + ' (' + o.n + ')' }))],
+      onDept: e => { const v = e.target.value; fltSet(dIdx >= 0 ? HD_FLT.patch(fltRoot, [dIdx], { o: 'is', v }) : HD_FLT.patch(HD_FLT.addCond(fltRoot, [], fcDept), [fltRoot.items.length], { v })); },
       fieldPick: FC.fields.map(f => ({ label: f.label, tag: f.type, cover: f.n + ' of ' + A.docs.length, on: fcSel.includes(f.key), tip: (fcPinned.includes(f.key) ? 'Explicit field, always shown. ' : '') + 'Written ' + f.surface + ' · ' + f.distinct + ' distinct values',
         onToggle: () => { if (fcPinned.includes(f.key)) return; const cur = fcSel.includes(f.key) ? fcSel.filter(k => k !== f.key) : [...fcSel, f.key]; try { localStorage.setItem('holodeck-sv-fields', JSON.stringify(cur)); } catch (e) {} this.setState({ svFields: cur }); } })),
       hasFolders: dvFl.length > 0, folders: dvFolderTiles, tiles: [...this.readingTiles(), ...dvTiles], empty: dvTiles.length === 0 && !(this._reading && this._reading.length),
