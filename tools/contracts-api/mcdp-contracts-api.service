@@ -1,0 +1,14 @@
+[Unit]
+Description=Metro contract DB - contracts API (read-only lookups over the derived index, loopback 8840)
+After=network.target
+
+[Service]
+User=admin
+WorkingDirectory=/mnt/watch/contracts-api
+ExecStart=/usr/bin/python3 /mnt/watch/contracts-api/server.py 8840
+Restart=always
+RestartSec=3
+Nice=5
+
+[Install]
+WantedBy=multi-user.target

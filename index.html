@@ -595,6 +595,51 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
           <div class="hd-drive-tools">
             <sc-for list="{{ svTabs }}" as="t" hint-placeholder-count="4"><button class="hd-chip {{ t.cls }}" onClick="{{ t.onClick }}">{{ t.label }} <span style="color:var(--dim)">{{ t.n }}</span></button></sc-for>
             <span style="flex:1"></span>
+            <sc-if value="{{ drv.isVm }}" hint-placeholder-val="{{ false }}">
+              <input type="search" value="{{ drv.vmQ }}" onInput="{{ drv.onVmQ }}" placeholder="Search every contract: vendor, number, text…" title="Searches all contracts on the VM, not only the ones shown" style="background:var(--s2);border:1px solid var(--line2);border-radius:8px;color:var(--ink);font:500 13px var(--sans);padding:5px 10px;outline:none;min-width:200px;flex:1 1 220px">
+              <span style="font:400 12px var(--sans);color:var(--mut);white-space:nowrap">{{ drv.vmNote }}</span>
+              <sc-if value="{{ drv.vmMoreOn }}" hint-placeholder-val="{{ false }}"><button class="hd-chip" onClick="{{ drv.onVmMore }}">Load more</button></sc-if>
+            </sc-if>
+            <sc-if value="{{ drv.hasDept }}" hint-placeholder-val="{{ false }}">
+              <select value="{{ drv.deptVal }}" onChange="{{ drv.onDept }}" title="Show one department's contracts" style="background:var(--s2);border:1px solid var(--line2);border-radius:8px;color:var(--ink);font:500 13px var(--sans);padding:5px 8px;outline:none"><sc-for list="{{ drv.deptOpts }}" as="o" hint-placeholder-count="4"><option value="{{ o.v }}">{{ o.l }}</option></sc-for></select>
+            </sc-if>
+            <sc-if value="{{ drv.hasFlt }}" hint-placeholder-val="{{ false }}">
+              <details class="hd-drive-menu"><summary title="Filter by any field. Conditions stack; add a group to nest all-of / any-of" style="width:auto;padding:0 11px;border:1px solid var(--line2);border-radius:8px;font:500 13px var(--sans);height:30px">Filter{{ drv.fltBadge }}</summary>
+                <div class="hd-drive-menu-panel" style="box-sizing:border-box;width:min(520px,calc(100vw - 40px));max-height:60vh;overflow:auto;overflow-x:hidden;padding:10px">
+                  <sc-for list="{{ drv.fltRows }}" as="fr" hint-placeholder-count="2">
+                    <sc-if value="{{ fr.isCond }}" hint-placeholder-val="{{ false }}">
+                      <div style="display:flex;gap:6px;align-items:center;margin:5px 0;{{ fr.pad }}">
+                        <span style="width:44px;flex:none;font:400 13px var(--sans);color:var(--mut)">{{ fr.lead }}</span>
+                        <select value="{{ fr.key }}" onChange="{{ fr.onKey }}" style="background:var(--s2);border:1px solid var(--line2);border-radius:8px;color:var(--ink);font:500 13px var(--sans);padding:5px 8px;outline:none;min-width:0;flex:1 1 0;max-width:100%;text-overflow:ellipsis"><sc-for list="{{ fr.keys }}" as="o" hint-placeholder-count="3"><option value="{{ o.v }}">{{ o.l }}</option></sc-for></select>
+                        <select value="{{ fr.op }}" onChange="{{ fr.onOp }}" style="background:var(--s2);border:1px solid var(--line2);border-radius:8px;color:var(--ink);font:500 13px var(--sans);padding:5px 8px;outline:none;min-width:0;flex:1 1 0;max-width:100%;text-overflow:ellipsis"><sc-for list="{{ fr.opsL }}" as="o" hint-placeholder-count="3"><option value="{{ o.v }}">{{ o.l }}</option></sc-for></select>
+                        <sc-if value="{{ fr.valSelect }}" hint-placeholder-val="{{ false }}"><select value="{{ fr.val }}" onChange="{{ fr.onVal }}" style="background:var(--s2);border:1px solid var(--line2);border-radius:8px;color:var(--ink);font:500 13px var(--sans);padding:5px 8px;outline:none;min-width:0;flex:1 1 0;max-width:100%;text-overflow:ellipsis"><sc-for list="{{ fr.vals }}" as="o" hint-placeholder-count="3"><option value="{{ o.v }}">{{ o.l }}</option></sc-for></select></sc-if>
+                        <sc-if value="{{ fr.valText }}" hint-placeholder-val="{{ false }}"><input value="{{ fr.val }}" onInput="{{ fr.onVal }}" placeholder="Value" style="background:var(--s2);border:1px solid var(--line2);border-radius:8px;color:var(--ink);font:500 13px var(--sans);padding:5px 8px;outline:none;min-width:0;flex:1 1 0;max-width:100%;text-overflow:ellipsis"></sc-if>
+                        <button onClick="{{ fr.onRemove }}" title="Remove this condition" style="all:unset;cursor:pointer;padding:2px 8px;color:var(--mut);font:500 16px var(--sans)">×</button>
+                      </div>
+                    </sc-if>
+                    <sc-if value="{{ fr.isGroup }}" hint-placeholder-val="{{ false }}">
+                      <div style="display:flex;gap:6px;align-items:center;margin:8px 0 2px;{{ fr.pad }}">
+                        <select value="{{ fr.op }}" onChange="{{ fr.onOp }}" style="background:var(--s2);border:1px solid var(--line2);border-radius:8px;color:var(--ink);font:500 13px var(--sans);padding:5px 8px;outline:none;min-width:0;flex:1 1 0;max-width:100%;text-overflow:ellipsis"><sc-for list="{{ fr.ops }}" as="o" hint-placeholder-count="2"><option value="{{ o.v }}">{{ o.l }}</option></sc-for></select>
+                        <button onClick="{{ fr.onRemove }}" title="Remove this group" style="all:unset;cursor:pointer;padding:2px 8px;color:var(--mut);font:500 16px var(--sans)">×</button>
+                      </div>
+                    </sc-if>
+                    <sc-if value="{{ fr.isAdd }}" hint-placeholder-val="{{ false }}">
+                      <div style="display:flex;gap:10px;margin:2px 0 6px;{{ fr.pad }}">
+                        <button onClick="{{ fr.onAddCond }}" style="all:unset;cursor:pointer;font:500 12px var(--sans);color:var(--acc)">+ Add condition</button>
+                        <button onClick="{{ fr.onAddGroup }}" style="all:unset;cursor:pointer;font:500 12px var(--sans);color:var(--acc)">+ Add group</button>
+                      </div>
+                    </sc-if>
+                  </sc-for>
+                  <div style="display:flex;gap:12px;align-items:center;margin-top:8px;border-top:1px solid var(--line);padding-top:8px">
+                    <button onClick="{{ drv.onFltAdd }}" style="all:unset;cursor:pointer;font:500 13px var(--sans);color:var(--acc)">+ Add condition</button>
+                    <button onClick="{{ drv.onFltAddGroup }}" style="all:unset;cursor:pointer;font:500 13px var(--sans);color:var(--acc)">+ Add condition group</button>
+                    <span style="flex:1"></span>
+                    <sc-if value="{{ drv.hasFltCount }}" hint-placeholder-val="{{ false }}"><span style="font:400 12px var(--sans);color:var(--mut)">{{ drv.fltCount }}</span></sc-if>
+                    <button onClick="{{ drv.onFltClear }}" style="all:unset;cursor:pointer;font:500 13px var(--sans);color:var(--ink2)">Clear</button>
+                  </div>
+                </div>
+              </details>
+            </sc-if>
             <select value="{{ drv.sort }}" onChange="{{ drv.onSort }}" title="Order" style="background:var(--s2);border:1px solid var(--line2);border-radius:8px;color:var(--ink);font:500 13px var(--sans);padding:5px 8px;outline:none"><sc-for list="{{ drv.sorts }}" as="o" hint-placeholder-count="4"><option value="{{ o.v }}">{{ o.l }}</option></sc-for></select>
             <sc-if value="{{ drv.hasFieldPick }}" hint-placeholder-val="{{ false }}">
               <details class="hd-drive-menu"><summary title="Columns taken from fields that recur across your sources (contract id, expiry, vendor…) — shown in Table view and sortable" style="width:auto;padding:0 11px;border:1px solid var(--line2);border-radius:8px;font:500 13px var(--sans);height:30px">Fields · {{ drv.fieldsOn }}</summary>
@@ -3722,6 +3767,10 @@ const hdReaderReady = () => !!(HD_PROF && HD_ASK && HD_READER);
 // cast. Absent the module or a prior, heldBy is a typed gap — never a guess.
 let HD_ATTR = null;
 import(new URL('holodeck-holders.js', location.href)).then(M => { HD_ATTR = M; }).catch(() => {});
+// Airtable-style filters for the Sources table (nested AND/OR groups); the render is synchronous, so the module is preloaded
+let HD_FLT = null; const hdFltP = import(new URL('holodeck-filters.js', location.href)).then(M => { HD_FLT = M; return M; }).catch(() => null);
+// The Metro contracts workspace is served by the VM (tools/contracts-api); the module is only the thin client
+const hdVmP = import(new URL('holodeck-vm-contracts.js', location.href)).catch(() => null);
 const hdAttrReady = () => !!HD_ATTR;
 // THE FRONT LEG of the holder read: NL → this language's OWN grammar → EOT.
 // relations-language.js::relationExtractorsFor under the language's RoleConfig@1
@@ -4396,6 +4445,23 @@ const short = (t, n) => { t = clean(t); return t.length > n ? t.slice(0, n - 1) 
 // doc's own address so a doc stored before pdfSrc existed still renders its PDF.
 function epavTokenOf(d) { const m = /\/(?:Document|Open)\/([A-Za-z0-9]+)/.exec((d && d.url) || ''); if (m) return m[1]; const id = String((d && d.id) || ''); return id.startsWith('nash-') ? id.slice(5) : null; }
 function withPdfSrc(d) { if (d && !d.pdfSrc) { const t = epavTokenOf(d); if (t) return { ...d, pdfSrc: '/epav/' + t + '.pdf' }; } return d; }
+// The public (static) host has no /epav route, so a same-origin fetch 404s there. Resolve a contract's PDF by trying the
+// same-origin route first (the dev server proxies it), then the archive.org twin through the CORS-open holodeck-proxy
+// worker. A body only counts if it is really a PDF, so a static host's 404 page or index fallback never reaches pdf.js.
+const EPAV_WORKER = 'https://holodeck-proxy.prometheoid.workers.dev/raw?url=';
+const epavTokenOfSrc = d => (/\/epav\/([A-Za-z0-9]+)\.pdf/.exec((d && d.pdfSrc) || '') || [])[1] || epavTokenOf(d);
+async function epavPdfBytes(d) {
+  const tok = epavTokenOfSrc(d); const tried = [];
+  const cands = [d.pdfSrc, d.archiveUrl && EPAV_WORKER + encodeURIComponent(d.archiveUrl), tok && EPAV_WORKER + encodeURIComponent('https://archive.org/download/nashville-epav-contract-' + tok + '/' + tok + '.pdf')].filter(Boolean);
+  for (const u of cands) {
+    try {
+      const r = await fetch(u); if (!r.ok) { tried.push('HTTP ' + r.status); continue; }
+      const b = await r.arrayBuffer(); if (new TextDecoder().decode(b.slice(0, 5)) === '%PDF-') return b;
+      tried.push('not a PDF');
+    } catch (e) { tried.push(String((e && e.message) || e)); }
+  }
+  throw new Error('HTTP ' + (tried[0] || '404') + ' — this contract is not on archive.org yet; open Extracted');
+}
 // A document's year is not "a date" until it says whose date it is. When the year is exactly the year of one date
 // the document itself states (its expiry, a signing), name it by that field: "Expires 2007", not a bare "2007" under
 // a "Date" header that means nothing. With no such field (or more than one) the year is left as it was.
@@ -5652,6 +5718,7 @@ class Component extends DCLogic {
     // the Workspaces screen by address: #workspaces on load, or typed/linked while the page is open
     this._heroHash = () => { if (location.hash === '#workspaces' && !this._heroOpen) this.openWorkspacesHero(); };
     window.addEventListener('hashchange', this._heroHash); setTimeout(this._heroHash, 0);
+    this.vmInit();
     setTimeout(() => { this.openFromUrl(); this._urlReady = true; this.urlSync(); }, 0);
     this.installColDrag();
     // optional extra screens: a deployment lists whole pages in screens.json and they join the sidebar; absent or
@@ -7853,7 +7920,7 @@ class Component extends DCLogic {
   }
   async sourceBytes(d) {
     await this.net();
-    if (d.pdfSrc) { try { const r = await fetch(d.pdfSrc); if (r.ok) return { buf: await r.arrayBuffer(), rel: (d.pdfSrc || '').split('/').pop(), mime: 'application/pdf' }; } catch (e) {} }
+    if (d.pdfSrc) { try { return { buf: await epavPdfBytes(d), rel: (d.pdfSrc || '').split('/').pop(), mime: 'application/pdf' }; } catch (e) {} }
     return { buf: new TextEncoder().encode(d.text || '').buffer, rel: null, mime: 'text/plain' };
   }
   netVals(A, view) {
@@ -8433,7 +8500,7 @@ class Component extends DCLogic {
     el.innerHTML = '<p style="color:var(--mut);font:400 14px var(--sans);padding:24px">Loading the captured PDF…</p>';
     this._pdfBuf = this._pdfBuf || {};
     try {
-      let buf = this._pdfBuf[d.id]; if (!buf) { const r = await fetch(d.pdfSrc); if (!r.ok) throw new Error('HTTP ' + r.status); buf = this._pdfBuf[d.id] = await r.arrayBuffer(); }
+      let buf = this._pdfBuf[d.id]; if (!buf) { buf = this._pdfBuf[d.id] = await epavPdfBytes(d); }
       if (this._rKey !== key) return;
       const pdfjs = await pdfLib(); const pdf = await pdfjs.getDocument({ data: new Uint8Array(buf).slice() }).promise;
       const N = Math.min(pdf.numPages, PDF_MAX_PAGES); const pages = [], tcs = []; let pt = '';
@@ -9227,7 +9294,7 @@ class Component extends DCLogic {
       const badges = [...(d.medium ? [{ label: d.medium === 'Video' || d.medium === 'Audio' ? d.medium + (d.transcribed ? ' · machine transcript' : ' · not transcribed') : d.medium, color: MEDIUM_C[d.medium] || 'var(--mut)' }] : []), ...(d.standing ? [{ label: d.standing, color: STANDING_C[d.standing] || 'var(--mut)' }] : []), ...((d.recordings || []).map(r => ({ label: 'Video linked · not transcribed', color: 'var(--date)' }))), ...(d.sameAs ? [{ label: 'Same bytes as ' + short(d.sameAsTitle || '', 36), color: 'var(--amber)' }] : []), ...(d.custodyStatus && d.custodyStatus !== 'captured' ? [{ label: d.custody, color: /missing|failed|not-located|no-text/.test(d.custodyStatus) ? 'var(--bad)' : 'var(--amber)' }] : [])];
       const vid = !!(d.media && d.media.kind === 'youtube');
       const tr = this.traceFor(d.id);
-      return { ...c, op: 1, isVid: vid, noVid: !vid, ...(() => { const pt = (d.pdfSrc || d.format === 'pdf' || d.type === 'PDF') ? epavTokenOf(d) : null; return { hasPdfThumb: !!pt, pdfThumb: pt ? 'url(thumbs/' + pt + '.jpg)' : 'none' }; })(), thumbBg: vid ? 'url(https://i.ytimg.com/vi/' + d.media.id + '/hqdefault.jpg)' : 'none', readLabel: 'Open source', ...(vid ? { onSelect: () => this.read(d.id) } : {}), badges, hasBadges: badges.length > 0, hasDistinct: !!dd, distinct: dd ? dd.label + ' · ' + pct(dd.a) + ' of its statements vs ' + pct(dd.b) + ' elsewhere' : '', hasFold: this._fold.length > 0, fold: inF + ' of ' + all.length + ' statements touch the topic', stats: (narrowed ? ((FbyDoc[d.id] || []).length).toLocaleString() + ' of ' + plural(all.length, 'statement') + ' in this selection' : plural(all.length, 'statement')) + ' · ' + plural(nm.size, 'name'), isSeen: m.status === 'seen', isKept: m.status !== 'seen', hasReplay: !!tr, onReplay: () => tr && import(new URL('holodeck-ingest-player.js', location.href).href).then(M => M.open(tr)), canUnkeep: m.status !== 'seen' && !this.baseDocs(this.corpusId()).some(x => x.id === d.id), needsRead: !!d.needsRead, onProcess: () => this.processRead(d.id), canProcess: !!(d.type === 'Image' || d.type === 'PDF' || d.format === 'pdf' || d.pdf || d.hasImg), ...(() => { const ec = (d.type === 'Image' || d.type === 'PDF' || d.format === 'pdf' || d.pdf || d.hasImg) ? this.eyesCard(d) : null; return { hasEyes: !!ec, eyesRows: ec ? ec.rows : [], eyesNote: ec ? ec.note : '' }; })(), canTranscribe: !!((d.medium === 'Audio' || d.medium === 'Video' || d.type === 'Audio' || d.type === 'Video' || (d.media && (d.media.kind === 'local' || d.media.kind === 'youtube'))) && !d.transcribed), onTranscribe: () => this.transcribeCard(d), cardStyle: 'border-color:' + (c.bd || 'var(--line)') + ';opacity:' + ((S.solo && S.solo.length && !S.solo.includes(d.id)) ? '0.28' : '1') + ';transition:opacity .25s ease', soloOn: !!(S.solo && S.solo.includes(d.id)), soloLabel: (S.solo && S.solo.includes(d.id)) ? 'Showing only this source' : 'Only this source', onSolo: () => this.setState(s => { const cur = Array.isArray(s.solo) ? s.solo : []; return { solo: cur.includes(d.id) ? cur.filter(x => x !== d.id) : [...cur, d.id] }; }),
+      return { ...c, op: 1, isVid: vid, noVid: !vid, ...(() => { const pt = !d.vm && (d.pdfSrc || d.format === 'pdf' || d.type === 'PDF') ? epavTokenOf(d) : null; return { hasPdfThumb: !!pt, pdfThumb: pt ? 'url(thumbs/' + pt + '.jpg)' : 'none' }; })(), thumbBg: vid ? 'url(https://i.ytimg.com/vi/' + d.media.id + '/hqdefault.jpg)' : 'none', readLabel: 'Open source', ...(vid ? { onSelect: () => this.read(d.id) } : {}), badges, hasBadges: badges.length > 0, hasDistinct: !!dd, distinct: dd ? dd.label + ' · ' + pct(dd.a) + ' of its statements vs ' + pct(dd.b) + ' elsewhere' : '', hasFold: this._fold.length > 0, fold: inF + ' of ' + all.length + ' statements touch the topic', stats: (narrowed ? ((FbyDoc[d.id] || []).length).toLocaleString() + ' of ' + plural(all.length, 'statement') + ' in this selection' : plural(all.length, 'statement')) + ' · ' + plural(nm.size, 'name'), isSeen: m.status === 'seen', isKept: m.status !== 'seen', hasReplay: !!tr, onReplay: () => tr && import(new URL('holodeck-ingest-player.js', location.href).href).then(M => M.open(tr)), canUnkeep: m.status !== 'seen' && !this.baseDocs(this.corpusId()).some(x => x.id === d.id), needsRead: !!d.needsRead, onProcess: () => this.processRead(d.id), canProcess: !!(d.type === 'Image' || d.type === 'PDF' || d.format === 'pdf' || d.pdf || d.hasImg), ...(() => { const ec = (d.type === 'Image' || d.type === 'PDF' || d.format === 'pdf' || d.pdf || d.hasImg) ? this.eyesCard(d) : null; return { hasEyes: !!ec, eyesRows: ec ? ec.rows : [], eyesNote: ec ? ec.note : '' }; })(), canTranscribe: !!((d.medium === 'Audio' || d.medium === 'Video' || d.type === 'Audio' || d.type === 'Video' || (d.media && (d.media.kind === 'local' || d.media.kind === 'youtube'))) && !d.transcribed), onTranscribe: () => this.transcribeCard(d), cardStyle: 'border-color:' + (c.bd || 'var(--line)') + ';opacity:' + ((S.solo && S.solo.length && !S.solo.includes(d.id)) ? '0.28' : '1') + ';transition:opacity .25s ease', soloOn: !!(S.solo && S.solo.includes(d.id)), soloLabel: (S.solo && S.solo.includes(d.id)) ? 'Showing only this source' : 'Only this source', onSolo: () => this.setState(s => { const cur = Array.isArray(s.solo) ? s.solo : []; return { solo: cur.includes(d.id) ? cur.filter(x => x !== d.id) : [...cur, d.id] }; }),
         ...(() => { const on = this._inf[d.id] || null;
           return { originText: on ? on.why + ' ' + short(A.docById[on.of].title, 40) : 'Independent · shares no claims or outlet with another source', originDep: !!on, originCol: on ? 'var(--amber)' : 'var(--mut)' }; })(),
         drawsX: 0, drawOptions: drawOpts,
@@ -9295,7 +9362,15 @@ class Component extends DCLogic {
     const sK = svFld ? (r => fieldSortKey(svFld.type, r.fvals[svFld.key])) : (sKey[svSort] || sKey.date);
     // sources with no value for the field always sort last, whichever way it runs
     const sortRows = L => L.sort((a, b) => { const ka = sK(a), kb = sK(b); if (ka == null || kb == null) return ka == null && kb == null ? a.title.localeCompare(b.title) : ka == null ? 1 : -1; return (ka < kb ? -1 : ka > kb ? 1 : 0) * svDir || a.title.localeCompare(b.title); });
-    const rowsAll = allSrcItems.map(rowOf);
+    const rowsAll0 = allSrcItems.map(rowOf);
+    // ---- filters (holodeck-filters.js): Department first, then any recurring field; groups nest and AND/OR ----
+    const fltOK = !!HD_FLT; if (!fltOK) hdFltP.then(M => { if (M) this.forceUpdate(); });
+    const fcDept = FIELD_EXPLICIT_DEPT.find(k => fcBy.has(k)) || null;
+    const fltFields = FC.fields.filter(f => f.key === fcDept || (!/^(date|amount|number)$/.test(f.type) && f.distinct > 1 && f.distinct <= 400)).map(f => ({ v: f.key, l: f.label }));
+    let fltRoot = S.svFlt || null;
+    if (fltOK && !fltRoot) { fltRoot = HD_FLT.newGroup('and'); if (fcDept) fltRoot = HD_FLT.addCond(fltRoot, [], fcDept); }
+    const fvOf = (r, k) => (r.fvals || {})[k];
+    const rowsAll = fltOK && fltRoot ? rowsAll0.filter(r => HD_FLT.evalGroup(fltRoot, k => fvOf(r, k))) : rowsAll0;
     // ---- columns: one ordered list, so any column can sit anywhere ----
     const TD = 'padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top;font:400 14px/1.4 var(--sans);color:var(--ink2)';
     const colDefs = [
@@ -9368,6 +9443,23 @@ class Component extends DCLogic {
         onOver: e => { try { e.preventDefault(); } catch (x) {} }, onDrop: e => { try { e.preventDefault(); String(e.dataTransfer.getData('text/plain')).split(',').filter(Boolean).forEach(id => this.setDocFolder(id, '')); } catch (x) {} } },
       ...dvFl.map(f => ({ id: f.id, label: f.name, icon: '📁', n: String((f.docs || []).length), cls: dvCurF === f.id ? 'on' : '', title: 'Open the folder — or drop sources here to move them in', onOpen: () => this.setState({ folder: dvCurF === f.id ? null : f.id }),
         onOver: e => { try { e.preventDefault(); } catch (x) {} }, onDrop: e => { try { e.preventDefault(); String(e.dataTransfer.getData('text/plain')).split(',').filter(Boolean).forEach(id => this.setDocFolder(id, f.id)); } catch (x) {} } }))];
+    const fltSet = nr => this.setState({ svFlt: nr });
+    const fltRowsT = fltOK ? HD_FLT.flatten(fltRoot).map(x => {
+      const pad = 'margin-left:' + (x.depth * 22) + 'px';
+      if (x.kind === 'add') return { isAdd: true, pad, onAddCond: () => fltSet(HD_FLT.addCond(fltRoot, x.path)), onAddGroup: () => fltSet(HD_FLT.addGroup(fltRoot, x.path)) };
+      if (x.kind === 'group') return { isGroup: true, pad, op: x.op, ops: [{ v: 'and', l: 'All of these' }, { v: 'or', l: 'Any of these' }], onOp: e => fltSet(HD_FLT.setOp(fltRoot, x.path, e.target.value)), onRemove: () => fltSet(HD_FLT.remove(fltRoot, x.path)) };
+      const c = x.cond, rest = HD_FLT.without(fltRoot, x.path);
+      const vals = c.k ? HD_FLT.facet(rowsAll0.filter(r => HD_FLT.evalGroup(rest, k => fvOf(r, k))), c.k, fvOf) : [];
+      const needs = HD_FLT.opNeedsValue(c.o), pick = needs && !/contains$/.test(c.o) && vals.length > 0 && vals.length <= 400;
+      return { isCond: true, pad, lead: x.index === 0 ? 'Where' : (x.op === 'or' ? 'or' : 'and'), key: c.k, keys: [{ v: '', l: 'Field…' }, ...fltFields],
+        onKey: e => fltSet(HD_FLT.patch(fltRoot, x.path, { k: e.target.value })), op: c.o, opsL: HD_FLT.OPS.map(([v, l]) => ({ v, l })), onOp: e => fltSet(HD_FLT.patch(fltRoot, x.path, { o: e.target.value })),
+        valSelect: pick, valText: needs && !pick, val: c.v, vals: [{ v: '', l: 'Choose…' }, ...vals.map(o => ({ v: o.v, l: o.v + ' (' + o.n + ')' }))],
+        onVal: e => fltSet(HD_FLT.patch(fltRoot, x.path, { v: e.target.value })), onRemove: () => fltSet(HD_FLT.remove(fltRoot, x.path)) };
+    }) : [];
+    const dIdx = fltOK && fcDept ? fltRoot.items.findIndex(x => x.t === 'c' && x.k === fcDept) : -1;
+    const deptVals = fltOK && fcDept ? HD_FLT.facet(dIdx >= 0 ? rowsAll0.filter(r => HD_FLT.evalGroup(HD_FLT.without(fltRoot, [dIdx]), k => fvOf(r, k))) : rowsAll0, fcDept, fvOf) : [];
+    const fltN = fltOK ? HD_FLT.activeCount(fltRoot) : 0;
+    const vmOn = !!this._vm && this.corpusId() === 'metro-vm';
     const drv = { q: S.dvQ || '', onQ: e => this.setState({ dvQ: e.target.value }), onHome: () => this.setState({ folder: null, dvQ: '' }),
       inFolder: !!(dvCurF && dvFl.some(f => f.id === dvCurF)), folderName: (dvFl.find(f => f.id === dvCurF) || {}).name || '',
       sort: dvSortK,
@@ -9383,6 +9475,11 @@ class Component extends DCLogic {
       // the recurring-field picker: every label that recurs across sources, with its read type and how many sources carry it
       onResetOrder: () => { try { localStorage.removeItem('holodeck-sv-colorder'); } catch (e) {} this.setState({ svColOrder: null }); },
       fieldsOn: String(fcSel.length), hasFieldPick: FC.fields.length > 0,
+      hasFlt: fltOK && fltFields.length > 0, fltRows: fltRowsT, fltBadge: fltN ? ' · ' + fltN : '', fltCount: fltN ? rowsAll.length + ' of ' + rowsAll0.length + ' sources' : '', hasFltCount: fltN > 0,
+      onFltAdd: () => fltSet(HD_FLT.addCond(fltRoot, [])), onFltAddGroup: () => fltSet(HD_FLT.addGroup(fltRoot, [])), onFltClear: () => this.setState({ svFlt: fcDept ? HD_FLT.addCond(HD_FLT.newGroup('and'), [], fcDept) : HD_FLT.newGroup('and') }),
+      isVm: vmOn, vmQ: vmOn ? this._vm.q : '', onVmQ: e => this.vmLoad({ q: e.target.value }), vmNote: vmOn ? (this._vm.loading ? 'Loading…' : this._vm.offset.toLocaleString() + ' of ' + this._vm.total.toLocaleString()) : '', vmMoreOn: vmOn && this._vm.offset < this._vm.total, onVmMore: () => this.vmLoad({ more: true }),
+      hasDept: vmOn ? this._vm.depts.length > 1 : deptVals.length > 1, deptVal: vmOn ? this._vm.dept : ( dIdx >= 0 && fltRoot.items[dIdx].o === 'is' ? fltRoot.items[dIdx].v : ''), deptOpts: vmOn ? [{ v: '', l: 'All departments (' + this._vm.depts.reduce((n, d) => n + d.n, 0).toLocaleString() + ')' }, ...this._vm.depts.map(d => ({ v: d.department, l: d.department + ' (' + d.n.toLocaleString() + ')' }))] : [{ v: '', l: 'All departments' }, ...deptVals.map(o => ({ v: o.v, l: o.v + ' (' + o.n + ')' }))],
+      onDept: vmOn ? (e => this.vmLoad({ dept: e.target.value })) : e => { const v = e.target.value; fltSet(dIdx >= 0 ? HD_FLT.patch(fltRoot, [dIdx], { o: 'is', v }) : HD_FLT.patch(HD_FLT.addCond(fltRoot, [], fcDept), [fltRoot.items.length], { v })); },
       fieldPick: FC.fields.map(f => ({ label: f.label, tag: f.type, cover: f.n + ' of ' + A.docs.length, on: fcSel.includes(f.key), tip: (fcPinned.includes(f.key) ? 'Explicit field, always shown. ' : '') + 'Written ' + f.surface + ' · ' + f.distinct + ' distinct values',
         onToggle: () => { if (fcPinned.includes(f.key)) return; const cur = fcSel.includes(f.key) ? fcSel.filter(k => k !== f.key) : [...fcSel, f.key]; try { localStorage.setItem('holodeck-sv-fields', JSON.stringify(cur)); } catch (e) {} this.setState({ svFields: cur }); } })),
       hasFolders: dvFl.length > 0, folders: dvFolderTiles, tiles: [...this.readingTiles(), ...dvTiles], empty: dvTiles.length === 0 && !(this._reading && this._reading.length),
@@ -9614,12 +9711,14 @@ class Component extends DCLogic {
     const addN = k => (S.added[k] || []).length;
     const wsNames = loadWorkspaceNames();
     const opts = [{ id: 'custom', name: 'Your content' + (addN('custom') ? ' (' + addN('custom') + ')' : '') }]
-      .concat(Object.keys(S.added).filter(k => wsNames[k]).map(k => ({ id: k, name: wsNames[k] + ' (' + addN(k) + ')' })));
+      .concat(Object.keys(S.added).filter(k => wsNames[k]).map(k => ({ id: k, name: wsNames[k] + ' (' + addN(k) + ')' })))
+      .concat(this._vm && SAMPLES['metro-vm'] ? [{ id: 'metro-vm', name: 'Metro contracts (' + this._vm.depts.reduce((n, d) => n + d.n, 0).toLocaleString() + ')' }] : []);
     const cid = this.corpusId(); const J = S.just; const demo = DEMOS[cid] || DEMOS.custom;
     // every workspace, searched, sorted, renamed and deleted, is on the Workspaces screen (openWorkspacesHero); the rail keeps the quick switcher
     const wsRecent = loadWsRecent();
-    const wsAll = [{ id: 'custom', name: 'Your content', fixed: true }].concat(Object.keys(S.added).filter(k => wsNames[k]).map(k => ({ id: k, name: wsNames[k] }))).map(w => ({ ...w, n: addN(w.id), at: wsRecent[w.id] || 0 }));
-    const wsOpenIt = id => this.setState({ corpus: id, view: 'summary', sel: null, f: {}, readDoc: null, folder: null, folderDraft: '' });
+    const wsAll = [{ id: 'custom', name: 'Your content', fixed: true }].concat(Object.keys(S.added).filter(k => wsNames[k]).map(k => ({ id: k, name: wsNames[k] }))).map(w => ({ ...w, n: addN(w.id), at: wsRecent[w.id] || 0 }))
+      .concat(this._vm && SAMPLES['metro-vm'] ? [{ id: 'metro-vm', name: 'Metro contracts (live)', fixed: true, n: this._vm.depts.reduce((n, d) => n + d.n, 0), at: wsRecent['metro-vm'] || 0 }] : []);
+    const wsOpenIt = id => { this.setState({ corpus: id, view: 'summary', sel: null, f: {}, readDoc: null, folder: null, folderDraft: '' }); if (id === 'metro-vm' && this._vm && !SAMPLES['metro-vm'].docs.length) this.vmLoad(); };
     // segmenting: the workspace's own discovered topics, computed once and driving the left-rail Topics
     // section, the global scope strip, and the Overview page's cards. A topic segment is source-based
     // (f.topicGroup keeps only the member documents' statements), not a keyword fold, so it holds even
@@ -10044,6 +10143,40 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
     };
   }
 
+  // ---- Metro contracts workspace, served by the VM (holodeck-vm-contracts.js) ----
+  // Nothing is ingested: a page of rows is light in-memory docs (SAMPLES['metro-vm']), a contract's text is fetched
+  // when it is opened, and the department / search / paging are lookups on the VM.
+  async vmInit() {
+    try {
+      const M = await hdVmP; if (!M) return;
+      const depts = await M.departments();
+      this._vm = { M, depts, dept: '', q: '', total: 0, offset: 0, loading: false, seq: 0 };
+      SAMPLES['metro-vm'] = { name: 'Metro contracts', docs: [] };
+      this.forceUpdate();
+      if (this.corpusId() === 'metro-vm') this.vmLoad();
+    } catch (e) { this._vm = null; }
+  }
+  async vmLoad(o = {}) {
+    const V = this._vm; if (!V) return;
+    if ('dept' in o) V.dept = o.dept; if ('q' in o) V.q = o.q;
+    const more = !!o.more, my = ++V.seq; V.loading = true; this.forceUpdate();
+    try {
+      const off = more ? V.offset : 0;
+      const j = await V.M.page({ dept: V.dept, q: V.q, offset: off, limit: 200 });
+      if (my !== V.seq) return;
+      const cur = SAMPLES['metro-vm'].docs, have = new Map(cur.map(d => [d.id, d]));
+      const rows = j.rows.map(r => have.get('nash-' + r.token) || V.M.toDoc(r));
+      SAMPLES['metro-vm'].docs = more ? cur.concat(rows.filter(d => !have.has(d.id))) : rows;
+      V.total = j.total; V.offset = off + j.rows.length;
+    } catch (e) { try { this.toast('Could not reach the contracts service (' + e.message + ').'); } catch (x) {} }
+    if (this._vm === V) { V.loading = false; this._key = null; this.forceUpdate(); }
+  }
+  async vmOpenText(id) {
+    const V = this._vm, d = V && SAMPLES['metro-vm'] && SAMPLES['metro-vm'].docs.find(x => x.id === id);
+    if (!d || !d.vm || d._read) return;
+    d._read = true;
+    try { const j = await V.M.detail(id.replace(/^nash-/, '')); d.text = V.M.textOf(j); if (j.epav_url) d.url = j.epav_url; this._key = null; this.setState(st => ({ htmlVer: st.htmlVer + 1 })); } catch (e) { d._read = false; }
+  }
   corpusName() { const id = this.corpusId(); return id === 'custom' ? 'Your content' : SAMPLES[id] ? SAMPLES[id].name.replace(/\s*·\s*GitHub$/i, '') : loadWorkspaceNames()[id] || 'Your content'; }
 
   graph(D, selName, F0, A, onlyDoc) {
@@ -10099,7 +10232,7 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
   }
 
   readLog() { if (!this._rlog) { try { this._rlog = JSON.parse(localStorage.getItem('fold-explorer-readlog') || '{}'); } catch (e) { this._rlog = {}; } } return this._rlog[this.corpusId()] || {}; }
-  markRead(docId) { const rl = this.readLog(); if (rl[docId]) return; this._rlog[this.corpusId()] = { ...rl, [docId]: Date.now() }; try { localStorage.setItem('fold-explorer-readlog', JSON.stringify(this._rlog)); } catch (e) {} }
+  markRead(docId) { if (this._vm && this.corpusId() === 'metro-vm') this.vmOpenText(docId); const rl = this.readLog(); if (rl[docId]) return; this._rlog[this.corpusId()] = { ...rl, [docId]: Date.now() }; try { localStorage.setItem('fold-explorer-readlog', JSON.stringify(this._rlog)); } catch (e) {} }
   surprise(A) {
     const cur = SU_CURSORS.some(c => c.id === this.state.cursor) ? this.state.cursor : 'pub';
     const lens = this.state.suLens; const base = null;

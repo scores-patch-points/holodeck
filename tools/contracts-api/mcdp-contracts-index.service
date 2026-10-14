@@ -1,0 +1,9 @@
+[Unit]
+Description=Metro contract DB - refresh the contracts API index from the pipeline files (incremental)
+
+[Service]
+Type=oneshot
+User=admin
+WorkingDirectory=/mnt/watch/contracts-api
+ExecStart=/usr/bin/python3 /mnt/watch/contracts-api/build_index.py
+Nice=10
