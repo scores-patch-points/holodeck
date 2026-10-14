@@ -66,6 +66,8 @@ button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visi
 .hd-drive-tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 /* the direct Metro contracts address shows that content only: no workspace switcher, no adding sources */
 html[data-metro] .hd-workspace,html[data-metro] .hd-topadd,html[data-metro] .hd-railadd,html[data-metro] .hd-drive-add{display:none!important}
+/* ...and for searching only: no ask-or-paste box, no model settings, no folders, no tool menu */
+html[data-metro] .hd-drive-search,html[data-metro] .hd-settings,html[data-metro] [data-nav="folders"],html[data-metro] [data-nav="explore"]{display:none!important}
 .hd-chip{all:unset;cursor:pointer;border:1px solid var(--line2);border-radius:8px;padding:5px 12px;font:500 13px var(--sans);color:var(--ink2);white-space:nowrap}
 .hd-chip:hover{background:var(--s2)}
 .hd-chip.on{background:var(--sel);border-color:var(--acc2);color:var(--ink)}
@@ -229,7 +231,7 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
       </sc-if>
     </div>
     <sc-if value="{{ hasContent }}" hint-placeholder-val="{{ false }}">
-    <details class="hd-disclosure" open="{{ foldersOpen }}">
+    <details class="hd-disclosure" data-nav="folders" open="{{ foldersOpen }}">
       <summary>{{ foldersLabel }}</summary>
       <div style="display:flex;flex-direction:column;gap:4px;padding-top:6px">
         <sc-if value="{{ hasFolders }}" hint-placeholder-val="{{ false }}">
@@ -299,7 +301,7 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
         </sc-if>
       </div>
       </details>
-      <details class="hd-disclosure" open="{{ toolsOpen }}">
+      <details class="hd-disclosure" data-nav="explore" open="{{ toolsOpen }}">
         <summary>Explore &amp; manage</summary>
       <div style="display:flex;flex-direction:column;gap:1px;padding:10px 0 12px;border-top:1px solid var(--line)">
         <span style="font:600 12px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--acc);padding:2px 12px 6px">{{ navRead.label }}</span>
@@ -363,7 +365,7 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
         <sc-if value="{{ omniPending }}" hint-placeholder-val="{{ false }}"><button onClick="{{ omniGo }}" style="margin:3px;border:0;background:var(--acc2);color:#fff;border-radius:6px;padding:4px 12px;cursor:pointer;font:600 13px var(--sans);white-space:nowrap">Search ↵</button></sc-if>
         <sc-if value="{{ omniUrl }}" hint-placeholder-val="{{ false }}"><button onClick="{{ omniOpen }}" style="margin:3px;border:0;background:var(--acc2);color:#fff;border-radius:6px;padding:4px 12px;cursor:pointer;font:600 14px var(--sans)">Open page ↵</button></sc-if>
       </div>
-      <button onClick="{{ openSettings }}" title="{{ acctTitle }}" style="flex:none;display:inline-flex;align-items:center;gap:7px;box-sizing:border-box;background:none;border:1px solid var(--line2);border-radius:999px;padding:5px 11px;cursor:pointer;font:500 13px/1 var(--sans);color:var(--ink2);white-space:nowrap;max-width:230px" style-hover="border-color:var(--acc);color:var(--ink)"><span style="width:8px;height:8px;border-radius:50%;background:{{ acctOn ? 'var(--ok)' : 'var(--dim)' }};flex:none"></span><span style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ acctLabel }}</span><span aria-hidden="true" title="Settings" style="flex:none;font-size:14px;line-height:1;opacity:.75">⚙</span></button>
+      <button class="hd-settings" onClick="{{ openSettings }}" title="{{ acctTitle }}" style="flex:none;display:inline-flex;align-items:center;gap:7px;box-sizing:border-box;background:none;border:1px solid var(--line2);border-radius:999px;padding:5px 11px;cursor:pointer;font:500 13px/1 var(--sans);color:var(--ink2);white-space:nowrap;max-width:230px" style-hover="border-color:var(--acc);color:var(--ink)"><span style="width:8px;height:8px;border-radius:50%;background:{{ acctOn ? 'var(--ok)' : 'var(--dim)' }};flex:none"></span><span style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ acctLabel }}</span><span aria-hidden="true" title="Settings" style="flex:none;font-size:14px;line-height:1;opacity:.75">⚙</span></button>
     </div>
     </sc-if>
     <sc-if value="{{ showFilterLayers }}" hint-placeholder-val="{{ false }}">
@@ -592,7 +594,7 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
             <span title="{{ drv.stats }}" style="font:400 13px var(--sans);color:var(--mut)">{{ drv.stats }}</span>
             <input class="hd-drive-search" value="{{ drv.q }}" onChange="{{ drv.onQ }}" onKeyDown="{{ drv.onKey }}" placeholder="Search, ask a question, or paste a link — Enter" title="Filters the list by name as you type. Enter searches the sources, asks a question, or opens a link.">
             <button class="hd-drive-add" onClick="{{ openAdd }}">＋ Add source</button>
-            <button onClick="{{ openSettings }}" title="{{ acctTitle }}" style="flex:none;display:inline-flex;align-items:center;gap:7px;box-sizing:border-box;background:none;border:1px solid var(--line2);border-radius:999px;padding:5px 11px;cursor:pointer;font:500 13px/1 var(--sans);color:var(--ink2);white-space:nowrap;max-width:230px" style-hover="border-color:var(--acc);color:var(--ink)"><span style="width:8px;height:8px;border-radius:50%;background:{{ acctOn ? 'var(--ok)' : 'var(--dim)' }};flex:none"></span><span style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ acctLabel }}</span><span aria-hidden="true" title="Settings" style="flex:none;font-size:14px;line-height:1;opacity:.75">⚙</span></button>
+            <button class="hd-settings" onClick="{{ openSettings }}" title="{{ acctTitle }}" style="flex:none;display:inline-flex;align-items:center;gap:7px;box-sizing:border-box;background:none;border:1px solid var(--line2);border-radius:999px;padding:5px 11px;cursor:pointer;font:500 13px/1 var(--sans);color:var(--ink2);white-space:nowrap;max-width:230px" style-hover="border-color:var(--acc);color:var(--ink)"><span style="width:8px;height:8px;border-radius:50%;background:{{ acctOn ? 'var(--ok)' : 'var(--dim)' }};flex:none"></span><span style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ acctLabel }}</span><span aria-hidden="true" title="Settings" style="flex:none;font-size:14px;line-height:1;opacity:.75">⚙</span></button>
           </div>
           <div class="hd-drive-tools">
             <sc-for list="{{ svTabs }}" as="t" hint-placeholder-count="4"><button class="hd-chip {{ t.cls }}" onClick="{{ t.onClick }}">{{ t.label }} <span style="color:var(--dim)">{{ t.n }}</span></button></sc-for>
@@ -9947,7 +9949,8 @@ class Component extends DCLogic {
     const navGroups = NAVG.map(([label, items]) => ({ label, hasLabel: !!label, items: items.map(([id, lab]) => { const isScr = id.startsWith('screen:');
       return { label: lab, count: id === 'fixnames' ? (this.refEdits().length ? String(this.refEdits().length) : '') : countFor(id), countColor: id === 'review' || id === 'hero:workspaces' ? 'var(--amber)' : 'var(--mut)', ...gHi(isScr ? S.screenId === id.slice(7) : view === id), onClick: id === 'hero:workspaces' ? () => this.openWorkspacesHero() : id === 'fixnames' ? () => this.openFixNames() : isScr ? () => this.setState({ screenId: id.slice(7) }) : () => this.setState({ view: id, readDoc: null, sel: null }) }; }) }));
     // split so Folds can sit right under The reading / Connections, inside Explore
-    const navTop = navGroups[0].items; const navRead = navGroups[1]; const navExplore = navGroups[2]; const navRest = navGroups.slice(3);
+    // the Metro contracts address is for searching: its rail offers Sources only (no Ask, no Draft)
+    const navTop = HD_METRO ? navGroups[0].items.filter(g => /^sources$/i.test(String(g.label))) : navGroups[0].items; const navRead = navGroups[1]; const navExplore = navGroups[2]; const navRest = navGroups.slice(3);
     const qv = (S.q || '').trim();
     const dv = (S.qDraft !== undefined ? S.qDraft : S.q || '').trim();
     const isOmniUrl = v => /^(https?:\/\/|www\.)\S+$|^[\w-]+(\.[\w-]+)*\.[a-z]{2,}(\/\S*)?$/i.test(v);
