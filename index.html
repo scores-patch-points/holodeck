@@ -9435,7 +9435,11 @@ class Component extends DCLogic {
     // a statement-level filter (a name, a time range, a topic, a search) narrows the SOURCES too: while one is on,
     // only sources holding at least one matching statement are listed, and the count of the hidden ones is said
     const stFilterOn = !!(f.name || f.range || f.topic || f.frame || f.type || f.unit || f.year || f.period || (S.q || '').trim());
-    const hasMatch = d => !stFilterOn || (FbyDoc[d.id] || []).length > 0; 
+    // a topic (f.topicGroup) narrows the SOURCES to its members as well as the statements: a source with no statements yet
+    // (unread) is still in the topic if its fields put it there, so membership is tested directly, not via its statements
+    const tgIds = f.topicGroup ? new Set(f.topicGroup.docs) : null;
+    const inTopic = d => !tgIds || (f.topicGroup.invert ? !tgIds.has(d.id) : tgIds.has(d.id));
+    const hasMatch = d => inTopic(d) && (!stFilterOn || (FbyDoc[d.id] || []).length > 0); 
     const gmap = {}; keptDocs.filter(hasMatch).forEach(d => { const b = distinctOf[d.id]; const k = b ? b.key : '_'; (gmap[k] = gmap[k] || { label: b ? b.label : (Object.keys(distinctOf).length ? 'Nothing sets these apart' : 'Sources'), docs: [] }).docs.push(d); });
     const hasKinds = keptDocs.some(d => d.kind);
     const fDoc = d => (!f.kind || (d.kind || 'Source') === f.kind) && (!f.medium || (d.medium || 'Text') === f.medium) && (!f.standing || (d.standing || 'Source') === f.standing);
@@ -9849,7 +9853,7 @@ class Component extends DCLogic {
     const hasTopicsNote = !hasTopics && A.docs.length >= 2;
     const showTopicsStray = hasTopics && P.strayN > 0;
     const topicsStrayN = String(P.strayN || 0);
-    const onTopicsStray = () => this.toggleTopicGroup({ label: 'Not in any topic', docs: strayDocs.map(d => d.id), invert: true });
+    const onTopicsStray = () => this.toggleTopicGroup({ label: 'Not in any topic', docs: [...realDocIds], invert: true });
     // topics in the rail: searchable, six per page, paginated. The search and page live on component state
     // so they survive re-renders; typing resets to page 1.
     const TOPICS_PER_PAGE = 6;
