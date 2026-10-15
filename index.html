@@ -301,6 +301,46 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
         </sc-if>
       </div>
       </details>
+      <details class="hd-disclosure hd-browse" open="{{ browseOpen }}">
+        <summary>{{ browseLabel }}</summary>
+        <div style="display:flex;flex-direction:column;gap:1px;padding:0 0 4px">
+          <button onClick="{{ browseMap.onClick }}" title="{{ browseMap.title }}" style="white-space:normal;text-align:left;cursor:pointer;padding:5px 12px 5px 20px;border-radius:8px;background:{{ browseMap.bg }};border:1px solid {{ browseMap.bd }};display:flex;justify-content:space-between;align-items:baseline;gap:10px" style-hover="background:var(--s2)">
+            <span style="font:{{ browseMap.weight }} 14px var(--sans);color:var(--ink2)">{{ browseMap.label }}</span>
+            <span style="font:500 12px var(--mono);color:var(--mut);white-space:nowrap">{{ browseMap.n }}</span>
+          </button>
+          <sc-for list="{{ browseMore }}" as="b" hint-placeholder-count="0">
+            <button onClick="{{ b.onClick }}" style="white-space:normal;text-align:left;cursor:pointer;padding:5px 12px 5px 20px;border-radius:8px;background:{{ b.bg }};border:1px solid {{ b.bd }};display:flex;justify-content:space-between;align-items:baseline;gap:10px" style-hover="background:var(--s2)">
+              <span style="font:{{ b.weight }} 14px var(--sans);color:var(--ink2)">{{ b.label }}</span>
+              <span style="font:500 12px var(--mono);color:var(--mut);white-space:nowrap">{{ b.n }}</span>
+            </button>
+          </sc-for>
+          <sc-if value="{{ hasBrowseDepts }}" hint-placeholder-val="{{ false }}">
+            <span style="font:600 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--dim);padding:8px 12px 4px">Departments</span>
+            <sc-if value="{{ browseDeptSearch }}" hint-placeholder-val="{{ false }}">
+              <div style="padding:0 12px 4px"><input value="{{ browseDeptQ }}" onChange="{{ browseDeptOnQ }}" placeholder="Filter departments…" style="width:100%;box-sizing:border-box;background:var(--bg);border:1px solid var(--line2);border-radius:6px;color:var(--ink);font:400 12px var(--sans);padding:4px 8px;outline:none"></div>
+            </sc-if>
+            <div style="max-height:230px;overflow:auto;display:flex;flex-direction:column;gap:1px">
+              <sc-for list="{{ browseDepts }}" as="d" hint-placeholder-count="4">
+                <button onClick="{{ d.onClick }}" title="Show only this department" style="white-space:normal;text-align:left;cursor:pointer;padding:4px 12px 4px 20px;border-radius:8px;background:{{ d.bg }};border:1px solid {{ d.bd }};display:flex;justify-content:space-between;align-items:baseline;gap:10px" style-hover="background:var(--s2)">
+                  <span style="font:{{ d.weight }} 13px var(--sans);color:var(--ink2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ d.label }}</span>
+                  <span style="font:500 12px var(--mono);color:var(--mut);white-space:nowrap">{{ d.n }}</span>
+                </button>
+              </sc-for>
+            </div>
+          </sc-if>
+          <sc-if value="{{ hasBrowseYears }}" hint-placeholder-val="{{ false }}">
+            <span style="font:600 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--dim);padding:8px 12px 4px">Dates</span>
+            <div style="max-height:180px;overflow:auto;display:flex;flex-direction:column;gap:1px">
+              <sc-for list="{{ browseYears }}" as="y" hint-placeholder-count="4">
+                <button onClick="{{ y.onClick }}" title="Show only this year" style="white-space:normal;text-align:left;cursor:pointer;padding:4px 12px 4px 20px;border-radius:8px;background:{{ y.bg }};border:1px solid {{ y.bd }};display:flex;justify-content:space-between;align-items:baseline;gap:10px" style-hover="background:var(--s2)">
+                  <span style="font:{{ y.weight }} 13px var(--sans);color:var(--ink2)">{{ y.label }}</span>
+                  <span style="font:500 12px var(--mono);color:var(--mut);white-space:nowrap">{{ y.n }}</span>
+                </button>
+              </sc-for>
+            </div>
+          </sc-if>
+        </div>
+      </details>
       <details class="hd-disclosure" data-nav="explore" open="{{ toolsOpen }}">
         <summary>Explore &amp; manage</summary>
       <div style="display:flex;flex-direction:column;gap:1px;padding:10px 0 12px;border-top:1px solid var(--line)">
@@ -5839,6 +5879,9 @@ class Component extends DCLogic {
     HD_POS_P.then(ok => { if (ok) { this._key = null; this.setState(st => ({ htmlVer: st.htmlVer + 1 })); } });
     hdLoadReference().then(ok => { if (ok) { this._key = null; this.setState(st => ({ htmlVer: st.htmlVer + 1 })); } }).catch(() => {}); // re-read names once the received normal (General English) is in — results never depend on load timing
     setTimeout(() => { try { this.netInit(); } catch (e) {} }, 800);
+    // The demo sample: the pointer lives in this repo (samples.json); the content is downloaded when the app opens
+    // (maybeSample — once per browser per sample, never over an explicit address or a person's own work).
+    setTimeout(() => { try { this.maybeSample(); } catch (e) {} }, 900);
     setTimeout(() => this.measureHdr(), 400);
     setTimeout(() => { try { this.akAutoLoad(); } catch (e) {} }, 2500);
     this.applyTheme(); this.restoreReaders(); this._c = 0; import(new URL('holodeck-match.js', location.href).href).then(M => { this._mt = M; this._qc = null; this.forceUpdate(); }).catch(() => {}); import(new URL('holodeck-profile.js', location.href).href).then(M => { _hdProf = M; this._pbA = null; this.forceUpdate(); }).catch(() => {}); import(new URL('holodeck-lang.js', location.href).href).then(M => { _hdLang = M; this._pfLang = null; this.loadLangPriors(); this.forceUpdate(); }).catch(() => {}); import(new URL('holodeck-ambiguity.js', location.href).href).then(M => { this._ambM = M; this.forceUpdate(); }).catch(() => {}); hdSum().then(() => this.forceUpdate()).catch(() => {}); this.loadHtml(); if (typeof location !== 'undefined' && /fx-share=/.test(location.hash)) { this.netInit(); this.setState({ view: 'draft' }); }
@@ -5918,6 +5961,8 @@ class Component extends DCLogic {
   applyTheme() { document.documentElement.dataset.theme = this.state.theme; try { localStorage.setItem('fold-chat:theme', this.state.theme); } catch (e) {} }
   async ingest(dt) {
     if (!dt) return;
+    // Instant feedback: a drop is acknowledged the moment it arrives, before the entries are walked — a deep folder can take a moment to enumerate, and the page must not sit silent.
+    try { if (dt.items && dt.items.length) this.setState({ busy: 'Reading your files…' }); } catch (e) {}
     const files = await hdFilesFromDataTransfer(dt);
     if (files.length) { try { HD_KNOWN_NAMES = Object.keys(this.analysis().names || {}); } catch (e) {} hdTraceStart(files.length === 1 ? files[0].name : plural(files.length, 'file')); this.setState({ busy: 'Reading ' + plural(files.length, 'file') + '…', showAdd: false, view: 'summary', folder: null }); this.beginReading(files); try { const list = []; for (const fl of files) list.push(await readAny(fl)); await this.addDocs(list); } finally { this.endReading(); } return; }
     let text = (dt.getData('text/plain') || '').trim(); const html = dt.getData('text/html') || '';
@@ -7415,7 +7460,10 @@ class Component extends DCLogic {
   async ensureMediaUrl(d) {
     if (!d || !d.media || d.media.kind !== 'local' || (this._mediaUrl || {})[d.id] !== undefined) return;
     this._mediaUrl = this._mediaUrl || {};
-    const buf = await mediaBytes(d.id);
+    let buf = await mediaBytes(d.id);
+    // A pre-digested sample points at its recording instead of shipping it: the bytes are fetched the first time
+    // the source is opened, then kept in this browser like any other recording.
+    if (!buf && d.media.src) { try { const r = await fetch(d.media.src); if (r.ok) { buf = await r.arrayBuffer(); idbPut('media:' + d.id, buf).catch(() => {}); opfsWrite('media/' + d.id, buf); } } catch (e) {} }
     this._mediaUrl[d.id] = buf ? URL.createObjectURL(new Blob([buf], { type: d.media.mime || 'application/octet-stream' })) : null;
     this.setState({});
   }
@@ -9056,7 +9104,7 @@ class Component extends DCLogic {
     // the fold, so Sources fills in as the files arrive instead of freezing until the whole batch is done.
     const added = { ...this.state.added, [id]: [...(this.state.added[id] || []), ...nd] };
     this.saveAdded(added);
-    this.endReading(); // the file is now a source in the workspace: its own tile (marked "reading" while staged) replaces the placeholder
+    if (!this._keepReading) this.endReading(); // the file is now a source in the workspace: its own tile (marked "reading" while staged) replaces the placeholder (a streamed load keeps the reading tiles up until its last file lands)
     (this._stage = this._stage || new Set()); nd.forEach(d => this._stage.add(d.id));
     (this._stagedIds = this._stagedIds || []).push(...nd.map(d => d.id));
     (this._stagedNotes = this._stagedNotes || []).push(...list.map(x => x.note).filter(Boolean));
@@ -9166,6 +9214,7 @@ class Component extends DCLogic {
     if (f.medium && skip !== 'medium' && (A2.docById[st.doc].medium || 'Text') !== f.medium) return false;
     if (f.standing && skip !== 'standing' && (A2.docById[st.doc].standing || 'Source') !== f.standing) return false;
     if (f.year && skip !== 'year' && st.year && st.year > f.year) return false;
+    if (f.dept && skip !== 'dept') { const dd = A2.docById[st.doc]; if (String(dd.dept || dd.department || dd.agency || '') !== f.dept) return false; }
     if (f.range && skip !== 'range') { const k = timeKey(st, A2.docById[st.doc], f.range.mode); if (!k ? !f.range.undated : !inTimeRange(k, f.range.from, f.range.to)) return false; }
     if (f.period && skip !== 'period') { const k = timeKey(st, A2.docById[st.doc], f.period.mode); if (!k || (k !== f.period.key && !k.startsWith(f.period.key + '-'))) return false; }
     if (q && !IS_Q(this.state.q) && !PARSE_REL(this.state.q) && !this.qScore(st, A2)) return false;
@@ -9807,6 +9856,7 @@ class Component extends DCLogic {
     if (f.medium) chips.push(chip('medium', 'Medium', f.medium, () => this.setF('medium', null)));
     if (f.standing) chips.push(chip('standing', 'Standing', f.standing, () => this.setF('standing', null)));
     if (f.year) chips.push(chip('year', 'Dated up to', String(f.year), () => this.setF('year', null)));
+    if (f.dept) chips.push(chip('dept', 'Department', f.dept, () => this.setF('dept', null)));
     if (f.range) chips.push(chip('range', CLOCK_L[f.range.mode] || 'Dated', rangeLabel(f.range) + (f.range.undated ? ', plus undated' : ''), () => this.setF('range', null)));
     if (f.period) chips.push(chip('period', f.period.mode === 'happened' ? 'Happened in' : 'Published in', periodLabel(f.period.key), () => this.setF('period', null)));
     if (S.q.trim() && !IS_Q(S.q) && !PARSE_REL(S.q)) chips.push(chip('q', 'Search', '“' + S.q.trim() + '”', () => this.setState(s => ({ q: '', ...(s.view === 'search' ? { view: s.prevView || 'summary' } : {}) }))));
@@ -9924,6 +9974,40 @@ class Component extends DCLogic {
     const segOpen = S.segOpen; const segToggleLabel = 'Saved folds'; const segCount = String(segList.length);
     const toggleSegOpen = () => { const open = !segOpen; try { localStorage.setItem('fold-explorer-segopen', open ? '1' : '0'); } catch (e) {} this.setState({ segOpen: open }); };
     const allYears = [...new Set(A.docs.map(d => d.year).filter(Boolean))].sort();
+    // ---- the rail's own ways in: the map, then the departments and the dates. A department's count comes from the
+    // whole workspace when its service can count it (the Metro contracts VM); otherwise from the sources on screen. ----
+    const browseVm = !!(this._vm && cid === 'metro-vm');
+    const deptOf = d => d.dept || d.department || d.agency || '';
+    const deptCounts = new Map();
+    A.docs.forEach(d => { if (this._cnt.has(d.id)) { const k = deptOf(d); if (k) deptCounts.set(k, (deptCounts.get(k) || 0) + 1); } });
+    const deptAll = browseVm && this._vm.depts && this._vm.depts.length
+      ? this._vm.depts.map(d => ({ v: d.department, label: d.department, n: d.n })).sort((a, b) => String(a.label).localeCompare(String(b.label)))
+      : [...deptCounts].sort((a, b) => b[1] - a[1] || String(a[0]).localeCompare(String(b[0]))).map(([v, n]) => ({ v, label: v, n }));
+    const bdq = (S.browseQ || '').trim().toLowerCase();
+    const deptPool = bdq ? deptAll.filter(d => String(d.label).toLowerCase().includes(bdq)) : deptAll;
+    const curDept = String(browseVm ? (this._vm.dept || '') : (f.dept || ''));
+    const browseDepts = deptPool.map(d => { const on = String(d.v) === curDept; return { label: d.label, n: typeof d.n === 'number' ? d.n.toLocaleString() : String(d.n), on,
+      bg: on ? 'var(--sel)' : 'transparent', bd: on ? 'var(--acc2)' : 'transparent', weight: on ? 600 : 500,
+      onClick: () => { if (browseVm) this.vmLoad({ dept: on ? '' : d.v }); else this.setF('dept', on ? null : d.v); } }; });
+    const yearCounts = new Map();
+    A.docs.forEach(d => { if (this._cnt.has(d.id) && d.year) yearCounts.set(d.year, (yearCounts.get(d.year) || 0) + 1); });
+    const curYear = f.range && String(f.range.from) === String(f.range.to) ? String(f.range.from) : '';
+    const browseYears = [...yearCounts].sort((a, b) => b[0] - a[0]).slice(0, 50).map(([y, n]) => { const on = String(y) === curYear; return { label: String(y), n: n.toLocaleString(), on,
+      bg: on ? 'var(--sel)' : 'transparent', bd: on ? 'var(--acc2)' : 'transparent', weight: on ? 600 : 500,
+      onClick: () => on ? this.setF('range', null) : this.setF('range', { mode: 'happened', from: String(y), to: String(y), undated: false }) }; });
+    const onMapView = view === 'connections';
+    // On the contracts address the tool menu is hidden, so the ways to explore content (not just search it)
+    // live here instead: the map, the names, the assertions and the evidence overview, one click each.
+    const browseMore = HD_METRO ? [['names', 'Names'], ['records', 'Assertions'], ['overview', 'Evidence overview']].map(([id, label]) => { const on = view === id; return { label, n: id === 'names' ? String(D.nameList.length) : id === 'records' ? String(F.length) : '', on,
+      bg: on ? 'var(--sel)' : 'transparent', bd: on ? 'var(--acc2)' : 'transparent', weight: on ? 600 : 500,
+      onClick: () => this.setState({ view: id, readDoc: null, sel: null }) }; }) : [];
+    const browseVals = {
+      browseOpen: S.browseOpen !== false, browseLabel: 'Ways in',
+      browseMap: { label: 'Map · names and their ties', n: '', title: 'The Connections map: every name placed around the one it shares the most statements with — the relativistic solar system view', bg: onMapView ? 'var(--sel)' : 'transparent', bd: onMapView ? 'var(--acc2)' : 'transparent', weight: onMapView ? 600 : 500, onClick: () => this.setState({ view: 'connections', readDoc: null, sel: null }) },
+      browseMore, hasBrowseMore: browseMore.length > 0,
+      hasBrowseDepts: deptAll.length > 1, browseDepts, browseDeptSearch: deptAll.length > 10, browseDeptQ: S.browseQ || '', browseDeptOnQ: e => this.setState({ browseQ: e.target.value }),
+      hasBrowseYears: yearCounts.size > 1, browseYears,
+    };
     const V = {}; ['overview', 'draft', 'inbox', 'summary', 'search', 'surprise', 'names', 'types', 'figures', 'statements', 'connections', 'framing', 'views', 'patterns', 'reader', 'profile', 'ingest', 'reading'].forEach(k => { V[k] = !isEmpty && view === k; });
     V.linkSurface = !isEmpty && ['lanes', 'margin', 'seam', 'orbit', 'fields', 'review'].includes(view);
 
@@ -10091,7 +10175,7 @@ class Component extends DCLogic {
       wsHasMore: true, wsMoreLabel: (wsAll.length > 6 ? 'All ' + wsAll.length + ' workspaces' : 'All workspaces') + ' & people…',
       wsAdding: !!S.wsAdding, wsNotAdding: !S.wsAdding, wsAddStart: () => this.setState({ wsAdding: true, wsNewName: '' }),
       wsNotRenaming: !S.wsRenaming,
-      corpusId: cid, corpusOptions: opts, q: S.q, corpusName: this.corpusName(), segList, hasSegments, segOpen, segToggleLabel, segCount, toggleSegOpen, addAsFold, navTop, navRead, navExplore, navRest,
+      corpusId: cid, corpusOptions: opts, q: S.q, corpusName: this.corpusName(), segList, hasSegments, segOpen, segToggleLabel, segCount, toggleSegOpen, addAsFold, navTop, navRead, navExplore, navRest, ...browseVals,
       topicsList, hasTopics, topicsOpen: !!activeTopicGroup || !!topicsQ, topicsLabel: P.groups.length ? 'Topics · ' + P.groups.length : 'Topics', topicsNote, hasTopicsNote, topicsStrayN, showTopicsStray, onTopicsStray, scope,
       topicsHasSearch, topicsSearchVal, onTopicsSearch, topicsHasPager, topicsPagerLine, onTopicsPrev, onTopicsNext, topicsHasPrev, topicsHasNext, topicsPageN: (topicsPage + 1) + ' of ' + topicsPages,
       toggleTheme: () => { const th = S.theme === 'dark' ? 'light' : 'dark'; try { localStorage.setItem('fold-explorer-theme', th); } catch (e) {} this.setState({ theme: th }); },
@@ -10313,6 +10397,62 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
         }
       }
     } catch (e) { this._vm = null; }
+  }
+  // ---- the demo sample: a pointer in this repo (samples.json) whose content is downloaded from its own
+  // hosts when the app opens. Feedback is instant: the reading tiles go up before the first byte is fetched,
+  // and each source lands as it arrives; the ingest player is one click on any tile, never a takeover.
+  async maybeSample() {
+    let want = ''; try { want = new URLSearchParams(location.search).get('ws') || ''; } catch (e) {}
+    const id = 'titanic-1912'; if (want && want !== id) return;   // an address asked for something else
+    let done = null; try { done = localStorage.getItem('hd:sample:' + id); } catch (e) {}
+    if ((this.state.added[id] || []).length) { if (want === id) this.setState({ corpus: id, view: 'summary', sel: null, f: {}, readDoc: null }); return; }
+    const hasOther = Object.keys(this.state.added || {}).some(k => k !== id && (this.state.added[k] || []).length);
+    if (want !== id && (done || hasOther)) return;   // never over a returning visitor's own work, unless asked by address
+    await this.loadSample(id);
+    try { localStorage.setItem('hd:sample:' + id, '1'); } catch (e) {}
+  }
+  async loadSample(id) {
+    if (this._sampleOn) return; this._sampleOn = true;
+    let M = null;
+    try { const r = await fetch(new URL('samples.json', location.href).href, { cache: 'no-cache' }); if (r.ok) M = await r.json(); } catch (e) {}
+    const Sp = M && M.samples && M.samples[id];
+    if (!Sp) { this._sampleOn = false; return; }
+    const names = loadWorkspaceNames(); if (!names[id]) { names[id] = Sp.name; saveWorkspaceNames(names); }
+    if (!this.state.added[id]) { const added = { ...this.state.added, [id]: [] }; this.saveAdded(added); this.setState({ added }); }
+    this.setState({ corpus: id, view: 'summary', sel: null, f: {}, readDoc: null, folder: null });
+    // The readings were digested once, on our side (see the samples repo); here they are installed, never re-read.
+    // The recordings are pointers: their bytes are fetched the first time one is opened. The reading tiles still
+    // go up at once so the arrival is visible, and a click on one opens the live install trace.
+    const R = Sp.readings ? await fetch(Sp.readings, { cache: 'no-cache' }).then(r => r.ok ? r.json() : null).catch(() => null) : null;
+    const readings = (R && R.readings) || [];
+    const media = Sp.docs || [];
+    const pend = readings.map(d => ({ name: d.title, size: 0 })).concat(media.map(d => ({ name: d.title, size: 0 })));
+    hdTraceStart(Sp.name || id);
+    this._keepReading = true; this.beginReading(pend);
+    let got = 0;
+    const drop = t => { const i = pend.findIndex(p => p.name === t); if (i >= 0) pend.splice(i, 1); this.beginReading(pend); try { this.forceUpdate(); } catch (e) {} };
+    for (const d of readings) {
+      try { await this.addDocs([{ ...d }], { defer: true }); got++; }
+      catch (e) { hdT('bytes', 'fail', 'A reading could not be installed (' + (e && e.message || e) + ')'); }
+      drop(d.title);
+    }
+    for (const d of media) {
+      try {
+        const medium = d.kind === 'audio' ? 'Audio' : 'Video';
+        let doc = { title: d.title, year: d.year || null, type: medium, format: 'text', text: d.title + (d.note ? '. ' + d.note : ''),
+          extra: { media: { kind: 'local', name: d.src.split('/').pop(), mime: d.mime, size: 0, dur: d.dur || null, src: d.src }, kind: 'Recording', medium, transcribed: false },
+          ...(d.url ? { url: d.url } : {}), ...(d.publisher ? { publisher: d.publisher } : {}), ...(d.note ? { note: d.note } : {}) };
+        if (d.captions) {   // the one that arrives already transcribed
+          try { const cr = await fetch(d.captions); if (cr.ok) { const cd = await readAny(new File([await cr.text()], d.captions.split('/').pop(), { type: 'text/vtt' }));
+            if (cd.html) doc = { ...doc, format: 'html', html: cd.html, text: htmlToText(cd.html), extra: { ...doc.extra, kind: 'Meeting recording', transcribed: true } }; } } catch (e) {}
+        }
+        await this.addDocs([doc], { defer: true }); got++;
+      } catch (e) { hdT('bytes', 'fail', 'A recording could not be installed (' + (e && e.message || e) + ')'); }
+      drop(d.title);
+    }
+    this._keepReading = false; this.endReading(); this.foldStaged({});
+    this._sampleOn = false;
+    if (got) this.toast((Sp.name || 'The sample') + ' — ' + got + ' source' + (got === 1 ? '' : 's') + ' ready. Open any one, or read across all of them.');
   }
   async vmLoad(o = {}) {
     const V = this._vm; if (!V) return;
