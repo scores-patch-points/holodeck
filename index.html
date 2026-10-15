@@ -308,6 +308,7 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
           <sc-for list="{{ topicsList }}" as="t" hint-placeholder-count="2">
             <button onClick="{{ t.onJump }}" title="Segment the whole workspace to this topic's sources" style="white-space:normal;text-align:left;cursor:pointer;padding:5px 12px 5px 20px;border-radius:8px;background:{{ t.bg }};border:1px solid {{ t.bd }};display:flex;justify-content:space-between;align-items:baseline;gap:10px" style-hover="background:var(--s2)">
               <span style="font:{{ t.weight }} 14px var(--sans);color:var(--ink2)">{{ t.label }}</span>
+              <span style="font:600 9px var(--mono);letter-spacing:.05em;text-transform:uppercase;color:{{ t.tagCol }};white-space:nowrap">{{ t.tag }}</span>
               <span style="font:500 12px var(--mono);color:var(--mut);white-space:nowrap">{{ t.n }}</span>
             </button>
           </sc-for>
@@ -1755,7 +1756,10 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
             <div style="display:flex;flex-direction:column;gap:3px">
               <button onClick="{{ pf.onBack }}" style="align-self:flex-start;background:none;border:0;padding:0;cursor:pointer;font:500 13px var(--sans);color:var(--acc);text-align:left" style-hover="color:var(--ink)">← {{ pf.back }}</button>
               <span style="font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:{{ pf.color }};margin-top:8px">{{ pf.eyebrow }}</span>
-              <h1 style="margin:0;font:500 34px/1.15 var(--serif);color:var(--ink);text-wrap:balance">{{ pf.title }}</h1>
+              <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap">
+                <h1 style="margin:0;font:500 34px/1.15 var(--serif);color:var(--ink);text-wrap:balance">{{ pf.title }}</h1>
+                <sc-if value="{{ pf.hasBadge }}" hint-placeholder-val="{{ false }}"><span style="font:600 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:{{ pf.badgeCol }};border:1px solid {{ pf.badgeCol }};border-radius:999px;padding:2px 10px;white-space:nowrap">{{ pf.badge }}</span></sc-if>
+              </div>
               <div style="display:flex;gap:4px 16px;flex-wrap:wrap;font:400 14px var(--sans);color:var(--mut)">
                 <sc-for list="{{ pf.facts }}" as="x" hint-placeholder-count="2"><span style="white-space:nowrap"><span style="color:var(--dim)">{{ x.k }}</span> <span style="color:var(--ink2)">{{ x.v }}</span></span></sc-for>
               </div>
@@ -3010,6 +3014,44 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
             </sc-for>
           </div>
         </sc-if>
+        <sc-if value="{{ d.hasDefs }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:6px;border-top:1px solid var(--line);padding-top:10px">
+            <span style="font:600 14px var(--sans);color:var(--mut)">{{ d.defTitle }}</span>
+            <span style="font:400 12px/1.4 var(--sans);color:var(--dim)">{{ d.defNote }}</span>
+            <sc-for list="{{ d.defs }}" as="de" hint-placeholder-count="2">
+              <div style="display:flex;gap:8px;align-items:baseline">
+                <span style="flex:none;min-width:58px;font:600 12px var(--mono);color:var(--acc)">{{ de.pos }}</span>
+                <span style="font:400 14px/1.5 var(--serif);color:var(--ink2)">{{ de.text }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+        <sc-if value="{{ d.hasRefs }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:6px;border-top:1px solid var(--line);padding-top:10px">
+            <span style="font:600 14px var(--sans);color:var(--mut)">{{ d.refsTitle }}</span>
+            <span style="font:400 12px/1.4 var(--sans);color:var(--dim)">{{ d.refsNote }}</span>
+            <sc-for list="{{ d.refs }}" as="r" hint-placeholder-count="2">
+              <div style="display:flex;gap:8px;align-items:baseline;font:500 12.5px var(--mono);border-bottom:1px solid var(--line);padding:4px 0">
+                <span style="flex:none;min-width:56px;color:var(--acc)">{{ r.k }}</span>
+                <span style="min-width:0;color:var(--ink);word-break:break-word">{{ r.v }}</span>
+                <span style="margin-left:auto;flex:none;font:400 11.5px var(--sans);color:var(--dim);text-align:right">{{ r.note }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+        <sc-if value="{{ d.hasAtoms }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:6px;border-top:1px solid var(--line);padding-top:10px">
+            <span style="font:600 14px var(--sans);color:var(--mut)">{{ d.atomsTitle }}</span>
+            <span style="font:400 12px/1.4 var(--sans);color:var(--dim)">{{ d.atomsNote }}</span>
+            <sc-for list="{{ d.atoms }}" as="a" hint-placeholder-count="3">
+              <div style="display:flex;gap:8px;align-items:baseline;font:500 12.5px var(--mono);border-bottom:1px solid var(--line);padding:4px 0">
+                <span style="flex:none;min-width:46px;color:{{ a.color }}">{{ a.kind }}</span>
+                <span style="min-width:0;color:var(--ink);word-break:break-word">{{ a.value }}</span>
+                <span style="margin-left:auto;flex:none;font:400 11.5px var(--sans);color:var(--dim);text-align:right">{{ a.note }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
         <div style="display:flex;flex-direction:column;gap:6px">
           <sc-for list="{{ d.actions }}" as="a" hint-placeholder-count="2">
             <button onClick="{{ a.onClick }}" style="white-space:normal;text-align:left;background:var(--sel);border:1px solid var(--line2);border-radius:8px;padding:7px 12px;cursor:pointer;font:500 14px var(--sans);color:var(--ink)" style-hover="border-color:var(--acc)">{{ a.label }}</button>
@@ -3825,6 +3867,8 @@ async function hdReadAcross(docs) {
 // that carries no information ("time unknown", "unexposed") is left out, and no row is starred.
 const HD_REL_PLAIN = { typed: 'Kind of name', 'also written': 'Also written as', 'said with': 'How it is stated', 'named in': 'Found in', about: 'Words around it', 'appears with': 'Appears with', figure: 'Figures', year: 'Years' };
 const HD_FRAME_PLAIN = { attributed: 'reported speech', fact: 'plain statement', plan: 'intent or plan', uncertain: 'hedged' };
+// Universal Dependencies parts of speech, in plain words, for the word a click lands on.
+const POS_L = { NOUN: 'noun', PROPN: 'proper noun', VERB: 'verb', ADJ: 'adjective', ADV: 'adverb', ADP: 'preposition', AUX: 'auxiliary', CCONJ: 'conjunction', SCONJ: 'subordinator', DET: 'determiner', NUM: 'number', PART: 'particle', PRON: 'pronoun', PUNCT: 'punctuation', INTJ: 'interjection', SYM: 'symbol', X: 'other' };
 const HD_KIND_PLAIN = { differs: 'Different figures', polarity: 'Denied', scope: 'Not named', absent: 'Spoken of, not held', defined: 'Defined as', names: 'Refers to', same: 'Both state', terms: 'Same subject', cite: 'Cites' };
 const HD_KIND_RANK = { differs: 0, polarity: 1, scope: 2, absent: 3, defined: 4, names: 5, same: 6, cite: 7, terms: 8 };
 const HD_STANDING_PLAIN = { fixed: 'always the same', 'one at a time': 'one at a time', 'many-valued': 'many values' };
@@ -4426,11 +4470,16 @@ function analyze(corpus, htmlMap) {
       const sentences = sts.map((st, i) => ({ text: st.text, offset: st.s, order: i }));
       const nonPersonal = new Set(Object.values(names).filter(n => n.type !== 'person').map(n => n.name));
       const r = HD_ENGINE.resolvePronouns(sentences, surfaceToRef, { minActivation: 0.05, minMargin: 0.2, nonPersonal });
+      const stAt = off => sts.find(x => x.s <= off && off < x.e);
       for (const b of (r && r.bindings) || []) {
         const who = b.referentId; const N = names[who]; if (!N) continue;
-        const st = sts.find(x => x.s <= b.offset && b.offset < x.e); if (!st) continue;
+        const st = stAt(b.offset); if (!st) continue;
         st.pron = who; N.pronouns = (N.pronouns || 0) + 1;
+        // keep the whole binding on the statement, so a click on the pronoun in it can show what it resolved to and why
+        (st.prons = st.prons || []).push(b);
       }
+      // a pronoun the engine could NOT resolve is a reported gap, kept on the statement beside the bindings
+      for (const g of (r && r.gaps) || []) { const st = stAt(g.offset); if (st) (st.pronGaps = st.pronGaps || []).push(g); }
     } catch (e) { /* the organ reports its own gap; never guessed here */ }
   }
   if (HD_TR) Object.values(names).forEach(n => { if (![...n.docs].some(hdF)) return; const I = info[n.name] || {}; hdT('canon', 'type', n.name + ' \u2192 ' + n.type + (I.person ? ' (had a title)' : I.said ? ' (followed by a reporting verb)' : I.acr ? ' (an acronym)' : n.type === 'other' ? ' (no rule matched)' : ' (by its first or last word)') + ' \u00b7 ' + n.sts.length + ' mention' + (n.sts.length === 1 ? '' : 's') + ' in ' + n.docs.size + ' source' + (n.docs.size === 1 ? '' : 's'), { name: n.name, type: n.type, mentions: n.sts.length, docsN: n.docs.size }); });
@@ -4642,15 +4691,22 @@ function holoTopics(A) {
   const cap = s => String(s).replace(/\b\w/g, c => c.toUpperCase());
   const shortName = s => { const raw = String(s).split(/\s+/).filter(Boolean); const t = raw.filter(x => !abbr(x)); return (t.length ? t : raw).slice(0, 2).join(' '); };
   const repPerDoc = sts => { const by = new Map(); sts.forEach(st => { if (!st || st.ref) return; const have = by.get(st.doc); if (!have || String(st.text).length > String(have.text).length) by.set(st.doc, st); }); return [...by].map(([doc, st]) => ({ doc, text: short(st.text, 220), title: title(doc) })); };
+  // a unit read as a topic word — the measure half of a complete tuple
+  const unitTopic = u => ({ ton: 'tonnage', gross: 'tonnage', net: 'tonnage', foot: 'length', feet: 'length', mile: 'distance', knot: 'speed', passenger: 'passengers', compartment: 'compartments', lifeboat: 'lifeboats', dollar: 'cost', pound: 'weight', inche: 'inches', percent: 'percent' }[String(u || '').toLowerCase()] || (u ? String(u).toLowerCase() : 'figure'));
 
   // ── ENTITY topics: every name the holograph admits (holoName) that ≥2 sources carry and that
-  // is not the hub — the whole cast, so the topic list grows with the corpus. A label that is a
-  // number or a common word (ONE, WATER, PREFACE) is not a name and is dropped. ──
-  Object.values(A.names).forEach(r => {
-    const dsz = r.docs.size; if (dsz < 2 || dsz > hub || !holoName(r.name, A)) return;
-    const lbl = cap(shortName(r.name));
-    const lc = lbl.toLowerCase();
-    if (!lbl || lc.length < 3 || /\d/.test(lbl) || TOPIC_JUNK.has(lc) || TOPIC_JUNK.has(lc.replace(/^the /, ''))) return;
+  // is not the hub — the whole cast, so the topic list grows with the corpus. A number or a common
+  // word (ONE, WATER, PREFACE) is not a name; and two DIFFERENT beings must not collapse onto one
+  // 1–2 word label (both "Smith" and "E. J. Smith" are in the cast), so a colliding label takes the
+  // given name — a false single topic (two captains merged, n inflated) is worse than a longer name. ──
+  const nameLabel = r => cap(shortName(r.name));
+  const disambigLabel = r => { const t = String(r.name).split(/\s+/).filter(Boolean); const last = t[t.length - 1];
+    const first = t.find(x => !abbr(x)) || t[0]; return cap(first && first !== last ? first + ' ' + last : last); };
+  const entList = Object.values(A.names).filter(r => { const d = r.docs.size; if (d < 2 || d > hub || !holoName(r.name, A)) return false;
+    const l = nameLabel(r), lc = l.toLowerCase(); return l && lc.length >= 3 && !/\d/.test(l) && !TOPIC_JUNK.has(lc) && !TOPIC_JUNK.has(lc.replace(/^the /, '')); });
+  const labelCount = new Map(); entList.forEach(r => { const l = nameLabel(r); labelCount.set(l, (labelCount.get(l) || 0) + 1); });
+  entList.forEach(r => {
+    const base = nameLabel(r); const lbl = (labelCount.get(base) || 0) > 1 ? disambigLabel(r) : base;
     const findings = repPerDoc(r.sts.map(id => A.byId[id])); if (findings.length < 2) return;
     const docs = [...r.docs].map(docOf).filter(Boolean); if (docs.length < 2) return;
     groups.push({ kind: 'entity', type: r.type, label: lbl, docs, n: docs.length, findings, forWhom: [r.name] });
@@ -4666,7 +4722,24 @@ function holoTopics(A) {
   meas.forEach(o => { const docs = [...o.docs].map(docOf).filter(Boolean); if (docs.length < 2) return;
     if (!o.anchor) return;   // a figure with no anchor is about no one: not meaningful, no for-whom
     const findings = [...o.vals].sort((a, b) => b[1].size - a[1].size).slice(0, 12).map(([v, ds]) => ({ text: v, doc: [...ds][0], title: [...ds].map(title).join(' · ') }));
-    groups.push({ kind: 'measure', label: cap(shortName(o.m || 'figure')), docs, n: docs.length, findings, forWhom: [o.anchor], differs: o.vals.size > 1 }); });
+    // the COMPLETE tuple, not the bare unit: (anchor · measure · value(s)) — "Titanic · tonnage · 46,328 / …"
+    const vals = findings.map(f => f.text);
+    const label = cap(shortName(o.anchor)) + ' · ' + unitTopic(o.m) + (vals.length ? ' · ' + vals.slice(0, 3).join(' / ') : '');
+    groups.push({ kind: 'measure', label, docs, n: docs.length, findings, forWhom: [o.anchor], differs: o.vals.size > 1 }); });
+
+  // ── TRIPLE topics: the holograph's own COMPLETE tuples (end1 · verb · end2), from the statements'
+  // EOGfpClaim@1 triples. A tuple is a topic when an end is a named being (a for whom) or it is
+  // restated across sources; the label IS the tuple. Few repeat verbatim on a small corpus, but the
+  // model is the right one as the corpus grows.
+  const trip = new Map();
+  A.sts.forEach(st => { if (st.ref) return; (st.eot || []).forEach(t => {
+    const e1 = String(t.end1 || '').trim(), v = String(t.label || '').trim(), e2 = String(t.end2 || '').trim();
+    if (!e1 || !v || !e2 || e1.length < 2 || e2.length < 2) return;
+    const k = (e1 + '|' + v + '|' + e2).toLowerCase(); let o = trip.get(k); if (!o) trip.set(k, o = { e1, v, e2, docs: new Set(), sts: [] }); o.docs.add(st.doc); o.sts.push(st); }); });
+  trip.forEach(o => { const docs = [...o.docs].map(docOf).filter(Boolean);
+    const who = [o.e1, o.e2].filter(n => (A.names || {})[n] && holoName(n, A));
+    if (docs.length < 2 && !who.length) return;
+    groups.push({ kind: 'triple', label: cap(o.e1) + ' · ' + o.v + ' · ' + cap(o.e2), docs, n: docs.length, findings: repPerDoc(o.sts), forWhom: who, triple: [o.e1, o.v, o.e2] }); });
 
   // ── BOND topics: an entity pair the holograph holds together (at least one side selective) ──
   const bond = new Map();
@@ -4683,7 +4756,8 @@ function holoTopics(A) {
 
   // merge same-label elements; a DIFFERENCE the sources disagree on leads, then what more sources share
   const merged = mergeTopicGroups(groups.filter(g => (g.forWhom || []).length));   // no for-whom, no topic
-  merged.sort((a, b) => (b.differs ? 1 : 0) - (a.differs ? 1 : 0) || b.n - a.n);
+  merged.forEach(g => Object.assign(g, topicTerrain(g)));                          // each topic's own terrain · stance · grain (the cube)
+  merged.sort((a, b) => b.n - a.n || (b.differs ? 1 : 0) - (a.differs ? 1 : 0));   // how many sources share it leads; a difference breaks ties
   const placed = new Set(merged.flatMap(g => g.docs.map(d => d.id)));
   return { groups: merged, strayN: A.docs.length - placed.size, basis: 'holograph' };
 }
@@ -4691,9 +4765,23 @@ function holoTopics(A) {
 // name reader admits but that do no work in the picture. Kept small and honest — an entry here
 // only removes a topic, never invents one.
 const TOPIC_JUNK = new Set(('one two three four five six seven eight nine ten eleven twelve twenty thirty forty fifty sixty seventy eighty ninety hundred thousand all any some none each every many most few more less other another same such own my our your their his her its our yours theirs who whom whose what which when where why how this that these those there here then than now do does did done doing be been being am is are was were will would shall should can could may might must not no yes help fig preface contents index chapter part volume section god bible lord messrs mr mrs miss dr sir water hold holds speed life heart breadth depth length height width weight displacement tonnage gross net separate city of old new world women children men women child first second third fourth african american americans english british german irish french turkish russian italian spanish european government state states county city town').split(' '));
-const TOPIC_KIND = (kind, type) => kind === 'measure' ? { e: 'Measure · a figure slot', c: 'var(--amber)' }
-  : kind === 'bond' ? { e: 'Bond · a relationship', c: 'var(--blue)' }
-  : { e: 'Entity · ' + ((typeof TYPE_L !== 'undefined' && TYPE_L[type]) ? TYPE_L[type].toLowerCase() : 'named') + ' across the sources', c: (typeof TYPE_C !== 'undefined' && TYPE_C[type]) || 'var(--acc)' };
+// The cube (khora native/kernel/cube.js, vendored) — a topic's own ONTOLOGY: its terrain (domain × grain)
+// and its stance (mode × grain). Mirrored here so the surface can tag a topic synchronously; the codes are
+// the frozen cube algebra, not a new list.
+const OP_DOMAIN = { NUL: 'Existence', SIG: 'Existence', INS: 'Existence', SEG: 'Structure', CON: 'Structure', SYN: 'Structure', DEF: 'Interpretation', EVA: 'Interpretation', REC: 'Interpretation' };
+const OP_MODE = { NUL: 'Differentiate', SIG: 'Relate', INS: 'Generate', SEG: 'Differentiate', CON: 'Relate', SYN: 'Generate', DEF: 'Differentiate', EVA: 'Relate', REC: 'Generate' };
+const TERRAIN_BY_DOMAIN = { Existence: { Ground: 'Void', Figure: 'Entity', Pattern: 'Kind' }, Structure: { Ground: 'Field', Figure: 'Link', Pattern: 'Network' }, Interpretation: { Ground: 'Atmosphere', Figure: 'Lens', Pattern: 'Paradigm' } };
+const STANCE_BY_MODE = { Differentiate: { Ground: 'Clearing', Figure: 'Dissecting', Pattern: 'Unraveling' }, Relate: { Ground: 'Tending', Figure: 'Binding', Pattern: 'Tracing' }, Generate: { Ground: 'Cultivating', Figure: 'Making', Pattern: 'Composing' } };
+// which cube cell each topic kind lands on: a being instantiates (INS·Figure → Entity), a relation/measure
+// connects (CON·Figure → Link).
+const TOPIC_CELL = { entity: { op: 'INS', grain: 'Figure' }, measure: { op: 'CON', grain: 'Figure' }, bond: { op: 'CON', grain: 'Figure' }, triple: { op: 'CON', grain: 'Figure' } };
+const TERRAIN_C = { Entity: 'var(--green)', Link: 'var(--blue)', Kind: 'var(--acc)', Network: 'var(--acc)', Paradigm: 'var(--acc)', Void: 'var(--mut)', Field: 'var(--mut)', Lens: 'var(--mut)', Atmosphere: 'var(--mut)' };
+// tag a group with its terrain / stance / grain
+const topicTerrain = g => { const c = TOPIC_CELL[g.kind] || { op: 'CON', grain: 'Figure' }; const dom = OP_DOMAIN[c.op], mode = OP_MODE[c.op];
+  return { grain: c.grain, terrain: TERRAIN_BY_DOMAIN[dom][c.grain], stance: STANCE_BY_MODE[mode][c.grain], domain: dom }; };
+// eyebrow = the topic's terrain and stance (+ the being type when it is an Entity)
+const TOPIC_KIND = g => ({ e: (g.terrain || 'Topic') + (g.stance ? ' · ' + g.stance : '') + (g.kind === 'entity' && typeof TYPE_L !== 'undefined' && TYPE_L[g.type] ? ' · ' + TYPE_L[g.type].toLowerCase() : ''), c: TERRAIN_C[g.terrain] || 'var(--acc)' });
+const TOPIC_BADGE = g => g.terrain || '';
 // A topic says, in one line, what it is and what is at stake for whom — the title is the 1–2
 // word label, this is the subtitle under it.
 const topicSubtitle = g => { const who = g.forWhom || [];
@@ -8556,9 +8644,10 @@ class Component extends DCLogic {
       if (nm) { e.preventDefault(); const dd = this._A && this.state.view === 'reader' && this.state.readDoc && this._A.docById[this.state.readDoc]; if (dd && dd.media && dd.media.segN > 0) { this.phJumpFrom(nm, e, dd.id); this.openProfile(nm.getAttribute('data-name')); return; } this.sel('name', nm.getAttribute('data-name')); return; }
       if (st) {
         e.preventDefault();
-        // a click on a word pivots the side panel to that word (a known name opens its profile); a click that is not on a word opens the statement
+        // a click on a word pivots the side panel: a known name opens its profile; any other word selects the
+        // PROPOSITION it is a part of (its atoms, its parts of speech, what it is tied to); empty space opens the statement
         const w = this.wordAtClick(e);
-        if (w) { const nmk = this.nameFor(w); if (nmk) this.sel('name', nmk); else this.setState({ sel: { type: 'term', id: w }, selAll: false, pfIdx: 0, pfAll: false, findQ: w, findOpen: true, findI: 0, findN: 0 }); return; }
+        if (w) { const nmk = this.nameFor(w); if (nmk) this.sel('name', nmk); else this.selWord(st.getAttribute('data-st'), w); return; }
         this.sel('statement', st.getAttribute('data-st')); return; }
       if (a) e.preventDefault(); }, true);
     target.addEventListener('submit', e => e.preventDefault(), true);
@@ -9354,6 +9443,34 @@ class Component extends DCLogic {
   // statements whose SOURCE belongs to the group's member documents (or, inverted, to no detected group).
   toggleTopicGroup(p) { const cur = this.state.f.topicGroup; const same = cur && cur.label === p.label && !!cur.invert === !!p.invert; const ids = (p.docs || []).map(d => (typeof d === 'string' ? d : d.id)); this.setF('topicGroup', same ? null : { label: p.label, docs: ids, invert: !!p.invert }); }
   sel(type, id) { const S0 = this.state; if (type === 'name' && S0.view === 'reader' && !(S0.sel && S0.sel.type === 'name' && S0.sel.id === id)) this.pushHist(); if (type === 'doc') this.markRead(id); this.setState(s => (s.sel && s.sel.type === type && s.sel.id === id && s.view !== 'reader') ? { sel: null, selAll: false, pfIdx: 0, pfAll: false } : { sel: { type, id }, selAll: false, pfIdx: 0, pfAll: false }); }   // in a source, clicking content pivots the side panel to that term; only its ✕ closes it
+  // A word that is not an entity selects the PROPOSITION it is a part of: the statement opens in the side panel with the
+  // clicked word's parts of speech and, under the hood, the proposition's own EOT atoms (holon / name / fig / term). The
+  // word is still painted in the source, so the eye lands on it.
+  selWord(stId, w) { if (!stId) return; if (this.state.view === 'reader') this.pushHist();
+    this.setState({ sel: { type: 'statement', id: stId, word: w }, selAll: false, pfIdx: 0, pfAll: false, findQ: w, findOpen: true, findI: 0, findN: 0 });
+    this.loadAtoms(stId); }
+  loadAtoms(stId) { if (this._atoms && this._atoms.id === stId) return; if (this._atomsLoading === stId) return;
+    const A = this.analysis(); const st = A.byId[stId]; if (!st) return; this._atomsLoading = stId;
+    import(new URL('holodeck-atoms.js', location.href).href).then(M => { this._atomsLoading = null; this._atoms = { id: stId, value: M.atomsOf(st, A) };
+      if (this.state.sel && this.state.sel.type === 'statement' && this.state.sel.id === stId) this.forceUpdate();
+    }).catch(() => { this._atomsLoading = null; }); }
+  // A word that is not a proper noun gets a definition, instantly: Wiktionary's REST definition
+  // endpoint, looked up once per word and cached. Nothing is guessed — a word Wiktionary does not
+  // carry is reported as "no definition found".
+  loadDef(w) {
+    const key = String(w).toLowerCase(); this._defs = this._defs || {}; this._defsLoading = this._defsLoading || new Set();
+    if (this._defs[key] !== undefined || this._defsLoading.has(key)) return;
+    this._defsLoading.add(key);
+    const url = 'https://en.wiktionary.org/api/rest_v1/page/definition/' + encodeURIComponent(key);
+    fetch(url, { headers: { Accept: 'application/json' } }).then(r => r.ok ? r.json() : null).then(j => {
+      const en = (j && (j.en || j.simple)) || [];
+      const SKIP = new Set(['Symbol', 'Character', 'Letter', 'Punctuation', 'Romanization']);
+      const strip = h => { const el = document.createElement('div'); el.innerHTML = String(h || ''); return (el.textContent || '').replace(/\s+/g, ' ').trim(); };
+      const entries = (Array.isArray(en) ? en : []).filter(e => !SKIP.has(e.partOfSpeech)).map(e => ({ pos: e.partOfSpeech || '', text: (e.definitions || []).map(x => strip(x.definition)).filter(Boolean).slice(0, 3).join(' · ') })).filter(e => e.text).slice(0, 3);
+      this._defs[key] = entries; this._defsLoading.delete(key);
+      if (this.state.sel && this.state.sel.word && String(this.state.sel.word).toLowerCase() === key) this.forceUpdate();
+    }).catch(() => { this._defs[key] = []; this._defsLoading.delete(key); if (this.state.sel && this.state.sel.word && String(this.state.sel.word).toLowerCase() === key) this.forceUpdate(); });
+  }
   go(view) { this.setState({ view, readDoc: null }); }
   // Opening a source from anywhere else is the heavy transition (the reader paints thousands of statements). The bar and
   // the cursor appear on the click's own frame; the work starts on the next, so the page answers before it is busy.
@@ -9835,7 +9952,6 @@ class Component extends DCLogic {
     if (!this.state.ground) this.state.ground = { on: true, names: true, figures: true, dates: true, sentences: true };
     if (!this.state.readMode) this.state.readMode = 'original';
     const A = this.analysis(); const S = this.state; const f = S.f;
-    if (!this._realityTried) { try { this.ensureReality(A); } catch (e) {} }   // the khora's reality-register face, folded once
     this._cnt = new Set(A.docs.filter(d => this.counted(d)).map(d => d.id));
     const topicStr = (this.metaAll()[this.corpusId()] || {}).__topic || ''; this._topicStr = topicStr; this._fold = termsOf(topicStr);
     const inf = this.inferOrigins(A); this._inf = inf;
@@ -10350,6 +10466,9 @@ class Component extends DCLogic {
     // (f.topicGroup keeps only the member documents' statements), not a keyword fold, so it holds even
     // when the workspace holds truly disparate content and none of the topics share a sentence.
     const P = this.paradigmGroups(A); this._P = P;
+    // the khora's reality-register face, folded once the corpus actually has entity topics (the
+    // first render fires before the sample's docs land). Keyed by A, so a workspace switch re-folds.
+    if (this._realityFoldA !== A && P.groups && P.groups.some(g => g.kind === 'entity')) { this._realityFoldA = A; try { this.ensureReality(A); } catch (e) {} }
     const isEmpty = A.docs.length === 0;
     const sameF = (a, b) => JSON.stringify(a || {}) === JSON.stringify(b || {});
     const realDocIds = new Set(P.groups.flatMap(g => g.docs.map(d => d.id)));
@@ -10371,7 +10490,7 @@ class Component extends DCLogic {
     const topicsPage = Math.min(S.topicsPage || 0, topicsPages - 1);
     const topicsShown = topicsAll.slice(topicsPage * TOPICS_PER_PAGE, (topicsPage + 1) * TOPICS_PER_PAGE);
     const topicsList = topicsShown.map(p => { const on = activeTopicGroup === p.label && !f.topicGroup.invert;
-      return { label: p.label, n: String(p.n), on, bg: on ? 'var(--sel)' : 'transparent', bd: on ? 'var(--acc2)' : 'transparent', weight: on ? 600 : 500, onJump: () => this.openTopic(p.label) }; });
+      return { label: p.label, tag: p.terrain || '', tagCol: (typeof TERRAIN_C !== 'undefined' && TERRAIN_C[p.terrain]) || 'var(--mut)', n: String(p.n), on, bg: on ? 'var(--sel)' : 'transparent', bd: on ? 'var(--acc2)' : 'transparent', weight: on ? 600 : 500, onJump: () => this.openTopic(p.label) }; });
     const topicsHasSearch = hasTopics;
     const topicsSearchVal = S.topicsQ || '';
     const onTopicsSearch = e => this.setState({ topicsQ: e.target.value, topicsPage: 0 });
@@ -12042,26 +12161,43 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
   // Load the khora's reality-level organs once, then fold a reality-register per entity topic.
   // A best-effort Wikipedia anchor (the organ's resolver); offline, the fold uses the declared
   // registers alone. The surface renders the records and adds no ontology logic.
+  realitySourcesFor(A, name) { const docIds = new Set(((A.names || {})[name] || {}).docs || []); const base = this._realitySources || A.docs.map(d => ({ id: d.id, register: this.realityReg(d) }));
+    return { base, sources: base.map(s => ({ ...s, referents: docIds.has(s.id) ? [name] : [] })) }; }
   async ensureReality(A) {
-    if (this._realityTried) return; this._realityTried = true;
+    if (this._realityFoldA === A && this._realityByName) return;
+    this._realityByName = new Map();
+    this._realityFoldA = A;
     try {
       const base = new URL('vendor/eoreader7/native/kernel/', location.href).href;
       const RR = await import(base + 'reality-register.js');
       this._realityRR = RR;
-      const ents = (this.paradigmGroups(A).groups || []).filter(g => g.kind === 'entity');
-      const srcBase = A.docs.map(d => ({ id: d.id, register: this.realityReg(d) }));
-      let resolve = null; try { resolve = RR.makeWikipediaResolver({ forWhom: { question: '', universeKind: 'world' } }); } catch (e) { resolve = null; }
-      const byName = new Map();
-      for (const g of ents) {
-        const name = (g.forWhom || [])[0]; if (!name) continue;
-        const docIds = new Set(((A.names || {})[name] || {}).docs || []);
-        const sources = srcBase.map(s => ({ ...s, referents: docIds.has(s.id) ? [name] : [] }));
-        let anchor = null; if (resolve) { try { anchor = await resolve(name); } catch (e) { anchor = null; } }
-        byName.set(name, RR.realityRegister({ id: name }, { sources, anchor }));
-      }
-      this._realityByName = byName;
+      this._realitySources = A.docs.map(d => ({ id: d.id, register: this.realityReg(d) }));
+      this._realityAnchors = this._realityAnchors || new Map();
+      try { this._realityResolver = RR.makeWikipediaResolver({ forWhom: { question: '', universeKind: 'world' }, timeoutMs: 5000, attempts: 1, backoffMs: 500 }); } catch (e) { this._realityResolver = null; }
+      // the register fold is synchronous and model-free (no network): the badge and TOLD BY show
+      // at once; the Wikipedia anchor ("what it is") is fetched lazily when a topic is opened.
+      (this.paradigmGroups(A).groups || []).filter(g => g.kind === 'entity').forEach(g => {
+        const name = (g.forWhom || [])[0]; if (!name) return;
+        const { sources } = this.realitySourcesFor(A, name);
+        this._realityByName.set(name, RR.realityRegister({ id: name }, { sources, anchor: this._realityAnchors.get(name) || null }));
+      });
       try { this.forceUpdate(); } catch (e) {}
     } catch (e) { this._realityByName = null; }
+  }
+  // Fetch the Wikipedia anchor for one entity, then re-fold just that entity's register. Cached;
+  // reserved so concurrent opens do not double-fetch. Reach nothing → anchor null, no "what it is".
+  ensureAnchor(A, name) {
+    if (!this._realityResolver || !this._realityRR || !name) return;
+    this._realityAnchors = this._realityAnchors || new Map();
+    if (this._realityAnchors.has(name)) return;
+    this._realityAnchors.set(name, null);
+    this._realityResolver(name).then(anchor => {
+      this._realityAnchors.set(name, anchor || null);
+      if (!this._realityByName || !this._realityRR) return;
+      const { sources } = this.realitySourcesFor(A, name);
+      this._realityByName.set(name, this._realityRR.realityRegister({ id: name }, { sources, anchor: anchor || null }));
+      try { this.forceUpdate(); } catch (e) {}
+    }).catch(() => {});
   }
   topicProfileVals(A, label) {
     const S = this.state;
@@ -12071,7 +12207,7 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
     // profile page is the khora's (native/kernel/profile-page.js); its reality-register fold
     // (native/kernel/reality-register.js) is vendored here. One owner per capability: this
     // renders the register's records, and adds no ontology logic of its own.
-    const kx = TOPIC_KIND(g.kind, g.type);
+    const kx = TOPIC_KIND(g);
     const list = (g.findings || []).map(f => ({ text: clean(f.text), src: f.title || '', date: '', by: '', hasBy: false, op: 1, pinLabel: '', pinColor: 'transparent', onClick: () => (f.doc ? this.read(f.doc) : null) }));
     const who = (g.forWhom || []).map(nm => ({ label: nm, color: 'var(--line2)', onClick: () => (A.names[nm] ? this.openProfile(nm) : null) }));
     const facts = [{ k: 'Sources', v: plural(g.n, 'source') }, { k: 'For whom', v: (g.forWhom || []).join(' · ') || '—' }];
@@ -12079,6 +12215,7 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
     // the khora's reality-register face, when the organ has answered for this entity
     let eyebrow = kx.e, color = kx.c;
     const rp = g.kind === 'entity' && this._realityByName ? this._realityByName.get(g.forWhom[0]) : null;
+    if (rp && !(rp.anchor && rp.anchor.found)) { try { this.ensureAnchor(A, g.forWhom[0]); } catch (e) {} }   // fetch "what it is" on open
     if (rp) {
       const BADGE = { real: '● real', 'fictionalized-real': '◐ fictionalized-real', fictional: '✕ fictional', unexamined: '? unexamined' };
       eyebrow = eyebrow + ' · ' + (BADGE[rp.realityKind] || rp.realityKind);
@@ -12087,6 +12224,7 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
       if (rp.anchor && rp.anchor.found && rp.anchor.extract) facts.push({ k: 'What it is', v: short(String(rp.anchor.extract).replace(/\s+/g, ' '), 140) });
     }
     return { has: true, eyebrow, color, title: g.label, facts,
+      hasBadge: !!g.terrain, badge: g.terrain || '', badgeCol: (typeof TERRAIN_C !== 'undefined' && TERRAIN_C[g.terrain]) || 'var(--mut)',
       narrow: { label: 'Segment to this topic', onClick: () => this.toggleTopicGroup(g) },
       sum: { has: false }, hasConns: false, hasRefs: false, hasProf: false,
       hasTags: who.length > 0, tags: who, tagTitle: 'For whom',
@@ -12322,6 +12460,61 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
         facts: [...(() => { const w = whoSays(st, A); const d0 = A.docById[st.doc]; return [...(w ? [{ k: w.how === 'quoted' ? 'Said by' : w.how === 'publisher' ? 'Issued by' : 'Written by', v: w.who }] : []), { k: 'Published', v: d0.pubLabel || (d0.year ? String(d0.year) : 'Undated') }]; })(), ...(st.where ? [{ k: 'Where', v: st.where }] : []), ...(su && su.sig ? [{ k: 'Moved the picture', v: 'Shift ' + su.excess.toFixed(1) }] : [])],
         tagTitle: 'Names in it', tags: st.names.slice(0, 10).map(nameTag),
         actions: [{ label: 'Show in its document', onClick: () => this.read(st.doc, st.id) }, { label: 'Narrow to this source', onClick: () => this.setF('doc', st.doc) }], listTitle: 'Similar wording elsewhere', list: (A.echoes[st.id] || []).map(e => { const o = A.byId[e.id]; const L = SRC_LINE(o, A); return { text: clean(o.text), ...L, hasBy: !!L.by, op: 1, onClick: () => this.sel('statement', o.id) }; }) };
+      // A non-entity word selected this proposition: lead with the word's parts of speech, and show — under the hood —
+      // the proposition's own EOT atoms, the minimal content units the fold reads it as.
+      const w = sel.word ? String(sel.word) : '';
+      if (w) {
+        const hd = window.__holodeck; const pos = (hd && hd.hdPos) ? hd.hdPos(w) : null;
+        const pe = pos ? Object.entries(pos).sort((a, b) => b[1] - a[1]) : null; const psum = pe ? (pe.reduce((s, e) => s + e[1], 0) || 1) : 1;
+        const tags = pe ? pe.slice(0, 3).map(([k, v]) => (POS_L[k] || k) + ' ' + Math.round(100 * v / psum) + '%').join(' · ') : '';
+        d.facts = [{ k: 'Word', v: w + (tags ? ' — ' + tags : ' — not in the part-of-speech prior') }, ...(d.facts || [])];
+        // WHAT IT REFERS TO IN CONTEXT — the engine's own pronoun binding for this word in this sentence (or its
+        // reported gap). "she" is not a name; the info we can link to it is the referent it resolved to and why.
+        const wl = w.toLowerCase();
+        const binds = (st.prons || []).filter(b => String(b.pronoun).toLowerCase() === wl);
+        const gaps = (st.pronGaps || []).filter(g => String(g.pronoun).toLowerCase() === wl);
+        if (binds.length || gaps.length) {
+          const b = binds[0];
+          if (b) {
+            const N = A.names[b.referentId];
+            d.facts = [{ k: 'Refers to', v: b.referentId + (N ? ' · ' + (TYPE_L[N.type] || '').replace(/s$/, '') : '') }, ...d.facts];
+            d.tagTitle = 'What it points at';
+            d.tags = [{ label: b.referentId, color: TYPE_C[N ? N.type : 'other'], onClick: () => this.openProfile(b.referentId) }, ...((d.tags || []).filter(t => t.label !== b.referentId))];
+            d.refsTitle = 'How it was resolved · under the hood';
+            d.refsNote = 'The engine binds a pronoun to an established referent by decayed presence over the cast; a pronoun it cannot resolve is a reported gap, never a guess.';
+            d.refs = [{ k: 'pronoun', v: b.pronoun, note: b.gender && b.gender !== 'unknown' ? b.gender : '' },
+              ...(b.provenance ? [{ k: 'by', v: b.provenance.mechanism || '', note: b.provenance.window != null ? 'window ' + b.provenance.window : '' }] : []),
+              ...(b.activation != null ? [{ k: 'presence', v: Number(b.activation).toFixed(3), note: 'the winner’s activation' }] : []),
+              ...(b.margin != null ? [{ k: 'margin', v: (Number(b.margin) * 100).toFixed(1) + '%', note: 'lead over the runner-up' }] : [])];
+          } else {
+            const g = gaps[0];
+            d.facts = [{ k: 'Refers to', v: 'not resolved' }, ...d.facts];
+            d.refsTitle = 'Why it did not resolve · under the hood';
+            d.refsNote = g.detail || '';
+            d.refs = [{ k: 'pronoun', v: g.pronoun || w, note: g.reason || '' },
+              ...(g.top ? [{ k: 'hottest', v: g.top, note: g.activation != null ? Number(g.activation).toFixed(3) : '' }] : []),
+              ...(g.runnerUp ? [{ k: 'runner-up', v: g.runnerUp, note: g.margin != null ? (Number(g.margin) * 100).toFixed(1) + '% apart' : '' }] : [])];
+          }
+          d.hasRefs = true;
+        }
+        // A DEFINITION, instantly: the word is not a proper noun (a name opens its profile instead), so Wiktionary
+        // answers what it means — looked up once and cached; the panel shows it the moment it lands.
+        d.hasDefs = true; d.defTitle = 'Definition · Wiktionary';
+        if (!/^[\p{L}][\p{L}'-]*$/u.test(w)) { d.defs = []; d.defNote = 'Not a word to look up.'; }
+        else {
+          const def = (this._defs || {})[wl];
+          if (def === undefined) { this.loadDef(w); d.defs = []; d.defNote = 'Looking it up…'; }
+          else if (!def.length) { d.defs = []; d.defNote = 'No definition found in Wiktionary.'; }
+          else { d.defs = def; d.defNote = 'From Wiktionary (English), the free dictionary.'; }
+        }
+        d.atomsTitle = 'Atoms · what this proposition makes a difference with';
+        d.hasAtoms = true;
+        const WA = (this._atoms && this._atoms.id === st.id) ? this._atoms.value : null;
+        if (!WA) { this.loadAtoms(st.id); d.atoms = []; d.atomsNote = 'Reading the atoms…'; }
+        else if (!WA.atoms.length) { d.atoms = []; d.atomsNote = 'No atoms: ' + WA.why + (WA.detail ? ' (' + WA.detail + ')' : ''); }
+        else { d.atoms = WA.atoms; const n = {}; WA.atoms.forEach(a => { n[a.kind] = (n[a.kind] || 0) + 1; });
+          d.atomsNote = ['holon', 'name', 'fig', 'term'].filter(k => n[k]).map(k => n[k] + ' ' + k).join(' · ') + ' · the fold of the ground at “' + WA.address + '”'; }
+      }
     } else if (sel.type === 'doc' && A.docById[sel.id]) {
       const doc = A.docById[sel.id]; const sts = A.stsByDoc[doc.id] || []; const nm = [...new Set(sts.flatMap(s => s.names))];
       const AM = this._ambM; let amb = { has: false }, amount = null;
@@ -12357,7 +12550,7 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
     } else if (sel.type === 'topic') {
       const g = (this.paradigmGroups(A).groups || []).find(x => x.label === sel.id);
       if (g) {
-        const kx = TOPIC_KIND(g.kind, g.type);
+        const kx = TOPIC_KIND(g);
         d = { eyebrow: kx.e, color: kx.c, title: g.label,
           facts: [{ k: 'Sources', v: plural(g.n, 'source') }, { k: 'For whom', v: (g.forWhom || []).join(' · ') || '—' }, ...(g.kind === 'measure' ? [{ k: 'Values', v: String((g.findings || []).length) }] : [])],
           tags: (g.forWhom || []).map(nm => ({ label: nm, color: 'var(--line2)', onClick: () => (A.names[nm] ? this.openProfile(nm) : null) })), tagTitle: 'For whom',
