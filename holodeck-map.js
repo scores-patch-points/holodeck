@@ -28,8 +28,9 @@ const eKey = (a, b) => a < b ? a + '\u0001' + b : b + '\u0001' + a;
 const solid = x => !!x && x.st !== 'cand' && x.st !== 'drop';
 
 const CSS = `
-.hm{position:absolute;inset:0;z-index:1;overflow:hidden;font:13px/1.45 'Hanken Grotesk',system-ui,sans-serif}
+.hm{position:absolute;inset:0;z-index:1;overflow:hidden;display:flex;font:13px/1.45 'Hanken Grotesk',system-ui,sans-serif}
 .hm *{box-sizing:border-box}
+.hm-stage{position:relative;flex:1 1 auto;min-width:0;min-height:0;height:100%}
 .hm canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none}
 .hm button{all:unset;cursor:pointer;color:var(--mut);font:500 13px 'Hanken Grotesk',sans-serif;padding:4px 9px}
 .hm button:hover{color:var(--ink)}.hm button:focus-visible{outline:2px solid var(--acc);outline-offset:1px}.hm button[disabled]{opacity:.35;cursor:default;color:var(--mut)}
@@ -41,9 +42,12 @@ const CSS = `
 .hm-tools{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
 .hm-lv,.hm-spd{font:500 12px 'JetBrains Mono',monospace;color:var(--mut);min-width:84px;text-align:center;white-space:nowrap}
 .hm-spd{min-width:40px}
-.hm-card{position:absolute;left:12px;top:46px;z-index:2;width:min(380px,calc(100% - 24px));max-height:min(46%,320px);overflow:auto;background:var(--s1);border:1px solid var(--line2);border-radius:10px;padding:10px 12px;color:var(--ink2)}
-.hm-card.full{width:calc(100% - 24px);max-height:calc(100% - 64px)}
+.hm-card{position:relative;flex:0 0 clamp(260px,30%,380px);height:100%;max-height:none;overflow:auto;background:var(--s1);border-left:1px solid var(--line2);padding:10px 12px;color:var(--ink2)}
+.hm-card.full{flex-basis:clamp(320px,44%,560px)}
 .hm-card[hidden]{display:none}
+.hm-x{position:absolute;right:6px;top:4px;z-index:1;font:500 15px/1 'Hanken Grotesk',sans-serif;color:var(--mut);padding:4px 7px;border-radius:6px}
+.hm-x:hover{color:var(--ink);background:var(--s2)}
+@media(max-width:700px){.hm{flex-direction:column}.hm-card{flex:0 0 auto;height:auto;max-height:45%;border-left:0;border-top:1px solid var(--line2)}}
 .hm-ch{color:var(--ink);margin-bottom:6px}
 .hm-src{font:600 11px 'JetBrains Mono',monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--dim);margin:8px 0 3px}
 .hm-st{padding:5px 0;border-top:1px solid var(--line)}
@@ -61,12 +65,12 @@ export function mountMap(host, opts = {}) {
   if (!styled) { const st = document.createElement('style'); st.textContent = CSS; document.head.appendChild(st); styled = true; }
   const root = document.createElement('div'); root.className = 'hm';
   const legend = `<div class="hm-key"><span><i style="border:1.5px dashed var(--dim)"></i>ring: holds more names, click to open</span><span><i style="background:var(--acc)"></i>a name; larger means more statements</span><span>${opts.wheelZoom ? 'scroll' : 'Ctrl + scroll'} to zoom · drag to pan · ↑ ↓ step a level</span></div>`;
-  root.innerHTML = `<canvas></canvas><div class="hm-top"><div class="hm-layers" role="group" aria-label="Layer"><button type="button" data-layer="sources" title="The readings and the names they share">Sources</button><button type="button" data-layer="names" aria-pressed="true" title="Names, nested into groups that open on click">Names</button><button type="button" data-layer="statements" title="What a name sits in">Statements</button></div>` +
+  root.innerHTML = `<div class="hm-stage"><canvas></canvas><div class="hm-top"><div class="hm-layers" role="group" aria-label="Layer"><button type="button" data-layer="sources" title="The readings and the names they share">Sources</button><button type="button" data-layer="names" aria-pressed="true" title="Names, nested into groups that open on click">Names</button><button type="button" data-layer="statements" title="What a name sits in">Statements</button></div>` +
     `<div class="hm-tools"><span class="hm-tg" title="Zoom the picture"><button type="button" data-z="out" title="Zoom out">−</button><button type="button" data-z="in" title="Zoom in">+</button><button type="button" data-z="fit" title="Fit everything">Fit</button></span>` +
     `<span class="hm-tg" title="Move between levels of nesting"><button type="button" data-lv="up" title="Up a level: fewer, larger groups">↑</button><span class="hm-lv"></span><button type="button" data-lv="down" title="Down a level: open the groups">↓</button></span>` +
-    `<span class="hm-tg" title="Orbit speed"><button type="button" data-spd="slow" title="Slower orbit">🐢</button><span class="hm-spd"></span><button type="button" data-spd="fast" title="Faster orbit">🐇</button></span></div><div class="hm-position" aria-label="Map viewpoint"></div></div><div class="hm-card" hidden></div>${opts.legend ? legend : ''}`;
+    `<span class="hm-tg" title="Orbit speed"><button type="button" data-spd="slow" title="Slower orbit">🐢</button><span class="hm-spd"></span><button type="button" data-spd="fast" title="Faster orbit">🐇</button></span></div><div class="hm-position" aria-label="Map viewpoint"></div></div>${opts.legend ? legend : ''}</div><div class="hm-card" hidden></div>`;
   host.appendChild(root);
-  const gc = root.querySelector('canvas'), cardEl = root.querySelector('.hm-card'), layersEl = root.querySelector('.hm-layers'), topEl = root.querySelector('.hm-top'), lvEl = root.querySelector('.hm-lv'); { const s = root.querySelector('.hm-spd'); if (s) s.textContent = '0.25×'; }
+  const gc = root.querySelector('canvas'), cardEl = root.querySelector('.hm-card'), layersEl = root.querySelector('.hm-layers'), topEl = root.querySelector('.hm-top'), stageEl = root.querySelector('.hm-stage'), lvEl = root.querySelector('.hm-lv'); { const s = root.querySelector('.hm-spd'); if (s) s.textContent = '0.25×'; }
   const padBottom = opts.padBottom ?? 30, css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim() || '#888';
   let col = {}, W = 0, H = 0, dpr = 1, topPad = 54, alive = true, raf = 0, frame = 0;
   const readCols = () => { col = { acc: css('--acc'), blue: css('--blue'), dim: css('--dim'), ink: css('--ink'), ink2: css('--ink2'), bad: css('--bad'), amber: css('--amber'), edge: css('--edge'), line2: css('--line2'), bg: css('--bg') }; };
@@ -133,7 +137,7 @@ export function mountMap(host, opts = {}) {
       if (M.agg) M.agg.forEach(E => addE(E.a, E.b, E.c));
       const center = mapOrigin(vis, adj, sel), origin = center.name;
       root.querySelector('.hm-position').textContent = origin ? 'Centered on ' + origin + ' because ' + center.reason + ' · ' + docMap.size + ' sources · distance follows shared-statement counts, not ownership or control' : 'No origin: no names have been read here.';
-      topPad = topEl.offsetHeight + 16; cardEl.style.top = topPad + 'px';
+      topPad = topEl.offsetHeight + 16;
       // GRAVITY: orbit radius ∝ 1/bond. Edge length is the bond's inverse
       // (scaled so the strongest bond is length 1), so a strongly-bound name
       // sits close and a weakly-bound one drifts out; Dijkstra gives the
@@ -254,8 +258,8 @@ export function mountMap(host, opts = {}) {
     const up = root.querySelector('[data-lv=up]'), dn = root.querySelector('[data-lv=down]'); up.disabled = layer === 'sources'; dn.disabled = layer === 'statements';
     if (D && layer === 'names') buildModel();
     lvEl.textContent = layer === 'sources' ? 'Sources' : layer === 'statements' ? 'Statements' : 'Names · ' + (level + 1) + '/' + ((model ? model.max : 0) + 1);
-    const h = D ? cardHtml() : ''; cardEl.className = 'hm-card' + (layer === 'statements' ? ' full' : ''); cardEl.hidden = !h; cardEl.style.top = (topEl.offsetHeight + 16) + 'px';
-    if (h !== lastCard) { lastCard = h; cardEl.innerHTML = h; }
+    const h = D ? cardHtml() : ''; cardEl.className = 'hm-card' + (layer === 'statements' ? ' full' : ''); cardEl.hidden = !h;
+    if (h !== lastCard) { lastCard = h; cardEl.innerHTML = h ? '<button type="button" class="hm-x" data-close title="Close this panel">✕</button>' + h : ''; }
   }
 
   // ---------- levels, zoom and pan ----------
@@ -286,13 +290,13 @@ export function mountMap(host, opts = {}) {
     if (b.dataset.spd) { simulate._spd = Math.min(8, Math.max(0.1, (simulate._spd || 0.5) * (b.dataset.spd === 'fast' ? 1.6 : 1 / 1.6))); const el = root.querySelector('.hm-spd'); if (el) el.textContent = (simulate._spd).toFixed(1) + '×'; return; }
     if (b.dataset.z === 'fit') fit(); else if (b.dataset.z) zoomAt(W / 2, H / 2, b.dataset.z === 'in' ? 1.35 : 1 / 1.35); else if (b.dataset.lv === 'up') levelUp(); else levelDown(); });
   layersEl.addEventListener('click', e => { const b = e.target.closest('[data-layer]'); if (b) setLayer(b.dataset.layer); });
-  cardEl.addEventListener('click', e => { const w = e.target.closest('[data-witness]'); if (w) { const o = [...occ.values()].flat().find(o => String(o.doc) + ':' + o.id === w.dataset.witness); if (o && opts.onWitness) opts.onWitness(o); return; } const b = e.target.closest('[data-name],[data-layer],[data-profile]'); if (!b) return;
+  cardEl.addEventListener('click', e => { const x = e.target.closest('[data-close]'); if (x) { sel = null; selectedEdge = null; heat = 1; dirty = true; renderCard(); return; } const w = e.target.closest('[data-witness]'); if (w) { const o = [...occ.values()].flat().find(o => String(o.doc) + ':' + o.id === w.dataset.witness); if (o && opts.onWitness) opts.onWitness(o); return; } const b = e.target.closest('[data-name],[data-layer],[data-profile]'); if (!b) return;
     if (b.dataset.profile) { opts.onProfile && opts.onProfile(b.dataset.profile); return; }
     if (b.dataset.layer) { setLayer(b.dataset.layer); return; }
     focusName(b.dataset.name); renderCard(); });
 
-  function size() { const r = gc.getBoundingClientRect(); if (!r.width || !r.height) return; dpr = window.devicePixelRatio || 1; W = r.width; H = r.height; gc.width = W * dpr; gc.height = H * dpr; topPad = topEl.offsetHeight + 16; cardEl.style.top = topPad + 'px'; dirty = true; }
-  const ro = new ResizeObserver(size); ro.observe(host);
+  function size() { const r = gc.getBoundingClientRect(); if (!r.width || !r.height) return; dpr = window.devicePixelRatio || 1; W = r.width; H = r.height; gc.width = W * dpr; gc.height = H * dpr; topPad = topEl.offsetHeight + 16; dirty = true; }
+  const ro = new ResizeObserver(size); ro.observe(host); ro.observe(stageEl);
   function loop() { if (!alive) return; if (++frame % 30 === 0) { readCols(); cc.clear(); dirty = true; }
     if (D && W && (dirty || heat > 0.01 || layer === 'names')) { simulate(); draw(); dirty = false; } raf = requestAnimationFrame(loop); }
 
