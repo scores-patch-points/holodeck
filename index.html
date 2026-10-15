@@ -296,33 +296,43 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
       <sc-if value="{{ hasContent }}" hint-placeholder-val="{{ false }}">
       <details class="hd-disclosure hd-topics" open="{{ topicsOpen }}">
       <summary>{{ topicsLabel }}</summary>
-      <div style="display:flex;flex-direction:column;gap:1px;padding:0 0 4px">
-        <sc-if value="{{ !hasTopics && !hasTopicsNote }}"><span style="padding:0 12px;font-size:12px;color:var(--mut)">Topics appear as sources connect.</span></sc-if>
+      <div style="display:flex;flex-direction:column;gap:5px;padding:0 0 6px">
         <sc-if value="{{ hasTopics }}" hint-placeholder-val="{{ false }}">
-          <span style="font:400 11px var(--sans);color:var(--mut);padding:0 12px 4px;text-wrap:pretty">{{ topicsNote }}</span>
-          <sc-if value="{{ topicsHasSearch }}" hint-placeholder-val="{{ false }}">
-            <div style="padding:0 12px 4px">
-              <input value="{{ topicsSearchVal }}" onChange="{{ onTopicsSearch }}" placeholder="Filter topics…" style="width:100%;box-sizing:border-box;background:var(--bg);border:1px solid var(--line2);border-radius:6px;color:var(--ink);font:400 12px var(--sans);padding:4px 8px;outline:none">
+          <sc-if value="{{ topicsHasTypes }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;gap:4px;flex-wrap:wrap;padding:0 12px">
+              <sc-for list="{{ topicsTypes }}" as="ty">
+                <button onClick="{{ ty.onClick }}" style="cursor:pointer;border:1px solid {{ ty.bd }};background:{{ ty.bg }};color:{{ ty.col }};border-radius:999px;padding:2px 9px;font:600 10px/1.4 var(--mono);letter-spacing:.06em;text-transform:uppercase" style-hover="border-color:var(--acc)">{{ ty.label }} <span style="color:var(--mut)">{{ ty.n }}</span></button>
+              </sc-for>
             </div>
           </sc-if>
-          <sc-for list="{{ topicsList }}" as="t" hint-placeholder-count="2">
-            <button onClick="{{ t.onJump }}" title="Segment the whole workspace to this topic's sources" style="white-space:normal;text-align:left;cursor:pointer;padding:5px 12px 5px 20px;border-radius:8px;background:{{ t.bg }};border:1px solid {{ t.bd }};display:flex;justify-content:space-between;align-items:baseline;gap:10px" style-hover="background:var(--s2)">
-              <span style="font:{{ t.weight }} 14px var(--sans);color:var(--ink2)">{{ t.label }}</span>
-              <span style="font:600 9px var(--mono);letter-spacing:.05em;text-transform:uppercase;color:{{ t.tagCol }};white-space:nowrap">{{ t.tag }}</span>
-              <span style="font:500 12px var(--mono);color:var(--mut);white-space:nowrap">{{ t.n }}</span>
-            </button>
-          </sc-for>
+          <sc-if value="{{ topicsHasSearch }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:0 12px">
+              <input value="{{ topicsSearchVal }}" onChange="{{ onTopicsSearch }}" placeholder="Filter topics…" style="width:100%;box-sizing:border-box;background:var(--bg);border:1px solid var(--line2);border-radius:8px;color:var(--ink);font:400 12px var(--sans);padding:5px 9px;outline:none">
+            </div>
+          </sc-if>
+          <div style="display:flex;flex-direction:column;gap:3px;padding:0 8px">
+            <sc-for list="{{ topicsList }}" as="t" hint-placeholder-count="3">
+              <button onClick="{{ t.onJump }}" title="Open this topic's profile" style="white-space:normal;text-align:left;cursor:pointer;padding:8px 11px;border-radius:10px;background:{{ t.bg }};border:1px solid {{ t.bd }};display:grid;grid-template-columns:1fr auto;gap:3px 10px;align-items:baseline" style-hover="background:var(--s2);border-color:var(--line2)">
+                <span style="font:500 15px/1.25 var(--serif);color:var(--ink);min-width:0">{{ t.label }}</span>
+                <span style="font:500 12px var(--mono);color:var(--mut);white-space:nowrap">{{ t.n }}</span>
+                <span style="grid-column:1 / -1;display:flex;gap:8px;align-items:center">
+                  <span style="font:600 9px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:{{ t.tagCol }}">{{ t.tag }}</span>
+                  <sc-if value="{{ t.differs }}" hint-placeholder-val="{{ false }}"><span style="font:600 9px var(--mono);letter-spacing:.06em;color:var(--amber)">DIFFERS</span></sc-if>
+                </span>
+              </button>
+            </sc-for>
+          </div>
+          <sc-if value="{{ topicsHasEmpty }}" hint-placeholder-val="{{ false }}"><span style="padding:0 12px;font:400 12px var(--sans);color:var(--mut)">No topics of this type.</span></sc-if>
           <sc-if value="{{ topicsHasPager }}" hint-placeholder-val="{{ false }}">
-            <div style="display:flex;align-items:center;gap:4px;padding:2px 12px 0 20px">
+            <div style="display:flex;align-items:center;gap:4px;padding:0 12px 0 14px">
               <button data-keep="1" onClick="{{ onTopicsPrev }}" style="all:unset;cursor:pointer;font:500 13px var(--sans);color:{{ topicsHasPrev ? 'var(--ink2)' : 'var(--dim)' }};padding:1px 6px" style-hover="color:var(--ink)">‹</button>
               <span style="font:500 11px var(--mono);color:var(--mut);flex:1;text-align:center;white-space:nowrap">{{ topicsPageN }}</span>
               <button data-keep="1" onClick="{{ onTopicsNext }}" style="all:unset;cursor:pointer;font:500 13px var(--sans);color:{{ topicsHasNext ? 'var(--ink2)' : 'var(--dim)' }};padding:1px 6px" style-hover="color:var(--ink)">›</button>
             </div>
           </sc-if>
         </sc-if>
-        <sc-if value="{{ hasTopicsNote }}" hint-placeholder-val="{{ false }}"><span style="font:400 11px var(--sans);color:var(--mut);padding:0 12px 4px;text-wrap:pretty">{{ topicsNote }}</span></sc-if>
         <sc-if value="{{ showTopicsStray }}" hint-placeholder-val="{{ false }}">
-          <button onClick="{{ onTopicsStray }}" title="Segment to the sources that belong to no topic" style="white-space:normal;text-align:left;cursor:pointer;padding:5px 12px 5px 20px;border-radius:8px;background:transparent;border:0;display:flex;justify-content:space-between;align-items:baseline;gap:10px" style-hover="background:var(--s2)">
+          <button onClick="{{ onTopicsStray }}" title="Segment to the sources that belong to no topic" style="white-space:normal;text-align:left;cursor:pointer;margin:0 8px;padding:8px 11px;border-radius:10px;background:transparent;border:1px solid var(--line2);display:flex;justify-content:space-between;align-items:baseline;gap:10px" style-hover="background:var(--s2)">
             <span style="font:500 14px var(--sans);color:var(--mut)">Not in any topic</span>
             <span style="font:500 12px var(--mono);color:var(--mut);white-space:nowrap">{{ topicsStrayN }}</span>
           </button>
@@ -10485,12 +10495,21 @@ class Component extends DCLogic {
     // so they survive re-renders; typing resets to page 1.
     const TOPICS_PER_PAGE = 6;
     const topicsQ = (S.topicsQ || '').trim().toLowerCase();
-    const topicsAll = topicsQ ? P.groups.filter(p => p.label.toLowerCase().includes(topicsQ)) : P.groups;
+    const topicsType = S.topicsType || '';
+    const topicsAll = P.groups.filter(p => (!topicsType || (p.terrain || 'Other') === topicsType) && (!topicsQ || p.label.toLowerCase().includes(topicsQ)));
     const topicsPages = Math.max(1, Math.ceil(topicsAll.length / TOPICS_PER_PAGE));
     const topicsPage = Math.min(S.topicsPage || 0, topicsPages - 1);
     const topicsShown = topicsAll.slice(topicsPage * TOPICS_PER_PAGE, (topicsPage + 1) * TOPICS_PER_PAGE);
     const topicsList = topicsShown.map(p => { const on = activeTopicGroup === p.label && !f.topicGroup.invert;
-      return { label: p.label, tag: p.terrain || '', tagCol: (typeof TERRAIN_C !== 'undefined' && TERRAIN_C[p.terrain]) || 'var(--mut)', n: String(p.n), on, bg: on ? 'var(--sel)' : 'transparent', bd: on ? 'var(--acc2)' : 'transparent', weight: on ? 600 : 500, onJump: () => this.openTopic(p.label) }; });
+      return { label: p.label, tag: p.terrain || '', tagCol: (typeof TERRAIN_C !== 'undefined' && TERRAIN_C[p.terrain]) || 'var(--mut)', differs: !!p.differs, n: String(p.n), on, bg: on ? 'var(--sel)' : 'transparent', bd: on ? 'var(--acc2)' : 'transparent', weight: on ? 600 : 500, onJump: () => this.openTopic(p.label) }; });
+    // filter by the topic's ontology: one chip per terrain present
+    const typeCount = new Map(); P.groups.forEach(p => { const t = p.terrain || 'Other'; typeCount.set(t, (typeCount.get(t) || 0) + 1); });
+    const TYPE_ORDER = ['Entity', 'Link', 'Kind', 'Network', 'Paradigm', 'Void', 'Field', 'Lens', 'Atmosphere'];
+    const topicsTypes = [{ id: '', label: 'All', n: String(P.groups.length), col: 'var(--ink2)' }]
+      .concat(TYPE_ORDER.filter(t => typeCount.has(t)).map(t => ({ id: t, label: t, n: String(typeCount.get(t)), col: (typeof TERRAIN_C !== 'undefined' && TERRAIN_C[t]) || 'var(--mut)' })))
+      .map(ty => ({ label: ty.label, n: ty.n, col: topicsType === ty.id ? ty.col : 'var(--mut)', bg: topicsType === ty.id ? 'var(--sel)' : 'transparent', bd: topicsType === ty.id ? 'var(--acc2)' : 'var(--line2)', onClick: () => this.setState({ topicsType: ty.id, topicsPage: 0 }) }));
+    const topicsHasTypes = typeCount.size > 1;
+    const topicsHasEmpty = hasTopics && topicsAll.length === 0;
     const topicsHasSearch = hasTopics;
     const topicsSearchVal = S.topicsQ || '';
     const onTopicsSearch = e => this.setState({ topicsQ: e.target.value, topicsPage: 0 });
@@ -10740,7 +10759,8 @@ class Component extends DCLogic {
         return { backLabel: bt ? short(titleCase(String(bt)), 24) : 'Back', backDisabled: !this.backTarget(), backTitle: bt ? 'Back to ' + bt : 'Back',
           onBack: () => this.goBack(), onHome: () => this.setState({ view: 'summary', readDoc: null, sel: null }),
           homeCls: onSummary ? 'on' : '', homeAria: onSummary ? 'page' : undefined, hasLoc: loc.length > 1, locTitle: loc.map(c => c.label).join(' › '), loc }; })(),
-      topicsList, hasTopics, topicsOpen: hasTopics || !!activeTopicGroup || !!topicsQ, topicsLabel: P.groups.length ? 'Topics · ' + P.groups.length : 'Topics', topicsNote, hasTopicsNote, topicsStrayN, showTopicsStray, onTopicsStray, scope,
+      topicsList, hasTopics, topicsOpen: hasTopics || !!activeTopicGroup || !!topicsQ, topicsLabel: P.groups.length ? 'Topics · ' + P.groups.length : 'Topics', topicsNote, hasTopicsNote, topicsStrayN, showTopicsStray, onTopicsStray,
+      topicsTypes, topicsHasTypes, topicsHasEmpty, topicsType: S.topicsType || '', scope,
       topicsHasSearch, topicsSearchVal, onTopicsSearch, topicsHasPager, topicsPagerLine, onTopicsPrev, onTopicsNext, topicsHasPrev, topicsHasNext, topicsPageN: (topicsPage + 1) + ' of ' + topicsPages,
       toggleTheme: () => { const th = S.theme === 'dark' ? 'light' : 'dark'; try { localStorage.setItem('fold-explorer-theme', th); } catch (e) {} this.setState({ theme: th }); },
       workspaceClass: S.akFocus && view === 'ask' ? 'hd-workspace-surface hd-focus' : 'hd-workspace-surface',
