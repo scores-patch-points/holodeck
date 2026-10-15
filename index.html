@@ -119,6 +119,12 @@ html[data-metro] .hd-drive-search,html[data-metro] .hd-settings,html[data-metro]
 @media (prefers-reduced-motion:reduce){.hd-drive-tile.reading::after{animation:none;background:var(--acc2);opacity:.45}}
 .hd-drive-tile:hover{border-color:var(--line2);box-shadow:0 1px 8px rgba(0,0,0,.25)}
 .hd-drive-prev{all:unset;cursor:pointer;display:block;position:relative;height:118px;background:var(--s2);border-radius:11px 11px 0 0;overflow:hidden;padding:12px 14px;box-sizing:border-box}
+#hd-opening{position:fixed;left:0;top:0;height:3px;width:100%;z-index:200;pointer-events:none;opacity:0;background:linear-gradient(90deg,transparent,var(--acc2),transparent);background-size:40% 100%;background-repeat:no-repeat}
+#hd-opening.on{opacity:1;animation:hd-open-bar 0.9s ease-in-out infinite}
+@keyframes hd-open-bar{from{background-position:-40% 0}to{background-position:140% 0}}
+.hd-drive-tile,.hd-source-card{transition:transform .12s ease,box-shadow .12s ease,border-color .12s ease}
+.hd-drive-tile:active,.hd-source-card:active{transform:scale(.985)}
+@media (prefers-reduced-motion:reduce){#hd-opening.on{animation:none;background:var(--acc2)}.hd-drive-tile,.hd-source-card{transition:none}.hd-drive-tile:active,.hd-source-card:active{transform:none}}
 .hd-drive-snip{font:400 11px/1.45 var(--serif);color:var(--mut);display:-webkit-box;-webkit-line-clamp:6;-webkit-box-orient:vertical;overflow:hidden}
 .hd-drive-wave{position:absolute;left:14px;right:14px;top:14px;bottom:14px;background-repeat:no-repeat;background-position:center;background-size:100% 100%}
 .hd-drive-badge{position:absolute;right:10px;bottom:10px;min-width:30px;height:30px;padding:0 6px;box-sizing:border-box;border-radius:8px;display:flex;align-items:center;justify-content:center;font:700 12px var(--mono);color:#fff}
@@ -9193,7 +9199,18 @@ class Component extends DCLogic {
   toggleTopicGroup(p) { const cur = this.state.f.topicGroup; const same = cur && cur.label === p.label && !!cur.invert === !!p.invert; const ids = (p.docs || []).map(d => (typeof d === 'string' ? d : d.id)); this.setF('topicGroup', same ? null : { label: p.label, docs: ids, invert: !!p.invert }); }
   sel(type, id) { const S0 = this.state; if (type === 'name' && S0.view === 'reader' && !(S0.sel && S0.sel.type === 'name' && S0.sel.id === id)) this.pushHist(); if (type === 'doc') this.markRead(id); this.setState(s => (s.sel && s.sel.type === type && s.sel.id === id && s.view !== 'reader') ? { sel: null, selAll: false, pfIdx: 0, pfAll: false } : { sel: { type, id }, selAll: false, pfIdx: 0, pfAll: false }); }   // in a source, clicking content pivots the side panel to that term; only its ✕ closes it
   go(view) { this.setState({ view, readDoc: null }); }
-  read(docId, stId) { const S0 = this.state; if (S0.view !== 'reader' || docId !== S0.readDoc || (S0.sel && S0.sel.type === 'name')) this.pushHist(); this.markRead(docId); const live = this.isLiveDoc(this.analysis().docById[docId]); if (docId !== this.state.readDoc) { this.state.seekT = 0; this._faithFound = null; } this.setState({ view: 'reader', readDoc: docId, narrowDetail: false, sel: stId ? { type: 'statement', id: stId } : { type: 'doc', id: docId }, ...(live ? { readMode: 'original' } : {}) }); }
+  // Opening a source from anywhere else is the heavy transition (the reader paints thousands of statements). The bar and
+  // the cursor appear on the click's own frame; the work starts on the next, so the page answers before it is busy.
+  read(docId, stId) {
+    const S0 = this.state;
+    if (this._rdNow || (S0.view === 'reader' && docId === S0.readDoc)) { this._rdNow = false; return this.readNow(docId, stId); }
+    try { let b = document.getElementById('hd-opening'); if (!b) { b = document.createElement('div'); b.id = 'hd-opening'; document.body.appendChild(b); } b.className = 'on'; document.body.style.cursor = 'progress'; } catch (e) {}
+    requestAnimationFrame(() => setTimeout(() => {
+      this._rdNow = true; try { this.read(docId, stId); } finally { this._rdNow = false; }
+      requestAnimationFrame(() => { try { const b = document.getElementById('hd-opening'); if (b) b.className = ''; document.body.style.cursor = ''; } catch (e) {} });
+    }, 0));
+  }
+  readNow(docId, stId) { const S0 = this.state; if (S0.view !== 'reader' || docId !== S0.readDoc || (S0.sel && S0.sel.type === 'name')) this.pushHist(); this.markRead(docId); const live = this.isLiveDoc(this.analysis().docById[docId]); if (docId !== this.state.readDoc) { this.state.seekT = 0; this._faithFound = null; } this.setState({ view: 'reader', readDoc: docId, narrowDetail: false, sel: stId ? { type: 'statement', id: stId } : { type: 'doc', id: docId }, ...(live ? { readMode: 'original' } : {}) }); }
   saveAdded(added, opts) {
     // The bytes go to IndexedDB as a gzipped binary blob, not localStorage: a big
     // corpus is stored compact, and the page only carries a small pointer. The
