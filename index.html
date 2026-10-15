@@ -5857,7 +5857,7 @@ class Component extends DCLogic {
   // otherwise the verbatim first words of its text. Never anything invented.
   docThumb(doc) {
     const vid = doc && doc.media && doc.media.kind === 'youtube' && doc.media.id;
-    const txt = String((doc && doc.text) || '').replace(/\s+/g, ' ').trim().slice(0, 180);
+    const txt = String((doc && doc.text) || '').slice(0, 700).replace(/\s+/g, ' ').trim().slice(0, 180);   // slice first: a book's whole text is never scanned for a 180-character preview
     return { thumbImg: vid ? 'url(https://i.ytimg.com/vi/' + doc.media.id + '/mqdefault.jpg)' : 'none', thumbText: vid ? '' : txt, hasThumbText: !vid && !!txt };
   }
   linkItems(sts, docWhole, A) {
@@ -8413,7 +8413,12 @@ class Component extends DCLogic {
     target.addEventListener('click', e => { const a = e.target.closest('a'); if (a && (e.metaKey || e.ctrlKey)) return; const nm = e.target.closest('[data-name]'); const st = e.target.closest('[data-st]');
       if (a && !e.shiftKey && /^https?:/.test(a.href || '')) { e.preventDefault(); e.stopPropagation(); this.navigate(a.href); return; }
       if (nm) { e.preventDefault(); const dd = this._A && this.state.view === 'reader' && this.state.readDoc && this._A.docById[this.state.readDoc]; if (dd && dd.media && dd.media.segN > 0) { this.phJumpFrom(nm, e, dd.id); this.openProfile(nm.getAttribute('data-name')); return; } this.sel('name', nm.getAttribute('data-name')); return; }
-      if (st) { e.preventDefault(); this.sel('statement', st.getAttribute('data-st')); return; }
+      if (st) {
+        e.preventDefault();
+        // a click on a word pivots the side panel to that word (a known name opens its profile); a click that is not on a word opens the statement
+        const w = this.wordAtClick(e);
+        if (w) { const nmk = this.nameFor(w); if (nmk) this.sel('name', nmk); else this.setState({ sel: { type: 'term', id: w }, selAll: false, pfIdx: 0, pfAll: false, findQ: w, findOpen: true, findI: 0, findN: 0 }); return; }
+        this.sel('statement', st.getAttribute('data-st')); return; }
       if (a) e.preventDefault(); }, true);
     target.addEventListener('submit', e => e.preventDefault(), true);
     target.addEventListener('mouseover', e => { const st = e.target.closest && e.target.closest('[data-st]'); this.hoverSt(st ? st.getAttribute('data-st') : null); });
@@ -9026,7 +9031,55 @@ class Component extends DCLogic {
       if (st.spans) st.spans = st.spans.filter(s => !sup.has(String(s.name || '').toLowerCase()));
     });
   }
-  setF(k, v) { this.setState(s => ({ f: { ...s.f, [k]: v } })); }
+  // The term a filter stands for: a topic, a name, or a single year. Choosing one reveals that term in the source text
+  // (the reader's find paints it; a source card quotes the passage around it) on whatever page is loaded.
+  termOf(f) {
+    f = f || this.state.f || {};
+    if (f.topicGroup && !f.topicGroup.invert && f.topicGroup.label && f.topicGroup.label !== 'Not in any topic') return String(f.topicGroup.label);
+    if (f.name) return String(f.name);
+    if (f.topic) return String(f.topic);
+    if (f.range && f.range.from && f.range.from === f.range.to) return String(f.range.from);
+    return '';
+  }
+  // verbatim passage around the first occurrence of the term, else the opening words; cached per source and term
+  termWindow(text, n, term) {
+    const t = String(text || ''); term = String(term || '').trim().toLowerCase();
+    const open = () => t.slice(0, n * 3).replace(/\s+/g, ' ').trim().slice(0, n);
+    if (!term || !t) return open();
+    const C = this._twC || (this._twC = new Map()), key = term + '|' + t.length + '|' + t.slice(0, 24) + '|' + n, hit = C.get(key); if (hit !== undefined) return hit;
+    const i = t.toLowerCase().indexOf(term); let out;
+    if (i < 0) out = open();
+    else { const a = Math.max(0, i - Math.floor(n / 3)); out = (a > 0 ? '… ' : '') + t.slice(a, a + n * 2).replace(/\s+/g, ' ').trim().slice(0, n); }
+    if (C.size > 400) C.clear(); C.set(key, out); return out;
+  }
+  // the word under a click (letters only, 3+), read from the text node itself
+  wordAtClick(e) {
+    try {
+      if (window.getSelection && String(window.getSelection()).trim()) return '';   // a drag-select is not a click on a word
+      const r = document.caretRangeFromPoint ? document.caretRangeFromPoint(e.clientX, e.clientY) : null; if (!r || r.startContainer.nodeType !== 3) return '';
+      const t = r.startContainer.nodeValue, i = r.startOffset; let a = i, b = i; const L = /[\p{L}\p{N}'’-]/u;
+      while (a > 0 && L.test(t[a - 1])) a--; while (b < t.length && L.test(t[b])) b++;
+      const w = t.slice(a, b).replace(/^['’-]+|['’-]+$/g, ''); return w.length >= 3 ? w : '';
+    } catch (err) { return ''; }
+  }
+  // a known name this word is (exact, case-insensitive), else ''
+  nameFor(w) {
+    const A = this._A; if (!A || !A.names) return ''; const L = w.toLowerCase();
+    if (A.names[w]) return w;
+    if (!this._nameLC || this._nameLCn !== Object.keys(A.names).length) { this._nameLC = new Map(Object.keys(A.names).map(k => [k.toLowerCase(), k])); this._nameLCn = this._nameLC.size; }
+    return this._nameLC.get(L) || '';
+  }
+  setF(k, v) {
+    this.setState(s => {
+      const f = { ...s.f, [k]: v }, out = { f };
+      if (k === 'topicGroup' || k === 'name' || k === 'topic' || k === 'range') {
+        const was = this.termOf(s.f), now = this.termOf(f);
+        if (now) { out.findQ = now; out.findOpen = true; out.findI = 0; out.findN = 0; }
+        else if (was && s.findQ === was) { out.findQ = ''; out.findOpen = false; out.findI = 0; out.findN = 0; }
+      }
+      return out;
+    });
+  }
   // FILTER TUPLE: [sources, filters, what-counts]. Position 1 (sources) is the kept/seen
   // toggle per document — being for this surface = document (holodeck-reader scope).
   // Position 2 (filters) is state.f. Position 3 (what-counts) is state.fw: one for-whom
@@ -9095,7 +9148,7 @@ class Component extends DCLogic {
     else if (specific) { l = typ; if (/book/i.test(typ)) g = '❐'; else if (/report|inquiry|investigation/i.test(typ)) g = '▤'; }
     else if (/news|blog|web|page|government|organisation/i.test(t) || d.url) { g = '◍'; c = '#12a4b6'; l = 'Web page'; }
     else if (/notes?\b/i.test(t)) { g = '✎'; c = '#f9ab00'; l = 'Note'; }
-    return { dvGlyph: g, dvColor: c, dvLabel: l, dvSnippet: String(d.text || '').replace(/\s+/g, ' ').trim().slice(0, 240) };
+    return { dvGlyph: g, dvColor: c, dvLabel: l, dvSnippet: this.termWindow(d.text, 240, this.termOf()) };
   }
   // every kept copy of a source's bytes: object URL, text, PDF, OCR, image, eyes, recording (IndexedDB + OPFS)
   purgeDocBytes(docId) {
@@ -9122,7 +9175,7 @@ class Component extends DCLogic {
   // a topic segment is a filter over the workspace's own detected groups, not a keyword fold: it keeps only
   // statements whose SOURCE belongs to the group's member documents (or, inverted, to no detected group).
   toggleTopicGroup(p) { const cur = this.state.f.topicGroup; const same = cur && cur.label === p.label && !!cur.invert === !!p.invert; const ids = (p.docs || []).map(d => (typeof d === 'string' ? d : d.id)); this.setF('topicGroup', same ? null : { label: p.label, docs: ids, invert: !!p.invert }); }
-  sel(type, id) { const S0 = this.state; if (type === 'name' && S0.view === 'reader' && !(S0.sel && S0.sel.type === 'name' && S0.sel.id === id)) this.pushHist(); if (type === 'doc') this.markRead(id); this.setState(s => (s.sel && s.sel.type === type && s.sel.id === id) ? { sel: null, selAll: false, pfIdx: 0, pfAll: false } : { sel: { type, id }, selAll: false, pfIdx: 0, pfAll: false }); }
+  sel(type, id) { const S0 = this.state; if (type === 'name' && S0.view === 'reader' && !(S0.sel && S0.sel.type === 'name' && S0.sel.id === id)) this.pushHist(); if (type === 'doc') this.markRead(id); this.setState(s => (s.sel && s.sel.type === type && s.sel.id === id && s.view !== 'reader') ? { sel: null, selAll: false, pfIdx: 0, pfAll: false } : { sel: { type, id }, selAll: false, pfIdx: 0, pfAll: false }); }   // in a source, clicking content pivots the side panel to that term; only its ✕ closes it
   go(view) { this.setState({ view, readDoc: null }); }
   read(docId, stId) { const S0 = this.state; if (S0.view !== 'reader' || docId !== S0.readDoc || (S0.sel && S0.sel.type === 'name')) this.pushHist(); this.markRead(docId); const live = this.isLiveDoc(this.analysis().docById[docId]); if (docId !== this.state.readDoc) { this.state.seekT = 0; this._faithFound = null; } this.setState({ view: 'reader', readDoc: docId, narrowDetail: false, sel: stId ? { type: 'statement', id: stId } : { type: 'doc', id: docId }, ...(live ? { readMode: 'original' } : {}) }); }
   saveAdded(added, opts) {
@@ -12003,6 +12056,13 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
         tagTitle: 'Names in it', tags: nm.slice(0, 10).map(nameTag),
         actions: [{ label: doc.media ? 'Watch and read the transcript' : this.isLiveDoc(doc) ? 'View the page' : 'Read it', onClick: () => this.read(doc.id) }, ...((doc.recordings || []).map(r => ({ label: r.label + ' ↗ (not transcribed)', onClick: () => window.open(r.url, '_blank', 'noopener') }))), ...(doc.url ? [{ label: 'Open original ↗', onClick: () => window.open(doc.url, '_blank', 'noopener') }] : []), { label: f.doc === doc.id ? 'Stop narrowing to this source' : 'Narrow everything to this source', onClick: () => this.setF('doc', f.doc === doc.id ? null : doc.id) }],
         listTitle: 'Its statements', list: listOf(sts), linkGroups: this.linkGroupsFor(doc.id, A) };
+    } else if (sel.type === 'term') {
+      const w = String(sel.id).toLowerCase(), sts = A.sts.filter(st => st.text.toLowerCase().includes(w)), docs = new Set(sts.map(st => st.doc));
+      d = { eyebrow: 'Word in the sources', color: 'var(--acc)', title: sel.id,
+        facts: [{ k: 'Said', v: plural(sts.length, 'time') + ' · ' + plural(docs.size, 'source') }, { k: 'When', v: years(sts) }],
+        tagTitle: 'Also named here', tags: [...new Set(sts.flatMap(st => st.names))].slice(0, 8).map(nameTag),
+        actions: [{ label: 'Narrow everything to “' + sel.id + '”', onClick: () => this.setState({ q: String(sel.id) }) }],
+        listTitle: 'Where it is said', list: listOf(sts) };
     } else if (sel.type === 'unit') {
       const items = A.sts.flatMap(st => st.figs.filter(g => g.unit === sel.id).map(g => ({ g, st })));
       const docs = new Set(items.map(x => x.st.doc)); const vals = new Set(items.map(x => x.g.value));
@@ -12023,9 +12083,9 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
       if (scopeN) { d.scopeCount = scopeN.k + ' of ' + scopeN.n + ' match your filters'; d.listTitle = (d.listTitle || '') + ' · ' + scopeN.k + ' of ' + scopeN.n + ' in view'; }
       else { const inV = sel.type === 'statement' ? Fs.has(sel.id) : null; d.scopeCount = inV === false ? 'Outside your filters' : inV ? 'Matches your filters' : 'Filters active'; } }
     if (sel.type === 'doc' && A.docById[sel.id]) {
-      const dd = A.docById[sel.id], T = this.docThumb(dd), paras = String(dd.text || '').split(/\n{2,}|\r\n\r\n/).map(x => x.replace(/\s+/g, ' ').trim()).filter(Boolean);
+      const dd = A.docById[sel.id], T = this.docThumb(dd), full = String(dd.text || ''), paras = full.slice(0, 9000).split(/\n{2,}|\r\n\r\n/).map(x => x.replace(/\s+/g, ' ').trim()).filter(Boolean);
       const shown = []; let used = 0; for (const x of paras) { if (used > 2400 || shown.length >= 12) break; shown.push({ text: x.length > 600 ? x.slice(0, 600) + '…' : x }); used += x.length; }
-      Object.assign(d, T, { hasThumb: true, hasTx: shown.length > 0, tx: shown, txTitle: (dd.media ? 'Transcript' : 'Text') + (paras.length > shown.length ? ' · first ' + shown.length + ' of ' + paras.length + ' passages' : ''), txNote: dd.media ? 'A machine reading of the sound, not checked by a person.' : 'As read from the source; spellings follow the scan.', txOpen: () => this.read(dd.id) });
+      Object.assign(d, T, { hasThumb: true, hasTx: shown.length > 0, tx: shown, txTitle: (dd.media ? 'Transcript' : 'Text') + (full.length > 9000 || paras.length > shown.length ? ' · first ' + shown.length + ' passages' : ''), txNote: dd.media ? 'A machine reading of the sound, not checked by a person.' : 'As read from the source; spellings follow the scan.', txOpen: () => this.read(dd.id) });
     }
     d.hasQuote = !!d.quote; d.hasTags = !!(d.tags && d.tags.length); d.hasList = !!(d.list && d.list.length);
     const LN = this.state.selAll ? Infinity : 4; const fullN = (d.list || []).length; d.list = (d.list || []).slice(0, LN); d.hasMoreList = fullN > d.list.length; d.moreList = 'Show all ' + fullN; d.onMoreList = () => this.setState({ selAll: true });
