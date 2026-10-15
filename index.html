@@ -4642,7 +4642,16 @@ const short = (t, n) => { t = clean(t); return t.length > n ? t.slice(0, n - 1) 
 // A contract's filed PDF lives at /epav/<token>.pdf. Derive the token from the
 // doc's own address so a doc stored before pdfSrc existed still renders its PDF.
 function epavTokenOf(d) { const m = /\/(?:Document|Open)\/([A-Za-z0-9]+)/.exec((d && d.url) || ''); if (m) return m[1]; const id = String((d && d.id) || ''); return id.startsWith('nash-') ? id.slice(5) : null; }
-function withPdfSrc(d) { if (d && !d.pdfSrc) { const t = epavTokenOf(d); if (t) return { ...d, pdfSrc: '/epav/' + t + '.pdf' }; } return d; }
+// PDFs kept beside the app, by the address a source cites them at: a same-origin copy renders as pages with the
+// selectable text over them (the host's own address is not CORS-open, so it cannot be fetched from a page).
+const KEPT_PDFS = { 'https://assets.scriptslug.com/live/pdf/scripts/titanic-1997.pdf': 'pdfs/titanic-1997.pdf' };
+function withPdfSrc(d) {
+  if (d && !d.pdfSrc) {
+    const kept = KEPT_PDFS[String(d.url || '').replace(/[?#].*$/, '')]; if (kept) return { ...d, pdfSrc: new URL(kept, location.href).href, custody: d.custody || 'a copy kept with the app' };
+    const t = epavTokenOf(d); if (t) return { ...d, pdfSrc: '/epav/' + t + '.pdf' };
+  }
+  return d;
+}
 // The public (static) host has no /epav route, so a same-origin fetch 404s there. Resolve a contract's PDF by trying the
 // same-origin route first (the dev server proxies it), then the archive.org twin through the CORS-open holodeck-proxy
 // worker. A body only counts if it is really a PDF, so a static host's 404 page or index fallback never reaches pdf.js.
@@ -9000,7 +9009,7 @@ class Component extends DCLogic {
   corpusId() { return this.state.corpus || 'custom'; }
   baseDocs(id) { return SAMPLES[id] ? SAMPLES[id].docs : []; }
   analysis() {
-    const id = this.corpusId(); const seenU = new Set(); const docs = this.baseDocs(id).concat(this.state.added[id] || []).filter(d => { const u = d.url && d.url.replace(/^https?:\/\/(www\.)?/, '').replace(/[#?].*$/, '').replace(/\/$/, '').toLowerCase(); if (!u || d.ohsId) { if (u) seenU.add(u); return true; } if (seenU.has(u)) return false; seenU.add(u); return true; });
+    const id = this.corpusId(); const seenU = new Set(); const docs = this.baseDocs(id).concat(this.state.added[id] || []).map(withPdfSrc).filter(d => { const u = d.url && d.url.replace(/^https?:\/\/(www\.)?/, '').replace(/[#?].*$/, '').replace(/\/$/, '').toLowerCase(); if (!u || d.ohsId) { if (u) seenU.add(u); return true; } if (seenU.has(u)) return false; seenU.add(u); return true; });
     // Progressive ingest: while sources are staged (stored, not yet folded), analyze only the folded set and return
     // their graph with the staged docs appended as bare sources — Sources renders the moment a file lands, and the
     // app stays responsive instead of blocking on one giant analyze over the whole batch.
@@ -9458,7 +9467,7 @@ class Component extends DCLogic {
     this._stage = null; this._stagedIds = null; this._stagedNotes = null;
     const added = this.state.added;
     if (!ids.length && !(added[id] || []).length) { this.setState({ busy: '' }); return; }
-    const seenU = new Set(); const allDocs = this.baseDocs(id).concat(added[id] || []).filter(d => { const u = d.url && d.url.replace(/^https?:\/\/(www\.)?/, '').replace(/[#?].*$/, '').replace(/\/$/, '').toLowerCase(); if (!u || d.ohsId) { if (u) seenU.add(u); return true; } if (seenU.has(u)) return false; seenU.add(u); return true; });
+    const seenU = new Set(); const allDocs = this.baseDocs(id).concat(added[id] || []).map(withPdfSrc).filter(d => { const u = d.url && d.url.replace(/^https?:\/\/(www\.)?/, '').replace(/[#?].*$/, '').replace(/\/$/, '').toLowerCase(); if (!u || d.ohsId) { if (u) seenU.add(u); return true; } if (seenU.has(u)) return false; seenU.add(u); return true; });
     hdT('store', 'analyze', 'Re-reading the whole workspace (' + allDocs.length + ' sources) so the new material is linked to everything already there');
     const A = analyze({ docs: allDocs }, this._html);
     this.applyCorrections(A, id);
