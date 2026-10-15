@@ -7629,6 +7629,18 @@ class Component extends DCLogic {
     this._lrixSig = sig;
     if (!docs.length) { this._lrixDone = sig; this._localRix = null; this._lrixP = null; return null; }
     this._lrixP = (async () => {
+      // Off the main thread first: the reading of a few thousand statements is seconds of work. If a worker cannot
+      // start or refuses, the same loop runs in the tab below.
+      try {
+        const viaWorker = await new Promise((res, rej) => {
+          const w = new Worker(new URL('local-reading-worker.js', location.href), { type: 'module' });
+          const give = () => w.postMessage({ docs: docs.map(d => (d.screen && d.screen.elements && d.screen.elements.length) ? { id: d.id, elements: d.screen.elements, readingText: d.screen.text } : { id: d.id, text: String(d.text || '').slice(0, 60000) }) });
+          const lost = setTimeout(() => { w.terminate(); rej(new Error('worker never answered')); }, 15000);   // a worker that cannot start falls back to the tab
+          w.onmessage = ev => { const m = ev.data || {}; if (m.ready) { clearTimeout(lost); give(); } else if (m.err) { w.terminate(); rej(new Error(m.err)); } else if (m.done) { w.terminate(); res(m.index); } };
+          w.onerror = ev => { clearTimeout(lost); w.terminate(); rej(new Error((ev && ev.message) || 'worker failed')); };
+        });
+        if (viaWorker) return viaWorker;
+      } catch (e) { /* fall through to the in-tab read */ }
       try {
         const M = await import(new URL('holodeck-reading.js', location.href).href);
         const R = await (await import(new URL('holodeck-reader.js', location.href).href)).makeEngineRelationReader();
