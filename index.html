@@ -823,6 +823,12 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
             </section>
           </sc-for>
         </sc-if>
+        <sc-if value="{{ svMap }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-top:8px;border-radius:12px;background:var(--bg);border:1px solid var(--line)">{{ graphEl }}</div>
+        </sc-if>
+        <sc-if value="{{ svRefs }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-top:8px">{{ refEl }}</div>
+        </sc-if>
         <sc-if value="{{ drv.empty }}" hint-placeholder-val="{{ false }}"><div style="padding:36px 8px;font:400 15px var(--sans);color:var(--mut);text-align:center">{{ drv.emptyText }}</div></sc-if>
         <sc-if value="{{ svGrid }}" hint-placeholder-val="{{ true }}">
           <div class="hd-drive-grid">
@@ -5477,6 +5483,18 @@ function MapView(p) {
   return R.createElement('div', { ref: host, style: { position: 'relative', height: p.height || '560px' } });
 }
 
+// The Referents inbox: every referent the reader admitted, in the order it first
+// appeared, each with the profile the sources give it. A list-and-detail surface
+// (holodeck-referents-view.js), mounted into the Sources view beside Grid and Table.
+function ReferentsView(p) {
+  const R = React, host = R.useRef(null), ctl = R.useRef(null), cur = R.useRef(p); cur.current = p;
+  R.useEffect(() => { let dead = false;
+    import(new URL('holodeck-referents-view.js', location.href).href).then(M => { if (dead || !host.current) return; ctl.current = M.mountReferentsView(host.current, { onOpen: n => cur.current.onOpen(n), onRead: (d, id) => cur.current.onRead(d, id) }); ctl.current.set(cur.current.data); }).catch(e => console.warn('holodeck referents view', e));
+    return () => { dead = true; if (ctl.current) ctl.current.destroy(); ctl.current = null; }; }, []);
+  R.useEffect(() => { if (ctl.current) ctl.current.set(p.data); });
+  return R.createElement('div', { ref: host, style: { position: 'relative', minHeight: '320px' } });
+}
+
 const SAY_RE = '(?:said|says|told|wrote|writes|argued|added|stated|states|announced|asked|testified|explained|noted|claimed|contends|replied|responded)';
 function whoSays(st, A) {
   if (st._who !== undefined) return st._who;
@@ -9737,8 +9755,8 @@ class Component extends DCLogic {
       : srcGroups.map(g => ({ label: g.label + ' · ' + g.n, hasLabel: true, rows: mkRows(rowsAll.filter(r => r.group === g.label)) }));
     const seg = on => ({ bg: on ? 'var(--sel2)' : 'transparent', col: on ? 'var(--ink)' : 'var(--mut)' });
     const meetVals = {};
-    const svVals = { ...meetVals, srcHiddenNote: this._srcHidden ? plural(this._srcHidden, 'other source') + ' with nothing in this selection ' + (this._srcHidden === 1 ? 'is' : 'are') + ' hidden' : '', svCards: svMode === 'cards', svTable: svMode === 'table', svTabsOn: svGroup === 'tabs',
-      svModes: [['grid', 'Grid'], ['table', 'Table']].map(([k, l]) => ({ label: l, ...seg(svMode === k || (k === 'grid' && svMode === 'cards')), onClick: () => this.setState({ svMode: k }) })),
+    const svVals = { ...meetVals, srcHiddenNote: this._srcHidden ? plural(this._srcHidden, 'other source') + ' with nothing in this selection ' + (this._srcHidden === 1 ? 'is' : 'are') + ' hidden' : '', svCards: svMode === 'cards', svTable: svMode === 'table', svMap: svMode === 'map', svRefs: svMode === 'referents', svTabsOn: svGroup === 'tabs',
+      svModes: [['grid', 'Grid'], ['table', 'Table'], ['map', 'Map'], ['referents', 'Referents']].map(([k, l]) => ({ label: l, ...seg(svMode === k || (k === 'grid' && svMode === 'cards')), onClick: () => this.setState({ svMode: k }) })),
       svTabs: tabs.map(t => ({ label: t.label, n: t.n, cls: t.id === svTab ? 'on' : '', bd: t.id === svTab ? 'var(--acc2)' : 'transparent', col: t.id === svTab ? 'var(--ink)' : 'var(--mut)', onClick: () => this.setState({ svTab: t.id }) })),
       svCols: colOrder.map(k => ({ label: colMap.get(k).label + (svSort === k ? (svDir > 0 ? ' ↑' : ' ↓') : ''),
         onClick: () => this.setState({ svSort: k, svDir: svSort === k ? -svDir : (k === 'title' || k === 'publisher' || (k.startsWith('f:') && ['text', 'id'].includes(fcBy.get(k.slice(2)).type)) ? 1 : -1) }),
@@ -9896,7 +9914,8 @@ class Component extends DCLogic {
 
     _m('statements'); // connections
     const pairs = D.edgeList.map(e => { const h = hi(isSel('pair', e.a + '|' + e.b)); return { a: e.a, b: e.b, n: plural(e.sts.length, 'statement'), bg: h.bg, bd: h.bd, onClick: () => this.sel('pair', e.a + '|' + e.b) }; });
-    const graphEl = view === 'connections' ? this.graph(D, selName, F, A) : null;
+    const graphEl = (view === 'connections' || svMode === 'map') ? this.graph(D, selName, F, A) : null;
+    const refEl = (view === 'summary' && svMode === 'referents') ? React.createElement(ReferentsView, { data: this.referentsView(A, D), onOpen: n => this.openProfile(n), onRead: (doc, id) => this.read(doc, id) }) : null;
     const orbX = view === 'connections' ? this.orbitUi(A, selName) : { orb: {}, tl: {}, srcT: [] };
 
     _m('connections'); // framing
@@ -10302,6 +10321,7 @@ class Component extends DCLogic {
     return {
       ...this._extra,
       ...svVals,
+      refEl, graphEl,
       sourceKindsUseful: tabs.length > 2, showSourceGroupLabels: svVals.svCardGroups.length > 1, hasGaps: false, /* "What to check" hidden for now; restore with gaps.length > 0 */ toolsOpen: this._toolsOpen !== false || ['names', 'records', 'connections', 'ingest'].includes(view), timeFilterActive: !!f.range, timeControlLabel: f.range ? 'Time filter · active' : 'Filter by time',
       srcGroups: svVals.svCardGroups.map(g => ({ ...g, ...this.capL('sg:' + g.label, g.items, 60) })),
       hasPairsHidden: D.edgeHidden > 0, pairsHidden: plural(D.edgeHidden, 'other pair') + ' share a statement only once, or no more often than chance would give, so ' + (D.edgeHidden === 1 ? 'it is' : 'they are') + ' left out.',
@@ -10715,6 +10735,32 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
   }
   corpusName() { const id = this.corpusId(); return id === 'custom' ? 'Your content' : SAMPLES[id] ? SAMPLES[id].name.replace(/\s*·\s*GitHub$/i, '') : loadWorkspaceNames()[id] || 'Your content'; }
 
+  // The Referents inbox rows: every referent the reader admitted, each with the
+  // profile the sources give it, ordered by where it FIRST appears (source reading
+  // order, then byte offset) — "as they appear". The profile is the workspace's own
+  // induced one (holodeck-profile.js); the first-appearance quote is the earliest
+  // statement that names it.
+  referentsView(A, D) {
+    const docIdx = new Map(A.docs.map((d, i) => [d.id, i]));
+    const rows = D.nameList.map(n => {
+      let best = null;
+      for (const st of n.sts) {
+        const di = docIdx.has(st.doc) ? docIdx.get(st.doc) : 1e9;
+        const s = st.s || 0;
+        if (!best || di < best.di || (di === best.di && s < best.s)) best = { di, s, st };
+      }
+      const st0 = best && best.st; const d0 = st0 ? A.docById[st0.doc] : null; const pl = this.profilePlain(A, n.name);
+      return {
+        name: n.name, type: n.type, typeLabel: TYPE_L[n.type] || 'Names', typeColor: TYPE_C[n.type] || 'var(--mut)',
+        mentions: n.sts.length, sources: n.docs.size, aliases: n.aliases || [],
+        established: !!(pl && pl.rows.length), kindLine: pl ? pl.kind : '', countLine: pl ? pl.countLine : '', profile: pl ? pl.rows : [],
+        firstDoc: d0 ? d0.title : '', firstYear: d0 && (d0.pubLabel || d0.year) ? String(d0.pubLabel || d0.year) : '',
+        firstLine: st0 ? short(clean(st0.text), 200) : '', firstDocId: st0 ? st0.doc : null, firstStId: st0 ? st0.id : null,
+        order: best ? best.di * 1e9 + best.s : 1e18,
+      };
+    }).sort((a, b) => a.order - b.order || b.mentions - a.mentions || a.name.localeCompare(b.name));
+    return { rows, total: rows.length, ready: !!(_hdProf && _hdProf.buildFromTriples) };
+  }
   graph(D, selName, F0, A, onlyDoc) {
     const h = React.createElement;
     // one source: only the statements of that source, so the names and ties are what that source says on its own
