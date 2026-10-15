@@ -642,10 +642,6 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
               </div>
               <button onClick="{{ intro.onClose }}" title="Dismiss this card" style="background:none;border:0;color:var(--mut);cursor:pointer;font:500 16px var(--sans);padding:0 2px;flex:none">✕</button>
             </div>
-            <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-              <span style="font:600 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mut)">Try</span>
-              <sc-for list="{{ intro.tryQs }}" as="x" hint-placeholder-count="3"><button class="hd-chip" onClick="{{ x.onClick }}" title="Ask this question now">{{ x.t }}</button></sc-for>
-            </div>
             <sc-if value="{{ intro.hasHint }}" hint-placeholder-val="{{ false }}"><span style="font:400 13px var(--sans);color:var(--acc)">{{ intro.hint }}</span></sc-if>
             <span style="font:400 12.5px/1.45 var(--sans);color:var(--mut)">{{ intro.legend }} <a href="demo-guide.html" style="color:var(--acc);white-space:nowrap">What am I looking at? →</a></span>
           </div>
@@ -1045,7 +1041,6 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
                 </div>
                 <div style="display:flex;gap:8px;flex-wrap:wrap">
                   <sc-if value="{{ db.rec.canOpen }}" hint-placeholder-val="{{ false }}"><button onClick="{{ db.rec.onOpen }}" style="background:var(--acc2);border:0;color:#fff;border-radius:8px;padding:6px 14px;cursor:pointer;font:600 14px var(--sans)" style-hover="background:var(--acc3)">{{ db.rec.openLabel }}</button></sc-if>
-                  <button onClick="{{ db.rec.onAsk }}" style="background:none;border:1px solid var(--line2);border-radius:8px;padding:6px 14px;cursor:pointer;font:500 14px var(--sans);color:var(--ink)" style-hover="border-color:var(--acc)">Ask the Fold about this</button>
                 </div>
                 <div style="display:flex;flex-direction:column">
                   <sc-for list="{{ db.rec.fields }}" as="f" hint-placeholder-count="4"><div style="display:grid;grid-template-columns:110px minmax(0,1fr);gap:12px;border-top:1px solid var(--line);padding:7px 0;align-items:baseline"><span style="font:500 12px var(--mono);color:var(--mut);overflow-wrap:anywhere">{{ f.k }}</span><span style="font:400 14px/1.45 var(--sans);color:var(--ink);overflow-wrap:anywhere">{{ f.v }}</span></div></sc-for>
@@ -1378,7 +1373,6 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
                 <sc-if value="{{ ak.art.chip.has }}" hint-placeholder-val="{{ false }}"><div style="display:flex;align-items:center;gap:8px;font:500 13px var(--sans);color:var(--ink2);padding-bottom:6px;border-bottom:1px solid var(--line)"><span style="flex:none;width:8px;height:8px;border-radius:2px;background:{{ ak.art.chip.col }}"></span><span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ ak.art.chip.label }}</span><button onClick="{{ ak.art.chip.onToggle }}" style="all:unset;cursor:pointer;color:var(--acc);font:500 13px var(--sans);white-space:nowrap" style-hover="text-decoration:underline">{{ ak.art.chip.action }}</button></div></sc-if>
                 <textarea value="{{ ak.q }}" onChange="{{ ak.onQ }}" onKeyDown="{{ ak.onKey }}" rows="2" placeholder="{{ ak.ph }}" style="background:transparent;border:0;outline:none;resize:vertical;color:var(--ink);font:400 16px/1.5 var(--sans);min-height:48px"></textarea>
                 <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-                  <sc-if value="{{ ak.tryOn }}" hint-placeholder-val="{{ false }}"><sc-for list="{{ ak.tryQs }}" as="x" hint-placeholder-count="3"><button class="hd-chip" onClick="{{ x.onClick }}" title="Ask this now">{{ x.t }}</button></sc-for></sc-if>
                   <sc-if value="{{ ak.showEx }}" hint-placeholder-val="{{ true }}"><sc-for list="{{ ak.examples }}" as="x" hint-placeholder-count="3"><button onClick="{{ x.onClick }}" style="background:var(--s2);border:1px solid var(--line2);border-radius:999px;padding:3px 10px;cursor:pointer;font:400 13px var(--sans);color:var(--ink2);white-space:normal;text-align:left" style-hover="border-color:var(--acc)">{{ x.t }}</button></sc-for></sc-if>
                   <div style="margin-left:auto;display:flex;gap:8px">
                     <sc-if value="{{ ak.busyAny }}" hint-placeholder-val="{{ false }}"><button onClick="{{ ak.stop }}" style="background:none;border:1px solid var(--line2);border-radius:8px;padding:6px 14px;cursor:pointer;font:500 14px var(--sans);color:var(--ink)">Stop</button></sc-if>
@@ -2002,8 +1996,6 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
             </div>
             <span style="font:400 13px/1.45 var(--sans);color:var(--mut);text-wrap:pretty">The map below is the combined content: the names these sources share, nested under the names they are tied to most. Step the Names level up or down to open or fold the groups; click a name to see every statement it sits in.</span>
             <div style="display:flex;gap:8px;flex-wrap:wrap">
-              <button onClick="{{ cfold.onAsk }}" style="background:var(--acc2);border:0;color:#fff;border-radius:8px;padding:6px 14px;cursor:pointer;font:600 13px var(--sans)">Ask these sources</button>
-              <button onClick="{{ cfold.onBuild }}" style="background:none;border:1px solid var(--line2);border-radius:8px;padding:6px 14px;cursor:pointer;font:500 13px var(--sans);color:var(--ink2)" style-hover="border-color:var(--acc)">Build a document from them</button>
               <button onClick="{{ cfold.onAll }}" style="background:none;border:0;padding:6px 8px;cursor:pointer;font:500 13px var(--sans);color:var(--acc)">Back to all sources</button>
             </div>
           </section>
@@ -2211,7 +2203,7 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
         <sc-if value="{{ qa.isAns }}" hint-placeholder-val="{{ false }}">
           <section style="background:var(--s1);border:1px solid var(--line);border-radius:14px;padding:18px 20px;display:flex;flex-direction:column;gap:14px">
             <div style="display:flex;flex-direction:column;gap:4px">
-              <div style="display:flex;justify-content:space-between;gap:12px;align-items:baseline;flex-wrap:wrap"><span style="font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--acc)">Best answer from the record</span><button onClick="{{ askFold }}" style="all:unset;cursor:pointer;font:600 13px var(--sans);color:var(--acc)" style-hover="text-decoration:underline">Ask the Fold →</button></div>
+              <div style="display:flex;justify-content:space-between;gap:12px;align-items:baseline;flex-wrap:wrap"><span style="font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--acc)">Best answer from the record</span></div>
               <span style="font:400 14px/1.45 var(--sans);color:var(--mut);text-wrap:pretty">{{ qa.note }}</span>
             </div>
             <sc-if value="{{ qa.hasCands }}" hint-placeholder-val="{{ false }}">
@@ -2261,7 +2253,6 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
           <div style="border:1px dashed var(--line2);border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:6px">
             <span style="font:500 19px var(--serif);color:var(--ink)">The record doesn’t answer this directly.</span>
             <span style="font:400 14px var(--sans);color:var(--mut)">{{ qa.noNote }}</span>
-            <button onClick="{{ askFold }}" style="all:unset;cursor:pointer;font:600 14px var(--sans);color:var(--acc);margin-top:4px" style-hover="text-decoration:underline">Ask the Fold instead →</button>
           </div>
         </sc-if>
         <sc-if value="{{ sr.none }}" hint-placeholder-val="{{ false }}">
@@ -3361,7 +3352,7 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
 function digammaH(x) { let r = 0; while (x < 6) { r -= 1 / x; x += 1; } const f = 1 / (x * x); return r + Math.log(x) - 0.5 / x - f * (1 / 12 - f * (1 / 120 - f * (1 / 252 - f * (1 / 240 - f / 132)))); }
 const klAdmitH = (bv, B) => Math.max(0, Math.log(B) - Math.log(bv) + digammaH(bv + 1) - digammaH(B + 1));
 const holoTokens = t => [...new Set((clean(t).toLowerCase().replace(/[\u2019']/g, '').match(/[a-z][a-z-]{2,}/g) || []).filter(w => !STOP.has(w) && !/^-|-$/.test(w)))];
-const VIEW_LABEL = { inbox: 'Inbox', overview: 'Evidence overview', summary: 'Sources', search: 'Search', names: 'Names', types: 'Types', figures: 'Figures', statements: 'Statements', connections: 'Connections', framing: 'Framing', views: 'Views', patterns: 'Patterns', surprise: 'Surprise', reader: 'Sources', profile: 'Names', draft: 'Draft', records: 'Records', ask: 'Ask the Fold', ingest: 'Add & publish', lanes: 'Lanes', margin: 'Margin', seam: 'Seam', orbit: 'Orbit', fields: 'Fields', review: 'Review' };
+const VIEW_LABEL = { inbox: 'Inbox', overview: 'Evidence overview', summary: 'Sources', search: 'Search', names: 'Names', types: 'Types', figures: 'Figures', statements: 'Statements', connections: 'Connections', framing: 'Framing', views: 'Views', patterns: 'Patterns', surprise: 'Surprise', reader: 'Sources', profile: 'Names', draft: 'Draft', records: 'Records', ingest: 'Add & publish', lanes: 'Lanes', margin: 'Margin', seam: 'Seam', orbit: 'Orbit', fields: 'Fields', review: 'Review' };
 const SU_CURSORS = [
   { id: 'loo', label: 'Everything else', desc: 'Each statement against normal text plus everything the other sources in this view say, regardless of date: what this source says that nothing else in view, and nothing normal, prepares you for.' },
   { id: 'pub', label: 'When published', desc: 'Sources in the order they were published: what a reader following the story would have learned, and when.' },
@@ -5768,7 +5759,7 @@ class Component extends DCLogic {
       this._overviewRoot = root; this._overviewMount = M.mountOverview(root, { ...options, docs: this.analysis().docs });
     }).catch(e => { this._overviewLoading = null; root.textContent = 'Overview unavailable: ' + e.message; });
   }
-  state = { corpus: null, added: loadAdded(), view: new URLSearchParams(location.search).has('work') ? 'ask' : 'summary', akMode: new URLSearchParams(location.search).get('work') === 'notebook' ? 'notebook' : new URLSearchParams(location.search).get('work') === 'fold' ? 'generate' : 'chat', akFocus: new URLSearchParams(location.search).get('fullscreen') === '1' || new URLSearchParams(location.search).get('work') === 'chat', akConvList: false, akNotes: {}, sel: null, f: {}, q: '', readDoc: null, showPos: false, showAdd: false, showSettings: false, draftText: '', fw: {}, note: '', theme: loadTheme(), railOpen: loadRailOpen(), segOpen: loadSegOpen(), topicsQ: '', topicsPage: 0, dragging: false, busy: '', just: null, readMode: 'original', htmlVer: 0, txAsk: null, txPrior: 'workspace', txLang: 'en', txModel: 'base', txBusy: false, txProg: '', txProgress: null, wsNewName: '', ground: { on: true, names: true, figures: true, dates: true, sentences: true }, wsRenaming: false, wsNameDraft: '', wsDeleting: false, readerRename: false, readerNameDraft: '', stripRead: { mode: 'Relate', domain: 'Interpretation', grain: 'Pattern' }, folder: null, folderDraft: '', folderRename: null, folderNameDraft: '', mxOpen: false, mxErr: '', mxBusy: false, editOpen: null, editDraft: null };
+  state = { corpus: null, added: loadAdded(), view: 'summary', akMode: new URLSearchParams(location.search).get('work') === 'notebook' ? 'notebook' : new URLSearchParams(location.search).get('work') === 'fold' ? 'generate' : 'chat', akFocus: new URLSearchParams(location.search).get('fullscreen') === '1' || new URLSearchParams(location.search).get('work') === 'chat', akConvList: false, akNotes: {}, sel: null, f: {}, q: '', readDoc: null, showPos: false, showAdd: false, showSettings: false, draftText: '', fw: {}, note: '', theme: loadTheme(), railOpen: loadRailOpen(), segOpen: loadSegOpen(), topicsQ: '', topicsPage: 0, dragging: false, busy: '', just: null, readMode: 'original', htmlVer: 0, txAsk: null, txPrior: 'workspace', txLang: 'en', txModel: 'base', txBusy: false, txProg: '', txProgress: null, wsNewName: '', ground: { on: true, names: true, figures: true, dates: true, sentences: true }, wsRenaming: false, wsNameDraft: '', wsDeleting: false, readerRename: false, readerNameDraft: '', stripRead: { mode: 'Relate', domain: 'Interpretation', grain: 'Pattern' }, folder: null, folderDraft: '', folderRename: null, folderNameDraft: '', mxOpen: false, mxErr: '', mxBusy: false, editOpen: null, editDraft: null };
   _html = {};
 
   // The links a contract's profile shows, from contract-links.json (made by tools/link-contracts.mjs): legislation
@@ -5945,7 +5936,7 @@ class Component extends DCLogic {
     window.addEventListener('resize', go);
     window.addEventListener('scroll', go, { passive: true });
   }
-  componentDidUpdate() { try { this.urlSync(); } catch (e) {} try { this.paintExtracted(); } catch (e) {} try { const c = this.corpusId(); if (c !== this._wsSeen) { this._wsSeen = c; touchWs(c); } } catch (e) {} this.installFill(); this.fitFill(); this.syncOverview(); this.syncInbox(); this.syncLinks(); this.ensureLinks(); this.applyTheme(); this.measureHdr(); try { const ff = document.getElementById('fold-folder-input'); if (ff && !ff.multiple) { ff.webkitdirectory = true; ff.setAttribute('webkitdirectory', ''); ff.multiple = true; ff.setAttribute('multiple', ''); } } catch (e) {} if (this._prevCorpus !== this.state.corpus || this._prevAdded !== this.state.added) { this._prevCorpus = this.state.corpus; this._prevAdded = this.state.added; this.loadHtml(); this.akAutoLoad(); } const rd0 = this.state.readDoc && this.analysis().docById[this.state.readDoc]; if (rd0 && rd0.media && rd0.media.kind === 'local') { this.ensureMediaUrl(rd0);
+  componentDidUpdate() { try { this.urlSync(); } catch (e) {} try { this.paintExtracted(); } catch (e) {} try { const c = this.corpusId(); if (c !== this._wsSeen) { this._wsSeen = c; touchWs(c); } } catch (e) {} this.installFill(); this.fitFill(); this.syncOverview(); this.syncInbox(); this.syncLinks(); this.ensureLinks(); this.applyTheme(); this.measureHdr(); try { const ff = document.getElementById('fold-folder-input'); if (ff && !ff.multiple) { ff.webkitdirectory = true; ff.setAttribute('webkitdirectory', ''); ff.multiple = true; ff.setAttribute('multiple', ''); } } catch (e) {} if (this._prevCorpus !== this.state.corpus || this._prevAdded !== this.state.added) { this._prevCorpus = this.state.corpus; this._prevAdded = this.state.added; this.loadHtml(); /* the ask model preload (this.akAutoLoad()) is off with the Ask door — restore both together */ } const rd0 = this.state.readDoc && this.analysis().docById[this.state.readDoc]; if (rd0 && rd0.media && rd0.media.kind === 'local') { this.ensureMediaUrl(rd0);
       // A recording opened but never classified gets its sound map on first sight (an
       // older stored recording, or one added before the classifier existed); the work
       // is the same in-browser rung, guarded so it happens once until it lands.
@@ -7672,7 +7663,7 @@ class Component extends DCLogic {
       const rel = [...gm.values()].map(g => ({ title: g.title, n: g.items.length.toLocaleString(), items: g.items.slice(0, 8).map(a => { const jump = this.dbOpen(A, a); return { label: short(this.dbLabel(db, a), 110), onClick: () => this.setState({ dbRec: a, dbT: typeOf(a) }), hasJump: !!jump, onJump: jump ? () => { this.setState({ dbRec: null }); jump(); } : null }; }), more: g.items.length > 8 ? '+ ' + (g.items.length - 8).toLocaleString() + ' more' : '', hasMore: g.items.length > 8 }));
       const op = this.dbOpen(A, rec._anchor); const lab = this.dbLabel(db, rec._anchor);
       recV = { has: true, type: rec._type, title: short(lab, 300), fields: kv, rel, hasRel: rel.length > 0, canOpen: !!op, onOpen: () => { if (op) { this.setState({ dbRec: null }); op(); } }, openLabel: this.openLabel(rec._anchor), anchor: rec._anchor,
-        onAsk: () => { this.setState({ dbRec: null, view: 'ask', readDoc: null, akQ: 'What do the sources say about ' + short(lab, 120) + '?' }); }, close: () => this.setState({ dbRec: null }), closeBg: e => { if (e.target === e.currentTarget) this.setState({ dbRec: null }); } }; }
+        close: () => this.setState({ dbRec: null }), closeBg: e => { if (e.target === e.currentTarget) this.setState({ dbRec: null }); } }; }
     let rv = { has: false };
     if (res) { const r = res.r; rv = { has: true, q: res.q, busy: !!res.busy, said: res.said || '', via: res.via || '', err: res.err || '', hasErr: !!res.err, isValue: !!r && r.kind === 'value', value: r && r.kind === 'value' ? (typeof r.value === 'number' ? r.value.toLocaleString() : String(r.value)) : '', label: r && r.label || '', note: r && r.note || '', hasNote: !!(r && r.note),
         isAgg: !!r && r.kind === 'table' && r.rows.some(x => x._agg), aggHead: r && r.columns ? r.columns.slice(0, 2).map(c => c.name).join(' · ') : '', agg: r && r.kind === 'table' && r.rows.some(x => x._agg) ? r.rows.slice(0, 40).map(x => ({ k: String(x[r.columns[0].name]), v: String(x[r.columns[1].name]) })) : [],
@@ -7795,14 +7786,10 @@ class Component extends DCLogic {
     this._akRO = new ResizeObserver(() => { const nar = el.clientWidth < ART_CHAT_W + ART_PANE_W + ART_GAP; if (nar !== !!this._akNarrow) { this._akNarrow = nar; this.forceUpdate(); } }); this._akRO.observe(el);
   };
   askReady() { const m = this.akModel(); const M = this._askM; if (m.startsWith('webllm:')) return !!(M && M.webllmLoaded(m.slice(7))); if (m.startsWith('heimdall:')) return !!(this._hdm && this._hdm.ok); return !!(this._oll && this._oll.ok); }
-  // A question is answered, never briefed: with ground and a ready model, straight to the Ask
-  // pipeline; with ground but no model loaded, the record's own answer; with no ground at all, a
-  // cited refusal (II.3, the descent test — resolution, never invention) that offers to gather, keep, or add — never a silent conversion to ingest.
+  // The Ask door is off in this preview: a question lands on the record's own answer
+  // in search — the ask view stays unreachable, not a dead end.
   askQuestion(qIn) {
     const q = String(qIn || '').trim(); if (!q) return;
-    const A = this.analysis();
-    if (!A.docs.some(d => this.counted(d))) { this.setState({ q, qDraft: undefined, view: 'ask', readDoc: null, akRefuse: { q }, akErr: '' }); return; }
-    if (this.askReady()) { this.setState({ q, qDraft: undefined, view: 'ask', readDoc: null, akRefuse: null, akErr: '' }); setTimeout(() => this.askSend(q), 0); return; }
     this.setState(s => ({ q, qDraft: undefined, view: 'search', readDoc: null, srN: 25, qaN: 0, prevView: s.view === 'search' || s.view === 'reader' ? (s.prevView || 'summary') : s.view }));
   }
   async askSend(qIn) {
@@ -8065,7 +8052,6 @@ class Component extends DCLogic {
       notGen: (S.akMode || 'chat') !== 'generate',
       art, isGen, mainFlex: isGen && art.has && !art.narrow ? '1 1 ' + ART_CHAT_W + 'px' : '1 1 480px', asideFlex: isGen ? (art.has && !art.narrow ? '1 1 ' + ART_PANE_W + 'px' : '0 0 0px') : '0 1 290px', asideMin: isGen ? (art.has && !art.narrow ? '320px' : '0px') : '250px', wrapRef: this.akWrapRef, asideZ: art.back ? 90 : 'auto',
       showReset: turns.length > 0 && !isGen, showEx: !isGen && turns.length === 0 && !S.akPending, busyAny: !!S.akBusy,
-      tryOn: !isGen && this.sampleTry(workspace).length > 0, tryQs: this.sampleTry(workspace).map(x => ({ t: x, onClick: () => this.askQuestion(x) })),
       showConvTabs: !isGen,
       convTabs: (this._convs || []).filter(c => c.open).map(c => { const on = c.id === this._convId; return { title: c.title || 'New conversation', on, bg: on ? 'var(--sel)' : 'transparent', bd: on ? 'var(--acc2)' : 'var(--line)', col: on ? 'var(--ink)' : 'var(--mut)', onClick: () => this.convOpen(c.id), onClose: ev => this.convClose(c.id, ev) }; }),
       convListOpen: !!S.akConvList, convToggleList: () => this.setState({ akConvList: !S.akConvList }), convCloseList: () => this.setState({ akConvList: false }),
@@ -10039,8 +10025,8 @@ class Component extends DCLogic {
     const suF = SU ? SU.list.filter(x => Fid.has(x.st.id)) : [];
     const juncMode = S.suMode !== 'belief'; const JN = isEmpty ? [] : this.junctions(A, Fid);
     const gHi = on => ({ bg: on ? 'var(--sel)' : 'transparent', bd: on ? 'var(--acc2)' : 'transparent', weight: on ? 600 : 500 });
-    const NAVG = [['', [['summary', 'Sources'], ['ask', 'Ask'], ['draft', 'Draft']]], ['Read closely', [['names', 'Names'], ['fixnames', 'Fix names'], ['records', 'Assertions']]], ['Explore', [['connections', 'Connections'], ['overview', 'Evidence overview']]], ['Manage', [['ingest', 'Add & publish'], ['hero:workspaces', 'Workspaces & people']]], ['Links', [['lanes', 'Lanes'], ['margin', 'Margin'], ['seam', 'Seam'], ['orbit', 'Orbit'], ['fields', 'Fields'], ['review', 'Review']]]];
-    // extra screens from screens.json (see componentDidMount): beside Sources, Ask, Inbox and Draft at the top of the
+    const NAVG = [['', [['summary', 'Sources'], ['draft', 'Draft']]], ['Read closely', [['names', 'Names'], ['fixnames', 'Fix names'], ['records', 'Assertions']]], ['Explore', [['connections', 'Connections'], ['overview', 'Evidence overview']]], ['Manage', [['ingest', 'Add & publish'], ['hero:workspaces', 'Workspaces & people']]], ['Links', [['lanes', 'Lanes'], ['margin', 'Margin'], ['seam', 'Seam'], ['orbit', 'Orbit'], ['fields', 'Fields'], ['review', 'Review']]]];
+    // extra screens from screens.json (see componentDidMount): beside Sources and Draft at the top of the
     // sidebar, where they are seen, not inside the collapsed "Explore & manage" group
     const SCREENS = this._screens || [];
     NAVG[0][1].push(...SCREENS.map(sc => ['screen:' + sc.id, sc.label]));
@@ -10049,7 +10035,6 @@ class Component extends DCLogic {
       connections: String(D.edgeList.length),
       draft: this.activePins().length ? String(this.activePins().length) : '',
       ingest: (this._net && this._net.chain && this._net.chain.length) ? String(this._net.chain.length) : '',
-      ask: (this._conv && this._conv.turns && this._conv.turns.length) ? String(this._conv.turns.length) : '',
       inbox: this._inboxSum && this._inboxSum.unread ? String(this._inboxSum.unread) : '',
       review: this.linkWaiting(),
       'hero:workspaces': this._wsTotals && this._wsTotals.waiting ? String(this._wsTotals.waiting) : '',
@@ -10072,7 +10057,7 @@ class Component extends DCLogic {
       if (!A.docs.length) { this.autoResearch(v); return; }
       this.setState(s => ({ q: v, qDraft: undefined, view: 'search', readDoc: null, srN: 25, qaN: 0, prevView: s.view === 'search' || s.view === 'reader' ? (s.prevView || 'summary') : s.view })); };
     const omniOpen = live => { const v = typeof live === 'string' ? live : dv; if (!isOmniUrl(v)) return; clearTimeout(this._omniT); this.setState({ q: '', qDraft: undefined }); this.ingestUrl(/^https?:\/\//.test(v) ? v : 'https://' + v, { open: true }); };
-    Object.assign(this._extra = {}, { ...this.qaVals(A, F, qv, view), ...this.draftVals(A), ...this.pfCoVals(A), ...this.dbVals(A, view), ...this.askVals(A, view), intro: this.introVals(), askFold: () => { const q = (this.state.q || '').trim(); this.setState({ view: 'ask', readDoc: null }); setTimeout(() => this.askSend(q), 0); }, ...this.netVals(A, view), ...this.readingVals(A, view),
+    Object.assign(this._extra = {}, { ...this.qaVals(A, F, qv, view), ...this.draftVals(A), ...this.pfCoVals(A), ...this.dbVals(A, view), ...this.askVals(A, view), intro: this.introVals(), ...this.netVals(A, view), ...this.readingVals(A, view),
       pinPop: S.pinPop && view === 'reader' ? { has: true, x: S.pinPop.x + 'px', y: S.pinPop.y + 'px', onPin: e => { e.preventDefault(); this.pinSelection(); }, onComment: e => { e.preventDefault(); this.commentOnSelection(); }, onCorrect: e => { e.preventDefault(); this.openCorr(S.pinPop.text); } } : { has: false },
       hasPinToast: !!S.pinToast, pinToast: S.pinToast || '', goDraft: () => { this.setState({ pinToast: '' }); this.go('draft'); }, plainRef: this.plainRef, extRef: this.extRef, omniRef: this.omniRef,
       rdPins: (() => { const n = view === 'reader' ? this.activePins().filter(p => p.docId === S.readDoc).length : 0; return { has: n > 0, label: plural(n, 'pin') + ' from this source →' }; })(), navGroups, omniUrl, omniOpen,
@@ -10188,7 +10173,6 @@ class Component extends DCLogic {
       cfold: (() => { const off = S.offDocs || {}, on = A.docs.filter(d => !off[d.id]); const dvx = on.map(d => this.driveVals(d));
         return { on: !!S.foldBand && view === 'connections' && Object.keys(S.offDocs || {}).some(k => S.offDocs[k]), title: plural(on.length, 'source') + ', one body of content',
           sources: on.slice(0, 12).map((d, i) => ({ title: d.title, color: dvx[i].dvColor, glyph: dvx[i].dvGlyph })).concat(on.length > 12 ? [{ title: '+' + (on.length - 12) + ' more', color: 'var(--dim)', glyph: '…' }] : []),
-          onAsk: () => this.setState({ view: 'ask', akMode: 'chat' }), onBuild: () => this.setState({ view: 'ask', akMode: 'generate', akPane: 'sources' }),
           onAll: () => this.setState({ offDocs: {}, foldBand: false, view: 'summary' }) }; })(),
       drv: { ...drv, stats: hdr.sub || '', onKey: e => { if (e.key !== 'Enter') return; const live = (e.target.value || '').trim(); if (!live) return; this.setState({ dvQ: '' }); if (isOmniUrl(live)) omniOpen(live); else omniGo(live); } }, drvd, svGrid: svMode === 'grid' || svMode === 'cards', svList: svMode === 'list',
       wsCount: wsAll.length, wsOpenMgr: () => { this.setState({ wsPop: false, wsAdding: false, wsDeleting: false }); this.openWorkspacesHero(); },
@@ -10433,17 +10417,14 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
       .then(M => { this._spM = M && M.samples ? M.samples : null; try { this.forceUpdate(); } catch (e) {} return M; });
     return this._spP;
   }
-  sampleTry(ws) { const S = this._spM && this._spM[ws]; return S && Array.isArray(S.try) ? S.try.filter(q => typeof q === 'string' && q.trim()) : []; }
   // The sample's own introduction, shown once in the summary it lands in and dismissed for good
   // (localStorage, per workspace). The legend is the surface's; the lead, line and hint are the sample's.
   introVals() {
     const ws = this.corpusId(), Sp = this._spM && this._spM[ws];
     if (!Sp || !Sp.intro) return { show: false };
     let done = false; try { done = localStorage.getItem('hd:intro:' + ws) === '1'; } catch (e) {}
-    const tryQs = this.sampleTry(ws);
     return { show: !done, lead: Sp.intro.lead || Sp.name || '', line: Sp.intro.line || '', hint: Sp.intro.hint || '', hasHint: !!Sp.intro.hint,
-      tryQs: tryQs.map(q => ({ t: q, onClick: () => this.askQuestion(q) })),
-      legend: 'In an answer, a sentence underlined and carrying a number is grounded — click the number to read the passage it is traced to. Plain text is this surface’s own wording; anything no source supports is named “Not in the material.”',
+      legend: 'Open a source: its names, figures and dates are marked where they appear — click one to see where it came from. Nothing here is answered from memory.',
       onClose: () => { try { localStorage.setItem('hd:intro:' + ws, '1'); } catch (e) {} this.forceUpdate(); } };
   }
   async maybeSample() {

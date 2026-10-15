@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>What am I looking at? — the fold</title>
-<meta name="description" content="A one-page guide to the Titanic, 1912 demo of the fold: what it is, three questions to try, what to watch for, and the known limits.">
+<meta name="description" content="A one-page guide to the Titanic, 1912 demo of the fold: what it is, what to look at, and the known limits.">
 <meta property="og:title" content="What am I looking at? — the fold">
-<meta property="og:description" content="A one-page guide to the Titanic, 1912 demo: what it is, three questions to try, what to watch for, and the known limits.">
+<meta property="og:description" content="A one-page guide to the Titanic, 1912 demo: what it is, what to look at, and the known limits.">
 <meta property="og:url" content="https://scores-patch-points.github.io/holodeck/demo-guide.html">
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary">
@@ -14,7 +14,7 @@
 <style>
 /* Tokens aligned to the fold's own surface (index.html): a graphite page with one calm
    blue for links, local fonts only. No JS on this page. */
-:root{--bg:#17171a;--s1:#1c1c20;--s2:#29292e;--line:#2e2e33;--line2:#3f3f46;--ink:#f4f4f6;--ink2:#c9c9d2;--mut:#9d9da8;--dim:#9494a0;--acc:#8ab4ff;--amber:#f0b429;--ok:#56d364;--r-md:10px;--r-lg:14px;--sans:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;--mono:ui-monospace,SFMono-Regular,Menlo,monospace;--serif:Georgia,"Times New Roman",serif;color-scheme:dark}
+:root{--bg:#17171a;--s1:#1c1c20;--s2:#29292e;--line:#2e2e33;--line2:#3f3f46;--ink:#f4f4f6;--ink2:#c9c9d2;--mut:#9d9da8;--dim:#9494a0;--acc:#8ab4ff;--ok:#56d364;--r-md:10px;--r-lg:14px;--sans:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;--mono:ui-monospace,SFMono-Regular,Menlo,monospace;--serif:Georgia,"Times New Roman",serif;color-scheme:dark}
 body{margin:0;background:var(--bg);color:var(--ink);font:400 15px/1.6 var(--sans)}
 a{color:var(--acc);text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px}
 a:hover{color:var(--ink)}
@@ -25,16 +25,12 @@ h2{margin:0 0 12px;font:600 12px var(--mono);letter-spacing:.08em;text-transform
 p{margin:0 0 10px;color:var(--ink2);text-wrap:pretty}
 .lead{font-size:16px;color:var(--ink)}
 .card{background:var(--s1);border:1px solid var(--line2);border-radius:var(--r-lg);padding:16px 18px;display:flex;flex-direction:column;gap:8px}
-.q{font:500 19px/1.35 var(--serif);color:var(--ink)}
 .qa{font:400 14px/1.55 var(--sans);color:var(--ink2)}
-.qs{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
-.qchip{display:inline-block;border:1px solid var(--line2);border-radius:8px;padding:5px 12px;font:500 13px var(--sans);color:var(--ink2);background:var(--s1);white-space:nowrap}
 .note{font:400 12.5px/1.5 var(--sans);color:var(--mut)}
 .w{display:flex;flex-direction:column;gap:5px;border-top:1px solid var(--line);padding-top:14px}
 .w:first-of-type{border-top:0;padding-top:0}
 .wt{font:600 14px var(--sans);color:var(--ink)}
 ul{margin:0;padding-left:20px;color:var(--ink2);display:flex;flex-direction:column;gap:6px}
-code{font:500 12.5px var(--mono);color:var(--amber)}
 .links{display:flex;flex-direction:column;gap:8px}
 footer{border-top:1px solid var(--line);padding-top:16px;font:400 13px var(--sans);color:var(--mut)}
 </style>
@@ -46,40 +42,27 @@ footer{border-top:1px solid var(--line);padding-top:16px;font:400 13px var(--san
     <h1>What am I looking at?</h1>
     <p class="lead">This is <b>the fold</b>, a reading and research surface, demoing on one night: the sinking of the Titanic, April 1912.</p>
     <p>The workspace holds five readings and three recordings — a Senate speech, the British inquiry's report and its own numbers table, a survivor's memoir, a newspaper front page read by OCR, film footage and a 1912 tribute record.</p>
-    <p>Nothing is answered from memory: every sentence is traced back to where it appears, and the surface answers from those sources — or tells you plainly what is missing.</p>
+    <p>Nothing is taken on memory: every sentence the surface shows is traced back to where it appears.</p>
   </header>
 
   <section>
-    <h2>Three questions to try</h2>
-    <div class="qs"><span class="qchip">How many lives were lost?</span><span class="qchip">What did the band play as the ship sank?</span><span class="qchip">When was the wreck of the Titanic discovered?</span></div>
-    <div class="card">
-      <span class="q">How many lives were lost?</span>
-      <span class="qa">The sources do not agree. The Board of Trade report says "the loss of 1,490 lives"; Lawrence Beesley's memoir says "815 of her passengers and 688 of her crew were drowned" — 1,503 — with 705 rescued. The report's own "Numbers saved" table lets you check its arithmetic: 2,201 aboard, 711 saved. The answer should show you the disagreement rather than pick a winner.</span>
-    </div>
-    <div class="card" style="margin-top:10px">
-      <span class="q">What did the band play as the ship sank?</span>
-      <span class="qa">Beesley's memoir has it: "the band grouped outside the gymnasium doors played with such supreme courage in face of the water which rose foot by foot before their eyes." The Senate speech says the same in its own words: "the musicians fill the last moments with sympathetic melody."</span>
-    </div>
-    <div class="card" style="margin-top:10px">
-      <span class="q">When was the wreck of the Titanic discovered?</span>
-      <span class="qa">This corpus cannot answer — it is 1912 and never looks forward. That is the point of this one: the surface should tell you what is missing instead of inventing it. (The wreck was found in 1985; that fact is nowhere in these sources.)</span>
-    </div>
-  </section>
-
-  <section>
-    <h2>What to watch for</h2>
+    <h2>What to look at</h2>
     <div class="card">
       <div class="w">
-        <span class="wt">Grounded sentences vs. the surface's own prose</span>
-        <p class="qa">In an answer, a sentence that is underlined and carries a number is grounded — click the number to read the passage it was traced to. Plain sentences are the surface's own framing, and anything no source supports is flagged <code>Not in the material</code>.</p>
+        <span class="wt">Open a source</span>
+        <p class="qa">Click any source — the Senate speech, Beesley's memoir, the Tribune front page. Its names, figures and dates are marked where they appear, and a passage carries its origin back to the text it was read from.</p>
+      </div>
+      <div class="w">
+        <span class="wt">Where the accounts disagree on the death toll</span>
+        <p class="qa">The Board of Trade report says "the loss of 1,490 lives"; Lawrence Beesley's memoir says "815 of her passengers and 688 of her crew were drowned" — 1,503. The report's own "Numbers saved" table lets you check its arithmetic: 2,201 aboard, 711 saved. The surface shows the disagreement rather than picking a winner.</p>
+      </div>
+      <div class="w">
+        <span class="wt">The film, with its read title cards</span>
+        <p class="qa">The 1912 footage plays here, and its captions are a machine reading of the film's own title cards, with timecodes. The second film has no captions — transcribe it to see what the machine hears.</p>
       </div>
       <div class="w">
         <span class="wt">Machine-read sources are flagged</span>
-        <p class="qa">The Senate speech (scan-derived text), the Tribune front page (OCR from the pixels) and the film's captions (OCR of its title cards) are machine readings, and each source's note says so. Quote the source, not the machine's reading of it.</p>
-      </div>
-      <div class="w">
-        <span class="wt">Typed gaps</span>
-        <p class="qa">Ask something the corpus does not cover — the wreck question above — and the surface answers from what is there, or tells you plainly what is missing. The refusal is the point: agreement, disagreement and absence are found in what is actually there, never declared.</p>
+        <p class="qa">The Senate speech (scan-derived text), the Tribune front page (OCR from the pixels) and the film's captions are machine readings, and each source's note says so. Quote the source, not the machine's reading of it.</p>
       </div>
     </div>
   </section>
@@ -90,7 +73,7 @@ footer{border-top:1px solid var(--line);padding-top:16px;font:400 13px var(--san
       <li>Synthesis no source states is not produced: if the sources do not say it, the surface says it is missing.</li>
       <li>Machine readings slip. The known misses: OCR errors outside the Fort's confusion table, generic headings made of ordinary words, and run-together names where one side is a single word.</li>
       <li>The demo corpus is small on purpose — five readings and three recordings, excerpted to what the demo needs. The full sources are at the addresses each one cites.</li>
-      <li>Conversational answers run a small model in your browser (or a local Ollama). The record itself — the sources, search, and the record's own best answer — works without one.</li>
+      <li>Conversational answers (not in this preview) run a small model in your browser (or a local Ollama). The record itself — the sources, search and the record's own best answer — works without one.</li>
     </ul>
   </section>
 
@@ -100,7 +83,7 @@ footer{border-top:1px solid var(--line);padding-top:16px;font:400 13px var(--san
     <a href="https://github.com/scores-patch-points/holodeck" rel="noopener">the fold — this surface's source →</a>
   </section>
 
-  <footer>the fold reads what is there and says what is not. <a href="index.html">Back to the surface</a>.</footer>
+  <footer>the fold reads what is there and says what is not. The Ask door is off in this preview. <a href="index.html">Back to the surface</a>.</footer>
 </main>
 </body>
 </html>
