@@ -180,7 +180,7 @@ async function chat(base, model, messages, opts = {}) {
 
 // One turn. `conv` = { summary, history, turns }. `computed` is an optional block of values computed from the
 // Records database (never asked of the model); it rides into the prompt as material and onto the record.
-export async function turn(conv, IX, question, { base = OLLAMA, model = DEFAULT_MODEL, computed = null, reading = null, retrievalQ = null, resolved = null, ctx = 4096, onToken, onStage, signal, deferFold = false, onFold = null, docs = null, summarize = true, privacy = 'local-raw', rix = null, carry = 'model', declarations = null } = {}) {
+export async function turn(conv, IX, question, { base = OLLAMA, model = DEFAULT_MODEL, computed = null, reading = null, retrievalQ = null, resolved = null, ctx = 4096, onToken, onStage, signal, deferFold = false, onFold = null, docs = null, summarize = true, privacy = 'local-raw', rix = null, carry = 'model', declarations = null, forWhom = null } = {}) {
   const t0 = Date.now(); const turnNo = (conv.summary.turnCount || 0) + 1;
   // THE SEALED BOUNDARY: an outside executor (heimdall frontier/remote model)
   // may only receive the projection the Fold builds. When the caller selects
@@ -188,6 +188,10 @@ export async function turn(conv, IX, question, { base = OLLAMA, model = DEFAULT_
   // the heimdall lane carries heimdall_privacy:"sealed-external". Raw material
   // never leaves for a stronger model's convenience (spec §2.I).
   const sealed = privacy === 'sealed-external';
+  // EVERY TURN IS READ FOR A FRAME (S113/S42): the ask carries the for-whom it is
+  // being read under (the filter's frame), so the referents it narrates declare
+  // whose reading they are, and a frame-free turn is a view from nowhere.
+  const askFrame = forWhom ? { forWhom: forWhom.forWhom || forWhom.id || 'reader', giver: forWhom.giver || null, question: forWhom.question || null, ground: forWhom.ground || null } : null;
   const folded = conv.summary.records.flatMap(r => r.refs || []);
   onStage && onStage('retrieving');
   const qTerms = [...new Set(tokenize(retrievalQ || question))];
@@ -201,8 +205,8 @@ export async function turn(conv, IX, question, { base = OLLAMA, model = DEFAULT_
   try { activation = activationRetrieval({ rix, IX, question: retrievalQ || question, transcript: conv.turns, seen: folded, limit: 8 }); } catch { activation = null; }
   const ranked0 = activation ? activation.passages : retrieve(IX.chunks, retrievalQ || question, 8, folded);
   const retrievalMeta = activation
-    ? { basis: 'activation', source: 'meaning activation over the workspace cast', resolution: activation.meta.resolution, active: activation.meta.active.length, hop1: activation.meta.hop1.length, window: activation.meta.window, grain: activation.meta.grain, why: activation.meta.why, fallback: false }
-    : { basis: 'surface', source: 'workspace chunk index (term)', chunks: IX.chunks.length, why: 'meaning activation resolved no referent', fallback: true };
+    ? { basis: 'activation', source: 'meaning activation over the workspace cast', resolution: activation.meta.resolution, active: activation.meta.active.length, hop1: activation.meta.hop1.length, window: activation.meta.window, grain: activation.meta.grain, why: activation.meta.why, fallback: false, forWhom: askFrame }
+    : { basis: 'surface', source: 'workspace chunk index (term)', chunks: IX.chunks.length, why: 'meaning activation resolved no referent', fallback: true, forWhom: askFrame };
   const ranked = ranked0.map(c => narrow(c, qTerms));
   const history = conv.history.slice(-2).map(m => ({ ...m, content: m.content.length > 1200 ? m.content.slice(0, 1200) + '…' : m.content }));
   // THE SURF AND FOLD (eoreader7 / the-fold holon.js): the passages are read by the engine's own relation reader,
@@ -368,7 +372,7 @@ export async function turn(conv, IX, question, { base = OLLAMA, model = DEFAULT_
   }
   const t = { n: turnNo, question, answer, used: used.map(ref => ({ ref, text: String(readRange(IX.texts, ref) || '').trim().slice(0, 700) })), offered: offered.map(c => ({ ref: c.ref, source: c.source, start: c.start, end: c.end, label: c.label, text: c.text.slice(0, 700) })),
     attr: attr.map(a => ({ text: a.text, ref: a.ref || null, via: a.via || null })), findings: (grounding.findings || []).map(f => ({ text: f.text, kind: f.atomKind, start: f.start, end: f.end, echoesQuestion: !!f.echoesQuestion })),
-    examined: !!grounding.examined, record, foldLine, refresh, computed, synopsis, gary: garyCheck, reading: reading ? { lines: reading.lines } : null, notes, resolved: resolved && resolved.length ? resolved : null, sentChars, transcriptChars, messages, model, ms: Date.now() - t0, foldInquiry, noModel: !!foldInquiry.answer, disposition: foldInquiry.disposition, retrieval: retrievalMeta,
+    examined: !!grounding.examined, record, foldLine, refresh, computed, synopsis, gary: garyCheck, reading: reading ? { lines: reading.lines } : null, notes, resolved: resolved && resolved.length ? resolved : null, sentChars, transcriptChars, messages, model, ms: Date.now() - t0, foldInquiry, noModel: !!foldInquiry.answer, disposition: foldInquiry.disposition, retrieval: retrievalMeta, forWhom: askFrame, frame: askFrame,
     tokens: res && res.stats ? { out: res.stats.eval_count, in: res.stats.prompt_eval_count, secs: res.stats.total_duration ? res.stats.total_duration / 1e9 : null } : null,
     sealed, rawWithheld: sealed ? (factBlock && factBlock.spans && factBlock.spans.length ? factBlock.spans.length : (offered.length || 0)) : 0 };
   return { conv: { summary, history: [...conv.history, { role: 'user', content: question }, { role: 'assistant', content: answer }], turns: [...conv.turns, t] }, turn: t, fold };
@@ -410,8 +414,9 @@ export function readingBlock(rix, question) {
   if (!refs.length) return null;
   const lines = refs.map(c => { const surf = (c.surfaces || []).slice(0, 5); const nm = surf[0] || c.id;
     const bonds = (rix.bonds || []).filter(b => b.a === nm || b.b === nm).sort((a, b) => b.n - a.n).slice(0, 5).map(b => (b.a === nm ? b.b : b.a) + ' (' + b.n + ')');
-    return { name: nm, text: nm + (surf.length > 1 ? ', also written ' + surf.slice(1).join(', ') : '') + '. Mentioned ' + (c.mentions || 0) + ' times across ' + (c.srcN || Object.keys(c.src || {}).length) + ' sources' + (c.standing ? '; standing: ' + c.standing : '') + '.' + (bonds.length ? ' Held together most often with ' + bonds.join(', ') + '.' : ''), surfaces: surf }; });
-  return { lines, text: lines.map(l => l.text).join('\n'), surfaces: refs.flatMap(c => c.surfaces || []) };
+    const fw = c.frame ? ' Read for ' + (c.frame.giver || 'the reader') + (c.frame.question ? ' (' + c.frame.question + ')' : '') + '.' : '';
+    return { name: nm, forWhom: c.forWhom || null, frame: c.frame || null, text: nm + (surf.length > 1 ? ', also written ' + surf.slice(1).join(', ') : '') + '. Mentioned ' + (c.mentions || 0) + ' times across ' + (c.srcN || Object.keys(c.src || {}).length) + ' sources' + (c.standing ? '; standing: ' + c.standing : '') + '.' + (bonds.length ? ' Held together most often with ' + bonds.join(', ') + '.' : '') + fw, surfaces: surf }; });
+  return { lines, text: lines.map(l => l.text).join('\n'), surfaces: refs.flatMap(c => c.surfaces || []), forWhoms: refs.map(c => c.forWhom || null) };
 }
 
 // THE GROUNDED SUMMARY (holodeck-summary.js): the SUBJECT folded at a point —

@@ -4002,8 +4002,8 @@ function hdHygiene(docs) {
       nonNominal: w => { const c = hdPos(w); if (!c || Object.keys(c).some(x => HD_NOM.includes(x))) return false; return !(/(ed|en|ing)$/i.test(w) && Object.keys(c).every(x => x === 'VERB' || x === 'AUX')); }, // a participle (Written Standards) modifies; a bare imperative (Provide Guest House) does not
       functionOnly: w => { const c = hdPos(w); return !!c && Object.keys(c).every(x => ['ADP', 'CCONJ', 'SCONJ', 'DET', 'AUX', 'PART', 'PRON'].includes(x)); },
       // dominant reading, not any reading: the treebank gives "of" and "The" stray ADV/PRON counts
-      clause: w => { if (/(ing|ed)$/i.test(w)) return false; const c = hdPos(w); if (!c || Object.keys(c).some(x => HD_NOM.includes(x))) return false; const top = Object.entries(c).sort((a, b) => b[1] - a[1])[0][0]; return ['AUX', 'PRON', 'ADV', 'SCONJ', 'PART', 'VERB', 'INTJ'].includes(top); },
-      commonOnly: w => { const c = hdPos(w); if (!c) return false; return Object.entries(c).sort((a, b) => b[1] - a[1])[0][0] !== 'PROPN'; },
+      clause: w => { if (/(ing|ed)$/i.test(w)) return false; const c = hdPos(w); if (!c) return false; const es = Object.entries(c); if (!es.length || es.some(([x]) => HD_NOM.includes(x))) return false; const top = es.sort((a, b) => b[1] - a[1])[0][0]; return ['AUX', 'PRON', 'ADV', 'SCONJ', 'PART', 'VERB', 'INTJ'].includes(top); },
+      commonOnly: w => { const c = hdPos(w); if (!c) return false; const es = Object.entries(c); if (!es.length) return false; return es.sort((a, b) => b[1] - a[1])[0][0] !== 'PROPN'; },
       namePair: (a, b) => midPairs.has(a + ' ' + b),
       ordinaryOpener: w => { if (/^[A-Z]+$/.test(w)) return false; const k = w.toLowerCase(); let r = mine.get(k);
         if (!r) { const e = P.get(k) || [0, 0], ek = K.get(k) || [0, 0], ew = ws.get(k) || [0, 0], c = HD_POS[k]; const pr = c ? [c.PROPN || 0, Object.values(c).reduce((a, b) => a + b, 0)] : [0, 0]; const rf = (HD_REF && HD_REF.casing.get(k)) || [0, 0];
@@ -7605,7 +7605,7 @@ class Component extends DCLogic {
     const qTerms = q => [...new Set(String(q || '').toLowerCase().match(/[\p{L}\p{N}’']{3,}/gu) ?? [])]
       .filter(w => !['the', 'and', 'for', 'with', 'what', 'does', 'show', 'this'].includes(w));
     const frame = (key, label, value) => {
-      const w = fw[key] || { giver: 'the reader', question: (this.state.q || '').trim() || 'what does this selection show?' };
+      const w = fw[key] || { giver: 'the reader', question: (this.state.q || '').trim() || 'what does this selection show?', ground: this.corpusName() };
       const matched = key === 'q' ? all.filter(st => this.match(st, A)).length : all.filter(st => this.match(st, A, key)).length;
       const terms = qTerms(w.question);
       let rel = 0;
@@ -7891,7 +7891,7 @@ class Component extends DCLogic {
     const mSel = this.akModel();
     const hdSel = this._hdm && this._hdm.ok ? (this._hdm.models || []).find(x => mSel === 'heimdall:' + x.name) : null;
     const privacy = hdSel && hdSel.sealed ? 'sealed-external' : 'local-raw';
-    try { const r = await M.turn(this._conv, this._ix, q, { model: this.akModel(), privacy, computed, reading, retrievalQ, resolved, docs: sourceDocs, signal: ac.signal, onStage: st => this.setState({ akBusy: st }), onToken: t => { const now = Date.now(); if (now - last > 50) { last = now; this.setState({ akStream: t }); } }, rix: this._rix, carry: (() => { try { return localStorage.getItem('hd:carry') === 'mechanical' ? 'mechanical' : 'model'; } catch (e) { return 'model'; } })(), deferFold: true, onFold: (folded, ref) => { if (this._conv !== r.conv) return; r.conv.summary = folded; r.turn.refresh = ref; this.saveConv(); this.forceUpdate(); } });
+    try { const r = await M.turn(this._conv, this._ix, q, { model: this.akModel(), privacy, computed, reading, retrievalQ, resolved, docs: sourceDocs, signal: ac.signal, forWhom: this.fwOf('q'), onStage: st => this.setState({ akBusy: st }), onToken: t => { const now = Date.now(); if (now - last > 50) { last = now; this.setState({ akStream: t }); } }, rix: this._rix, carry: (() => { try { return localStorage.getItem('hd:carry') === 'mechanical' ? 'mechanical' : 'model'; } catch (e) { return 'model'; } })(), deferFold: true, onFold: (folded, ref) => { if (this._conv !== r.conv) return; r.conv.summary = folded; r.turn.refresh = ref; this.saveConv(); this.forceUpdate(); } });
       this._akFold = r.fold ? { abort: () => r.fold.abort(), conv: r.conv } : null;
       this._conv = r.conv; this._lastMsgs = r.turn.messages; this.saveConv(); this.setState({ akBusy: '', akStream: '', akPending: '', akComputed: null });
       if ((this.state.akMode || 'chat') === 'notebook') { try { await this.syncNotebookLog(); } catch (e) {} }
@@ -8123,7 +8123,7 @@ class Component extends DCLogic {
     const srcMeta = X.sourcesMeta ? X.sourcesMeta() : null; const nSrc = srcMeta ? Object.keys(srcMeta).length : Object.keys(X.sources).length;
     const bondRow = b => { const within = b.n - b.srcN; const bg = b.srcN >= 5 && b.n <= b.srcN * 1.25; return { pair: b.a + ' \u2014 ' + b.b, n: '\u00d7' + b.n, where: plural(b.srcN, 'source'), rel: Object.entries(b.rel || {}).sort((x, y) => y[1] - x[1]).slice(0, 3).map(([k]) => '\u201c' + k + '\u201d').join(' '), tag: bg ? 'background: once per page' : within > 0 ? 'recurs within sources' : '', tagCol: bg ? 'var(--dim)' : 'var(--ok)', neg: b.neg ? b.neg + ' negated' : '' }; };
     const bonds = (X.eachBond ? X.eachBond() : (X.bonds || [])).map(bondRow); const load = bonds.filter(b => b.tag !== 'background: once per page'), back = bonds.filter(b => b.tag === 'background: once per page');
-    const castRows = (X.castTop ? X.castTop(60) : (X.cast || []).slice().sort((a, b) => b.srcN - a.srcN || b.mentions - a.mentions).slice(0, 60)).map(c => { const nm = c.surfaces[0]; const inCorpus = !!A.names[nm]; return { name: nm, alts: c.surfaces.slice(1, 4).join(' \u00b7 '), hasAlts: c.surfaces.length > 1, meta: plural(c.mentions, 'mention') + ' \u00b7 ' + plural(c.srcN, 'source') + ' \u00b7 ' + String(c.standing || '').replace(/_/g, ' '), onClick: inCorpus ? () => this.openProfile(nm) : () => { this.setState({ q: nm, qDraft: undefined }); this.go('search'); } }; });
+    const castRows = (X.castTop ? X.castTop(60) : (X.cast || []).slice().sort((a, b) => b.srcN - a.srcN || b.mentions - a.mentions).slice(0, 60)).map(c => { const nm = c.surfaces[0]; const inCorpus = !!A.names[nm]; return { name: nm, alts: c.surfaces.slice(1, 4).join(' \u00b7 '), hasAlts: c.surfaces.length > 1, meta: plural(c.mentions, 'mention') + ' \u00b7 ' + plural(c.srcN, 'source') + ' \u00b7 ' + String(c.standing || '').replace(/_/g, ' ') + (c.frame ? ' \u00b7 for ' + (c.frame.giver || 'the reader') : ' \u00b7 no for-whom (gap)'), onClick: inCorpus ? () => this.openProfile(nm) : () => { this.setState({ q: nm, qDraft: undefined }); this.go('search'); } }; });
     const churn = (X.identitiesTop ? X.identitiesTop(30) : (X.identities || []).slice(0, 30)).map(i => ({ pair: i.left + ' \u2194 ' + i.right, n: '\u00d7' + i.n, ev: Object.entries(i.events || {}).map(([k, v]) => k.replace(/^identity_/, '').replace(/_/g, ' ') + ' ' + v).join(' \u00b7 '), where: plural(i.srcN, 'source') }));
     const srcRows = (X.order || (srcMeta ? Object.keys(srcMeta) : Object.keys(X.sources))).map(s => { const x = srcMeta ? srcMeta[s] : X.sources[s]; const d = docOf(s); return { name: d ? d.title : s, file: s, line: plural(x.chunks, 'encounter') + ' \u00b7 ' + (x.ops.CON || 0) + ' CON \u00b7 ' + (x.ops.INS || 0) + ' INS \u00b7 ' + (x.ops.REC || 0) + ' REC', onOpen: d ? () => this.read(d.id) : () => {} , canOpen: !!d }; });
     return { rx: { on: true, ready: true, stats: [[X.encounters, 'encounters'], [nSrc, 'sources'], [X.castTotal, 'referents admitted'], [X.bondsTotal, 'bonds witnessed'], [X.canonTotal, 'canonical relations'], [X.identitiesTotal, 'identity hypotheses']].map(([n, l]) => ({ n: Number(n).toLocaleString(), l })),
@@ -8538,12 +8538,27 @@ class Component extends DCLogic {
   }
   snap() { const S = this.state; return { view: S.view, readDoc: S.readDoc, sel: S.sel, pfFrom: S.pfFrom }; }
   pushHist() { const H = this._hist = this._hist || []; const s = this.snap(); const t = H[H.length - 1]; if (t && t.view === s.view && t.readDoc === s.readDoc && JSON.stringify(t.sel) === JSON.stringify(s.sel)) return; H.push(s); if (H.length > 60) H.shift(); }
-  backLabel(A) { const t = (this._hist || [])[(this._hist || []).length - 1]; if (!t) return null;
+  // The state a Back click would actually land on: the same walk goBack does, skipping an entry that is exactly
+  // where we already are and any reader whose source has left the workspace, without mutating the stack.
+  backTarget() {
+    const H = (this._hist || []).slice(); const A = this.analysis(); const cur = this.snap(); let t;
+    while ((t = H.pop())) {
+      if (t.view === cur.view && t.readDoc === cur.readDoc && JSON.stringify(t.sel) === JSON.stringify(cur.sel)) continue;
+      if (t.view !== 'reader' || (t.readDoc && A.docById[t.readDoc])) return t;
+    }
+    return null;
+  }
+  backLabel(A) { const t = this.backTarget(); if (!t) return null;
     if (t.sel && t.sel.type === 'name' && (t.view === 'profile' || t.view === 'reader')) return t.sel.id;
     if (t.view === 'reader' && t.readDoc && A.docById[t.readDoc]) return short(A.docById[t.readDoc].title, 60);
     return { names: 'names', search: 'search results', summary: 'sources', surprise: 'junctions' }[t.view] || 'previous view'; }
-  goBack() { const H = this._hist || []; const A = this.analysis(); let t;
-    while ((t = H.pop())) { if (t.view !== 'reader' || (t.readDoc && A.docById[t.readDoc])) break; }
+  goBack() { const H = this._hist || []; const A = this.analysis(); let t; const cur = this.snap();
+    while ((t = H.pop())) {
+      // Skip an entry that is exactly where we already are (e.g. Back is still lit after "Sources" home) and any
+      // reader pointing at a source no longer in the workspace, so Back is never a click that does nothing.
+      if (t.view === cur.view && t.readDoc === cur.readDoc && JSON.stringify(t.sel) === JSON.stringify(cur.sel)) continue;
+      if (t.view !== 'reader' || (t.readDoc && A.docById[t.readDoc])) break;
+    }
     if (t) { if (t.view === 'reader' && t.readDoc !== this.state.readDoc) { this.state.seekT = 0; this._faithFound = null; } this.setState({ view: t.view, readDoc: t.readDoc, sel: t.sel, pfFrom: t.pfFrom, pfIdx: 0, pfAll: false, selAll: false }); if (typeof window !== 'undefined') window.scrollTo(0, 0); }
     else this.go('summary'); }
   hoverSt(id) {
@@ -8661,7 +8676,7 @@ class Component extends DCLogic {
   // ---- find in this source: the whole open document is searched as it is painted (plain text, a faithful page,
   // or a PDF's invisible text layer); every occurrence is highlighted and can be stepped through. The highlights
   // sit over the text with the CSS Custom Highlight API, so the document's own marking is never touched.
-  findAvail() { const S = this.state; return S.view === 'reader' && !!S.readDoc; }
+  findAvail() { const S = this.state; return S.view === 'reader' && !!S.readDoc && !['restated', 'summary', 'map'].includes(S.readMode); }
   findHost() { const S = this.state; return (S.readMode === 'plain' && this._plainEl) ? this._plainEl : (this._rRoot || this._rEl); }
   findRanges(q) {
     const query = String(q || ''); if (!query) return [];
@@ -8682,8 +8697,11 @@ class Component extends DCLogic {
   }
   findClear() { try { if (typeof CSS !== 'undefined' && CSS.highlights) { CSS.highlights.delete('hd-find'); CSS.highlights.delete('hd-find-active'); } } catch (e) {} this._findR = []; }
   paintFind() {
-    const S = this.state; this.findClear();
-    if (!S.findOpen || !S.findQ || !this.findAvail()) return;
+    const S = this.state;
+    if (!S.findOpen || !S.findQ || !this.findAvail()) { this._findPaintKey = null; this.findClear(); return; }
+    const key = [S.readDoc, S.readMode, S.findQ, S.findI, this._rKey, S.htmlVer].join('|');
+    if (this._findPaintKey === key) return;        // nothing that shapes the ranges moved: leave the highlights as they are
+    this._findPaintKey = key; this.findClear();
     const ranges = this._findR = this.findRanges(S.findQ);
     try {
       if (typeof CSS !== 'undefined' && CSS.highlights && typeof Highlight !== 'undefined' && ranges.length) {
@@ -8975,10 +8993,10 @@ class Component extends DCLogic {
   // Position 2 (filters) is state.f. Position 3 (what-counts) is state.fw: one for-whom
   // frame per filter key — {giver, question} — never a view from nowhere. Empowerment,
   // not a limit: the same filter value means different things for different whoms.
-  fwOf(key) { const dfltQ = (this.state.q || '').trim() || (this._fold || []).join(' ') || 'what does this selection show?'; return (this.state.fw || {})[key] || { giver: 'the reader', question: dfltQ }; }
-  setFw(key, patch) { this.setState(s => ({ fw: { ...(s.fw || {}), [key]: { ...((s.fw || {})[key] || { giver: 'the reader', question: '' }), ...patch } } })); }
-  fwLabel(key) { const w = this.fwOf(key); return 'for ' + w.giver; }
-  filterTuple() { const S = this.state, f = S.f || {}, fw = S.fw || {}; const keys = Object.keys(f).filter(k => f[k] !== null && f[k] !== undefined && f[k] !== ''); if (S.q && S.q.trim()) keys.push('q'); const dfltQ = (S.q || '').trim() || 'what does this selection show?'; return { being: 'document', sources: { on: this._cnt ? [...this._cnt] : [], off: S.offDocs ? Object.keys(S.offDocs).filter(k => S.offDocs[k]) : [] }, filters: keys.map(k => ({ key: k, value: k === 'q' ? S.q.trim() : f[k], forWhom: fw[k] || { giver: 'the reader', question: dfltQ } })) }; }
+  fwOf(key) { const dfltQ = (this.state.q || '').trim() || (this._fold || []).join(' ') || 'what does this selection show?'; return (this.state.fw || {})[key] || { giver: 'the reader', question: dfltQ, ground: this.corpusName() }; }
+  setFw(key, patch) { this.setState(s => ({ fw: { ...(s.fw || {}), [key]: { ...((s.fw || {})[key] || { giver: 'the reader', question: '', ground: this.corpusName() }), ...patch } } })); }
+  fwLabel(key) { const w = this.fwOf(key); return 'for ' + w.giver + (w.ground ? ' on ' + w.ground : ''); }
+  filterTuple() { const S = this.state, f = S.f || {}, fw = S.fw || {}; const keys = Object.keys(f).filter(k => f[k] !== null && f[k] !== undefined && f[k] !== ''); if (S.q && S.q.trim()) keys.push('q'); const dfltQ = (S.q || '').trim() || 'what does this selection show?'; return { being: 'document', sources: { on: this._cnt ? [...this._cnt] : [], off: S.offDocs ? Object.keys(S.offDocs).filter(k => S.offDocs[k]) : [] }, filters: keys.map(k => ({ key: k, value: k === 'q' ? S.q.trim() : f[k], forWhom: fw[k] || { giver: 'the reader', question: dfltQ, ground: this.corpusName() } })) }; }
   metaAll() { if (!this._meta) this._meta = loadMeta(); return this._meta; }
   mOf(d) { const cid = this.corpusId(); const raw = (this.state.added[cid] || []).find(x => x.id === d.id) || d; const m = (this.metaAll()[cid] || {})[d.id] || {}; return { status: m.status || raw.status || 'source', drawsOn: m.drawsOn || '' }; }
   inferOrigins(A) {
@@ -10150,7 +10168,7 @@ class Component extends DCLogic {
       'hero:workspaces': this._wsTotals && this._wsTotals.waiting ? String(this._wsTotals.waiting) : '',
     }[id] || '');
     const navGroups = NAVG.map(([label, items]) => ({ label, hasLabel: !!label, items: items.map(([id, lab]) => { const isScr = id.startsWith('screen:');
-      return { label: lab, count: id === 'fixnames' ? (this.refEdits().length ? String(this.refEdits().length) : '') : countFor(id), countColor: id === 'review' || id === 'hero:workspaces' ? 'var(--amber)' : 'var(--mut)', ...gHi(isScr ? S.screenId === id.slice(7) : view === id), onClick: id === 'hero:workspaces' ? () => this.openWorkspacesHero() : id === 'fixnames' ? () => this.openFixNames() : isScr ? () => this.setState({ screenId: id.slice(7) }) : () => this.setState({ view: id, readDoc: null, sel: null }) }; }) }));
+      return { label: lab, count: id === 'fixnames' ? (this.refEdits().length ? String(this.refEdits().length) : '') : countFor(id), countColor: id === 'review' || id === 'hero:workspaces' ? 'var(--amber)' : 'var(--mut)', ...gHi(isScr ? S.screenId === id.slice(7) : view === id), onClick: id === 'hero:workspaces' ? () => this.openWorkspacesHero() : id === 'fixnames' ? () => this.openFixNames() : isScr ? () => { if (this.state.screenId !== id.slice(7)) this.pushHist(); this.setState({ screenId: id.slice(7) }); } : () => { if (view !== id || S.readDoc) this.pushHist(); this.setState({ view: id, readDoc: null, sel: null }); } }; }) }));
     // split so Folds can sit right under The reading / Connections, inside Explore
     // the Metro contracts address is for searching: its rail offers Sources only (no Ask, no Draft)
     const navTop = HD_METRO ? navGroups[0].items.filter(g => /^sources$/i.test(String(g.label))) : navGroups[0].items; const navRead = navGroups[1]; const navExplore = navGroups[2]; const navRest = navGroups.slice(3);
@@ -10296,12 +10314,16 @@ class Component extends DCLogic {
       corpusId: cid, corpusOptions: opts, q: S.q, corpusName: this.corpusName(), segList, hasSegments, segOpen, segToggleLabel, segCount, toggleSegOpen, addAsFold, navTop, navRead, navExplore, navRest, ...browseVals,
       // the rail's navigation bar: where you are now (the same trail the header breadcrumbs build) with a way
       // back step by step and a one-click home to Sources, so the way back is never a guess
-      navCtl: (() => { const H = this._hist || []; const bt = this.backLabel(A); const onSummary = view === 'summary' && !S.readDoc;
-        const loc = crumbs.map((c, i) => { const last = i === crumbs.length - 1; const canGo = !!c.onClick && !last;
-          return { label: c.label, on: canGo, here: !canGo, sep: !last, onClick: c.onClick }; });
-        return { backLabel: bt ? short(String(bt), 24) : 'Back', backDisabled: !H.length, backTitle: bt ? 'Back to ' + bt : 'Back',
+      navCtl: (() => { const bt = this.backLabel(A); const onSummary = view === 'summary' && !S.readDoc;
+        const titleCase = s => s ? s.charAt(0).toUpperCase() + s.slice(1) : s;
+        // the reader's surface crumb reads "Sources" in the shared breadcrumb; here it says what it is, and is not a link
+        // (there is no "reader root" to go up to), so the trail reads: workspace › Reading › what you have open.
+        const loc = crumbs.map((c, i) => { const last = i === crumbs.length - 1; const isSurf = i === 1;
+          const canGo = !!c.onClick && !last && !(isSurf && view === 'reader');
+          return { label: (isSurf && view === 'reader') ? 'Reading' : c.label, on: canGo, here: !canGo, sep: !last, onClick: c.onClick }; });
+        return { backLabel: bt ? short(titleCase(String(bt)), 24) : 'Back', backDisabled: !this.backTarget(), backTitle: bt ? 'Back to ' + bt : 'Back',
           onBack: () => this.goBack(), onHome: () => this.setState({ view: 'summary', readDoc: null, sel: null }),
-          homeCls: onSummary ? 'on' : '', homeAria: onSummary ? 'page' : undefined, hasLoc: loc.length > 1, locTitle: crumbs.map(c => c.label).join(' › '), loc }; })(),
+          homeCls: onSummary ? 'on' : '', homeAria: onSummary ? 'page' : undefined, hasLoc: loc.length > 1, locTitle: loc.map(c => c.label).join(' › '), loc }; })(),
       topicsList, hasTopics, topicsOpen: hasTopics || !!activeTopicGroup || !!topicsQ, topicsLabel: P.groups.length ? 'Topics · ' + P.groups.length : 'Topics', topicsNote, hasTopicsNote, topicsStrayN, showTopicsStray, onTopicsStray, scope,
       topicsHasSearch, topicsSearchVal, onTopicsSearch, topicsHasPager, topicsPagerLine, onTopicsPrev, onTopicsNext, topicsHasPrev, topicsHasNext, topicsPageN: (topicsPage + 1) + ' of ' + topicsPages,
       toggleTheme: () => { const th = S.theme === 'dark' ? 'light' : 'dark'; try { localStorage.setItem('fold-explorer-theme', th); } catch (e) {} this.setState({ theme: th }); },

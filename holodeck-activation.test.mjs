@@ -37,3 +37,9 @@ test('a null or cast-less reading never activates (no phantom referents)', () =>
   assert.equal(activationRetrieval({ rix: null, IX, question: 'What did Bob do?' }), null);
   assert.equal(activationRetrieval({ rix: {}, IX, question: 'What did Bob do?' }), null);
 });
+
+test('EVERY REFERENT HAS A FOR-WHOM — a gap-marked row never activates (a refused referent is not a thing)', () => {
+  const grix = { cast: [{ id: 'bob', surfaces: ['Bob'], forWhom: 'reader' }, { id: 'zed', surfaces: ['Zed'], standing: 'gap' }] };
+  const IX2 = { chunks: [{ ref: 'd#0-30', source: 'd', start: 0, end: 30, text: 'Zed invented the telephone.' }] };
+  assert.equal(activationRetrieval({ rix: grix, IX: IX2, question: 'What did Zed invent?' }), null, 'the gap-marked referent is not indexed, so nothing resolves');
+});

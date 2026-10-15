@@ -26,6 +26,21 @@ const inc = (o, k, n) => { o[k] = (o[k] || 0) + (n || 1); };
 const bag = () => Object.create(null);
 const intoBag = src => { const o = bag(); for (const k in src) o[k] = src[k]; return o; };
 
+// EVERY REFERENT HAS A FOR-WHOM (S113/S42). A source read in this tab is read FOR
+// the reader unless the caller declares its own for-whom ({ id, giver, question,
+// ground }); the frame is constitutive on every cast row, never absent. A caller
+// that passes `false` explicitly asks for the frameless read, and the gate answers
+// with a typed gap, never a bare admit.
+export function readerFrame(name, forWhom = null) {
+  if (forWhom === false) return null;                                  // explicitly frameless → the gate refuses
+  if (forWhom && forWhom.id) return { forWhom: forWhom.id, giver: forWhom.giver ?? null, question: forWhom.question ?? null, ground: forWhom.ground ?? name ?? null };
+  const src = forWhom && typeof forWhom === 'object' ? forWhom : {};
+  return { forWhom: src.forWhom || 'reader', giver: src.giver || 'the reader', question: src.question ?? null, ground: src.ground ?? name ?? null };
+}
+/** A cast row carries its frame, or it is a typed gap — never a bare referent. */
+export const referentGap = (c) => ({ schema: 'EOReferentGap@1', id: 'gap:referent:' + c.id + ':no-for-whom', reason: 'no_for_whom', referent: c.id, tier: 'referent',
+  detail: 'a referent is a referent only for-whom (S113); with no frame it is a view from nowhere, so it is a typed gap, never a bare admit' });
+
 /** Split a document into relation-reader passages. Paragraphs first, then long ones cut on
  *  sentence boundaries, so the vocabulary the reader measures is neither one giant blob nor a
  *  fragment per line. `max` mirrors the engine's own 60 000-character cap for the whole read. */
@@ -63,6 +78,7 @@ export function countSurface(text, surface) {
  *  - encounters/chars: what the source contributed (the OHS `sources[name].chunks` / `.chars`). */
 export function readDoc(name, text, report, opts = {}) {
   const standing = opts.standing || 'witnessed';
+  const frame = readerFrame(name, opts.forWhom);   // never absent unless the caller asks for the frameless read
   const passages = opts.passages || 1;
   const edges = Array.isArray(report && report.edges) ? report.edges : [];
   const bySurf = new Map();   // normalized -> display surface (first seen)
@@ -84,7 +100,7 @@ export function readDoc(name, text, report, opts = {}) {
   const text0 = String(text || '');
   for (const sf of bySurf.values()) inc(srcCast, sf, Math.max(1, countSurface(text0, sf)));
   const surfaces = [...bySurf.values()];
-  const cast = surfaces.map(sf => { const src = bag(); inc(src, name, 1); return { id: norm(sf), surfaces: [sf], standing, mentions: srcCast[sf] || 1, src, first: name, srcN: 1 }; });
+  const cast = surfaces.map(sf => { const src = bag(); inc(src, name, 1); return { id: norm(sf), surfaces: [sf], standing, mentions: srcCast[sf] || 1, src, first: name, srcN: 1, ...(frame ? { forWhom: frame.forWhom, frame } : {}) }; });
   const bonds = [...bond.values()].map(B => { const src = bag(); inc(src, name, B.n); return { ...B, src, first: name, srcN: 1 }; });
   const source = { chunks: passages, chars: text0.length, ops: intoBag({ INS: surfaces.length, CON: edges.length, REC: 0 }), terrain: bag(), kinds: srcKinds, cast: srcCast, bonds: srcBonds, idChurn: bag() };
   return { source, cast, bonds, surfaces, encounters: passages, chars: text0.length };
@@ -107,13 +123,18 @@ export function mergeReadings(readings, meta = {}) {
     if (prev) { for (const k in r.source.ops) inc(prev.ops, k, r.source.ops[k]); for (const k in r.source.cast) inc(prev.cast, k, r.source.cast[k]); for (const k in r.source.bonds) inc(prev.bonds, k, r.source.bonds[k]); for (const k in r.source.kinds) inc(prev.kinds, k, r.source.kinds[k]); prev.chunks += r.source.chunks; prev.chars += r.source.chars; }
     else sources[name] = { ...r.source, ops: intoBag(r.source.ops), cast: intoBag(r.source.cast), bonds: intoBag(r.source.bonds), kinds: intoBag(r.source.kinds) };
     for (const k in r.source.kinds) inc(kinds, k, r.source.kinds[k]);
-    for (const c of r.cast) { const key = norm((c.surfaces || [c.id])[0]); let C = cast.get(key); if (!C) { C = { id: c.id, surfaces: [], standing: c.standing, mentions: 0, src: bag(), first: c.first, regions: [], roles: bag() }; cast.set(key, C); } for (const s of c.surfaces) if (!C.surfaces.includes(s)) C.surfaces.push(s); C.mentions = Math.max(C.mentions, c.mentions || 0); C.standing = c.standing || C.standing; inc(C.src, name, 1); for (const rg of c.regions || []) if (!C.regions.some(x => x.join(',') === rg.join(','))) C.regions.push(rg); for (const k in c.roles || {}) inc(C.roles, k, c.roles[k]); }
+    for (const c of r.cast) { const key = norm((c.surfaces || [c.id])[0]); let C = cast.get(key); if (!C) { C = { id: c.id, surfaces: [], standing: c.standing, mentions: 0, src: bag(), first: c.first, regions: [], roles: bag(), forWhom: c.forWhom ?? null, frame: c.frame ?? null }; cast.set(key, C); } for (const s of c.surfaces) if (!C.surfaces.includes(s)) C.surfaces.push(s); C.mentions = Math.max(C.mentions, c.mentions || 0); C.standing = c.standing || C.standing; if (!C.forWhom && c.forWhom) { C.forWhom = c.forWhom; C.frame = c.frame ?? C.frame; } inc(C.src, name, 1); for (const rg of c.regions || []) if (!C.regions.some(x => x.join(',') === rg.join(','))) C.regions.push(rg); for (const k in c.roles || {}) inc(C.roles, k, c.roles[k]); }
     for (const b of r.bonds) { const key = bondKey(b.aKey || b.a, b.bKey || b.b); let B = bonds.get(key); if (!B) { B = { a: b.a, b: b.b, aKey: b.aKey || b.a, bKey: b.bKey || b.b, n: 0, rel: bag(), pos: 0, neg: 0, src: bag(), first: b.first }; bonds.set(key, B); } B.n += b.n; for (const k in b.rel) inc(B.rel, k, b.rel[k]); B.pos += b.pos; B.neg += b.neg; inc(B.src, name, b.n); }
   }
-  const castArr = [...cast.values()].map(c => ({ ...c, srcN: Object.keys(c.src).length })).sort((a, b) => b.mentions * 10 + b.srcN - (a.mentions * 10 + a.srcN));
+  // THE GATE: a cast row carries its frame, or it is a typed gap. A frameless
+  // referent is never admitted bare (S113/S42) — it is counted and disclosed,
+  // never silently dropped and never silently kept.
+  const allCast = [...cast.values()].map(c => ({ ...c, srcN: Object.keys(c.src).length }));
+  const castArr = allCast.filter(c => c.forWhom).sort((a, b) => b.mentions * 10 + b.srcN - (a.mentions * 10 + a.srcN));
+  const castGaps = allCast.filter(c => !c.forWhom).map(referentGap);
   const bondArr = [...bonds.values()].map(b => ({ ...b, srcN: Object.keys(b.src).length })).sort((a, b) => b.n + 3 * b.srcN - (a.n + 3 * a.srcN));
   return { schema: 'FoldReadingIndex@2', from: meta.from || 'workspace (read in this tab)', builtAt: meta.builtAt || new Date().toISOString(), ms: meta.ms || 0, lines: 0, bad: 0,
-    encounters, order, sources, kinds, castTotal: castArr.length, cast: castArr, bondsTotal: bondArr.length, bonds: bondArr, canonTotal: 0, canon: [], identitiesTotal: 0, identities: [] };
+    encounters, order, sources, kinds, castTotal: castArr.length, cast: castArr, castGapsTotal: castGaps.length, castGaps, bondsTotal: bondArr.length, bonds: bondArr, canonTotal: 0, canon: [], identitiesTotal: 0, identities: [] };
 }
 
 const STOP_W = new Set(('the a an and or of to in on for with at by from as is are was were be been being ' +
@@ -167,7 +188,8 @@ export function readSighted(name, elements, meta = {}) {
     }
   }
   const surfaces = [...casting.values()].map(c => ({ ...c, regions: c.regions, roles: c.roles, srcN: Object.keys(c.src).length }));
-  const cast = surfaces.map(c => ({ ...c, first: name }));
+  const frame = readerFrame(name, meta.forWhom);   // a sighted referent is a referent for-whom too
+  const cast = surfaces.map(c => ({ ...c, first: name, ...(frame ? { forWhom: frame.forWhom, frame } : {}) }));
   const bonds = [...bond.values()].map(B => {
     const key = bondKey(B.a, B.b); const A = casting.get(B.a), Bb = casting.get(B.b);
     return { a: (A && A.surfaces[0]) || B.a, b: (Bb && Bb.surfaces[0]) || B.b, aKey: B.a, bKey: B.b, n: B.n, rel: B.rel, pos: B.pos, neg: B.neg, src: B.src, first: name, srcN: Object.keys(B.src).length };
@@ -186,7 +208,7 @@ export function readWorkspace(docs, relationsFor, opts = {}) {
     if (!text.trim()) continue;
     let report = { edges: [] };
     try { report = relationsFor(splitPassages(text).map(t => ({ ref: d.id, text: t }))) || report; } catch (e) { report = { edges: [] }; }
-    const r = readDoc(opts.nameOf ? opts.nameOf(d) : (d.id || d.title), text, report, { passages: splitPassages(text).length, standing: opts.standing });
+    const r = readDoc(opts.nameOf ? opts.nameOf(d) : (d.id || d.title), text, report, { passages: splitPassages(text).length, standing: opts.standing, forWhom: opts.forWhom });
     out.push({ name: opts.nameOf ? opts.nameOf(d) : (d.id || d.title), ...r });
   }
   return mergeReadings(out, { from: opts.from, builtAt: opts.builtAt, ms: opts.ms });

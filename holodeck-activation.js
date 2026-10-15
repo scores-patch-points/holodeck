@@ -13,6 +13,12 @@
 // caller falls back to term retrieval — a recorded basis, never a silent mix
 // (the organ's own rule: `basis: "surface"` is disclosed when the fallback
 // stood in).
+//
+// EVERY REFERENT HAS A FOR-WHOM (S113/S42): the cast rows this index is built
+// from each carry the frame they were admitted under. A referent the reading
+// admitted is framed by construction (holodeck-reading.js gates a frameless one
+// into a typed gap), so a gap-marked row is never indexed here, and the frame
+// rides with the entry the engine resolves.
 import { mentionBook, activate } from './vendor/eoreader7/native/the-fold/activation-wiring.js';
 import { readingIndexFromLog } from './vendor/eoreader7/native/the-fold/reading-log.js';
 import { namesCorefer, diaNorm } from './vendor/eoreader7/native/adapters/text/surfaces.js';
@@ -30,10 +36,13 @@ export function indexFromCast(rix) {
   if (index) return index;
   try {
     const entries = rix.cast
+      .filter((c) => c && c.standing !== 'gap')   // a gap is a refused referent, never a thing that can activate
       .map((c) => ({
         schema: 'EOReferent@1',
         ref: String(c.id),
         surfaces: ((c.surfaces && c.surfaces.length) ? c.surfaces : [c.id]).filter(Boolean),
+        forWhom: c.forWhom || null,
+        frame: c.frame || null,
       }))
       .filter((e) => e.ref && e.surfaces.length);
     index = entries.length ? readingIndexFromLog(entries, { diaNorm, namesCorefer }) : null;
