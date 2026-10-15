@@ -4181,10 +4181,13 @@ function findNames(t, hy) {
   return out;
 }
 function nameType(n, info) {
-  if (info.person) return 'person';
   const words = n.split(/\s+/).filter(Boolean);
   const last = words[words.length - 1] || '';
   const first = words[0] || '';
+  // a compound place ("New York", "New Jersey") is a place by its own shape, before any human-role cue a sentence
+  // happens to attach to it — "New York" was read as a person because one sentence put a role word near a copula.
+  if (words.length > 1 && (first === 'New' || /^(East|West|North|South|Port|Fort|Mount|Lake|Cape)$/.test(first)) && PLACE.has(last)) return 'place';
+  if (info.person) return 'person';
   // a structural organisation head anywhere in the name beats a place that happens
   // to be its last token: "Catholic University of America" is an organisation even
   // though it ends in "America", and "New York City" stays a place (no org head).
@@ -12501,7 +12504,7 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
       hasRefs: refs.length > 0, refs, refTitle: refs.length === 1 ? 'Linked referent' : 'Linked referents',
       sum: this.profileSummary(A, n.name),
       facts: d.facts, here: N ? plural(N, 'mention') + ' in this source' : 'Not named in this source’s statements', hasStep: N > 1, pos: N > 1 ? (Math.min(idx, N - 1) + 1) + ' / ' + N : '', prev: () => step(-1), next: () => step(1),
-      hasDef: !!d.hasDefs, defTitle: d.defTitle, defNote: d.defNote, defRows: d.defs || [],
+      hasDef: !lead && !!d.hasDefs, defTitle: d.defTitle, defNote: d.defNote, defRows: d.defs || [],   // the lead IS the definition; only show the block when there is no lead
       hasTags: !!(d.tags && d.tags.length), tags: page ? (d.tags || []).map(t => ({ ...t, onClick: () => this.openProfile(t.label) })) : (d.tags || []), tagTitle: d.tagTitle,
       hasElse: elsewhere.length > 0, elseTitle: page ? 'In ' + plural(elsewhere.length, 'source') : 'Also in ' + plural(elsewhere.length, 'other source'), elsewhere: elsewhere.slice(0, S.pfAll ? 99 : 3), hasMoreElse: !S.pfAll && elsewhere.length > 3, moreElse: 'Show all ' + elsewhere.length, onMoreElse: () => this.setState({ pfAll: true }),
       noElse: !elsewhere.length, narrow: d.actions[0], hasHere: !page,
