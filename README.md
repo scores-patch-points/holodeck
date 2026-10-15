@@ -186,7 +186,9 @@ homeserver: `node tests/matrix-invites.live.mjs`.
 
 ## Full-screen Chat · Fold · Notebook
 
-Open **Ask**, then choose **Chat**, **Fold**, or **Notebook**. **Full screen** hides the workspace navigation and reading controls; Escape restores them. The workspace name and source count remain visible. Switching modes preserves the conversation, artifacts and notebook edits. Direct entry: `?work=chat`, `?work=fold`, or `?work=notebook`; add `&fullscreen=1` for a focused workspace.
+**Off in this preview (2026-10-14).** The Ask door is removed from the surface for now: no Ask entry in the rail, no ask affordances in the workspace, and the direct entries below do not open it. The machinery stays in place, unwired, for its return.
+
+Open **Ask**, then choose **Chat**, **Fold**, or **Notebook**. **Full screen** hides the workspace navigation and reading controls; Escape restores them. The workspace name and source count remain visible. Switching modes preserves the conversation, artifacts and notebook edits. Direct entry (when the door is on): `?work=chat`, `?work=fold`, or `?work=notebook`; add `&fullscreen=1` for a focused workspace.
 
 **Chat** uses the existing source-grounded conversational reader. **Fold** uses the existing artifact pipeline and keeps its preview, versions and evidence ledger. **Notebook** now uses a genuine persistent Jupyter/IPython kernel: variables survive between cells, execution counts follow actual execution order, Python exceptions and rich outputs are recorded, matplotlib figures appear inline, and Markdown cells remain editable.
 
