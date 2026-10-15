@@ -211,6 +211,9 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
 .hd-railadd{display:none!important}
 .hd-workspace>span{display:none}
 .hd-content{padding:6px 12px 12px!important}.hd-scope{font-size:12px!important}.hd-source-card{padding:16px}}
+/* collapsed rail (desktop): only the toggle fits in 40px, so hide the wide Add / Menu buttons and centre it */
+.hd-shell.rail-closed .hd-topadd,.hd-shell.rail-closed .hd-menubtn{display:none!important}
+.hd-shell.rail-closed .hd-railtop{justify-content:center;padding:2px!important}
 </style>
 </helmet>
 <div class="{{ workspaceClass }}" style="min-height:100vh;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:14px;line-height:1.5">
@@ -1763,16 +1766,27 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
       <sc-if value="{{ v.profile }}" hint-placeholder-val="{{ false }}">
         <sc-if value="{{ pf.has }}" hint-placeholder-val="{{ false }}">
           <div style="background:var(--s1);border:1px solid var(--line);border-radius:14px;padding:20px 22px;display:flex;flex-direction:column;gap:16px">
-            <div style="display:flex;flex-direction:column;gap:3px">
-              <button onClick="{{ pf.onBack }}" style="align-self:flex-start;background:none;border:0;padding:0;cursor:pointer;font:500 13px var(--sans);color:var(--acc);text-align:left" style-hover="color:var(--ink)">← {{ pf.back }}</button>
-              <span style="font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:{{ pf.color }};margin-top:8px">{{ pf.eyebrow }}</span>
-              <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap">
-                <h1 style="margin:0;font:500 34px/1.15 var(--serif);color:var(--ink);text-wrap:balance">{{ pf.title }}</h1>
-                <sc-if value="{{ pf.hasBadge }}" hint-placeholder-val="{{ false }}"><span style="font:600 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:{{ pf.badgeCol }};border:1px solid {{ pf.badgeCol }};border-radius:999px;padding:2px 10px;white-space:nowrap">{{ pf.badge }}</span></sc-if>
+            <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(210px,270px);gap:10px 24px;align-items:start">
+              <div style="display:flex;flex-direction:column;gap:3px;min-width:0">
+                <button onClick="{{ pf.onBack }}" style="align-self:flex-start;background:none;border:0;padding:0;cursor:pointer;font:500 13px var(--sans);color:var(--acc);text-align:left" style-hover="color:var(--ink)">← {{ pf.back }}</button>
+                <span style="font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:{{ pf.color }};margin-top:8px">{{ pf.eyebrow }}</span>
+                <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap">
+                  <h1 style="margin:0;font:500 34px/1.15 var(--serif);color:var(--ink);text-wrap:balance">{{ pf.title }}</h1>
+                  <sc-if value="{{ pf.hasBadge }}" hint-placeholder-val="{{ false }}"><span style="font:600 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:{{ pf.badgeCol }};border:1px solid {{ pf.badgeCol }};border-radius:999px;padding:2px 10px;white-space:nowrap">{{ pf.badge }}</span></sc-if>
+                </div>
+                <sc-if value="{{ pf.hasLead }}" hint-placeholder-val="{{ false }}">
+                  <p style="margin:8px 0 0;font:400 16.5px/1.6 var(--serif);color:var(--ink2);text-wrap:pretty"><span style="font:600 10px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--mut);margin-right:8px;vertical-align:.15em">{{ pf.leadPos }}</span>{{ pf.lead }}</p>
+                </sc-if>
               </div>
-              <div style="display:flex;gap:4px 16px;flex-wrap:wrap;font:400 14px var(--sans);color:var(--mut)">
-                <sc-for list="{{ pf.facts }}" as="x" hint-placeholder-count="2"><span style="white-space:nowrap"><span style="color:var(--dim)">{{ x.k }}</span> <span style="color:var(--ink2)">{{ x.v }}</span></span></sc-for>
-              </div>
+              <sc-if value="{{ pf.infobox }}" hint-placeholder-val="{{ false }}">
+                <aside style="border:1px solid var(--line2);border-radius:12px;overflow:hidden;background:var(--s2)">
+                  <sc-for list="{{ pf.infobox }}" as="x" hint-placeholder-count="4">
+                    <div style="display:grid;grid-template-columns:84px minmax(0,1fr);gap:10px;padding:7px 12px;border-top:1px solid var(--line);font:400 13px/1.4 var(--sans)">
+                      <span style="color:var(--mut)">{{ x.k }}</span><span style="color:var(--ink);text-align:right;font-weight:500;overflow-wrap:anywhere">{{ x.v }}</span>
+                    </div>
+                  </sc-for>
+                </aside>
+              </sc-if>
             </div>
             <div style="display:flex;gap:8px;flex-wrap:wrap">
               <button onClick="{{ pf.narrow.onClick }}" style="background:none;border:1px solid var(--line2);border-radius:8px;padding:5px 12px;cursor:pointer;font:500 13px var(--sans);color:var(--ink2)" style-hover="border-color:var(--acc)">{{ pf.narrow.label }}</button>
@@ -3176,10 +3190,15 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
       <button onClick="{{ pf.onBack }}" style="align-self:flex-start;background:none;border:0;padding:0;cursor:pointer;font:500 13px var(--sans);color:var(--acc);text-align:left;white-space:normal" style-hover="color:var(--ink)">← {{ pf.back }}</button>
       <span style="font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:{{ pf.color }};margin-top:6px">{{ pf.eyebrow }}</span>
       <h1 style="margin:0;font:500 30px/1.15 var(--serif);color:var(--ink);text-wrap:balance">{{ pf.title }}</h1>
-      <div style="display:flex;gap:4px 16px;flex-wrap:wrap;font:400 14px var(--sans);color:var(--mut)">
-      <sc-for list="{{ pf.facts }}" as="x" hint-placeholder-count="2"><span style="white-space:nowrap"><span style="color:var(--dim)">{{ x.k }}</span> <span style="color:var(--ink2)">{{ x.v }}</span></span></sc-for>
+      <sc-if value="{{ pf.hasLead }}" hint-placeholder-val="{{ false }}"><p style="margin:6px 0 0;font:400 15.5px/1.6 var(--serif);color:var(--ink2);text-wrap:pretty"><span style="font:600 10px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--mut);margin-right:7px;vertical-align:.15em">{{ pf.leadPos }}</span>{{ pf.lead }}</p></sc-if>
       </div>
-      </div>
+      <sc-if value="{{ pf.infobox }}" hint-placeholder-val="{{ false }}">
+      <aside style="border:1px solid var(--line2);border-radius:12px;overflow:hidden;background:var(--s2)">
+      <sc-for list="{{ pf.infobox }}" as="x" hint-placeholder-count="4">
+      <div style="display:grid;grid-template-columns:78px minmax(0,1fr);gap:10px;padding:6px 11px;border-top:1px solid var(--line);font:400 13px/1.4 var(--sans)"><span style="color:var(--mut)">{{ x.k }}</span><span style="color:var(--ink);text-align:right;font-weight:500;overflow-wrap:anywhere">{{ x.v }}</span></div>
+      </sc-for>
+      </aside>
+      </sc-if>
       <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
       <span style="font:500 14px var(--sans);color:var(--ink)">{{ pf.here }}</span>
       <sc-if value="{{ pf.hasStep }}" hint-placeholder-val="{{ false }}">
@@ -3687,7 +3706,7 @@ const PLACE_FIRST = W('Port Mount Lake Fort Cape Point Isle Gulf');
 const MONTHS = W('Jan Feb Mar Apr Jun Jul Aug Sep Sept Oct Nov Dec January February March April May June July August September October November December Monday Tuesday Wednesday Thursday Friday Saturday Sunday');
 const ORG = W('Council Authority Farms Dairy Inc Ltd LLC Company Co Department Division Agency Office Group Board Committee University Hospital School Structural Associates Partners Foundation Institute Ministry Commission Services Corporation Corp Bureau Trust Union Party Press News Times Club Team Clinic Lab Labs Industries Court Caucus Congress Administration Guard Navy Army Engineers Association Society Center Service Police Senate House Assembly Bradstreet Line Lines Marine Shipping Holdings Bank Centre Coalition Alliance Network Ministries Initiative Collaborative Partnership');
 const ORG_LOWER = new Set([...ORG].map(w => w.toLowerCase()).concat(['inc.', 'ltd.', 'corp.', 'co.', 'plc', 'gmbh', 'llp', 'lp', 'pa', 'pllc', 'inc', 'corp']));
-const PLACE = W('Bridge Avenue Street Road River Park Square City County District Station Corridor Lane Way Valley Hill Harbor Harbour Island Bay Lake Coast Airport Market Centre Plaza Quarter North South East West Point Terminal Channel Tunnel Ocean Sea States Kingdom Chile Maryland Virginia Baltimore Singapore Asia America Europe Africa Dundalk');
+const PLACE = W('Bridge Avenue Street Road River Park Square City County District Station Corridor Lane Way Valley Hill Harbor Harbour Island Bay Lake Coast Airport Market Centre Plaza Quarter North South East West Point Terminal Channel Tunnel Ocean Sea States Kingdom Chile Maryland Virginia Baltimore Singapore Asia America Europe Africa Dundalk York');
 const TYPE_C = { person: 'var(--pink)', organisation: 'var(--blue)', place: 'var(--green)', other: 'var(--mut)' };
 const TYPE_L = { person: 'People', organisation: 'Organisations', place: 'Places', other: 'Other names' };
 // The narrow, safe subset of PERSON_ROLE used to SPLIT a leading profession off a
@@ -4489,7 +4508,9 @@ function analyze(corpus, htmlMap) {
         for (const [v, c] of sv) if (EMERG_PERSON.has(v)) score.person += 2 * c;
         for (const [v, c] of ov) { if (EMERG_PLACE.has(v)) score.place += 2 * c; if (EMERG_ORG.has(v)) score.organisation += 2 * c; }
         const top = Object.entries(score).sort((a, b) => b[1] - a[1])[0];
-        if (top && top[1] >= 2) n.type = top[0];
+        // emergent typing is a tie-breaker for a name the deterministic rules could not type; it never overrides one
+        // they did ("New York" is a place by its token, not a person because it is once the subject of "moved")
+        if (top && top[1] >= 2 && n.type === 'other') n.type = top[0];
       });
     } catch (e) { /* an organ failure leaves the reader's own fallback typing — a gap, never a guess */ }
   }
@@ -12274,7 +12295,10 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
       }
       if (rp.anchor && rp.anchor.found && rp.anchor.extract) facts.push({ k: 'What it is', v: short(String(rp.anchor.extract).replace(/\s+/g, ' '), 140) });
     }
+    // A WIKIPEDIA-LIKE TOP: one line saying what the topic is and for whom, then the structured facts as an infobox.
+    const lead = (typeof topicSubtitle === 'function') ? (topicSubtitle(g) || '') : '';
     return { has: true, eyebrow, color, title: g.label, facts,
+      hasLead: !!lead, lead, leadPos: kx.e, infobox: facts,
       hasBadge: !!g.terrain, badge: g.terrain || '', badgeCol: (typeof TERRAIN_C !== 'undefined' && TERRAIN_C[g.terrain]) || 'var(--mut)',
       narrow: { label: 'Segment to this topic', onClick: () => this.toggleTopicGroup(g) },
       sum: { has: false }, hasConns: false, hasRefs: false, hasProf: false,
@@ -12466,7 +12490,12 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
     ((A.nameLinks || {})[n.name] || []).forEach(L => { if (seenRef.has(L.href)) return; seenRef.add(L.href);
       const r = referentOfLink(L.href); refs.push({ label: r.label, host: r.host, href: r.href, wiki: r.wiki, onOpen: () => this.navigate(L.href) }); });
     refs.length = Math.min(refs.length, 6);
+    // A WIKIPEDIA-LIKE TOP: the word's own sense as the lead (Wiktionary's first gloss), and the structured facts
+    // as an infobox — so an entity opens the way an article does: a line, then a table of what is known.
+    const wdef = (this._defs || {})[n.name.toLowerCase()];
+    const lead = (wdef && wdef.length) ? wdef[0].text : ''; const leadPos = (wdef && wdef.length) ? wdef[0].pos : '';
     return { has: true, eyebrow: d.eyebrow, color: d.color, title: n.name,
+      hasLead: !!lead, lead, leadPos, infobox: d.facts || [],
       ...(() => { const pl = this.profilePlain(A, n.name); return { hasProf: !!(pl && pl.rows.length), profKind: pl ? pl.kind : '', profEstablished: pr ? pr.established : false, profCount: pl ? pl.countLine : '', profRows: pl ? pl.rows : [] }; })(),
       hasConns: conns.length > 0, conns, connTitle: 'Connections across sources · ' + conns.length,
       hasRefs: refs.length > 0, refs, refTitle: refs.length === 1 ? 'Linked referent' : 'Linked referents',
