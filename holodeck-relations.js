@@ -680,7 +680,7 @@ function verdictOfBags(P, Q) {
 }
 
 // ── the whole set, with a reader's decisions applied ────────────────────────────────────────────────────────────
-export function collect(A, { contractLinks = null, origins = null, inferred = true, budget, readAcross = null, cues = false } = {}) {
+export function collect(A, { contractLinks = null, origins = null, inferred = true, budget, timeMs = null, readAcross = null, cues = false } = {}) {
   const cites = importCitations(A);
   const base = [].concat(importCues(A), importAlignment(A), cites.links, importParts(A),
     contractLinks ? importContractLinks(contractLinks, A) : [], origins ? importOrigins(origins, A) : [], []);
@@ -690,7 +690,7 @@ export function collect(A, { contractLinks = null, origins = null, inferred = tr
   if (cues) { const ixd = buildIndex(A); base.push(...definedLinks(A, ixd), ...polarityLinks(A, ixd)); }
   let truncated = false, coverage = null, weak = [];
   if (inferred) {
-    const p = proposeAll(A, { budget }); base.push(...p.links); weak = p.weak; truncated = p.truncated;
+    const p = proposeAll(A, { budget, timeMs }); base.push(...p.links); weak = p.weak; truncated = p.truncated;
     coverage = { sources: p.sources, statements: p.statements, vocabulary: p.vocabulary };
   }
   const byId = new Map(); base.forEach(L => { if (!byId.has(L.id)) byId.set(L.id, L); });

@@ -5712,9 +5712,24 @@ class Component extends DCLogic {
     const bk = this._key + '|' + (this._contractLinks ? 1 : 0) + '|' + A.docs.length + '|' + (this._readAcross ? this._readAcrossKey : '');
     if (!this._lkBase || this._lkBaseKey !== bk) {
       this._lkBaseKey = bk; let C;
-      try { C = LM.R.collect(A, { contractLinks: this._contractLinks ? { links: this._contractLinks } : null, origins: this.inferOrigins(A), budget: 1.5e6, readAcross: this._readAcross || null }); }
+      // The links the sources declare (citations, contract links, origins) come first and paint with the page; the pairwise
+      // matching over every statement is the slow part and runs when the page is idle, then the link set is rebuilt.
+      try { C = LM.R.collect(A, { contractLinks: this._contractLinks ? { links: this._contractLinks } : null, origins: this.inferOrigins(A), inferred: false, readAcross: this._readAcross || null }); }
       catch (e) { C = { links: [], weak: [], unresolved: [], truncated: false, coverage: null, error: String((e && e.message) || e) }; }
-      this._lkBase = C;
+      this._lkBase = C; this._lkNeedFull = bk;
+    }
+    if (this._lkNeedFull === bk && !this._lkFullBusy) {
+      this._lkFullBusy = true;
+      const run = () => {
+        try {
+          if (this._lkNeedFull === bk && this._lkBaseKey === bk) {
+            this._lkBase = LM.R.collect(A, { contractLinks: this._contractLinks ? { links: this._contractLinks } : null, origins: this.inferOrigins(A), budget: 1.5e6, timeMs: 1500, readAcross: this._readAcross || null });   // best-supported pairs first; `truncated` says the rest was not read
+            this._lkKey = null; this._lkSet = null;
+          }
+        } catch (e) {}
+        this._lkNeedFull = null; this._lkFullBusy = false; this.forceUpdate();
+      };
+      if (typeof requestIdleCallback === 'function') requestIdleCallback(run, { timeout: 2500 }); else setTimeout(run, 400);
     }
     const C = this._lkBase; const main = LM.R.resolveLinks(C.links, ev); const wk = LM.R.resolveLinks(C.weak, ev);
     const byId = new Map(); main.links.forEach(L => byId.set(L.id, L)); wk.links.filter(L => L.provenance === 'confirmed').forEach(L => byId.set(L.id, { ...L, weak: false }));
