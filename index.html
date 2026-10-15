@@ -4,6 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#17171a">
+<meta property="og:title" content="the fold — a reading and research surface">
+<meta property="og:description" content="Paste, upload or link anything: every name, figure and date is traced back to where it appears. Answers come from the sources, or the surface tells you plainly what is missing.">
+<meta property="og:url" content="https://scores-patch-points.github.io/holodeck/">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary">
 <link rel="icon" href="./favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="./favicon.svg">
 <script src="./holodeck-theme-boot.js"></script>
@@ -628,6 +633,23 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
       <sc-if value="{{ v.linkSurface }}" hint-placeholder-val="{{ false }}"><div id="links-surface" style="min-width:0"></div></sc-if>
       <sc-if value="{{ v.inbox }}" hint-placeholder-val="{{ false }}"><div id="inbox-surface" style="max-width:1100px"></div></sc-if>
       <sc-if value="{{ v.summary }}" hint-placeholder-val="{{ true }}">
+        <sc-if value="{{ intro.show }}" hint-placeholder-val="{{ false }}">
+          <div style="background:var(--s1);border:1px solid var(--line2);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:10px;margin-bottom:12px">
+            <div style="display:flex;align-items:flex-start;gap:10px">
+              <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:4px">
+                <span style="font:500 17px/1.3 var(--serif);color:var(--ink)">{{ intro.lead }}</span>
+                <span style="font:400 14px/1.5 var(--sans);color:var(--ink2)">{{ intro.line }}</span>
+              </div>
+              <button onClick="{{ intro.onClose }}" title="Dismiss this card" style="background:none;border:0;color:var(--mut);cursor:pointer;font:500 16px var(--sans);padding:0 2px;flex:none">✕</button>
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+              <span style="font:600 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mut)">Try</span>
+              <sc-for list="{{ intro.tryQs }}" as="x" hint-placeholder-count="3"><button class="hd-chip" onClick="{{ x.onClick }}" title="Ask this question now">{{ x.t }}</button></sc-for>
+            </div>
+            <sc-if value="{{ intro.hasHint }}" hint-placeholder-val="{{ false }}"><span style="font:400 13px var(--sans);color:var(--acc)">{{ intro.hint }}</span></sc-if>
+            <span style="font:400 12.5px/1.45 var(--sans);color:var(--mut)">{{ intro.legend }} <a href="demo-guide.html" style="color:var(--acc);white-space:nowrap">What am I looking at? →</a></span>
+          </div>
+        </sc-if>
         <div class="hd-drive-bar">
           <div class="hd-drive-top">
             <span class="hd-drive-crumb"><button onClick="{{ drv.onHome }}" title="All sources">{{ corpusName }}</button><sc-if value="{{ drv.inFolder }}" hint-placeholder-val="{{ false }}"><span style="color:var(--mut)">›</span><span style="padding:3px 8px">{{ drv.folderName }}</span></sc-if></span>
@@ -1356,6 +1378,7 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
                 <sc-if value="{{ ak.art.chip.has }}" hint-placeholder-val="{{ false }}"><div style="display:flex;align-items:center;gap:8px;font:500 13px var(--sans);color:var(--ink2);padding-bottom:6px;border-bottom:1px solid var(--line)"><span style="flex:none;width:8px;height:8px;border-radius:2px;background:{{ ak.art.chip.col }}"></span><span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ ak.art.chip.label }}</span><button onClick="{{ ak.art.chip.onToggle }}" style="all:unset;cursor:pointer;color:var(--acc);font:500 13px var(--sans);white-space:nowrap" style-hover="text-decoration:underline">{{ ak.art.chip.action }}</button></div></sc-if>
                 <textarea value="{{ ak.q }}" onChange="{{ ak.onQ }}" onKeyDown="{{ ak.onKey }}" rows="2" placeholder="{{ ak.ph }}" style="background:transparent;border:0;outline:none;resize:vertical;color:var(--ink);font:400 16px/1.5 var(--sans);min-height:48px"></textarea>
                 <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+                  <sc-if value="{{ ak.tryOn }}" hint-placeholder-val="{{ false }}"><sc-for list="{{ ak.tryQs }}" as="x" hint-placeholder-count="3"><button class="hd-chip" onClick="{{ x.onClick }}" title="Ask this now">{{ x.t }}</button></sc-for></sc-if>
                   <sc-if value="{{ ak.showEx }}" hint-placeholder-val="{{ true }}"><sc-for list="{{ ak.examples }}" as="x" hint-placeholder-count="3"><button onClick="{{ x.onClick }}" style="background:var(--s2);border:1px solid var(--line2);border-radius:999px;padding:3px 10px;cursor:pointer;font:400 13px var(--sans);color:var(--ink2);white-space:normal;text-align:left" style-hover="border-color:var(--acc)">{{ x.t }}</button></sc-for></sc-if>
                   <div style="margin-left:auto;display:flex;gap:8px">
                     <sc-if value="{{ ak.busyAny }}" hint-placeholder-val="{{ false }}"><button onClick="{{ ak.stop }}" style="background:none;border:1px solid var(--line2);border-radius:8px;padding:6px 14px;cursor:pointer;font:500 14px var(--sans);color:var(--ink)">Stop</button></sc-if>
@@ -8042,6 +8065,7 @@ class Component extends DCLogic {
       notGen: (S.akMode || 'chat') !== 'generate',
       art, isGen, mainFlex: isGen && art.has && !art.narrow ? '1 1 ' + ART_CHAT_W + 'px' : '1 1 480px', asideFlex: isGen ? (art.has && !art.narrow ? '1 1 ' + ART_PANE_W + 'px' : '0 0 0px') : '0 1 290px', asideMin: isGen ? (art.has && !art.narrow ? '320px' : '0px') : '250px', wrapRef: this.akWrapRef, asideZ: art.back ? 90 : 'auto',
       showReset: turns.length > 0 && !isGen, showEx: !isGen && turns.length === 0 && !S.akPending, busyAny: !!S.akBusy,
+      tryOn: !isGen && this.sampleTry(workspace).length > 0, tryQs: this.sampleTry(workspace).map(x => ({ t: x, onClick: () => this.askQuestion(x) })),
       showConvTabs: !isGen,
       convTabs: (this._convs || []).filter(c => c.open).map(c => { const on = c.id === this._convId; return { title: c.title || 'New conversation', on, bg: on ? 'var(--sel)' : 'transparent', bd: on ? 'var(--acc2)' : 'var(--line)', col: on ? 'var(--ink)' : 'var(--mut)', onClick: () => this.convOpen(c.id), onClose: ev => this.convClose(c.id, ev) }; }),
       convListOpen: !!S.akConvList, convToggleList: () => this.setState({ akConvList: !S.akConvList }), convCloseList: () => this.setState({ akConvList: false }),
@@ -10048,7 +10072,7 @@ class Component extends DCLogic {
       if (!A.docs.length) { this.autoResearch(v); return; }
       this.setState(s => ({ q: v, qDraft: undefined, view: 'search', readDoc: null, srN: 25, qaN: 0, prevView: s.view === 'search' || s.view === 'reader' ? (s.prevView || 'summary') : s.view })); };
     const omniOpen = live => { const v = typeof live === 'string' ? live : dv; if (!isOmniUrl(v)) return; clearTimeout(this._omniT); this.setState({ q: '', qDraft: undefined }); this.ingestUrl(/^https?:\/\//.test(v) ? v : 'https://' + v, { open: true }); };
-    Object.assign(this._extra = {}, { ...this.qaVals(A, F, qv, view), ...this.draftVals(A), ...this.pfCoVals(A), ...this.dbVals(A, view), ...this.askVals(A, view), askFold: () => { const q = (this.state.q || '').trim(); this.setState({ view: 'ask', readDoc: null }); setTimeout(() => this.askSend(q), 0); }, ...this.netVals(A, view), ...this.readingVals(A, view),
+    Object.assign(this._extra = {}, { ...this.qaVals(A, F, qv, view), ...this.draftVals(A), ...this.pfCoVals(A), ...this.dbVals(A, view), ...this.askVals(A, view), intro: this.introVals(), askFold: () => { const q = (this.state.q || '').trim(); this.setState({ view: 'ask', readDoc: null }); setTimeout(() => this.askSend(q), 0); }, ...this.netVals(A, view), ...this.readingVals(A, view),
       pinPop: S.pinPop && view === 'reader' ? { has: true, x: S.pinPop.x + 'px', y: S.pinPop.y + 'px', onPin: e => { e.preventDefault(); this.pinSelection(); }, onComment: e => { e.preventDefault(); this.commentOnSelection(); }, onCorrect: e => { e.preventDefault(); this.openCorr(S.pinPop.text); } } : { has: false },
       hasPinToast: !!S.pinToast, pinToast: S.pinToast || '', goDraft: () => { this.setState({ pinToast: '' }); this.go('draft'); }, plainRef: this.plainRef, extRef: this.extRef, omniRef: this.omniRef,
       rdPins: (() => { const n = view === 'reader' ? this.activePins().filter(p => p.docId === S.readDoc).length : 0; return { has: n > 0, label: plural(n, 'pin') + ' from this source →' }; })(), navGroups, omniUrl, omniOpen,
@@ -10401,9 +10425,31 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
   // ---- the demo sample: a pointer in this repo (samples.json) whose content is downloaded from its own
   // hosts when the app opens. Feedback is instant: the reading tiles go up before the first byte is fetched,
   // and each source lands as it arrives; the ingest player is one click on any tile, never a takeover.
+  // The pointer is fetched once and held: what a sample offers a visitor to try, and how it introduces
+  // itself, live in samples.json as data — any sample that declares them is rendered the same way.
+  sampleMeta() {
+    if (!this._spP) this._spP = fetch(new URL('samples.json', location.href).href, { cache: 'no-cache' })
+      .then(r => r.ok ? r.json() : null).catch(() => null)
+      .then(M => { this._spM = M && M.samples ? M.samples : null; try { this.forceUpdate(); } catch (e) {} return M; });
+    return this._spP;
+  }
+  sampleTry(ws) { const S = this._spM && this._spM[ws]; return S && Array.isArray(S.try) ? S.try.filter(q => typeof q === 'string' && q.trim()) : []; }
+  // The sample's own introduction, shown once in the summary it lands in and dismissed for good
+  // (localStorage, per workspace). The legend is the surface's; the lead, line and hint are the sample's.
+  introVals() {
+    const ws = this.corpusId(), Sp = this._spM && this._spM[ws];
+    if (!Sp || !Sp.intro) return { show: false };
+    let done = false; try { done = localStorage.getItem('hd:intro:' + ws) === '1'; } catch (e) {}
+    const tryQs = this.sampleTry(ws);
+    return { show: !done, lead: Sp.intro.lead || Sp.name || '', line: Sp.intro.line || '', hint: Sp.intro.hint || '', hasHint: !!Sp.intro.hint,
+      tryQs: tryQs.map(q => ({ t: q, onClick: () => this.askQuestion(q) })),
+      legend: 'In an answer, a sentence underlined and carrying a number is grounded — click the number to read the passage it is traced to. Plain text is this surface’s own wording; anything no source supports is named “Not in the material.”',
+      onClose: () => { try { localStorage.setItem('hd:intro:' + ws, '1'); } catch (e) {} this.forceUpdate(); } };
+  }
   async maybeSample() {
     let want = ''; try { want = new URLSearchParams(location.search).get('ws') || ''; } catch (e) {}
     const id = 'titanic-1912'; if (want && want !== id) return;   // an address asked for something else
+    await this.sampleMeta();
     let done = null; try { done = localStorage.getItem('hd:sample:' + id); } catch (e) {}
     if ((this.state.added[id] || []).length) { if (want === id) this.setState({ corpus: id, view: 'summary', sel: null, f: {}, readDoc: null }); return; }
     const hasOther = Object.keys(this.state.added || {}).some(k => k !== id && (this.state.added[k] || []).length);
@@ -10413,8 +10459,7 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
   }
   async loadSample(id) {
     if (this._sampleOn) return; this._sampleOn = true;
-    let M = null;
-    try { const r = await fetch(new URL('samples.json', location.href).href, { cache: 'no-cache' }); if (r.ok) M = await r.json(); } catch (e) {}
+    const M = await this.sampleMeta();
     const Sp = M && M.samples && M.samples[id];
     if (!Sp) { this._sampleOn = false; return; }
     const names = loadWorkspaceNames(); if (!names[id]) { names[id] = Sp.name; saveWorkspaceNames(names); }

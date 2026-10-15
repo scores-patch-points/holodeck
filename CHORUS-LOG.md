@@ -192,3 +192,11 @@ fast: 4 files · 1 affected test file (12) pass · law: ok (no citations)
 | Simon/Chekhov | — | holodeck-referents-panel.js | noted | DOM panel has no unit test; verified live (fold, SEG, CON, undo, wide + 375px) |
 | Frankfurt | — | holodeck-referents-panel.js:147 | false-positive-on-review | HTML placeholder attribute, not a stand-in value |
 clean: Diaconis, Feynman, Holmes, Ostrom
+
+## 2026-10-14 — the demo guides itself: samples.json carries the sample's try-questions and intro card (read generically), share meta on both addresses, and a one-page guide for the shared link (main, demo)
+fast: 4 files · none affected (no test imports index.html or samples.json; demo-guide.html is static) · law: ok
+| lens | citation | file:line | verdict | one line |
+| Feynman | a swallowed error | index.html:10433 | false-positive-on-review | the pointer-fetch catch is the pattern the old inline fetch carried — a failed fetch degrades to no sample, exactly as before; the forceUpdate try/catch only guards an unmount race |
+| Frankfurt | a placeholder value | index.html:636 | false-positive-on-review | hint-placeholder-val is the surface's standing sc-if template syntax (logged 2026-10-11, 2026-10-13) |
+clean: Lévi-Strauss (stash × open problems ran; none of its pieces meets this diff — no join earned)
+checked live (not by a test): index.html?ws=titanic-1912 in Chromium — the intro card, its three chips and the composer chips all render from samples.json; a chip lands on the question's record answer ("How many lives were lost?" leads with the report's "1,490 lives"; the band question leads with Beesley's passage); the dismissal (hd:intro:titanic-1912) survives a reload. Carried into this commit, found live: the chips route through askQuestion (the hero/omni front door — Ask when a model is ready, the record's own answer otherwise) because holodeck-ask.js cannot be imported at all: vendor/eoreader7/native/kernel/reading-rules.js is missing in this repo and 404 on the deployed site (pre-existing, not this diff).
