@@ -118,16 +118,17 @@ html[data-metro] .hd-drive-search,html[data-metro] .hd-settings,html[data-metro]
 @keyframes hd-reading{from{background-position:-40% 0}to{background-position:140% 0}}
 @media (prefers-reduced-motion:reduce){.hd-drive-tile.reading::after{animation:none;background:var(--acc2);opacity:.45}}
 .hd-drive-tile:hover{border-color:var(--line2);box-shadow:0 1px 8px rgba(0,0,0,.25)}
-.hd-drive-prev{all:unset;cursor:pointer;display:block;position:relative;height:118px;background:var(--s2);border-radius:11px 11px 0 0;overflow:hidden;padding:12px 14px;box-sizing:border-box}
+.hd-drive-prev{all:unset;cursor:pointer;display:block;position:relative;height:150px;background:#f4f4f1;border-radius:11px 11px 0 0;overflow:hidden;padding:14px 16px 0;box-sizing:border-box;box-shadow:inset 0 -1px 0 rgba(0,0,0,.08)}
+.hd-drive-prev::after{content:"";position:absolute;left:0;right:0;bottom:0;height:46px;background:linear-gradient(to bottom,rgba(244,244,241,0),#f4f4f1 85%);pointer-events:none}
 #hd-opening{position:fixed;left:0;top:0;height:3px;width:100%;z-index:200;pointer-events:none;opacity:0;background:linear-gradient(90deg,transparent,var(--acc2),transparent);background-size:40% 100%;background-repeat:no-repeat}
 #hd-opening.on{opacity:1;animation:hd-open-bar 0.9s ease-in-out infinite}
 @keyframes hd-open-bar{from{background-position:-40% 0}to{background-position:140% 0}}
 .hd-drive-tile,.hd-source-card{transition:transform .12s ease,box-shadow .12s ease,border-color .12s ease}
 .hd-drive-tile:active,.hd-source-card:active{transform:scale(.985)}
 @media (prefers-reduced-motion:reduce){#hd-opening.on{animation:none;background:var(--acc2)}.hd-drive-tile,.hd-source-card{transition:none}.hd-drive-tile:active,.hd-source-card:active{transform:none}}
-.hd-drive-snip{font:400 11px/1.45 var(--serif);color:var(--mut);display:-webkit-box;-webkit-line-clamp:6;-webkit-box-orient:vertical;overflow:hidden}
+.hd-drive-snip{font:400 11.5px/1.5 var(--serif);color:#2f323a;display:-webkit-box;-webkit-line-clamp:8;-webkit-box-orient:vertical;overflow:hidden}
 .hd-drive-wave{position:absolute;left:14px;right:14px;top:14px;bottom:14px;background-repeat:no-repeat;background-position:center;background-size:100% 100%}
-.hd-drive-badge{position:absolute;right:10px;bottom:10px;min-width:30px;height:30px;padding:0 6px;box-sizing:border-box;border-radius:8px;display:flex;align-items:center;justify-content:center;font:700 12px var(--mono);color:#fff}
+.hd-drive-badge{z-index:1;position:absolute;right:10px;bottom:10px;min-width:30px;height:30px;padding:0 6px;box-sizing:border-box;border-radius:8px;display:flex;align-items:center;justify-content:center;font:700 12px var(--mono);color:#fff}
 .hd-drive-check{position:absolute;left:8px;top:8px;opacity:0;background:var(--s1);border-radius:6px;padding:3px 4px;line-height:0}
 .hd-drive-tile:hover .hd-drive-check,.hd-drive-check.on,.hd-drive-bar.has-sel~* .hd-drive-check{opacity:1}
 .hd-drive-foot{display:flex;align-items:center;gap:8px;padding:10px 6px 2px 12px;min-width:0}
@@ -816,7 +817,7 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
           <div class="hd-drive-grid">
             <sc-for list="{{ drv.tiles }}" as="d" hint-placeholder-count="4">
               <div class="hd-drive-tile {{ d.tileCls }}" draggable="{{ true }}" onDragStart="{{ d.onDragStart }}" style="{{ d.tileStyle }}">
-                <button class="hd-drive-prev" onClick="{{ d.onRead }}" title="Open {{ d.title }}">
+                <button class="hd-drive-prev" style="border-top:4px solid {{ d.dvColor }}" onClick="{{ d.onRead }}" title="Open {{ d.title }}">
                   <sc-if value="{{ d.isVid }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;inset:0;background-image:{{ d.thumbBg }};background-size:cover;background-position:center;opacity:.85"></span></sc-if>
                   <sc-if value="{{ d.dvSnipOn }}" hint-placeholder-val="{{ true }}"><span class="hd-drive-snip">{{ d.dvSnippet }}</span></sc-if>
                   <sc-if value="{{ d.dvIsWave }}" hint-placeholder-val="{{ false }}"><span class="hd-drive-wave" style="background-image:{{ d.dvWaveBg }}"></span></sc-if>
@@ -9167,6 +9168,18 @@ class Component extends DCLogic {
   // when this browser first took the source in: stamped at add time; older sources carry it in the id's base-36 prefix
   addedAtOf(d) { if (d && d.addedAt) return d.addedAt; const m = d && /^u([0-9a-z]{8})/.exec(d.id || ''); const t = m ? parseInt(m[1], 36) : 0; return t > 1.5e12 && t < 4e12 ? t : 0; }
   // what kind of file a source looks like to a person: a coloured type badge, a short label, and a text preview
+  // The public picture of a source, where its own host publishes one: the Internet Archive's item image, a Project
+  // Gutenberg cover. Anything else has none, and the tile keeps the verbatim opening words of its text instead.
+  previewUrl(d) {
+    const u = String((d && d.url) || ''); let m;
+    if ((m = u.match(/^https:\/\/archive\.org\/details\/([^/?#]+)/))) return 'https://archive.org/services/img/' + m[1];
+    if ((m = u.match(/^https:\/\/www\.gutenberg\.org\/ebooks\/(\d+)/))) return 'https://www.gutenberg.org/cache/epub/' + m[1] + '/pg' + m[1] + '.cover.medium.jpg';
+    return '';
+  }
+  previewVals(d, it) {
+    if (!d || it.hasPdfThumb) return {};
+    const u = this.previewUrl(d); return u ? { hasPdfThumb: true, pdfThumb: 'url("' + u + '")' } : {};
+  }
   driveVals(d) {
     const med = d.medium || '', typ = String(d.type || '').trim(), t = typ + ' ' + (d.kind || '') + ' ' + med, mime = (d.media && d.media.mime) || '';
     // What kind of thing this is, named as a person would name it: the reading's own type when it has one
@@ -9894,7 +9907,7 @@ class Component extends DCLogic {
     const dvOwn = new Set((S.added[this.corpusId()] || []).map(x => x.id));
     const dvTiles = dvRows.map(r => { const it = r.it, id = r.id, sel = !!dvSel[id], own = dvOwn.has(id);
       const saveName = () => { const nm = (this.state.dvRenameDraft || '').trim(); if (this.state.dvRename === id && nm && nm !== r.title) this.renameDocTitle(id, nm); this.setState({ dvRename: null, dvRenameDraft: null }); };
-      return { ...it, ...(w => ({ ...w, dvSnipOn: !it.isVid && !w.dvIsWave }))(this.tileWave(A.docById[id], svMode === 'grid' || svMode === 'cards')), id, selected: sel, checkCls: sel ? 'on' : '', tileStyle: sel ? 'border-color:var(--acc);box-shadow:0 0 0 2px var(--acc2)' : '',
+      return { ...it, ...(w => ({ ...w, dvSnipOn: !it.isVid && !w.dvIsWave }))(this.tileWave(A.docById[id], svMode === 'grid' || svMode === 'cards')), ...this.previewVals(A.docById[id], it), id, selected: sel, checkCls: sel ? 'on' : '', tileStyle: sel ? 'border-color:var(--acc);box-shadow:0 0 0 2px var(--acc2)' : '',
         onToggleSel: () => this.setState(st => { const m = { ...(st.dvSel || {}) }; if (m[id]) delete m[id]; else m[id] = true; return { dvSel: m, dvBulkAsk: false }; }),
         onDragStart: e => { try { const ids = dvSel[id] ? Object.keys(dvSel) : [id]; e.dataTransfer.setData('text/plain', ids.join(',')); e.dataTransfer.effectAllowed = 'move'; } catch (x) {} },
         renaming: S.dvRename === id, notRenaming: S.dvRename !== id, rnDraft: S.dvRenameDraft != null ? S.dvRenameDraft : r.title,
