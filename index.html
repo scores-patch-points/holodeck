@@ -1841,6 +1841,18 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
                 <sc-for list="{{ pf.tags }}" as="t" hint-placeholder-count="3"><button onClick="{{ t.onClick }}" style="background:var(--s1);border:1px solid {{ t.color }};border-radius:999px;padding:2px 10px;cursor:pointer;font:500 13px var(--sans);color:var(--ink)">{{ t.label }}</button></sc-for>
               </div>
             </sc-if>
+            <sc-if value="{{ pf.hasDef }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;flex-direction:column;gap:6px">
+                <span style="font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mut)">{{ pf.defTitle }}</span>
+                <span style="font:400 12px/1.45 var(--sans);color:var(--mut)">{{ pf.defNote }}</span>
+                <sc-for list="{{ pf.defRows }}" as="de" hint-placeholder-count="2">
+                  <div style="display:flex;gap:8px;align-items:baseline">
+                    <span style="flex:none;min-width:64px;font:600 12px var(--mono);color:var(--acc)">{{ de.pos }}</span>
+                    <span style="font:400 14px/1.5 var(--serif);color:var(--ink2)">{{ de.text }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
             <sc-if value="{{ pf.hasRefs }}" hint-placeholder-val="{{ false }}">
               <div style="display:flex;flex-direction:column;gap:6px">
                 <span style="font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mut)">{{ pf.refTitle }}</span>
@@ -3179,6 +3191,18 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
       </sc-if>
       <button onClick="{{ pf.narrow.onClick }}" style="background:none;border:1px solid var(--line2);border-radius:8px;padding:4px 10px;cursor:pointer;font:500 13px var(--sans);color:var(--ink2)" style-hover="border-color:var(--acc)">{{ pf.narrow.label }}</button>
       </div>
+      <sc-if value="{{ pf.hasDef }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;flex-direction:column;gap:6px">
+      <span style="font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mut)">{{ pf.defTitle }}</span>
+      <span style="font:400 12px/1.45 var(--sans);color:var(--mut)">{{ pf.defNote }}</span>
+      <sc-for list="{{ pf.defRows }}" as="de" hint-placeholder-count="2">
+        <div style="display:flex;gap:8px;align-items:baseline">
+          <span style="flex:none;min-width:64px;font:600 12px var(--mono);color:var(--acc)">{{ de.pos }}</span>
+          <span style="font:400 14px/1.5 var(--serif);color:var(--ink2)">{{ de.text }}</span>
+        </div>
+      </sc-for>
+      </div>
+      </sc-if>
       <sc-if value="{{ pf.hasRefs }}" hint-placeholder-val="{{ false }}">
       <div style="display:flex;flex-direction:column;gap:6px">
       <span style="font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mut)">{{ pf.refTitle }}</span>
@@ -4712,13 +4736,15 @@ function holoTopics(A) {
   const nameLabel = r => cap(shortName(r.name));
   const disambigLabel = r => { const t = String(r.name).split(/\s+/).filter(Boolean); const last = t[t.length - 1];
     const first = t.find(x => !abbr(x)) || t[0]; return cap(first && first !== last ? first + ' ' + last : last); };
-  const entList = Object.values(A.names).filter(r => { const d = r.docs.size; if (d < 2 || d > hub || !holoName(r.name, A)) return false;
-    const l = nameLabel(r), lc = l.toLowerCase(); return l && lc.length >= 3 && !/\d/.test(l) && !TOPIC_JUNK.has(lc) && !TOPIC_JUNK.has(lc.replace(/^the /, '')); });
+  // ── ENTITY topics are ALL proper nouns the reader found (every canonical name), named once or many —
+  // not only the shared/selective ones. A proper noun is a topic; a bare number or a common word is not. ──
+  const entList = Object.values(A.names).filter(r => { const nm = String(r.name || '').trim(); if (nm.length < 2 || /^\d+$/.test(nm)) return false;
+    const l = nameLabel(r), lc = l.toLowerCase(); return l && !/\d/.test(l) && !TOPIC_JUNK.has(lc) && !TOPIC_JUNK.has(lc.replace(/^the /, '')); });
   const labelCount = new Map(); entList.forEach(r => { const l = nameLabel(r); labelCount.set(l, (labelCount.get(l) || 0) + 1); });
   entList.forEach(r => {
     const base = nameLabel(r); const lbl = (labelCount.get(base) || 0) > 1 ? disambigLabel(r) : base;
-    const findings = repPerDoc(r.sts.map(id => A.byId[id])); if (findings.length < 2) return;
-    const docs = [...r.docs].map(docOf).filter(Boolean); if (docs.length < 2) return;
+    const findings = repPerDoc(r.sts.map(id => A.byId[id])); if (!findings.length) return;
+    const docs = [...r.docs].map(docOf).filter(Boolean); if (!docs.length) return;
     groups.push({ kind: 'entity', type: r.type, label: lbl, docs, n: docs.length, findings, forWhom: [r.name] });
   });
 
@@ -12172,11 +12198,11 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
   realityReg(d) { const t = String((d && (d.type || d.kind)) || '').toLowerCase() + ' ' + String((d && d.medium) || '').toLowerCase();
     if (/screenplay|film|movie|novel|play|fiction|drama/.test(t)) return 'fiction';
     if (/report|inquiry|audit/.test(t)) return 'report';
-    if (/speech|testimony|memoir|interview|biography/.test(t)) return 'testimony';
+    if (/speech|testimony|memoir|interview|biography|autobiograph/.test(t)) return 'testimony';
     if (/newspaper|news|journal|press/.test(t)) return 'journalism';
     if (/data|table|dataset/.test(t)) return 'data';
     if (/reference|encyclopedia|wiki/.test(t)) return 'reference';
-    if (/comment|editorial|opinion|blog/.test(t)) return 'comment';
+    if (/comment|editorial|opinion|blog|book|compilation|essay|pamphlet/.test(t)) return 'comment';
     return 'unknown'; }
   // Load the khora's reality-level organs once, then fold a reality-register per entity topic.
   // A best-effort Wikipedia anchor (the organ's resolver); offline, the fold uses the declared
@@ -12240,7 +12266,11 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
       const BADGE = { real: '● real', 'fictionalized-real': '◐ fictionalized-real', fictional: '✕ fictional', unexamined: '? unexamined' };
       eyebrow = eyebrow + ' · ' + (BADGE[rp.realityKind] || rp.realityKind);
       facts.push({ k: 'Reality', v: rp.realityKind });
-      if (rp.registers && rp.registers.length) facts.push({ k: 'Told by', v: rp.registers.join(', ') });
+      if (rp.registers && rp.registers.length) {
+        const LAB = (this._realityRR && this._realityRR.REGISTER_TRAITS) || {};
+        const dec = rp.registers.filter(x => x && x !== 'unknown');   // an undeclared register is not "told by"
+        facts.push({ k: 'Told by', v: dec.length ? dec.map(x => (LAB[x] && LAB[x].label) || x).join(', ') : 'register undeclared' });
+      }
       if (rp.anchor && rp.anchor.found && rp.anchor.extract) facts.push({ k: 'What it is', v: short(String(rp.anchor.extract).replace(/\s+/g, ' '), 140) });
     }
     return { has: true, eyebrow, color, title: g.label, facts,
@@ -12441,6 +12471,7 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
       hasRefs: refs.length > 0, refs, refTitle: refs.length === 1 ? 'Linked referent' : 'Linked referents',
       sum: this.profileSummary(A, n.name),
       facts: d.facts, here: N ? plural(N, 'mention') + ' in this source' : 'Not named in this source’s statements', hasStep: N > 1, pos: N > 1 ? (Math.min(idx, N - 1) + 1) + ' / ' + N : '', prev: () => step(-1), next: () => step(1),
+      hasDef: !!d.hasDefs, defTitle: d.defTitle, defNote: d.defNote, defRows: d.defs || [],
       hasTags: !!(d.tags && d.tags.length), tags: page ? (d.tags || []).map(t => ({ ...t, onClick: () => this.openProfile(t.label) })) : (d.tags || []), tagTitle: d.tagTitle,
       hasElse: elsewhere.length > 0, elseTitle: page ? 'In ' + plural(elsewhere.length, 'source') : 'Also in ' + plural(elsewhere.length, 'other source'), elsewhere: elsewhere.slice(0, S.pfAll ? 99 : 3), hasMoreElse: !S.pfAll && elsewhere.length > 3, moreElse: 'Show all ' + elsewhere.length, onMoreElse: () => this.setState({ pfAll: true }),
       noElse: !elsewhere.length, narrow: d.actions[0], hasHere: !page,
@@ -12473,6 +12504,15 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
         tagTitle: 'Often appears with', tags: Object.keys(co).sort((a, b) => co[b] - co[a]).slice(0, 8).map(nameTag),
         actions: [{ label: f.name === n.name ? 'Stop narrowing to ' + n.name : 'Narrow everything to ' + n.name, onClick: () => this.setF('name', f.name === n.name ? null : n.name) }, { label: 'Read first mention', onClick: () => this.read(sts[0].doc, sts[0].id) }],
         listTitle: 'Mentions', list: listOf(sts) };
+      // A PROPER NOUN is still a word Wiktionary defines — a name gets the same definition block as any other word. And
+      // its FOR WHOM: the being this name is most tied to HERE, so "New York" reads as the Titanic's New York, not a bare place.
+      const who = Object.keys(co).filter(o => A.names[o] && holoName(o, A)).sort((a, b) => co[b] - co[a])[0];
+      if (who) d.facts = [...d.facts, { k: 'For whom', v: who }];
+      d.hasDefs = true; d.defTitle = 'Definition · Wiktionary';
+      const dk = String(sel.id).toLowerCase(); const def = (this._defs || {})[dk];
+      if (def === undefined) { this.loadDef(sel.id); d.defs = []; d.defNote = 'Looking it up…'; }
+      else if (!def.length) { d.defs = []; d.defNote = 'No definition found in Wiktionary.'; }
+      else { d.defs = def; d.defNote = 'From Wiktionary (English), the free dictionary.'; }
     } else if (sel.type === 'statement' && A.byId[sel.id]) {
       const st = A.byId[sel.id]; const fr = FR[st.frame];
       const su = this._su && this._su.by[st.id];
