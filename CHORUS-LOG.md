@@ -214,3 +214,11 @@ checked live (not by a test): the deployed index.html?ws=titanic-1912, via Playw
 fast: 2 files (README.md, CHORUS-LOG.md) · none affected · law: ok (no citations)
 | lens | citation | file:line | verdict | one line |
 | Kondo | dead or unplugged code | README.md:189 | noted | the note names the unplugged door so the doc stops promising an entry the surface no longer offers; the machinery paragraph stays, marked for its return |
+
+## 2026-10-15 — The rail finds its way home, and a source finds its words: a navigation bar in the rail (back step by step, Sources, the header's own breadcrumb trail) and find-in-source with Ctrl/⌘+F over the rendered document, highlighted with the CSS Custom Highlight API so the page's own marking is never touched (main, surface)
+fast: 1 file (index.html, +122/−4) · 49 standing workspaces/share tests re-run green · no test imports index.html · law: ok
+| lens | citation | file:line | verdict | one line |
+| Feynman | a swallowed error | index.html:6005 | false-positive-on-review | the find-paint guard matches the component's standing guarded-paint pattern (paintExtracted and neighbors); a failed paint leaves the last highlights and no crash |
+| Dijkstra | locale/script in a fold | index.html:8674 | noted | the fold is the locale-independent toLowerCase on BOTH haystack and needle, so it cannot mismatch itself; it can only miss exotic case pairs, the disclosed limit of substring find |
+| Frankfurt | a placeholder value | index.html:224 | false-positive-on-review | hint-placeholder-val is the surface's standing sc-if template syntax (logged 2026-10-11, 2026-10-13, 2026-10-14) |
+checked live (not by a test): local server + Chromium — the rail navbar renders ("▤ Sources"; back disabled on Sources); the Senate speech opens from the sample; the reader's Find button opens the bar, "Titanic" reports "1 of 18" with live CSS Custom Highlight ranges, Enter/Escape step and close; after opening a source the rail's back reads "← sources" and returns to Sources. Zero page errors. NOT checked live: the 375px rail layout with the navbar stacked, PDF/faithful-page hosts, and find while the reader re-renders mid-scroll.
