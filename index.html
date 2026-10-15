@@ -300,6 +300,11 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
       <details class="hd-disclosure hd-topics" open="{{ topicsOpen }}">
       <summary>{{ topicsLabel }}</summary>
       <div style="display:flex;flex-direction:column;gap:5px;padding:0 0 6px">
+        <div style="display:flex;gap:4px;padding:0 12px">
+          <sc-for list="{{ topicsLens }}" as="m">
+            <button onClick="{{ m.onClick }}" style="cursor:pointer;border:1px solid {{ m.bd }};background:{{ m.bg }};color:{{ m.col }};border-radius:999px;padding:1px 9px;font:600 10px/1.5 var(--mono);letter-spacing:.06em;text-transform:uppercase" style-hover="border-color:var(--acc)">{{ m.label }} <span style="color:var(--mut)">{{ m.n }}</span></button>
+          </sc-for>
+        </div>
         <sc-if value="{{ hasTopics }}" hint-placeholder-val="{{ false }}">
           <sc-if value="{{ topicsHasTypes }}" hint-placeholder-val="{{ false }}">
             <div style="display:flex;gap:4px;flex-wrap:wrap;padding:0 12px">
@@ -310,22 +315,19 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
           </sc-if>
           <sc-if value="{{ topicsHasSearch }}" hint-placeholder-val="{{ false }}">
             <div style="padding:0 12px">
-              <input value="{{ topicsSearchVal }}" onChange="{{ onTopicsSearch }}" placeholder="Filter topics…" style="width:100%;box-sizing:border-box;background:var(--bg);border:1px solid var(--line2);border-radius:8px;color:var(--ink);font:400 12px var(--sans);padding:5px 9px;outline:none">
+              <input value="{{ topicsSearchVal }}" onChange="{{ onTopicsSearch }}" placeholder="{{ topicsSearchPh }}" style="width:100%;box-sizing:border-box;background:var(--bg);border:1px solid var(--line2);border-radius:8px;color:var(--ink);font:400 12px var(--sans);padding:5px 9px;outline:none">
             </div>
           </sc-if>
           <div style="display:flex;flex-direction:column;gap:3px;padding:0 8px">
             <sc-for list="{{ topicsList }}" as="t" hint-placeholder-count="3">
-              <button onClick="{{ t.onJump }}" title="{{ t.src }} share this topic · open its profile" style="white-space:normal;text-align:left;cursor:pointer;padding:8px 11px;border-radius:10px;background:{{ t.bg }};border:1px solid {{ t.bd }};display:grid;grid-template-columns:1fr auto;gap:3px 10px;align-items:baseline" style-hover="background:var(--s2);border-color:var(--line2)">
-                <span style="font:500 15px/1.25 var(--serif);color:var(--ink);min-width:0">{{ t.label }}</span>
-                <span style="font:500 11px var(--mono);color:var(--mut);white-space:nowrap">{{ t.src }}</span>
-                <span style="grid-column:1 / -1;display:flex;gap:8px;align-items:center">
-                  <span style="font:600 9px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:{{ t.tagCol }}">{{ t.tag }}</span>
-                  <sc-if value="{{ t.differs }}" hint-placeholder-val="{{ false }}"><span style="font:600 9px var(--mono);letter-spacing:.06em;color:var(--amber)">DIFFERS</span></sc-if>
-                </span>
+              <button onClick="{{ t.onJump }}" title="{{ t.title }}" style="white-space:nowrap;text-align:left;cursor:pointer;padding:3px 9px;border-radius:7px;background:{{ t.bg }};border:1px solid {{ t.bd }};display:flex;align-items:baseline;gap:8px" style-hover="background:var(--s2);border-color:var(--line2)">
+                <span style="font:500 13.5px/1.4 var(--sans);color:var(--ink);min-width:0;overflow:hidden;text-overflow:ellipsis;flex:1">{{ t.label }}</span>
+                <span style="font:600 9px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:{{ t.tagCol }};white-space:nowrap">{{ t.tag }}</span>
+                <span style="font:500 10px var(--mono);color:var(--mut);white-space:nowrap">{{ t.n }}</span>
               </button>
             </sc-for>
           </div>
-          <sc-if value="{{ topicsHasEmpty }}" hint-placeholder-val="{{ false }}"><span style="padding:0 12px;font:400 12px var(--sans);color:var(--mut)">No topics of this type.</span></sc-if>
+          <sc-if value="{{ topicsHasEmpty }}" hint-placeholder-val="{{ false }}"><span style="padding:0 12px;font:400 12px var(--sans);color:var(--mut)">{{ topicsEmptyText }}</span></sc-if>
           <sc-if value="{{ topicsHasPager }}" hint-placeholder-val="{{ false }}">
             <div style="display:flex;align-items:center;gap:4px;padding:0 12px 0 14px">
               <button data-keep="1" onClick="{{ onTopicsPrev }}" style="all:unset;cursor:pointer;font:500 13px var(--sans);color:{{ topicsHasPrev ? 'var(--ink2)' : 'var(--dim)' }};padding:1px 6px" style-hover="color:var(--ink)">‹</button>
@@ -1938,13 +1940,24 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
               <span style="font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mut)">What the sources say about it</span>
               <span style="font:500 13px var(--sans);color:var(--ink2)">{{ pf.profKind }}<span style="color:var(--mut)"> · {{ pf.profCount }}</span></span>
               <sc-for list="{{ pf.profRows }}" as="r" hint-placeholder-count="4">
-                <div style="display:grid;grid-template-columns:1.4fr auto 1.8fr;gap:10px;align-items:center;padding:5px 0;border-top:1px solid var(--line)">
+                <div style="display:grid;grid-template-columns:1.4fr auto;gap:2px 10px;align-items:baseline;padding:5px 0;border-top:1px solid var(--line)">
                   <span style="font:600 13px var(--sans);color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ r.rel }}</span>
-                  <span style="font:500 11px var(--sans);color:var(--mut);white-space:nowrap">{{ r.standing }}</span>
-                  <span style="font:400 13px var(--sans);color:var(--ink2);text-align:right;overflow-wrap:anywhere">{{ r.vals }}</span>
+                  <span style="font:500 11px var(--sans);color:var(--mut);white-space:nowrap;text-align:right">{{ r.standing }}</span>
+                  <sc-if value="{{ r.hasChips }}" hint-placeholder-val="{{ false }}">
+                    <span style="grid-column:1 / -1;display:flex;flex-wrap:wrap;gap:4px">
+                      <sc-for list="{{ r.chips }}" as="c"><button onClick="{{ c.onClick }}" style="background:var(--s2);border:1px solid var(--line2);border-radius:6px;padding:1px 8px;font:500 11px var(--sans);color:var(--ink2);cursor:pointer;max-width:26ch;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" style-hover="border-color:var(--acc);color:var(--ink)">{{ c.label }}</button></sc-for>
+                    </span>
+                  </sc-if>
+                  <sc-if value="{{ r.vals }}" hint-placeholder-val="{{ true }}"><span style="grid-column:1 / -1;font:400 13px var(--sans);color:var(--ink2);overflow-wrap:anywhere">{{ r.vals }}</span></sc-if>
                 </div>
               </sc-for>
             </div>
+          </sc-if>
+          <sc-if value="{{ pf.hasCard }}" hint-placeholder-val="{{ false }}">
+            <button onClick="{{ pf.onCopy }}" style="align-self:flex-start;background:none;border:1px solid var(--line2);border-radius:8px;padding:4px 10px;cursor:pointer;font:500 12px var(--mono);color:var(--mut)" style-hover="border-color:var(--acc);color:var(--ink)">Copy the record · the khora page, as text</button>
+          </sc-if>
+          <sc-if value="{{ pf.hasFoot }}" hint-placeholder-val="{{ false }}">
+            <span style="font:400 12px var(--mono);color:var(--mut)">{{ pf.footText }}</span>
           </sc-if>
         </sc-if>
       </sc-if>
@@ -3017,6 +3030,10 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
             <span style="font:400 13px/1.4 var(--sans);color:var(--mut)">{{ d.scope }}</span>
           </div>
         </sc-if>
+        <sc-if value="{{ d.hasPassage }}" hint-placeholder-val="{{ false }}">
+          <blockquote style="margin:0;padding:10px 12px;border-radius:8px;background:var(--s2);font:400 16px/1.5 var(--serif);color:var(--ink)"><sc-for list="{{ d.passage }}" as="q" hint-placeholder-count="5"><span style="{{ q.style }}">{{ q.s }}</span></sc-for>
+          <span style="display:block;margin-top:7px;font:400 10.5px var(--mono);letter-spacing:.02em;color:var(--dim)">{{ d.passageNote }}</span></blockquote>
+        </sc-if>
         <sc-if value="{{ d.hasQuote }}" hint-placeholder-val="{{ false }}">
           <blockquote style="margin:0;padding:10px 12px;border-radius:8px;background:var(--s2);font:400 16px/1.5 var(--serif);color:var(--ink)">“{{ d.quote }}”</blockquote>
         </sc-if>
@@ -3184,12 +3201,18 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
     <sc-if value="{{ pfSide }}" hint-placeholder-val="{{ false }}">
     <aside style="{{ sidePanelStyle }}">
       <sc-if value="{{ narrowBack }}" hint-placeholder-val="{{ false }}"><button onClick="{{ pfClose }}" style="align-self:flex-start;background:var(--s2);border:1px solid var(--line2);border-radius:8px;color:var(--ink);cursor:pointer;font:500 14px var(--sans);padding:6px 12px">← Back</button></sc-if>
-      <div style="display:flex;justify-content:flex-end;margin-bottom:-8px"><button onClick="{{ pfClose }}" title="Close" style="background:none;border:0;color:var(--mut);cursor:pointer;font-size:14px">✕</button></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:-8px">
+        <sc-if value="{{ pf.hasPage }}" hint-placeholder-val="{{ false }}"><button onClick="{{ pf.onPage }}" style="background:none;border:0;padding:0;cursor:pointer;font:500 13px var(--sans);color:var(--acc)">Open the full page →</button></sc-if>
+        <button onClick="{{ pfClose }}" title="Close" style="background:none;border:0;color:var(--mut);cursor:pointer;font-size:14px">✕</button>
+      </div>
       <div style="display:flex;flex-direction:column;gap:12px">
       <div style="display:flex;flex-direction:column;gap:3px">
       <button onClick="{{ pf.onBack }}" style="align-self:flex-start;background:none;border:0;padding:0;cursor:pointer;font:500 13px var(--sans);color:var(--acc);text-align:left;white-space:normal" style-hover="color:var(--ink)">← {{ pf.back }}</button>
       <span style="font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:{{ pf.color }};margin-top:6px">{{ pf.eyebrow }}</span>
-      <h1 style="margin:0;font:500 30px/1.15 var(--serif);color:var(--ink);text-wrap:balance">{{ pf.title }}</h1>
+      <div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap">
+        <h1 style="margin:0;font:500 30px/1.15 var(--serif);color:var(--ink);text-wrap:balance">{{ pf.title }}</h1>
+        <sc-if value="{{ pf.hasBadge }}" hint-placeholder-val="{{ false }}"><span style="font:600 10px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:{{ pf.badgeCol }};border:1px solid {{ pf.badgeCol }};border-radius:999px;padding:1px 8px;white-space:nowrap">{{ pf.badge }}</span></sc-if>
+      </div>
       <sc-if value="{{ pf.hasLead }}" hint-placeholder-val="{{ false }}"><p style="margin:6px 0 0;font:400 15.5px/1.6 var(--serif);color:var(--ink2);text-wrap:pretty"><span style="font:600 10px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--mut);margin-right:7px;vertical-align:.15em">{{ pf.leadPos }}</span>{{ pf.lead }}</p></sc-if>
       </div>
       <sc-if value="{{ pf.infobox }}" hint-placeholder-val="{{ false }}">
@@ -3271,11 +3294,24 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
         <sc-for list="{{ pf.profRows }}" as="r" hint-placeholder-count="4">
           <div style="display:grid;grid-template-columns:1.2fr auto;gap:0 8px;align-items:baseline;padding:5px 0;border-top:1px solid var(--line)">
             <span style="font:600 13px var(--sans);color:var(--ink)">{{ r.rel }}<span style="font:500 11px var(--sans);color:var(--mut)">{{ r.standingNote }}</span></span>
-            <span style="grid-column:1 / -1;font:400 13px/1.45 var(--sans);color:var(--ink2);overflow-wrap:anywhere">{{ r.vals }}</span>
+            <sc-if value="{{ r.hasChips }}" hint-placeholder-val="{{ false }}"><span style="grid-column:1 / -1;display:flex;flex-wrap:wrap;gap:4px"><sc-for list="{{ r.chips }}" as="c"><button onClick="{{ c.onClick }}" style="background:var(--s2);border:1px solid var(--line2);border-radius:6px;padding:0 7px;font:500 11px var(--sans);color:var(--ink2);cursor:pointer;max-width:24ch;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" style-hover="border-color:var(--acc);color:var(--ink)">{{ c.label }}</button></sc-for></span></sc-if>
+            <sc-if value="{{ r.vals }}" hint-placeholder-val="{{ true }}"><span style="grid-column:1 / -1;font:400 13px/1.45 var(--sans);color:var(--ink2);overflow-wrap:anywhere">{{ r.vals }}</span></sc-if>
           </div>
         </sc-for>
       </div>
       </sc-if>
+      <sc-if value="{{ pf.hasList }}" hint-placeholder-val="{{ false }}">
+      <div style="background:var(--s1);border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:2px">
+        <span style="font:600 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mut);padding-bottom:4px">{{ pf.listTitle }}</span>
+        <sc-for list="{{ pf.list }}" as="s" hint-placeholder-count="3">
+          <button onClick="{{ s.onClick }}" style="all:unset;cursor:pointer;display:flex;flex-direction:column;gap:3px;padding:7px 0;border-top:1px solid var(--line)">
+            <span style="font:600 12px var(--sans);color:var(--ink)">{{ s.src }}</span>
+            <span style="font:400 14px/1.45 var(--serif);color:var(--ink2);overflow-wrap:anywhere">{{ s.text }}</span>
+          </button>
+        </sc-for>
+      </div>
+      </sc-if>
+      <sc-if value="{{ pf.hasFoot }}" hint-placeholder-val="{{ false }}"><span style="font:400 12px var(--mono);color:var(--mut)">{{ pf.footText }}</span></sc-if>
       </div>
     </aside>
     </sc-if>
@@ -3920,6 +3956,36 @@ async function hdReadAcross(docs) {
 // that carries no information ("time unknown", "unexposed") is left out, and no row is starred.
 const HD_REL_PLAIN = { typed: 'Kind of name', 'also written': 'Also written as', 'said with': 'How it is stated', 'named in': 'Found in', about: 'Words around it', 'appears with': 'Appears with', figure: 'Figures', year: 'Years' };
 const HD_FRAME_PLAIN = { attributed: 'reported speech', fact: 'plain statement', plan: 'intent or plan', uncertain: 'hedged' };
+// FALSIFYING THE KIND. The reader types a referent from the corpus alone, and the corpus mistypes
+// (a ship reads as a person). The Wikipedia anchor says what the thing IS in its own lead — "RMS
+// Titanic was a British passenger liner" — and the class noun after the copula is the EARNED kind.
+// A closed, disclosed map sorts it into the surface's four types; a class the map does not carry is
+// kept AS ITS OWN WORD (a liner is not forced into "person"). No anchor → no claim: the reading's
+// type stands, nothing invented. The falsifier: a kind whose word is not the lead's own head noun.
+const KIND_CLASS = {
+  person: ('human man woman person politician businessman businesswoman captain officer sailor passenger engineer architect president chairman director actor actress writer author novelist king queen prince princess general admiral commander scientist inventor journalist senator governor mayor lawyer doctor singer artist poet philosopher monarch').split(' '),
+  organisation: ('company line organisation organization corporation agency board committee association club society institute party government navy army church university college bank newspaper journal bureau department service force registry register commission council court league union trust foundation firm').split(' '),
+  place: ('city town village country island region port county state province mountain river sea ocean strait bay continent harbour harbor gulf lake valley peninsula district empire kingdom colony territory').split(' '),
+};
+const KIND_STOP = new Set(('who whom whose which that when where why how was were is are been being the of and or in on at for with as by from to into than then this these those it its his her their they he she them himself herself itself later early first second').split(' '));
+function anchorKindOf(extract, opts) {
+  const t = String(extract || '').replace(/\s+/g, ' ').trim(); if (!t) return null;
+  const m = t.slice(0, 320).match(/\b(?:was|is|were|are)\b[^.;:]{0,80}?\b(?:a|an|the)\s+([A-Za-z0-9][A-Za-z0-9-]*(?:\s+[A-Za-z0-9][A-Za-z0-9-]*){0,7})/);
+  if (!m) return null;
+  const toks = m[1].trim().toLowerCase().split(/\s+/).map(w => w.replace(/[^a-z0-9-]/g, '')).filter(w => /[a-z]/.test(w));
+  if (!toks.length) return null;
+  // The head noun is the last NOUN before the clause turns — never the first class word (a
+  // "passenger liner" is a liner, not a passenger). POS knows VERB/ADP/SCONJ; without it a small
+  // closed stop set stands in, disclosed.
+  const noun = w => (opts && opts.isNoun) ? opts.isNoun(w) : !KIND_STOP.has(w);
+  const stop = w => (opts && opts.isStop) ? opts.isStop(w) : (KIND_STOP.has(w) && !noun(w));
+  let head = null;
+  for (const w of toks) { if (stop(w)) break; if (noun(w)) head = w; }
+  if (!head) head = toks[0];
+  if (head.length > 3 && /[^s]s$/.test(head)) head = head.slice(0, -1);
+  for (const type of ['person', 'organisation', 'place']) if (KIND_CLASS[type].includes(head)) return { type, word: head };
+  return { type: null, word: head };
+}
 // Universal Dependencies parts of speech, in plain words, for the word a click lands on.
 const POS_L = { NOUN: 'noun', PROPN: 'proper noun', VERB: 'verb', ADJ: 'adjective', ADV: 'adverb', ADP: 'preposition', AUX: 'auxiliary', CCONJ: 'conjunction', SCONJ: 'subordinator', DET: 'determiner', NUM: 'number', PART: 'particle', PRON: 'pronoun', PUNCT: 'punctuation', INTJ: 'interjection', SYM: 'symbol', X: 'other' };
 const HD_KIND_PLAIN = { differs: 'Different figures', polarity: 'Denied', scope: 'Not named', absent: 'Spoken of, not held', defined: 'Defined as', names: 'Refers to', same: 'Both state', terms: 'Same subject', cite: 'Cites' };
@@ -4726,9 +4792,13 @@ function mergeTopicGroups(groups) {
 // elements, which is what collapsed a whole single-subject corpus into one blob. A bond
 // whose every entity is the corpus hub (reach > sqrt(N)+1) is the subject, not a part of
 // it, and is dropped; a measure anchored to the hub is named by its unit alone.
-// A topic is a thing the SOURCES share — not a neighbourhood of words. The holograph's own
-// elements are the only shared things worth naming, and each is named by itself, in 1–2 words:
-//   · an ENTITY the holograph admits (holoName) that ≥2 sources carry and that is NOT the hub;
+//
+// A REFERENT IS NOT A TOPIC. A proper noun is a being (a referent, Figure grain), and the
+// referent surface owns it; a topic is a thing the SOURCES SHARE — a restated claim, a
+// bond, a measure (Pattern grain). So the entity elements are returned SEPARATELY, in
+// `entities`, for the reality fold and the referent routing; they never enter the Topics
+// rail (a rail of the cast duplicated the referent surface and mixed the two grains).
+// The holograph's shared elements are named by themselves, in 1–2 words:
 //   · a BOND — an entity pair the holograph holds together (one side selective, so not the hub);
 //   · a MEASURE — a figure-slot (unit | measure | anchor) ≥2 sources carry, a DIFFERENCE when
 //     they disagree on the value.
@@ -4736,14 +4806,14 @@ function mergeTopicGroups(groups) {
 // measure, so its name would be a stray token. Selectivity is what makes a difference — an
 // element the whole corpus carries is the subject, not a part of it, and is left as strayN.
 function holoTopics(A) {
-  const none = { groups: [], strayN: A.docs.length, basis: 'holograph' };
+  const none = { groups: [], entities: [], strayN: A.docs.length, basis: 'holograph' };
   if (!A || A.docs.length < 2) return none;
   const K = holoKit(A, { cur: 'pub', srcShort: () => '' });
   const N = A.docs.length, hub = Math.sqrt(N) + 1;
   const docOf = id => A.docById[id];
   const title = id => (docOf(id) || {}).title || id;
   const reach = n => ((A.names[n] || {}).docs || new Set()).size;
-  const groups = [];
+  const groups = [], entities = [];
   // a 1–2 word label is the shared element's own head noun (abbreviations dropped), never a word from a statement
   const abbr = t => /[.]/.test(t) || (t.length <= 3 && t === t.toUpperCase());
   const cap = s => String(s).replace(/\b\w/g, c => c.toUpperCase());
@@ -4760,8 +4830,9 @@ function holoTopics(A) {
   const nameLabel = r => cap(shortName(r.name));
   const disambigLabel = r => { const t = String(r.name).split(/\s+/).filter(Boolean); const last = t[t.length - 1];
     const first = t.find(x => !abbr(x)) || t[0]; return cap(first && first !== last ? first + ' ' + last : last); };
-  // ── ENTITY topics are ALL proper nouns the reader found (every canonical name), named once or many —
-  // not only the shared/selective ones. A proper noun is a topic; a bare number or a common word is not. ──
+  // ── REFERENT elements: every proper noun the reader found (every canonical name), named once
+  // or many. These are BEINGS, not topics — returned in `entities`, routed to the referent page,
+  // never listed in the Topics rail. A bare number or a common word is neither. ──
   const entList = Object.values(A.names).filter(r => { const nm = String(r.name || '').trim(); if (nm.length < 2 || /^\d+$/.test(nm)) return false;
     const l = nameLabel(r), lc = l.toLowerCase(); return l && !/\d/.test(l) && !TOPIC_JUNK.has(lc) && !TOPIC_JUNK.has(lc.replace(/^the /, '')); });
   const labelCount = new Map(); entList.forEach(r => { const l = nameLabel(r); labelCount.set(l, (labelCount.get(l) || 0) + 1); });
@@ -4769,23 +4840,43 @@ function holoTopics(A) {
     const base = nameLabel(r); const lbl = (labelCount.get(base) || 0) > 1 ? disambigLabel(r) : base;
     const findings = repPerDoc(r.sts.map(id => A.byId[id])); if (!findings.length) return;
     const docs = [...r.docs].map(docOf).filter(Boolean); if (!docs.length) return;
-    groups.push({ kind: 'entity', type: r.type, label: lbl, docs, n: docs.length, findings, forWhom: [r.name] });
+    entities.push({ kind: 'entity', name: r.name, type: r.type, label: lbl, docs, n: docs.length, findings, forWhom: [r.name] });
   });
 
+  // The word a measure's name may carry is EARNED from the sources' own statements — the content
+  // word the group's members share (in ≥2 of them, and mostly inside the group, not the corpus),
+  // never a word typed here. A disagreement with no such word keeps the plain name and shows the
+  // badge instead. Falsified by a marker that appears when the members do not share it — or one
+  // that is absent when they do.
+  const foldw = s => String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  let CORPUS_WC = null;
+  const corpusWC = () => { if (CORPUS_WC) return CORPUS_WC; const m = new Map();
+    A.sts.forEach(st => { const seen = new Set(); foldw(st.text).split(/[^a-z0-9]+/).forEach(w => { if (w.length < 4 || /^\d/.test(w)) return; seen.add(w); }); seen.forEach(w => m.set(w, (m.get(w) || 0) + 1)); });
+    return (CORPUS_WC = m); };
+  const sharedMarker = (sts, exclude) => {
+    const ex = new Set(foldw(exclude.join(' ')).split(/[^a-z0-9]+/).filter(Boolean));
+    const inG = new Map();
+    A.sts.forEach(st => { if (!sts.has(st.id)) return; const seen = new Set();
+      foldw(st.text).split(/[^a-z0-9]+/).forEach(w => { if (w.length < 4 || /^\d/.test(w) || ex.has(w) || TOPIC_JUNK.has(w)) return; seen.add(w); });
+      seen.forEach(w => inG.set(w, (inG.get(w) || 0) + 1)); });
+    const cands = [...inG.entries()].filter(([w, c]) => c >= 2 && (corpusWC().get(w) || 0) <= 2 * c).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
+    return cands.length ? cands[0][0] : '';
+  };
   // ── MEASURE topics: the same figure-slot (unit | measure | anchor) in ≥2 sources ──
   const meas = new Map();
   A.sts.forEach(st => { if (st.ref || !st.claimy) return;
     K.figsOf(st, K.namesOf(st)).forEach(f => { const m = f.measure || f.unit || ''; if (!f.anchor && !m) return;
       const key = m + '\u0001' + (f.anchor || ''); let o = meas.get(key);
-      if (!o) meas.set(key, o = { docs: new Set(), vals: new Map(), anchor: f.anchor, m });
-      o.docs.add(st.doc); let d = o.vals.get(f.raw); if (!d) o.vals.set(f.raw, d = new Set()); d.add(st.doc); }); });
+      if (!o) meas.set(key, o = { docs: new Set(), vals: new Map(), anchor: f.anchor, m, sts: new Set() });
+      o.docs.add(st.doc); o.sts.add(st.id); let d = o.vals.get(f.raw); if (!d) o.vals.set(f.raw, d = new Set()); d.add(st.doc); }); });
   meas.forEach(o => { const docs = [...o.docs].map(docOf).filter(Boolean); if (docs.length < 2) return;
     if (!o.anchor) return;   // a figure with no anchor is about no one: not meaningful, no for-whom
     const findings = [...o.vals].sort((a, b) => b[1].size - a[1].size).slice(0, 12).map(([v, ds]) => ({ text: v, doc: [...ds][0], title: [...ds].map(title).join(' · ') }));
-    // the COMPLETE tuple, not the bare unit: (anchor · measure · value(s)) — "Titanic · tonnage · 46,328 / …"
-    const vals = findings.map(f => f.text);
-    const label = cap(shortName(o.anchor)) + ' · ' + unitTopic(o.m) + (vals.length ? ' · ' + vals.slice(0, 3).join(' / ') : '');
-    groups.push({ kind: 'measure', label, docs, n: docs.length, findings, forWhom: [o.anchor], differs: o.vals.size > 1 }); });
+    // the NAME says what the topic IS — the being and the measure — and a disagreement word ONLY
+    // when the group's own statements carry one (earned, above); the values stay in the findings.
+    const marker = o.vals.size > 1 ? sharedMarker(o.sts, [o.anchor, unitTopic(o.m), ...findings.map(f => f.text)]) : '';
+    const label = cap(shortName(o.anchor)) + ' · ' + unitTopic(o.m) + (marker ? ' · ' + marker : '');
+    groups.push({ kind: 'measure', label, docs, n: docs.length, findings, forWhom: [o.anchor], differs: o.vals.size > 1, tuple: { anchor: o.anchor, measure: unitTopic(o.m), unit: o.m } }); });
 
   // ── TRIPLE topics: the holograph's own COMPLETE tuples (end1 · verb · end2), from the statements'
   // EOGfpClaim@1 triples. A tuple is a topic when an end is a named being (a for whom) or it is
@@ -4810,16 +4901,19 @@ function holoTopics(A) {
       o.docs.add(st.doc); } });
   bond.forEach(o => { const docs = [...o.docs].map(docOf).filter(Boolean); if (docs.length < 2) return;
     const ra = reach(o.a), rb = reach(o.b); if (Math.min(ra, rb) > hub) return;   // both hub: the subject, not a part
-    const keep = ra <= rb ? o.a : o.b;                                            // name the bond by its rarer member
+    const keep = ra <= rb ? o.a : o.b, other = ra <= rb ? o.b : o.a;               // lead with the rarer member
     const findings = [{ text: o.a + ' · ' + o.b, doc: [...o.docs][0], title: [...o.docs].map(title).join(' · ') }];
-    groups.push({ kind: 'bond', label: cap(shortName(keep)), pair: [o.a, o.b], docs, n: docs.length, findings, forWhom: [o.a, o.b] }); });
+    // the label is the PAIR, never one member alone: a bond named by one being reads as that being,
+    // and a being is not a topic (the single-name label was a vestige of the entity rail).
+    groups.push({ kind: 'bond', label: cap(shortName(keep)) + ' · ' + cap(shortName(other)), pair: [o.a, o.b], docs, n: docs.length, findings, forWhom: [o.a, o.b] }); });
 
   // merge same-label elements; a DIFFERENCE the sources disagree on leads, then what more sources share
   const merged = mergeTopicGroups(groups.filter(g => (g.forWhom || []).length));   // no for-whom, no topic
   merged.forEach(g => Object.assign(g, topicTerrain(g)));                          // each topic's own terrain · stance · grain (the cube)
   merged.sort((a, b) => b.n - a.n || (b.differs ? 1 : 0) - (a.differs ? 1 : 0));   // how many sources share it leads; a difference breaks ties
   const placed = new Set(merged.flatMap(g => g.docs.map(d => d.id)));
-  return { groups: merged, strayN: A.docs.length - placed.size, basis: 'holograph' };
+  // `entities` rides beside the topics: referent elements, for the reality fold and referent routing — never the rail.
+  return { groups: merged, entities, strayN: A.docs.length - placed.size, basis: 'holograph' };
 }
 // Labels that are not a name: number words, function words, and capitalized common words the
 // name reader admits but that do no work in the picture. Kept small and honest — an entry here
@@ -4836,6 +4930,9 @@ const STANCE_BY_MODE = { Differentiate: { Ground: 'Clearing', Figure: 'Dissectin
 // connects (CON·Figure → Link).
 const TOPIC_CELL = { entity: { op: 'INS', grain: 'Figure' }, measure: { op: 'CON', grain: 'Figure' }, bond: { op: 'CON', grain: 'Figure' }, triple: { op: 'CON', grain: 'Figure' } };
 const TERRAIN_C = { Entity: 'var(--green)', Link: 'var(--blue)', Kind: 'var(--acc)', Network: 'var(--acc)', Paradigm: 'var(--acc)', Void: 'var(--mut)', Field: 'var(--mut)', Lens: 'var(--mut)', Atmosphere: 'var(--mut)' };
+// a topic's own kind, in a word — the element the holograph SHARES (never a machine-assigned terrain)
+const TOPIC_KIND_LABEL = { measure: 'Measure', bond: 'Bond', triple: 'Statement' };
+const TOPIC_KIND_COLOR = { measure: 'var(--amber)', bond: 'var(--blue)', triple: 'var(--acc)' };
 // tag a group with its terrain / stance / grain
 const topicTerrain = g => { const c = TOPIC_CELL[g.kind] || { op: 'CON', grain: 'Figure' }; const dom = OP_DOMAIN[c.op], mode = OP_MODE[c.op];
   return { grain: c.grain, terrain: TERRAIN_BY_DOMAIN[dom][c.grain], stance: STANCE_BY_MODE[mode][c.grain], domain: dom }; };
@@ -9514,6 +9611,28 @@ class Component extends DCLogic {
     import(new URL('holodeck-atoms.js', location.href).href).then(M => { this._atomsLoading = null; this._atoms = { id: stId, value: M.atomsOf(st, A) };
       if (this.state.sel && this.state.sel.type === 'statement' && this.state.sel.id === stId) this.forceUpdate();
     }).catch(() => { this._atomsLoading = null; }); }
+  // THE PASSAGE, SCHEMATISED. A statement's own EOT ground, subtle: the reader's name spans, its
+  // figures and its dates are marked in the sentence, and the clicked word is highlighted — so a
+  // click on a bare word shows THE PASSAGE it sits in, with what the fold read of it, at a glance.
+  passageSegments(st, word) {
+    const text = String((st && st.text) || ''); if (!text) return [];
+    const STY = { word: 'background:var(--sel);border-radius:4px;padding:0 2px;box-shadow:0 0 0 1px var(--acc2)',
+      name: 'border-bottom:1px dotted var(--acc)', fig: 'border-bottom:1px dotted var(--amber)', date: 'border-bottom:1px dotted var(--mut)', txt: '' };
+    const marks = [];
+    (st.spans || []).forEach(sp => { if (sp.e > sp.s) marks.push({ s: sp.s, e: sp.e, t: 'name' }); });
+    (st.figs || []).forEach(g => { if (g.e > g.s) marks.push({ s: g.s, e: g.e, t: 'fig' }); });
+    (st.dates || []).forEach(g => { if (g.e > g.s) marks.push({ s: g.s, e: g.e, t: 'date' }); });
+    const wl = String(word || '').trim();
+    if (wl) { const re = new RegExp('\\b' + wl.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'gi'); let m;
+      while ((m = re.exec(text))) { if (m[0]) marks.push({ s: m.index, e: m.index + m[0].length, t: 'word' }); else re.lastIndex++; } }
+    marks.sort((a, b) => a.s - b.s || (b.e - b.s) - (a.e - a.s));
+    const kept = []; let last = -1;
+    for (const k of marks) { if (k.s >= last) { kept.push(k); last = k.e; } else if (k.e > last) { kept.push({ s: last, e: k.e, t: k.t }); last = k.e; } }
+    const out = []; let i = 0;
+    for (const k of kept) { if (k.s > i) out.push({ t: 'txt', s: text.slice(i, k.s), style: '' }); out.push({ t: k.t, s: text.slice(k.s, k.e), style: STY[k.t] || '' }); i = k.e; }
+    if (i < text.length) out.push({ t: 'txt', s: text.slice(i), style: '' });
+    return out;
+  }
   // A word that is not a proper noun gets a definition, instantly: Wiktionary's REST definition
   // endpoint, looked up once per word and cached. Nothing is guessed — a word Wiktionary does not
   // carry is reported as "no definition found".
@@ -10003,6 +10122,13 @@ class Component extends DCLogic {
       if (this._pg && this._pg.basis !== 'holograph') this._pg = { ...this._pg, groups: mergeTopicGroups(this._pg.groups || []) };
     }
     return this._pg;
+  }
+  // The holograph's REFERENT elements — every proper noun it admits, with its for-whom — kept
+  // apart from the topics (a topic is a shared stake, a being is not a topic). The reality fold
+  // and the referent routing read this; the Topics rail never does.
+  holoEntList(A) {
+    if (this._heA !== A) { this._heA = A; try { this._he = holoTopics(A).entities || []; } catch (e) { this._he = []; } }
+    return this._he;
   }
   topicOfDoc(A, id) {
     const g = (this.paradigmGroups(A).groups || []).find(x => (x.docs || []).some(d => (d && d.id) === id));
@@ -10529,7 +10655,7 @@ class Component extends DCLogic {
     const P = this.paradigmGroups(A); this._P = P;
     // the khora's reality-register face, folded once the corpus actually has entity topics (the
     // first render fires before the sample's docs land). Keyed by A, so a workspace switch re-folds.
-    if (this._realityFoldA !== A && P.groups && P.groups.some(g => g.kind === 'entity')) { this._realityFoldA = A; try { this.ensureReality(A); } catch (e) {} }
+    if (this._realityFoldA !== A && this.holoEntList(A).length) { this._realityFoldA = A; try { this.ensureReality(A); } catch (e) {} }
     const isEmpty = A.docs.length === 0;
     const sameF = (a, b) => JSON.stringify(a || {}) === JSON.stringify(b || {});
     const realDocIds = new Set(P.groups.flatMap(g => g.docs.map(d => d.id)));
@@ -10539,29 +10665,57 @@ class Component extends DCLogic {
     const topicsNote = P.groups.length ? plural(P.groups.length, 'separate topic') + (P.basis === 'fields' ? ' — sources that share a recurring field and read alike, more than any random set of sources would.' : ' — sources that repeat a real claim, relationship or figure.') : A.docs.length >= 2 ? 'No two sources repeat a real claim, relationship or figure yet — ' + plural(A.docs.length, 'source') + ' each stands alone.' : '';
     const hasTopics = P.groups.length > 0;
     const hasTopicsNote = !hasTopics && A.docs.length >= 2;
-    const showTopicsStray = hasTopics && P.strayN > 0;
+    const showTopicsStray = hasTopics && P.strayN > 0 && S.topicsLens !== 'referents';
     const topicsStrayN = plural(P.strayN || 0, 'source');
     const onTopicsStray = () => this.toggleTopicGroup({ label: 'Not in any topic', docs: [...realDocIds], invert: true });
     // topics in the rail: searchable, six per page, paginated. The search and page live on component state
     // so they survive re-renders; typing resets to page 1.
-    const TOPICS_PER_PAGE = 6;
+    const TOPICS_PER_PAGE = 8;
     const topicsQ = (S.topicsQ || '').trim().toLowerCase();
     const topicsType = S.topicsType || '';
-    const topicsAll = P.groups.filter(p => (!topicsType || (p.terrain || 'Other') === topicsType) && (!topicsQ || p.label.toLowerCase().includes(topicsQ)));
+    // ONE list, TWO lenses: TOPICS (what the sources share) or REFERENTS (the beings the reader
+    // admitted). A being is not a topic, and a topic is not a being — the lens says which you are
+    // reading, and switching costs nothing. Rows are one dense line each, not three.
+    const topicsLensMode = S.topicsLens === 'referents' ? 'referents' : 'topics';
+    const entAll = this.holoEntList(A);
+    const refAll = topicsLensMode === 'referents' ? entAll.filter(r => !topicsQ || r.name.toLowerCase().includes(topicsQ)).slice().sort((a, b) => b.n - a.n || a.name.localeCompare(b.name)) : [];
+    const topicsAll = topicsLensMode === 'referents' ? refAll : P.groups.filter(p => (!topicsType || (p.terrain || 'Other') === topicsType) && (!topicsQ || p.label.toLowerCase().includes(topicsQ)));
     const topicsPages = Math.max(1, Math.ceil(topicsAll.length / TOPICS_PER_PAGE));
     const topicsPage = Math.min(S.topicsPage || 0, topicsPages - 1);
     const topicsShown = topicsAll.slice(topicsPage * TOPICS_PER_PAGE, (topicsPage + 1) * TOPICS_PER_PAGE);
-    const topicsList = topicsShown.map(p => { const on = activeTopicGroup === p.label && !f.topicGroup.invert;
-      return { label: p.label, tag: p.terrain || '', tagCol: (typeof TERRAIN_C !== 'undefined' && TERRAIN_C[p.terrain]) || 'var(--mut)', differs: !!p.differs, src: plural(p.n, 'source'), on, bg: on ? 'var(--sel)' : 'transparent', bd: on ? 'var(--acc2)' : 'transparent', weight: on ? 600 : 500, onJump: () => this.openTopic(p.label) }; });
+    // the row's tag is the topic's KIND (Measure/Bond/Statement) — every topic is Link, so a
+    // terrain tag was the same word on every row; a uniform kind shows no tag at all.
+    const topicsMixed = new Set((P.groups || []).map(p => p.kind)).size > 1;
+    const topicsList = topicsLensMode === 'referents'
+      ? topicsShown.map(r => { const on = !!(S.sel && S.sel.type === 'name' && S.sel.id === r.name);
+          // the tag is the EARNED kind once the Wikipedia lead has answered ("Liner", not "People");
+          // amber when the anchor overturned the reading's own type — the falsification, made visible.
+          const rk = this._realityKinds && this._realityKinds.get(r.name);
+          const kk = rk && rk.kind;
+          const earned = kk ? ((kk.type && typeof TYPE_L !== 'undefined' && TYPE_L[kk.type]) ? TYPE_L[kk.type].replace(/s$/, '') : kk.word.replace(/^./, c => c.toUpperCase())) : '';
+          return { label: r.name, title: plural(r.n, 'source') + ' name it · open its profile', n: String(r.n),
+            tag: earned ? (earned + (rk.ambiguous ? '?' : '')) : (r.type !== 'other' ? ((typeof TYPE_L !== 'undefined' && TYPE_L[r.type]) ? TYPE_L[r.type].replace(/s$/, '') : '') : ''),
+            tagCol: earned ? (rk.corrected ? 'var(--amber)' : 'var(--ink2)') : ((typeof TYPE_C !== 'undefined' && TYPE_C[r.type]) || 'var(--mut)'),
+            on, bg: on ? 'var(--sel)' : 'transparent', bd: on ? 'var(--acc2)' : 'transparent', onJump: () => this.openProfile(r.name) }; })
+      : topicsShown.map(p => { const on = activeTopicGroup === p.label && !f.topicGroup.invert;
+          return { label: p.label, title: plural(p.n, 'source') + ' share this topic · open its profile', n: String(p.n), tag: topicsMixed ? (TOPIC_KIND_LABEL[p.kind] || '') : '', tagCol: TOPIC_KIND_COLOR[p.kind] || 'var(--mut)', on, bg: on ? 'var(--sel)' : 'transparent', bd: on ? 'var(--acc2)' : 'transparent', onJump: () => this.openTopic(p.label) }; });
+    // the lens toggle: Topics | Referents, with their counts
+    // showing a referent is the explicit ask: check the shown rows' kinds against Wikipedia
+    // (one lookup per row, memoized; anchors checked before are kept and never re-fetched).
+    if (topicsLensMode === 'referents' && topicsShown.length) { try { topicsShown.slice(0, 8).forEach(r => this.ensureAnchor(A, r.name)); } catch (e) {} }
+    const lensBtn = (id, label, n) => ({ label, n: String(n), col: topicsLensMode === id ? 'var(--ink)' : 'var(--mut)', bg: topicsLensMode === id ? 'var(--sel)' : 'transparent', bd: topicsLensMode === id ? 'var(--acc2)' : 'var(--line2)', onClick: () => this.setState({ topicsLens: id, topicsPage: 0, topicsType: '' }) });
+    const topicsLens = [lensBtn('topics', 'Topics', P.groups.length), lensBtn('referents', 'Referents', entAll.length)];
     // filter by the topic's ontology: one chip per terrain present
     const typeCount = new Map(); P.groups.forEach(p => { const t = p.terrain || 'Other'; typeCount.set(t, (typeCount.get(t) || 0) + 1); });
     const TYPE_ORDER = ['Entity', 'Link', 'Kind', 'Network', 'Paradigm', 'Void', 'Field', 'Lens', 'Atmosphere'];
     const topicsTypes = [{ id: '', label: 'All', n: String(P.groups.length), col: 'var(--ink2)' }]
       .concat(TYPE_ORDER.filter(t => typeCount.has(t)).map(t => ({ id: t, label: t, n: String(typeCount.get(t)), col: (typeof TERRAIN_C !== 'undefined' && TERRAIN_C[t]) || 'var(--mut)' })))
       .map(ty => ({ label: ty.label, n: ty.n, title: ty.n + ' ' + (ty.id ? ty.label.toLowerCase() + ' topics' : 'topics'), col: topicsType === ty.id ? ty.col : 'var(--mut)', bg: topicsType === ty.id ? 'var(--sel)' : 'transparent', bd: topicsType === ty.id ? 'var(--acc2)' : 'var(--line2)', onClick: () => this.setState({ topicsType: ty.id, topicsPage: 0 }) }));
-    const topicsHasTypes = typeCount.size > 1;
-    const topicsHasEmpty = hasTopics && topicsAll.length === 0;
-    const topicsHasSearch = hasTopics;
+    const topicsHasTypes = topicsLensMode === 'topics' && typeCount.size > 1;
+    const topicsHasEmpty = (topicsLensMode === 'referents' ? topicsAll.length === 0 : hasTopics && topicsAll.length === 0);
+    const topicsHasSearch = hasTopics || entAll.length > 0;
+    const topicsSearchPh = topicsLensMode === 'referents' ? 'Filter referents…' : 'Filter topics…';
+    const topicsEmptyText = topicsLensMode === 'referents' ? 'No referent matches.' : 'No topics of this type.';
     const topicsSearchVal = S.topicsQ || '';
     const onTopicsSearch = e => this.setState({ topicsQ: e.target.value, topicsPage: 0 });
     const topicsHasPager = topicsPages > 1;
@@ -10810,8 +10964,8 @@ class Component extends DCLogic {
         return { backLabel: bt ? short(titleCase(String(bt)), 24) : 'Back', backDisabled: !this.backTarget(), backTitle: bt ? 'Back to ' + bt : 'Back',
           onBack: () => this.goBack(), onHome: () => this.setState({ view: 'summary', readDoc: null, sel: null }),
           homeCls: onSummary ? 'on' : '', homeAria: onSummary ? 'page' : undefined, hasLoc: loc.length > 1, locTitle: loc.map(c => c.label).join(' › '), loc }; })(),
-      topicsList, hasTopics, topicsOpen: hasTopics || !!activeTopicGroup || !!topicsQ, topicsLabel: P.groups.length ? 'Topics · ' + P.groups.length : 'Topics', topicsNote, hasTopicsNote, topicsStrayN, showTopicsStray, onTopicsStray,
-      topicsTypes, topicsHasTypes, topicsHasEmpty, topicsType: S.topicsType || '', scope,
+      topicsList, hasTopics, topicsOpen: hasTopics || entAll.length > 0 || !!activeTopicGroup || !!topicsQ, topicsLabel: topicsLensMode === 'referents' ? 'Referents · ' + entAll.length : (P.groups.length ? 'Topics · ' + P.groups.length : 'Topics'), topicsNote, hasTopicsNote, topicsStrayN, showTopicsStray, onTopicsStray,
+      topicsTypes, topicsHasTypes, topicsHasEmpty, topicsEmptyText, topicsLens, topicsSearchPh, topicsType: S.topicsType || '', scope,
       topicsHasSearch, topicsSearchVal, onTopicsSearch, topicsHasPager, topicsPagerLine, onTopicsPrev, onTopicsNext, topicsHasPrev, topicsHasNext, topicsPageN: (topicsPage + 1) + ' of ' + topicsPages,
       toggleTheme: () => { const th = S.theme === 'dark' ? 'light' : 'dark'; try { localStorage.setItem('fold-explorer-theme', th); } catch (e) {} this.setState({ theme: th }); },
       workspaceClass: S.akFocus && view === 'ask' ? 'hd-workspace-surface hd-focus' : 'hd-workspace-surface',
@@ -10966,7 +11120,9 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
           // narrow: the profile/detail SWAPS IN as a full-screen view (with a Back button), it is not a bottom sheet
           ? 'position:fixed;inset:0;overflow:auto;z-index:45;background:var(--bg);padding:14px 16px 32px;display:flex;flex-direction:column;gap:12px;box-sizing:border-box'
           : 'position:fixed;top:0;right:0;bottom:0;width:' + SIDE_PANEL_W + 'px;overflow:auto;z-index:30;background:var(--s1);border-left:1px solid var(--line2);padding:20px 20px 28px;display:flex;flex-direction:column;gap:12px;box-sizing:border-box';
-        const pfSide = !!pf.has && view === 'reader';
+        // the panel is ALWAYS offered: a name in the reader, a topic in any view — but not on the
+        // topic's own full page (view='profile'), where the page itself is what is shown.
+        const pfSide = !!pf.has && (view === 'reader' || (view !== 'profile' && !!(S.sel && S.sel.type === 'topic')));
         const panelOpen = pfSide || (!(pf.has || view === 'draft' || view === 'profile') && !!det.hasSel);
         const colPad = !panelOpen ? '' : narrow ? '' : 'padding-right:' + SIDE_PANEL_W + 'px';
         const side = { sidePanelStyle, pfSide, colPad, narrowBack: narrow, pfClose: () => this.setState({ sel: null }) };
@@ -12212,7 +12368,14 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
   openProfile(name) { this.pushHist(); this.setState(s => ({ view: 'profile', readDoc: null, pfFrom: s.view === 'profile' ? s.pfFrom : s.view, sel: { type: 'name', id: name }, pfIdx: 0, pfAll: false, selAll: false })); if (typeof window !== 'undefined') window.scrollTo(0, 0); }
   // A topic is a holograph element (a restated claim, a measure slot, a bond). Clicking one
   // opens its own profile page — what it is, what it finds in each source, and the segment.
-  openTopic(label) { this.pushHist(); this.setState(s => ({ view: 'profile', readDoc: null, pfFrom: s.view === 'profile' ? s.pfFrom : s.view, sel: { type: 'topic', id: label }, pfIdx: 0, pfAll: false, selAll: false })); if (typeof window !== 'undefined') window.scrollTo(0, 0); }
+  // A topic opens in the RIGHT PANEL, in whatever view you are in — the same panel a name uses
+  // (the panel is always offered). { page: true } swaps to the full page instead; the panel links to it.
+  openTopic(label, opts) {
+    this.pushHist();
+    if (opts && opts.page) this.setState(s => ({ view: 'profile', readDoc: null, pfFrom: s.view === 'profile' ? s.pfFrom : s.view, sel: { type: 'topic', id: label }, pfIdx: 0, pfAll: false, selAll: false }));
+    else this.setState({ sel: { type: 'topic', id: label }, pfIdx: 0 });
+    if (typeof window !== 'undefined') window.scrollTo(0, 0);
+  }
   // The topic profile, in the profile page's own shape (pf.*): the header carries the label as
   // its H1, the facts say how many sources and of what kind, and "What it finds" lists, per
   // source, the verbatim restatement (claim), each value and who states it (measure), or the
@@ -12242,15 +12405,31 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
       const base = new URL('vendor/eoreader7/native/kernel/', location.href).href;
       const RR = await import(base + 'reality-register.js');
       this._realityRR = RR;
+      // the khora's profile-page renderer (one owner per capability: the khora owns the page
+      // shape and vocabulary; this surface only wires it). The reality-register shim above keeps
+      // it loadable in a page. window.__hdRealityProfileCard is the seam the consolidation note names.
+      try { const PC = await import(base + 'profile-page.js'); this._realityPC = PC; try { window.__hdRealityProfileCard = PC.profileCard; } catch (e2) {} } catch (e2) { this._realityPC = null; }
       this._realitySources = A.docs.map(d => ({ id: d.id, register: this.realityReg(d) }));
-      this._realityAnchors = this._realityAnchors || new Map();
+      if (!this._realityAnchors) this.loadAnchors();   // anchors checked in an earlier visit are kept
+      this._realityKinds = this._realityKinds || new Map();
       try { this._realityResolver = RR.makeWikipediaResolver({ forWhom: { question: '', universeKind: 'world' }, timeoutMs: 5000, attempts: 1, backoffMs: 500 }); } catch (e) { this._realityResolver = null; }
       // the register fold is synchronous and model-free (no network): the badge and TOLD BY show
-      // at once; the Wikipedia anchor ("what it is") is fetched lazily when a topic is opened.
-      (this.paradigmGroups(A).groups || []).filter(g => g.kind === 'entity').forEach(g => {
+      // at once; the Wikipedia anchor ("what it is") is fetched lazily when a referent is opened
+      // or shown in the referent rail. The population is the holograph's REFERENT elements.
+      const posOf = w => { try { const k = (typeof hdPos === 'function') ? hdPos(w) : null; return k && Object.keys(k).sort((a, b) => k[b] - k[a])[0]; } catch (e) { return null; } };
+      const posReady = posOf('ship') === 'NOUN' || posOf('ship') === 'PROPN';
+      const kindOpts = posReady ? { isNoun: w => ['NOUN', 'PROPN'].includes(posOf(w)), isStop: w => { const t = posOf(w); return !!t && !['NOUN', 'PROPN', 'ADJ'].includes(t); } } : undefined;
+      this.holoEntList(A).forEach(g => {
         const name = (g.forWhom || [])[0]; if (!name) return;
         const { sources } = this.realitySourcesFor(A, name);
-        this._realityByName.set(name, RR.realityRegister({ id: name }, { sources, anchor: this._realityAnchors.get(name) || null }));
+        const anchor = this._realityAnchors.get(name) || null;
+        this._realityByName.set(name, RR.realityRegister({ id: name }, { sources, anchor }));
+        // a kept anchor carries its kind falsification too (no re-fetch, no claim without one)
+        if (anchor && (anchor.found || anchor.extract) && !this._realityKinds.has(name)) {
+          const local = (A.names[name] || {}).type || null;
+          const kind = anchorKindOf(anchor.extract, kindOpts);
+          this._realityKinds.set(name, { kind, local, corrected: !!(kind && local && local !== 'other' && (kind.type ? kind.type !== local : true)), ambiguous: !!anchor.ambiguous, url: anchor.url || null });
+        }
       });
       try { this.forceUpdate(); } catch (e) {}
     } catch (e) { this._realityByName = null; }
@@ -12260,51 +12439,98 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
   ensureAnchor(A, name) {
     if (!this._realityResolver || !this._realityRR || !name) return;
     this._realityAnchors = this._realityAnchors || new Map();
+    this._realityKinds = this._realityKinds || new Map();
     if (this._realityAnchors.has(name)) return;
     this._realityAnchors.set(name, null);
-    this._realityResolver(name).then(anchor => {
+    const fold = anchor => {
       this._realityAnchors.set(name, anchor || null);
+      // FALSIFY THE KIND: the reading's own type stands unless the anchor's lead names a class —
+      // "RMS Titanic was a British passenger liner" earns "liner" and overturns "person". The
+      // falsifier is a kind whose word is not the lead's own head noun; no anchor, no claim.
+      try {
+        const local = ((A.names || {})[name] || {}).type || null;
+        const posTop = w => { try { const k = (typeof hdPos === 'function') ? hdPos(w) : null; return k ? Object.keys(k).sort((a, b) => k[b] - k[a])[0] : null; } catch (e) { return null; } };
+        const posReady = posTop('ship') === 'NOUN' || posTop('ship') === 'PROPN';   // the prior is loaded
+        // the picked page's lead is evidence even when its SENSE is not earned (ambiguous): the kind
+        // is drawn from the lead, and the doubt rides along on the record (disclosed, never smoothed).
+        const kind = anchor && (anchor.found || anchor.extract) ? anchorKindOf(anchor.extract, posReady ? {
+          isNoun: w => ['NOUN', 'PROPN'].includes(posTop(w)),
+          isStop: w => { const t = posTop(w); return !!t && !['NOUN', 'PROPN', 'ADJ'].includes(t); },
+        } : undefined) : null;
+        this._realityKinds.set(name, { kind, local, corrected: !!(kind && local && local !== 'other' && (kind.type ? kind.type !== local : true)), ambiguous: !!(anchor && anchor.ambiguous), url: (anchor && anchor.url) || null });
+      } catch (e) {}
+      try { this.saveAnchors(); } catch (e) {}
       if (!this._realityByName || !this._realityRR) return;
       const { sources } = this.realitySourcesFor(A, name);
       this._realityByName.set(name, this._realityRR.realityRegister({ id: name }, { sources, anchor: anchor || null }));
       try { this.forceUpdate(); } catch (e) {}
+    };
+    this._realityResolver(name).then(a1 => {
+      if (a1 && (a1.found || a1.extract)) return fold(a1);
+      // initials lose their periods on Wikipedia (R.M.S. Titanic → RMS Titanic): try once before refusing
+      const bare = String(name).replace(/\./g, '').replace(/\s+/g, ' ').trim();
+      if (bare !== String(name)) return this._realityResolver(bare).then(a2 => fold((a2 && (a2.found || a2.extract)) ? a2 : a1)).catch(() => fold(a1));
+      return fold(a1);
     }).catch(() => {});
+  }
+  saveAnchors() { try { const o = {}; let n = 0; (this._realityAnchors || new Map()).forEach((v, k) => { if (v && v.found && n < 500) { o[k] = v; n++; } }); localStorage.setItem('hd:anchors', JSON.stringify(o)); } catch (e) {} }
+  loadAnchors() { try { this._realityAnchors = new Map(Object.entries(JSON.parse(localStorage.getItem('hd:anchors') || '{}'))); } catch (e) { this._realityAnchors = new Map(); } }
+  // A topic's rows, induced by the KERNEL from the element's own tuple — the same kind
+  // induction a referent's relations go through (holodeck-profile.js over the vendored
+  // entity-profile.js). No key is typed here: the tuple's own verbs are the keys, and the
+  // standing comes from the induced kind (or "no kind" — still a valid profile).
+  topicRows(A, g) {
+    const M = _hdProf; if (!M || !M.buildFromTriples) return null;
+    const fw = (g.forWhom || []).filter(Boolean); if (!fw.length) return null;
+    const tri = [];
+    if (g.kind === 'measure' && g.tuple && g.tuple.anchor) {
+      (g.findings || []).forEach(f => { const v = clean(f.text); if (v) tri.push({ subject: g.tuple.anchor, verb: g.tuple.measure || 'value', object: v, witnessed: true }); });
+    } else if (g.kind === 'bond' && g.pair && g.pair.length === 2) {
+      tri.push({ subject: g.pair[0], verb: 'held with', object: g.pair[1], witnessed: true });
+    } else if (g.kind === 'triple' && g.triple) {
+      tri.push({ subject: g.triple[0], verb: g.triple[1], object: g.triple[2], witnessed: true });
+    }
+    if (!tri.length) return null;
+    try {
+      const built = M.buildFromTriples(tri, { beings: fw, exposureFloor: 2, draws: 99, alpha: 0.05, seed: 5 });
+      const p = built.byId.get(fw[0]) || [...built.byId.values()][0];
+      if (!p || !p.parameters.length) return null;
+      const rows = M.paramRows(p, built).map(r => ({ rel: r.rel, star: r.star, standing: r.standing, standingNote: r.standing === 'no kind' ? '' : ' · ' + r.standing, vals: r.values.map(v => v.text + (v.n > 1 ? ' ×' + v.n : '')).join(' · ') + (r.more ? ' ' + r.more : '') }));
+      const kind = (p.kinds || []).map(k => (k.signatures || []).slice(0, 4).join(' · ') || k.kindKey).join(' / ');
+      return { kind: kind ? 'Read as ' + kind : 'No kind established — the raw tuple is shown', count: rows.length + (rows.length === 1 ? ' key' : ' keys') + ' · induced, not typed', rows };
+    } catch (e) { return null; }
   }
   topicProfileVals(A, label) {
     const S = this.state;
     const g = (this.paradigmGroups(A).groups || []).find(x => x.label === label);
     if (!g) return { has: false, tags: [], elsewhere: [], facts: [] };
-    // CONSOLIDATION SEAM (see TOPIC-PROFILE-CONSOLIDATION.md): the reality-register
-    // profile page is the khora's (native/kernel/profile-page.js); its reality-register fold
-    // (native/kernel/reality-register.js) is vendored here. One owner per capability: this
-    // renders the register's records, and adds no ontology logic of its own.
-    const kx = TOPIC_KIND(g);
+    // THE SAME SHAPE AS A REFERENT'S PAGE. One owner per capability: the kind induction and its
+    // rows are the khora's (holodeck-profile.js / entity-profile.js); this composes them into the
+    // page shape and adds no ontology of its own. A topic is a shared stake (Pattern grain), never
+    // a being: its FOR WHOM points at the referent(s), and the terrain is the one muted engine line.
+    const KIND_WHAT = {
+      measure: 'A figure-slot the sources share — the same measure of the same being, stated where they disagree.',
+      bond: 'A relation the sources share between two named beings. The label is the tuple itself: end1 · verb · end2.',
+      triple: 'A stated tuple the sources share, read as end1 · verb · end2.',
+    };
     const list = (g.findings || []).map(f => ({ text: clean(f.text), src: f.title || '', date: '', by: '', hasBy: false, op: 1, pinLabel: '', pinColor: 'transparent', onClick: () => (f.doc ? this.read(f.doc) : null) }));
     const who = (g.forWhom || []).map(nm => ({ label: nm, color: 'var(--line2)', onClick: () => (A.names[nm] ? this.openProfile(nm) : null) }));
+    // TOLD BY: the sources the element spans, each with its DECLARED register (a giver, never induced).
+    const LAB = (this._realityRR && this._realityRR.REGISTER_TRAITS) || {};
+    const regs = [...new Set((g.docs || []).map(d => this.realityReg(d)).filter(x => x && x !== 'unknown'))];
     const facts = [{ k: 'Sources', v: plural(g.n, 'source') }, { k: 'For whom', v: (g.forWhom || []).join(' · ') || '—' }];
+    if (regs.length) facts.push({ k: 'Told by', v: regs.map(x => (LAB[x] && LAB[x].label) || x).join(', ') });
     if (g.kind === 'measure') facts.push({ k: 'Values', v: String(list.length) });
-    // the khora's reality-register face, when the organ has answered for this entity
-    let eyebrow = kx.e, color = kx.c;
-    const rp = g.kind === 'entity' && this._realityByName ? this._realityByName.get(g.forWhom[0]) : null;
-    if (rp && !(rp.anchor && rp.anchor.found)) { try { this.ensureAnchor(A, g.forWhom[0]); } catch (e) {} }   // fetch "what it is" on open
-    if (rp) {
-      const BADGE = { real: '● real', 'fictionalized-real': '◐ fictionalized-real', fictional: '✕ fictional', unexamined: '? unexamined' };
-      eyebrow = eyebrow + ' · ' + (BADGE[rp.realityKind] || rp.realityKind);
-      facts.push({ k: 'Reality', v: rp.realityKind });
-      if (rp.registers && rp.registers.length) {
-        const LAB = (this._realityRR && this._realityRR.REGISTER_TRAITS) || {};
-        const dec = rp.registers.filter(x => x && x !== 'unknown');   // an undeclared register is not "told by"
-        facts.push({ k: 'Told by', v: dec.length ? dec.map(x => (LAB[x] && LAB[x].label) || x).join(', ') : 'register undeclared' });
-      }
-      if (rp.anchor && rp.anchor.found && rp.anchor.extract) facts.push({ k: 'What it is', v: short(String(rp.anchor.extract).replace(/\s+/g, ' '), 140) });
-    }
-    // A WIKIPEDIA-LIKE TOP: one line saying what the topic is and for whom, then the structured facts as an infobox.
-    const lead = (typeof topicSubtitle === 'function') ? (topicSubtitle(g) || '') : '';
-    return { has: true, eyebrow, color, title: g.label, facts,
-      hasLead: !!lead, lead, leadPos: kx.e, infobox: facts,
-      hasBadge: !!g.terrain, badge: g.terrain || '', badgeCol: (typeof TERRAIN_C !== 'undefined' && TERRAIN_C[g.terrain]) || 'var(--mut)',
+    const tr = this.topicRows(A, g);
+    return { has: true, eyebrow: TOPIC_KIND_LABEL[g.kind] || 'Topic', color: TOPIC_KIND_COLOR[g.kind] || 'var(--acc)', title: g.label, facts,
+      hasPage: true, onPage: () => this.openTopic(label, { page: true }),
+      hasLead: true, lead: KIND_WHAT[g.kind] || '', leadPos: TOPIC_KIND_LABEL[g.kind] || 'Topic',
+      infobox: facts,
+      hasBadge: true, badge: g.differs ? '◐ contested' : '● agree', badgeCol: g.differs ? 'var(--amber)' : 'var(--ok)',
       narrow: { label: 'Segment to this topic', onClick: () => this.toggleTopicGroup(g) },
-      sum: { has: false }, hasConns: false, hasRefs: false, hasProf: false,
+      sum: { has: false }, hasConns: false, hasRefs: false,
+      hasProf: !!(tr && tr.rows.length), profKind: tr ? tr.kind : '', profCount: tr ? tr.count : '', profRows: tr ? tr.rows : [],
+      hasFoot: true, footText: '▸ engine · ' + [g.terrain, g.stance].filter(Boolean).join(' · ') + ' — the connection the holograph admitted for this topic',
       hasTags: who.length > 0, tags: who, tagTitle: 'For whom',
       hasElse: false, noElse: true, hasHere: false, hasStep: false, here: '', pos: '', prev: () => {}, next: () => {},
       hasMoreList: false, moreList: '', onMoreList: () => {},
@@ -12378,15 +12604,20 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
     const p = built.byId.get(name); if (!p || !p.parameters.length) return null;
     const REL = HD_REL_PLAIN, FRAME = HD_FRAME_PLAIN, STANDING = HD_STANDING_PLAIN;
     const title = id => { const d = (A.docById && A.docById[id]) || (A.docs || []).find(x => x.id === id); return d ? d.title : id; };
-    // the "kind of name" row says "other" when no type was established, which the header already says
+    // the "kind of name" row says "other" when no type was established, which the header already says.
+    // FOUND IN is not prose: each source is a CHIP that opens it — compact, and clearly a door.
+    const shortT = (s, n = 24) => { const t = String(s || ''); return t.length > n ? t.slice(0, n - 1) + '…' : t; };
     const rows = M.paramRows(p, built).filter(r => !(r.rel === 'typed' && r.values.length === 1 && r.values[0].text === 'other')).map(r => {
+      const chips = [];
       const vals = r.values.map(v => {
         let t = v.text;
         if (r.rel === 'said with') t = FRAME[t] || t;
-        else if (r.rel === 'named in') t = title(t);
+        else if (r.rel === 'named in') { const full = title(t); chips.push({ label: shortT(full) + (v.n > 1 ? ' ×' + v.n : ''), onClick: () => this.read(v.text) }); t = full; }
         return t + (v.n > 1 ? ' ×' + v.n : '');
       });
-      return { rel: REL[r.rel] || r.rel, standingNote: STANDING[r.standing] ? ' · ' + STANDING[r.standing] : '', hasStanding: !!STANDING[r.standing], standing: STANDING[r.standing] || '', vals: vals.join(' · ') + (r.more ? ' ' + r.more : '') };
+      const chipRow = chips.length > 0;
+      return { rel: REL[r.rel] || r.rel, standingNote: STANDING[r.standing] ? ' · ' + STANDING[r.standing] : '', hasStanding: !!STANDING[r.standing], standing: STANDING[r.standing] || '',
+        vals: chipRow ? '' : vals.join(' · ') + (r.more ? ' ' + r.more : ''), chips, hasChips: chipRow, more: r.more || '' };
     });
     const typed = M.paramRows(p, built).find(r => r.rel === 'typed');
     const kindWord = typed && typed.values[0] ? typed.values[0].text : '';
@@ -12466,11 +12697,40 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
       showProps: size === 'full', props,
     };
   }
+  // THE RECORD: the khora's own page for a being (vendor/eoreader7/native/kernel/profile-page.js),
+  // wired as one owner per capability (window.__hdRealityProfileCard). The shape is fixed — badge ·
+  // WHAT IT IS · TOLD BY · WHAT THE SOURCES SAY · DISAGREEMENTS · FOR WHOM · the muted engine line —
+  // and the keys under WHAT THE SOURCES SAY are the induced kind's own (holodeck-profile.js): no key
+  // is typed here. No organ loaded → no record (never a lookalike drawn by the surface).
+  profileCardText(A, name) {
+    const PC = this._realityPC; if (!PC || !PC.profileCard) return null;
+    const rec = (this._realityByName && this._realityByName.get(name)) || null;
+    // the record carries raw doc ids; resolve them to the titles a person sees (a display map,
+    // never a change to the register fold). And fetch the world anchor once, lazily, on open.
+    const reality = rec ? { ...rec, attested: (rec.attested || []).map(a => ({ ...a, source: ((A.docById || {})[a.source] || {}).title || a.source })) } : null;
+    if (rec && !(rec.anchor && (rec.anchor.found || rec.anchor.ambiguous || rec.anchor.missing))) { try { this.ensureAnchor(A, name); } catch (e) {} }
+    const pr = this.profileRows(A, name);
+    // `named in` carries doc ids; show the titles (the same display map profilePlain uses).
+    const titleOf = t => { const m = String(t).match(/^(.+?)( ×\d+)?$/); const base = m ? m[1] : String(t); const n = m && m[2] ? m[2] : ''; const d = (A.docById || {})[base]; return (d ? d.title : base) + n; };
+    const rows = ((pr && pr.rows) || []).map(r => ({ rel: r.rel, star: r.star ? '★' : '', standing: r.standing === 'no kind' ? '' : r.standing, values: r.rel === 'named in' ? String(r.vals || '').split(' · ').map(titleOf).join(' · ') : String(r.vals || '') }));
+    const fw = this.frameOf(name);
+    try { return PC.profileCard({ id: name }, { reality, rows, forWhom: fw }); } catch (e) { return null; }
+  }
+  // The frame the reading was admitted for (S113) — the local reading stamps it per cast row.
+  frameOf(name) {
+    try {
+      const X = this._localRix, f = String(name || '').toLowerCase();
+      const c = X && (X.cast || []).find(x => String(x.id || '').toLowerCase() === f || (x.surfaces || []).some(s => String(s).toLowerCase() === f));
+      return (c && c.frame) || { giver: 'the reader', question: '', ground: this.corpusName() };
+    } catch (e) { return { giver: 'the reader', question: '', ground: '' }; }
+  }
   profileVals(A, det) {
     const S = this.state, sel = S.sel; const off = { has: false, tags: [], elsewhere: [], facts: [] };
+    // a topic's page shows in the right panel from ANY view (the panel is always offered);
+    // a name's page needs the profile view or the reader, where its statements are at hand.
+    if (sel && sel.type === 'topic') return this.topicProfileVals(A, sel.id);
     const page = S.view === 'profile';
     if (!page && (S.view !== 'reader' || !S.readDoc)) return off;
-    if (sel && sel.type === 'topic') return this.topicProfileVals(A, sel.id);
     if (!sel || sel.type !== 'name' || !A.names[sel.id] || !det.hasSel) return off;
     const n = A.names[sel.id]; const sts = n.sts.map(id => A.byId[id]).filter(Boolean);
     const here = page ? [] : sts.filter(s => s.doc === S.readDoc); const byDoc = {};
@@ -12497,14 +12757,37 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
     // as an infobox — so an entity opens the way an article does: a line, then a table of what is known.
     const wdef = (this._defs || {})[n.name.toLowerCase()];
     const lead = (wdef && wdef.length) ? wdef[0].text : ''; const leadPos = (wdef && wdef.length) ? wdef[0].pos : '';
+    // the khora record on the profile view only (the reader's side panel is too narrow for the page)
+    const cardText = page ? this.profileCardText(A, n.name) : null;
+    // the earned kind, from the anchor's own lead — the reading's type stands unless Wikipedia names a class
+    const rk = this._realityKinds && this._realityKinds.get(n.name);
+    const kindFact = (rk && rk.kind) ? [{ k: 'Kind', v: (rk.kind.type ? ((typeof TYPE_L !== 'undefined' && TYPE_L[rk.kind.type]) ? TYPE_L[rk.kind.type].replace(/s$/, '') : rk.kind.type) : rk.kind.word.replace(/^./, c => c.toUpperCase())) + ' · Wikipedia' + (rk.corrected ? ' — the reading said ' + ((typeof TYPE_L !== 'undefined' && TYPE_L[rk.local]) ? TYPE_L[rk.local].replace(/s$/, '') : String(rk.local)) : '') + (rk.ambiguous ? ' · one sense among the candidates' : '') }] : [];
+    // THE REALITY FACE, on the page itself — the khora's records in this surface's own medium.
+    // (The ASCII card is an exportable record now, not a wall of text on the page.)
+    const rp = this._realityByName && this._realityByName.get(n.name);
+    const RB = { real: '● real', 'fictionalized-real': '◐ fictionalized-real', fictional: '✕ fictional', unexamined: '? unexamined' };
+    const RB_C = { real: 'var(--green)', 'fictionalized-real': 'var(--amber)', fictional: 'var(--bad)', unexamined: 'var(--mut)' };
+    const realityFacts = [];
+    if (rp) {
+      const LAB = (this._realityRR && this._realityRR.REGISTER_TRAITS) || {};
+      const regs = (rp.registers || []).filter(x => x && x !== 'unknown');
+      if (regs.length) realityFacts.push({ k: 'Told by', v: regs.map(x => (LAB[x] && LAB[x].label) || x).join(', ') });
+    }
+    const wikiLead = rp && rp.anchor && rp.anchor.found && rp.anchor.extract ? String(rp.anchor.extract).replace(/\s+/g, ' ').trim() : '';
+    const leadText = lead || wikiLead; const leadPosText = lead ? leadPos : (wikiLead ? 'Wikipedia' : '');
+    const fw = this.frameOf(n.name);
+    if (fw && fw.giver) realityFacts.push({ k: 'For whom', v: [fw.giver, fw.question ? '“' + short(fw.question, 56) + '”' : '', fw.ground].filter(Boolean).join(' · ') });
     return { has: true, eyebrow: d.eyebrow, color: d.color, title: n.name,
-      hasLead: !!lead, lead, leadPos, infobox: d.facts || [],
+      hasCard: !!cardText, cardText: cardText || '',
+      onCopy: async () => { try { await navigator.clipboard.writeText(cardText); this.toast('The record copied — the khora page, as text.'); } catch (e) { this.toast('Could not copy the record.'); } },
+      hasBadge: !!rp, badge: rp ? (RB[rp.realityKind] || rp.realityKind) : '', badgeCol: rp ? (RB_C[rp.realityKind] || 'var(--mut)') : 'var(--mut)',
+      hasLead: !!leadText, lead: leadText, leadPos: leadPosText, infobox: kindFact.concat(realityFacts, d.facts || []),
       ...(() => { const pl = this.profilePlain(A, n.name); return { hasProf: !!(pl && pl.rows.length), profKind: pl ? pl.kind : '', profEstablished: pr ? pr.established : false, profCount: pl ? pl.countLine : '', profRows: pl ? pl.rows : [] }; })(),
       hasConns: conns.length > 0, conns, connTitle: 'Connections across sources · ' + conns.length,
       hasRefs: refs.length > 0, refs, refTitle: refs.length === 1 ? 'Linked referent' : 'Linked referents',
       sum: this.profileSummary(A, n.name),
       facts: d.facts, here: N ? plural(N, 'mention') + ' in this source' : 'Not named in this source’s statements', hasStep: N > 1, pos: N > 1 ? (Math.min(idx, N - 1) + 1) + ' / ' + N : '', prev: () => step(-1), next: () => step(1),
-      hasDef: !lead && !!d.hasDefs, defTitle: d.defTitle, defNote: d.defNote, defRows: d.defs || [],   // the lead IS the definition; only show the block when there is no lead
+      hasDef: !leadText && !!d.hasDefs, defTitle: d.defTitle, defNote: d.defNote, defRows: d.defs || [],   // the lead IS the definition; only show the block when there is no lead
       hasTags: !!(d.tags && d.tags.length), tags: page ? (d.tags || []).map(t => ({ ...t, onClick: () => this.openProfile(t.label) })) : (d.tags || []), tagTitle: d.tagTitle,
       hasElse: elsewhere.length > 0, elseTitle: page ? 'In ' + plural(elsewhere.length, 'source') : 'Also in ' + plural(elsewhere.length, 'other source'), elsewhere: elsewhere.slice(0, S.pfAll ? 99 : 3), hasMoreElse: !S.pfAll && elsewhere.length > 3, moreElse: 'Show all ' + elsewhere.length, onMoreElse: () => this.setState({ pfAll: true }),
       noElse: !elsewhere.length, narrow: d.actions[0], hasHere: !page,
@@ -12553,10 +12836,14 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
         facts: [...(() => { const w = whoSays(st, A); const d0 = A.docById[st.doc]; return [...(w ? [{ k: w.how === 'quoted' ? 'Said by' : w.how === 'publisher' ? 'Issued by' : 'Written by', v: w.who }] : []), { k: 'Published', v: d0.pubLabel || (d0.year ? String(d0.year) : 'Undated') }]; })(), ...(st.where ? [{ k: 'Where', v: st.where }] : []), ...(su && su.sig ? [{ k: 'Moved the picture', v: 'Shift ' + su.excess.toFixed(1) }] : [])],
         tagTitle: 'Names in it', tags: st.names.slice(0, 10).map(nameTag),
         actions: [{ label: 'Show in its document', onClick: () => this.read(st.doc, st.id) }, { label: 'Narrow to this source', onClick: () => this.setF('doc', st.doc) }], listTitle: 'Similar wording elsewhere', list: (A.echoes[st.id] || []).map(e => { const o = A.byId[e.id]; const L = SRC_LINE(o, A); return { text: clean(o.text), ...L, hasBy: !!L.by, op: 1, onClick: () => this.sel('statement', o.id) }; }) };
+      d.passage = this.passageSegments(st, ''); d.hasPassage = d.passage.length > 0;
+      d.passageNote = 'the sentence the fold read · dotted: a name · amber: a figure · grey: a date';
       // A non-entity word selected this proposition: lead with the word's parts of speech, and show — under the hood —
       // the proposition's own EOT atoms, the minimal content units the fold reads it as.
       const w = sel.word ? String(sel.word) : '';
       if (w) {
+        d.passage = this.passageSegments(st, w); d.hasPassage = d.passage.length > 0;
+        d.passageNote = 'the highlighted word is the one you clicked · dotted: a name · amber: a figure · grey: a date';
         const hd = window.__holodeck; const pos = (hd && hd.hdPos) ? hd.hdPos(w) : null;
         const pe = pos ? Object.entries(pos).sort((a, b) => b[1] - a[1]) : null; const psum = pe ? (pe.reduce((s, e) => s + e[1], 0) || 1) : 1;
         const tags = pe ? pe.slice(0, 3).map(([k, v]) => (POS_L[k] || k) + ' ' + Math.round(100 * v / psum) + '%').join(' · ') : '';
@@ -12643,11 +12930,15 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
     } else if (sel.type === 'topic') {
       const g = (this.paradigmGroups(A).groups || []).find(x => x.label === sel.id);
       if (g) {
-        const kx = TOPIC_KIND(g);
-        d = { eyebrow: kx.e, color: kx.c, title: g.label,
-          facts: [{ k: 'Sources', v: plural(g.n, 'source') }, { k: 'For whom', v: (g.forWhom || []).join(' · ') || '—' }, ...(g.kind === 'measure' ? [{ k: 'Values', v: String((g.findings || []).length) }] : [])],
+        // the SAME shape as a referent's panel: the element kind leads (never a machine-assigned
+        // terrain), the tuple's induced keys are the profile rows, the terrain is the muted line.
+        const tv = this.topicProfileVals(A, g.label);
+        d = { eyebrow: tv.eyebrow, color: tv.color, title: g.label,
+          facts: tv.facts,
+          profKind: tv.profKind, profCount: tv.profCount, profRows: tv.profRows, hasProf: tv.hasProf,
           tags: (g.forWhom || []).map(nm => ({ label: nm, color: 'var(--line2)', onClick: () => (A.names[nm] ? this.openProfile(nm) : null) })), tagTitle: 'For whom',
           actions: [{ label: 'Segment to this topic', onClick: () => this.toggleTopicGroup(g) }],
+          footText: tv.footText, hasFoot: tv.hasFoot,
           listTitle: 'What it finds', list: (g.findings || []).map(f => ({ text: clean(f.text), src: f.title, date: '', by: '', hasBy: false, op: 1, pinLabel: '', pinColor: 'transparent', onClick: () => (f.doc ? this.read(f.doc) : null) })) };
       }
     }
@@ -12662,7 +12953,7 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
       const shown = []; let used = 0; for (const x of paras) { if (used > 2400 || shown.length >= 12) break; shown.push({ text: x.length > 600 ? x.slice(0, 600) + '…' : x }); used += x.length; }
       Object.assign(d, T, { hasThumb: true, hasTx: shown.length > 0, tx: shown, txTitle: (dd.media ? 'Transcript' : 'Text') + (full.length > 9000 || paras.length > shown.length ? ' · first ' + shown.length + ' passages' : ''), txNote: dd.media ? 'A machine reading of the sound, not checked by a person.' : 'As read from the source; spellings follow the scan.', txOpen: () => this.read(dd.id) });
     }
-    d.hasQuote = !!d.quote; d.hasTags = !!(d.tags && d.tags.length); d.hasList = !!(d.list && d.list.length);
+    d.hasQuote = !!d.quote && !d.hasPassage; d.hasTags = !!(d.tags && d.tags.length); d.hasList = !!(d.list && d.list.length);
     const LN = this.state.selAll ? Infinity : 4; const fullN = (d.list || []).length; d.list = (d.list || []).slice(0, LN); d.hasMoreList = fullN > d.list.length; d.moreList = 'Show all ' + fullN; d.onMoreList = () => this.setState({ selAll: true });
     if (fullN > 1) d.listTitle += ' · ' + fullN;
     return { noSel: false, hasSel: true, d, clearSel: () => this.setState({ sel: null }) };
