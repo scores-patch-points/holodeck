@@ -10575,21 +10575,33 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
   async maybeSample() {
     let want = ''; try { want = new URLSearchParams(location.search).get('ws') || ''; } catch (e) {}
     const id = 'titanic-1912'; if (want && want !== id) return;   // an address asked for something else
-    await this.sampleMeta();
+    const M = await this.sampleMeta();
+    const Sp = M && M.samples && M.samples[id];
+    if ((this.state.added[id] || []).length) {
+      // A sample already installed still refreshes when the sample's own version moves on (its readings change on our
+      // side). The stored version is the pointer: a returning visitor gets the current readings, not a pinned old copy.
+      let stored = 0; try { stored = Number(localStorage.getItem('hd:sample-ver:' + id) || 0); } catch (e) {}
+      if (Sp && Number(Sp.version || 1) > stored) { await this.loadSample(id, { reinstall: true }); return; }
+      if (want === id) this.setState({ corpus: id, view: 'summary', sel: null, f: {}, readDoc: null });
+      return;
+    }
     let done = null; try { done = localStorage.getItem('hd:sample:' + id); } catch (e) {}
-    if ((this.state.added[id] || []).length) { if (want === id) this.setState({ corpus: id, view: 'summary', sel: null, f: {}, readDoc: null }); return; }
     const hasOther = Object.keys(this.state.added || {}).some(k => k !== id && (this.state.added[k] || []).length);
     if (want !== id && (done || hasOther)) return;   // never over a returning visitor's own work, unless asked by address
     await this.loadSample(id);
     try { localStorage.setItem('hd:sample:' + id, '1'); } catch (e) {}
   }
-  async loadSample(id) {
+  async loadSample(id, o = {}) {
     if (this._sampleOn) return; this._sampleOn = true;
     const M = await this.sampleMeta();
     const Sp = M && M.samples && M.samples[id];
     if (!Sp) { this._sampleOn = false; return; }
     const names = loadWorkspaceNames(); if (!names[id]) { names[id] = Sp.name; saveWorkspaceNames(names); }
-    if (!this.state.added[id]) { const added = { ...this.state.added, [id]: [] }; this.saveAdded(added); this.setState({ added }); }
+    if (o.reinstall) {
+      // a newer sample: drop this workspace's old sources and their stored bytes, then install the current readings below
+      (this.state.added[id] || []).forEach(d => { try { if (this._html) delete this._html[d.id]; } catch (e) {} try { idbDel('html:' + d.id); idbDel('pdf:' + d.id); } catch (e) {} });
+      const added = { ...this.state.added, [id]: [] }; this.saveAdded(added); this.setState({ added, htmlVer: (this.state.htmlVer || 0) + 1 });
+    } else if (!this.state.added[id]) { const added = { ...this.state.added, [id]: [] }; this.saveAdded(added); this.setState({ added }); }
     this.setState({ corpus: id, view: 'summary', sel: null, f: {}, readDoc: null, folder: null });
     // The readings were digested once, on our side (see the samples repo); here they are installed, never re-read.
     // The recordings are pointers: their bytes are fetched the first time one is opened. The reading tiles still
@@ -10623,6 +10635,7 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
     }
     this._keepReading = false; this.endReading(); this.foldStaged({});
     this._sampleOn = false;
+    try { localStorage.setItem('hd:sample-ver:' + id, String(Sp.version || 1)); } catch (e) {}
     if (got) this.toast((Sp.name || 'The sample') + ' — ' + got + ' source' + (got === 1 ? '' : 's') + ' ready. Open any one, or read across all of them.');
   }
   async vmLoad(o = {}) {
