@@ -2,6 +2,7 @@
 <html>
 <head>
 <meta charset="utf-8">
+<title>the fold — a reading and research surface</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#17171a">
 <meta property="og:title" content="the fold — a reading and research surface">
@@ -6360,8 +6361,8 @@ class Component extends DCLogic {
     HD_POS_P.then(ok => { if (ok) { this._key = null; this.setState(st => ({ htmlVer: st.htmlVer + 1 })); } });
     hdLoadReference().then(ok => { if (ok) { this._key = null; this.setState(st => ({ htmlVer: st.htmlVer + 1 })); } }).catch(() => {}); // re-read names once the received normal (General English) is in — results never depend on load timing
     setTimeout(() => { try { this.netInit(); } catch (e) {} }, 800);
-    // The demo sample: the pointer lives in this repo (samples.json); the content is downloaded when the app opens
-    // (maybeSample — once per browser per sample, never over an explicit address or a person's own work).
+    // The sample is OPT-IN BY ADDRESS: ?ws=<id> asks for it (maybeSample). A bare open installs
+    // nothing — the app lands in the person's own (empty) workspace, never on a demo's content.
     setTimeout(() => { try { this.maybeSample(); } catch (e) {} }, 900);
     setTimeout(() => this.measureHdr(), 400);
     setTimeout(() => { try { this.akAutoLoad(); } catch (e) {} }, 2500);
@@ -11209,22 +11210,22 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
     return { show: !done, lead: Sp.intro.lead || Sp.name || '', line: Sp.intro.line || '', hint: Sp.intro.hint || '', hasHint: !!Sp.intro.hint, legend: '',
       onClose: () => { try { localStorage.setItem('hd:intro:' + ws, '1'); } catch (e) {} this.forceUpdate(); } };
   }
+  // A sample is OPT-IN BY ADDRESS: it installs only when the address names it (?ws=titanic-1912).
+  // A bare open never seeds a demo over a person's own workspace — the app starts empty.
   async maybeSample() {
     let want = ''; try { want = new URLSearchParams(location.search).get('ws') || ''; } catch (e) {}
-    const id = 'titanic-1912'; if (want && want !== id) return;   // an address asked for something else
+    const id = 'titanic-1912'; if (want !== id) return;   // nothing is installed unless asked for by address
     const M = await this.sampleMeta();
     const Sp = M && M.samples && M.samples[id];
+    if (!Sp) return;
     if ((this.state.added[id] || []).length) {
       // A sample already installed still refreshes when the sample's own version moves on (its readings change on our
       // side). The stored version is the pointer: a returning visitor gets the current readings, not a pinned old copy.
       let stored = 0; try { stored = Number(localStorage.getItem('hd:sample-ver:' + id) || 0); } catch (e) {}
-      if (Sp && Number(Sp.version || 1) > stored) { await this.loadSample(id, { reinstall: true }); return; }
-      if (want === id) this.setState({ corpus: id, view: 'summary', sel: null, f: {}, readDoc: null });
+      if (Number(Sp.version || 1) > stored) { await this.loadSample(id, { reinstall: true }); return; }
+      this.setState({ corpus: id, view: 'summary', sel: null, f: {}, readDoc: null });
       return;
     }
-    let done = null; try { done = localStorage.getItem('hd:sample:' + id); } catch (e) {}
-    const hasOther = Object.keys(this.state.added || {}).some(k => k !== id && (this.state.added[k] || []).length);
-    if (want !== id && (done || hasOther)) return;   // never over a returning visitor's own work, unless asked by address
     await this.loadSample(id);
     try { localStorage.setItem('hd:sample:' + id, '1'); } catch (e) {}
   }
