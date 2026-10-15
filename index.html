@@ -210,7 +210,7 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
 <div class="hd-shell {{ shellCls }}" style="display:flex;align-items:flex-start;min-height:100vh">
   <div class="hd-rail {{ railCls }}" onClick="{{ onRailClick }}" style="{{ railStyle }}">
     <div class="hd-railtop" style="display:flex;align-items:center;justify-content:space-between;gap:6px;padding:2px 2px 2px 10px">
-      <sc-if value="{{ railOpen }}" hint-placeholder-val="{{ true }}"><div style="display:flex;align-items:center;gap:10px;min-width:0"><span style="width:12px;height:12px;border-radius:3px;background:var(--acc2);flex:none"></span><span style="font:600 13px var(--mono),monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--ink);white-space:nowrap">Holodeck</span></div></sc-if>
+      <sc-if value="{{ railOpen }}" hint-placeholder-val="{{ true }}"><div style="display:flex;align-items:center;gap:10px;min-width:0"><span style="width:12px;height:12px;border-radius:3px;background:var(--acc2);flex:none"></span><span style="font:600 13px var(--mono),monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--ink);white-space:nowrap">Holodeck</span><a href="mailto:scores.patch.points@proton.me?subject=Holodeck%20beta%20feedback" title="Beta: this surface is in progress — send feedback to scores.patch.points@proton.me" style="font:600 10px var(--mono),monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--acc);border:1px solid var(--acc2);border-radius:999px;padding:1px 7px;flex:none;text-decoration:none">beta</a></div></sc-if>
       <div style="display:flex;align-items:center;gap:4px;flex:none">
         <sc-if value="{{ hasContent }}" hint-placeholder-val="{{ false }}"><button class="hd-topadd" onClick="{{ openAdd }}" title="Add a source: a file, a folder, a link or pasted text">＋ Add</button></sc-if>
         <button class="hd-menubtn" onClick="{{ toggleRailMenu }}" aria-expanded="{{ railMenu }}" title="Workspace, folders, topics and tools">{{ railMenuLabel }}</button>
@@ -413,6 +413,7 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
       </details>
       </sc-if>
     </nav>
+    <div style="margin:8px 8px 4px;padding:9px 10px;border:1px dashed var(--line2);border-radius:8px;font:400 11.5px/1.5 var(--sans);color:var(--mut)">Beta — the Holodeck is in progress. Found a bug or have an idea? <a href="mailto:scores.patch.points@proton.me?subject=Holodeck%20beta%20feedback" style="color:var(--acc);text-decoration:none;font-weight:600">Send feedback</a>.</div>
     </sc-if>
   </div>
   <div class="hd-column" style="flex:1 1 0;min-width:0;box-sizing:border-box;{{ colPad }}">
@@ -4567,6 +4568,19 @@ function paradigms(A) {
     return { docs: ds, label, n: ds.length };
   }).sort((a, b) => b.n - a.n);
   return { groups: groupsOut, strayN };
+}
+// A topic is named for the name its members share, and two separate components can both land on the same
+// name (sources that name the subject without echoing each other's claims): fold same-named groups into
+// one, so the rail never shows the same topic twice.
+function mergeTopicGroups(groups) {
+  const by = new Map(), out = [];
+  (groups || []).forEach(g => {
+    const key = String(g.label || '').trim().toLowerCase().replace(/\s+/g, ' ');
+    const hit = key ? by.get(key) : null;
+    if (hit) { const have = new Set(hit.docs.map(d => d.id)); (g.docs || []).forEach(d => { if (!have.has(d.id)) { hit.docs.push(d); have.add(d.id); } }); hit.n = hit.docs.length; }
+    else { const c = { ...g, docs: (g.docs || []).slice() }; if (key) by.set(key, c); out.push(c); }
+  });
+  return out.sort((a, b) => b.n - a.n);
 }
 const QW = new Set('who whom whose what when where why how which did does do is are was were can could should has have had will would much many the a an of to in on at for by with and or from about as be been it its this that there any some between into than then them they their our your my me i we you us all'.split(' '));
 const qStem = w => w.length > 4 ? w.replace(/(ings|ing|ied|ies|ed|es|s)$/, '') : w;
@@ -9534,6 +9548,7 @@ class Component extends DCLogic {
         const ft = fieldTopics(A.docs, FC);
         if (ft.groups.length && ft.strayN < claims.strayN) this._pg = ft;
       } catch (e) { /* the claim-based topics stand */ }
+      if (this._pg) this._pg = { ...this._pg, groups: mergeTopicGroups(this._pg.groups || []) };
     }
     return this._pg;
   }
