@@ -10134,7 +10134,7 @@ class Component extends DCLogic {
       noDiverge: !(SU && SU.perspectives && SU.perspectives.pairs.some(p => p.conflicting.length)),
       suCursors: SU_CURSORS.map(c => { const on = SU && SU.cur === c.id; return { label: c.label, desc: c.desc, bg: on ? 'var(--sel)' : 'var(--s1)', bd: on ? 'var(--acc2)' : 'var(--line2)', fw: on ? 600 : 500, onClick: () => this.setState({ cursor: c.id, suN: 30 }) }; }),
       suReadingEmpty: !!(SU && SU.cur === 'reading' && SU.n === 0),
-      ...(() => { const S2 = this.state; const list = this.foldersFor(); const open = this._foldersOpen === true || !!S2.folder; /* closed by default (chrome diet); a scoped folder keeps it open */
+      ...(() => { const S2 = this.state; const list = this.foldersFor(); const open = this._foldersOpen !== false || !!S2.folder; /* open from the start (a person collapses it, and the collapse sticks); a scoped folder keeps it open */
         const items = list.map(f => { const on = S2.folder === f.id; const renaming = S2.folderRename === f.id; return { label: f.name, n: String((f.docs || []).length), bg: on ? 'var(--sel)' : 'transparent', bd: on ? 'var(--acc2)' : 'var(--line)', weight: on ? 600 : 500,
           onClick: () => this.setState({ folder: on ? null : f.id }), hasRemove: true, onRemove: e => { if (e && e.stopPropagation) e.stopPropagation(); this.removeFolder(f.id); },
           renaming, notRenaming: !renaming, onRenameStart: e => { if (e && e.stopPropagation) e.stopPropagation(); this.setState({ folderRename: f.id, folderNameDraft: f.name }); }, onRename: e => this.setState({ folderNameDraft: e.target.value }), onRenameKey: e => { if (e.stopPropagation) e.stopPropagation(); if (e.key === 'Enter') this.finishFolderRename(f.id); if (e.key === 'Escape') this.setState({ folderRename: null }); }, onRenameSave: e => { if (e && e.stopPropagation) e.stopPropagation(); this.finishFolderRename(f.id); } }; });
@@ -10153,7 +10153,7 @@ class Component extends DCLogic {
     return {
       ...this._extra,
       ...svVals,
-      sourceKindsUseful: tabs.length > 2, showSourceGroupLabels: svVals.svCardGroups.length > 1, hasGaps: false, /* "What to check" hidden for now; restore with gaps.length > 0 */ toolsOpen: ['names', 'records', 'connections', 'ingest'].includes(view), timeFilterActive: !!f.range, timeControlLabel: f.range ? 'Time filter · active' : 'Filter by time',
+      sourceKindsUseful: tabs.length > 2, showSourceGroupLabels: svVals.svCardGroups.length > 1, hasGaps: false, /* "What to check" hidden for now; restore with gaps.length > 0 */ toolsOpen: this._toolsOpen !== false || ['names', 'records', 'connections', 'ingest'].includes(view), timeFilterActive: !!f.range, timeControlLabel: f.range ? 'Time filter · active' : 'Filter by time',
       srcGroups: svVals.svCardGroups.map(g => ({ ...g, ...this.capL('sg:' + g.label, g.items, 60) })),
       hasPairsHidden: D.edgeHidden > 0, pairsHidden: plural(D.edgeHidden, 'other pair') + ' share a statement only once, or no more often than chance would give, so ' + (D.edgeHidden === 1 ? 'it is' : 'they are') + ' left out.',
       readerSeen: !!(S.readDoc && A.docById[S.readDoc] && this.mOf(A.docById[S.readDoc]).status === 'seen'),
@@ -10176,7 +10176,7 @@ class Component extends DCLogic {
       wsAdding: !!S.wsAdding, wsNotAdding: !S.wsAdding, wsAddStart: () => this.setState({ wsAdding: true, wsNewName: '' }),
       wsNotRenaming: !S.wsRenaming,
       corpusId: cid, corpusOptions: opts, q: S.q, corpusName: this.corpusName(), segList, hasSegments, segOpen, segToggleLabel, segCount, toggleSegOpen, addAsFold, navTop, navRead, navExplore, navRest, ...browseVals,
-      topicsList, hasTopics, topicsOpen: !!activeTopicGroup || !!topicsQ, topicsLabel: P.groups.length ? 'Topics · ' + P.groups.length : 'Topics', topicsNote, hasTopicsNote, topicsStrayN, showTopicsStray, onTopicsStray, scope,
+      topicsList, hasTopics, topicsOpen: hasTopics || !!activeTopicGroup || !!topicsQ, topicsLabel: P.groups.length ? 'Topics · ' + P.groups.length : 'Topics', topicsNote, hasTopicsNote, topicsStrayN, showTopicsStray, onTopicsStray, scope,
       topicsHasSearch, topicsSearchVal, onTopicsSearch, topicsHasPager, topicsPagerLine, onTopicsPrev, onTopicsNext, topicsHasPrev, topicsHasNext, topicsPageN: (topicsPage + 1) + ' of ' + topicsPages,
       toggleTheme: () => { const th = S.theme === 'dark' ? 'light' : 'dark'; try { localStorage.setItem('fold-explorer-theme', th); } catch (e) {} this.setState({ theme: th }); },
       workspaceClass: S.akFocus && view === 'ask' ? 'hd-workspace-surface hd-focus' : 'hd-workspace-surface',
