@@ -683,7 +683,7 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
               <button onClick="{{ intro.onClose }}" title="Dismiss this card" style="background:none;border:0;color:var(--mut);cursor:pointer;font:500 16px var(--sans);padding:0 2px;flex:none">✕</button>
             </div>
             <sc-if value="{{ intro.hasHint }}" hint-placeholder-val="{{ false }}"><span style="font:400 13px var(--sans);color:var(--acc)">{{ intro.hint }}</span></sc-if>
-            <span style="font:400 12.5px/1.45 var(--sans);color:var(--mut)">{{ intro.legend }} <a href="demo-guide.html" style="color:var(--acc);white-space:nowrap">What am I looking at? →</a></span>
+            <span style="font:400 12.5px/1.45 var(--sans);color:var(--mut)">{{ intro.legend }}</span>
           </div>
         </sc-if>
         <div class="hd-drive-bar">
@@ -4568,10 +4568,17 @@ function paradigms(A) {
   const strayN = comps.length - real.length;
   if (!real.length) return { groups: [], strayN };
   const groupsOut = real.map(ds => {
-    const idSet = new Set(ds.map(d => d.id)); let best = null, bestN = 0;
-    // most mentions inside this component, not full containment -- a component can be a chain (A-B via one
-    // name, B-C via another) with no single name spanning every member, and still be a real paradigm
-    Object.values(A.names).forEach(n => { if (n.docs.size > hubFloor) return; const inside = n.sts.filter(id => idSet.has(A.byId[id].doc)).length; if (inside > bestN) { bestN = inside; best = n; } });
+    const idSet = new Set(ds.map(d => d.id)); let best = null, bestDocs = 0, bestMentions = 0;
+    // The label is the name that spans the MOST of the component's documents (breadth first, mentions to break
+    // ties). A name repeated many times inside a single member — a character in one screenplay — must not name a
+    // topic that many sources share; the subject most of them actually carry does. A component can be a chain
+    // (A-B via one name, B-C via another) with no single name spanning every member and still be a real paradigm.
+    Object.values(A.names).forEach(n => {
+      const insideDocs = [...n.docs].reduce((c, id) => c + (idSet.has(id) ? 1 : 0), 0);
+      if (!insideDocs) return;
+      const mentions = n.sts.reduce((c, id) => c + (idSet.has(A.byId[id].doc) ? 1 : 0), 0);
+      if (insideDocs > bestDocs || (insideDocs === bestDocs && mentions > bestMentions)) { bestDocs = insideDocs; bestMentions = mentions; best = n; }
+    });
     let label = best ? best.name : null;
     // a topic held together by the holograph may have no name spanning it (the same story told with
     // different proper names) -- name it by the content word its statements repeat most, else the first title
@@ -10568,8 +10575,7 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
     const ws = this.corpusId(), Sp = this._spM && this._spM[ws];
     if (!Sp || !Sp.intro) return { show: false };
     let done = false; try { done = localStorage.getItem('hd:intro:' + ws) === '1'; } catch (e) {}
-    return { show: !done, lead: Sp.intro.lead || Sp.name || '', line: Sp.intro.line || '', hint: Sp.intro.hint || '', hasHint: !!Sp.intro.hint,
-      legend: 'Open a source: its names, figures and dates are marked where they appear — click one to see where it came from. Nothing here is answered from memory.',
+    return { show: !done, lead: Sp.intro.lead || Sp.name || '', line: Sp.intro.line || '', hint: Sp.intro.hint || '', hasHint: !!Sp.intro.hint, legend: '',
       onClose: () => { try { localStorage.setItem('hd:intro:' + ws, '1'); } catch (e) {} this.forceUpdate(); } };
   }
   async maybeSample() {
