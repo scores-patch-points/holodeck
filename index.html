@@ -3848,7 +3848,7 @@ function hdEngineMerge(t, ns, eng, hy) {
   return out.sort((a, b) => a.s - b.s);
 }
 // read-only handle for tests: the real functions, so a harness can recompute what a trace claims happened
-setTimeout(() => { try { window.__holodeck = Object.freeze({ analyze, holoKit, paradigms, fieldTopics, fieldCatalog, splitSentences, findNames, isJunk, readAny, hdHygiene, hdPos: w => hdPos(w), hdPosForms: () => HD_POS, hdDeclReady: () => !!HD_DECL, hdEngineReady: () => !!HD_ENGINE, hdReaderReady: () => hdReaderReady(), hdAttrReady: () => hdAttrReady(), hdHoldReady: () => hdHoldReady(), summarizeHolders: (sts, names) => (HD_ATTR ? HD_ATTR.summarizeHolders(sts, names) : null) }); } catch (e) {} }, 0);
+setTimeout(() => { try { window.__holodeck = Object.freeze({ analyze, holoKit, holoName, paradigms, holoTopics, fieldTopics, fieldCatalog, splitSentences, findNames, isJunk, readAny, hdHygiene, hdPos: w => hdPos(w), hdPosForms: () => HD_POS, hdDeclReady: () => !!HD_DECL, hdEngineReady: () => !!HD_ENGINE, hdReaderReady: () => hdReaderReady(), hdAttrReady: () => hdAttrReady(), hdHoldReady: () => hdHoldReady(), summarizeHolders: (sts, names) => (HD_ATTR ? HD_ATTR.summarizeHolders(sts, names) : null) }); } catch (e) {} }, 0);
 const hdCut = (t, n) => { t = String(t || '').replace(/\s+/g, ' ').trim(); return t.length > n ? t.slice(0, n - 1) + '…' : t; };
 function splitSentences(text, tr) {
   const out = []; const re = /[^\n]+?(?:[.!?]+(?=\s|$)|(?=\n)|$)/g; let m;
@@ -4607,6 +4607,100 @@ function mergeTopicGroups(groups) {
   });
   return out.sort((a, b) => b.n - a.n);
 }
+// Topics from the HOLOGRAPH's own elements, each carrying whatever SUBSET of the sources
+// it actually spans. A topic is not a connected doc-component and not a word frequency:
+// the holograph itself holds three kinds of thing together, and each is a topic in its
+// own right —
+//   · a RESTATED CLAIM — the statements the near-echo graph holds together (the same
+//     claim, relationship or figure restated across sources);
+//   · a MEASURE SLOT   — the same figure-slot (unit | measure | anchor) in two sources;
+//   · a BOND           — an entity pair the holograph holds together.
+// The elements are listed individually and merged by label; they are NEVER unioned across
+// elements, which is what collapsed a whole single-subject corpus into one blob. A bond
+// whose every entity is the corpus hub (reach > sqrt(N)+1) is the subject, not a part of
+// it, and is dropped; a measure anchored to the hub is named by its unit alone.
+// A topic is a thing the SOURCES share — not a neighbourhood of words. The holograph's own
+// elements are the only shared things worth naming, and each is named by itself, in 1–2 words:
+//   · an ENTITY the holograph admits (holoName) that ≥2 sources carry and that is NOT the hub;
+//   · a BOND — an entity pair the holograph holds together (one side selective, so not the hub);
+//   · a MEASURE — a figure-slot (unit | measure | anchor) ≥2 sources carry, a DIFFERENCE when
+//     they disagree on the value.
+// A near-echo cluster (statements alike in wording) is NOT a topic: it shares no entity and no
+// measure, so its name would be a stray token. Selectivity is what makes a difference — an
+// element the whole corpus carries is the subject, not a part of it, and is left as strayN.
+function holoTopics(A) {
+  const none = { groups: [], strayN: A.docs.length, basis: 'holograph' };
+  if (!A || A.docs.length < 2) return none;
+  const K = holoKit(A, { cur: 'pub', srcShort: () => '' });
+  const N = A.docs.length, hub = Math.sqrt(N) + 1;
+  const docOf = id => A.docById[id];
+  const title = id => (docOf(id) || {}).title || id;
+  const reach = n => ((A.names[n] || {}).docs || new Set()).size;
+  const groups = [];
+  // a 1–2 word label is the shared element's own head noun (abbreviations dropped), never a word from a statement
+  const abbr = t => /[.]/.test(t) || (t.length <= 3 && t === t.toUpperCase());
+  const cap = s => String(s).replace(/\b\w/g, c => c.toUpperCase());
+  const shortName = s => { const raw = String(s).split(/\s+/).filter(Boolean); const t = raw.filter(x => !abbr(x)); return (t.length ? t : raw).slice(0, 2).join(' '); };
+  const repPerDoc = sts => { const by = new Map(); sts.forEach(st => { if (!st || st.ref) return; const have = by.get(st.doc); if (!have || String(st.text).length > String(have.text).length) by.set(st.doc, st); }); return [...by].map(([doc, st]) => ({ doc, text: short(st.text, 220), title: title(doc) })); };
+
+  // ── ENTITY topics: every name the holograph admits (holoName) that ≥2 sources carry and that
+  // is not the hub — the whole cast, so the topic list grows with the corpus. A label that is a
+  // number or a common word (ONE, WATER, PREFACE) is not a name and is dropped. ──
+  Object.values(A.names).forEach(r => {
+    const dsz = r.docs.size; if (dsz < 2 || dsz > hub || !holoName(r.name, A)) return;
+    const lbl = cap(shortName(r.name));
+    const lc = lbl.toLowerCase();
+    if (!lbl || lc.length < 3 || /\d/.test(lbl) || TOPIC_JUNK.has(lc) || TOPIC_JUNK.has(lc.replace(/^the /, ''))) return;
+    const findings = repPerDoc(r.sts.map(id => A.byId[id])); if (findings.length < 2) return;
+    const docs = [...r.docs].map(docOf).filter(Boolean); if (docs.length < 2) return;
+    groups.push({ kind: 'entity', type: r.type, label: lbl, docs, n: docs.length, findings, forWhom: [r.name] });
+  });
+
+  // ── MEASURE topics: the same figure-slot (unit | measure | anchor) in ≥2 sources ──
+  const meas = new Map();
+  A.sts.forEach(st => { if (st.ref || !st.claimy) return;
+    K.figsOf(st, K.namesOf(st)).forEach(f => { const m = f.measure || f.unit || ''; if (!f.anchor && !m) return;
+      const key = m + '\u0001' + (f.anchor || ''); let o = meas.get(key);
+      if (!o) meas.set(key, o = { docs: new Set(), vals: new Map(), anchor: f.anchor, m });
+      o.docs.add(st.doc); let d = o.vals.get(f.raw); if (!d) o.vals.set(f.raw, d = new Set()); d.add(st.doc); }); });
+  meas.forEach(o => { const docs = [...o.docs].map(docOf).filter(Boolean); if (docs.length < 2) return;
+    if (!o.anchor) return;   // a figure with no anchor is about no one: not meaningful, no for-whom
+    const findings = [...o.vals].sort((a, b) => b[1].size - a[1].size).slice(0, 12).map(([v, ds]) => ({ text: v, doc: [...ds][0], title: [...ds].map(title).join(' · ') }));
+    groups.push({ kind: 'measure', label: cap(shortName(o.m || 'figure')), docs, n: docs.length, findings, forWhom: [o.anchor], differs: o.vals.size > 1 }); });
+
+  // ── BOND topics: an entity pair the holograph holds together (at least one side selective) ──
+  const bond = new Map();
+  A.sts.forEach(st => { if (st.ref || !st.claimy) return; const ns = K.namesOf(st);
+    for (let i = 0; i < ns.length; i++) for (let j = i + 1; j < ns.length; j++) { const a = ns[i], b = ns[j]; if (a.includes(b) || b.includes(a)) continue;
+      const k = a < b ? a + '\u0001' + b : b + '\u0001' + a; let o = bond.get(k);
+      if (!o) bond.set(k, o = { docs: new Set(), a: a <= b ? a : b, b: a <= b ? b : a });
+      o.docs.add(st.doc); } });
+  bond.forEach(o => { const docs = [...o.docs].map(docOf).filter(Boolean); if (docs.length < 2) return;
+    const ra = reach(o.a), rb = reach(o.b); if (Math.min(ra, rb) > hub) return;   // both hub: the subject, not a part
+    const keep = ra <= rb ? o.a : o.b;                                            // name the bond by its rarer member
+    const findings = [{ text: o.a + ' · ' + o.b, doc: [...o.docs][0], title: [...o.docs].map(title).join(' · ') }];
+    groups.push({ kind: 'bond', label: cap(shortName(keep)), pair: [o.a, o.b], docs, n: docs.length, findings, forWhom: [o.a, o.b] }); });
+
+  // merge same-label elements; a DIFFERENCE the sources disagree on leads, then what more sources share
+  const merged = mergeTopicGroups(groups.filter(g => (g.forWhom || []).length));   // no for-whom, no topic
+  merged.sort((a, b) => (b.differs ? 1 : 0) - (a.differs ? 1 : 0) || b.n - a.n);
+  const placed = new Set(merged.flatMap(g => g.docs.map(d => d.id)));
+  return { groups: merged, strayN: A.docs.length - placed.size, basis: 'holograph' };
+}
+// Labels that are not a name: number words, function words, and capitalized common words the
+// name reader admits but that do no work in the picture. Kept small and honest — an entry here
+// only removes a topic, never invents one.
+const TOPIC_JUNK = new Set(('one two three four five six seven eight nine ten eleven twelve twenty thirty forty fifty sixty seventy eighty ninety hundred thousand all any some none each every many most few more less other another same such own my our your their his her its our yours theirs who whom whose what which when where why how this that these those there here then than now do does did done doing be been being am is are was were will would shall should can could may might must not no yes help fig preface contents index chapter part volume section god bible lord messrs mr mrs miss dr sir water hold holds speed life heart breadth depth length height width weight displacement tonnage gross net separate city of old new world women children men women child first second third fourth african american americans english british german irish french turkish russian italian spanish european government state states county city town').split(' '));
+const TOPIC_KIND = (kind, type) => kind === 'measure' ? { e: 'Measure · a figure slot', c: 'var(--amber)' }
+  : kind === 'bond' ? { e: 'Bond · a relationship', c: 'var(--blue)' }
+  : { e: 'Entity · ' + ((typeof TYPE_L !== 'undefined' && TYPE_L[type]) ? TYPE_L[type].toLowerCase() : 'named') + ' across the sources', c: (typeof TYPE_C !== 'undefined' && TYPE_C[type]) || 'var(--acc)' };
+// A topic says, in one line, what it is and what is at stake for whom — the title is the 1–2
+// word label, this is the subtitle under it.
+const topicSubtitle = g => { const who = g.forWhom || [];
+  if (g.kind === 'measure') return who[0] + '’s ' + String(g.label).toLowerCase() + (g.differs ? ' — the sources state it ' + plural((g.findings || []).length, 'way') + ', and they disagree.' : ', stated by ' + plural(g.n, 'source') + '.');
+  if (g.kind === 'bond') return who.join(' and ') + ', held together in ' + plural(g.n, 'source') + '.';
+  const ty = (typeof TYPE_L !== 'undefined' && TYPE_L[g.type]) ? TYPE_L[g.type].toLowerCase().replace(/s$/, '') : 'name';
+  return 'A ' + ty + ' named across ' + plural(g.n, 'source') + (who[0] ? ' — ' + who[0] + '.' : '.'); };
 const QW = new Set('who whom whose what when where why how which did does do is are was were can could should has have had will would much many the a an of to in on at for by with and or from about as be been it its this that there any some between into than then them they their our your my me i we you us all'.split(' '));
 const qStem = w => w.length > 4 ? w.replace(/(ings|ing|ied|ies|ed|es|s)$/, '') : w;
 const IS_Q = s => { s = (s || '').trim(); return /\?$/.test(s) || (/^(who|whom|whose|what|when|where|why|how|which|did|does|do|is|are|was|were|can|could|should|has|have|will)\b/i.test(s) && s.split(/\s+/).length >= 3); };
@@ -8640,6 +8734,7 @@ class Component extends DCLogic {
     return null;
   }
   backLabel(A) { const t = this.backTarget(); if (!t) return null;
+    if (t.sel && t.sel.type === 'topic' && t.view === 'profile') return t.sel.id;
     if (t.sel && t.sel.type === 'name' && (t.view === 'profile' || t.view === 'reader')) return t.sel.id;
     if (t.view === 'reader' && t.readDoc && A.docById[t.readDoc]) return short(A.docById[t.readDoc].title, 60);
     return { names: 'names', search: 'search results', summary: 'sources', surprise: 'junctions' }[t.view] || 'previous view'; }
@@ -9708,22 +9803,26 @@ class Component extends DCLogic {
     if (fast) { const r = { ...this._lastRV, ...this.draftVals(this.analysis()) }; this._lastRV = r; return r; }
     const r = this.renderValsFull(); this._lastRV = r; this._lastSt = this.state; return r;
   }
-  // A topic is a PARADIGM: the connected component the holograph's own
-  // connectors (restated claim, shared measure-anchor, shared bond) hold
-  // together — what is really at stake across the sources, named by the
-  // paradigm's own label (its spanning name, else its most-repeated content
-  // word). Never a single statement's keyword.
+  // A topic is a HOLOGRAPH ELEMENT the sources actually share — a restated claim, a
+  // measure-slot, or a bond — each one carrying its own SUBSET of the sources (see
+  // holoTopics). A corpus can therefore hold many topics at once; nothing is unioned
+  // across elements, so a single-subject corpus is not collapsed into one blob. The
+  // recurring-field engine is the fallback for a workspace with no claims to restate (a
+  // shelf of contracts), and never overrides the holograph.
   paradigmGroups(A) {
     if (this._pgA !== A) { this._pgA = A;
-      // two ways to find topics: sources that repeat a claim/relationship/figure (the holograph), and sources that
-      // share a recurring field value validated against body text. The page shows whichever places more sources.
-      const claims = paradigms(A); claims.basis = 'claims'; this._pg = claims;
-      try {
-        const FC = this._fc && this._fc.A === A ? this._fc : (this._fc = { A, ...fieldCatalog(A.docs) });
-        const ft = fieldTopics(A.docs, FC);
-        if (ft.groups.length && ft.strayN < claims.strayN) this._pg = ft;
-      } catch (e) { /* the claim-based topics stand */ }
-      if (this._pg) this._pg = { ...this._pg, groups: mergeTopicGroups(this._pg.groups || []) };
+      let pick = null;
+      try { const ht = holoTopics(A); if (ht.groups.length) pick = ht; } catch (e) { /* fall through to claims */ }
+      if (!pick) {
+        const claims = paradigms(A); claims.basis = 'claims'; pick = claims;
+        try {
+          const FC = this._fc && this._fc.A === A ? this._fc : (this._fc = { A, ...fieldCatalog(A.docs) });
+          const ft = fieldTopics(A.docs, FC);
+          if (ft.groups.length && ft.strayN < claims.strayN) pick = ft;
+        } catch (e) { /* the claim-based topics stand */ }
+      }
+      this._pg = pick;
+      if (this._pg && this._pg.basis !== 'holograph') this._pg = { ...this._pg, groups: mergeTopicGroups(this._pg.groups || []) };
     }
     return this._pg;
   }
@@ -9736,6 +9835,7 @@ class Component extends DCLogic {
     if (!this.state.ground) this.state.ground = { on: true, names: true, figures: true, dates: true, sentences: true };
     if (!this.state.readMode) this.state.readMode = 'original';
     const A = this.analysis(); const S = this.state; const f = S.f;
+    if (!this._realityTried) { try { this.ensureReality(A); } catch (e) {} }   // the khora's reality-register face, folded once
     this._cnt = new Set(A.docs.filter(d => this.counted(d)).map(d => d.id));
     const topicStr = (this.metaAll()[this.corpusId()] || {}).__topic || ''; this._topicStr = topicStr; this._fold = termsOf(topicStr);
     const inf = this.inferOrigins(A); this._inf = inf;
@@ -10271,7 +10371,7 @@ class Component extends DCLogic {
     const topicsPage = Math.min(S.topicsPage || 0, topicsPages - 1);
     const topicsShown = topicsAll.slice(topicsPage * TOPICS_PER_PAGE, (topicsPage + 1) * TOPICS_PER_PAGE);
     const topicsList = topicsShown.map(p => { const on = activeTopicGroup === p.label && !f.topicGroup.invert;
-      return { label: p.label, n: String(p.n), on, bg: on ? 'var(--sel)' : 'transparent', bd: on ? 'var(--acc2)' : 'transparent', weight: on ? 600 : 500, onJump: () => onTopicGroup(p) }; });
+      return { label: p.label, n: String(p.n), on, bg: on ? 'var(--sel)' : 'transparent', bd: on ? 'var(--acc2)' : 'transparent', weight: on ? 600 : 500, onJump: () => this.openTopic(p.label) }; });
     const topicsHasSearch = hasTopics;
     const topicsSearchVal = S.topicsQ || '';
     const onTopicsSearch = e => this.setState({ topicsQ: e.target.value, topicsPage: 0 });
@@ -10291,8 +10391,8 @@ class Component extends DCLogic {
       hasSegment: !!scopeSeg, segmentLabel: scopeSeg ? scopeSeg.label : '', onClearSegment: scopeSeg ? scopeSeg.onClear : null,
       filters: chips.map(ch => ({ k: ch.k, v: short(String(ch.v), 26), onClear: ch.onClear })),
       hasTopics: P.groups.length > 0,
-      topics: P.groups.slice(0, 5).map(p => { const on = activeTopicGroup === p.label && !(f.topicGroup && f.topicGroup.invert);
-        return { label: p.label, n: String(p.n), col: on ? 'var(--ink)' : 'var(--acc)', onClick: () => onTopicGroup(p) }; }),
+      topics: P.groups.slice(0, 8).map(p => { const on = activeTopicGroup === p.label && !(f.topicGroup && f.topicGroup.invert);
+        return { label: p.label, n: String(p.n), col: on ? 'var(--ink)' : 'var(--acc)', onClick: () => this.openTopic(p.label) }; }),
       hasStray: showTopicsStray, strayN: topicsStrayN, onStray: onTopicsStray,
     };
     // a fold row's own click both shows what it is (name, count, one-line description, always visible)
@@ -11920,6 +12020,83 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
     return { pfCo: { open: true, label: 'Hide company', toggle: () => this.setState({ pfCoOpen: false }), note: !r.ok ? r.why : r.list.length ? 'Names whose neighbouring words match ' + name + '’s more closely than 95% of pairs among the other names do. Spelling plays no part: this is where each name sits in a sentence.' : 'No name keeps company with ' + name + ' more closely than names do with each other at random.', list: r.ok ? r.list.map(x => ({ name: x.name, sim: x.sim.toFixed(2), shared: x.shared.length ? 'both appear ' + x.shared.join(', ') : '', onClick: () => this.openProfile(x.name) })) : [] } };
   }
   openProfile(name) { this.pushHist(); this.setState(s => ({ view: 'profile', readDoc: null, pfFrom: s.view === 'profile' ? s.pfFrom : s.view, sel: { type: 'name', id: name }, pfIdx: 0, pfAll: false, selAll: false })); if (typeof window !== 'undefined') window.scrollTo(0, 0); }
+  // A topic is a holograph element (a restated claim, a measure slot, a bond). Clicking one
+  // opens its own profile page — what it is, what it finds in each source, and the segment.
+  openTopic(label) { this.pushHist(); this.setState(s => ({ view: 'profile', readDoc: null, pfFrom: s.view === 'profile' ? s.pfFrom : s.view, sel: { type: 'topic', id: label }, pfIdx: 0, pfAll: false, selAll: false })); if (typeof window !== 'undefined') window.scrollTo(0, 0); }
+  // The topic profile, in the profile page's own shape (pf.*): the header carries the label as
+  // its H1, the facts say how many sources and of what kind, and "What it finds" lists, per
+  // source, the verbatim restatement (claim), each value and who states it (measure), or the
+  // bound pair and its sources (bond). Every row opens its source; nothing here is invented.
+  // The surface's DECLARED register rule (a giver): a source's register is read off its own
+  // declared kind, never induced from its bytes (reality-register.js doctrine). Unknown → 'unknown'
+  // (the organ refuses it, never guesses).
+  realityReg(d) { const t = String((d && (d.type || d.kind)) || '').toLowerCase() + ' ' + String((d && d.medium) || '').toLowerCase();
+    if (/screenplay|film|movie|novel|play|fiction|drama/.test(t)) return 'fiction';
+    if (/report|inquiry|audit/.test(t)) return 'report';
+    if (/speech|testimony|memoir|interview|biography/.test(t)) return 'testimony';
+    if (/newspaper|news|journal|press/.test(t)) return 'journalism';
+    if (/data|table|dataset/.test(t)) return 'data';
+    if (/reference|encyclopedia|wiki/.test(t)) return 'reference';
+    if (/comment|editorial|opinion|blog/.test(t)) return 'comment';
+    return 'unknown'; }
+  // Load the khora's reality-level organs once, then fold a reality-register per entity topic.
+  // A best-effort Wikipedia anchor (the organ's resolver); offline, the fold uses the declared
+  // registers alone. The surface renders the records and adds no ontology logic.
+  async ensureReality(A) {
+    if (this._realityTried) return; this._realityTried = true;
+    try {
+      const base = new URL('vendor/eoreader7/native/kernel/', location.href).href;
+      const RR = await import(base + 'reality-register.js');
+      this._realityRR = RR;
+      const ents = (this.paradigmGroups(A).groups || []).filter(g => g.kind === 'entity');
+      const srcBase = A.docs.map(d => ({ id: d.id, register: this.realityReg(d) }));
+      let resolve = null; try { resolve = RR.makeWikipediaResolver({ forWhom: { question: '', universeKind: 'world' } }); } catch (e) { resolve = null; }
+      const byName = new Map();
+      for (const g of ents) {
+        const name = (g.forWhom || [])[0]; if (!name) continue;
+        const docIds = new Set(((A.names || {})[name] || {}).docs || []);
+        const sources = srcBase.map(s => ({ ...s, referents: docIds.has(s.id) ? [name] : [] }));
+        let anchor = null; if (resolve) { try { anchor = await resolve(name); } catch (e) { anchor = null; } }
+        byName.set(name, RR.realityRegister({ id: name }, { sources, anchor }));
+      }
+      this._realityByName = byName;
+      try { this.forceUpdate(); } catch (e) {}
+    } catch (e) { this._realityByName = null; }
+  }
+  topicProfileVals(A, label) {
+    const S = this.state;
+    const g = (this.paradigmGroups(A).groups || []).find(x => x.label === label);
+    if (!g) return { has: false, tags: [], elsewhere: [], facts: [] };
+    // CONSOLIDATION SEAM (see TOPIC-PROFILE-CONSOLIDATION.md): the reality-register
+    // profile page is the khora's (native/kernel/profile-page.js); its reality-register fold
+    // (native/kernel/reality-register.js) is vendored here. One owner per capability: this
+    // renders the register's records, and adds no ontology logic of its own.
+    const kx = TOPIC_KIND(g.kind, g.type);
+    const list = (g.findings || []).map(f => ({ text: clean(f.text), src: f.title || '', date: '', by: '', hasBy: false, op: 1, pinLabel: '', pinColor: 'transparent', onClick: () => (f.doc ? this.read(f.doc) : null) }));
+    const who = (g.forWhom || []).map(nm => ({ label: nm, color: 'var(--line2)', onClick: () => (A.names[nm] ? this.openProfile(nm) : null) }));
+    const facts = [{ k: 'Sources', v: plural(g.n, 'source') }, { k: 'For whom', v: (g.forWhom || []).join(' · ') || '—' }];
+    if (g.kind === 'measure') facts.push({ k: 'Values', v: String(list.length) });
+    // the khora's reality-register face, when the organ has answered for this entity
+    let eyebrow = kx.e, color = kx.c;
+    const rp = g.kind === 'entity' && this._realityByName ? this._realityByName.get(g.forWhom[0]) : null;
+    if (rp) {
+      const BADGE = { real: '● real', 'fictionalized-real': '◐ fictionalized-real', fictional: '✕ fictional', unexamined: '? unexamined' };
+      eyebrow = eyebrow + ' · ' + (BADGE[rp.realityKind] || rp.realityKind);
+      facts.push({ k: 'Reality', v: rp.realityKind });
+      if (rp.registers && rp.registers.length) facts.push({ k: 'Told by', v: rp.registers.join(', ') });
+      if (rp.anchor && rp.anchor.found && rp.anchor.extract) facts.push({ k: 'What it is', v: short(String(rp.anchor.extract).replace(/\s+/g, ' '), 140) });
+    }
+    return { has: true, eyebrow, color, title: g.label, facts,
+      narrow: { label: 'Segment to this topic', onClick: () => this.toggleTopicGroup(g) },
+      sum: { has: false }, hasConns: false, hasRefs: false, hasProf: false,
+      hasTags: who.length > 0, tags: who, tagTitle: 'For whom',
+      hasElse: false, noElse: true, hasHere: false, hasStep: false, here: '', pos: '', prev: () => {}, next: () => {},
+      hasMoreList: false, moreList: '', onMoreList: () => {},
+      hasList: list.length > 0, list,
+      listTitle: g.kind === 'measure' ? 'What it finds · each value and the sources stating it' : g.kind === 'bond' ? 'What it finds · the pair and its sources' : 'What it finds · one restatement per source',
+      back: 'Back to ' + (this.backLabel(A) || 'sources'),
+      onBack: (this._hist || []).length ? () => this.goBack() : () => this.setState({ view: S.pfFrom || 'summary', sel: null }) };
+  }
   // ── Contested readings ──────────────────────────────────────────────────────
   // A meaningful assertion read by several independent ants. When they disagree
   // the ambiguity is disclosed, never collapsed: the bytes are shown and a person
@@ -12077,6 +12254,7 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
     const S = this.state, sel = S.sel; const off = { has: false, tags: [], elsewhere: [], facts: [] };
     const page = S.view === 'profile';
     if (!page && (S.view !== 'reader' || !S.readDoc)) return off;
+    if (sel && sel.type === 'topic') return this.topicProfileVals(A, sel.id);
     if (!sel || sel.type !== 'name' || !A.names[sel.id] || !det.hasSel) return off;
     const n = A.names[sel.id]; const sts = n.sts.map(id => A.byId[id]).filter(Boolean);
     const here = page ? [] : sts.filter(s => s.doc === S.readDoc); const byDoc = {};
@@ -12176,6 +12354,16 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
       d = { eyebrow: 'Connection', color: 'var(--blue)', title: a + ' and ' + b,
         facts: [{ k: 'Together in', v: plural(sts.length, 'statement') }, { k: 'Sources', v: String(new Set(sts.map(s => s.doc)).size) }],
         tagTitle: 'Open either', tags: [nameTag(a), nameTag(b)], actions: [], listTitle: 'Where they appear together', list: listOf(sts) };
+    } else if (sel.type === 'topic') {
+      const g = (this.paradigmGroups(A).groups || []).find(x => x.label === sel.id);
+      if (g) {
+        const kx = TOPIC_KIND(g.kind, g.type);
+        d = { eyebrow: kx.e, color: kx.c, title: g.label,
+          facts: [{ k: 'Sources', v: plural(g.n, 'source') }, { k: 'For whom', v: (g.forWhom || []).join(' · ') || '—' }, ...(g.kind === 'measure' ? [{ k: 'Values', v: String((g.findings || []).length) }] : [])],
+          tags: (g.forWhom || []).map(nm => ({ label: nm, color: 'var(--line2)', onClick: () => (A.names[nm] ? this.openProfile(nm) : null) })), tagTitle: 'For whom',
+          actions: [{ label: 'Segment to this topic', onClick: () => this.toggleTopicGroup(g) }],
+          listTitle: 'What it finds', list: (g.findings || []).map(f => ({ text: clean(f.text), src: f.title, date: '', by: '', hasBy: false, op: 1, pinLabel: '', pinColor: 'transparent', onClick: () => (f.doc ? this.read(f.doc) : null) })) };
+      }
     }
     if (!d) return none;
     if (!d.linkGroups) d.linkGroups = [];
