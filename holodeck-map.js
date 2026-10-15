@@ -65,7 +65,7 @@ export function mountMap(host, opts = {}) {
   if (!styled) { const st = document.createElement('style'); st.textContent = CSS; document.head.appendChild(st); styled = true; }
   const root = document.createElement('div'); root.className = 'hm';
   const legend = `<div class="hm-key"><span><i style="border:1.5px dashed var(--dim)"></i>ring: holds more names, click to open</span><span><i style="background:var(--acc)"></i>a name; larger means more statements</span><span>${opts.wheelZoom ? 'scroll' : 'Ctrl + scroll'} to zoom · drag to pan · ↑ ↓ step a level</span></div>`;
-  root.innerHTML = `<div class="hm-stage"><canvas></canvas><div class="hm-top"><div class="hm-layers" role="group" aria-label="Layer"><button type="button" data-layer="sources" title="The readings and the names they share">Sources</button><button type="button" data-layer="names" aria-pressed="true" title="Names, nested into groups that open on click">Names</button><button type="button" data-layer="statements" title="What a name sits in">Statements</button></div>` +
+  root.innerHTML = `<div class="hm-stage"><canvas></canvas><div class="hm-top"><div class="hm-layers" role="group" aria-label="Layer"><button type="button" data-layer="sources" title="The readings and the names they share">Sources</button><button type="button" data-layer="names" aria-pressed="true" title="Names, nested into groups that open on click">Names</button></div>` +
     `<div class="hm-tools"><span class="hm-tg" title="Zoom the picture"><button type="button" data-z="out" title="Zoom out">−</button><button type="button" data-z="in" title="Zoom in">+</button><button type="button" data-z="fit" title="Fit everything">Fit</button></span>` +
     `<span class="hm-tg" title="Move between levels of nesting"><button type="button" data-lv="up" title="Up a level: fewer, larger groups">↑</button><span class="hm-lv"></span><button type="button" data-lv="down" title="Down a level: open the groups">↓</button></span>` +
     `<span class="hm-tg" title="Orbit speed"><button type="button" data-spd="slow" title="Slower orbit">🐢</button><span class="hm-spd"></span><button type="button" data-spd="fast" title="Faster orbit">🐇</button></span></div><div class="hm-position" aria-label="Map viewpoint"></div></div>${opts.legend ? legend : ''}</div><div class="hm-card" hidden></div>`;
@@ -247,26 +247,24 @@ export function mountMap(host, opts = {}) {
       const sts = statementsOf(occ, sel), holds = model.nest.size.get(sel) - 1;
       return `<div class="hm-ch"><b>${esc(sel)}</b> · ${plural(sts.length, 'statement')}${holds ? ' · holds ' + plural(holds, 'more name') + (model.open.has(sel) ? ' (open)' : ' — click it to open') : ''}</div>` +
         sts.slice(0, 3).map(o => `<div class="hm-st"><div class="hm-src">${esc(docTitle(o.doc))}</div>${esc(sentenceOf(o))}</div>`).join('') +
-        `<div style="margin-top:6px">${sts.length ? `<button type="button" class="hm-nm" data-layer="statements">All ${sts.length} in Statements →</button>` : '<p class="hm-mut">Its statements are not among the sources read here.</p>'}${opts.onProfile ? `<button type="button" class="hm-nm" data-profile="${esc(sel)}">Open its profile →</button>` : ''}</div>`;
+        `<div style="margin-top:6px">${sts.length ? '' : '<p class="hm-mut">Its statements are not among the sources read here.</p>'}${opts.onProfile ? `<button type="button" class="hm-nm" data-profile="${esc(sel)}">Open its profile →</button>` : ''}</div>`;
     }
-    if (!sel || !occ.has(sel)) { const top = [...occ].map(([n, l]) => [n, l.length]).sort((a, b) => b[1] - a[1]).slice(0, 16); return `<p class="hm-mut">Statements sit inside names. Pick a name:</p>${chipsOf(top)}`; }
-    const sts = statementsOf(occ, sel), by = new Map(); sts.forEach(o => (by.get(o.doc) || by.set(o.doc, []).get(o.doc)).push(o));
-    return `<div class="hm-ch"><b>${esc(sel)}</b> · ${plural(sts.length, 'statement')} in ${plural(by.size, 'source')}</div>` + [...by].map(([d, l]) => `<div class="hm-src">${esc(docTitle(d))}</div>` + l.slice(0, 60).map(o => `<div class="hm-st">${esc(sentenceOf(o))}${o.with.length ? `<div class="hm-wi">${chipsOf(o.with.slice(0, 8).map(n => [n, 0]))}</div>` : ''}</div>`).join('')).join('');
+    return '';
   }
   function renderCard() {
     layersEl.querySelectorAll('[data-layer]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.layer === layer)));
-    const up = root.querySelector('[data-lv=up]'), dn = root.querySelector('[data-lv=down]'); up.disabled = layer === 'sources'; dn.disabled = layer === 'statements';
     if (D && layer === 'names') buildModel();
-    lvEl.textContent = layer === 'sources' ? 'Sources' : layer === 'statements' ? 'Statements' : 'Names · ' + (level + 1) + '/' + ((model ? model.max : 0) + 1);
-    const h = D ? cardHtml() : ''; cardEl.className = 'hm-card' + (layer === 'statements' ? ' full' : ''); cardEl.hidden = !h;
+    const up = root.querySelector('[data-lv=up]'), dn = root.querySelector('[data-lv=down]'); up.disabled = layer === 'sources'; dn.disabled = layer === 'names' && !!model && level >= model.max;
+    lvEl.textContent = layer === 'sources' ? 'Sources' : 'Names · ' + (level + 1) + '/' + ((model ? model.max : 0) + 1);
+    const h = D ? cardHtml() : ''; cardEl.className = 'hm-card'; cardEl.hidden = !h;
     if (h !== lastCard) { lastCard = h; cardEl.innerHTML = h ? '<button type="button" class="hm-x" data-close title="Close this panel">✕</button>' + h : ''; }
   }
 
   // ---------- levels, zoom and pan ----------
   const after = () => { heat = 1; dirty = true; renderCard(); };
-  const setLayer = l => { selectedEdge = null; if (l !== 'names') root.querySelector('.hm-position').textContent = docMap.size + ' sources in this map · ' + (l === 'sources' ? 'links count shared names; placement is a display arrangement' : 'statements shown for the selected name'); if ((l === 'sources') !== (layer === 'sources')) sel = null; layer = l; after(); };
-  function levelDown() { if (!D) return; if (layer === 'sources') { layer = 'names'; level = 0; manual.clear(); } else if (layer === 'names') { buildModel(); if (level < model.max) { level++; manual.clear(); } else layer = 'statements'; } after(); }
-  function levelUp() { if (layer === 'statements') layer = 'names'; else if (layer === 'names') { if (level > 0) { level--; manual.clear(); } else { layer = 'sources'; sel = null; } } after(); }
+  const setLayer = l => { selectedEdge = null; if (l !== 'names') root.querySelector('.hm-position').textContent = docMap.size + ' sources in this map · links count shared names; placement is a display arrangement'; if ((l === 'sources') !== (layer === 'sources')) sel = null; layer = l; after(); };
+  function levelDown() { if (!D) return; if (layer === 'sources') { layer = 'names'; level = 0; manual.clear(); } else if (layer === 'names') { buildModel(); if (level < model.max) { level++; manual.clear(); } } after(); }
+  function levelUp() { if (layer === 'names') { if (level > 0) { level--; manual.clear(); } else { layer = 'sources'; sel = null; } } after(); }
   function zoomAt(mx, my, f) { const nk = Math.max(0.35, Math.min(8, view.k * f)), s = nk / view.k; view.x = mx - (mx - view.x) * s; view.y = my - (my - view.y) * s; view.k = nk; dirty = true; }
   const fit = () => { view.k = 1; view.x = 0; view.y = 0; dirty = true; };
   function focusName(n) { selectedEdge = null; buildModel(); sel = n; layer = 'names'; for (let p = model.nest.parent.get(n); p != null; p = model.nest.parent.get(p)) manual.set(p, true); heat = 1; dirty = true; }
@@ -300,9 +298,24 @@ export function mountMap(host, opts = {}) {
   function loop() { if (!alive) return; if (++frame % 30 === 0) { readCols(); cc.clear(); dirty = true; }
     if (D && W && (dirty || heat > 0.01 || layer === 'names')) { simulate(); draw(); dirty = false; } raf = requestAnimationFrame(loop); }
 
+  // On first load, open to the nesting level that draws the most ties — the layer
+  // where the picture is busiest — instead of the fully folded view.
+  function busiestLevel() {
+    if (!nest0) return 0;
+    const N = nest0; let best = 0, bestScore = -1;
+    for (let L = 0; L <= N.lv.max; L++) {
+      const open = openAtLevel(N.nest, L); open.delete(VIRT);
+      const rep = new Map(N.names.map(n => [n, repOf(N.nest, n, open)]));
+      const score = rollUp(N.all, rep).size;
+      if (score > bestScore) { bestScore = score; best = L; }
+    }
+    return best;
+  }
+  let autoDone = false;
   function set(d) {
     D = d; selectedEdge = null; if (d.sig == null || d.sig !== sig) { sig = d.sig; rebuild(); heat = Math.max(heat, 0.8); }
     if ((d.sel || null) !== lastSel) { lastSel = d.sel || null; if (lastSel && nodeMap.has(lastSel)) focusName(lastSel); }
+    if (!autoDone && !d.sel) { buildModel(); if (nest0) { const bl = busiestLevel(); if (bl !== level) { level = bl; manual.clear(); } } autoDone = true; }
     dirty = true; renderCard();
   }
   function destroy() { alive = false; cancelAnimationFrame(raf); ro.disconnect(); root.remove(); }
