@@ -9173,11 +9173,34 @@ class Component extends DCLogic {
   previewUrl(d) {
     const u = String((d && d.url) || ''); let m;
     if ((m = u.match(/^https:\/\/archive\.org\/details\/([^/?#]+)/))) return 'https://archive.org/services/img/' + m[1];
-    if ((m = u.match(/^https:\/\/www\.gutenberg\.org\/ebooks\/(\d+)/))) return 'https://www.gutenberg.org/cache/epub/' + m[1] + '/pg' + m[1] + '.cover.medium.jpg';
+    // a PDF whose first page is kept beside the app (thumbs/pdf-<file name>.jpg); a missing file falls back to the text
+    if ((m = u.match(/\/([A-Za-z0-9._-]+)\.pdf(?:[?#]|$)/))) return new URL('thumbs/pdf-' + m[1] + '.jpg', location.href).href;
     return '';
+  }
+  // A table is previewed as its own first cells, ruled like a table, not as a paragraph.
+  tableThumb(d) {
+    const html = String((d && d.html) || ''); if (!/<table/i.test(html)) return '';
+    this._tbT = this._tbT || {}; if (this._tbT[d.id] !== undefined) return this._tbT[d.id];
+    let out = '';
+    try {
+      const doc = new DOMParser().parseFromString(html, 'text/html');
+      const rows = [...doc.querySelectorAll('tr')].slice(0, 8).map(tr => [...tr.children].slice(0, 4).map(c => c.textContent.replace(/\s+/g, ' ').trim().slice(0, 15)));
+      const nc = Math.max(1, ...rows.map(r => r.length)), W = 300, H = 170, rh = Math.min(22, (H - 8) / Math.max(1, rows.length)), cw = (W - 24) / nc, esc = x => x.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+      let g = '<rect width="' + W + '" height="' + H + '" fill="#f4f4f1"/>';
+      rows.forEach((r, i) => {
+        const y = 10 + i * rh;
+        if (i === 0) g += '<rect x="12" y="' + y + '" width="' + (W - 24) + '" height="' + rh + '" fill="#dfe3ea"/>';
+        g += '<line x1="12" x2="' + (W - 12) + '" y1="' + (y + rh) + '" y2="' + (y + rh) + '" stroke="#c4c8d0"/>';
+        r.forEach((c, j) => { const num = /^[\d.,%\s-]+$/.test(c); g += '<text x="' + (num && i ? 12 + (j + 1) * cw - 6 : 12 + j * cw + 6) + '" y="' + (y + rh * 0.68) + '" font-family="system-ui,sans-serif" font-size="10" font-weight="' + (i === 0 ? 700 : 400) + '" fill="#2f323a"' + (num && i ? ' text-anchor="end"' : '') + '>' + esc(c) + '</text>'; });
+      });
+      for (let j = 1; j < nc; j++) g += '<line y1="10" y2="' + (10 + rows.length * rh) + '" x1="' + (12 + j * cw) + '" x2="' + (12 + j * cw) + '" stroke="#d6d9df"/>';
+      out = 'url("data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="xMidYMin slice">' + g + '</svg>') + '")';
+    } catch (e) { out = ''; }
+    return (this._tbT[d.id] = out);
   }
   previewVals(d, it) {
     if (!d || it.hasPdfThumb) return {};
+    const t = this.tableThumb(d); if (t) return { hasPdfThumb: true, pdfThumb: t };
     const u = this.previewUrl(d); return u ? { hasPdfThumb: true, pdfThumb: 'url("' + u + '")' } : {};
   }
   driveVals(d) {
