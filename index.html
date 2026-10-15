@@ -5995,6 +5995,10 @@ class Component extends DCLogic {
     this._heroHash = () => { if (location.hash === '#workspaces' && !this._heroOpen) this.openWorkspacesHero(); };
     window.addEventListener('hashchange', this._heroHash); setTimeout(this._heroHash, 0);
     this.vmInit();
+    // an address that names a source (?doc=) can only open once the source is loaded — the demo sample installs
+    // and stored sources hydrate from IndexedDB a moment after mount, so the wanted address is captured here and
+    // reopened in componentDidUpdate as the sources land.
+    try { const q0 = new URL(location.href).searchParams; this._wantDoc = q0.get('doc'); this._wantView = q0.get('view'); this._wantLevel = q0.get('level'); this._wantLayout = q0.get('layout'); } catch (e) {}
     setTimeout(() => { this.openFromUrl(); this._urlReady = true; this.urlSync(); }, 0);
     this.installColDrag();
     // optional extra screens: a deployment lists whole pages in screens.json and they join the sidebar; absent or
@@ -6062,7 +6066,7 @@ class Component extends DCLogic {
     window.addEventListener('resize', go);
     window.addEventListener('scroll', go, { passive: true });
   }
-  componentDidUpdate() { try { this.urlSync(); } catch (e) {} try { this.paintExtracted(); } catch (e) {} try { const c = this.corpusId(); if (c !== this._wsSeen) { this._wsSeen = c; touchWs(c); } } catch (e) {} this.installFill(); this.fitFill(); this.syncOverview(); this.syncInbox(); this.syncLinks(); this.ensureLinks(); this.applyTheme(); this.measureHdr(); try { const ff = document.getElementById('fold-folder-input'); if (ff && !ff.multiple) { ff.webkitdirectory = true; ff.setAttribute('webkitdirectory', ''); ff.multiple = true; ff.setAttribute('multiple', ''); } } catch (e) {} if (this._prevCorpus !== this.state.corpus || this._prevAdded !== this.state.added) { this._prevCorpus = this.state.corpus; this._prevAdded = this.state.added; this.loadHtml(); /* the ask model preload (this.akAutoLoad()) is off with the Ask door — restore both together */ } const rd0 = this.state.readDoc && this.analysis().docById[this.state.readDoc]; if (rd0 && rd0.media && rd0.media.kind === 'local') { this.ensureMediaUrl(rd0);
+  componentDidUpdate() { try { this.urlSync(); } catch (e) {} if (this._wantDoc) { try { this.openFromUrl(); } catch (e) {} } try { this.paintExtracted(); } catch (e) {} try { const c = this.corpusId(); if (c !== this._wsSeen) { this._wsSeen = c; touchWs(c); } } catch (e) {} this.installFill(); this.fitFill(); this.syncOverview(); this.syncInbox(); this.syncLinks(); this.ensureLinks(); this.applyTheme(); this.measureHdr(); try { const ff = document.getElementById('fold-folder-input'); if (ff && !ff.multiple) { ff.webkitdirectory = true; ff.setAttribute('webkitdirectory', ''); ff.multiple = true; ff.setAttribute('multiple', ''); } } catch (e) {} if (this._prevCorpus !== this.state.corpus || this._prevAdded !== this.state.added) { this._prevCorpus = this.state.corpus; this._prevAdded = this.state.added; this.loadHtml(); /* the ask model preload (this.akAutoLoad()) is off with the Ask door — restore both together */ } const rd0 = this.state.readDoc && this.analysis().docById[this.state.readDoc]; if (rd0 && rd0.media && rd0.media.kind === 'local') { this.ensureMediaUrl(rd0);
       // A recording opened but never classified gets its sound map on first sight (an
       // older stored recording, or one added before the classifier existed); the work
       // is the same in-browser rung, guarded so it happens once until it lands.
@@ -11318,7 +11322,7 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
     try {
       const S = this.state, u = new URL(location.href), q = u.searchParams, reader = S.view === 'reader' && S.readDoc;
       const VM = { original: 'original', map: 'map', restated: 'extracted', reading: 'reading', figures: 'figures', summary: 'summary', plain: 'plain' };
-      const want = { doc: reader ? S.readDoc : null, view: reader ? (VM[S.readMode] || 'original') : null,
+      const want = { doc: reader ? S.readDoc : this._wantDoc ? undefined : null, view: reader ? (VM[S.readMode] || 'original') : this._wantDoc ? undefined : null,
         level: reader && S.readMode === 'restated' && this._foldP != null && Math.round(this._foldP) !== 100 ? String(Math.round(this._foldP)) : null,
         layout: !reader && S.svMode === 'table' ? 'table' : null,
         // undefined = leave it alone: until the VM workspace is up, ?ws= / ?dept= / ?q= are not ours to strip
@@ -11330,16 +11334,20 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
     } catch (e) { /* the address bar is a convenience; never break the page for it */ }
   }
   openFromUrl() {
+    // Opens the source the address names. It may not be loaded yet — the demo sample installs a moment after mount,
+    // and a returning visitor's sources hydrate from IndexedDB — so this is called again from componentDidUpdate;
+    // it returns true when nothing is left to open, and ?doc= stays in the address until then.
     try {
-      const q = new URL(location.href).searchParams, id = q.get('doc'), layout = q.get('layout');
-      if (layout === 'table') this.setState({ svMode: 'table' });
-      if (!id) return;
-      const A = this.analysis(); if (!A || !A.docById || !A.docById[id]) return;
+      if (this._wantLayout === 'table') { this.setState({ svMode: 'table' }); this._wantLayout = null; }
+      const id = this._wantDoc; if (!id) return true;
+      const A = this.analysis(); if (!A || !A.docById || !A.docById[id]) return false;
       const MV = { original: 'original', map: 'map', extracted: 'restated', reading: 'reading', figures: 'figures', summary: 'summary', plain: 'plain' };
-      const lv = q.get('level'); if (lv != null && lv !== '' && isFinite(+lv)) this._foldP = Math.max(0, Math.min(100, +lv));
+      const lv = this._wantLevel; if (lv != null && lv !== '' && isFinite(+lv)) this._foldP = Math.max(0, Math.min(100, +lv));
       this.read(id);
-      const m = MV[q.get('view')]; if (m) this.setState({ readMode: m });
-    } catch (e) { /* an unknown contract in the URL just opens the page */ }
+      const m = MV[this._wantView]; if (m) this.setState({ readMode: m });
+      this._wantDoc = null; this._wantView = null; this._wantLevel = null;
+      return true;
+    } catch (e) { return true; /* an unknown source in the URL just opens the page */ }
   }
   // The folded reading. Priors are what the REST of the sample established (tools/build-ocr-priors.mjs); the fold is
   // holodeck-fold.js: exact, then near-miss through the engine's own comparator, then the neighbours as witnesses, and a tie
