@@ -9099,7 +9099,8 @@ class Component extends DCLogic {
     const texts = {}; kept.forEach(d => { texts[d.id] = new Set(per[d.id].map(s => nt(s.text))); });
     const out = {}; const ws = t => new Set((clean(t).toLowerCase().match(/[a-z]{3,}/g) || []));
     const W = {}; kept.forEach(d => { W[d.id] = per[d.id].map(st => ws(st.text)); });
-    const near = (a, B) => B.some(b => { let i = 0; a.forEach(w => { if (b.has(w)) i++; }); return i / ((a.size + b.size - i) || 1) >= 0.8; });
+    // Jaccard >= 0.8 needs the smaller set to be at least 0.8 of the larger: rule the rest out before counting words
+    const near = (a, B) => B.some(b => { const lo = Math.min(a.size, b.size), hi = Math.max(a.size, b.size); if (!hi || lo < hi * 0.8) return false; let i = 0; a.forEach(w => { if (b.has(w)) i++; }); return i / ((a.size + b.size - i) || 1) >= 0.8; });
     const rank = (a, b) => (a.year || 9999) - (b.year || 9999) || per[b.id].length - per[a.id].length || (a.id < b.id ? -1 : 1);
     const hosts = {}; kept.forEach(d => { const h = hostK(d); if (h) (hosts[h] = hosts[h] || []).push(d); });
     const hostFloor = Math.sqrt(kept.length) + 1; // a domain hosting more than this share of the corpus (e.g. a government TLD) is too broad to mean "same outlet"
@@ -9382,7 +9383,10 @@ class Component extends DCLogic {
     const A = analyze({ docs: allDocs }, this._html);
     this.applyCorrections(A, id);
     this._A = A; this._key = id + ':' + allDocs.map(d => d.id).join(',') + ':' + this.state.htmlVer + ':' + this.corrKey(id);
-    try { this.hdFinish(T, A, prev, ids); } catch (e) { console.warn('ingest trace', e); HD_TR = null; } const odd = (T && T.odd) || []; const sts = A.sts.filter(s => ids.includes(s.doc));
+    // The ingest trace (names folded, the shuffled-text null) is a record of what an add did, not something the page waits on:
+    // a sample install runs it after the workspace has painted instead of in front of it.
+    if (this._sampleOn) { const T0 = T; setTimeout(() => { try { this.hdFinish(T0, A, prev, ids); } catch (e) { console.warn('ingest trace', e); } this.forceUpdate(); }, 600); }
+    else { try { this.hdFinish(T, A, prev, ids); } catch (e) { console.warn('ingest trace', e); HD_TR = null; } } const odd = (T && T.odd) || []; const sts = A.sts.filter(s => ids.includes(s.doc));
     const nm = [...new Set(sts.flatMap(s => s.names))];
     const echoN = sts.filter(s => (A.echoes[s.id] || []).some(e => !ids.includes(A.byId[e.id].doc))).length;
     const byId = {}; (added[id] || []).forEach(d => { byId[d.id] = d; }); const firstD = byId[ids[0]] || (added[id] || [])[0] || {};
