@@ -844,7 +844,7 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
                 </sc-if>
                 <div class="hd-drive-foot">
                   <span class="hd-drive-ic" style="background:{{ d.dvColor }}" title="{{ d.dvLabel }}">{{ d.dvGlyph }}</span>
-                  <sc-if value="{{ d.notRenaming }}" hint-placeholder-val="{{ true }}"><span class="hd-drive-name" title="{{ d.title }}">{{ d.title }}</span></sc-if>
+                  <sc-if value="{{ d.notRenaming }}" hint-placeholder-val="{{ true }}"><span class="hd-drive-name" title="{{ d.title }}">“{{ d.title }}”</span></sc-if>
                   <sc-if value="{{ d.renaming }}" hint-placeholder-val="{{ false }}"><input value="{{ d.rnDraft }}" onChange="{{ d.onRnDraft }}" onKeyDown="{{ d.onRnKey }}" onBlur="{{ d.onRnSave }}" style="flex:1;min-width:0;background:var(--s2);border:1px solid var(--acc2);border-radius:6px;color:var(--ink);font:500 14px var(--sans);padding:3px 6px;outline:none"></sc-if>
                   <details class="hd-drive-menu"><summary title="More actions">⋮</summary><div class="hd-drive-menu-panel"><sc-for list="{{ d.menu }}" as="m" hint-placeholder-count="4"><button onClick="{{ m.onClick }}" style="color:{{ m.col }}">{{ m.label }}</button></sc-for></div></details>
                 </div>
@@ -861,7 +861,7 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
                 <input type="checkbox" checked="{{ d.selected }}" onChange="{{ d.onToggleSel }}" title="Select"></input>
                 <span style="display:flex;align-items:center;gap:10px;min-width:0">
                   <span class="hd-drive-ic" style="background:{{ d.dvColor }}" title="{{ d.dvLabel }}">{{ d.dvGlyph }}</span>
-                  <sc-if value="{{ d.notRenaming }}" hint-placeholder-val="{{ true }}"><button onClick="{{ d.onRead }}" class="hd-drive-name" style="all:unset;cursor:pointer;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:500 14px var(--sans);color:var(--ink)" title="{{ d.title }}">{{ d.title }}</button></sc-if>
+                  <sc-if value="{{ d.notRenaming }}" hint-placeholder-val="{{ true }}"><button onClick="{{ d.onRead }}" class="hd-drive-name" style="all:unset;cursor:pointer;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:500 14px var(--sans);color:var(--ink)" title="{{ d.title }}">“{{ d.title }}”</button></sc-if>
                   <sc-if value="{{ d.renaming }}" hint-placeholder-val="{{ false }}"><input value="{{ d.rnDraft }}" onChange="{{ d.onRnDraft }}" onKeyDown="{{ d.onRnKey }}" onBlur="{{ d.onRnSave }}" style="flex:1;min-width:0;background:var(--s2);border:1px solid var(--acc2);border-radius:6px;color:var(--ink);font:500 14px var(--sans);padding:3px 6px;outline:none"></sc-if>
                   <sc-if value="{{ d.delAsking }}" hint-placeholder-val="{{ false }}"><button onClick="{{ d.onDelete }}" style="background:var(--bad);border:0;color:#fff;border-radius:6px;padding:3px 10px;cursor:pointer;font:600 12px var(--sans);white-space:nowrap">Delete for good</button><button onClick="{{ d.onCancelDelete }}" class="hd-chip">Keep</button></sc-if>
                 </span>
@@ -875,7 +875,7 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
         </sc-if>
         <sc-if value="{{ drvd.has }}" hint-placeholder-val="{{ false }}">
           <div style="position:fixed;top:0;right:0;bottom:0;z-index:60;width:min(420px,100%);overflow:auto;box-sizing:border-box;background:var(--s1);border-left:1px solid var(--line2);padding:18px 20px;display:flex;flex-direction:column;gap:12px;box-shadow:-8px 0 30px rgba(0,0,0,.3)">
-            <div style="display:flex;gap:10px;align-items:flex-start"><span class="hd-drive-ic" style="background:{{ drvd.dvColor }};width:26px;height:26px;font-size:12px">{{ drvd.dvGlyph }}</span><div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><span style="font:500 18px/1.3 var(--serif);color:var(--ink)">{{ drvd.title }}</span><span style="font:400 13px var(--sans);color:var(--mut)">{{ drvd.dvLabel }} · {{ drvd.meta }}</span><span style="font:400 13px var(--sans);color:var(--mut)">{{ drvd.stats }}</span></div><button onClick="{{ drvd.onClose }}" title="Close" style="background:none;border:0;color:var(--mut);cursor:pointer;font:500 16px var(--sans)">✕</button></div>
+            <div style="display:flex;gap:10px;align-items:flex-start"><span class="hd-drive-ic" style="background:{{ drvd.dvColor }};width:26px;height:26px;font-size:12px">{{ drvd.dvGlyph }}</span><div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><span style="font:500 18px/1.3 var(--serif);color:var(--ink)">“{{ drvd.title }}”</span><span style="font:400 13px var(--sans);color:var(--mut)">{{ drvd.dvLabel }} · {{ drvd.meta }}</span><span style="font:400 13px var(--sans);color:var(--mut)">{{ drvd.stats }}</span></div><button onClick="{{ drvd.onClose }}" title="Close" style="background:none;border:0;color:var(--mut);cursor:pointer;font:500 16px var(--sans)">✕</button></div>
             <div style="display:flex;gap:8px;flex-wrap:wrap"><button onClick="{{ drvd.onRead }}" style="background:var(--acc2);border:0;color:#fff;border-radius:8px;padding:7px 16px;cursor:pointer;font:600 14px var(--sans)">Open source</button></div>
             <details class="hd-disclosure" open="{{ true }}" style="padding:8px 0 0">
                     <summary>Source details &amp; actions</summary>
@@ -9042,13 +9042,18 @@ class Component extends DCLogic {
   addedAtOf(d) { if (d && d.addedAt) return d.addedAt; const m = d && /^u([0-9a-z]{8})/.exec(d.id || ''); const t = m ? parseInt(m[1], 36) : 0; return t > 1.5e12 && t < 4e12 ? t : 0; }
   // what kind of file a source looks like to a person: a coloured type badge, a short label, and a text preview
   driveVals(d) {
-    const med = d.medium || '', t = (d.type || '') + ' ' + (d.kind || '') + ' ' + med, mime = (d.media && d.media.mime) || '';
+    const med = d.medium || '', typ = String(d.type || '').trim(), t = typ + ' ' + (d.kind || '') + ' ' + med, mime = (d.media && d.media.mime) || '';
+    // What kind of thing this is, named as a person would name it: the reading's own type when it has one
+    // (Book, Report, Speech, Newspaper, Screenplay), else the medium. A url alone no longer makes everything a web page.
+    const specific = typ && !/^(text|link|document|source|file|other)$/i.test(typ);
     let g = '≡', c = '#4285f4', l = 'Document';
-    if ((d.media && d.media.kind === 'youtube') || /video/i.test(med) || /^video/.test(mime)) { g = '▶'; c = '#ea4335'; l = 'Video'; }
-    else if (/audio/i.test(med) || /^audio/.test(mime)) { g = '♪'; c = '#a142f4'; l = 'Audio'; }
-    else if (d.format === 'pdf' || d.pdfSrc || /\bpdf\b/i.test(t)) { g = 'PDF'; c = '#d93025'; l = 'PDF'; }
-    else if (/spreadsheet|data file|csv|xlsx/i.test(t)) { g = '▦'; c = '#0f9d58'; l = 'Spreadsheet'; }
-    else if (/image/i.test(t)) { g = '▣'; c = '#e8710a'; l = 'Image'; }
+    if ((d.media && d.media.kind === 'youtube') || /video/i.test(med) || /^video/.test(mime)) { g = '▶'; c = '#ea4335'; l = specific ? typ : 'Video'; }
+    else if (/audio/i.test(med) || /^audio/.test(mime)) { g = '♪'; c = '#a142f4'; l = specific ? typ : 'Sound recording'; }
+    else if (d.format === 'pdf' || d.pdfSrc || /\bpdf\b/i.test(t)) { g = 'PDF'; c = '#d93025'; l = /script|screen/i.test(t) ? 'Screenplay' : 'PDF'; }
+    else if (/spreadsheet|data file|csv|xlsx|data table/i.test(t)) { g = '▦'; c = '#0f9d58'; l = 'Data table'; }
+    else if (/newspaper|press|tribune/i.test(t)) { g = '▤'; c = '#e8710a'; l = 'Newspaper'; }
+    else if (/image|photo|scan/i.test(t)) { g = '▣'; c = '#e8710a'; l = 'Image'; }
+    else if (specific) { l = typ; if (/book/i.test(typ)) g = '❐'; else if (/report|inquiry|investigation/i.test(typ)) g = '▤'; }
     else if (/news|blog|web|page|government|organisation/i.test(t) || d.url) { g = '◍'; c = '#12a4b6'; l = 'Web page'; }
     else if (/notes?\b/i.test(t)) { g = '✎'; c = '#f9ab00'; l = 'Note'; }
     return { dvGlyph: g, dvColor: c, dvLabel: l, dvSnippet: String(d.text || '').replace(/\s+/g, ' ').trim().slice(0, 240) };
