@@ -190,6 +190,31 @@ test('the referent is the holograph\'s, never a span: "ship" is not a referent, 
   assert.ok(other && other !== a, 'the being qualifies the measure, so two beings never fold');
 });
 
+test('identity is read at the POINT grain — the being+measure, not the spelling — for the observer', () => {
+  // Two sources name the same being+measure with DIFFERENT spellings ("saved"/"rescued"). The identity the record
+  // asserts is at the point (the being the record carries the forms on), so the pair holds; the form grain would
+  // see two different spellings and refuse it. This is the seam docs/SOURCE-CONTRADICTION-PREREG.md left open.
+  const values = [
+    { id: 'a', doc: 'a', s: 0, e: 3, raw: '711', value: 711, unit: 'count', anchor: 'R.M.S. Titanic', measure: 'saved', window: 'total saved 711' },
+    { id: 'b', doc: 'b', s: 0, e: 3, raw: '705', value: 705, unit: 'count', anchor: 'R.M.S. Titanic', measure: 'rescued', window: '705 rescued' },
+  ];
+  const r = contradictionsOf(values, { forWhom: SAVED, synonyms: SYN });
+  assert.equal(r.identityGrain, 'point');
+  assert.equal(r.contradictions.length, 1, JSON.stringify(r.gaps));
+  const [v1, v2] = r.contradictions[0].values;
+  assert.notEqual(v1.raw, v2.raw, 'the two spellings differ');
+  assert.equal(v1.point, v2.point, 'but they are one point — the being+measure — so the identity holds');
+  assert.deepEqual(referentParts(v1.point), { measure: 'saved', being: 'R.M.S. Titanic' });
+  // a DIFFERENT being with the same measure word is a different point: never the same referent.
+  const other = contradictionsOf([
+    values[0],
+    { id: 'c', doc: 'c', s: 0, e: 3, raw: '705', value: 705, unit: 'count', anchor: 'Carpathia', measure: 'saved', window: '705 saved' },
+  ], { forWhom: SAVED, synonyms: SYN });
+  assert.equal(other.contradictions.length, 0, 'the being qualifies the measure — a different point, never a contradiction');
+  const beings = other.referents.map((x) => referentParts(x.referent).being).sort();
+  assert.deepEqual(beings, ['Carpathia', 'R.M.S. Titanic']);
+});
+
 test('contradictionForTopic: the holograph\'s own measure topic is the contradiction, with the being as the identity', () => {
   // The exact shape holoTopics emits for a measure group: the shared figure-slot FOR ONE BEING, with `differs`.
   const topic = {

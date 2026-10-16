@@ -3584,14 +3584,72 @@ function holoRun(stream, alpha, keep, base) {
 function holoKit(A, opt) { const cur = opt.cur; const srcShort = opt.srcShort;
   const NEG = /\b(not|no|never|denied|denies|den(y|ies)|without|failed to|did not|does not|was not|were not|has not|have not|isn’t|wasn’t|didn’t|doesn’t|won’t|cannot|can’t)\b/i;
   const namesOf = st => [...new Set(st.names.filter(n => holoName(n, A) && (/\s/.test(n) || /^[A-Z]{2,}$/.test(n))))].slice(0, 8);
-  const figsOf = (st, ns) => { const out = []; const anchor = ns.slice().sort((a, b) => ((A.names[b] || {}).sts || []).length - ((A.names[a] || {}).sts || []).length)[0] || '';
-    const MW = /\b(budget|contract|grant|funding|allocation|appropriation|salary|cost|deficit|shortfall|revenue|spending|reimbursements?|beds|units|positions|households|encampments?|count|point-in-time|pit|homeless(?:ness)?|housed|housing|shelter)\b/gi;
-    const VB = /\b(moved|relocated|housed|placed|counted|served|identified|sheltered|evicted|exited|enrolled|hired|cut|added|funded|awarded|approved|requested|returned|spent|allocated)\b/gi;
-    st.figs.forEach(g => { const u = g.unit || ''; const v = +g.value; if (!isFinite(v) || !v) return; if (!u && v >= 1900 && v <= 2100) return; if (!/dollar|percent/.test(u) && !(u && v >= 10)) return;
-      const raw = clean(g.raw || String(v)); const at = st.text.indexOf(g.raw || raw); const win = at >= 0 ? st.text.slice(Math.max(0, at - 70), at + (g.raw || raw).length + 50) : '';
-      const mws = (win.match(MW) || []).map(w => w.toLowerCase().replace(/s$/, '')); const vbs = (win.match(VB) || []).map(w => w.toLowerCase());
-      const measure = [vbs[0], mws[0]].filter(Boolean).join(' ');
-      out.push({ key: measure ? u + '|' + measure + '|' + anchor : null, measure: measure ? (measure + (/dollar/.test(u) ? '' : ' ' + u)).trim() : u.replace(/s$/, ''), anchor, v, raw, s: g.s, e: g.e }); }); return out; };
+  // ── THE BEING FROM THE SOURCE'S OWN READING, NEVER A SPAN (docs/SOURCE-CONTRADICTION-PREREG.md R3) ──────────
+  // A pronoun-bearing statement ("815 … were drowned") names no referent, so its figure would be anchorless and
+  // dropped. The being a pronominal statement is about is the SOURCE'S OWN referent — the admitted being the source
+  // mostly carries (earned: it stands in ≥2 sources) — so a figure reaches its being through the source's own
+  // reading, never through the span ("ship" means many things). It is used ONLY when the figure's MEASURE IS AN
+  // EARNED RELATION (a measure word/verb the statement itself carries), never for a bare unit: the unit is not a
+  // grain (measured: the ungated anchor folds "Titanic · feet" 200 vs 800 — the E1 false contradiction).
+  const docRefCache = new Map();
+  const docReferentOf = (docId) => {
+    if (docRefCache.has(docId)) return docRefCache.get(docId);
+    const c = new Map();
+    for (const n of Object.values(A.names)) { const nm = String(n.name || '').trim();
+      if (nm.length < 2 || /^\d+$/.test(nm) || !holoName(nm, A) || (n.docs || new Set()).size < 2) continue;
+      for (const id of n.sts || []) { const s2 = A.byId[id]; if (!s2 || s2.doc !== docId) continue; c.set(nm, (c.get(nm) || 0) + 1); } }
+    const top = [...c.entries()].sort((a, b) => b[1] - a[1] || (a[0] < b[0] ? -1 : 1))[0];
+    const out = top && top[1] >= 3 ? top[0] : null;   // the source must be mostly about it — three statements, not one
+    docRefCache.set(docId, out); return out;
+  };
+  // A bare TABLE source (the British report's own "Numbers saved" table) names no being at all — but its figures
+  // are about the being the whole CORPUS is about, the one every other source reads. So an anchorless TABLE takes
+  // the corpus's own referent — the admitted being the most sources carry (≥3), disclosed as `via: 'corpus'`, never
+  // silently: a table of numbers with no other reading in the workspace is read as the workspace's own subject.
+  let _corpusRef;
+  const corpusReferent = () => {
+    if (_corpusRef !== undefined) return _corpusRef;
+    let best = null, bestN = 0;
+    for (const n of Object.values(A.names)) { const nm = String(n.name || '').trim();
+      if (nm.length < 2 || /^\d+$/.test(nm) || !holoName(nm, A) || (n.docs || new Set()).size < 3) continue;
+      const c = (n.sts || []).length; if (c > bestN) { bestN = c; best = nm; } }
+    _corpusRef = best; return _corpusRef;
+  };
+  // A LABELLED QUANTITY: the source's own label names what the number counts ("Total number saved, 705"; "…company
+  // lost, 1635"; "number of persons aboard, 2340"). The label's own head word IS the measure — the relation the
+  // figure stands under — so a bare total is a figure of the relation, not a number with no unit. Earned, never typed.
+  // A comma/colon/em-dash separator, never "; ": a prose labelled total ("Total number saved, 705") binds, but a
+  // table's own flattened row ("…saved; 2201; 711") does NOT — the row is read by its columns (tableFiguresOf),
+  // so its two figures are never mislabelled by the one label that precedes them both.
+  const LABQ = /\b(?:total\s+|grand\s+total\s+)?(?:number|count|figure)s?\s+(?:of\s+(?:the\s+|her\s+|his\s+|its\s+|their\s+)?)?((?:[A-Za-z\u2019'-]+\s+){0,4}?)([A-Za-z\u2019'-]{2,})\s*[,:\u2014-]\s*(\d{1,3}(?:,\d{3})+(?:\.\d+)?|\d+(?:\.\d+)?)\b/gi;
+  const labelledQuantities = (text) => { const out = []; let m;
+    while ((m = LABQ.exec(String(text || '')))) { const head = clean(m[2]).toLowerCase();
+      if (!head || STOP.has(head) || /^\d/.test(head)) continue;
+      const raw = m[3]; const at = m.index + m[0].lastIndexOf(raw); out.push({ raw, value: +raw.replace(/,/g, ''), label: head, s: at, e: at + raw.length, src: 'label' }); }
+    return out; };
+  const figsOf = (st, ns) => { const out = []; const named = ns.slice().sort((a, b) => ((A.names[b] || {}).sts || []).length - ((A.names[a] || {}).sts || []).length)[0] || '';
+    const docRef = docReferentOf(st.doc);
+    // the measure-word prior: the vocabulary of what a figure can measure. The budget/housing words are the original
+    // corpus's; the casualty/nautical words are this corpus's own (a closed prior, the same kind of list, never a
+    // per-statement guess) — the earned paths (the source's own label, its table column) are named below.
+    const MW = /\b(budget|contract|grant|funding|allocation|appropriation|salary|cost|deficit|shortfall|revenue|spending|reimbursements?|beds|units|positions|households|encampments?|count|point-in-time|pit|homeless(?:ness)?|housed|housing|shelter|aboard|on board|saved|rescued|drowned|perished|lost|sacrificed|survived)\b/gi;
+    const VB = /\b(moved|relocated|housed|placed|counted|served|identified|sheltered|evicted|exited|enrolled|hired|cut|added|funded|awarded|approved|requested|returned|spent|allocated|drowned|perished|rescued|saved|lost|sacrificed|survived)\b/gi;
+    const push = (raw, v, unit, s, e, label) => { const u = unit || ''; if (!isFinite(v) || !v) return; if (!u && v >= 1900 && v <= 2100 && !label) return;
+      if (!label && !/dollar|percent/.test(u) && !(u && v >= 10)) return;
+      const at = st.text.indexOf(raw); const w0 = Math.max(0, at - 70); const win = at >= 0 ? st.text.slice(w0, at + raw.length + 50) : '';
+      // the relation the figure stands under: the measure word/verb NEAREST the figure (not the first in the window),
+      // so "705 rescued by the Carpathia" reads "rescued", not a "drowned" earlier in the same sentence.
+      const rels = [...win.matchAll(new RegExp(MW.source, 'gi')), ...win.matchAll(new RegExp(VB.source, 'gi'))]
+        .map(m => ({ w: m[0].toLowerCase().replace(/s$/, ''), d: Math.abs((w0 + m.index) - at) })).sort((a, b) => a.d - b.d);
+      const relation = label || (rels[0] ? rels[0].w : '');
+      // the being: a name the statement itself carries, else (only for an EARNED relation) the source's own referent.
+      const anchor = named || (relation ? docRef : '') || '';
+      const unitNorm = u.replace(/s$/, '');
+      const measure = relation ? (relation === unitNorm ? relation : (relation + (/dollar/.test(u) ? '' : ' ' + u)).trim()) : unitNorm;
+      out.push({ key: measure && anchor ? u + '|' + measure + '|' + anchor : null, measure, anchor, via: named ? 'name' : (relation && docRef ? 'source' : null), v, raw, s, e }); };
+    st.figs.forEach(g => push(clean(g.raw || String(g.value)), +g.value, g.unit, g.s, g.e, null));
+    for (const L of labelledQuantities(st.text)) push(L.raw, L.value, '', L.s, L.e, L.label);   // the label IS the measure
+    return out; };
   const pk = (a, b) => a < b ? a + '\u0001' + b : b + '\u0001' + a;
   const mkH = () => ({ ent: new Map(), bond: new Map(), bneg: new Map(), val: new Map() });
   const admit = (H, st) => { const I = infoOf(st); I.ns.forEach(n => H.ent.set(n, (H.ent.get(n) || 0) + 1));
@@ -3610,7 +3668,7 @@ function holoKit(A, opt) { const cur = opt.cur; const srcShort = opt.srcShort;
       const r = Math.abs(Math.log2(Math.max(f.v, 1e-9) / Math.max(last.v, 1e-9))); parts.push({ w: 2 + Math.min(2, r), kind: 'revise', text: 'Changes the “' + f.measure + '” figure' + (f.anchor ? ' for ' + f.anchor : '') + ': ' + last.raw + ' (' + srcShort(A, last.st) + ', ' + when(last.st) + ') → ' + f.raw, name: f.anchor || null }); });
     parts.sort((x, y) => y.w - x.w); return { shift: parts.reduce((s, p) => s + p.w, 0), parts }; };
   const info = new Map(); const infoOf = st => { let I = info.get(st.id); if (!I) { const ns = namesOf(st); I = { ns, fs: figsOf(st, ns), neg: NEG.test(st.text.replace(/\b(no|not) (fewer|less|more|later|earlier|sooner) than\b|\bnot only\b|\bno doubt\b|\bnot yet\b/gi, '')) }; info.set(st.id, I); } return I; };
-  return { NEG, namesOf, figsOf, info, infoOf, pk, mkH, admit, shiftOf };
+  return { NEG, namesOf, figsOf, docReferentOf, corpusReferent, info, infoOf, pk, mkH, admit, shiftOf };
 }
 const dmdCo = (nab, na, nb, N) => nab >= 2 && N > 0 && nab * N > na * nb * 1.2;
 const TOPIC_STOP = new Set('the and for with from that this into about over under what when where which their there were been have has had not are was its'.split(' '));
@@ -4302,6 +4360,51 @@ function findDates(t) {
   while ((m = re.exec(t))) { if (m[1] === 'May' && /\bmay\b/.test(t.slice(m.index, m.index + 3))) continue; out.push({ raw: m[1], s: m.index, e: m.index + m[1].length, year: /^\d{4}$/.test(m[1]) ? +m[1] : null }); }
   return out;
 }
+// ── A TABLE'S OWN FIGURES (docs/SOURCE-CONTRADICTION-PREREG.md R3): the source's table binds each cell to the
+// column it stands under ("aboard", "saved") — the MEASURE the figure stands under — and to the row it stands in.
+// A number a table states is a figure OF ITS COLUMN'S MEASURE, so "Passengers and crew | Total on board saved |
+// 2201 | 711" reads as 2201 ABOARD and 711 SAVED — the two figures one prose sentence fuses. The measure is the
+// table's own header word, earned, never typed. Pure: rows in, figures out (the DOM walk is tableFiguresOf below).
+function tableRowsToFigures(rows) {
+  const out = [];
+  if (!Array.isArray(rows) || rows.length < 2) return out;
+  const header = (rows[0] || []).map(c => String(c == null ? '' : c).replace(/\s+/g, ' ').trim());
+  const NUM = /^[$£€]?(\d{1,3}(?:,\d{3})+(?:\.\d+)?|\d+(?:\.\d+)?)$/;
+  const RATE = /^(percent|%|percent_saved|share|rate|ratio|pct)$/;
+  const width = Math.max(...rows.map(r => (r || []).length));
+  // A subgroup row ("First class … males, aboard 175, saved 57") is a partial — a different referent (a
+  // sub-population), never "the number saved". The GRAND TOTAL is the figure-slot the sources share, and a
+  // partition's grand total is ≥ every subtotal, so for each count column the shared figure is the LARGEST value
+  // among the rows the table itself labels "total". A table with no total states no shared slot (a named gap).
+  for (let c = 1; c < width; c++) {
+    const col = header[c] ? header[c].toLowerCase() : '';
+    if (!col || RATE.test(col) || !/[a-z]/.test(col)) continue;   // a rate is not a count; no header, no measure
+    let best = null;
+    for (let r = 1; r < rows.length; r++) {
+      const cells = rows[r] || [];
+      if (!cells.some(x => /\btotal\b/i.test(String(x)))) continue;
+      const raw = String(cells[c] == null ? '' : cells[c]).replace(/\s+/g, ' ').trim();
+      const m = NUM.exec(raw); if (!m) continue;
+      const value = +m[1].replace(/,/g, ''); if (!value) continue;
+      if (!best || value > best.value) best = { raw, value, unit: col, measure: col, row: String(cells[0] || '').trim(), s: 0, e: 0 };
+    }
+    if (best) out.push(best);
+  }
+  return out;
+}
+function tableFiguresOf(body, text) {
+  const out = []; if (!body || !body.querySelectorAll) return out;
+  let cursor = 0;
+  body.querySelectorAll('table').forEach(tb => {
+    const trs = tb.querySelectorAll ? [...tb.querySelectorAll('tr')] : [];
+    const rows = trs.map(tr => [...tr.children].filter(c => /^(TD|TH)$/.test(c.tagName)).map(c => (c.textContent || '').replace(/\s+/g, ' ').trim()));
+    for (const f of tableRowsToFigures(rows)) {
+      let at = text.indexOf(f.raw, cursor); if (at < 0) at = text.indexOf(f.raw); if (at < 0) continue;
+      cursor = at + f.raw.length; out.push({ ...f, s: at, e: at + f.raw.length });
+    }
+  });
+  return out;
+}
 function frameOf(t) {
   const l = t.toLowerCase();
   if (/\b(may|might|could|possibly|perhaps|likely|unclear|appears to|seems)\b/.test(l)) return 'uncertain';
@@ -4339,6 +4442,8 @@ function analyze(corpus, htmlMap) {
       body.querySelectorAll('h1,h2,h3,h4,h5,h6').forEach(el => { const o = firstOff(el); const tx = el.textContent.replace(/\s+/g, ' ').trim(); if (o !== null && tx) x.heads.push({ lv: +el.tagName[1], text: tx, o, e: o + tx.length }); });
       body.querySelectorAll('p,li,tr,blockquote,dd,figcaption,pre').forEach(el => { const o = firstOff(el); if (o !== null) x.blocks.push(o); });
       x.heads.sort((a, b) => a.o - b.o); x.blocks.sort((a, b) => a - b);
+      // the source's own TABLE figures: a cell's measure is its column's own header word (never the prose window).
+      try { x.tableFigs = tableFiguresOf(body, x.text); } catch (e) { x.tableFigs = []; }
     }
     if (hdF(x.id)) { HD_TR.docs.push({ id: x.id, title: x.title, type: x.type, text: x.text }); hdT('text', 'walk', x.format === 'pdf' ? 'Took ' + x.text.length + ' characters from the PDF text layer' : 'Walked the page tree: ' + x.text.length + ' characters of text, ' + x.heads.length + ' headings, ' + x.blocks.length + ' blocks, ' + (x.links || []).length + ' links', { doc: x.id, chars: x.text.length }); }
     // SULLIVAN: the naming convention is MEASURED from the material, never assumed.
@@ -4870,11 +4975,26 @@ function holoTopics(A) {
   };
   // ── MEASURE topics: the same figure-slot (unit | measure | anchor) in ≥2 sources ──
   const meas = new Map();
-  A.sts.forEach(st => { if (st.ref || !st.claimy) return;
-    K.figsOf(st, K.namesOf(st)).forEach(f => { const m = f.measure || f.unit || ''; if (!f.anchor && !m) return;
-      const key = m + '\u0001' + (f.anchor || ''); let o = meas.get(key);
+  A.sts.forEach(st => {
+    const figs = K.figsOf(st, K.namesOf(st));
+    // A thin or reference-matter statement normally carries no measure — but one that STATES a figure WITH A BEING
+    // does, whatever its length: "Total number saved, 705" is four words and a fact. The being (`via`) is required,
+    // so a stray number in page furniture (a page number, a list cell) is never measured.
+    if ((!st.claimy || st.ref) && !figs.some(f => f.via)) return;
+    figs.forEach(f => { const m = f.measure || f.unit || ''; if (!f.anchor || !m) return;   // a figure about no one is no for-whom
+      const key = m + '\u0001' + f.anchor; let o = meas.get(key);
       if (!o) meas.set(key, o = { docs: new Set(), vals: new Map(), anchor: f.anchor, m, sts: new Set() });
       o.docs.add(st.doc); o.sts.add(st.id); let d = o.vals.get(f.raw); if (!d) o.vals.set(f.raw, d = new Map()); d.set(st.doc, { doc: st.doc, s: st.s + f.s, e: st.s + f.e, raw: f.raw }); }); });
+  // the source's own TABLE figures: a cell's measure is its column's own header word, and the being is the
+  // source's own referent (the being the source is about), so a table's "aboard"/"saved" columns meet across
+  // sources — the two figures one prose sentence fuses, each under the column the table itself put it under.
+  A.docs.forEach(d => { for (const f of (d.tableFigs || [])) { const m = f.measure; if (!m) continue;
+    // the being: the source's own referent, else (a bare table that names no one) the being the whole corpus
+    // reads — disclosed, never silent. A table about no being at all is a typed gap, not a guess.
+    const own = K.docReferentOf(d.id); const anchor = own || K.corpusReferent(); if (!anchor) continue;
+    const key = m + '\u0001' + anchor; let o = meas.get(key);
+    if (!o) meas.set(key, o = { docs: new Set(), vals: new Map(), anchor, m, sts: new Set() });
+    o.docs.add(d.id); let dd = o.vals.get(f.raw); if (!dd) o.vals.set(f.raw, dd = new Map()); dd.set(d.id, { doc: d.id, s: f.s, e: f.e, raw: f.raw, via: own ? 'source' : 'corpus' }); } });
   meas.forEach(o => { const docs = [...o.docs].map(docOf).filter(Boolean); if (docs.length < 2) return;
     if (!o.anchor) return;   // a figure with no anchor is about no one: not meaningful, no for-whom
     const findings = [...o.vals].sort((a, b) => b[1].size - a[1].size).slice(0, 12).map(([v, ds]) => ({ text: v, doc: [...ds.keys()][0], title: [...ds.keys()].map(title).join(' · '), sources: [...ds.keys()], at: [...ds.values()] }));
