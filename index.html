@@ -3591,7 +3591,7 @@ function holoKit(A, opt) { const cur = opt.cur; const srcShort = opt.srcShort;
       const raw = clean(g.raw || String(v)); const at = st.text.indexOf(g.raw || raw); const win = at >= 0 ? st.text.slice(Math.max(0, at - 70), at + (g.raw || raw).length + 50) : '';
       const mws = (win.match(MW) || []).map(w => w.toLowerCase().replace(/s$/, '')); const vbs = (win.match(VB) || []).map(w => w.toLowerCase());
       const measure = [vbs[0], mws[0]].filter(Boolean).join(' ');
-      out.push({ key: measure ? u + '|' + measure + '|' + anchor : null, measure: measure ? (measure + (/dollar/.test(u) ? '' : ' ' + u)).trim() : u.replace(/s$/, ''), anchor, v, raw }); }); return out; };
+      out.push({ key: measure ? u + '|' + measure + '|' + anchor : null, measure: measure ? (measure + (/dollar/.test(u) ? '' : ' ' + u)).trim() : u.replace(/s$/, ''), anchor, v, raw, s: g.s, e: g.e }); }); return out; };
   const pk = (a, b) => a < b ? a + '\u0001' + b : b + '\u0001' + a;
   const mkH = () => ({ ent: new Map(), bond: new Map(), bneg: new Map(), val: new Map() });
   const admit = (H, st) => { const I = infoOf(st); I.ns.forEach(n => H.ent.set(n, (H.ent.get(n) || 0) + 1));
@@ -4806,6 +4806,11 @@ function mergeTopicGroups(groups) {
 // A near-echo cluster (statements alike in wording) is NOT a topic: it shares no entity and no
 // measure, so its name would be a stray token. Selectivity is what makes a difference — an
 // element the whole corpus carries is the subject, not a part of it, and is left as strayN.
+// A unit read as a topic word — the measure half of a complete tuple. Hoisted so the contradiction record reads a
+// figure's measure the same way the holograph's topics do (one owner for the mapping, never two).
+const UNIT_TOPIC = { ton: 'tonnage', gross: 'tonnage', net: 'tonnage', foot: 'length', feet: 'length', mile: 'distance', knot: 'speed', passenger: 'passengers', compartment: 'compartments', lifeboat: 'lifeboats', dollar: 'cost', pound: 'weight', inche: 'inches', percent: 'percent' };
+const unitTopic = u => UNIT_TOPIC[String(u || '').toLowerCase()] || (u ? String(u).toLowerCase() : 'figure');
+
 function holoTopics(A) {
   const none = { groups: [], entities: [], strayN: A.docs.length, basis: 'holograph' };
   if (!A || A.docs.length < 2) return none;
@@ -4820,8 +4825,8 @@ function holoTopics(A) {
   const cap = s => String(s).replace(/\b\w/g, c => c.toUpperCase());
   const shortName = s => { const raw = String(s).split(/\s+/).filter(Boolean); const t = raw.filter(x => !abbr(x)); return (t.length ? t : raw).slice(0, 2).join(' '); };
   const repPerDoc = sts => { const by = new Map(); sts.forEach(st => { if (!st || st.ref) return; const have = by.get(st.doc); if (!have || String(st.text).length > String(have.text).length) by.set(st.doc, st); }); return [...by].map(([doc, st]) => ({ doc, text: short(st.text, 220), title: title(doc) })); };
-  // a unit read as a topic word — the measure half of a complete tuple
-  const unitTopic = u => ({ ton: 'tonnage', gross: 'tonnage', net: 'tonnage', foot: 'length', feet: 'length', mile: 'distance', knot: 'speed', passenger: 'passengers', compartment: 'compartments', lifeboat: 'lifeboats', dollar: 'cost', pound: 'weight', inche: 'inches', percent: 'percent' }[String(u || '').toLowerCase()] || (u ? String(u).toLowerCase() : 'figure'));
+  // (the unit→topic word mapping lives at module scope — UNIT_TOPIC / unitTopic — so the contradiction record
+  //  reads a figure's measure the same way these topics do; one owner for the mapping, never two.)
 
   // ── ENTITY topics: every name the holograph admits (holoName) that ≥2 sources carry and that
   // is not the hub — the whole cast, so the topic list grows with the corpus. A number or a common
@@ -4869,10 +4874,10 @@ function holoTopics(A) {
     K.figsOf(st, K.namesOf(st)).forEach(f => { const m = f.measure || f.unit || ''; if (!f.anchor && !m) return;
       const key = m + '\u0001' + (f.anchor || ''); let o = meas.get(key);
       if (!o) meas.set(key, o = { docs: new Set(), vals: new Map(), anchor: f.anchor, m, sts: new Set() });
-      o.docs.add(st.doc); o.sts.add(st.id); let d = o.vals.get(f.raw); if (!d) o.vals.set(f.raw, d = new Set()); d.add(st.doc); }); });
+      o.docs.add(st.doc); o.sts.add(st.id); let d = o.vals.get(f.raw); if (!d) o.vals.set(f.raw, d = new Map()); d.set(st.doc, { doc: st.doc, s: st.s + f.s, e: st.s + f.e, raw: f.raw }); }); });
   meas.forEach(o => { const docs = [...o.docs].map(docOf).filter(Boolean); if (docs.length < 2) return;
     if (!o.anchor) return;   // a figure with no anchor is about no one: not meaningful, no for-whom
-    const findings = [...o.vals].sort((a, b) => b[1].size - a[1].size).slice(0, 12).map(([v, ds]) => ({ text: v, doc: [...ds][0], title: [...ds].map(title).join(' · ') }));
+    const findings = [...o.vals].sort((a, b) => b[1].size - a[1].size).slice(0, 12).map(([v, ds]) => ({ text: v, doc: [...ds.keys()][0], title: [...ds.keys()].map(title).join(' · '), sources: [...ds.keys()], at: [...ds.values()] }));
     // the NAME says what the topic IS — the being and the measure — and a disagreement word ONLY
     // when the group's own statements carry one (earned, above); the values stay in the findings.
     const marker = o.vals.size > 1 ? sharedMarker(o.sts, [o.anchor, unitTopic(o.m), ...findings.map(f => f.text)]) : '';
@@ -6366,7 +6371,7 @@ class Component extends DCLogic {
     setTimeout(() => { try { this.maybeSample(); } catch (e) {} }, 900);
     setTimeout(() => this.measureHdr(), 400);
     setTimeout(() => { try { this.akAutoLoad(); } catch (e) {} }, 2500);
-    this.applyTheme(); this.restoreReaders(); this._c = 0; import(new URL('holodeck-match.js', location.href).href).then(M => { this._mt = M; this._qc = null; this.forceUpdate(); }).catch(() => {}); import(new URL('holodeck-profile.js', location.href).href).then(M => { _hdProf = M; this._pbA = null; this.forceUpdate(); }).catch(() => {}); import(new URL('holodeck-lang.js', location.href).href).then(M => { _hdLang = M; this._pfLang = null; this.loadLangPriors(); this.forceUpdate(); }).catch(() => {}); import(new URL('holodeck-ambiguity.js', location.href).href).then(M => { this._ambM = M; this.forceUpdate(); }).catch(() => {}); hdSum().then(() => this.forceUpdate()).catch(() => {}); this.loadHtml(); if (typeof location !== 'undefined' && /fx-share=/.test(location.hash)) { this.netInit(); this.setState({ view: 'draft' }); }
+    this.applyTheme(); this.restoreReaders(); this._c = 0; import(new URL('holodeck-match.js', location.href).href).then(M => { this._mt = M; this._qc = null; this.forceUpdate(); }).catch(() => {}); import(new URL('holodeck-profile.js', location.href).href).then(M => { _hdProf = M; this._pbA = null; this.forceUpdate(); }).catch(() => {}); import(new URL('holodeck-lang.js', location.href).href).then(M => { _hdLang = M; this._pfLang = null; this.loadLangPriors(); this.forceUpdate(); }).catch(() => {}); import(new URL('holodeck-ambiguity.js', location.href).href).then(M => { this._ambM = M; this.forceUpdate(); }).catch(() => {}); import(new URL('holodeck-contradiction.js', location.href).href).then(M => { this._ctM = M; this.forceUpdate(); }).catch(() => {}); hdSum().then(() => this.forceUpdate()).catch(() => {}); this.loadHtml(); if (typeof location !== 'undefined' && /fx-share=/.test(location.hash)) { this.netInit(); this.setState({ view: 'draft' }); }
     this._onRz = () => { this.measureHdr(); const stk = window.innerWidth <= 720; if ((window.innerWidth < SIDE_PANEL_MIN_VW) !== this._narrow || stk !== this._stk) { this._stk = stk; this.forceUpdate(); } }; window.addEventListener('resize', this._onRz);
 
     this._onFocusKey = e => { if (e.key === 'Escape' && this.state.akFocus) this.setState({ akFocus: false }); }; window.addEventListener('keydown', this._onFocusKey);
@@ -10170,6 +10175,7 @@ class Component extends DCLogic {
     const single = D.nameList.filter(n => n.docs.size === 1);
     const unattributed = F.filter(st => !st.names.some(n => ['person', 'organisation'].includes(A.names[n].type)) && st.frame !== 'attributed');
     const differ = D.unitList.filter(u => u.differs);
+    const contra = this.contradictionForUnits(A, S);
     const hostOf = id => { const d = A.docById[origin(id)]; try { const u = new URL(d.url || d.link || ''); const dom = u.hostname.split('.').slice(-2).join('.'); return (d.wiki || /(wikipedia|wiktionary|britannica|wikisource)\.org$|britannica\.com$/.test(u.hostname)) ? dom + u.pathname.replace(/\/$/, '').toLowerCase() : dom; } catch (e) { return d ? 't:' + (d.title || d.id).toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 40) : id; } };
     const kOf = docs => new Set([...docs].map(hostOf)).size;
     const wset = t => new Set((clean(t).toLowerCase().match(/[a-z]{4,}/g) || []).filter(w => !STOP.has(w))); const normT = t => clean(t).toLowerCase().replace(/[^a-z0-9]/g, '');
@@ -10523,8 +10529,20 @@ class Component extends DCLogic {
       { label: 'Names confirmed by another source', value: corro + '/' + nN, pct: pc(corro, nN), color: col(corro, nN), desc: 'Names that appear in more than one document. The rest rest on a single source.', items: single.slice(0, 6).map(n => ({ label: 'only one source: ' + n.name, onClick: selN(n.name) })) },
       { label: 'Echoed in another source', value: echoed.length + '/' + F.length, pct: pc(echoed.length, F.length), color: col(echoed.length, F.length), desc: 'Statements that resemble one in a different document — similar content, measured against a shuffled baseline. A resemblance, never treated as the same claim.', items: echoed.slice(0, 4).map(st => ({ label: short(st.text, 48), onClick: selSt(st) })) }
     ];
+    const qa = (S.q || '').trim();
     const breaks = [
-      ...differ.map(u => ({ label: 'Different figures in ' + u.unit, value: u.items.slice(0, 4).map(x => x.g.raw).join(' · '), pct: '100%', color: 'var(--amber)', desc: 'The same measure with different numbers in different sources. They may describe different things — compare them.', items: u.items.slice(0, 6).map(x => ({ label: x.g.raw + ' — ' + docT(x.st.doc), onClick: selSt(x.st) })) })),
+      ...contra.topics.map(({ group, held }) => {
+        const being = (group.tuple && group.tuple.anchor) || (group.forWhom || [])[0] || '';
+        const meas = (group.tuple && group.tuple.measure) || '';
+        const label = held ? 'Sources contradict each other about ' + being + (meas ? ' · ' + meas : '') : 'Figures differ for ' + being + (meas ? ' · ' + meas : '');
+        const value = held ? held.values.map(v => v.raw).join(' · ') : '';
+        const desc = held
+          ? 'For “' + qa + '”, these are the same referent — ' + being + '’s ' + meas + ' — and the sources give different values. ' + held.standing + ' (' + plural(held.statements, 'independent source-pair') + '). The referent is the holograph’s (the being the sources admit and the figure-slot they share), never the unit word.'
+          : 'The sources share this figure-slot for ' + being + ', but for “' + qa + '” no two values read as the same referent.';
+        const items = held ? held.values.map(v => ({ label: v.raw + ' — ' + (v.sources || []).map(d => docT(d)).join(' · '), onClick: v.at && v.at[0] ? () => this.read(v.at[0].doc) : () => {} })) : [];
+        return { label, value, pct: '100%', color: 'var(--bad)', desc, items };
+      }),
+      ...differ.map(u => ({ label: 'Different figures in ' + u.unit, value: u.items.slice(0, 4).map(x => x.g.raw).join(' · '), pct: '100%', color: 'var(--amber)', desc: 'The same measure with different numbers in different sources. They may describe different things — compare them.' + (qa ? ' A question asks the holograph which figures are the same referent, and decides for it — never by the unit word.' : ''), items: u.items.slice(0, 6).map(x => ({ label: x.g.raw + ' — ' + docT(x.st.doc), onClick: selSt(x.st) })) })),
       ...(echoConf.length ? [{ label: 'Said alike, numbers differ', value: plural(echoConf.length, 'claim'), pct: '100%', color: 'var(--bad)', desc: 'Statements that echo each other across sources but give different figures for the same measure.', items: echoConf.slice(0, 4).map(g => ({ label: short(g.m[0].text, 50) + ' — ' + g.clash.join(', ') + ' differ', onClick: selSt(g.m[0]) })) }] : [])
     ];
 
@@ -12547,6 +12565,35 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
   // on the table, so the dissent stays on the record.
   verdicts() { if (!this._verd) { try { this._verd = JSON.parse(localStorage.getItem('fold-explorer-verdicts') || '{}'); } catch (e) { this._verd = {}; } } return this._verd; }
   verdictOf(docId, type) { const c = this.corpusId(); return (this.verdicts()[c] || {})[docId + '|' + type] || null; }
+  // ── The identity-gated contradiction (docs/SOURCE-CONTRADICTION-PREREG.md) ──────────────────────────────────
+  // The referent is the HOLOGRAPH'S, never a span: the BEING the source's own reading admitted and the MEASURE
+  // the figure stands under. The holograph's own MEASURE TOPICS ARE the discrepancy register (holoTopics): a
+  // measure group is one figure-slot the sources share FOR ONE BEING, `differs` when they give it different
+  // values. So a contradiction rides the element the sources SHARE — one being, one figure-slot — and is never
+  // the unit string or a word read off the prose. Measured on this corpus: the question "…as the ship sank?"
+  // folded the engine revolutions under the span "ship" (60/70/75/78/165 — not a referent, not a contradiction);
+  // the holograph's topics give the one real disagreement, "R.M.S. Titanic · tonnage".
+  // With no question there is no observer, so no record is emitted (a frameless assertion is refused) and the
+  // unit-string `differs` stands unchanged. The map is keyed by the topic's unit word AND by its label, so the
+  // panel's per-unit rows and the topic rows both find their record.
+  contradictionForUnits(A, S) {
+    const out = new Map(); const topics = []; const q = ((S && S.q) || '').trim();
+    if (!this._ctM || !q || !A) return { byUnit: out, topics };
+    let obs; try { obs = this._ctM.observerFrame(q, { giver: 'this reader' }); } catch (e) { return { byUnit: out, topics }; }
+    let groups = [];
+    try { groups = (holoTopics(A).groups || []).filter(g => g.kind === 'measure' && g.differs && (g.forWhom || []).length); } catch (e) { groups = []; }
+    for (const g of groups) {
+      try {
+        const rec = this._ctM.contradictionForTopic(g, { forWhom: obs });
+        if (!rec || (!rec.contradictions.length && !rec.refusals.length)) continue;
+        const entry = { group: g, rec, held: rec.contradictions[0] || null };
+        topics.push(entry);
+        out.set(g.label, entry);
+        const u = g.tuple && g.tuple.unit; if (u) out.set(u, entry);
+      } catch (e) { /* the unit-string reading stands */ }
+    }
+    return { byUnit: out, topics };
+  }
   saveVerdict(docId, type, value, readings) { const c = this.corpusId(); const all = this.verdicts(); const w = { ...(all[c] || {}) }; w[docId + '|' + type] = { value, at: new Date().toISOString(), readings: (readings || []).map(r => ({ ant: r.ant, raw: r.raw, val: r.val, s: r.s, e: r.e })) }; all[c] = w; this._verd = all; try { localStorage.setItem('fold-explorer-verdicts', JSON.stringify(all)); } catch (e) {} this._key = null; this.forceUpdate(); }
   openAmb(docId) { const d = this.analysis().docById[docId]; if (!d || !this._ambM) return; this._ambOpen = { docId, type: 'amount', r: this._ambM.amountReadings(d.text || '') }; this.forceUpdate(); }
   voteAmb(value) { const o = this._ambOpen; if (!o) return; this.saveVerdict(o.docId, o.type, value, o.r.readings); this._ambOpen = null; this.forceUpdate(); }
