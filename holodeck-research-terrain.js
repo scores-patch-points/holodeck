@@ -27,6 +27,7 @@
 
 import { DRAWS, rng, hash32, stemsOf } from './holodeck-research-null.js';
 import { referentKey } from './holodeck-research-read.js';
+import { contradictionForField } from './holodeck-contradiction.js';
 
 export const SCHEMA = 'HolodeckResearchTerrain@1';
 
@@ -98,16 +99,30 @@ export function terrainOf(input, { key = '' } = {}) {
   const kindRows = [...kindMap.values()].sort((a, b) => b.n - a.n || (a.kind < b.kind ? -1 : 1));
 
   // ── field: figures by unit ─────────────────────────────────────────────────────────────────────────────────────
+  const stById = new Map(sts.map(st => [st.id, st]));
+  const windowOf = (at, raw) => { const st = stById.get(at.id); if (!st) return null; const i = Math.max(0, at.s - st.s - 40); const j = Math.min((st.text || '').length, at.s - st.s + String(raw || '').length + 40); return (st.text || '').slice(i, j); };
   const units = new Map();
   for (const st of sts) for (const f of st.figs || []) {
     const u = f.unit || f.label || '?'; const x = units.get(u) || units.set(u, { unit: u, values: new Map() }).get(u);
     const vk = String(f.value); const v = x.values.get(vk) || x.values.set(vk, { raw: f.raw, value: f.value, docs: new Set(), at: [] }).get(vk);
-    v.docs.add(st.doc); if (v.at.length < 20) v.at.push({ ...addr(st), raw: f.raw });
+    v.docs.add(st.doc); if (v.at.length < 20) { const a = { ...addr(st), raw: f.raw }; a.window = windowOf(a, f.raw); v.at.push(a); }
   }
   const fieldRows = [...units.values()].map(x => {
     const vals = [...x.values.values()].map(v => ({ raw: v.raw, value: v.value, sources: [...v.docs].sort(), at: v.at })).sort((a, b) => b.sources.length - a.sources.length || a.value - b.value);
     const bySource = new Set(vals.flatMap(v => v.sources));
-    return { unit: x.unit, values: vals, sources: [...bySource].sort(), witnessedTwice: vals.filter(v => v.sources.length >= 2).length, differs: bySource.size >= 2 && vals.length >= 2 && !vals.some(v => v.sources.length === bySource.size) };
+    const row = { unit: x.unit, values: vals, sources: [...bySource].sort(), witnessedTwice: vals.filter(v => v.sources.length >= 2).length, differs: bySource.size >= 2 && vals.length >= 2 && !vals.some(v => v.sources.length === bySource.size) };
+    // THE SEAM, OPT-IN: when the caller declares an observer (input.forWhom) AND the rows carry the holograph's
+    // own referent (a being `anchor` and/or a `measure`), the unit-string `differs` above is nominated, never
+    // decided — the contradiction is the identity law's, read for that observer (holodeck-contradiction.js).
+    // No observer ⇒ no record (a frameless assertion is refused). No declared referent ⇒ no record either: the
+    // window is not an identity source (the span "ship" means many things), so a figure with no admitting being
+    // is a typed gap, not a guess. `differs` stands as it always did.
+    const refd = vals.some(v => v.anchor || v.referent || v.measure || (v.at || []).some(a => a.anchor || a.referent || a.measure));
+    if (input.forWhom && refd && vals.length >= 2 && bySource.size >= 2) {
+      try { row.contradiction = contradictionForField({ unit: x.unit, anchor: input.anchor || null, measure: input.measure || null, values: vals.map(v => ({ ...v, window: (v.at[0] || {}).window || null })) }, { forWhom: input.forWhom, synonyms: input.synonyms || {} }); }
+      catch (e) { row.contradiction = null; }
+    }
+    return row;
   }).sort((a, b) => b.sources.length - a.sources.length || b.values.length - a.values.length || (a.unit < b.unit ? -1 : 1));
 
   // ── link: statements, and which are said again elsewhere (echoes) ──────────────────────────────────────────────
@@ -135,7 +150,7 @@ export function terrainOf(input, { key = '' } = {}) {
   const echoes = []; const echoOf = new Map();
   // The page hands over the Holodeck's own echoes (analyze() already measures them against a shuffled null); then
   // none are recomputed here. Without them this module measures its own, against the null above.
-  const given = input.echoes || null, stById = new Map(sts.map(st => [st.id, st]));
+  const given = input.echoes || null;
   if (given) {
     const seenPair = new Set();
     for (const [id, list] of Object.entries(given)) { const a = stById.get(id); if (!a) continue;
@@ -217,7 +232,19 @@ export function terrainOf(input, { key = '' } = {}) {
   const paradigmGroups = [...groups.values()].filter(g => g.length >= 2).map(ids => ({ docs: ids.sort(), shared: sharedBy(ids), label: sharedBy(ids).slice(0, 3).join(' · ') })).sort((a, b) => b.docs.length - a.docs.length);
   const stray = docs.filter(d => ![...groups.values()].some(g => g.length >= 2 && g.includes(d.id))).map(d => d.id);
   const breaks = [
-    ...fieldRows.filter(f => f.differs).map(f => ({ kind: 'figures differ', unit: f.unit, values: f.values.slice(0, 6).map(v => ({ raw: v.raw, sources: v.sources, at: v.at.slice(0, 2) })) })),
+    ...fieldRows.filter(f => f.differs).map(f => ({
+      kind: 'figures differ', unit: f.unit,
+      values: f.values.slice(0, 6).map(v => ({ raw: v.raw, sources: v.sources, at: v.at.slice(0, 2) })),
+      // when an observer is declared, the identity decision rides along: the contradiction (same referent, two
+      // values) and the refusals (the unit string nominated them; this question refuses them — a different referent).
+      contradiction: f.contradiction ? {
+        forWhom: f.contradiction.forWhom,
+        contradictions: f.contradiction.contradictions.map(c => ({ referent: c.referent, values: c.values.map(v => ({ raw: v.raw, sources: v.sources, at: v.at.slice(0, 2) })), standing: c.standing, statements: c.statements, pairs_held: c.pairs_held })),
+        refusals: f.contradiction.refusals.map(r => ({ pair: r.pair, why: r.why })),
+        unstable: f.contradiction.unstable.map(u => ({ values: u.values, why: u.why })),
+        gaps: f.contradiction.gaps,
+      } : null,
+    })),
   ];
   const paradigm = { groups: paradigmGroups, stray, ties, recurs: echoes.slice(0, 20), echoFloor: +echoFloor.toFixed(3), breaks };
 
