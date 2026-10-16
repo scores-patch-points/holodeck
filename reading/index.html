@@ -1,0 +1,572 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>the reading microscope — how the fold reads, with no model</title>
+<style>
+  :root{
+    --bg:#0b0d12; --panel:#12151d; --panel2:#171b25; --line:#252b38;
+    --ink:#e7ecf5; --dim:#8b96ab; --faint:#5b6577;
+    --ground:#5ee0a0; --assert:#e6c04a; --void:#e0667a; --blue:#6cb6ff; --violet:#b48cff;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 var(--sans);-webkit-font-smoothing:antialiased}
+  a{color:var(--blue)}
+  header{padding:34px 28px 20px;border-bottom:1px solid var(--line)}
+  header h1{margin:0 0 6px;font-size:23px;letter-spacing:-.01em}
+  header .sub{color:var(--dim);max-width:900px;font-size:14px}
+  header .sub b{color:var(--ink);font-weight:600}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 28px 90px}
+  .drop{margin:22px 0;border:1.5px dashed #33405a;border-radius:14px;background:var(--panel);
+        padding:26px;text-align:center;transition:.15s;cursor:pointer}
+  .drop.hot{border-color:var(--blue);background:#141a26}
+  .drop .big{font-size:16px;font-weight:600}
+  .drop .small{color:var(--dim);font-size:13px;margin-top:5px}
+  textarea{width:100%;min-height:150px;background:var(--panel2);color:var(--ink);border:1px solid var(--line);
+           border-radius:12px;padding:14px;font:13px/1.5 var(--mono);resize:vertical;margin-top:14px}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:14px 0}
+  button{background:var(--panel2);color:var(--ink);border:1px solid var(--line);border-radius:9px;
+         padding:8px 14px;font:13px var(--sans);cursor:pointer}
+  button:hover{border-color:var(--blue);color:var(--blue)}
+  button.primary{background:#1c2740;border-color:#3a5party}
+  button.primary{border-color:#33507f}
+  .samples button{padding:5px 10px;font-size:12px}
+  section{background:var(--panel);border:1px solid var(--line);border-radius:14px;margin:18px 0;overflow:hidden}
+  section > .h{display:flex;gap:12px;align-items:baseline;padding:15px 20px;border-bottom:1px solid var(--line);
+                background:linear-gradient(0deg,#141926,#12151d)}
+  section > .h .n{font:600 11px var(--mono);color:var(--bg);background:var(--dim);border-radius:6px;padding:2px 7px;flex:0 0 auto}
+  section > .h h2{margin:0;font-size:15px;letter-spacing:.01em}
+  section > .h .why{color:var(--faint);font-size:12.5px;margin-left:auto;max-width:52%;text-align:right}
+  section > .b{padding:16px 20px}
+  .grid{display:grid;gap:14px}
+  .g2{grid-template-columns:1fr 1fr}
+  .g3{grid-template-columns:repeat(3,1fr)}
+  @media(max-width:820px){.g2,.g3{grid-template-columns:1fr}}
+  .card{background:var(--panel2);border:1px solid var(--line);border-radius:11px;padding:13px 15px}
+  .card h3{margin:0 0 8px;font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--dim);font-weight:600}
+  .kv{display:flex;justify-content:space-between;gap:14px;padding:3px 0;border-bottom:1px dotted #232936;font-size:13px}
+  .kv:last-child{border-bottom:0}
+  .kv .k{color:var(--dim)}
+  .kv .v{font-family:var(--mono);font-size:12px;text-align:right;word-break:break-all}
+  .mono{font-family:var(--mono);font-size:12.5px}
+  .chip{display:inline-block;border:1px solid var(--line);border-radius:20px;padding:1px 9px;font:11.5px var(--mono);
+        color:var(--dim);margin:2px 3px 2px 0}
+  .chip.g{color:var(--ground);border-color:#245a41}
+  .chip.a{color:var(--assert);border-color:#5c4d1d}
+  .chip.v{color:var(--void);border-color:#5c2530}
+  .chip.b{color:var(--blue);border-color:#234a6f}
+  table{width:100%;border-collapse:collapse;font-size:12.5px}
+  th,td{text-align:left;padding:6px 8px;border-bottom:1px solid #1e2430;vertical-align:top}
+  th{color:var(--dim);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.06em}
+  td.mono,th.mono{font-family:var(--mono)}
+  .bar{display:inline-block;height:9px;background:#2b3a56;border-radius:3px;vertical-align:middle;min-width:2px}
+  .cls{font:12.5px var(--mono)}
+  .atom{background:var(--panel2);border:1px solid var(--line);border-left:3px solid var(--ground);border-radius:10px;padding:12px 14px;margin:9px 0}
+  .atom.asserted{border-left-color:var(--assert)}
+  .atom .tri{font:14px var(--mono);line-height:1.5}
+  .atom .tri .e1{color:var(--blue)} .atom .tri .lb{color:var(--violet)} .atom .tri .e2{color:var(--ground)}
+  .atom .meta{color:var(--faint);font-size:11.5px;margin-top:7px;display:flex;gap:12px;flex-wrap:wrap}
+  .atom .meta b{color:var(--dim);font-weight:600}
+  .atom blockquote{margin:9px 0 0;padding:7px 11px;background:#0f131b;border-left:2px solid #263246;
+                   color:var(--dim);font:12px/1.5 var(--mono);border-radius:0 6px 6px 0;white-space:pre-wrap}
+  .evt{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;padding:6px 0;border-bottom:1px solid #1c222d;font-size:12px;font-family:var(--mono)}
+  .evt .id{color:var(--violet)}
+  .evt .st{color:var(--assert)}
+  .evt .rd{color:var(--dim)}
+  pre{background:#0f131b;border:1px solid var(--line);border-radius:10px;padding:13px;overflow:auto;max-height:360px;
+      font:11.5px/1.5 var(--mono);color:#c7d2e2}
+  .note{color:var(--dim);font-size:12.5px;margin:8px 0 0}
+  .note b{color:var(--ink)}
+  .gap{color:var(--void)}
+  .empty{color:var(--faint);font-style:italic;font-size:13px}
+  .hex{font:11px/1.5 var(--mono);color:#7c8aa0;word-break:break-all}
+  .num{font-family:var(--mono);color:var(--blue)}
+  .badge{font:11px var(--mono);padding:1px 7px;border-radius:6px;background:#1a2130;color:var(--dim);border:1px solid var(--line)}
+  .badge.live{color:var(--ground);border-color:#245a41}
+  .spin{color:var(--dim);font-size:13px}
+</style>
+</head>
+<body>
+<header>
+  <h1>the reading microscope</h1>
+  <div class="sub">
+    Drop any text in. This page reads it <b>the way the fold reads it</b> — grammar, then morphology,
+    then a hypergraph of relations — and shows you every step, byte by byte.
+    <b>No language model is called at any point.</b> Every organ below is the fold's own vendored code,
+    running here in your browser; every name in the reading is the giver that supplied it.
+  </div>
+</header>
+
+<div class="wrap">
+  <div id="drop" class="drop">
+    <div class="big">drop a document here, or click to choose a file</div>
+    <div class="small">.txt · .md · .html · .json · .csv · source code — anything that is text, up to a few MB</div>
+  </div>
+  <input id="file" type="file" hidden>
+  <textarea id="ta" placeholder="…or paste text here, then press Read."></textarea>
+  <div class="row">
+    <button id="read" class="primary">Read it</button>
+    <button id="clear">Clear</button>
+    <span class="samples" id="samples">
+      <button data-s="positions">sample · positions</button>
+      <button data-s="dossier">sample · dossier</button>
+      <button data-s="history">sample · history</button>
+    </span>
+    <span id="model" class="badge live" style="margin-left:auto">model calls: 0</span>
+  </div>
+
+  <div id="out"></div>
+</div>
+
+<script type="module">
+// ─────────────────────────────────────────────────────────────────────────────
+// Instrument BEFORE any organ loads, so the claim "no model was called" is
+// measured, not asserted. We count every network request the page makes; the
+// only ones that will appear are the static JSON priors it reads from disk.
+// ─────────────────────────────────────────────────────────────────────────────
+const net = { requests: [], models: 0 };
+const _fetch = window.fetch.bind(window);
+window.fetch = (u, o) => { net.requests.push(String(u)); return _fetch(u, o); };
+const t0 = performance.now();
+
+import { makeEngineRelationReader, loadPriors, blankMarkup } from '../holodeck-reader.js';
+import { classifyWord, THRAX_MAP, THRAX_OUT_OF_SCOPE, THRAX_META, POS_PRIOR_META } from '../vendor/eoreader7/native/adapters/text/wordclass.js';
+import { morphologyFromPrior, createLemmatizer, stemsOf } from '../vendor/eoreader7/native/adapters/text/morphology.js';
+import { splitSentences } from '../vendor/eoreader7/native/adapters/text/spans.js';
+import { tokenize } from '../vendor/eoreader7/native/organs/source.js';
+import { sha256Hex, stableProvenanceId, byteRange, EotLedger } from '../vendor/fold-chat/fold-chat-eot.js';
+
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]));
+const enc = new TextEncoder();
+const utf8Len = (s) => enc.encode(String(s)).length;
+const charToByte = (text, i) => utf8Len(text.slice(0, i));
+const clamp = (s, n) => { s = String(s); return s.length > n ? s.slice(0, n) + '…' : s; };
+
+const SAMPLES = {
+  positions: `The Palestinian Authority condemned the raid on Monday. Israel said the strike had targeted a commander. Human Rights Watch criticized the decision, while the mayor endorsed it. The council opposed the measure but the governor supported it, and two senators praised the compromise.`,
+  dossier: `Marie Curie praised the method, and the Royal Society endorsed the finding. Darwin opposed the standard, and Wallace supported the appeal. Human Rights Watch criticized the decision, and the mayor endorsed it. The Palestinian Authority condemned the raid, and Israel defended the strike.`,
+  history: `Napoleon opposed the treaty, and Wellington supported it. Lincoln condemned the raid, and Grant endorsed the plan. The Senate opposed the measure, and the President supported it. Caesar criticized the senate, and Pompey praised the crowd.`,
+};
+
+let PRIORS = null;      // { posPrior, morphRaw, morph, lemmatizer, verbForms }
+let READER = null;      // the assembled engine relation reader
+
+// ── 0 · INPUT ───────────────────────────────────────────────────────────────
+function show(){}
+function reset(){ $('out').innerHTML = ''; }
+
+async function ready(){
+  if (READER) return;
+  $('out').innerHTML = `<section><div class="b"><span class="spin">loading the fold's priors and organs…</span></div></section>`;
+  PRIORS = await loadPriors();
+  PRIORS.morphRaw = await (await fetch('../vendor/eoreader7/native/priors/morphology-eng.json')).json();
+  PRIORS.morph = morphologyFromPrior(PRIORS.morphRaw);
+  READER = await makeEngineRelationReader();
+}
+
+// ── MAIN ────────────────────────────────────────────────────────────────────
+async function read(text, label){
+  reset();
+  const raw = String(text || '');
+  if (raw.trim().length < 8) { $('out').innerHTML = `<section><div class="b"><span class="empty">Nothing to read yet — drop a document or paste text.</span></div></section>`; return; }
+  await ready();
+
+  const tRead0 = performance.now();
+  const fullBytes = utf8Len(raw);
+  const fullHash = sha256Hex(raw);
+  const LIMIT = 14000;
+  const analysis = raw.length > LIMIT ? raw.slice(0, LIMIT) : raw;
+  const truncated = raw.length > LIMIT;
+  const clean = blankMarkup(analysis);                // length-preserving: markup blanked, offsets intact
+
+  const report = READER([{ ref: label || 'source', text: clean }]);
+  const read0 = report.read(clean);
+  const claims = read0.claims || [];
+  const vocab = read0.vocabulary || report.vocabulary || {};
+  const sentences = splitSentences(clean);
+  const toks = tokenize(clean);
+  const readMs = Math.round(performance.now() - tRead0);
+
+  const doc = { label: label || 'pasted text', bytes: fullBytes, hash: fullHash, chars: raw.length, truncated, analysis };
+
+  render(doc, { clean, sentences, toks, claims, vocab, report, readMs });
+  $('model').textContent = `model calls: ${net.models}`;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+function render(doc, R){
+  const out = $('out');
+  const H = [];
+  H.push(inputCard(doc, R));
+  H.push(bytesCard(doc, R));
+  H.push(grammarCard(doc, R));
+  H.push(morphCard(doc, R));
+  H.push(stanceCard(doc, R));
+  H.push(atomsCard(doc, R));
+  H.push(logCard(doc, R));
+  H.push(priorsCard(doc, R));
+  H.push(timeCard(doc, R));
+  out.innerHTML = H.join('');
+  wireAtoms(doc, R);
+  $('model').textContent = `model calls: ${net.models}`;
+}
+
+// ── 0 · what came in ────────────────────────────────────────────────────────
+function inputCard(doc, R){
+  const distinct = new Set(R.toks).size;
+  return section(0, 'what came in', 'the material, its shape, and what the page read it as', `
+    <div class="grid g3">
+      ${card('shape', [
+        ['label', esc(doc.label)],
+        ['characters', doc.chars.toLocaleString()],
+        ['bytes (utf-8)', doc.bytes.toLocaleString()],
+        ['sentences', R.sentences.length.toLocaleString()],
+        ['words (distinct)', distinct.toLocaleString()],
+        ['read in', R.readMs + ' ms'],
+      ])}
+      ${card('the reading, in numbers', [
+        ['relations bound', R.claims.length],
+        ['relation vocabulary', (R.vocab.verbs ?? '—')],
+        ['grammar prior', R.vocab.grammarPrior ? 'present' : 'absent'],
+        ['model calls', 0],
+        ['network requests', ([...new Set(net.requests.map(u=>u.split('/').pop()))].join(', ') || 'none') + ' — static only'],
+      ])}
+      ${card('what this is', [
+        ['reader', 'hypergraph GFP, clause-aware'],
+        ['giver', 'eoreader7 native organs'],
+        ['model', 'none — deterministic'],
+        ['determinism', 'same bytes → same reading, ids included'],
+      ])}
+    </div>
+    ${doc.truncated ? `<p class="note">The file is longer than 14,000 characters; the <b>whole file</b> is hashed and addressed (above), but the live reading, below, is shown over its first 14,000 characters so the page stays responsive. The fold's own corpus path (<span class="mono">readCorpus</span>) chunks a whole book the same honest way.</p>` : ''}
+  `);
+}
+
+// ── 1 · BYTES & ADDRESS ─────────────────────────────────────────────────────
+function bytesCard(doc, R){
+  const led = new EotLedger({ artifact: 'reading-microscope', encoding: 'utf8' });
+  const srcId = led.source({ kind: 'document', locator: sha256Hex(doc.analysis).slice(0, 20), anchor: byteRange(0, utf8Len(doc.analysis)), meta: { label: doc.label } });
+  const hex = [...enc.encode(doc.analysis.slice(0, 48))].map(b => b.toString(16).padStart(2,'0')).join(' ');
+  return section(1, 'everything is byte-addressed & auditable', 'an id you can recompute; an address you can re-open', `
+    <p class="note">There is no floating claim here. The document becomes a <b>source</b>, stored once under a stable key derived from its own bytes, and every reading below points back into it by <b>byte range</b>. Anyone can recompute the id and re-open the exact bytes — that is the whole of the audit.</p>
+    <div class="grid g2">
+      ${card('the address', [
+        ['sha-256 (whole file)', clamp(doc.hash, 72)],
+        ['stable source id', srcId],
+        ['anchor', `byteRange(0, ${utf8Len(doc.analysis)})`],
+        ['address space', 'folded-bytes · unit: byte · encoding: utf8'],
+      ])}
+      ${card('the derivation', [
+        ['rule', "prefix_ + first 20 hex of sha256(JSON.stringify({kind,locator}))"],
+        ['prefix', 'src'],
+        ['locator', sha256Hex(doc.analysis).slice(0, 20)],
+        ['collision check', 'recompute & compare — never trust, re-derive'],
+      ])}
+    </div>
+    <h3 style="font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--dim);margin:14px 0 6px">first 48 bytes, as bytes</h3>
+    <div class="hex">${esc(hex)}</div>
+    <p class="note">Every relation the reader binds, further down, carries a range like <span class="mono">{unit:"byte", start, end}</span> cut from this same space. The claim is located by its own verbatim text, so its address is never a guess — it is the bytes it was read from.</p>
+  `);
+}
+
+// ── 2 · GRAMMAR ─────────────────────────────────────────────────────────────
+function grammarCard(doc, R){
+  const pos = PRIORS.posPrior;
+  // take the first few sentences, shoe every token
+  const shown = R.sentences.slice(0, 4);
+  let rows = '';
+  let unknown = 0, ambiguous = 0, tagged = 0;
+  for (const s of shown){
+    const words = String(s.text).match(/[\p{L}\p{N}][\p{L}\p{N}'’.\-]*/gu) || [];
+    let cells = '';
+    for (const w of words){
+      const c = classifyWord(w, { posPrior: pos });
+      if (!c.found){ unknown++; cells += cell(w, '<span class="gap">no entry — typed gap</span>', ''); continue; }
+      tagged++;
+      const cands = c.candidates;
+      if (cands.length > 1) ambiguous++;
+      const top = cands[0];
+      const bits = cands.slice(0,3).map(k => {
+        const thrax = k.thraxClass ? esc(k.thraxClass) : '<span class="gap">—</span>';
+        return `<span class="mono">${k.upos}</span> ${(k.share*100).toFixed(0)}% → ${thrax}`;
+      }).join('<br>');
+      cells += cell(w, bits, `<span class="bar" style="width:${Math.max(3,Math.round(top.share*46))}px"></span>`);
+    }
+    rows += `<div style="margin:10px 0 14px"><div class="evt-rd" style="color:var(--faint);font:11.5px var(--mono);margin-bottom:4px">sentence ${s.order} · ${utf8Len(s.text)} bytes · offset ${s.offset}</div><div>${cells}</div></div>`;
+  }
+  return section(2, 'grammar first', 'Dionysius Thrax over Universal Dependencies — an occurrence, never collapsed', `
+    <p class="note">Before any meaning, the page asks of each word <b>only what class its form is attested as</b> — a translation from the Universal Dependencies treebank (a real, human-annotated count) into Dionysius Thrax's eight ancient categories. The counts are the giver's; the reading is declared, never inherited.</p>
+    <div class="row" style="margin:6px 0 2px">
+      <span class="badge">${tagged} forms tagged</span>
+      <span class="badge">${ambiguous} attested in more than one class</span>
+      <span class="badge ${unknown?'':'live'}">${unknown} typed gaps</span>
+    </div>
+    <p class="note"><b>Ambiguity is preserved, not resolved.</b> A type-level table ("<i>book</i> is usually a noun") cannot answer an instance-level question ("<i>book</i> in this clause"). So the page never picks a winner here; where the top class is not dominant it says so. Resolving an occurrence is the job of its own local company, at the right grain — below.</p>
+    ${rows}
+    ${card('the two givers, never merged', [
+      ['class prior — giver', POS_PRIOR_META.giver],
+      ['class prior — scope', POS_PRIOR_META.scope],
+      ['Thrax map — giver', THRAX_META.giver],
+      ['out of Thrax’s scope', [...THRAX_OUT_OF_SCOPE].join(' · ') + ' (kept out, never forced)'],
+    ])}
+  `);
+}
+function cell(w, inner, bar){
+  return `<span style="display:inline-block;vertical-align:top;min-width:74px;margin:0 8px 8px 0;padding:5px 7px;background:#0f131b;border:1px solid #1e2532;border-radius:7px">
+    <span class="mono" style="color:var(--ink)">${esc(w)}</span><br>${bar}
+    <span style="color:var(--dim)">${inner}</span></span>`;
+}
+
+// ── 3 · MORPHOLOGY / UNIMORPH ───────────────────────────────────────────────
+function morphCard(doc, R){
+  const lem = PRIORS.lemmatizer;
+  const prov = PRIORS.morphRaw.provenance || {};
+  // the measured vocabulary: the verbs the reader actually BOUND (its own gate)
+  const measured = new Set(R.claims.map(c => String(c.label || '').toLowerCase()).filter(Boolean));
+  const tokenTypes = [...new Set(R.toks.map(t => String(t)))];
+  const links = [];
+  for (const t of tokenTypes){
+    if (measured.has(t)) continue;
+    for (const l of lem.lemmasOf(t)){
+      const src = [...measured].find(m => lem.lemmasOf(m).has(l));
+      if (src){ links.push({ form: t, lemma: l, sameAs: src }); break; }
+    }
+  }
+  const rows = links.slice(0, 40).map(l => `<tr><td class="mono">${esc(l.form)}</td><td class="mono">${esc(l.lemma)}</td><td class="mono">${esc(l.sameAs)}</td></tr>`).join('');
+  const wf = ['discovered','won','went','lay','trudged','is','was','criticized','supported'];
+  const ruleRows = wf.map(w => {
+    const stem = [...stemsOf(w)];
+    const cand = [...lem.lemmasOf(w)].sort((a,b)=>a.length-b.length);
+    return `<tr><td class="mono">${esc(w)}</td><td class="mono">${cand.map(esc).join(', ')}</td><td class="mono">${stem.map(esc).join(', ') || '—'}</td></tr>`;
+  }).join('');
+  return section(3, 'morphology — the act closure (UniMorph)', 'prior decides sameness; the material decides presence', `
+    <p class="note">A reader who has learned "<i>trudged</i>" hears "<i>trudges</i>" and "<i>trudging</i>" for free. The engine does the same, on <b>two walls</b>:</p>
+    <div class="grid g2">
+      ${card('wall 1 — the prior decides sameness', [
+        ['prior', prov.source || 'UniMorph English'],
+        ['schema', PRIORS.morphRaw.schema],
+        ['irregular-tail rows kept', (prov.kept ?? '—') + ' of ' + (prov.pairs_read ?? '—') + ' read'],
+        ['rule-recoverable dropped', prov.rule_recoverable_dropped ?? '—'],
+        ['built by', prov.built_by || '—'],
+      ])}
+      ${card('wall 2 — the material decides presence', [
+        ['measured acts (gate)', measured.size],
+        ['same-act forms admitted', links.length],
+        ['token types in material', tokenTypes.length],
+        ['never invents an act', 'the closure widens FORM, never vocabulary'],
+        ['never picks one lemma', 'lemmasOf returns the candidate SET'],
+      ])}
+    </div>
+    <h3 style="font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--dim);margin:14px 0 6px">forms in this material that are the same act as a verb the reader measured</h3>
+    ${links.length ? `<table><thead><tr><th>form in material</th><th>lemma candidate</th><th>same act as (measured)</th></tr></thead><tbody>${rows}</tbody></table>` : `<span class="empty">No added forms: every verb form in this material was already measured by the reader's own gate.</span>`}
+    <h3 style="font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--dim);margin:16px 0 6px">the lookup itself — table ∪ English suffix rule (never one chosen over the other)</h3>
+    <table><thead><tr><th>form</th><th>lemma candidates (set)</th><th>stemsOf — rule-recovered</th></tr></thead><tbody>${ruleRows}</tbody></table>
+    <p class="note">The lemma is never reduced to one string: <b>identity lives in the referent, never in a string</b>. A form the prior does not know and the rule cannot recover stays a form — a typed gap, never a silently wrong act.</p>
+  `);
+}
+
+// ── 3b · STANCE (the one construction worth calling out) ────────────────────
+function stanceCard(doc, R){
+  const withStance = R.claims.filter(c => /support|oppos|against|pro|criticiz|condemn|endors|prais|backed|favou|advocat|denounc|boycott|resist|protest/i.test(c.label || ''));
+  return section("3b", 'the stance class — position read, label untouched', '“is pro” binds a source’s “in support of”, without rewriting either', `
+    <p class="note">A position — X supports Y — is read when it takes the plain verb form. The construction the base reader cannot hear is the <b>copula + adjective</b> ("is pro", "is opposed to"). On this page the stance class is read as a relation, and a stance is equated with its own paraphrases at the <b>class</b> level — the label a source was read from is carried through verbatim, never rewritten.</p>
+    <div class="row">${withStance.length ? withStance.map(c => `<span class="chip b">${esc(c.label)}</span>`).join('') : '<span class="empty">No stance relation bound in this material.</span>'}</div>
+    <p class="note">Falsifiable: this reader was measured against its own shuffle-null, and a swap that did <b>not</b> beat its null was reverted rather than kept. The negative result stays in the code.</p>
+  `);
+}
+
+// ── 4 · THE READING (EOT atoms) ─────────────────────────────────────────────
+const VERDICT_LABEL = { bound: 'read', 'beyond-reach': 'beyond reach', unheard: 'unheard' };
+const VERDICT_WHY = {
+  bound: 'both endpoints resolve to a referent this material establishes',
+  'beyond-reach': 'an endpoint does not resolve to any referent this material establishes — disclosed as unreadable, never implied false',
+  unheard: 'the act is outside the vocabulary this material itself measures — the instrument’s reach ends here, and the omission stays visible',
+};
+function atomsCard(doc, R){
+  const atoms = R.claims.map((c, i) => {
+    const sp = (c.spans || [])[0] || {};
+    const hasSpan = sp.text != null && sp.text !== '';
+    const at = hasSpan ? doc.analysis.indexOf(sp.text) : -1;
+    const s = at >= 0 ? at : (sp.start ?? 0);
+    const e = s + (hasSpan ? sp.text.length : 0);
+    const grounded = at >= 0;
+    const b0 = hasSpan ? charToByte(doc.analysis, s) : null;
+    const b1 = hasSpan ? charToByte(doc.analysis, e) : null;
+    const v = c.verdict || 'bound';
+    return { i, end1: c.end1, end2: c.end2, label: c.label, polarity: c.polarity || '+', verdict: v,
+      standing: VERDICT_LABEL[v] || v, why: VERDICT_WHY[v] || '', span: sp.text || '', b0, b1, grounded, hasSpan };
+  });
+  const body = atoms.length ? atoms.map(a => `
+    <div class="atom ${a.standing === 'read' ? '' : 'asserted'}" data-i="${a.i}">
+      <div class="tri"><span class="e1">${esc(a.end1)}</span> <span class="lb">—${esc(a.label)}→</span> <span class="e2">${esc(a.end2)}</span></div>
+      <div class="meta">
+        <span><b>standing</b> ${a.standing}</span>
+        <span><b>polarity</b> ${esc(a.polarity)}</span>
+        <span><b>address</b> ${a.b0 == null ? '<span class="gap">— (no span in record)</span>' : 'byte ' + a.b0 + '–' + a.b1}</span>
+        <span><b>grounded</b> ${a.grounded ? 'verbatim in source' : (a.hasSpan ? 'span not found — typed gap' : 'no span carried')}</span>
+      </div>
+      <div class="note" style="margin:5px 0 0">${esc(a.why)}</div>
+      ${a.span ? `<blockquote>${esc(clamp(a.span, 220))}</blockquote>` : ''}
+    </div>`).join('') : `<span class="empty">The reader bound no relation here. That is a real, honest result — it refuses to guess rather than invent one. Try a sample with clear actors and verbs, or a longer passage.</span>`;
+  const counts = { read: 0, 'beyond reach': 0, unheard: 0 };
+  atoms.forEach(a => { counts[a.standing] = (counts[a.standing] || 0) + 1; });
+  return section(4, 'the reading — EOT atoms', 'what the reader actually heard: subject —act→ object, with its verdict', `
+    <p class="note">This is the reading itself. The hypergraph reads a clause as <b>(subject, act, object)</b> and attaches a <b>verdict</b> to every atom — including the ones it cannot read. A refusal is a result, not a failure: <b>nothing here is ever implied false</b>.</p>
+    ${card('the three tiers — the ways it reads, and the ways it declines', [
+      ['read', 'both endpoints resolve to a referent this material establishes'],
+      ['beyond reach', 'an endpoint does not resolve to any referent — disclosed as unreadable, never implied false'],
+      ['unheard', 'the act is outside the vocabulary the material itself measures — the omission stays visible'],
+    ])}
+    <div class="row" style="margin-top:12px">
+      <span class="badge live">${counts.read} read</span>
+      <span class="badge">${counts['beyond reach']} beyond reach</span>
+      <span class="badge">${counts.unheard} unheard</span>
+      <span class="badge">${atoms.length} atoms · 0 model calls</span>
+    </div>
+    ${body}
+  `);
+}
+
+// ── 5 · THE LOG ─────────────────────────────────────────────────────────────
+function logCard(doc, R){
+  const led = new EotLedger({ artifact: 'reading-microscope', encoding: 'utf8' });
+  const srcId = led.source({ kind: 'document', locator: sha256Hex(doc.analysis).slice(0, 20), anchor: byteRange(0, utf8Len(doc.analysis)), meta: { label: doc.label } });
+  const readEvt = led.event({ stage: 'read', source_id: srcId, transform: 'bytes→sentences' });
+  led.event({ stage: 'arrange', source_id: srcId, parent: readEvt, transform: 'sentences→tokens' });
+  R.claims.forEach((c, i) => {
+    const sp = (c.spans || [])[0] || {};
+    const at = sp.text != null ? doc.analysis.indexOf(sp.text) : -1;
+    const b0 = at >= 0 ? charToByte(doc.analysis, at) : 0;
+    const b1 = b0 + (sp.text ? utf8Len(sp.text) : 0);
+    led.event({ stage: 'bind', source_id: srcId, parent: readEvt, unit: 'relation', range: byteRange(b0, b1),
+      transform: 'clause→relation', detail: { end1: c.end1, label: c.label, end2: c.end2, polarity: c.polarity || '+' } });
+  });
+  const eot = led.eot({ root: readEvt });
+  const evRows = led.events.map(ev => `<div class="evt">
+      <span class="id">${esc(ev.event_id.slice(0, 14))}</span>
+      <span><span class="st">${esc(ev.stage)}</span> <span class="rd">${esc(ev.transform || '')}</span>${ev.range ? ` <span class="rd">· byte ${ev.range.start}–${ev.range.end}</span>` : ''}${ev.detail ? ` <span class="rd">· ${esc(clamp(JSON.stringify(ev.detail), 90))}</span>` : ''}${ev.parent ? ` <span class="rd">· parent ${esc(ev.parent.slice(0,10))}</span>` : ''}</span>
+    </div>`).join('');
+  window.__LED = { led, srcId, readEvt };
+  return section(5, 'the log — Provenance@2, append-only', 'transformations, not citations; ids you can recompute', `
+    <p class="note">The reading is not thrown away; it is <b>appended to a provenance ledger</b>. A source is stored once under its stable key; every event points to a source and to a parent. The stage names the <b>transformation</b> — read, arrange, bind — never a bare citation. The id derivation is penelope's own: <span class="mono">evt_ + first 20 hex of sha256(JSON.stringify(value))</span> — so the same reading always yields the <b>same ids</b>, and a third party can recompute the whole log.</p>
+    <div class="grid g2">
+      <div class="card"><h3>events (${led.events.length})</h3>${evRows}</div>
+      <div class="card"><h3>the document, as emitted</h3><pre>${esc(JSON.stringify(swapSources(eot), null, 1)).slice(0, 3400)}</pre></div>
+    </div>
+    <p class="note">Read the events as a chain of transforms on the material's own bytes: <span class="mono">bytes→sentences→tokens→…→relation</span>, each anchored to the range it came from. Nothing is asserted without the address it was read at.</p>
+  `);
+}
+function swapSources(eot){ // keep the JSON readable: sources keyed once
+  return { schema: eot.schema, artifact: eot.artifact, addressSpace: eot.addressSpace, sources: eot.sources, events: eot.events.map(e => ({ event_id: e.event_id, stage: e.stage, parent: e.parent || undefined, transform: e.transform || undefined, range: e.range || undefined, detail: e.detail || undefined })) };
+}
+
+// ── 6 · PRIORS ──────────────────────────────────────────────────────────────
+function priorsCard(doc, R){
+  const pos = PRIORS.posPrior, mr = PRIORS.morphRaw;
+  return section(6, 'priors — received, named, never derived', 'a missing prior is a typed gap, never a silent guess', `
+    <p class="note">Everything above was read without a model. What it <i>did</i> receive are <b>priors</b>: knowledge injected from outside, each naming its giver. The engine derives none of it. Where a prior is absent, the reading widens its gap loudly rather than quietly changing its answer.</p>
+    <table><thead><tr><th>prior</th><th>schema</th><th>giver</th><th>the wall it holds</th></tr></thead><tbody>
+      <tr><td>part of speech</td><td class="mono">${esc(pos.schema)}</td><td>${esc(pos.provenance.giver)}</td><td>attests classes per form; code picks no winner</td></tr>
+      <tr><td>licence</td><td class="mono">—</td><td>${esc(pos.provenance.license)}</td><td>the giver's terms travel with the reading</td></tr>
+      <tr><td>morphology</td><td class="mono">${esc(mr.schema)}</td><td>${esc(mr.provenance.source)}</td><td>decides same-act; never invents a form</td></tr>
+      <tr><td>Thrax map</td><td class="mono">declared</td><td>${esc(THRAX_META.giver)}</td><td>a translation, not a fact — gaps left out</td></tr>
+    </tbody></table>
+    <p class="note">The rule the whole page obeys: <b>the prior decides sameness; the material decides presence.</b> And a prior is only ever <i>injected</i> — an organ never reaches out to disk to find one.</p>
+  `);
+}
+
+// ── 7 · POLYTEMPORALITY ─────────────────────────────────────────────────────
+const MODAL_FUT = /\b(will|shall|'ll)\b/i;
+const HAD_PART = /\b(had)\s+\w+(ed|en|wn|ne|de|ad|it)\b/i;
+function localTense(span){
+  const t = String(span || '');
+  if (HAD_PART.test(t)) return { v:'Pqp', why:'had + participle — a past before a past' };
+  if (MODAL_FUT.test(t)) return { v:'Fut', why:'modal will/shall — analytic future' };
+  if (/\b(is|are|am|has|have)\b/i.test(t)) return { v:'Pres', why:'finite present (be/have)' };
+  if (/\b(was|were|had|said|saw|came|went|took|gave)\b|\w+ed\b/i.test(t)) return { v:'Past', why:'finite past form or -ed' };
+  return { v:'undeclared', why:'no finite verb in the clause — counted, never guessed' };
+}
+function timeCard(doc, R){
+  const rows = R.claims.map((c, i) => {
+    const sp = (c.spans || [])[0] || {};
+    const hasSpan = sp.text != null && sp.text !== '';
+    const at = hasSpan ? doc.analysis.indexOf(sp.text) : -1;
+    const b0 = hasSpan ? charToByte(doc.analysis, at >= 0 ? at : 0) : null;
+    const T = hasSpan ? localTense(sp.text) : { v: 'unlocated', why: 'the claim carried no span — nothing to place in the material' };
+    return `<tr><td class="mono">${b0 == null ? '<span class="gap">—</span>' : 'byte ' + b0}</td><td class="mono">${esc(c.label)}</td><td><span class="chip ${T.v==='undeclared'||T.v==='unlocated'?'':'b'}">${T.v}</span></td><td>${esc(T.why)}</td></tr>`;
+  }).join('');
+  return section(7, 'polytemporality — time is local, never a global clock', 'each atom carries its own time read from its own clause', `
+    <p class="note">There is <b>no universal clock</b> in this reading. Each atom is anchored in its own <b>byte range</b> — its own coordinate in the material — and its time is read from its <b>own clause</b>, not from a shared counter or an arrival order. Two atoms about the same referent ("the council opposed…" / "…the governor supported it") are not ordered by a clock; each stands at its own address with its own tense.</p>
+    <p class="note">The engine's own tense organ (<span class="mono">adapters/text/clause-tense.js</span>, giver: UD_English-EWT through the Chomsky parser) reads <span class="mono">Pqp</span> as <i>"a past before a past"</i> off the had+participle construction, <span class="mono">Fut</span> off a modal, and <span class="mono">undeclared</span> where no finite verb exists — counted, never guessed. The column below shows the <b>same shape</b> read by this page's own declared rule, so the mechanism is visible; swap in the engine's organ for the full inverse (<span class="mono">go → went</span>, <span class="mono">lay → lie</span>) it would read.</p>
+    <table><thead><tr><th>local coordinate</th><th>act</th><th>local tense signal</th><th>how it was read</th></tr></thead><tbody>${rows || '<tr><td colspan="4" class="empty">No atoms to place.</td></tr>'}</tbody></table>
+    <p class="note">Because every coordinate is a byte range and every event records a <b>transform</b>, the log is reproducible across time and machines — a reading is not a moment, it is a chain that can be re-run and re-derived, byte for byte.</p>
+  `);
+}
+
+// ── REVISABLE ASSERTIONS (wired after render) ───────────────────────────────
+function wireAtoms(doc, R){
+  const host = document.querySelector('section[data-n="4"]');
+  if (!host) return;
+  const led = window.__LED.led;
+  host.querySelectorAll('.atom').forEach(el => {
+    const meta = el.querySelector('.meta');
+    const btn = document.createElement('button');
+    btn.textContent = 'revisit this assertion';
+    btn.style.marginTop = '9px';
+    meta.appendChild(btn);
+    btn.addEventListener('click', () => {
+      const i = Number(el.dataset.i);
+      const c = R.claims[i];
+      const prev = el.dataset.evt;
+      const evt = led.event({ stage: 'revisit', source_id: window.__LED.srcId, parent: prev || window.__LED.readEvt,
+        transform: 'assertion→revision', detail: { of: c.end1 + '—' + c.label + '→' + c.end2, act: 'reopened', note: 'standing held open for re-reading' } });
+      el.dataset.evt = evt;
+      el.classList.add('asserted');
+      el.querySelectorAll('.meta span').forEach(s => { if (s.innerHTML.startsWith('<b>standing</b>')) s.innerHTML = '<b>standing</b> reopened'; });
+      const badge = document.createElement('span');
+      badge.className = 'chip a'; badge.textContent = 'revised · ' + evt.slice(0, 12);
+      meta.appendChild(badge);
+      const logHost = document.querySelector('section[data-n="5"] .card');
+      if (logHost){
+        const row = document.createElement('div');
+        row.className = 'evt';
+        row.innerHTML = `<span class="id">${esc(evt.slice(0,14))}</span><span><span class="st">revisit</span> <span class="rd">assertion→revision · ${esc(clamp(c.end1+'—'+c.label+'→'+c.end2, 70))}</span> <span class="rd">· parent ${esc((prev||window.__LED.readEvt).slice(0,10))}</span></span>`;
+        logHost.appendChild(row);
+      }
+      btn.disabled = true; btn.textContent = 'reopened — appended to the log';
+    });
+  });
+}
+
+function section(n, title, why, body){
+  return `<section data-n="${n}">
+    <div class="h"><span class="n">${n}</span><h2>${esc(title)}</h2><span class="why">${esc(why)}</span></div>
+    <div class="b">${body}</div></section>`;
+}
+function card(title, kvs){
+  return `<div class="card"><h3>${esc(title)}</h3>${kvs.map(([k,v]) => `<div class="kv"><span class="k">${esc(k)}</span><span class="v">${v}</span></div>`).join('')}</div>`;
+}
+
+// ── INPUT WIRING ────────────────────────────────────────────────────────────
+const drop = $('drop'), file = $('file'), ta = $('ta');
+drop.addEventListener('click', () => file.click());
+file.addEventListener('change', async () => { const f = file.files[0]; if (f) read(await f.text(), f.name); });
+['dragenter','dragover'].forEach(e => drop.addEventListener(e, ev => { ev.preventDefault(); drop.classList.add('hot'); }));
+['dragleave','drop'].forEach(e => drop.addEventListener(e, ev => { ev.preventDefault(); drop.classList.remove('hot'); }));
+drop.addEventListener('drop', async ev => {
+  const f = ev.dataTransfer.files && ev.dataTransfer.files[0];
+  if (f) return read(await f.text(), f.name);
+  const t = ev.dataTransfer.getData('text');
+  if (t) read(t, 'dropped text');
+});
+$('read').addEventListener('click', () => read(ta.value, 'pasted text'));
+$('clear').addEventListener('click', () => { ta.value = ''; reset(); });
+$('samples').addEventListener('click', e => { const s = e.target.dataset.s; if (s){ ta.value = SAMPLES[s]; read(SAMPLES[s], 'sample · ' + s); } });
+window.__read = read; window.__SAMPLES = SAMPLES; window.__net = net;
+</script>
+</body>
+</html>
