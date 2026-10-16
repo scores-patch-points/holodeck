@@ -128,17 +128,50 @@ export function referentOf(value, voc) {
   return null;
 }
 
+// ── the POINT: the referent the whole record carries each form on, read frame-INDEPENDENTLY ────────────────────
+// identity-meet.js's two levels: the FORM (a frame's own naming — "saved"/"rescued") and the POINT (the referent
+// the record carries a form on — the being+measure). The being is INVARIANT; only the identification is relative
+// (identity-at-a-point.md). So the point is read from the value's DECLARED measure canonicalised through the
+// injected synonym prior — a prior names a form; it never depends on which observer is asking — and each frame's
+// question then only decides whether that frame SPEAKS about the point. A point carries no frame, so every frame
+// meets on the same points: the being, not the spelling.
+function canonIndexOf(synonyms) {
+  const canon = new Map(); const groups = [];
+  for (const [key, forms] of Object.entries(synonyms || {})) {
+    const k = norm(key); if (!k) continue;
+    const list = [...new Set([k, ...(forms || []).map(norm)].filter(Boolean))];
+    for (const f of list) canon.set(f, k);
+    groups.push([k, list]);
+  }
+  return { canon, groups };
+}
+/** pointOfValue(value, canon) — the referent point a value is carried on: its declared MEASURE, canonicalised
+ *  through the injected synonym prior, qualified by the BEING (`anchor`). No declared measure ⇒ no point (the
+ *  value answers no referent this record can carry it on) — a typed gap, never the spelling. Frame-independent. */
+function pointOfValue(value, canon) {
+  const anchorName = String(value.anchor || '').trim();
+  const text = norm([value.referent, value.measure].filter(Boolean).join(' '));
+  if (!text) return null;
+  let term = null;
+  for (const [k, forms] of canon.groups) { if (forms.some((f) => f && text.includes(f))) { term = k; break; } }
+  if (!term) term = text;
+  return anchorName ? term + '\u0001' + anchorName : term;
+}
+
 // ── the frame's entries: every value as an edge the identity law can read at a point ──────────────────────────
-// The participants carry the value's FORM (the raw string) and its REF (the referent key the frame reads it on),
-// so the meet at the point level translates a frame's reading of the forms onto the referent the record carries
-// them on — the being, not the spelling (identity-meet.js's own two levels).
+// The participants carry the value's FORM (the raw string) and its REF — the frame-INDEPENDENT point above — so
+// the meet at the point level translates a frame's reading of the forms onto the referent the record carries them
+// on: the being, not the spelling (identity-meet.js's own two levels).
 function entryFor(value, referentKey) {
   const s = Number.isFinite(value.s) ? value.s : 0;
   return Object.freeze({
     schema: 'EOHyperedge@1',
     id: 'value:' + (value.id != null ? value.id : value.doc + ':' + s),
     witness: String(value.doc),
-    scope: Object.freeze({ byteOffset: s }),
+    // the ENCOUNTER is the source's own reading (the witness), not each value's byte offset: the identity's
+    // coherence is measured over the sources that state the values, so a topic many sources state is a real
+    // trajectory, and one source's many values are one encounter (not a flat run the gate must refuse).
+    scope: Object.freeze({ sourceRef: String(value.doc) }),
     relation: value.unit || null,
     referent: referentKey,
     participants: Object.freeze([
@@ -178,7 +211,11 @@ function frameEvidence(nominated, refOf, frameName) {
   return { supports, attacks };
 }
 
-const pairIn = (list, a, b) => { const k = [norm(a), norm(b)].sort().join('\u0000'); return list.includes(k); };
+// The point keys the meet carries a form on contain the referent's own control character (measure\u0001being), so
+// they are compared by their normalised halves — the same normalisation identity-meet applies to a form's spelling.
+const keyNorm = (k) => String(k).split('\u0000').map(norm).sort().join('\u0000');
+const keySetOf = (list) => new Set((list || []).map(keyNorm));
+const inKeySet = (set, a, b) => set.has([norm(a), norm(b)].sort().join('\u0000'));
 
 /**
  * contradictionsOf(values, { forWhom, synonyms, frames }) — the contradiction records for a set of value
@@ -201,6 +238,7 @@ export function contradictionsOf(values = [], { forWhom = null, synonyms = {}, f
     });
   }
   const voc = referentVocabulary(obs, synonyms);
+  const canon = canonIndexOf(synonyms);   // the frame-independent canon: the point every frame meets on
   const vals = (values || []).filter((v) => v && v.doc != null && isFinite(+v.value) && v.raw != null && String(v.raw).trim());
 
   // ── group by unit (the nomination axis), then by referent (the frame's decision axis) ────────────────────────
@@ -215,7 +253,7 @@ export function contradictionsOf(values = [], { forWhom = null, synonyms = {}, f
     if (!key) { offReferent.push(v); continue; }
     const r = referents.get(key) || referents.set(key, { referent: key, values: new Map() }).get(key);
     const rk = norm(v.raw);
-    const x = r.values.get(rk) || r.values.set(rk, { raw: String(v.raw), value: +v.value, docs: new Set(), at: [] }).get(rk);
+    const x = r.values.get(rk) || r.values.set(rk, { raw: String(v.raw), value: +v.value, docs: new Set(), at: [], point: pointOfValue(v, canon) || norm(v.raw) }).get(rk);
     x.docs.add(String(v.doc));
     if (x.at.length < 20) x.at.push(Object.freeze({ doc: String(v.doc), s: v.s, e: v.e, raw: String(v.raw), year: v.year != null ? +v.year : null }));
   }
@@ -231,15 +269,26 @@ export function contradictionsOf(values = [], { forWhom = null, synonyms = {}, f
     };
     const nominated = [];
     for (const group of byUnit.values()) for (const alt of nominatedAlternatives(group, 'the unit string')) nominated.push(alt);
-    const entries = vals.map((v) => entryFor(v, referentOf(v, fvoc) || 'unknown')).filter((e) => e.referent !== 'unknown');
+    // the entries carry the frame-INDEPENDENT point, so the point meet is the being every frame shares; the frame's
+    // supports/attacks (below) are its own reading of the forms — the being is invariant, only the reading is relative.
+    const entries = vals.map((v) => entryFor(v, pointOfValue(v, canon) || 'unknown')).filter((e) => e.referent !== 'unknown');
     const { supports, attacks } = frameEvidence(nominated, refOf, fr.id);
     reads.push({ forWhom: fr, ctx: { fold: { graphEntries: entries, unresolvedAlternatives: nominated }, supports, attacks } });
   }
   let forms = null, points = null;
   try { forms = survivingIdentity(reads); } catch (e) { forms = null; }
   try { points = survivingIdentityAtPoints(reads); } catch (e) { points = null; }
-  const survivors = forms ? forms.survivors : [];
+  // THE GRAIN (docs/SOURCE-CONTRADICTION-PREREG.md's one open seam): the identity the record ASSERTS is read at the
+  // POINT level — the being the record carries the forms on, not the spelling — so a pair survives iff some
+  // admissible frame holds its POINTS and none splits them. The form-level meet is kept beside it, because the
+  // nomination and the disclosed refusals are the frames' own namings (their forms). Falls back to the form grain
+  // when the point meet is unavailable (a typed gap, never a silent wrong grain).
+  const survivors = forms ? forms.survivors : [];   // the frames' own namings (the forms)
   const splits = forms ? forms.splits : [];
+  const pSurvivors = points ? points.survivors : survivors;   // the being the record carries the forms on
+  const pSplits = points ? points.splits : splits;
+  const pSurvSet = keySetOf(pSurvivors), pSplitSet = keySetOf(pSplits);
+  const identityGrain = points ? 'point' : 'form';
 
   // ── the record: per referent, the values in parallel; a contradiction only where identity held and values split ─
   const outReferents = [];
@@ -249,18 +298,18 @@ export function contradictionsOf(values = [], { forWhom = null, synonyms = {}, f
   for (const r of [...referents.values()].sort((a, b) => b.values.size - a.values.size || (a.referent < b.referent ? -1 : 1))) {
     const valueRows = [...r.values.values()].map((x) => ({
       raw: x.raw, value: x.value, sources: [...x.docs].sort(),
-      statements: x.docs.size, standing: standingOf(x.docs.size),
+      statements: x.docs.size, standing: standingOf(x.docs.size), point: x.point,
       at: x.at.slice().sort((a, b) => (a.doc < b.doc ? -1 : a.doc > b.doc ? 1 : (a.s - b.s))),
     })).sort((a, b) => b.sources.length - a.sources.length || a.value - b.value);
     const pairCount = valueRows.length < 2 ? 0 : valueRows.length * (valueRows.length - 1) / 2;
-    // the pairs the meet held, whose values differ: the contradiction.
+    // the pairs the meet held at the IDENTITY GRAIN, whose values differ: the contradiction.
     const heldPairs = [];
     for (let i = 0; i < valueRows.length; i++) for (let j = i + 1; j < valueRows.length; j++) {
       const a = valueRows[i], b = valueRows[j];
-      if (pairIn(survivors, a.raw, b.raw)) heldPairs.push([a, b]);
+      if (inKeySet(pSurvSet, a.point, b.point)) heldPairs.push([a, b]);
     }
     const refPairs = [];
-    for (let i = 0; i < valueRows.length; i++) for (let j = i + 1; j < valueRows.length; j++) if (pairIn(splits, valueRows[i].raw, valueRows[j].raw)) refPairs.push([valueRows[i], valueRows[j]]);
+    for (let i = 0; i < valueRows.length; i++) for (let j = i + 1; j < valueRows.length; j++) if (inKeySet(pSplitSet, valueRows[i].point, valueRows[j].point)) refPairs.push([valueRows[i], valueRows[j]]);
     // the contradiction's support: how many independent source-pairs exhibit the split (the recurrence floor).
     let statements = 0;
     for (const [a, b] of heldPairs) statements += a.sources.length * b.sources.length;
@@ -315,6 +364,7 @@ export function contradictionsOf(values = [], { forWhom = null, synonyms = {}, f
     refusals: Object.freeze(refusals),
     unstable: Object.freeze(unstableU),
     meet: Object.freeze({ schema: MEET_SCHEMA, forms, points }),
+    identityGrain,
     gaps: Object.freeze(gaps),
     floor: WITNESS_FLOOR,
   });

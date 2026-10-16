@@ -254,3 +254,85 @@ a gap in the corpus, and it is named, not guessed.
 * **The demo's try questions.** The sample's three try questions were built for
   the idealised table. "What was the Titanic's tonnage?" is added so the demo can
   show the one contradiction the corpus actually holds.
+
+### R4 — the two R3 gaps closed, and the open seam decided (2026-10-16, `topics-holograph-profile`)
+
+**The open seam is decided: the record reads identity at the POINT grain.** The
+doubt section above left one seam — whether the demo needs the point-level meet
+(the being) or the form-level one (the spelling). It is the POINT: the point
+(`measure\u0001being`) is read frame-INDEPENDENTLY (the declared measure
+canonicalised through the injected synonym prior), and each for-whom only decides
+whether it SPEAKS about that point. The being is invariant; only the reading is
+relative — `holodeck-contradiction.js`'s `identityGrain` is `point`, and the
+form-level meet is kept beside it for the frames' own namings. Measured on the
+Titanic corpus: `R.M.S. Titanic · tonnage` holds exactly as before, now with the
+point meet; the fixture's E1–E8 controls are unchanged.
+
+**The anchor is the source's own referent — gated on an EARNED relation.** A
+pronominal statement names no being; its figure takes the being the SOURCE is
+about (`docReferentOf`: the admitted referent the source mostly carries, ≥2
+sources, ≥3 of its statements) — never the span. But the gate is the grain: the
+anchor-from-the-source applies ONLY when the figure's measure is an EARNED
+RELATION, never a bare unit. **The control that must fail does fail (measured):**
+an ungated doc-referent anchor folds "Titanic · feet" (200 vs 800 vs 150 — an
+iceberg's size and the ship's) and "Titanic · inches" — E1, a false
+contradiction. With the gate, those groups do not form.
+
+**The measure is the relation, not the unit.** Two earned sources feed it: the
+statement's own LABELLED QUANTITY ("Total number saved, 705"; "…company lost,
+1635"; "…persons aboard, 2340" — the label's head word is the measure), and the
+source's own TABLE COLUMN (below). The nearest measure word to the figure is
+taken, so "705 rescued by the Carpathia" reads "rescued", not a "drowned"
+earlier in the sentence.
+
+**A table's own figures: the column's header word is the measure.** The British
+report's own "Numbers saved" table states 2201 aboard AND 711 saved in one row —
+the two figures one prose sentence fuses. `tableRowsToFigures` binds each cell to
+its column's header word, and emits ONLY the GRAND TOTAL (the largest value among
+the rows the table itself labels "total"), so a table's own subslices (First-class
+males, 175/57) never fold into one false contradiction. A table with no total
+states no shared slot — a named gap.
+
+**Measured on the live corpus** (`?ws=titanic-1912`, 3,561 statements; the
+observer's own try questions):
+
+| question | result |
+|---|---|
+| "How many were saved?" | **one contradiction**: `R.M.S. Titanic · saved` — **705 · 711**, standing **single-witness** (one source-pair) |
+| "How many people were aboard?" | **one contradiction**: `R.M.S. Titanic · aboard` — **2201 · 2340**, standing **single-witness** |
+| "What was the Titanic's tonnage?" | **one contradiction**: `R.M.S. Titanic · tonnage` — **45,328 · 46,328 · 60,000 tons**, standing **corroborated** |
+| "How many lives were lost?" | **no contradiction** — see the named gap below |
+| "What did the band play as the ship sank?" | **no contradiction** — the span "ship" is not a referent (unchanged) |
+
+Two of the three contradictions ride the two R3 gaps: the "saved" and "aboard"
+figures are one 1912 table's totals meeting Marshall's own labelled totals, each
+under the column/label the source itself put it under.
+
+**P-floor is now partly established.** The "saved" (705 vs 711) and "aboard"
+(2201 vs 2340) contradictions each rest on ONE independent source-pair, so each
+is disclosed `single-witness`, never `corroborated` — the floor doing its job,
+not a tuned threshold. Only the tonnage pair recurs (corroborated).
+
+**What remains open, and why (named, not guessed).**
+
+* **"Lives lost" is a cross-source SUBTRACTION the corpus never states.** Marshall
+  states one total lost (1635, "company lost"); Beesley states its two components
+  (815 passengers + 688 crew drowned); the British table states 2201 aboard and
+  711 saved, so its loss is 2201−711. No source states a total loss in prose, so
+  no two sources state it — a single-source gap, not a contradiction. Surfacing it
+  needs the identity to carry a DERIVED value (a sum or a subtraction), which is a
+  later step, honestly named.
+* **Table totals are read only where the table labels one "total".** The British
+  table's grand total is the largest labelled total per column; a corpus whose
+  table has no such row states no shared slot (a named gap). The rule is the
+  table's own word, never a typed threshold.
+* **The reference-matter gate.** Marshall's labelled totals are four words
+  ("Total number saved, 705"), so the page calls them reference matter (`st.ref`).
+  They are measured anyway — but only when the figure carries a BEING (`via`), so
+  a stray number in page furniture is never measured.
+* **A residual same-measure, different-referent risk (disclosed).** The new
+  measure register also forms `R.M.S. Titanic · passengers` — **2208 · 2500** — a
+  ship's COMPLEMENT against its CAPACITY, two different referents the question
+  gate does not yet split (neither question's terms name "capacity"). It is
+  disclosed as a topic with the `differs` badge, and no try question asks it; but
+  it is a named residual, not a settled contradiction.
