@@ -61,6 +61,14 @@ Measured against three blind graders (90–95% agreement) on 150 held-out OHS na
 
 Known misses: generic headings made of ordinary words, OCR slips outside its confusion table, and run-togethers where one side is a single word.
 
+## Seeing how it reads, with no model
+
+`reading/index.html` replays the reading itself, one layer at a time: bytes → decode → furniture → statements → tokens → grammar → morphology → referents → relations → ledger → priors. It runs the same vendored organs (`vendor/eoreader7/native/`) in the tab, on a small text or on the built-in samples, and draws each proposition as **subject —act→ object**, anchored to the bytes it was read from. Nothing is asserted that the page has not measured: it wraps `fetch` and reports **model calls: 0**, it names the organ that gave every name, and every ledger id is recomputable (`evt_` + the first 20 hex of the value's sha-256). The page is not a picture of the reading — it is the reading, replayed.
+
+Two controls produce the output as an artifact. **⤓ Diagrammed (text)** gives the source in reading order with each sentence's proposition drawn under it, its standing, polarity, tense, and byte range. **⤓ Reading (JSON)** gives the whole reading — source hash and address, statements, propositions, referents, the `Provenance@2` ledger, and the step trace — as one document. A proposition the reader stated but carried no span for is listed under **unlocated propositions**, never pinned to a sentence it did not come from.
+
+Worked examples live in `reading/examples/` — three real municipal records from `demo-motorola/`, read to text and JSON with zero model calls.
+
 ## Reading every kind of source
 
 The OHS corpus was read to a depth its own captures earned — attribution from the page's

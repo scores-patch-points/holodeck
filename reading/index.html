@@ -1,0 +1,979 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How to parse natural language without an LLM</title>
+<style>
+  :root{--bg:#17171a;--s1:#1c1c20;--s2:#29292e;--sel:#26272c;--sel2:#30333b;--line:#2e2e33;--line2:#3f3f46;--ink:#f4f4f6;--ink2:#c9c9d2;--mut:#9d9da8;--dim:#9494a0;--acc:#8ab4ff;--acc2:#8ab4ff;--acc3:#6d9dff;--amber:#f0b429;--blue:#8ab4ff;--green:#56d364;--pink:#e0a0c0;--date:#8ab4ff;--ok:#56d364;--bad:#f87171;--edge:#3f3f46;--hdr:rgba(23,23,26,.95);--sans:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;--mono:ui-monospace,SFMono-Regular,Menlo,monospace;--serif:Georgia,"Times New Roman",serif;color-scheme:dark}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 var(--sans);-webkit-font-smoothing:antialiased}
+  a{color:var(--acc)}
+  button{font:inherit}
+  /* ── landing ───────────────────────────────────────────────────────────── */
+  header{padding:30px 28px 16px;border-bottom:1px solid var(--line)}
+  header h1{margin:0 0 6px;font-size:22px;letter-spacing:-.01em;font-family:var(--serif);font-weight:500}
+  header .sub{color:var(--dim);max-width:920px;font-size:14px}
+  header .sub b{color:var(--ink);font-weight:600}
+  .wrap{max-width:1100px;margin:0 auto;padding:0 28px 80px}
+  .drop{margin:20px 0;border:1.5px dashed var(--line2);border-radius:14px;background:var(--s1);padding:24px;text-align:center;transition:.15s;cursor:pointer}
+  .drop.hot{border-color:var(--acc);background:#1a1d26}
+  .drop .big{font-size:16px;font-weight:600}.drop .small{color:var(--dim);font-size:13px;margin-top:5px}
+  textarea{width:100%;min-height:130px;background:var(--s1);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:13px;font:13px/1.5 var(--mono);resize:vertical;margin-top:12px}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:12px 0}
+  .row button{background:var(--s1);color:var(--ink);border:1px solid var(--line2);border-radius:9px;padding:8px 14px;font:13px var(--sans);cursor:pointer}
+  .row button:hover{border-color:var(--acc);color:var(--acc)}
+  .row button.primary{background:#1c2740;border-color:#33507f}
+  .samples button{padding:5px 10px;font-size:12px}
+  .badge{font:11px var(--mono);padding:1px 7px;border-radius:6px;background:#1a2130;color:var(--dim);border:1px solid var(--line)}
+  .badge.live{color:var(--green);border-color:#245a41}
+  .legend-note{color:var(--dim);font-size:12.5px;margin-top:6px}
+  .legend-note b{color:var(--ink)}
+  /* ── player ────────────────────────────────────────────────────────────── */
+  .hdp{position:fixed;inset:0;z-index:9999;background:var(--bg);color:var(--ink);display:grid;grid-template-rows:auto 1fr auto;font:14px/1.45 var(--sans)}
+  .hdp[hidden]{display:none}
+  .hdp-top{display:flex;align-items:baseline;gap:6px 14px;flex-wrap:wrap;padding:10px 18px;border-bottom:1px solid var(--line)}
+  .hdp-top h2{margin:0;font:500 19px/1.2 var(--serif);text-wrap:balance}
+  .hdp-top .meta{font:12px var(--mono);color:var(--dim)}
+  .hdp-top .sp{flex:1}
+  .hdp button{all:unset;cursor:pointer;color:var(--mut);font:500 13px var(--sans);padding:4px 6px;border-radius:4px}
+  .hdp select{background:none;color:var(--mut);border:0;font:500 13px var(--sans);cursor:pointer}
+  .hdp select option{background:var(--s1);color:var(--ink)}
+  .hdp button:hover{color:var(--ink)}.hdp .pl{color:var(--acc);font-weight:600;min-width:64px}
+  .hdp button:focus-visible,.hdp select:focus-visible{outline:2px solid var(--acc);outline-offset:1px}
+  .hdp button[aria-pressed=true]{color:var(--ink);box-shadow:inset 0 -2px 0 var(--acc);border-radius:0}
+  .hdp-exit{border:1px solid var(--line2)!important;border-radius:6px;padding:5px 11px!important;color:var(--ink)!important;font-weight:600}
+  .hdp-stats{flex-basis:100%;font:12px var(--mono);color:var(--ink2);display:flex;gap:10px 16px;flex-wrap:wrap;padding-top:6px}
+  .hdp-stats b{color:var(--ink);font-weight:600}.hdp-stats .g{color:var(--dim)}
+  .hdp-body{display:grid;grid-template-columns:minmax(300px,34%) 1fr;min-height:0}
+  .hdp-log{border-right:1px solid var(--line);display:grid;grid-template-rows:auto 1fr auto;min-height:0}
+  .hdp-h{font:600 11px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--dim);padding:10px 14px 6px}
+  .hdp-rows{overflow-y:auto;position:relative;font:12px/24px var(--mono);min-height:0}
+  .hdp-sz{position:relative}
+  .hdp-row{position:absolute;left:0;right:0;height:24px;display:grid;grid-template-columns:74px 92px 1fr;gap:8px;padding:0 12px;white-space:nowrap;cursor:pointer;color:var(--ink2)}
+  .hdp-row span{overflow:hidden;text-overflow:ellipsis}
+  .hdp-row .t{color:var(--dim);text-align:right;font-variant-numeric:tabular-nums}
+  .hdp-row .st{font-weight:500}
+  .hdp-row:hover{background:var(--s1)}.hdp-row.cur{background:var(--sel2);color:var(--ink)}
+  .hdp-row.fut{opacity:.28}
+  .hdp-now{border-top:1px solid var(--line);padding:8px 14px 10px;min-height:76px}
+  .hdp-now .k{font:600 11px var(--mono);letter-spacing:.1em;text-transform:uppercase}
+  .hdp-now p{margin:4px 0 0;font-size:14px;color:var(--ink);max-width:74ch}
+  .hdp-right{display:grid;grid-template-rows:auto auto 1fr;min-height:0}
+  .hdp-lens{border-bottom:1px solid var(--line);padding:4px 18px 12px;max-height:27vh;overflow:auto}
+  .hdp-lens .doc{font:12px var(--mono);color:var(--dim);margin-bottom:4px;padding-top:8px}
+  .hdp-lens .txt{font:15px/1.7 var(--serif);color:var(--mut);white-space:pre-wrap;max-width:92ch;word-break:break-word}
+  .hdp-lens .txt .s{color:var(--ink2)}
+  .hdp-lens .txt .on{color:var(--ink);background:var(--sel)}
+  .hdp-lens .txt .nm{box-shadow:inset 0 -2px 0 var(--acc);color:var(--ink)}
+  .hdp-lens .txt .g{box-shadow:inset 0 -2px 0 var(--blue)}
+  .hdp-lens .txt .m{box-shadow:inset 0 -2px 0 var(--amber)}
+  .hdp-lens .txt .r{box-shadow:inset 0 -3px 0 var(--green)}
+  .hdp-lens .txt .fu{text-decoration:line-through;opacity:.42}
+  .hdp-lens .txt .hit{outline:2px solid var(--acc);border-radius:2px}
+  .hdp-graph{position:relative;border-top:1px solid var(--line);min-height:0;overflow:hidden}
+  /* ── tabs: one view at a time, never a wall of everything ──────────────── */
+  .hdp-tabs{display:flex;gap:2px;padding:0 14px;border-bottom:1px solid var(--line);overflow-x:auto}
+  .hdp-tabs button{all:unset;cursor:pointer;font:600 12.5px var(--sans);color:var(--dim);padding:8px 12px;border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap}
+  .hdp-tabs button:hover{color:var(--ink)}
+  .hdp-tabs button[aria-selected=true]{color:var(--ink);border-bottom-color:var(--acc)}
+  .hdp-pane{overflow:auto;min-height:0;padding:0 14px 20px}
+  .hdp-pane .hdp-h{padding-left:0}
+  .hdp-pane.hdp-graph{overflow:hidden;padding:0}
+  .hdp-figure{border:1px solid var(--line);border-radius:9px;background:var(--s1);padding:9px 11px;margin:8px 0;font-size:12.5px;color:var(--ink2)}
+  .hdp-figure b{color:var(--ink)}
+  /* ── the propositions table: the source, with each proposition drawn ───── */
+  table.props{width:100%;border-collapse:collapse;font-size:13.5px}
+  table.props th,table.props td{text-align:left;padding:7px 9px;border-bottom:1px solid var(--line);vertical-align:top}
+  table.props th{position:sticky;top:0;background:var(--bg);color:var(--dim);font:600 10.5px var(--mono);text-transform:uppercase;letter-spacing:.06em;z-index:2}
+  table.props tr.cur{background:#20242e;box-shadow:inset 3px 0 0 var(--acc)}
+  table.props td.n{color:var(--dim);font:11.5px var(--mono);text-align:right;width:34px}
+  table.props td.stmt{font:14.5px/1.65 var(--serif);color:var(--ink2);max-width:46ch}
+  table.props td.diag{min-width:230px}
+  .hdp-layers td.diag{min-width:220px}
+  .hdp-layers td.diag .pnode{font-size:12px}
+  table.props td.standing,table.props td.tense,table.props td.bytes{white-space:nowrap;font:11.5px var(--mono);color:var(--mut)}
+  table.props .mrel{border-bottom:1.5px solid var(--acc);color:var(--ink)}
+  .noprop{color:var(--dim);font:11.5px var(--mono)}
+  /* ── one proposition, drawn ────────────────────────────────────────────── */
+  .prop{display:flex;align-items:center;gap:7px;flex-wrap:wrap;padding:2px 0;margin:1px 0}
+  .pnode{border:1px solid var(--line2);border-radius:20px;padding:1px 10px;background:var(--s2);font:12.5px var(--sans);color:var(--ink);max-width:24ch;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .pnode.s{border-color:#33507f;background:#1a2130}
+  .pnode.o{border-color:#245a41;background:#141f1a}
+  .parc{display:inline-flex;align-items:center;gap:5px;color:var(--pink);font:12px var(--mono)}
+  .parc .pline{width:30px;height:0;border-top:1.7px solid currentColor}
+  .parc .phead{width:0;height:0;border-left:7px solid currentColor;border-top:4.5px solid transparent;border-bottom:4.5px solid transparent;margin-left:-6px}
+  .parc.neg{color:var(--bad)}
+  .parc.neg .pline{border-top-style:dashed}
+  .parc.neg .plabel::before{content:'¬ '}
+  .parc.far{color:var(--dim)}
+  .parc.far .pline{border-top-style:dotted}
+  .prop .reopen{all:unset;cursor:pointer;font:11px var(--mono);color:var(--dim);border-bottom:1px dotted var(--dim);margin-left:2px}
+  .prop .reopen:hover{color:var(--acc);border-bottom-color:var(--acc)}
+
+  /* layers panel */
+  .hdp-layers{overflow:auto;min-height:0;padding:6px 14px 14px}
+  .ly{border:1px solid var(--line);border-radius:9px;margin:7px 0;background:var(--s1);overflow:hidden}
+  .ly.fut{opacity:.4}
+  .ly .ly-h{display:flex;align-items:baseline;gap:9px;padding:6px 11px;cursor:pointer;font-size:13px}
+  .ly .ly-i{font:600 10px var(--mono);color:var(--bg);background:var(--dim);border-radius:5px;padding:1px 6px;flex:none}
+  .ly.on .ly-i{background:var(--acc);color:#0b0d12}
+  .ly .ly-n{font-weight:600}.ly .ly-c{margin-left:auto;font:11.5px var(--mono);color:var(--dim)}
+  .ly.on{border-color:var(--acc3)}
+  .ly .ly-b{padding:2px 11px 11px;border-top:1px solid var(--line)}
+  .ly-min{color:var(--dim);font-size:12px}
+  .hdp-layers table{width:100%;border-collapse:collapse;font-size:12px}
+  .hdp-layers th,.hdp-layers td{text-align:left;padding:3px 6px;border-bottom:1px solid var(--line);vertical-align:top}
+  .hdp-layers th{color:var(--dim);font-weight:600;font-size:10.5px;text-transform:uppercase;letter-spacing:.05em}
+  .hdp-layers td.mono{font-family:var(--mono);font-size:11.5px}
+  .chip{display:inline-block;border:1px solid var(--line2);border-radius:20px;padding:0 8px;font:11.5px var(--mono);color:var(--dim);margin:2px 3px 2px 0}
+  .chip.g{color:var(--green);border-color:#245a41}.chip.a{color:var(--amber);border-color:#5c4d1d}
+  .chip.b{color:var(--blue);border-color:#234a6f}.chip.v{color:var(--bad);border-color:#5c2530}
+  .gap{color:var(--bad)}
+  .bar{display:inline-block;height:8px;background:#2b3a56;border-radius:3px;vertical-align:middle;min-width:2px}
+  .hdp-layers .reopen{all:unset;cursor:pointer;font:11.5px var(--mono);color:var(--acc);border-bottom:1px dotted var(--acc)}
+  .hdp-layers .reopen:hover{color:var(--ink)}
+  .hdp-layers .atom{border-left:2px solid var(--green);padding:5px 9px;margin:5px 0;background:var(--s2);border-radius:6px}
+  .hdp-layers .atom.asserted{border-left-color:var(--amber)}
+  .hdp-layers .tri{font:13px var(--mono)}
+  .hdp-layers .tri .e1{color:var(--blue)}.hdp-layers .tri .lb{color:var(--pink)}.hdp-layers .tri .e2{color:var(--green)}
+  .hdp-layers .am{color:var(--dim);font-size:11.5px;margin-top:3px;display:flex;gap:11px;flex-wrap:wrap}
+  .hdp-layers .am b{color:var(--mut);font-weight:600}
+  .hdp-layers pre{background:#0f131b;border:1px solid var(--line);border-radius:8px;padding:9px;overflow:auto;max-height:220px;font:11px/1.5 var(--mono);color:#c7d2e2;margin:6px 0}
+  .hdp-layers .evt{display:grid;grid-template-columns:auto 1fr;gap:3px 10px;padding:3px 0;border-bottom:1px solid var(--line);font:11.5px var(--mono)}
+  .hdp-layers .evt .id{color:var(--pink)}.hdp-layers .evt .st{color:var(--amber)}.hdp-layers .evt .rd{color:var(--dim)}
+  .hdp-layers .blk{max-height:300px;overflow:auto}
+  /* transport */
+  .hdp-bar{border-top:1px solid var(--line);padding:6px 18px calc(12px + env(safe-area-inset-bottom,0px));display:grid;gap:8px}
+  .hdp-rib{position:relative;height:18px;cursor:pointer;touch-action:none}
+  .hdp-rib canvas{width:100%;height:100%;display:block}
+  .hdp-ctl{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .hdp-ctl .rd{font:12px var(--mono);color:var(--ink2);font-variant-numeric:tabular-nums;margin-left:auto}
+  .hdp-seg{display:inline-flex;gap:2px;margin-left:10px}
+  .hdp-key{font:11.5px var(--mono);color:var(--dim);display:flex;gap:14px;flex-wrap:wrap}
+  .hdp-key i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+  @media (max-width:860px){.hdp-body{grid-template-columns:1fr;grid-template-rows:42% 58%}.hdp-log{border-right:0;border-bottom:1px solid var(--line)}.hdp-right{grid-template-rows:auto 1fr 180px}}
+</style>
+</head>
+<body>
+<header>
+  <h1>How to parse natural language without an LLM</h1>
+  <div class="sub">
+    Drop any text in. It is read <b>the way the fold reads it</b> — then the reading is <b>replayed, one layer at a time</b>:
+    bytes → decode → furniture → statements → tokens → grammar → morphology → referents → relations → ledger → priors.
+    Every layer is the fold's own vendored code, running here in your browser. <b>No language model is called at any point.</b>
+    Every name is the <b>giver</b> that supplied it, every claim is anchored to the <b>bytes</b> it was read from,
+    and every assertion stays <b>revisable</b>. Start with <b>Propositions</b>: the source itself, with each proposition it makes drawn out.
+  </div>
+</header>
+<div class="wrap">
+  <div id="drop" class="drop">
+    <div class="big">drop a document here, or click to choose a file</div>
+    <div class="small">.txt · .md · .html · .json · .csv · source — anything that is text, up to a few MB</div>
+  </div>
+  <input id="file" type="file" hidden>
+  <textarea id="ta" placeholder="…or paste text here, then press Read."></textarea>
+  <div class="row">
+    <button id="read" class="primary">Read it — animate the layers</button>
+    <button id="clear">Clear</button>
+    <span class="samples" id="samples">
+      <button data-s="positions">sample · positions</button>
+      <button data-s="dossier">sample · dossier</button>
+      <button data-s="history">sample · history</button>
+    </span>
+    <span id="model" class="badge live" style="margin-left:auto">model calls: 0</span>
+  </div>
+  <div class="legend-note" id="landing-note">
+    <b>Propositions</b> shows the whole source in reading order with each proposition drawn as
+    <b>subject —act→ object</b>, tied to the exact words that carried it. <b>Layers</b> opens the one layer the reading
+    is on right now, as tables. <b>Graph</b> plots the referents and their relations. Drag the ribbon or step with the arrow
+    keys at any point — the animation is the reading itself.
+  </div>
+</div>
+
+<div class="hdp" id="player" hidden role="dialog" aria-label="Replay of how this was read">
+  <div class="hdp-top">
+    <h2 id="p-title">how it was read</h2>
+    <span class="meta" id="p-meta"></span><span class="sp"></span>
+    <button type="button" data-a="copy">Copy trace (JSON)</button>
+    <button type="button" data-a="dl-json" title="Download the whole reading — propositions, referents, and the Provenance@2 ledger — as JSON">⤓ Reading (JSON)</button>
+    <button type="button" data-a="dl-text" title="Download the source in reading order, each sentence diagrammed with the proposition it states">⤓ Diagrammed (text)</button>
+    <button type="button" class="hdp-exit" data-a="close" aria-label="Exit" title="Exit (Esc)">✕ Exit</button>
+    <span class="hdp-stats" id="p-stats"></span>
+  </div>
+  <div class="hdp-body">
+    <div class="hdp-log">
+      <div class="hdp-h">the reading, one layer at a time</div>
+      <div class="hdp-rows" tabindex="0"><div class="hdp-sz"></div></div>
+      <div class="hdp-now" id="p-now"></div>
+    </div>
+    <div class="hdp-right">
+      <div class="hdp-lens" id="p-lens"></div>
+      <div class="hdp-tabs" id="p-tabs" role="tablist" aria-label="View">
+        <button type="button" data-tab="props" role="tab" aria-selected="true">Propositions</button>
+        <button type="button" data-tab="layers" role="tab" aria-selected="false">Layers</button>
+        <button type="button" data-tab="graph" role="tab" aria-selected="false">Graph</button>
+      </div>
+      <div class="hdp-pane" id="p-props" data-pane="props"></div>
+      <div class="hdp-pane hdp-layers" id="p-layers" data-pane="layers" hidden></div>
+      <div class="hdp-pane hdp-graph" id="p-graph" data-pane="graph" hidden></div>
+    </div>
+  </div>
+  <div class="hdp-bar">
+    <div class="hdp-rib" title="Drag to scrub"><canvas></canvas></div>
+    <div class="hdp-ctl">
+      <button type="button" data-a="start" title="First event (Home)">|◀</button>
+      <button type="button" data-a="back" title="One event back (←)">◀|</button>
+      <button type="button" data-a="rev" title="Rewind (J)">◀◀</button>
+      <button type="button" data-a="play" class="pl" title="Play / pause (Space)">▶ Play</button>
+      <button type="button" data-a="fwd" title="One event forward (→)">|▶</button>
+      <span class="hdp-seg" role="group" aria-label="Clock">
+        <button type="button" data-a="steps" aria-pressed="true">Steps</button>
+        <button type="button" data-a="real" aria-pressed="false">Real time</button>
+      </span>
+      <label style="display:flex;align-items:center" title="Speed"><select id="p-speed"></select></label>
+      <span class="rd" id="p-rd"></span>
+    </div>
+    <div class="hdp-key" id="p-key"></div>
+  </div>
+</div>
+
+<script type="module">
+// ─────────────────────────────────────────────────────────────────────────────
+// The claim "no model was called" is MEASURED, not asserted: every network
+// request this page makes is counted, and the only ones that appear are the
+// static prior files the organs read from disk.
+// ─────────────────────────────────────────────────────────────────────────────
+const net = { requests: [], models: 0 };
+const _fetch = window.fetch.bind(window);
+window.fetch = (u, o) => { net.requests.push(String(u)); return _fetch(u, o); };
+
+import { makeEngineRelationReader, loadPriors, blankMarkup } from '../holodeck-reader.js';
+import { mountMap } from '../holodeck-map.js';
+import { classifyWord, THRAX_MAP, THRAX_OUT_OF_SCOPE, THRAX_META, POS_PRIOR_META } from '../vendor/eoreader7/native/adapters/text/wordclass.js';
+import { morphologyFromPrior, createLemmatizer, stemsOf } from '../vendor/eoreader7/native/adapters/text/morphology.js';
+import { splitSentences } from '../vendor/eoreader7/native/adapters/text/spans.js';
+import { tokenize } from '../vendor/eoreader7/native/organs/source.js';
+import { sha256Hex, stableProvenanceId, byteRange, EotLedger } from '../vendor/fold-chat/fold-chat-eot.js';
+
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]));
+const enc = new TextEncoder();
+const utf8Len = (s) => enc.encode(String(s)).length;
+const charToByte = (text, i) => utf8Len(text.slice(0, i));
+const clamp = (s, n) => { s = String(s); return s.length > n ? s.slice(0, n) + '…' : s; };
+const hx = (v, n) => String(v == null ? '' : v).slice(0, n == null ? 20 : n);
+const ms = t => t < 1 ? t.toFixed(3) : t < 100 ? t.toFixed(2) : t < 10000 ? t.toFixed(1) : Math.round(t).toLocaleString();
+const cssVar = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim() || '#888';
+
+const SAMPLES = {
+  positions: `The Palestinian Authority condemned the raid on Monday. Israel said the strike had targeted a commander. Human Rights Watch criticized the decision, while the mayor endorsed it. The council opposed the measure but the governor supported it, and two senators praised the compromise.`,
+  dossier: `Marie Curie praised the method, and the Royal Society endorsed the finding. Darwin opposed the standard, and Wallace supported the appeal. Human Rights Watch criticized the decision, and the mayor endorsed it. The Palestinian Authority condemned the raid, and Israel defended the strike.`,
+  history: `Napoleon opposed the treaty, and Wellington supported it. Lincoln condemned the raid, and Grant endorsed the plan. The Senate opposed the measure, and the President supported it. Caesar criticized the senate, and Pompey praised the crowd.`,
+};
+
+// ── the layers, in the order the reading really makes them ───────────────────
+const LAYERS = [
+  ['bytes',     'Bytes',      '--dim',   'the material as bytes — one addressable source'],
+  ['decode',    'Decode',     '--pink',  'utf-8 → characters; the address space stays bytes'],
+  ['furniture', 'Furniture',  '--mut',   'markup/CSS/URLs blanked in place — offsets untouched'],
+  ['statement', 'Statements', '--ink2',  'the material split into the statements it makes'],
+  ['token',     'Tokens',     '--blue',  'each statement split into the forms it is made of'],
+  ['grammar',   'Grammar',    '--acc',   'each form → the classes it is ATTESTED as (Thrax over UD)'],
+  ['morph',     'Morphology', '--amber', 'each form → the act it belongs to (UniMorph prior ∪ rule)'],
+  ['referent',  'Referents',  '--acc2',  'the participants this material establishes, by name'],
+  ['relation',  'Relations',  '--green', 'subject —act→ object, bound clause-aware, with a verdict'],
+  ['ledger',    'Ledger',     '--green', 'every step appended as a transform, with a recomputable id'],
+  ['prior',     'Priors',     '--date',  'the knowledge RECEIVED from outside, each naming its giver'],
+];
+const L = {}; LAYERS.forEach(([k, label, c, why], i) => L[k] = { i, label, c, why });
+const CK = { bytes: 0, decode: 1, furniture: 2, statement: 3, token: 4, grammar: 5, morph: 6, referent: 7, relation: 8, ledger: 9, prior: 10 };
+
+let PRIORS = null, READER = null;
+async function ready(){
+  if (READER) return;
+  PRIORS = await loadPriors();
+  const r = await fetch('../vendor/eoreader7/native/priors/morphology-eng.json'); PRIORS.morphRaw = await r.json();
+  PRIORS.morph = morphologyFromPrior(PRIORS.morphRaw);
+  READER = await makeEngineRelationReader();
+}
+
+// ── the polytemporality rule (declared on this page, same shape as the organ) ─
+const MODAL_FUT = /\b(will|shall|'ll)\b/i;
+const HAD_PART = /\bhad\s+\w+(ed|en|wn|ne|de|ad|it)\b/i;
+function localTense(t){
+  t = String(t || '');
+  if (HAD_PART.test(t)) return { v: 'Pqp', why: 'had + participle — a past before a past' };
+  if (MODAL_FUT.test(t)) return { v: 'Fut', why: 'modal will/shall — analytic future' };
+  if (/\b(is|are|am|has|have)\b/i.test(t)) return { v: 'Pres', why: 'finite present (be/have)' };
+  if (/\b(was|were|had|said|saw|came|went|took|gave)\b|\w+ed\b/i.test(t)) return { v: 'Past', why: 'finite past form or -ed' };
+  return { v: 'undeclared', why: 'no finite verb in the clause — counted, never guessed' };
+}
+
+// ── build the trace: run the real organs, recording each transformation ──────
+const WORD_RE = /[\p{L}\p{N}][\p{L}\p{N}'’.\-]*/gu;
+function wordsIn(text, base){
+  const out = []; WORD_RE.lastIndex = 0; let m;
+  while ((m = WORD_RE.exec(text))) out.push({ w: m[0], s: base + m.index, e: base + m.index + m[0].length });
+  return out;
+}
+
+const WORDS_ANIMATED = 900;   // per-form layers animate the first N forms, then summarise
+
+function buildTrace(doc, clean, R){
+  const ev = [];
+  const t0 = performance.now();
+  const push = (stage, kind, msg, extra) => { ev.push({ i: ev.length, t: performance.now() - t0, stage, kind, msg, ...(extra || {}) }); return ev.length - 1; };
+  const analysis = doc.analysis;
+  const nBytes = utf8Len(analysis);
+
+  // 1 · BYTES
+  const hash = sha256Hex(analysis);
+  const srcKey = sha256Hex(analysis).slice(0, 20);
+  push('bytes', 'source', `${esc(doc.label)} · ${nBytes.toLocaleString()} bytes utf-8 · sha-256 ${hash.slice(0,20)}…`, { s: 0, e: analysis.length });
+
+  // 2 · DECODE
+  push('decode', 'text', `decoded to ${analysis.length.toLocaleString()} characters — the address space is BYTES, the reading is in characters`, { s: 0, e: analysis.length });
+
+  // 3 · FURNITURE (blanked in place)
+  const blanks = [];
+  for (let i = 0; i < analysis.length; i++) if (analysis[i] !== ' ' && clean[i] === ' ') blanks.push(i);
+  const blankRuns = [];
+  for (const i of blanks){ const last = blankRuns[blankRuns.length - 1]; if (last && last.e === i) last.e = i + 1; else blankRuns.push({ s: i, e: i + 1 }); }
+  push('furniture', 'blank', blanks.length
+    ? `blanked ${blanks.length.toLocaleString()} characters of markup/CSS/URL furniture to spaces — every offset is unchanged, so every address still reads back`
+    : `no markup furniture found — this material is already prose, read as it stands`,
+    { s: 0, e: analysis.length, data: { runs: blankRuns } });
+
+  // 4 · STATEMENTS
+  const sents = splitSentences(clean);
+  sents.forEach((s, i) => push('statement', 'statement',
+    `statement ${i + 1} of ${sents.length} · bytes ${charToByte(analysis, s.offset)}–${charToByte(analysis, s.offset + s.text.length)} · “${clamp(s.text.replace(/\s+/g,' ').trim(), 74)}”`,
+    { s: s.offset, e: s.offset + s.text.length, data: { order: i, len: sents.length } }));
+
+  // words, with offsets (the page's own boundary read, declared)
+  const words = [];
+  for (const s of sents) for (const w of wordsIn(s.text, s.offset)) words.push(w);
+
+  // 5 · TOKENS
+  const shown = words.slice(0, WORDS_ANIMATED);
+  const toks = tokenize(clean);
+  push('token', 'vocabulary', `${words.length.toLocaleString()} form occurrences · ${new Set(toks).size.toLocaleString()} distinct forms in the reader's own vocabulary`, { s: 0, e: 0 });
+  shown.forEach(w => push('token', 'word', `“${w.w}” · bytes ${charToByte(analysis, w.s)}–${charToByte(analysis, w.e)}`, { s: w.s, e: w.e, data: { w: w.w } }));
+  if (words.length > WORDS_ANIMATED) push('token', 'cap', `+${(words.length - WORDS_ANIMATED).toLocaleString()} more form occurrences — the per-form layers below animate the first ${WORDS_ANIMATED.toLocaleString()} (the reading itself covers all of them)`, { s: 0, e: 0 });
+
+  // 6 · GRAMMAR
+  const pos = PRIORS.posPrior;
+  let gaps = 0, ambiguous = 0;
+  shown.forEach(w => {
+    const c = classifyWord(w.w, { posPrior: pos });
+    if (!c.found){ gaps++; push('grammar', 'gap', `“${w.w}” → no entry in the class prior — a typed gap, never a guess`, { s: w.s, e: w.e, data: { w: w.w, found: false } }); return; }
+    if (c.candidates.length > 1) ambiguous++;
+    const parts = c.candidates.slice(0, 3).map(k => `${k.upos} ${(k.share * 100).toFixed(0)}%→${k.thraxClass || '—'}`).join(' · ');
+    push('grammar', 'class', `“${w.w}” → ${parts}${c.candidates.length > 1 ? ' — ambiguous, left unresolved' : ''}`,
+      { s: w.s, e: w.e, data: { w: w.w, found: true, candidates: c.candidates.slice(0, 3), total: c.total } });
+  });
+
+  // 7 · MORPHOLOGY (the act closure)
+  const lem = PRIORS.lemmatizer;
+  shown.forEach(w => {
+    const lemmas = lem ? [...lem.lemmasOf(w.w)] : [];
+    const stems = [...stemsOf(w.w)];
+    if (!lemmas.length && !stems.length){ push('morph', 'gap', `“${w.w}” → no act recovered — a form the prior does not know and the rule cannot recover stays a form`, { s: w.s, e: w.e, data: { w: w.w, lemmas: [], stems: [] } }); return; }
+    push('morph', 'act', `“${w.w}” → act {${lemmas.slice(0,3).map(l=>`“${l}”`).join(', ') || '—'}}${stems.length ? ` · rule {${stems.slice(0,2).join(', ')}}` : ''}${lemmas.length > 1 ? ' — a SET, never one chosen' : ''}`,
+      { s: w.s, e: w.e, data: { w: w.w, lemmas: lemmas.slice(0, 4), stems: stems.slice(0, 3) } });
+  });
+
+  // ── the reading itself (the reader binds relations) ──────────────────────
+  const report = READER([{ ref: 'source', text: clean }]);
+  const read0 = report.read(clean);
+  const claims = (read0.claims || []).map(c => {
+    const sp = (c.spans || [])[0] || {};
+    const hasSpan = sp.text != null && sp.text !== '';
+    const at = hasSpan ? analysis.indexOf(sp.text) : -1;
+    const s = at >= 0 ? at : (sp.start ?? 0);
+    const e = s + (hasSpan ? sp.text.length : 0);
+    return { end1: c.end1, end2: c.end2, label: c.label, polarity: c.polarity || '+', verdict: c.verdict || 'bound',
+      span: sp.text || '', s, e, grounded: at >= 0, hasSpan, located: hasSpan,
+      b0: hasSpan ? charToByte(analysis, s) : null, b1: hasSpan ? charToByte(analysis, e) : null,
+      tense: hasSpan ? localTense(sp.text) : { v: 'unlocated', why: 'the claim carried no span — nothing to place' } };
+  }).sort((a, b) => a.s - b.s || a.b0 - b.b0);
+
+  // 8 · REFERENTS (the participants this material establishes)
+  const refs = new Map();
+  for (const c of claims) for (const nm of [c.end1, c.end2]) {
+    if (!nm) continue; const k = String(nm);
+    const r = refs.get(k) || { n: k, c: 0, s: c.s, e: c.e, b0: c.b0 };
+    r.c++; if (c.s < r.s) { r.s = c.s; r.e = c.e; r.b0 = c.b0; }
+    refs.set(k, r);
+  }
+  [...refs.values()].sort((a, b) => a.s - b.s).forEach(r => push('referent', 'name',
+    `referent “${r.n}” — first read at byte ${r.b0 == null ? '—' : r.b0} · stands in ${r.c} relation${r.c>1?'s':''}`,
+    { s: r.s, e: r.e, data: r }));
+
+  // 9 · RELATIONS
+  claims.forEach(c => {
+    const v = c.verdict;
+    push('relation', v, `${c.end1} —${c.label}→ ${c.end2} · standing: ${v === 'bound' ? 'read' : v === 'beyond-reach' ? 'beyond reach' : 'unheard'} · polarity ${c.polarity} · byte ${c.b0 == null ? '—' : c.b0}–${c.b1} · tense ${c.tense.v}`,
+      { s: c.s, e: c.e, data: c });
+  });
+
+  // 10 · LEDGER (provenance chain)
+  const led = new EotLedger({ artifact: 'reading-layers', encoding: 'utf8' });
+  const srcId = led.source({ kind: 'document', locator: srcKey, anchor: byteRange(0, nBytes), meta: { label: doc.label } });
+  push('ledger', 'source', `source stored once under its own bytes → ${srcId} · anchor byteRange(0, ${nBytes})`, { s: 0, e: 0, data: { srcId } });
+  const readEvt = led.event({ stage: 'read', source_id: srcId, transform: 'bytes→statements' });
+  push('ledger', 'event', `${readEvt} · stage read · transform bytes→statements`, { s: 0, e: 0, data: { id: readEvt } });
+  led.event({ stage: 'arrange', source_id: srcId, parent: readEvt, transform: 'statements→tokens' });
+  claims.forEach(c => {
+    const id = led.event({ stage: 'bind', source_id: srcId, parent: readEvt, unit: 'relation',
+      range: byteRange(c.b0 ?? 0, (c.b0 ?? 0) + (c.span ? utf8Len(c.span) : 0)),
+      transform: 'clause→relation', detail: { end1: c.end1, label: c.label, end2: c.end2, polarity: c.polarity, verdict: c.verdict } });
+    push('ledger', 'bind', `${id} · bind clause→relation · byte ${c.b0 ?? 0}–${(c.b0 ?? 0) + (c.span ? utf8Len(c.span) : 0)} · “${c.end1}—${c.label}→${c.end2}”`, { s: c.s, e: c.e, data: { id } });
+  });
+  const eot = led.eot({ root: readEvt });
+  push('ledger', 'eot', `append-only Provenance@${eot.schema || 2} emitted · ${led.events.length} events · ids recomputable by anyone (evt_ + first 20 hex of sha256(value))`, { s: 0, e: 0 });
+
+  // 11 · PRIORS
+  const prov = PRIORS.morphRaw.provenance || {};
+  push('prior', 'prior', `part of speech ← ${POS_PRIOR_META.giver} (${pos.schema}) — attests classes per form; the code picks no winner`, { s: 0, e: 0, data: { name: 'part of speech', giver: POS_PRIOR_META.giver, schema: pos.schema, wall: 'attests classes per form; code picks no winner' } });
+  push('prior', 'prior', `morphology ← ${prov.source || 'UniMorph English'} (${PRIORS.morphRaw.schema}) — decides same-act; never invents a form`, { s: 0, e: 0, data: { name: 'morphology', giver: prov.source || 'UniMorph English', schema: PRIORS.morphRaw.schema, wall: 'decides same-act; never invents a form' } });
+  push('prior', 'prior', `Thrax map ← ${THRAX_META.giver} — a declared translation, not a fact; ${[...THRAX_OUT_OF_SCOPE].length} categories kept out, never forced`, { s: 0, e: 0, data: { name: 'Thrax map', giver: THRAX_META.giver, schema: 'declared', wall: 'a translation, not a fact — gaps left out' } });
+
+  return { ev, claims, refs, words, shown, sents, blanks: blankRuns, gaps, ambiguous, toks, nBytes, hash, srcId, led, eot, doc, net: { ...net }, totalMs: performance.now() - t0 };
+}
+
+// ── the OUTPUT: the reading as text (each sentence diagrammed) and as JSON ────
+// The same typing the page draws, emitted as an artifact: the source in reading
+// order with each sentence's proposition drawn under it, and the whole reading —
+// propositions, referents, and the Provenance@2 ledger — as one JSON document.
+const standingOfClaim = (c) => c.verdict === 'bound' ? 'read' : c.verdict === 'beyond-reach' ? 'beyond reach' : 'unheard';
+const arrowOf = (c) => `${c.end1} ──${c.polarity === '-' ? '¬' : ''}${c.label}──▶ ${c.end2}`;
+const slugOf = (T) => String(T.doc.label || 'reading').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60) || 'reading';
+
+// the sentence with the span that carried a proposition wrapped in « » (the drawn mark, in text)
+function markedText(T, s, idxs){
+  const a0 = s.offset, b0 = s.offset + s.text.length;
+  // several propositions can carry the same span; their marks are one mark, never the sentence repeated
+  const spans = idxs.map(i => T.claims[i]).map(c => [Math.max(a0, c.s), Math.min(b0, c.e)]).filter(([a, b]) => b > a).sort((x, y) => x[0] - y[0]);
+  const merged = [];
+  for (const [a, b] of spans){ const last = merged[merged.length - 1]; if (last && a <= last[1]) last[1] = Math.max(last[1], b); else merged.push([a, b]); }
+  let out = '', cur = a0;
+  for (const [a, b] of merged){ if (a > cur) out += T.doc.analysis.slice(cur, a); out += '«' + T.doc.analysis.slice(a, b) + '»'; cur = b; }
+  if (cur < b0) out += T.doc.analysis.slice(cur, b0);
+  return out.replace(/\s+/g, ' ').trim();
+}
+
+function readingJSON(T){
+  const reopened = i => (T.reopened && T.reopened.get(i)) || null;
+  const counts = { read: 0, 'beyond reach': 0, unheard: 0 };
+  T.claims.forEach(c => counts[standingOfClaim(c)]++);
+  const unlocated = T.claims.map((c, i) => c.located ? null : i + 1).filter(Boolean);
+  const stmtOf = (c) => { if (!c.located) return null; for (let j = 0; j < T.sents.length; j++){ const s = T.sents[j]; if (c.s >= s.offset && c.s < s.offset + s.text.length) return j + 1; } return null; };
+  const inSent = T.sents.map(s => T.claims.map((c, ci) => (c.located && c.s >= s.offset && c.s < s.offset + s.text.length) ? ci + 1 : null).filter(Boolean));
+  return {
+    reading: 'reading-layers',
+    schema: 'Reading@1',
+    source: { label: T.doc.label, bytes: T.nBytes, sha256: T.hash, source_id: T.srcId, truncated: !!T.doc.truncated, anchor: { unit: 'byte', start: 0, end: T.nBytes } },
+    run: { steps: T.ev.length, ms: Math.round(T.totalMs * 100) / 100, model_calls: T.net.models, network: T.net.requests.slice() },
+    summary: { statements: T.sents.length, propositions: T.claims.length, read: counts.read, beyond_reach: counts['beyond reach'], unheard: counts.unheard, referents: T.refs.size, forms: T.words.length, distinct_forms: new Set(T.toks).size, grammar_gaps: T.gaps, grammar_ambiguous: T.ambiguous },
+    statements: T.sents.map((s, i) => ({ n: i + 1, bytes: [charToByte(T.doc.analysis, s.offset), charToByte(T.doc.analysis, s.offset + s.text.length)], text: s.text.replace(/\s+/g, ' ').trim(), propositions: inSent[i] })),
+    propositions: T.claims.map((c, i) => ({ n: i + 1, located: !!c.located, statement: stmtOf(c), subject: c.end1, act: c.label, object: c.end2, polarity: c.polarity === '-' ? '-' : '+', standing: reopened(i) ? 'reopened' : standingOfClaim(c), tense: c.tense.v, tense_why: c.tense.why, bytes: c.b0 == null ? null : [c.b0, c.b1], span: c.span || null, grounded: !!c.grounded, revised_by: reopened(i) })),
+    unlocated,
+    referents: [...T.refs.values()].map(r => ({ name: r.n, relations: r.c, first_byte: r.b0 == null ? null : r.b0 })),
+    priors: T.ev.filter(e => e.stage === 'prior').map(e => e.data),
+    ledger: T.eot,
+    trace: T.ev.map(e => ({ t: Math.round(e.t * 1000) / 1000, stage: e.stage, kind: e.kind, msg: e.msg })),
+  };
+}
+
+function diagrammedText(T){
+  const reopened = i => (T.reopened && T.reopened.get(i)) || null;
+  const counts = { read: 0, 'beyond reach': 0, unheard: 0 };
+  T.claims.forEach(c => counts[standingOfClaim(c)]++);
+  const reopenedN = T.reopened ? T.reopened.size : 0;
+  const inSent = T.sents.map(s => T.claims.map((c, ci) => (c.located && c.s >= s.offset && c.s < s.offset + s.text.length) ? ci : null).filter(ci => ci != null));
+  const unlocated = T.claims.map((c, i) => c.located ? null : i).filter(i => i != null);
+  const L = [];
+  L.push(`How “${T.doc.label}” is read — layer by layer, no model`);
+  L.push('='.repeat(66));
+  L.push('');
+  L.push(`source     ${T.doc.label}${T.doc.truncated ? ' — read over its first 14,000 characters; the whole file is still hashed and addressed' : ''}`);
+  L.push(`bytes      ${T.nBytes.toLocaleString()} utf-8 · sha-256 ${T.hash}`);
+  L.push(`address    byte 0–${T.nBytes} (unit byte) · source id ${T.srcId}`);
+  L.push(`run        ${T.ev.length.toLocaleString()} steps · ${ms(T.totalMs)} ms · ${T.net.models} model calls · ${T.net.requests.length} network request(s), static priors only`);
+  const priors = T.ev.filter(e => e.stage === 'prior').map(e => e.data);
+  L.push(`priors     ${priors.length} injected, never derived — ${priors.map(p => `${p.name} ← ${p.giver}`).join(' · ')}`);
+  L.push(`scope      English, Latin script, subject–act–object. Another language or word order is a typed gap the reading names, never a guess it makes.`);
+  L.push(`reading    ${T.sents.length.toLocaleString()} statements · ${T.claims.length} propositions — ${counts.read} read · ${counts['beyond reach']} beyond reach · ${counts.unheard} unheard${unlocated.length ? ` · ${unlocated.length} unlocated` : ''}${reopenedN ? ` · ${reopenedN} reopened` : ''} · ${T.refs.size} referents`);
+  L.push('');
+  L.push('propositions — the source in reading order, each sentence with what it states');
+  L.push('-'.repeat(66));
+  T.sents.forEach((s, j) => {
+    const idxs = inSent[j];
+    L.push('');
+    L.push(`${String(j + 1).padStart(3)}  ${markedText(T, s, idxs)}`);
+    if (!idxs.length){ L.push('      — no proposition bound: this statement named no act the reader could bind (a refusal is a result, never an error)'); return; }
+    for (const ci of idxs){
+      const c = T.claims[ci], st = reopened(ci) ? 'reopened' : standingOfClaim(c), bytes = c.b0 == null ? '—' : `${c.b0}–${c.b1}`;
+      L.push(`       ${arrowOf(c)}`);
+      L.push(`        ${st} · polarity ${c.polarity === '-' ? '¬' : '+'} · tense ${c.tense.v} · bytes ${bytes}`);
+    }
+  });
+  if (unlocated.length){
+    L.push('');
+    L.push('unlocated propositions — the reader stated these, but carried no span to place them');
+    L.push('-'.repeat(66));
+    unlocated.forEach(ci => {
+      const c = T.claims[ci], st = reopened(ci) ? 'reopened' : standingOfClaim(c);
+      L.push(`  ${arrowOf(c)}`);
+      L.push(`    ${st} · polarity ${c.polarity === '-' ? '¬' : '+'} · no span — not attributable to any statement`);
+    });
+  }
+  L.push('');
+  L.push('referents — the participants the material establishes');
+  L.push('-'.repeat(66));
+  [...T.refs.values()].sort((a, b) => (a.b0 ?? 0) - (b.b0 ?? 0)).forEach(r => L.push(`  ${r.n}  ×${r.c} · first read at byte ${r.b0 == null ? '—' : r.b0}`));
+  L.push('');
+  L.push('ledger — Provenance@2 · every step a transformation, ids recomputable by anyone');
+  L.push('-'.repeat(66));
+  (T.eot.events || []).forEach(e => L.push(`  ${e.event_id}  ${String(e.stage).padEnd(9)} ${e.transform || ''}${e.range ? `  bytes ${e.range.start}–${e.range.end}` : ''}`));
+  L.push('');
+  L.push('Nothing above called a model. Every name is the giver that supplied it, every claim is anchored to the bytes it was read from, and every assertion stays revisable.');
+  return L.join('\n');
+}
+
+function download(name, text, mime){
+  const url = URL.createObjectURL(new Blob([text], { type: mime || 'text/plain;charset=utf-8' }));
+  const a = document.createElement('a'); a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 5000);
+}
+
+// ── replay state: a pure fold of the trace ──────────────────────────────────
+const fresh = () => ({ marks: [], on: null, tokens: [], grammar: [], morph: [], refs: new Map(), rels: [], led: [], priors: [], counts: {} });
+function apply(S, e){
+  S.counts[e.stage] = (S.counts[e.stage] || 0) + 1;
+  const mk = (cls) => { if (e.s != null && e.e != null && e.e > e.s) S.marks.push({ s: e.s, e: e.e, cls, stage: e.stage }); };
+  if (e.stage === 'statement'){ S.on = { s: e.s, e: e.e }; mk('s'); }
+  else if (e.stage === 'token' && e.kind === 'word'){ S.tokens.push(e.data && e.data.w); mk('t'); }
+  else if (e.stage === 'grammar'){ S.grammar.push(e.data); mk(e.data && e.data.found ? 'g' : 'gap'); }
+  else if (e.stage === 'morph'){ S.morph.push(e.data); mk('m'); }
+  else if (e.stage === 'referent'){ S.refs.set(e.data.n, e.data); mk('nm'); }
+  else if (e.stage === 'relation'){ S.rels.push(e.data); mk('r'); }
+  else if (e.stage === 'ledger'){ S.led.push(e); }
+  else if (e.stage === 'prior'){ S.priors.push(e.data); }
+  if (e.stage === 'furniture' && e.data && e.data.runs) e.data.runs.forEach(r => S.marks.push({ s: r.s, e: r.e, cls: 'fu', stage: 'furniture' }));
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+//  THE PLAYER
+// ═════════════════════════════════════════════════════════════════════════════
+const STEP_SPEEDS = [[1, '1 event/s'], [4, '4 events/s'], [8, '8 events/s'], [30, '30 events/s'], [120, '120 events/s'], [600, '600 events/s']];
+const REAL_SPEEDS = [[1, '1×'], [0.1, '1/10×'], [0.01, '1/100×'], [0.001, '1/1,000×'], [1e-4, '1/10,000×']];
+
+let cur = null;
+function openTrace(T, opt = {}){
+  if (cur) cur.close();
+  cur = mount(T, opt);
+  return cur;
+}
+
+function mount(T, opt){
+  const ev = T.ev; let N = ev.length;
+  const root = $('player'); root.hidden = false;
+  const $q = s => root.querySelector(s);
+  const rowsEl = $q('.hdp-rows'), sz = $q('.hdp-sz'), nowEl = $('p-now'), lens = $('p-lens'), layersEl = $('p-layers'), propsEl = $('p-props');
+  const statsEl = $('p-stats'), metaEl = $('p-meta'), rc = $q('.hdp-rib canvas'), rdEl = $('p-rd'), speedSel = $('p-speed'), keyEl = $('p-key');
+  $('p-title').textContent = `How “${T.doc.label}” is parsed — layer by layer, no model`;
+  keyEl.innerHTML = LAYERS.map(([k, label, c]) => `<span><i style="background:var(${c})"></i>${esc(label)}</span>`).join('');
+
+  // ── clock ──
+  let real = false, dir = 0, pos = 0, k = 0, speed = 8, last = performance.now(), raf = 0;
+  const clockOf = i => real ? ev[i].t : i, maxPos = () => clockOf(N - 1) || 1;
+  const idxAt = p => { let lo = 0, hi = N - 1; while (lo < hi){ const m = (lo + hi + 1) >> 1; if (clockOf(m) <= p) lo = m; else hi = m - 1; } return lo; };
+  function fillSpeeds(){
+    const list = real ? REAL_SPEEDS : STEP_SPEEDS;
+    speedSel.innerHTML = list.map(([v, l]) => `<option value="${v}">${l}</option>`).join('');
+    if (real){ const want = (T.totalMs || ev[N-1].t) / 20000; speed = (list.find(([v]) => v <= Math.max(want, 1e-5)) || list[0])[0]; }
+    else speed = 8;
+    speedSel.value = String(speed);
+    $q('[data-a=steps]').setAttribute('aria-pressed', String(!real));
+    $q('[data-a=real]').setAttribute('aria-pressed', String(real));
+  }
+  const setClock = r => { real = r; pos = clockOf(k); fillSpeeds(); drawRibbon(); };
+  const seek = i => { k = Math.max(0, Math.min(N - 1, i)); pos = clockOf(k); render(true); };
+  const setDir = d => { dir = d; $q('[data-a=play]').textContent = dir === 1 ? '❚❚ Pause' : '▶ Play'; $q('[data-a=rev]').textContent = dir === -1 ? '❚❚' : '◀◀'; last = performance.now(); };
+
+  // ── state fold ──
+  let S = null, sk = -1, panelKey = '', propsKey = '', tab = 'props';
+  function stateAt(i){ if (!S || i < sk){ S = fresh(); sk = -1; } while (sk < i) apply(S, ev[++sk]); return S; }
+
+  // ── log (virtualised) ──
+  const RH = 24;
+  function renderLog(follow){
+    const H = rowsEl.clientHeight, top = rowsEl.scrollTop; sz.style.height = (N * RH) + 'px';
+    if (follow){ const y = k * RH; if (y < top + RH * 2 || y > top + H - RH * 4) rowsEl.scrollTop = Math.max(0, y - H * 0.6); }
+    const a = Math.max(0, Math.floor(rowsEl.scrollTop / RH) - 5), b = Math.min(N, a + Math.ceil(H / RH) + 10);
+    let h = ''; for (let i = a; i < b; i++){ const e = ev[i], S0 = L[e.stage] || { label: e.stage, c: '--dim' };
+      h += `<div class="hdp-row${i === k ? ' cur' : i > k ? ' fut' : ''}" data-i="${i}" style="top:${i*RH}px" title="${esc(e.msg)}"><span class="t">${ms(e.t)}</span><span class="st" style="color:var(${S0.c})">${esc(S0.label)}</span><span>${esc(e.msg)}</span></div>`; }
+    sz.innerHTML = h;
+    const e = ev[k], S0 = L[e.stage] || { label: e.stage, c: '--dim' }, dt = k ? e.t - ev[k-1].t : e.t;
+    nowEl.innerHTML = `<div class="k" style="color:var(${S0.c})">layer ${S0.i + 1} of ${LAYERS.length} · ${esc(S0.label)} · ${esc(e.kind)} · +${ms(dt)} ms</div><p>${esc(e.msg)}</p>`;
+  }
+  rowsEl.addEventListener('scroll', () => { if (!dir) renderLog(false); });
+  rowsEl.addEventListener('click', e => { const r = e.target.closest('.hdp-row'); if (r){ setDir(0); seek(+r.dataset.i); } });
+
+  // ── source lens ──
+  function renderLens(St){
+    const e = ev[k], at = (e.s != null && e.s > 0) ? e.s : (St.on ? St.on.s : 0);
+    const a = Math.max(0, at - 300), b = Math.min(T.doc.analysis.length, at + 760);
+    const cuts = new Set([a, b]);
+    const M = St.marks.filter(m => m.e > a && m.s < b);
+    M.forEach(m => { cuts.add(Math.max(a, m.s)); cuts.add(Math.min(b, m.e)); });
+    const cur = (e.s != null && e.e != null && e.e > e.s) ? e : null;
+    if (cur){ cuts.add(Math.max(a, cur.s)); cuts.add(Math.min(b, cur.e)); }
+    const P = [...cuts].sort((x, y) => x - y);
+    let h = a ? '…' : '';
+    for (let i = 0; i < P.length - 1; i++){
+      const x = P[i], y = P[i+1]; if (y <= x) continue;
+      const cls = new Set();
+      M.forEach(m => { if (m.s <= x && m.e >= y && m.cls) cls.add(m.cls); });
+      if (St.on && St.on.s <= x && St.on.e >= y && cls.has('s')) cls.add('on');
+      if (cur && cur.s <= x && cur.e >= y) cls.add('hit');
+      const t = T.doc.analysis.slice(x, y);
+      h += cls.size ? `<span class="${[...cls].join(' ')}">${esc(t)}</span>` : esc(t);
+    }
+    lens.innerHTML = `<div class="doc">${esc(T.doc.label)} · characters ${a.toLocaleString()}–${b.toLocaleString()} of ${T.doc.analysis.length.toLocaleString()} · the marks are the layers that have reached these bytes</div><div class="txt">${h}${b < T.doc.analysis.length ? '…' : ''}</div>`;
+    const hit = lens.querySelector('.hit') || lens.querySelector('.on');
+    if (hit && dir) hit.scrollIntoView({ block: 'nearest' });
+  }
+
+  // ── the shared holodeck map engine, fed from the fold at the playhead ──
+  const map = mountMap($('p-graph'), { padBottom: 24, wheelZoom: true, empty: 'Referents and relations appear here as the reading reaches them.', sentence: () => '' });
+  function mapData(St, e){
+    const nodes = [...St.refs.values()].map(r => ({ n: r.n, c: r.c, mine: true, st: 'fold' }));
+    const edges = St.rels.map(c => ({ a: String(c.end1), b: String(c.end2), c: 1, mine: true, neg: c.polarity === '-' }));
+    const hot = new Set([e && e.data && e.data.end1, e && e.data && e.data.end2, e && e.data && e.data.n].filter(Boolean).map(String));
+    return { nodes, edges, docs: [], occ: new Map(), odd: new Map(), hot, hotPairs: [] };
+  }
+
+  // ── tabs: one view at a time, so nothing is a wall of everything ──
+  const tabBtns = [...root.querySelectorAll('#p-tabs [data-tab]')];
+  const panes = [...root.querySelectorAll('.hdp-pane')];
+  function setTab(t){
+    tab = t; panelKey = ''; propsKey = '';
+    tabBtns.forEach(b => b.setAttribute('aria-selected', String(b.dataset.tab === t)));
+    panes.forEach(p => { p.hidden = p.dataset.pane !== t; });
+    render(false);
+  }
+  tabBtns.forEach(b => b.addEventListener('click', () => setTab(b.dataset.tab)));
+
+  // ── the layers panel: one layer at a time ──
+  function renderLayers(St, e){
+    const active = e.stage;
+    const sig = active + ':' + (St.grammar.length) + ':' + (St.morph.length) + ':' + St.rels.length + ':' + St.led.length + ':' + St.priors.length + ':' + (St.tokens.length) + ':' + (e.i >>> 2);
+    if (sig === panelKey) return; panelKey = sig;
+    let H = '';
+    for (const [key, label, c, why] of LAYERS){
+      const done = CK[key] < CK[active], on = key === active, fut = CK[key] > CK[active];
+      const count = layerCount(key, St);
+      H += `<div class="ly ${on ? 'on' : ''} ${fut ? 'fut' : ''}">
+        <div class="ly-h"><span class="ly-i">${CK[key] + 1}</span><span class="ly-n" style="color:var(${c})">${esc(label)}</span><span class="ly-c">${fut ? '—' : count}</span></div>
+        ${on ? `<div class="ly-b">${layerBody(key, St, e)}</div>` : done ? `<div class="ly-b"><div class="ly-min">${esc(why)} · ${count}</div></div>` : `<div class="ly-b"><div class="ly-min">${esc(why)}</div></div>`}
+      </div>`;
+    }
+    layersEl.innerHTML = `<div class="hdp-h">the layers — the one it is reading now is open</div>${H}`;
+    const on = layersEl.querySelector('.ly.on');
+    if (on && dir) on.scrollIntoView({ block: 'nearest' });
+    wireReopen(layersEl);
+  }
+  function layerCount(key, St){
+    switch (key){
+      case 'bytes': return esc(T.doc.label) + ' · ' + T.nBytes.toLocaleString() + ' bytes';
+      case 'decode': return T.doc.analysis.length.toLocaleString() + ' chars';
+      case 'furniture': return T.blanks.length ? T.blanks.length.toLocaleString() + ' chars blanked' : 'nothing to blank';
+      case 'statement': return St.counts.statement ? St.counts.statement + ' of ' + T.sents.length : T.sents.length + ' statements';
+      case 'token': return St.tokens.length.toLocaleString() + ' forms';
+      case 'grammar': return St.grammar.length.toLocaleString() + ' classified · ' + T.gaps + ' gaps · ' + T.ambiguous + ' ambiguous';
+      case 'morph': return St.morph.length.toLocaleString() + ' acts';
+      case 'referent': return St.refs.size.toLocaleString() + ' referents';
+      case 'relation': return St.rels.length.toLocaleString() + ' atoms of ' + T.claims.length;
+      case 'ledger': return St.led.length.toLocaleString() + ' events';
+      case 'prior': return St.priors.length.toLocaleString() + ' of 3';
+    }
+    return '';
+  }
+  function layerBody(key, St, e){
+    const last = (arr, n) => arr.slice(Math.max(0, arr.length - n));
+    switch (key){
+      case 'bytes': {
+        const hex = [...enc.encode(T.doc.analysis.slice(0, 48))].map(b => b.toString(16).padStart(2, '0')).join(' ');
+        return tbl([['sha-256 (whole file)', hx(T.hash, 44)], ['stable source id', T.srcId], ['anchor', `byteRange(0, ${T.nBytes})`], ['address space', 'folded-bytes · unit byte · encoding utf8']])
+          + `<pre>${esc(hex)}</pre><div class="ly-min">first 48 bytes, as bytes. Anyone can recompute the id and re-open these exact bytes — that is the whole of the audit.</div>`;
+      }
+      case 'decode':
+        return `<div class="ly-min">utf-8 bytes → ${T.doc.analysis.length.toLocaleString()} characters. The two are not the same number for any non-ASCII text, so the page keeps both: <b>read in characters, addressed in bytes</b>. Every address below is a byte offset.</div>`;
+      case 'furniture':
+        return T.blanks.length
+          ? `<div class="ly-min">${T.blanks.length.toLocaleString()} characters of markup/CSS/entity/URL were replaced by spaces <b>of their own length</b>, so the passage is clean prose but every offset is untouched — content-anchoring still lands on the real bytes.</div><div>${T.blanks.slice(0, 14).map(r => `<span class="chip">${charToByte(T.doc.analysis, r.s)}–${charToByte(T.doc.analysis, r.e)}</span>`).join('')}${T.blanks.length > 14 ? `<span class="chip">+${T.blanks.length - 14} more</span>` : ''}</div>`
+          : `<div class="ly-min">Nothing to blank: this material arrived as prose and is read exactly as it stands.</div>`;
+      case 'statement':
+        return `<div class="blk"><table><thead><tr><th>#</th><th>bytes</th><th>the statement</th></tr></thead><tbody>${last(T.sents, 40).map((s, i) => `<tr><td class="mono">${s.order + 1}</td><td class="mono">${charToByte(T.doc.analysis, s.offset)}–${charToByte(T.doc.analysis, s.offset + s.text.length)}</td><td>${esc(clamp(s.text.replace(/\s+/g,' ').trim(), 120))}</td></tr>`).join('')}</tbody></table></div>`;
+      case 'token':
+        return `<div class="blk">${last(St.tokens.filter(Boolean), 160).map(t => `<span class="chip">${esc(t)}</span>`).join('')}<div class="ly-min" style="margin-top:6px">${St.tokens.length.toLocaleString()} forms reached${T.words.length > T.shown.length ? ` · the reading covers all ${T.words.length.toLocaleString()}` : ''} · ${new Set(T.toks).size.toLocaleString()} distinct in the reader's vocab.</div></div>`;
+      case 'grammar': {
+        const rows = last(St.grammar.filter(Boolean), 30).reverse().map(g => {
+          if (!g.found) return `<tr><td class="mono">${esc(g.w)}</td><td colspan="2" class="gap">no entry — typed gap</td></tr>`;
+          const bits = g.candidates.map(k => `<span class="mono">${esc(k.upos)}</span> ${(k.share*100).toFixed(0)}% → ${k.thraxClass ? esc(k.thraxClass) : '<span class="gap">—</span>'}`).join('<br>');
+          const bar = `<span class="bar" style="width:${Math.max(3, Math.round(g.candidates[0].share * 46))}px"></span>`;
+          return `<tr><td class="mono">${esc(g.w)}</td><td>${bar}</td><td>${bits}</td></tr>`;
+        }).join('');
+        return `<div class="blk"><table><thead><tr><th>form</th><th></th><th>classes attested (UD → Thrax)</th></tr></thead><tbody>${rows}</tbody></table></div>
+          <div class="ly-min"><b>Ambiguity is preserved, not resolved.</b> A type-level table cannot answer an instance-level question, so no winner is picked here. Giver: ${esc(POS_PRIOR_META.giver)} → ${esc(THRAX_META.giver)}.</div>`;
+      }
+      case 'morph': {
+        const rows = last(St.morph.filter(Boolean), 30).reverse().map(m => `<tr><td class="mono">${esc(m.w)}</td><td class="mono">${m.lemmas.map(l => esc(l)).join(', ') || '—'}</td><td class="mono">${m.stems.map(esc).join(', ') || '—'}</td></tr>`).join('');
+        return `<div class="blk"><table><thead><tr><th>form</th><th>lemma candidates (a set)</th><th>rule-recovered stem</th></tr></thead><tbody>${rows}</tbody></table></div>
+          <div class="ly-min"><b>The prior decides sameness; the material decides presence.</b> Identity lives in the referent, never in a string — the lemma is never reduced to one.</div>`;
+      }
+      case 'referent':
+        return `<div>${[...St.refs.values()].map(r => `<span class="chip b">${esc(r.n)} <span style="color:var(--dim)">×${r.c}</span></span>`).join('') || '<span class="ly-min">—</span>'}</div>
+          <div class="ly-min">The participants this material establishes, each with the byte it was first read at. A participant that never appears in a bound relation is not invented here.</div>`;
+      case 'relation': {
+        const total = St.rels.length, startI = Math.max(0, total - 30);
+        const rows = St.rels.slice(startI).map((c, k) => {
+          const i = startI + k, re = T.reopened && T.reopened.get(i), st = standingOf(c);
+          return `<tr><td class="diag">${diagram(c, i)}</td><td><span class="chip ${re ? 'a' : st === 'read' ? 'g' : st === 'beyond reach' ? 'a' : 'v'}">${re ? 'reopened' : st}</span></td><td class="mono">${esc(c.polarity === '-' ? '¬ −' : '+')}</td><td class="mono">${esc(c.tense.v)}</td><td class="mono">${c.b0 == null ? '<span class="gap">—</span>' : c.b0 + '–' + c.b1}</td><td>${c.grounded ? 'verbatim' : '<span class="gap">typed gap</span>'}</td></tr>`;
+        }).join('');
+        const counts = { read: 0, 'beyond reach': 0, unheard: 0 };
+        St.rels.forEach(c => { counts[standingOf(c)]++; });
+        return `<div class="row" style="margin:2px 0 6px"><span class="badge live">${counts.read} read</span><span class="badge">${counts['beyond reach']} beyond reach</span><span class="badge">${counts.unheard} unheard</span>${total > 30 ? `<span class="badge">last 30 of ${total}</span>` : ''}</div>
+          <table><thead><tr><th>the proposition (subject —act→ object)</th><th>standing</th><th>polarity</th><th>tense</th><th>bytes</th><th>grounded</th></tr></thead><tbody>${rows || '<tr><td colspan="6" class="ly-min">the reader has bound no relation yet</td></tr>'}</tbody></table>
+          <div class="ly-min">A refusal is a result, not a failure: <b>nothing here is ever implied false</b>. Each proposition carries its own byte range and its own clause's tense — there is no global clock. <b>revisit</b> holds an assertion open and appends the revision to the ledger.</div>`;
+      }
+      case 'ledger': {
+        const rows = last(St.led, 26).reverse().map(x => {
+          const d = x.data || {};
+          return `<div class="evt"><span class="id">${esc(hx(d.id || d.srcId, 14))}</span><span><span class="st">${esc(x.kind)}</span> <span class="rd">${esc(clamp(x.msg, 110))}</span></span></div>`;
+        }).join('');
+        return `<div class="blk">${rows}</div><div class="ly-min">Not citations but <b>transformations</b>: read → arrange → bind → eot. Ids are ${esc('evt_ + first 20 hex of sha256(JSON.stringify(value))')} — the same reading always yields the same ids, and a third party can recompute the whole log.</div>`;
+      }
+      case 'prior':
+        return `<table><thead><tr><th>prior</th><th>schema</th><th>giver</th><th>the wall it holds</th></tr></thead><tbody>
+          ${St.priors.map(p => `<tr><td>${esc(p.name)}</td><td class="mono">${esc(p.schema)}</td><td>${esc(p.giver)}</td><td>${esc(p.wall)}</td></tr>`).join('')}
+          </tbody></table><div class="ly-min">Everything above was read without a model. What it did <i>receive</i> are these priors — each naming its giver, injected, never derived. A missing prior is a typed gap, never a silent guess.</div>`;
+    }
+    return '';
+  }
+  function tbl(kvs){ return `<table>${kvs.map(([k, v]) => `<tr><td>${esc(k)}</td><td class="mono">${v}</td></tr>`).join('')}</table>`; }
+
+  // ── revisable assertions: hold one open, appending the revision to the ledger live ──
+  function reopen(i){
+    const c = T.claims[i]; if (!c) return;
+    const id = T.led.event({ stage: 'revisit', source_id: T.srcId, transform: 'assertion→revision', detail: { of: `${c.end1}—${c.label}→${c.end2}`, act: 'reopened', note: 'standing held open for re-reading' } });
+    ev.push({ i: ev.length, t: performance.now() - (T.ev._t0 || 0), stage: 'ledger', kind: 'revisit', msg: `${id} · revisit assertion→revision · “${c.end1}—${c.label}→${c.end2}” reopened — the standing is held open`, s: c.s, e: c.e, data: { id, revisits: i } });
+    if (!T.reopened) T.reopened = new Map();
+    T.reopened.set(i, id);
+    N = ev.length; panelKey = ''; propsKey = ''; render(true);
+  }
+  function wireReopen(scope){
+    scope.querySelectorAll('[data-reopen]').forEach(btn => btn.addEventListener('click', () => reopen(+btn.dataset.reopen)));
+  }
+
+  // ── the propositions: the source in reading order, each proposition drawn ──
+  const standingOf = c => c.verdict === 'bound' ? 'read' : c.verdict === 'beyond-reach' ? 'beyond reach' : 'unheard';
+  function marked(s, idxs){
+    const a0 = s.offset, b0 = s.offset + s.text.length;
+    const parts = idxs.map(i => T.claims[i]).sort((x, y) => x.s - y.s);
+    let html = '', cur = a0;
+    for (const c of parts){
+      const a = Math.max(a0, c.s), b = Math.min(b0, c.e); if (b <= a) continue;
+      if (a > cur) html += esc(T.doc.analysis.slice(cur, a));
+      html += `<span class="mrel">${esc(T.doc.analysis.slice(a, b))}</span>`;
+      if (b > cur) cur = b;
+    }
+    if (cur < b0) html += esc(T.doc.analysis.slice(cur, b0));
+    return html.replace(/[ \t]+/g, ' ');
+  }
+  function diagram(c, i){
+    const neg = c.polarity === '-', far = c.verdict !== 'bound', re = T.reopened && T.reopened.get(i);
+    return `<div class="prop" data-r="${i}"><span class="pnode s">${esc(c.end1)}</span>`
+      + `<span class="parc${neg ? ' neg' : ''}${far ? ' far' : ''}"><span class="plabel">${esc(c.label)}</span><span class="pline"></span><span class="phead"></span></span>`
+      + `<span class="pnode o">${esc(c.end2)}</span>`
+      + (re ? `<span class="chip a">revised</span>` : `<button class="reopen" data-reopen="${i}" title="Hold this assertion open for re-reading — the revision is appended to the ledger">revisit</button>`)
+      + `</div>`;
+  }
+  function renderProps(St, e){
+    if (tab !== 'props') return;
+    const hot = e.stage === 'relation' ? e.data : null;
+    const sig = 'P' + T.claims.length + '|' + (hot ? hot.s + ':' + hot.e : '-') + '|' + (T.reopened ? T.reopened.size : 0);
+    if (sig === propsKey) return; propsKey = sig;
+
+    const sents = T.sents, inSent = sents.map(() => []), unlocated = [];
+    T.claims.forEach((c, i) => {
+      if (!c.located){ unlocated.push(i); return; }
+      for (let j = 0; j < sents.length; j++){ const s = sents[j]; if (c.s >= s.offset && c.s < s.offset + s.text.length){ inSent[j].push(i); return; } }
+      unlocated.push(i);   // a span that lands outside every statement is still not attributable to one
+    });
+    const counts = { read: 0, far: 0, unheard: 0 };
+    T.claims.forEach(c => { counts[c.verdict === 'bound' ? 'read' : c.verdict === 'beyond-reach' ? 'far' : 'unheard']++; });
+
+    const CAP = 500;
+    const rowsHtml = sents.slice(0, CAP).map((s, j) => {
+      const idxs = inSent[j], isCur = !!hot && idxs.some(i => T.claims[i].s === hot.s && T.claims[i].e === hot.e);
+      if (!idxs.length) return `<tr${isCur ? ' class="cur"' : ''}><td class="n">${j + 1}</td><td class="stmt">${marked(s, [])}</td><td colspan="4"><span class="noprop">— no proposition bound: this statement named no act the reader could bind. A refusal is a result, never an error.</span></td></tr>`;
+      const n = idxs.length;
+      return idxs.map((ci, k) => {
+        const c = T.claims[ci], st = standingOf(c), re = T.reopened && T.reopened.get(ci);
+        let h = `<tr${isCur ? ' class="cur"' : ''}>`;
+        if (k === 0) h += `<td class="n" rowspan="${n}">${j + 1}</td><td class="stmt" rowspan="${n}">${marked(s, idxs)}</td>`;
+        h += `<td class="diag">${diagram(c, ci)}</td>`;
+        h += `<td class="standing"><span class="chip ${re ? 'a' : st === 'read' ? 'g' : st === 'beyond reach' ? 'a' : 'v'}">${re ? 'reopened' : st}</span></td>`;
+        h += `<td class="tense" title="${esc(c.tense.why)}">${esc(c.tense.v)}</td>`;
+        h += `<td class="bytes">${c.b0 == null ? '—' : c.b0 + '–' + c.b1}</td>`;
+        return h + '</tr>';
+      }).join('');
+    }).join('');
+
+    const head = `<div class="hdp-h">the propositions this reading makes — the source in order, each one drawn</div>
+      <div class="hdp-figure"><b>${counts.read}</b> read · <b>${counts.far}</b> beyond reach · <b>${counts.unheard}</b> unheard${unlocated.length ? ` · <b>${unlocated.length}</b> unlocated` : ''}${T.reopened && T.reopened.size ? ` · <b>${T.reopened.size}</b> reopened` : ''} over <b>${sents.length.toLocaleString()}</b> statements.
+      Each row shows the <b>original words</b> (the span that carried the proposition is underlined), the proposition drawn as <b>subject —act→ object</b> beside it,
+      its polarity (a dashed <b>¬</b> arc is negative), the clause's own <b>tense</b>, and the <b>byte range</b> it was read from.</div>
+      ${sents.length > CAP ? `<div class="ly-min">showing the first ${CAP.toLocaleString()} of ${sents.length.toLocaleString()} statements.</div>` : ''}`;
+
+    const unlocatedHtml = unlocated.length ? `<div class="hdp-h" style="margin-top:16px">unlocated propositions — the reader stated these, but carried no span to place them</div>
+      <table class="props"><thead><tr><th></th><th>the proposition it makes</th><th>standing</th><th>tense</th><th>bytes</th></tr></thead><tbody>${unlocated.map(ci => {
+        const c = T.claims[ci], st = T.reopened && T.reopened.get(ci) ? 'reopened' : standingOf(c);
+        return `<tr><td class="n">—</td><td class="diag">${diagram(c, ci)}</td><td class="standing"><span class="chip ${st === 'read' ? 'g' : 'a'}">${st}</span></td><td class="tense">${esc(c.tense.v)}</td><td class="bytes">—</td></tr>`;
+      }).join('')}</tbody></table>
+      <div class="ly-min">No span means no address: the proposition stands (or is refused) on its own, but the source never carried it to a byte — so it is shown here, never pinned to a sentence it did not come from.</div>` : '';
+
+    propsEl.innerHTML = head + `<table class="props"><thead><tr><th>#</th><th>the statement</th><th>the proposition it makes</th><th>standing</th><th>tense</th><th>bytes</th></tr></thead><tbody>${rowsHtml}</tbody></table>` + unlocatedHtml;
+    wireReopen(propsEl);
+    if (hot && dir){ const r = propsEl.querySelector('tr.cur'); if (r) r.scrollIntoView({ block: 'nearest' }); }
+  }
+
+  // ── ribbon ──
+  let dpr = 1;
+  function size(){ dpr = window.devicePixelRatio || 1; const q = rc.getBoundingClientRect(); rc.width = Math.max(1, q.width * dpr); rc.height = Math.max(1, q.height * dpr); drawRibbon(); }
+  function drawRibbon(){
+    const g = rc.getContext('2d'), w = rc.width, h = rc.height; if (!w) return; g.clearRect(0, 0, w, h); const mp = maxPos();
+    for (let i = 0; i < N; i++){ const x0 = clockOf(i) / mp * w, x1 = i + 1 < N ? clockOf(i + 1) / mp * w : w;
+      g.fillStyle = cssVar((L[ev[i].stage] || { c: '--dim' }).c); g.globalAlpha = 0.85; g.fillRect(x0, h * 0.22, Math.max(1, x1 - x0), h * 0.56); }
+    g.globalAlpha = 1; const x = pos / mp * w; g.fillStyle = cssVar('--ink'); g.fillRect(x - dpr, 0, 2 * dpr, h);
+  }
+  const scrub = e => { const r = rc.getBoundingClientRect(); const f = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)); setDir(0); pos = f * maxPos(); k = idxAt(pos); render(true); };
+  let dragging = false;
+  const rib = $q('.hdp-rib');
+  rib.addEventListener('pointerdown', e => { dragging = true; e.target.setPointerCapture && e.target.setPointerCapture(e.pointerId); scrub(e); });
+  rib.addEventListener('pointermove', e => { if (dragging) scrub(e); });
+  rib.addEventListener('pointerup', () => { dragging = false; });
+
+  // ── render ──
+  function render(follow){
+    const St = stateAt(k), e = ev[k];
+    renderLog(follow); renderLens(St); renderLayers(St, e); renderProps(St, e); map.set(mapData(St, e)); drawRibbon(); updateStats(St, e);
+    rdEl.textContent = (real ? 't = ' + ms(pos) + ' of ' + ms(ev[N-1].t) + ' ms' : 'step ' + (k + 1).toLocaleString() + ' of ' + N.toLocaleString())
+      + ' · layer ' + ((L[e.stage] || {}).i + 1) + '/' + LAYERS.length + ' · real ' + ms(e.t) + ' ms';
+  }
+  function updateStats(St, e){
+    statsEl.innerHTML =
+      `<span>statements <b>${(St.counts.statement || 0).toLocaleString()}</b></span>` +
+      `<span>forms <b>${St.tokens.length.toLocaleString()}</b></span>` +
+      `<span>referents <b>${St.refs.size.toLocaleString()}</b></span>` +
+      `<span>relations <b>${St.rels.length.toLocaleString()}</b></span>` +
+      `<span>ledger <b>${St.led.length.toLocaleString()}</b></span>` +
+      `<span class="g">layer <b>${(L[e.stage] || {}).i + 1}</b>/${LAYERS.length} · <b>${esc((L[e.stage] || { label: e.stage }).label)}</b></span>` +
+      `<span class="g">real run <b>${ms(T.totalMs)}</b> ms · model calls <b>${T.net.models}</b></span>`;
+    metaEl.textContent = `${N.toLocaleString()} steps · read in ${ms(T.totalMs)} ms · ${T.net.requests.length} network request${T.net.requests.length === 1 ? '' : 's'} (static priors only)`;
+  }
+
+  // ── loop ──
+  function loop(now){
+    const dt = Math.min(100, now - last); last = now;
+    if (dir && dt > 0){
+      pos += dir * (real ? dt * speed : dt / 1000 * speed);
+      if (pos >= maxPos()){ pos = maxPos(); setDir(0); } else if (pos < 0){ pos = 0; setDir(0); }
+      else { const nk = idxAt(pos); if (nk !== k){ k = nk; render(true); } else drawRibbon(); }
+    }
+    raf = requestAnimationFrame(loop);
+  }
+
+  // ── controls ──
+  const onClick = e => { const a = e.target.closest('[data-a]'); if (!a) return; const act = a.dataset.a;
+    if (act === 'close') close(); else if (act === 'play') setDir(dir === 1 ? 0 : (k >= N - 1 ? (seek(0), 1) : 1));
+    else if (act === 'rev') setDir(dir === -1 ? 0 : (k <= 0 ? (seek(N - 1), -1) : -1));
+    else if (act === 'start'){ setDir(0); seek(0); } else if (act === 'back'){ setDir(0); seek(k - 1); } else if (act === 'fwd'){ setDir(0); seek(k + 1); }
+    else if (act === 'steps') setClock(false); else if (act === 'real') setClock(true);
+    else if (act === 'copy'){ const txt = JSON.stringify({ doc: T.doc.label, bytes: T.nBytes, hash: T.hash, steps: ev.length, events: ev.map(x => ({ t: x.t, stage: x.stage, kind: x.kind, msg: x.msg })) }, null, 1);
+      navigator.clipboard && navigator.clipboard.writeText(txt).then(() => { a.textContent = 'Copied'; setTimeout(() => { a.textContent = 'Copy trace (JSON)'; }, 1400); }, () => { a.textContent = 'Copy failed'; }); }
+    else if (act === 'dl-json'){ download(`${slugOf(T)}-reading.json`, JSON.stringify(readingJSON(T), null, 2), 'application/json'); a.textContent = 'Saved'; setTimeout(() => { a.textContent = '⤓ Reading (JSON)'; }, 1400); }
+    else if (act === 'dl-text'){ download(`${slugOf(T)}-reading.txt`, diagrammedText(T), 'text/plain;charset=utf-8'); a.textContent = 'Saved'; setTimeout(() => { a.textContent = '⤓ Diagrammed (text)'; }, 1400); } };
+  const onKey = e => { if (e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA') return;
+    if (root.hidden) return;
+    if (e.key === 'Escape') close(); else if (e.key === ' '){ e.preventDefault(); setDir(dir ? 0 : 1); }
+    else if (e.key === 'ArrowLeft'){ setDir(0); seek(k - 1); } else if (e.key === 'ArrowRight'){ setDir(0); seek(k + 1); }
+    else if (e.key === 'j' || e.key === 'J') setDir(-1); else if (e.key === 'k' || e.key === 'K') setDir(0); else if (e.key === 'l' || e.key === 'L') setDir(1);
+    else if (e.key === 'Home'){ setDir(0); seek(0); } else if (e.key === 'End'){ setDir(0); seek(N - 1); } };
+  function close(){ cancelAnimationFrame(raf); root.hidden = true; cur = null; }
+  const ro = new ResizeObserver(() => size());
+
+  root.addEventListener('click', onClick);
+  document.addEventListener('keydown', onKey);
+  speedSel.addEventListener('change', () => { speed = +speedSel.value; });
+
+  T.ev._t0 = T.ev._t0 || performance.now();
+  fillSpeeds(); ro.observe($q('.hdp-right')); size();
+  seek(opt.seek != null ? opt.seek : 0);
+  if (opt.seek == null && !matchMedia('(prefers-reduced-motion: reduce)').matches) setDir(1);
+  raf = requestAnimationFrame(loop);
+
+  return { close, root, T, seek, el: root };
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+//  READ → BUILD TRACE → PLAY
+// ═════════════════════════════════════════════════════════════════════════════
+async function read(text, label){
+  const raw = String(text || '');
+  if (raw.trim().length < 8){ alert('Nothing to read yet — drop a document or paste text.'); return; }
+  const btn = $('read'); const was = btn.textContent; btn.textContent = 'reading…'; btn.disabled = true;
+  try {
+    await ready();
+    const LIMIT = 14000;
+    const analysis = raw.length > LIMIT ? raw.slice(0, LIMIT) : raw;
+    const truncated = raw.length > LIMIT;
+    const clean = blankMarkup(analysis);
+    const doc = { label: label || 'pasted text', analysis, truncated };
+    const T = buildTrace(doc, clean, READER);
+    $('model').textContent = `model calls: ${T.net.models}`;
+    openTrace(T, {});
+    $('landing-note').innerHTML = truncated
+      ? `<b>Note:</b> the file is longer than ${LIMIT.toLocaleString()} characters; the <b>whole file</b> is hashed and addressed, but the animated reading runs over its first ${LIMIT.toLocaleString()} so the page stays responsive (the fold's own corpus path chunks a whole book the same honest way).`
+      : $('landing-note').innerHTML;
+  } catch (err){
+    alert('The reading failed: ' + (err && err.message || err));
+    console.error(err);
+  } finally { btn.textContent = was; btn.disabled = false; }
+}
+
+// ── input wiring ──
+const drop = $('drop'), file = $('file'), ta = $('ta');
+drop.addEventListener('click', () => file.click());
+file.addEventListener('change', async () => { const f = file.files[0]; if (f) read(await f.text(), f.name); });
+['dragenter','dragover'].forEach(e => drop.addEventListener(e, ev => { ev.preventDefault(); drop.classList.add('hot'); }));
+['dragleave','drop'].forEach(e => drop.addEventListener(e, ev => { ev.preventDefault(); drop.classList.remove('hot'); }));
+drop.addEventListener('drop', async ev => {
+  const f = ev.dataTransfer.files && ev.dataTransfer.files[0];
+  if (f) return read(await f.text(), f.name);
+  const t = ev.dataTransfer.getData('text'); if (t) read(t, 'dropped text');
+});
+$('read').addEventListener('click', () => read(ta.value, 'pasted text'));
+$('clear').addEventListener('click', () => { ta.value = ''; });
+$('samples').addEventListener('click', e => { const s = e.target.dataset.s; if (s){ ta.value = SAMPLES[s]; read(SAMPLES[s], 'sample · ' + s); } });
+
+window.__read = read; window.__SAMPLES = SAMPLES; window.__net = net;
+window.__reading = { json: () => (cur ? readingJSON(cur.T) : null), text: () => (cur ? diagrammedText(cur.T) : null), current: () => (cur ? cur.T : null) };
+</script>
+</body>
+</html>
