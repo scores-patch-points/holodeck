@@ -1,3 +1,36 @@
+## 2026-10-18 — make "Continue with Google" the primary sign-in; Drive tucked behind Advanced (topics-holograph-profile, byo-storage)
+fast: 3 files · 43 tests pass · law: ok
+| lens | citation | file:line | verdict | one line |
+| Kondo | what did the diff leave dead/unwired | holodeck-byo-panel.js | noted | the Drive path was de-emphasized, not removed: it stays imported by the panel behind a <details>, so holodeck-byo.js / holodeck-storage-drive.js are still wired, not dead |
+| Frankfurt | does the thing correspond to something real | holodeck-byo-panel.js | noted | the card now says what Google is asked for (name + email only) and why the Drive option re-opens the scope rules — no placeholder |
+clean: Diaconis, Feynman, Dijkstra, Holmes, Alexander, Ostrom, Simon/Chekhov
+
+## 2026-10-18 — single sign-in: "Continue with Google" through Supabase (implicit flow), one login for identity + storage (topics-holograph-profile, byo-storage)
+fast: 5 files · 43 tests pass · law: ok
+| lens | citation | file:line | verdict | one line |
+| Feynman | a swallowed failure | holodeck-supabase.js:resume | fixed | a PKCE-only project used to be a silent non-connect; `resume` now throws a typed `pkce-unsupported`, so the failure is named |
+| Dijkstra | an origin/allowlist decision | holodeck-supabase.js:oauthAuthorizeUrl | noted | the authorize URL is HTTPS-guarded like the provider; the redirect allow-list lives in Supabase, and the doc says each holodeck origin is added there once |
+| Holmes | one entity or two | docs/GOOGLE-SIGNIN-AND-BYO-STORAGE.md | noted | Google (identity, via Supabase) and the workspace keyring stay separate; the session token is the Storage token, the key is still the device link |
+clean: Diaconis, Alexander, Frankfurt, Ostrom, Simon/Chekhov
+
+## 2026-10-18 — Supabase provider + email one-time-code sign-in; sealed-only and HTTPS-only by construction (topics-holograph-profile, byo-storage)
+fast: 8 files · 41 tests pass · law: ok
+| lens | citation | file:line | verdict | one line |
+| Dijkstra | a path-handling defect | holodeck-storage-supabase.js:88 | fixed | object keys were interpolated raw into the URL path, so a space or `?` in a name broke the request; each segment is now encodeURIComponent'd (slashes kept), with a space/`?`/slash test |
+| Feynman | a swallowed error | holodeck-storage-supabase.js:90 | noted | the `sealed()` parse check returns false on malformed bytes and `put` then refuses with `plaintext-refused` — a typed refusal at the door, not a swallowed verdict |
+| Alexander | a composition seam | holodeck-supabase.js | noted | the facade is the only supported entry and always wraps the provider in sealedStore; the raw provider is sealed-only (`requireSealed`) and HTTPS-only by default |
+clean: Diaconis, Holmes, Frankfurt, Ostrom, Simon/Chekhov
+
+## 2026-10-18 — bring-your-own storage: sign in with Google, keep the workspace's sealed bytes in your own Drive app folder (topics-holograph-profile, byo-storage)
+fast: 12 files · 28 tests pass · law: ok
+| lens | citation | file:line | verdict | one line |
+| Simon/Chekhov | a new module no test imports | holodeck-byo-panel.js | fixed | added holodeck-byo-panel.test.mjs (linkedom): the panel mounts, draws the connect control, closes; every new source now has a test |
+| Diaconis | an unmeasured assumption / stale state | holodeck-storage-drive.js:110 | fixed | the name→id cache could be stale and a put would CREATE a second file (the app folder allows duplicate names); put now refreshes before create, with a two-provider test |
+| Feynman | a swallowed error / a constant | holodeck-google-signin.js:41 | noted | decodeJwtPayload returns null on an unreadable token by contract (decode-only, never verification); identityOf documents it and no claim rides on it |
+| Dijkstra | an allowlist / locale pattern | holodeck-byo-panel.js:34 | false-positive-on-review | the el() `on*` binder is the same DOM helper the people/share panels use, not identity logic |
+| Alexander | a composition seam | holodeck-byo.js | noted | the facade composes sign-in + provider + vault and throws without a client id or workspace (tested) |
+clean: Holmes, Frankfurt, Ostrom
+
 ## 2026-10-02 — the mechanical summary's real job is the VOID; wired as an additive fact (main, summary-ladder)
 fast: 4 files · law: ok
 | lens | citation | file:line | verdict | one line |
