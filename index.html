@@ -438,6 +438,9 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
       </sc-if>
     </nav>
     <div style="margin:8px 8px 4px;padding:9px 10px;border:1px dashed var(--line2);border-radius:8px;font:400 11.5px/1.5 var(--sans);color:var(--mut)">Beta — the Holodeck is in progress. Found a bug or have an idea? <a href="mailto:scores.patch.points@proton.me?subject=Holodeck%20beta%20feedback" style="color:var(--acc);text-decoration:none;font-weight:600">Send feedback</a>.</div>
+    <div style="margin:2px 8px 4px;padding:0 10px;font:400 11.5px/1.5 var(--sans);color:var(--mut)"><a href="reading/index.html" style="color:var(--acc);text-decoration:none;font-weight:600">How it reads →</a> the same reading, layer by layer, audited byte by byte, with no model.</div>
+    <div style="margin:2px 8px 4px;padding:0 10px;font:400 11.5px/1.5 var(--sans);color:var(--mut)"><a href="power-map.html" style="color:var(--acc);text-decoration:none;font-weight:600">Power map →</a> a directed map of who holds what — entities and typed relations, drawn as a DAG and exported as SVG.</div>
+    <div style="margin:2px 8px 4px;padding:0 10px;font:400 11.5px/1.5 var(--sans);color:var(--mut)"><a href="reading/parse.html" style="color:var(--acc);text-decoration:none;font-weight:600">Parsing without an LLM →</a> the reading page as a worked example: bytes to referents, every step measured, no model.</div>
     </sc-if>
   </div>
   <div class="hd-column" style="flex:1 1 0;min-width:0;box-sizing:border-box;{{ colPad }}">
@@ -3642,11 +3645,18 @@ function holoKit(A, opt) { const cur = opt.cur; const srcShort = opt.srcShort;
       const rels = [...win.matchAll(new RegExp(MW.source, 'gi')), ...win.matchAll(new RegExp(VB.source, 'gi'))]
         .map(m => ({ w: m[0].toLowerCase().replace(/s$/, ''), d: Math.abs((w0 + m.index) - at) })).sort((a, b) => a.d - b.d);
       const relation = label || (rels[0] ? rels[0].w : '');
+      // THE RELATION FROM GRAMMAR, NOT A LIST (docs/SOURCE-CONTRADICTION-PREREG.md R5): the nearest CONTENT VERB the
+      // vendored POS prior tags in the figure's clause. It NOMINATES a relation; whether it qualifies the measure and
+      // EARNS the being is decided by cross-source RECURRENCE in holoTopics (a relation two sources share is the
+      // referent they share; an incidental matrix verb one source happens to use is not). An unseen corpus thus reads
+      // its OWN verbs ("3,000 people died" → died) with no corpus-specific list, and no incidental verb fragments a slot.
+      const posRel = label ? '' : figureRelation(win, at - w0);
       // the being: a name the statement itself carries, else (only for an EARNED relation) the source's own referent.
       const anchor = named || (relation ? docRef : '') || '';
       const unitNorm = u.replace(/s$/, '');
       const measure = relation ? (relation === unitNorm ? relation : (relation + (/dollar/.test(u) ? '' : ' ' + u)).trim()) : unitNorm;
-      out.push({ key: measure && anchor ? u + '|' + measure + '|' + anchor : null, measure, anchor, via: named ? 'name' : (relation && docRef ? 'source' : null), v, raw, s, e }); };
+      out.push({ key: measure && anchor ? u + '|' + measure + '|' + anchor : null, measure, anchor, via: named ? 'name' : (relation && docRef ? 'source' : null),
+        u, rel: relation || '', posRel, named: named || '', docRef: docRef || '', label: label || '', v, raw, s, e }); };
     st.figs.forEach(g => push(clean(g.raw || String(g.value)), +g.value, g.unit, g.s, g.e, null));
     for (const L of labelledQuantities(st.text)) push(L.raw, L.value, '', L.s, L.e, L.label);   // the label IS the measure
     return out; };
@@ -4916,6 +4926,23 @@ function mergeTopicGroups(groups) {
 const UNIT_TOPIC = { ton: 'tonnage', gross: 'tonnage', net: 'tonnage', foot: 'length', feet: 'length', mile: 'distance', knot: 'speed', passenger: 'passengers', compartment: 'compartments', lifeboat: 'lifeboats', dollar: 'cost', pound: 'weight', inche: 'inches', percent: 'percent' };
 const unitTopic = u => UNIT_TOPIC[String(u || '').toLowerCase()] || (u ? String(u).toLowerCase() : 'figure');
 
+// THE RELATION A FIGURE STANDS UNDER — what the number counts — read from the figure's OWN clause, never a
+// hand-grown list of one corpus's words (docs/SOURCE-CONTRADICTION-PREREG.md R5). The CONTENT VERB nearest the
+// figure in its window comes from the vendored POS prior (hdPos), so a corpus the engine has never seen reads its
+// own verbs ("3,000 people died" → died, "…were killed" → killed). It NOMINATES a relation; whether it earns the
+// being and qualifies the measure is decided by cross-source recurrence (holoTopics), so an incidental matrix verb
+// ("was felt", "was observed") one source happens to use never fragments a real slot. A bare dimension with no
+// content verb nearby yields no relation: the E1 gate that keeps "feet" from folding an iceberg's size and a ship's.
+function figureRelation(win, at, pos = (typeof hdPos === 'function' ? hdPos : null)) {
+  if (!pos) return '';
+  const cand = [];
+  for (const m of win.matchAll(/[A-Za-z][A-Za-z'’-]*/g)) { const c = pos(m[0]); if (!c) continue;
+    const top = Object.keys(c).sort((x, y) => c[y] - c[x])[0]; if (top !== 'VERB') continue;
+    cand.push({ w: m[0].toLowerCase().replace(/['’]s$/, '').replace(/s$/, ''), d: Math.abs(m.index - at) }); }
+  cand.sort((a, b) => a.d - b.d || (a.w < b.w ? -1 : a.w > b.w ? 1 : 0));
+  return cand[0] ? cand[0].w : '';
+}
+
 function holoTopics(A) {
   const none = { groups: [], entities: [], strayN: A.docs.length, basis: 'holograph' };
   if (!A || A.docs.length < 2) return none;
@@ -4974,17 +5001,43 @@ function holoTopics(A) {
     return cands.length ? cands[0][0] : '';
   };
   // ── MEASURE topics: the same figure-slot (unit | measure | anchor) in ≥2 sources ──
+  // THE RELATION IS DECIDED BY RECURRENCE, NOT A LIST (docs/SOURCE-CONTRADICTION-PREREG.md R5). A figure's relation
+  // — the source's own label, or a content verb the POS prior reads in its clause — NOMINATES what the number
+  // measures; it qualifies the measure and EARNS the being (the source's own referent) only when ≥2 sources carry it
+  // for the same being+unit. A relation two sources share IS the referent they share ("killed", "homeless"); an
+  // incidental matrix verb one source happens to use ("was felt", "was observed") is not, and must not fragment a
+  // real slot (measured: "296 miles" read "felt mile" against "mile", and the San Andreas distance contradiction
+  // vanished). An unearned relation leaves the figure to its NAME alone, so a bare dimension with no name stays
+  // anchorless — the E1 gate that keeps an iceberg's "feet" from folding onto a ship's.
   const meas = new Map();
+  const relDocs = new Map();   // (being | unit | relation) -> the sources that carry it (the recurrence decision)
+  const rows = [];
   A.sts.forEach(st => {
     const figs = K.figsOf(st, K.namesOf(st));
     // A thin or reference-matter statement normally carries no measure — but one that STATES a figure WITH A BEING
     // does, whatever its length: "Total number saved, 705" is four words and a fact. The being (`via`) is required,
     // so a stray number in page furniture (a page number, a list cell) is never measured.
     if ((!st.claimy || st.ref) && !figs.some(f => f.via)) return;
-    figs.forEach(f => { const m = f.measure || f.unit || ''; if (!f.anchor || !m) return;   // a figure about no one is no for-whom
-      const key = m + '\u0001' + f.anchor; let o = meas.get(key);
-      if (!o) meas.set(key, o = { docs: new Set(), vals: new Map(), anchor: f.anchor, m, sts: new Set() });
-      o.docs.add(st.doc); o.sts.add(st.id); let d = o.vals.get(f.raw); if (!d) o.vals.set(f.raw, d = new Map()); d.set(st.doc, { doc: st.doc, s: st.s + f.s, e: st.s + f.e, raw: f.raw }); }); });
+    figs.forEach(f => rows.push({ st, f })); });
+  // A unit that NAMES a measure (UNIT_TOPIC: ton→tonnage, mile→distance) IS the measure, so a verb never supplies one
+  // there; a POS verb may nominate only for a count noun the sources share ("people") or a unit-less figure —
+  // otherwise an incidental action verb ("used", "weighed", "sold") would mint a false slot. The witness list
+  // (MW/VB) and the source's own label always nominate; they are witness knowledge, not a per-statement guess.
+  const relOf = (f) => f.label || f.rel || (!(f.u && UNIT_TOPIC[(f.u || '').replace(/s$/, '')]) ? f.posRel : '');
+  for (const { st, f } of rows) { const rel = relOf(f); const being = f.named || f.docRef;
+    if (!rel || !being) continue; const k = being + '\u0001' + (f.u || '') + '\u0001' + rel; (relDocs.get(k) || relDocs.set(k, new Set()).get(k)).add(st.doc); }
+  for (const { st, f } of rows) {
+    const rel = relOf(f);
+    const earned = !!f.label || (!!rel && (relDocs.get((f.named || f.docRef) + '\u0001' + (f.u || '') + '\u0001' + rel) || new Set()).size >= 2);
+    // a figure about no one is no for-whom. `f.named`/`f.docRef` are the current kit's fields; `f.anchor` is the
+    // older shape a caller may still pass (the referent already decided), so it is the fallback, never the decider.
+    const anchor = f.named !== undefined ? (f.named || (earned ? f.docRef : '')) : (f.anchor || '');
+    const un = (f.u || '').replace(/s$/, '');
+    const m = earned && rel ? (rel === un ? rel : (rel + (f.u ? ' ' + f.u : '')).trim()) : (f.u ? un : (rel || f.measure || ''));
+    if (!anchor || !m) continue;
+    const key = m + '\u0001' + anchor; let o = meas.get(key);
+    if (!o) meas.set(key, o = { docs: new Set(), vals: new Map(), anchor, m, sts: new Set() });
+    o.docs.add(st.doc); o.sts.add(st.id); let d = o.vals.get(f.raw); if (!d) o.vals.set(f.raw, d = new Map()); d.set(st.doc, { doc: st.doc, s: st.s + f.s, e: st.s + f.e, raw: f.raw }); }
   // the source's own TABLE figures: a cell's measure is its column's own header word, and the being is the
   // source's own referent (the being the source is about), so a table's "aboard"/"saved" columns meet across
   // sources — the two figures one prose sentence fuses, each under the column the table itself put it under.
