@@ -11,6 +11,12 @@
     "clone": "https://{host}/{account}/{name}.git",
     "npm": "github:{account}/{name}"
   },
+  "storage": {
+    "note": "Bring-your-own storage. The default is Supabase: its URL and publishable anon key are public, so one project serves EVERY holodeck with no per-copy config. Everything written is sealed on the device first, so the store holds ciphertext (at rest) and is reached over HTTPS (in transit). Fill these in once.",
+    "default": "supabase",
+    "supabase": { "url": "", "anonKey": "", "bucket": "holodeck" },
+    "google": { "clientId": "", "scopes": ["openid", "email", "profile", "https://www.googleapis.com/auth/drive.appdata"] }
+  },
   "repos": {
     "the-fold": { "role": "chat", "dir": "the-fold" },
     "holodeck": { "role": "surface", "dir": "holodeck" },
