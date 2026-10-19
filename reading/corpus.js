@@ -4,7 +4,8 @@
 // A link between two sources joins referent ENDS, never the sources, and always carries both ends' registers and the SPLIT between them
 // (corroborates / fictionalizes / comments-on / …). A "being" is a view over the links; its ends stay ends. Severing a wrong link is one
 // more event on top of the log. Voices: for any position in a source, who is saying it, and who they are relaying, to any depth.
-import { buildCorpusTimeline, foldLog } from '../vendor/khora/native/adapters/text/reading-timeline.js';
+import { buildCorpusTimeline, foldLog, splitOf, CELLS } from '../vendor/khora/native/adapters/text/reading-timeline.js';
+import { isTruthClaiming } from '../vendor/khora/native/kernel/reality-register.js';
 import { sniffRegister, steerWithLocalModel } from './sniff.js';
 
 const REGS = [['testimony', 'testimony'], ['report', 'report'], ['journalism', 'journalism'], ['reference', 'reference'], ['data', 'data'], ['comment', 'comment'], ['fiction', 'fiction']];
@@ -68,8 +69,18 @@ export function mountSources(host, { makeDeps, openInReader, currentText }) {
     const shown = (st.onlyShared ? beings.filter((b) => new Set(b.ends.map((e) => e.source)).size > 1) : beings).slice(0, 60);
     const kinds = {}; for (const l of f.links) kinds[l.split.kind] = (kinds[l.split.kind] || 0) + 1;
     const rows = shown.map((b) => `<tr data-being="${esc(b.id)}" class="${b.id === st.sel ? 'sel' : ''}"><td>${esc(b.name || '—')}</td><td><span class="chip ${esc(b.reality)}">${esc(b.reality)}</span></td><td>${b.ends.map((e) => `${esc(lab(e.source))} ${regChip(e.register)}×${e.mentions}`).join('<br>')}</td></tr>`).join('');
-    return `<div class="src-row dim">${f.links.length} cross-source link${f.links.length === 1 ? '' : 's'} ${Object.entries(kinds).map(([k, n]) => `<span class="chip">${esc(k)} ${n}</span>`).join('')}${c.refused.length ? ` · ${c.refused.length} not linked (type unsure)` : ''}${st.overlay.length ? ` · ${st.overlay.length} severed by you` : ''}</div>
-      <table class="src-tbl"><thead><tr><th>name</th><th>reality</th><th>met in</th></tr></thead><tbody>${rows || '<tr><td colspan="3" class="dim">nothing shared across these sources yet</td></tr>'}</tbody></table>${profile()}${voices()}`;
+    return `<div class="src-row dim">${f.links.length} cross-source link${f.links.length === 1 ? '' : 's'} ${Object.entries(kinds).map(([k, n]) => `<span class="chip">${esc(k)} ${n}</span>`).join('')}${c.refused.length ? ` · ${c.refused.length} not linked (type unsure)` : ''}${st.overlay.length ? ` · ${st.overlay.length} from you` : ''}</div>
+      <table class="src-tbl"><thead><tr><th>name</th><th>reality</th><th>met in</th></tr></thead><tbody>${rows || '<tr><td colspan="3" class="dim">nothing shared across these sources yet</td></tr>'}</tbody></table>${undecided()}${profile()}${voices()}`;
+  }
+
+  // A shared name only NOMINATES. The identity test (holographic, for-whom 'who is this?') joins when it can; when there is not enough reading it
+  // says so, and the pair waits here for a person: "same" is one more event of yours on top of the log, severable like any other.
+  function undecided() {
+    const c = st.corpus, f = st.fold, lab = (id) => (c.sources.find((s) => s.id === id) || {}).label || id;
+    const joined = (k) => f.links.some((l) => (l.from.ref === k.from.ref && l.to.ref === k.to.ref) || (l.from.ref === k.to.ref && l.to.ref === k.from.ref));
+    const rows = (c.candidates || []).map((k, i) => ({ k, i })).filter(({ k }) => !joined(k) && (k.matched.from.trim().split(/\s+/).length > 1 || k.matched.to.trim().split(/\s+/).length > 1) ).slice(0, 12);
+    if (!rows.length) return '';
+    return `<div class="src-prof"><div><b>Possibly the same</b> <span class="dim">— the same name, not enough reading to say</span></div>${rows.map(({ k, i }) => `<div style="margin:6px 0">${esc(k.from.name)} <span class="dim">(${esc(lab(k.from.source))})</span> ~ ${esc(k.to.name)} <span class="dim">(${esc(lab(k.to.source))})</span> <button type="button" data-a="same" data-i="${i}" title="${esc(k.identity.basis)}">same</button></div>`).join('')}</div>`;
   }
 
   function profile() {
@@ -116,6 +127,13 @@ export function mountSources(host, { makeDeps, openInReader, currentText }) {
         else if (a === 'addcur') { const t = (currentText() || '').trim(); if (t.length < 8) { st.err = 'Put some text in the box below first.'; render(); return; } add("", t); st.err = null; render(); }
     else if (a === 'titanic') { st.sources = []; for (const t of TITANIC) add(t.label, t.text, t.register); render(); }
         else if (a === 'vsrc') { st.voiceSrc = b.dataset.src; render(); }
+    else if (a === 'same') {
+      const k = st.corpus.candidates[+b.dataset.i]; if (!k) return;
+      const split = splitOf(k.from.register, k.to.register), flip = split.kind === 'fictionalizes' && isTruthClaiming(k.from.register);
+      const [from, to] = flip ? [k.to, k.from] : [k.from, k.to];
+      st.overlay.push({ op: 'CON', ...CELLS.CON, kind: 'correspondence', at: 'corpus', from, to, split: { ...split, registers: [from.register, to.register], truthClaiming: [isTruthClaiming(from.register), isTruthClaiming(to.register)] }, matched: flip ? { from: k.matched.to, to: k.matched.from } : k.matched, identity: { verdict: 'asserted', forWhom: 'you', basis: 'you said these are one being' }, checkedBy: 'asserted by you', giver: 'you', id: 'you_same_' + from.ref + '_' + to.ref, basis: from.name + ' ↔ ' + to.name + ': ' + split.kind });
+      st.fold = foldLog(st.corpus.log, { overlay: st.overlay }); render();
+    }
     else if (a === 'sever') { st.overlay.push({ op: 'CON', cell: 'Link', kind: 'correspondence', severs: b.dataset.link, giver: 'you', id: 'you_' + st.overlay.length + '_' + b.dataset.link, basis: 'severed by you' }); st.fold = foldLog(st.corpus.log, { overlay: st.overlay }); render(); }
   });
   host.addEventListener('change', (ev) => {
