@@ -1,0 +1,1184 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How to read without a model — the pipeline, layer by layer</title>
+<style>
+  :root{--bg:#17171a;--s1:#1c1c20;--s2:#29292e;--sel:#26272c;--sel2:#30333b;--line:#2e2e33;--line2:#3f3f46;--ink:#f4f4f6;--ink2:#c9c9d2;--mut:#9d9da8;--dim:#9494a0;--acc:#8ab4ff;--acc2:#8ab4ff;--acc3:#6d9dff;--amber:#f0b429;--blue:#8ab4ff;--green:#56d364;--pink:#e0a0c0;--date:#8ab4ff;--ok:#56d364;--bad:#f87171;--edge:#3f3f46;--hdr:rgba(23,23,26,.95);--sans:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;--mono:ui-monospace,SFMono-Regular,Menlo,monospace;--serif:Georgia,"Times New Roman",serif;color-scheme:dark}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 var(--sans);-webkit-font-smoothing:antialiased}
+  a{color:var(--acc)}
+  button{font:inherit}
+  /* ── landing ───────────────────────────────────────────────────────────── */
+  header{padding:30px 28px 16px;border-bottom:1px solid var(--line)}
+  header h1{margin:0 0 6px;font-size:22px;letter-spacing:-.01em;font-family:var(--serif);font-weight:500}
+  header .sub{color:var(--dim);max-width:960px;font-size:14px}
+  header .sub b{color:var(--ink);font-weight:600}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 28px 80px}
+  .drop{margin:20px 0;border:1.5px dashed var(--line2);border-radius:14px;background:var(--s1);padding:24px;text-align:center;transition:.15s;cursor:pointer}
+  .drop.hot{border-color:var(--acc);background:#1a1d26}
+  .drop .big{font-size:16px;font-weight:600}.drop .small{color:var(--dim);font-size:13px;margin-top:5px}
+  textarea{width:100%;min-height:130px;background:var(--s1);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:13px;font:13px/1.5 var(--mono);resize:vertical;margin-top:12px}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:12px 0}
+  .row button{background:var(--s1);color:var(--ink);border:1px solid var(--line2);border-radius:9px;padding:8px 14px;font:13px var(--sans);cursor:pointer}
+  .row button:hover{border-color:var(--acc);color:var(--acc)}
+  .row button.primary{background:#1c2740;border-color:#33507f}
+  .samples button{padding:5px 10px;font-size:12px}
+  .badge{font:11px var(--mono);padding:1px 7px;border-radius:6px;background:#1a2130;color:var(--dim);border:1px solid var(--line)}
+  .badge.live{color:var(--green);border-color:#245a41}
+  .legend-note{color:var(--dim);font-size:12.5px;margin-top:6px}
+  .legend-note b{color:var(--ink)}
+  .refuse{margin:12px 0;border:1px solid #5c2530;border-radius:12px;background:#201418;color:#f0c9cf;padding:12px 14px;font-size:13.5px}
+  .refuse b{color:#fff}
+  .refuse[hidden]{display:none}
+  /* ── the app ───────────────────────────────────────────────────────────── */
+  #app{position:fixed;inset:0;z-index:40;background:var(--bg);display:none;grid-template-rows:auto 1fr auto;font:14px/1.45 var(--sans)}
+  #app.on{display:grid}
+  .top{display:flex;align-items:baseline;gap:6px 14px;flex-wrap:wrap;padding:10px 18px;border-bottom:1px solid var(--line)}
+  .top h2{margin:0;font:500 19px/1.2 var(--serif);text-wrap:balance}
+  .top .meta{font:12px var(--mono);color:var(--dim)}
+  .top .sp{flex:1}
+  .top button{all:unset;cursor:pointer;color:var(--mut);font:500 13px var(--sans);padding:4px 6px;border-radius:4px}
+  .top button:hover{color:var(--ink)}
+  .top button.f{font-weight:600}
+  .top button.f[aria-pressed=true]{color:var(--ink);box-shadow:inset 0 -2px 0 var(--acc);border-radius:0}
+  .top .exit{border:1px solid var(--line2)!important;border-radius:6px;padding:5px 11px!important;color:var(--ink)!important;font-weight:600}
+  .top .stats{flex-basis:100%;font:12px var(--mono);color:var(--ink2);display:flex;gap:10px 16px;flex-wrap:wrap;padding-top:6px}
+  .top .stats b{color:var(--ink);font-weight:600}.top .stats .g{color:var(--dim)}
+  .body{display:grid;grid-template-columns:minmax(300px,32%) 1fr;min-height:0}
+  /* ── spine: the pipeline, with layer switches ──────────────────────────── */
+  .left{border-right:1px solid var(--line);display:grid;grid-template-rows:minmax(0,44%) minmax(0,1fr);min-height:0}
+  .spine{overflow-y:auto;border-bottom:1px solid var(--line);padding:8px 10px 10px}
+  .spine .h{font:600 11px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--dim);padding:6px 4px 8px}
+  .ly{display:grid;grid-template-columns:26px 1fr auto;gap:8px;align-items:center;border:1px solid var(--line);border-radius:9px;margin:5px 0;padding:6px 9px;background:var(--s1);cursor:default}
+  .ly .n{font:600 10px var(--mono);color:var(--bg);background:var(--dim);border-radius:5px;padding:1px 6px;text-align:center}
+  .ly.on{border-color:var(--acc3);background:#1a1f2b}
+  .ly.on .n{background:var(--acc);color:#0b0d12}
+  .ly.off{opacity:.55}
+  .ly .lab{font-weight:600;font-size:13px}
+  .ly .why{color:var(--dim);font-size:11.5px;grid-column:2 / 4;margin-top:-2px}
+  .ly .cnt{font:11px var(--mono);color:var(--dim)}
+  .sw{position:relative;width:36px;height:20px;border-radius:20px;background:#33333a;border:1px solid var(--line2);cursor:pointer;flex:none}
+  .sw::after{content:'';position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:var(--dim);transition:.14s}
+  .sw[aria-checked=true]{background:#1e3a2b;border-color:#2f6b4b}
+  .sw[aria-checked=true]::after{left:18px;background:var(--green)}
+  .sw[aria-disabled=true]{opacity:.4;cursor:not-allowed}
+  .ly.cur .lab{color:var(--ink)}
+  .ly.cur{box-shadow:inset 3px 0 0 var(--acc)}
+  /* ── event log ─────────────────────────────────────────────────────────── */
+  .log{display:grid;grid-template-rows:1fr auto;min-height:0}
+  .rows{overflow-y:auto;position:relative;font:12px/24px var(--mono);min-height:0}
+  .sz{position:relative}
+  .row-ev{position:absolute;left:0;right:0;height:24px;display:grid;grid-template-columns:70px 88px 1fr;gap:8px;padding:0 12px;white-space:nowrap;cursor:pointer;color:var(--ink2)}
+  .row-ev span{overflow:hidden;text-overflow:ellipsis}
+  .row-ev .t{color:var(--dim);text-align:right;font-variant-numeric:tabular-nums}
+  .row-ev .st{font-weight:500}
+  .row-ev:hover{background:var(--s1)}.row-ev.cur{background:var(--sel2);color:var(--ink)}
+  .row-ev.fut{opacity:.28}
+  .now{border-top:1px solid var(--line);padding:8px 14px 10px;min-height:74px}
+  .now .k{font:600 11px var(--mono);letter-spacing:.1em;text-transform:uppercase}
+  .now p{margin:4px 0 0;font-size:14px;color:var(--ink);max-width:74ch}
+  /* ── right: lens + tabs ────────────────────────────────────────────────── */
+  .right{display:grid;grid-template-rows:auto auto 1fr;min-height:0}
+  .lens{border-bottom:1px solid var(--line);padding:4px 18px 12px;max-height:24vh;overflow:auto}
+  .lens .doc{font:12px var(--mono);color:var(--dim);margin-bottom:4px;padding-top:8px}
+  .lens .txt{font:15px/1.7 var(--serif);color:var(--mut);white-space:pre-wrap;max-width:92ch;word-break:break-word}
+  .lens .txt .s{color:var(--ink2)}.lens .txt .on{color:var(--ink);background:var(--sel)}
+  .lens .txt .nm{box-shadow:inset 0 -2px 0 var(--acc)}.lens .txt .g{box-shadow:inset 0 -2px 0 var(--blue)}
+  .lens .txt .m{box-shadow:inset 0 -2px 0 var(--amber)}.lens .txt .r{box-shadow:inset 0 -3px 0 var(--green)}
+  .lens .txt .fu{text-decoration:line-through;opacity:.42}.lens .txt .hit{outline:2px solid var(--acc);border-radius:2px}
+  .tabs{display:flex;gap:2px;padding:0 14px;border-bottom:1px solid var(--line);overflow-x:auto}
+  .tabs button{all:unset;cursor:pointer;font:600 12.5px var(--sans);color:var(--dim);padding:8px 12px;border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap}
+  .tabs button:hover{color:var(--ink)}
+  .tabs button[aria-selected=true]{color:var(--ink);border-bottom-color:var(--acc)}
+  .pane{overflow:auto;min-height:0;padding:0 16px 24px}
+  .pane-wrap{min-height:0;display:grid;position:relative}
+  .pane-wrap > *{grid-area:1/1}
+  .graph-host{padding:0;overflow:hidden;position:relative}
+  .graph-host[hidden]{display:none}
+  .pane .h{font:600 11px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--dim);padding:12px 0 6px}
+  .fig{border:1px solid var(--line);border-radius:9px;background:var(--s1);padding:9px 11px;margin:8px 0;font-size:12.5px;color:var(--ink2)}
+  .fig b{color:var(--ink)}
+  /* source pane */
+  .src{font:13px/1.7 var(--mono);color:var(--ink2);white-space:pre-wrap;word-break:break-word}
+  .src .s{color:var(--ink2)}.src .nm{color:var(--ink);box-shadow:inset 0 -2px 0 var(--acc)}
+  .src .r{background:#15211a;box-shadow:inset 3px 0 0 var(--green)}
+  .src .fu{color:#5b5b66;text-decoration:line-through}
+  .src .hit{outline:2px solid var(--acc);border-radius:2px}
+  /* tables */
+  table.t{width:100%;border-collapse:collapse;font-size:13px}
+  table.t th,table.t td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+  table.t th{position:sticky;top:0;background:var(--bg);color:var(--dim);font:600 10.5px var(--mono);text-transform:uppercase;letter-spacing:.06em;z-index:2}
+  table.t tr.cur{background:#20242e;box-shadow:inset 3px 0 0 var(--acc)}
+  table.t th[data-sort]{cursor:pointer;user-select:none}
+  table.t th[data-sort]:hover{color:var(--ink)}
+  table.t td.n{color:var(--dim);font:11.5px var(--mono);text-align:right;width:34px}
+  table.t td.stmt{font:14.5px/1.65 var(--serif);color:var(--ink2);max-width:44ch}
+  table.t .mrel{border-bottom:1.5px solid var(--acc);color:var(--ink)}
+  .noprop{color:var(--dim);font:11.5px var(--mono)}
+  .mono{font-family:var(--mono);font-size:11.5px}
+  .chip{display:inline-block;border:1px solid var(--line2);border-radius:20px;padding:0 8px;font:11.5px var(--mono);color:var(--dim);margin:2px 3px 2px 0}
+  .chip.g{color:var(--green);border-color:#245a41}.chip.a{color:var(--amber);border-color:#5c4d1d}
+  .chip.b{color:var(--blue);border-color:#234a6f}.chip.v{color:var(--bad);border-color:#5c2530}
+  .gap{color:var(--bad)}
+  .bar{display:inline-block;height:8px;background:#2b3a56;border-radius:3px;vertical-align:middle;min-width:2px}
+  /* a drawn proposition */
+  .prop{display:flex;align-items:center;gap:7px;flex-wrap:wrap;padding:2px 0;margin:1px 0}
+  .pnode{border:1px solid var(--line2);border-radius:20px;padding:1px 10px;background:var(--s2);font:12.5px var(--sans);color:var(--ink);max-width:24ch;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .pnode.s{border-color:#33507f;background:#1a2130}.pnode.o{border-color:#245a41;background:#141f1a}
+  .parc{display:inline-flex;align-items:center;gap:5px;color:var(--pink);font:12px var(--mono)}
+  .parc .pline{width:30px;height:0;border-top:1.7px solid currentColor}
+  .parc .phead{width:0;height:0;border-left:7px solid currentColor;border-top:4.5px solid transparent;border-bottom:4.5px solid transparent;margin-left:-6px}
+  .parc.neg{color:var(--bad)}.parc.neg .pline{border-top-style:dashed}.parc.neg .plabel::before{content:'¬ '}
+  .parc.far{color:var(--dim)}.parc.far .pline{border-top-style:dotted}
+  /* confidence */
+  .conf{display:inline-flex;align-items:center;gap:6px;font:11px var(--mono);color:var(--mut);cursor:help}
+  .conf .cbar{width:52px;height:7px;border-radius:4px;background:#2a2a30;overflow:hidden}
+  .conf .cbar i{display:block;height:100%;background:linear-gradient(90deg,#6b8f6a,#56d364)}
+  .conf.mid .cbar i{background:linear-gradient(90deg,#8a7a3a,#f0b429)}
+  .conf.low .cbar i{background:linear-gradient(90deg,#7a3a3a,#f87171)}
+  /* render view */
+  .ord{border:1px solid var(--line);border-radius:9px;background:var(--s1);padding:10px 12px;margin:10px 0}
+  .ord h3{margin:0 0 2px;font:600 13px var(--sans)}.ord .giver{color:var(--dim);font:11px var(--mono);margin-bottom:8px}
+  .ord .line{font:15px/1.7 var(--serif);color:var(--ink2);padding:2px 0;border-bottom:1px dotted #232936}
+  .ord .line .lab{color:var(--pink)}.ord .line .neg{color:var(--bad)}
+  /* EOT + JSON */
+  pre.json{background:#0f131b;border:1px solid var(--line);border-radius:8px;padding:10px;overflow:auto;max-height:60vh;font:11.5px/1.5 var(--mono);color:#c7d2e2;margin:6px 0;white-space:pre}
+  .evt{display:grid;grid-template-columns:auto auto 1fr;gap:3px 10px;padding:4px 0;border-bottom:1px solid var(--line);font:11.5px var(--mono)}
+  .evt .id{color:var(--pink)}.evt .st{color:var(--amber)}.evt .rd{color:var(--dim)}
+  /* transport */
+  .bar2{border-top:1px solid var(--line);padding:6px 18px calc(12px + env(safe-area-inset-bottom,0px));display:grid;gap:8px}
+  .rib{position:relative;height:18px;cursor:pointer;touch-action:none}
+  .rib canvas{width:100%;height:100%;display:block}
+  .ctl{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .ctl button{background:none;border:0;color:var(--mut);font:500 13px var(--sans);cursor:pointer;padding:4px 6px;border-radius:4px}
+  .ctl button:hover{color:var(--ink)}.ctl .pl{color:var(--acc);font-weight:600;min-width:64px}
+  .ctl .rd{font:12px var(--mono);color:var(--ink2);font-variant-numeric:tabular-nums;margin-left:auto}
+  .ctl select{background:none;color:var(--mut);border:0;font:500 13px var(--sans);cursor:pointer}
+  .ctl select option{background:var(--s1);color:var(--ink)}
+  .seg{display:inline-flex;gap:2px;margin-left:8px}
+  .seg button[aria-pressed=true]{color:var(--ink);box-shadow:inset 0 -2px 0 var(--acc);border-radius:0}
+  .key{font:11.5px var(--mono);color:var(--dim);display:flex;gap:14px;flex-wrap:wrap}
+  .key i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+  .delta{margin:8px 0;border:1px solid #5c4d1d;border-radius:9px;background:#221d10;color:#f0d9a0;padding:8px 11px;font-size:13px}
+  .delta b{color:#fff}
+  @media (max-width:900px){.body{grid-template-columns:1fr;grid-template-rows:44% 56%}.left{border-right:0;border-bottom:1px solid var(--line)}}
+</style>
+</head>
+<body>
+<header>
+  <h1>How to read without a model — the pipeline, layer by layer</h1>
+  <div class="sub">
+    Drop any text in. It is read <b>the way the fold reads it</b> — and you can watch every layer do its work, then
+    <b>switch a layer off</b> and see exactly what it was carrying. The pipeline:
+    <b>bytes → decode → furniture → statements → words → POS → morphology → stance → referents → relations → render → EOT</b>.
+    Every organ is the fold's own vendored code, running here in your browser. <b>No language model is called at any point</b> —
+    and the page counts every network request to prove it. Every name is the <b>giver</b> that supplied it, every claim is
+    anchored to the <b>bytes</b> it was read from, and every assertion stays <b>revisable</b>.
+  </div>
+</header>
+<div class="wrap">
+  <div id="drop" class="drop">
+    <div class="big">drop a document here, or click to choose a file</div>
+    <div class="small">.txt · .md · .html · .json · .csv · source · .pdf (its own text layer) — anything that is text, up to a few MB</div>
+  </div>
+  <input id="file" type="file" hidden>
+  <textarea id="ta" placeholder="…or paste text here, then press Read."></textarea>
+  <div class="row">
+    <button id="read" class="primary">Read it — walk the pipeline</button>
+    <button id="clear">Clear</button>
+    <span class="samples" id="samples">
+      <button data-s="positions">sample · positions</button>
+      <button data-s="dossier">sample · dossier</button>
+      <button data-s="history">sample · history</button>
+    </span>
+    <span id="model" class="badge live" style="margin-left:auto">model calls: 0</span>
+  </div>
+  <div id="refuse" class="refuse" hidden></div>
+  <div class="legend-note" id="landing-note">
+    <b>Propositions</b> shows the source in reading order with each proposition drawn as <b>subject —act→ object</b>, carrying a
+    <b>confidence</b> derived from the engine's own signals. <b>POS / Morphology</b> open the priors that did the work.
+    <b>Render</b> shows the same triple in English (SVO), SOV and VSO. <b>EOT</b> is the folded, append-only ledger. Switch any
+    layer in the left rail off and the reading re-runs — with the cost disclosed. A PDF is read through its own text layer
+    (pdf.js); an image, a recording or a binary file is <b>refused with a typed gap</b>, never decoded into mojibake — the full
+    holodeck reads those with its own visual model, OCR and ASR.
+  </div>
+</div>
+
+<div id="app">
+  <div class="top">
+    <h2 id="p-title">how it was read</h2>
+    <span class="meta" id="p-meta"></span><span class="sp"></span>
+    <button type="button" class="f" data-a="toggle-all" title="Switch every optional layer off or on">all layers</button>
+    <button type="button" data-a="reset" title="Back to every layer on">reset</button>
+    <button type="button" data-a="copy">Copy trace (JSON)</button>
+    <button type="button" data-a="dl-json" title="Download the whole reading — propositions, referents, and the EOT ledger — as JSON">⤓ Reading (JSON)</button>
+    <button type="button" class="exit" data-a="close" aria-label="Exit" title="Exit (Esc)">✕ Exit</button>
+    <span class="stats" id="p-stats"></span>
+    <div class="delta" id="p-delta" hidden></div>
+  </div>
+  <div class="body">
+    <div class="left">
+      <div class="spine" id="spine"></div>
+      <div class="log">
+        <div class="rows" tabindex="0"><div class="sz"></div></div>
+        <div class="now" id="p-now"></div>
+      </div>
+    </div>
+    <div class="right">
+      <div class="lens" id="p-lens"></div>
+      <div class="tabs" id="p-tabs" role="tablist" aria-label="View">
+        <button type="button" data-tab="source" role="tab" aria-selected="true">Source</button>
+        <button type="button" data-tab="words" role="tab" aria-selected="false">Words</button>
+        <button type="button" data-tab="pos" role="tab" aria-selected="false">POS</button>
+        <button type="button" data-tab="morph" role="tab" aria-selected="false">Morphology</button>
+        <button type="button" data-tab="refs" role="tab" aria-selected="false">Referents</button>
+        <button type="button" data-tab="props" role="tab" aria-selected="false">Propositions</button>
+        <button type="button" data-tab="render" role="tab" aria-selected="false">Render</button>
+        <button type="button" data-tab="eot" role="tab" aria-selected="false">EOT</button>
+        <button type="button" data-tab="json" role="tab" aria-selected="false">JSON</button>
+        <button type="button" data-tab="graph" role="tab" aria-selected="false">Graph</button>
+      </div>
+      <div class="pane-wrap">
+        <div class="pane" id="p-pane"></div>
+        <div class="pane graph-host" id="p-graph" hidden></div>
+      </div>
+    </div>
+  </div>
+  <div class="bar2">
+    <div class="rib" title="Drag to scrub"><canvas></canvas></div>
+    <div class="ctl">
+      <button type="button" data-a="start" title="First event (Home)">|◀</button>
+      <button type="button" data-a="back" title="One event back (←)">◀|</button>
+      <button type="button" data-a="rev" title="Rewind (J)">◀◀</button>
+      <button type="button" data-a="play" class="pl" title="Play / pause (Space)">▶ Play</button>
+      <button type="button" data-a="fwd" title="One event forward (→)">|▶</button>
+      <span class="seg" role="group" aria-label="Clock">
+        <button type="button" data-a="steps" aria-pressed="true">Steps</button>
+        <button type="button" data-a="real" aria-pressed="false">Real time</button>
+      </span>
+      <label style="display:flex;align-items:center" title="Speed"><select id="p-speed"></select></label>
+      <span class="rd" id="p-rd"></span>
+    </div>
+    <div class="key" id="p-key"></div>
+  </div>
+</div>
+
+<script type="module">
+// ─────────────────────────────────────────────────────────────────────────────
+// "No model was called" is MEASURED: every network request this page makes is
+// counted, and the only ones that appear are the static prior files read from
+// disk. The badge shows the count live.
+// ─────────────────────────────────────────────────────────────────────────────
+const net = { requests: [], models: 0 };
+const _fetch = window.fetch.bind(window);
+window.fetch = (u, o) => { net.requests.push(String(u)); return _fetch(u, o); };
+
+import { makeEngineRelationReader, loadPriors, blankMarkup } from '../holodeck-reader.js';
+import { extractReadings } from './extract.js';
+import { mountMap } from '../holodeck-map.js';
+import { classifyWord, THRAX_MAP, THRAX_OUT_OF_SCOPE, THRAX_META, POS_PRIOR_META } from '../vendor/eoreader7/native/adapters/text/wordclass.js';
+import { morphologyFromPrior, createLemmatizer, stemsOf } from '../vendor/eoreader7/native/adapters/text/morphology.js';
+import { splitSentences } from '../vendor/eoreader7/native/adapters/text/spans.js';
+import { tokenize } from '../vendor/eoreader7/native/organs/source.js';
+import { sha256Hex, stableProvenanceId, byteRange, EotLedger } from '../vendor/fold-chat/fold-chat-eot.js';
+
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]));
+const enc = new TextEncoder();
+const utf8Len = (s) => enc.encode(String(s)).length;
+const charToByte = (text, i) => utf8Len(text.slice(0, i));
+const clamp = (s, n) => { s = String(s); return s.length > n ? s.slice(0, n) + '…' : s; };
+const hx = (v, n) => String(v == null ? '' : v).slice(0, n == null ? 20 : n);
+const ms = t => t < 1 ? t.toFixed(3) : t < 100 ? t.toFixed(2) : t < 10000 ? t.toFixed(1) : Math.round(t).toLocaleString();
+const cap = s => { s = String(s || ''); return s ? s[0].toUpperCase() + s.slice(1) : s; };
+const cssVar = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim() || '#888';
+
+const SAMPLES = {
+  positions: `The Palestinian Authority condemned the raid on Monday. Israel said the strike had targeted a commander. Human Rights Watch criticized the decision, while the mayor endorsed it. The council opposed the measure but the governor supported it, and two senators praised the compromise.`,
+  dossier: `Marie Curie praised the method, and the Royal Society endorsed the finding. Darwin opposed the standard, and Wallace supported the appeal. Human Rights Watch criticized the decision, and the mayor endorsed it. The Palestinian Authority condemned the raid, and Israel defended the strike.`,
+  history: `Napoleon opposed the treaty, and Wellington supported it. Lincoln condemned the raid, and Grant endorsed the plan. The Senate opposed the measure, and the President supported it. Caesar criticized the senate, and Pompey praised the crowd.`,
+};
+
+// ── THE PIPELINE: the layers, in the order the reading really makes them. ─────
+// `feature` names the reader option a switch controls; `fixed` layers always run.
+const LAYERS = [
+  { id:'extract',   label:'Extract',    color:'--date',  fixed:true, why:'the container (PDF / HTML) → text, sniffed; the platform converter is called when the sniff says so' },
+  { id:'bytes',     label:'Bytes',      color:'--dim',   fixed:true, why:'the material as bytes — one addressable source' },
+  { id:'decode',    label:'Decode',     color:'--pink',  fixed:true, why:'utf-8 bytes → characters; the address space stays bytes' },
+  { id:'furniture', label:'Furniture',  color:'--mut',   feature:'furniture', why:'markup / CSS / URLs blanked in place — offsets untouched' },
+  { id:'statement', label:'Statements', color:'--ink2',  fixed:true, why:'the material split into the statements it makes' },
+  { id:'token',     label:'Words',      color:'--blue',  fixed:true, why:'each statement split into the forms it is made of' },
+  { id:'grammar',   label:'POS',        color:'--acc',   feature:'pos', why:'each form → the classes it is ATTESTED as (Thrax over UD)' },
+  { id:'morph',     label:'Morphology', color:'--amber', feature:'morph', why:'each form → the act it belongs to (UniMorph prior ∪ rule)' },
+  { id:'stance',    label:'Stance',     color:'--pink',  feature:'stance', why:'a position read as its class ("is pro" = a source\'s "in support of")' },
+  { id:'referent',  label:'Referents',  color:'--acc2',  fixed:true, why:'the participants this material establishes, by name' },
+  { id:'relation',  label:'Relations',  color:'--green', fixed:true, why:'subject —act→ object, bound clause-aware, with a verdict' },
+  { id:'np',        label:'Noun-phrase subjects', color:'--dim', feature:'npSubj', why:'a subject read as a noun phrase, not just the token before the verb' },
+  { id:'phrasal',   label:'Phrasal predicates',   color:'--dim', feature:'phrasal', why:'a verb + particle read as one act ("gave up")' },
+  { id:'render',    label:'Render',     color:'--blue',  fixed:true, why:'the triple → a reader\'s word order (English SVO · SOV · VSO)' },
+  { id:'ledger',    label:'EOT',        color:'--green', fixed:true, why:'every step appended as a transform, with a recomputable id' },
+];
+const L = {}; LAYERS.forEach((l, i) => L[l.id] = { i, ...l });
+const CK = {}; LAYERS.forEach((l, i) => CK[l.id] = i);
+const FEATURE_OF = {}; LAYERS.forEach(l => { if (l.feature) FEATURE_OF[l.feature] = l.id; });
+const OPTIONAL = LAYERS.filter(l => l.feature).map(l => l.feature);
+const DEFAULT_FEATURES = { furniture:true, pos:true, morph:true, stance:true, npSubj:true, phrasal:true };
+
+// the stance class, re-declared here (same shape as the organ) so the page can
+// COUNT and LABEL the positions the stance layer carried, never to change them.
+const STANCE_CLASS = [
+  ['support', /\b(?:supports?|supported|supporting|support(?:ive)?|backs?|backed|backing|endors(?:e|es|ed|ing)|favou?rs?|favou?red|favou?ring|champions?|championed|advocat(?:e|es|ed|ing)|defends?|defended|prais(?:e|es|ed|ing)|pro|solidarity|ally)\b/i],
+  ['oppose', /\b(?:oppos(?:e|es|ed|ing)|against|anti|condemn(?:s|ed|ing)?|criticiz(?:e|es|ed|ing)|criticis(?:e|es|ed|ing)|denounc(?:e|es|ed|ing)|boycott(?:s|ed|ing)?|resist(?:s|ed|ing)?|protest(?:s|ed|ing)?)\b/i],
+];
+const stanceClass = label => { const t = String(label || ''); for (const [k, re] of STANCE_CLASS) if (re.test(t)) return k; return null; };
+
+// ── the polytemporality rule (declared on this page, same shape as the organ) ─
+const MODAL_FUT = /\b(will|shall|'ll)\b/i;
+const HAD_PART = /\bhad\s+\w+(ed|en|wn|ne|de|ad|it)\b/i;
+function localTense(t){
+  t = String(t || '');
+  if (HAD_PART.test(t)) return { v:'Pqp', why:'had + participle — a past before a past' };
+  if (MODAL_FUT.test(t)) return { v:'Fut', why:'modal will/shall — analytic future' };
+  if (/\b(is|are|am|has|have)\b/i.test(t)) return { v:'Pres', why:'finite present (be/have)' };
+  if (/\b(was|were|had|said|saw|came|went|took|gave)\b|\w+ed\b/i.test(t)) return { v:'Past', why:'finite past form or -ed' };
+  return { v:'undeclared', why:'no finite verb in the clause — counted, never guessed' };
+}
+
+// ── CONFIDENCE: a disclosed, deterministic rubric over the engine's OWN signals.
+// NOT a model's probability. Every component is a fact the engine already
+// carries; the score is the sum, and the tooltip shows the exact terms.
+function confidenceOf(c){
+  const terms = [];
+  const add = (label, w) => { terms.push([label, w]); return w; };
+  let s = 0;
+  const V = { bound:['the material binds this edge, same polarity', .45],
+              contradicted:['the material binds this edge with the OPPOSITE polarity', .35],
+              unbound:['no passage states the whole of the object', .20],
+              'beyond-reach':['an endpoint or the verb is beyond this check', .08],
+              unheard:['no edge was heard around this claim', .05] }[c.verdict] || ['untyped verdict', .05];
+  s += add(V[0], V[1]);
+  if (c.grounded) s += add('the span was located verbatim in the source', .25); else s += add('no span — the claim is unlocated', 0);
+  if (c.polarityMeasured) s += add('polarity was measured (not negation-led)', .08); else s += add('polarity never measured', 0);
+  if (!c.formBased) s += add('both ends resolved to named referents', .10); else s += add('the subject resolved by recurring form, not a named referent', 0);
+  if (c.fillers > 1) s += add(`slot competition: ${c.fillers} distinct fillers`, -.12); else s += add('singular — no competing filler', .07);
+  if (c.standing === 'corroborated') s += add('corroborated by ≥2 statements', .05); else s += add('single witness', 0);
+  const pct = Math.max(0, Math.min(100, Math.round(s * 100)));
+  return { pct, terms };
+}
+function confHTML(c){
+  const { pct, terms } = confidenceOf(c);
+  const cls = pct >= 60 ? '' : pct >= 35 ? ' mid' : ' low';
+  const tip = 'confidence ' + pct + '% — a disclosed rubric over the engine\'s own signals, no model\n' +
+    terms.filter(t => t[1] !== 0 || /no |never|unlocated/.test(t[0])).map(t => `  ${t[1] >= 0 ? '+' : ''}${t[1].toFixed(2)}  ${t[0]}`).join('\n');
+  return `<span class="conf${cls}" title="${esc(tip)}"><span class="cbar"><i style="width:${pct}%"></i></span>${pct}%</span>`;
+}
+
+// ── THE RENDER LENS: the same triple in a reader's word order. A declared
+// scaffold (WALS-style register), never a model. English is SVO; SOV and VSO
+// are the identical subject–act–object under another order.
+const ORDERS = [
+  { id:'svo', label:'English · SVO', giver:'the reader\'s own order — subject · act · object', line:c => `${cap(c.end1)} ${c.polarity === '-' ? 'did not ' : ''}${c.label} ${c.end2}.` },
+  { id:'sov', label:'SOV',          giver:'the same triple, object before act', line:c => `${cap(c.end1)} ${c.end2} ${c.polarity === '-' ? 'not ' : ''}${c.label}.` },
+  { id:'vso', label:'VSO',          giver:'the same triple, act first', line:c => `${cap(c.polarity === '-' ? 'not ' + c.label : c.label)} ${c.end1} ${c.end2}.` },
+];
+
+let PRIORS = null, READER = null, LEXICON = null, LEXICON_LONGEST = 0;
+const knownWord = w => !!(LEXICON && LEXICON.has(String(w).toLowerCase()));
+async function ready(){
+  if (READER) return;
+  PRIORS = await loadPriors();
+  try { const r = await fetch('../vendor/eoreader7/native/priors/morphology-eng.json'); PRIORS.morphRaw = await r.json(); PRIORS.morph = morphologyFromPrior(PRIORS.morphRaw); } catch (e) { PRIORS.morphRaw = { provenance:{} }; }
+  LEXICON = new Set(); LEXICON_LONGEST = 0;
+  try { Object.keys((PRIORS.posPrior && PRIORS.posPrior.forms) || {}).forEach(w => { LEXICON.add(w.toLowerCase()); if (w.length > LEXICON_LONGEST) LEXICON_LONGEST = w.length; }); } catch (e) {}
+  try { Object.keys((PRIORS.morphRaw && PRIORS.morphRaw.forms) || {}).forEach(w => { LEXICON.add(w.toLowerCase()); if (w.length > LEXICON_LONGEST) LEXICON_LONGEST = w.length; }); } catch (e) {}
+  READER = await makeEngineRelationReader();
+}
+
+// ── build the trace: run the real organs, recording each transformation ──────
+const WORD_RE = /[\p{L}\p{N}][\p{L}\p{N}'’.\-]*/gu;
+function wordsIn(text, base){ const out = []; WORD_RE.lastIndex = 0; let m; while ((m = WORD_RE.exec(text))) out.push({ w:m[0], s:base + m.index, e:base + m.index + m[0].length }); return out; }
+const WORDS_ANIMATED = 700;
+
+function buildTrace(doc, clean, claims, features, extraction){
+  const ev = []; const t0 = performance.now();
+  const push = (stage, kind, msg, extra) => { ev.push({ i:ev.length, t:performance.now() - t0, stage, kind, msg, ...(extra || {}) }); return ev.length - 1; };
+  const analysis = doc.analysis;
+  const nBytes = utf8Len(analysis);
+
+  // the EXTRACTION is auditable: which extractor ran, what the sniff measured, whether the platform
+  // converter was called (and why), and which text was kept — every step on the record, never blind.
+  if (extraction){
+    push('extract', 'superposition', `${extraction.held} extraction reading${extraction.held === 1 ? '' : 's'} held in parallel — the gate does not discard them`, { s:0, e:0, data:{ extraction } });
+    extraction.readings.forEach((r, i) => push('extract', r.ok ? 'reading' : 'reading-failed', r.ok
+      ? `reading ${i + 1}: ${r.extractor} → reads as words ${(r.sniff.reads * 100).toFixed(0)}% · ${r.sniff.verdict}${i === extraction.collapsed ? ' — COLLAPSED as the reading' : ''}`
+      : `reading ${i + 1}: ${r.extractor} → not available (${r.why})`, { s:0, e:0, data:{ reading: r, i } }));
+    if (extraction.revisions && extraction.revisions.length) push('extract', 'revision', `the collapse was revised ${extraction.revisions.length}× — append-only: ${extraction.revisions.map(v => v.extractor).join(' → ')}`, { s:0, e:0 });
+  }
+
+  const hash = sha256Hex(analysis);
+  const srcKey = sha256Hex(analysis).slice(0, 20);
+  push('bytes', 'source', `${esc(doc.label)} · ${nBytes.toLocaleString()} bytes utf-8 · sha-256 ${hash.slice(0,20)}…`, { s:0, e:analysis.length });
+
+  push('decode', 'text', `decoded to ${analysis.length.toLocaleString()} characters — the address space is BYTES, the reading is in characters`, { s:0, e:analysis.length });
+
+  const blanks = [];
+  if (features.furniture !== false) for (let i = 0; i < analysis.length; i++) if (analysis[i] !== ' ' && clean[i] === ' ') blanks.push(i);
+  const blankRuns = [];
+  for (const i of blanks){ const last = blankRuns[blankRuns.length - 1]; if (last && last.e === i) last.e = i + 1; else blankRuns.push({ s:i, e:i + 1 }); }
+  push('furniture', 'blank', features.furniture === false
+    ? `furniture layer OFF — the raw material goes to the reader as it stands (markup folded as content, disclosed)`
+    : blanks.length ? `blanked ${blanks.length.toLocaleString()} characters of markup/CSS/URL furniture to spaces — every offset is unchanged` : `no markup furniture found — this material is already prose, read as it stands`,
+    { s:0, e:analysis.length, data:{ runs:blankRuns } });
+
+  const sents = splitSentences(clean);
+  sents.forEach((s, i) => push('statement', 'statement',
+    `statement ${i + 1} of ${sents.length} · bytes ${charToByte(analysis, s.offset)}–${charToByte(analysis, s.offset + s.text.length)} · “${clamp(s.text.replace(/\s+/g,' ').trim(), 74)}”`,
+    { s:s.offset, e:s.offset + s.text.length, data:{ order:i, len:sents.length } }));
+
+  const words = [];
+  for (const s of sents) for (const w of wordsIn(s.text, s.offset)) words.push(w);
+
+  const shown = words.slice(0, WORDS_ANIMATED);
+  const toks = tokenize(clean);
+  push('token', 'vocabulary', `${words.length.toLocaleString()} form occurrences · ${new Set(toks).size.toLocaleString()} distinct forms in the reader's own vocabulary`, { s:0, e:0 });
+  shown.forEach(w => push('token', 'word', `“${w.w}” · bytes ${charToByte(analysis, w.s)}–${charToByte(analysis, w.e)}`, { s:w.s, e:w.e, data:{ w:w.w } }));
+  if (words.length > WORDS_ANIMATED) push('token', 'cap', `+${(words.length - WORDS_ANIMATED).toLocaleString()} more form occurrences — the per-form layers animate the first ${WORDS_ANIMATED.toLocaleString()} (the reading covers all)`, { s:0, e:0 });
+
+  const pos = features.pos === false ? null : PRIORS.posPrior;
+  let gaps = 0, ambiguous = 0, classified = 0;
+  shown.forEach(w => {
+    if (!pos){ push('grammar', 'off', `“${w.w}” → POS layer OFF — no class prior is read; the form is carried as a bare string`, { s:w.s, e:w.e, data:{ w:w.w, found:false, off:true } }); return; }
+    const c = classifyWord(w.w, { posPrior: pos });
+    if (!c.found){ gaps++; push('grammar', 'gap', `“${w.w}” → no entry in the class prior — a typed gap, never a guess`, { s:w.s, e:w.e, data:{ w:w.w, found:false } }); return; }
+    classified++;
+    if (c.candidates.length > 1) ambiguous++;
+    const parts = c.candidates.slice(0, 3).map(k => `${k.upos} ${(k.share * 100).toFixed(0)}%→${k.thraxClass || '—'}`).join(' · ');
+    push('grammar', 'class', `“${w.w}” → ${parts}${c.candidates.length > 1 ? ' — ambiguous, left unresolved' : ''}`, { s:w.s, e:w.e, data:{ w:w.w, found:true, candidates:c.candidates.slice(0,3), total:c.total } });
+  });
+
+  const lem = features.morph === false ? null : PRIORS.lemmatizer;
+  let acts = 0, morphGaps = 0;
+  shown.forEach(w => {
+    if (!lem){ push('morph', 'off', `“${w.w}” → morphology layer OFF — no lemma is recovered; the form stays itself`, { s:w.s, e:w.e, data:{ w:w.w, lemmas:[], stems:[], off:true } }); return; }
+    const lemmas = [...lem.lemmasOf(w.w)]; const stems = [...stemsOf(w.w)];
+    if (!lemmas.length && !stems.length){ morphGaps++; push('morph', 'gap', `“${w.w}” → no act recovered — a form the prior does not know and the rule cannot recover stays a form`, { s:w.s, e:w.e, data:{ w:w.w, lemmas:[], stems:[] } }); return; }
+    acts++;
+    push('morph', 'act', `“${w.w}” → act {${lemmas.slice(0,3).map(l=>`“${l}”`).join(', ') || '—'}}${stems.length ? ` · rule {${stems.slice(0,2).join(', ')}}` : ''}${lemmas.length > 1 ? ' — a SET, never one chosen' : ''}`, { s:w.s, e:w.e, data:{ w:w.w, lemmas:lemmas.slice(0,4), stems:stems.slice(0,3) } });
+  });
+
+  // stance layer: count + name the positions the stance class carried
+  const stanceClaims = claims.filter(c => stanceClass(c.label));
+  push('stance', features.stance === false ? 'off' : 'on',
+    features.stance === false
+      ? `stance layer OFF — a position ("is pro", "supports") is not equated with its class; only the base reader's own verbs bind`
+      : stanceClaims.length
+        ? `${stanceClaims.length} position${stanceClaims.length === 1 ? '' : 's'} read as ${[...new Set(stanceClaims.map(c => stanceClass(c.label)))].join(' / ')} — "is pro" binds a source's "in support of" without either label rewritten`
+        : `no stance position in this material — the layer had nothing to carry`,
+    { s:0, e:0, data:{ n:stanceClaims.length } });
+
+  // ── referents ──
+  const refs = new Map();
+  for (const c of claims) for (const nm of [c.end1, c.end2]) {
+    if (!nm) continue; const k = String(nm);
+    const r = refs.get(k) || { n:k, c:0, s:c.s, e:c.e, b0:c.b0 };
+    r.c++; if (c.s < r.s) { r.s = c.s; r.e = c.e; r.b0 = c.b0; }
+    refs.set(k, r);
+  }
+  [...refs.values()].sort((a,b) => a.s - b.s).forEach(r => push('referent', 'name',
+    `referent “${r.n}” — first read at byte ${r.b0 == null ? '—' : r.b0} · stands in ${r.c} relation${r.c>1?'s':''}`, { s:r.s, e:r.e, data:r }));
+
+  // ── relations ──
+  claims.forEach(c => {
+    const v = c.verdict;
+    push('relation', v, `${c.end1} —${c.label}→ ${c.end2} · standing: ${v === 'bound' ? 'read' : v === 'beyond-reach' ? 'beyond reach' : v === 'unbound' ? 'unbound' : v === 'contradicted' ? 'contradicted' : 'unheard'} · polarity ${c.polarity} · byte ${c.b0 == null ? '—' : c.b0}–${c.b1} · tense ${c.tense.v}`,
+      { s:c.s, e:c.e, data:c });
+  });
+
+  // ── render ──
+  claims.slice(0, 40).forEach(c => push('render', 'order', `“${ORDERS[0].line(c)}” — English SVO · the same triple is also read SOV and VSO`, { s:c.s, e:c.e, data:c }));
+
+  // ── EOT / ledger ──
+  const led = new EotLedger({ artifact:'reading-demo', encoding:'utf8' });
+  const srcId = led.source({ kind:'document', locator:srcKey, anchor:byteRange(0, nBytes), meta:{ label:doc.label } });
+  push('ledger', 'source', `source stored once under its own bytes → ${srcId} · anchor byteRange(0, ${nBytes})`, { s:0, e:0, data:{ srcId } });
+  if (extraction) led.event({ stage:'extract', source_id:srcId, transform:'container→readings', detail:{ readings: extraction.readings.map(r => r.ok ? { extractor:r.extractor, reads:r.sniff.reads, verdict:r.sniff.verdict } : { extractor:r.extractor, skipped:r.why }), collapsed: extraction.collapsed, floor: extraction.floor, revisions: extraction.revisions || [] } });
+  const readEvt = led.event({ stage:'read', source_id:srcId, transform:'bytes→statements' });
+  push('ledger', 'event', `${readEvt} · stage read · transform bytes→statements`, { s:0, e:0, data:{ id:readEvt } });
+  led.event({ stage:'arrange', source_id:srcId, parent:readEvt, transform:'statements→tokens' });
+  led.event({ stage:'classify', source_id:srcId, parent:readEvt, transform:'tokens→classes', detail:{ giver:features.pos === false ? null : POS_PRIOR_META.giver } });
+  claims.forEach(c => {
+    const id = led.event({ stage:'bind', source_id:srcId, parent:readEvt, unit:'relation',
+      range:byteRange(c.b0 ?? 0, (c.b0 ?? 0) + (c.span ? utf8Len(c.span) : 0)),
+      transform:'clause→relation', detail:{ end1:c.end1, label:c.label, end2:c.end2, polarity:c.polarity, verdict:c.verdict, confidence:confidenceOf(c).pct } });
+    push('ledger', 'bind', `${id} · bind clause→relation · byte ${c.b0 ?? 0}–${(c.b0 ?? 0) + (c.span ? utf8Len(c.span) : 0)} · “${c.end1}—${c.label}→${c.end2}”`, { s:c.s, e:c.e, data:{ id } });
+  });
+  const eot = led.eot({ root:readEvt });
+  push('ledger', 'eot', `append-only Provenance@${eot.schema || 2} emitted · ${led.events.length} events · ids recomputable by anyone (evt_ + first 20 hex of sha256(value))`, { s:0, e:0 });
+
+  // occurrences: name → the statements it was read in (drives the solar-system
+  // bonds, the witness list and the Sources layer — all real, from the reading)
+  const occ = new Map();
+  claims.forEach((c, i) => { for (const nm of [c.end1, c.end2]) { if (!nm) continue; const k = String(nm);
+    const list = occ.get(k) || (occ.set(k, []), occ.get(k));
+    list.push({ doc:'source', id:i, s:c.s, e:c.e, t:c.span || analysis.slice(c.s, c.e) }); } });
+
+  return { ev, claims, refs, occ, words, shown, sents, blanks:blankRuns, gaps, ambiguous, toks, nBytes, hash, srcId, led, eot, doc, features, extraction, net:{ ...net }, totalMs:performance.now() - t0,
+    stats:{ words:words.length, classified, gaps, ambiguous, acts, morphGaps, positions:stanceClaims.length, blanked:blanks.length } };
+}
+
+// ── the OUTPUT: the reading as text (each sentence diagrammed) and as JSON ────
+const standingOfClaim = (c) => c.verdict === 'bound' ? 'read' : c.verdict === 'beyond-reach' ? 'beyond reach' : c.verdict === 'unbound' ? 'unbound' : c.verdict === 'contradicted' ? 'contradicted' : 'unheard';
+const arrowOf = (c) => `${c.end1} ──${c.polarity === '-' ? '¬' : ''}${c.label}──▶ ${c.end2}`;
+const slugOf = (T) => String(T.doc.label || 'reading').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60) || 'reading';
+
+function readingJSON(T){
+  const reopened = i => (T.reopened && T.reopened.get(i)) || null;
+  const counts = { read:0, 'beyond reach':0, unbound:0, contradicted:0, unheard:0 };
+  T.claims.forEach(c => counts[standingOfClaim(c)]++);
+  const stmtOf = (c) => { if (!c.located) return null; for (let j = 0; j < T.sents.length; j++){ const s = T.sents[j]; if (c.s >= s.offset && c.s < s.offset + s.text.length) return j + 1; } return null; };
+  return {
+    reading:'reading-demo',
+    schema:'Reading@1',
+    layers:{ on:T.features, off:Object.keys(T.features).filter(k => T.features[k] === false) },
+    source:{ label:T.doc.label, bytes:T.nBytes, sha256:T.hash, source_id:T.srcId, truncated:!!T.doc.truncated, anchor:{ unit:'byte', start:0, end:T.nBytes } },
+    run:{ steps:T.ev.length, ms:Math.round(T.totalMs * 100) / 100, model_calls:T.net.models, network:T.net.requests.slice() },
+    summary:{ statements:T.sents.length, propositions:T.claims.length, read:counts.read, unbound:counts.unbound, contradicted:counts.contradicted, beyond_reach:counts['beyond reach'], unheard:counts.unheard, referents:T.refs.size, forms:T.words.length, distinct_forms:new Set(T.toks).size, grammar_gaps:T.gaps, grammar_ambiguous:T.ambiguous },
+    statements:T.sents.map((s, i) => ({ n:i + 1, bytes:[charToByte(T.doc.analysis, s.offset), charToByte(T.doc.analysis, s.offset + s.text.length)], text:s.text.replace(/\s+/g, ' ').trim() })),
+    propositions:T.claims.map((c, i) => ({ n:i + 1, located:!!c.located, statement:stmtOf(c), subject:c.end1, act:c.label, object:c.end2, polarity:c.polarity === '-' ? '-' : '+', standing:reopened(i) ? 'reopened' : standingOfClaim(c), confidence:confidenceOf(c).pct, tense:c.tense.v, tense_why:c.tense.why, bytes:c.b0 == null ? null : [c.b0, c.b1], span:c.span || null, grounded:!!c.grounded, revised_by:reopened(i), render:{ en:ORDERS[0].line(c), sov:ORDERS[1].line(c), vso:ORDERS[2].line(c) } })),
+    referents:[...T.refs.values()].map(r => ({ name:r.n, relations:r.c, first_byte:r.b0 == null ? null : r.b0 })),
+    priors:[
+      { name:'part of speech', giver:POS_PRIOR_META.giver, schema:PRIORS.posPrior && PRIORS.posPrior.schema, on:T.features.pos !== false },
+      { name:'morphology', giver:(PRIORS.morphRaw && PRIORS.morphRaw.provenance && PRIORS.morphRaw.provenance.source) || 'UniMorph English', schema:PRIORS.morphRaw && PRIORS.morphRaw.schema, on:T.features.morph !== false },
+      { name:'Thrax map', giver:THRAX_META.giver, schema:'declared', on:T.features.pos !== false },
+    ],
+    ledger:T.eot,
+    trace:T.ev.map(e => ({ t:Math.round(e.t * 1000) / 1000, layer:e.stage, kind:e.kind, msg:e.msg })),
+  };
+}
+function diagrammedText(T){
+  const reopened = i => (T.reopened && T.reopened.get(i)) || null;
+  const counts = { read:0, 'beyond reach':0, unbound:0, contradicted:0, unheard:0 };
+  T.claims.forEach(c => counts[standingOfClaim(c)]++);
+  const inSent = T.sents.map(s => T.claims.map((c, ci) => (c.located && c.s >= s.offset && c.s < s.offset + s.text.length) ? ci : null).filter(ci => ci != null));
+  const unlocated = T.claims.map((c, i) => c.located ? null : i).filter(i => i != null);
+  const Ls = [];
+  Ls.push(`How “${T.doc.label}” is read — layer by layer, no model`);
+  Ls.push('='.repeat(66)); Ls.push('');
+  Ls.push(`source     ${T.doc.label}${T.doc.truncated ? ' — read over its first 14,000 characters; the whole file is still hashed and addressed' : ''}`);
+  Ls.push(`bytes      ${T.nBytes.toLocaleString()} utf-8 · sha-256 ${T.hash}`);
+  Ls.push(`address    byte 0–${T.nBytes} (unit byte) · source id ${T.srcId}`);
+  Ls.push(`run        ${T.ev.length.toLocaleString()} steps · ${ms(T.totalMs)} ms · ${T.net.models} model calls · ${T.net.requests.length} network request(s), static priors only`);
+  Ls.push(`layers off ${Object.keys(T.features).filter(k => T.features[k] === false).join(', ') || '(none — every layer on)'}`);
+  Ls.push(`reading    ${T.sents.length.toLocaleString()} statements · ${T.claims.length} propositions — ${counts.read} read · ${counts.unbound} unbound · ${counts.contradicted} contradicted · ${counts['beyond reach']} beyond reach · ${counts.unheard} unheard · ${T.refs.size} referents`);
+  Ls.push(''); Ls.push('propositions — the source in reading order, each sentence with what it states'); Ls.push('-'.repeat(66));
+  T.sents.forEach((s, j) => {
+    const idxs = inSent[j]; Ls.push(''); Ls.push(`${String(j + 1).padStart(3)}  ${s.text.replace(/\s+/g, ' ').trim()}`);
+    if (!idxs.length){ Ls.push('      — no proposition bound: this statement named no act the reader could bind (a refusal is a result, never an error)'); return; }
+    for (const ci of idxs){ const c = T.claims[ci], st = reopened(ci) ? 'reopened' : standingOfClaim(c), bytes = c.b0 == null ? '—' : `${c.b0}–${c.b1}`;
+      Ls.push(`       ${arrowOf(c)}`); Ls.push(`        ${st} · confidence ${confidenceOf(c).pct}% · polarity ${c.polarity === '-' ? '¬' : '+'} · tense ${c.tense.v} · bytes ${bytes}`); }
+  });
+  if (unlocated.length){ Ls.push(''); Ls.push('unlocated propositions — the reader stated these, but carried no span'); Ls.push('-'.repeat(66));
+    unlocated.forEach(ci => { const c = T.claims[ci], st = standingOfClaim(c); Ls.push(`  ${arrowOf(c)}`); Ls.push(`    ${st} · confidence ${confidenceOf(c).pct}% · no span — not attributable to any statement`); }); }
+  Ls.push(''); Ls.push('render — the same triples in a reader\'s word order'); Ls.push('-'.repeat(66));
+  ORDERS.forEach(o => { Ls.push(''); Ls.push(`${o.label} — ${o.giver}`); T.claims.slice(0, 60).forEach(c => Ls.push('  ' + o.line(c))); });
+  Ls.push(''); Ls.push('referents — the participants the material establishes'); Ls.push('-'.repeat(66));
+  [...T.refs.values()].sort((a,b) => (a.b0 ?? 0) - (b.b0 ?? 0)).forEach(r => Ls.push(`  ${r.n}  ×${r.c} · first read at byte ${r.b0 == null ? '—' : r.b0}`));
+  Ls.push(''); Ls.push('EOT — Provenance@2 · every step a transformation, ids recomputable by anyone'); Ls.push('-'.repeat(66));
+  (T.eot.events || []).forEach(e => Ls.push(`  ${e.event_id}  ${String(e.stage).padEnd(9)} ${e.transform || ''}${e.range ? `  bytes ${e.range.start}–${e.range.end}` : ''}`));
+  Ls.push(''); Ls.push('Nothing above called a model. Every name is the giver that supplied it, every claim is anchored to the bytes it was read from, and every assertion stays revisable.');
+  return Ls.join('\n');
+}
+function download(name, text, mime){
+  const url = URL.createObjectURL(new Blob([text], { type:mime || 'text/plain;charset=utf-8' }));
+  const a = document.createElement('a'); a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 5000);
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+//  THE DEMO
+// ═════════════════════════════════════════════════════════════════════════════
+const STEP_SPEEDS = [[1,'1 event/s'],[4,'4 events/s'],[8,'8 events/s'],[30,'30 events/s'],[120,'120 events/s'],[600,'600 events/s']];
+const REAL_SPEEDS = [[1,'1×'],[0.1,'1/10×'],[0.01,'1/100×'],[0.001,'1/1,000×'],[1e-4,'1/10,000×']];
+
+let cur = null, BASELINE = null;
+let features = { ...DEFAULT_FEATURES };
+let lastRaw = '', lastLabel = '';
+let LAST_TAB = 'source';
+
+function openTrace(T){ if (cur) cur.close(); cur = mount(T); return cur; }
+
+function mount(T){
+  const ev = T.ev; let N = ev.length;
+  const app = $('app'); app.classList.add('on');
+  const rowsEl = app.querySelector('.rows'), sz = app.querySelector('.sz'), nowEl = $('p-now'), lens = $('p-lens'), pane = $('p-pane');
+  const statsEl = $('p-stats'), metaEl = $('p-meta'), rc = app.querySelector('.rib canvas'), rdEl = $('p-rd'), speedSel = $('p-speed'), keyEl = $('p-key'), spineEl = $('spine');
+  $('p-title').textContent = `How “${T.doc.label}” is read — layer by layer, no model`;
+  keyEl.innerHTML = LAYERS.map(l => `<span><i style="background:var(${l.color})"></i>${esc(l.label)}</span>`).join('');
+
+  // ── clock ──
+  let real = false, dir = 0, pos = 0, k = 0, speed = 8, last = performance.now(), raf = 0;
+  const clockOf = i => real ? ev[i].t : i, maxPos = () => clockOf(N - 1) || 1;
+  const idxAt = p => { let lo = 0, hi = N - 1; while (lo < hi){ const m = (lo + hi + 1) >> 1; if (clockOf(m) <= p) lo = m; else hi = m - 1; } return lo; };
+  function fillSpeeds(){ const list = real ? REAL_SPEEDS : STEP_SPEEDS;
+    speedSel.innerHTML = list.map(([v,l]) => `<option value="${v}">${l}</option>`).join('');
+    if (real){ const want = (T.totalMs || ev[N-1].t) / 20000; speed = (list.find(([v]) => v <= Math.max(want, 1e-5)) || list[0])[0]; } else speed = 8;
+    speedSel.value = String(speed);
+    app.querySelector('[data-a=steps]').setAttribute('aria-pressed', String(!real));
+    app.querySelector('[data-a=real]').setAttribute('aria-pressed', String(real)); }
+  const setClock = r => { real = r; pos = clockOf(k); fillSpeeds(); drawRibbon(); };
+  const seek = i => { k = Math.max(0, Math.min(N - 1, i)); pos = clockOf(k); render(true); };
+  const setDir = d => { dir = d; app.querySelector('[data-a=play]').textContent = dir === 1 ? '❚❚ Pause' : '▶ Play'; app.querySelector('[data-a=rev]').textContent = dir === -1 ? '❚❚' : '◀◀'; last = performance.now(); };
+
+  // ── state fold ──
+  const fresh = () => ({ marks:[], on:null, tokens:[], grammar:[], morph:[], refs:new Map(), rels:[], led:[], stance:0, counts:{} });
+  function apply(S, e){
+    S.counts[e.stage] = (S.counts[e.stage] || 0) + 1;
+    const mk = (cls) => { if (e.s != null && e.e != null && e.e > e.s) S.marks.push({ s:e.s, e:e.e, cls, stage:e.stage }); };
+    if (e.stage === 'statement'){ S.on = { s:e.s, e:e.e }; mk('s'); }
+    else if (e.stage === 'token' && e.kind === 'word'){ S.tokens.push(e.data && e.data.w); mk('t'); }
+    else if (e.stage === 'grammar'){ S.grammar.push(e.data); mk(e.data && e.data.found ? 'g' : 'gap'); }
+    else if (e.stage === 'morph'){ S.morph.push(e.data); mk('m'); }
+    else if (e.stage === 'stance'){ S.stance = (e.data && e.data.n) || 0; }
+    else if (e.stage === 'referent'){ S.refs.set(e.data.n, e.data); mk('nm'); }
+    else if (e.stage === 'relation'){ S.rels.push(e.data); mk('r'); }
+    else if (e.stage === 'ledger'){ S.led.push(e); }
+    if (e.stage === 'furniture' && e.data && e.data.runs) e.data.runs.forEach(r => S.marks.push({ s:r.s, e:r.e, cls:'fu', stage:'furniture' }));
+  }
+  let S = null, sk = -1;
+  function stateAt(i){ if (!S || i < sk){ S = fresh(); sk = -1; } while (sk < i) apply(S, ev[++sk]); return S; }
+
+  // ── spine (layers + switches) ──
+  function renderSpine(St, e){
+    const active = e.stage;
+    spineEl.innerHTML = `<div class="h">the pipeline — switch a layer off and the reading re-runs</div>` + LAYERS.map(l => {
+      const on = l.fixed || T.features[l.feature] !== false;
+      const cnt = layerCount(l.id, St);
+      const cur = l.id === active;
+      const sw = l.fixed ? `<span class="sw" aria-disabled="true" aria-checked="true" title="always runs"></span>`
+        : `<span class="sw" role="switch" tabindex="0" aria-checked="${on}" data-feature="${l.feature}" title="switch ${esc(l.label)} ${on ? 'off' : 'on'} — the reading re-runs"></span>`;
+      return `<div class="ly ${cur ? 'cur' : ''} ${on ? '' : 'off'}"><span class="n">${l.i + 1}</span><span class="lab" style="color:var(${l.color})">${esc(l.label)}</span>${sw}<span class="why">${esc(l.why)}</span><span class="cnt" style="grid-column:2/3">${cnt}</span></div>`;
+    }).join('');
+    wireSwitches();
+  }
+  function layerCount(key, St){
+    switch (key){
+      case 'extract': { const X = T.extraction; return X ? `${esc((X.readings[X.collapsed] || {}).extractor || '—')} · ${X.held} reading${X.held === 1 ? '' : 's'} held` : 'text — no container'; }
+      case 'bytes': return esc(T.doc.label) + ' · ' + T.nBytes.toLocaleString() + ' bytes';
+      case 'decode': return T.doc.analysis.length.toLocaleString() + ' chars';
+      case 'furniture': return T.features.furniture === false ? 'off' : (T.blanks.length ? T.blanks.length.toLocaleString() + ' chars blanked' : 'nothing to blank');
+      case 'statement': return T.sents.length + ' statements';
+      case 'token': return St.tokens.length.toLocaleString() + ' forms';
+      case 'grammar': return T.features.pos === false ? 'off' : (St.grammar.length.toLocaleString() + ' classified · ' + T.gaps + ' gaps · ' + T.ambiguous + ' ambiguous');
+      case 'morph': return T.features.morph === false ? 'off' : St.morph.length.toLocaleString() + ' acts';
+      case 'stance': return T.features.stance === false ? 'off' : St.stance + ' positions';
+      case 'referent': return St.refs.size.toLocaleString() + ' referents';
+      case 'relation': return St.rels.length.toLocaleString() + ' of ' + T.claims.length;
+      case 'np': return T.features.npSubj === false ? 'off' : 'on';
+      case 'phrasal': return T.features.phrasal === false ? 'off' : 'on';
+      case 'render': return T.claims.length + ' triples × 3 orders';
+      case 'ledger': return St.led.length.toLocaleString() + ' events';
+    }
+    return '';
+  }
+
+  // ── log ──
+  const RH = 24;
+  function renderLog(follow){
+    const H = rowsEl.clientHeight, top = rowsEl.scrollTop; sz.style.height = (N * RH) + 'px';
+    if (follow){ const y = k * RH; if (y < top + RH * 2 || y > top + H - RH * 4) rowsEl.scrollTop = Math.max(0, y - H * 0.6); }
+    const a = Math.max(0, Math.floor(rowsEl.scrollTop / RH) - 5), b = Math.min(N, a + Math.ceil(H / RH) + 10);
+    let h = ''; for (let i = a; i < b; i++){ const e = ev[i], S0 = L[e.stage] || { label:e.stage, color:'--dim' };
+      h += `<div class="row-ev${i === k ? ' cur' : i > k ? ' fut' : ''}" data-i="${i}" style="top:${i*RH}px" title="${esc(e.msg)}"><span class="t">${ms(e.t)}</span><span class="st" style="color:var(${S0.color})">${esc(S0.label)}</span><span>${esc(e.msg)}</span></div>`; }
+    sz.innerHTML = h;
+    const e = ev[k], S0 = L[e.stage] || { label:e.stage, color:'--dim' }, dt = k ? e.t - ev[k-1].t : e.t;
+    nowEl.innerHTML = `<div class="k" style="color:var(${S0.color})">layer ${S0.i + 1} of ${LAYERS.length} · ${esc(S0.label)} · ${esc(e.kind)} · +${ms(dt)} ms</div><p>${esc(e.msg)}</p>`;
+  }
+  rowsEl.addEventListener('scroll', () => { if (!dir) renderLog(false); });
+  rowsEl.addEventListener('click', e => { const r = e.target.closest('.row-ev'); if (r){ setDir(0); seek(+r.dataset.i); } });
+
+  // ── lens ──
+  function renderLens(St){
+    const e = ev[k], at = (e.s != null && e.s > 0) ? e.s : (St.on ? St.on.s : 0);
+    const a = Math.max(0, at - 300), b = Math.min(T.doc.analysis.length, at + 760);
+    const cuts = new Set([a, b]); const M = St.marks.filter(m => m.e > a && m.s < b);
+    M.forEach(m => { cuts.add(Math.max(a, m.s)); cuts.add(Math.min(b, m.e)); });
+    const cur = (e.s != null && e.e != null && e.e > e.s) ? e : null; if (cur){ cuts.add(Math.max(a, cur.s)); cuts.add(Math.min(b, cur.e)); }
+    const P = [...cuts].sort((x, y) => x - y); let h = a ? '…' : '';
+    for (let i = 0; i < P.length - 1; i++){ const x = P[i], y = P[i+1]; if (y <= x) continue; const cls = new Set();
+      M.forEach(m => { if (m.s <= x && m.e >= y && m.cls) cls.add(m.cls); });
+      if (St.on && St.on.s <= x && St.on.e >= y && cls.has('s')) cls.add('on');
+      if (cur && cur.s <= x && cur.e >= y) cls.add('hit');
+      const t = T.doc.analysis.slice(x, y); h += cls.size ? `<span class="${[...cls].join(' ')}">${esc(t)}</span>` : esc(t); }
+    lens.innerHTML = `<div class="doc">${esc(T.doc.label)} · characters ${a.toLocaleString()}–${b.toLocaleString()} of ${T.doc.analysis.length.toLocaleString()} · the marks are the layers that reached these bytes</div><div class="txt">${h}${b < T.doc.analysis.length ? '…' : ''}</div>`;
+    const hit = lens.querySelector('.hit') || lens.querySelector('.on'); if (hit && dir) hit.scrollIntoView({ block:'nearest' });
+  }
+
+  // ── graph ──
+  const gh = $('p-graph'); gh.innerHTML = '';
+  const map = mountMap(gh, { padBottom:24, wheelZoom:true, empty:'Referents and relations appear here as the reading reaches them.', sentence:o => o.t || '', onWitness:o => openSourceAt(o.s, o.e) });
+  function mapData(St, e){
+    const nodes = [...St.refs.values()].map(r => ({ n:r.n, c:r.c, mine:true, st:'fold' }));
+    const edges = St.rels.map(c => ({ a:String(c.end1), b:String(c.end2), c:1, mine:true, neg:c.polarity === '-' }));
+    const hot = new Set([e && e.data && e.data.end1, e && e.data && e.data.end2, e && e.data && e.data.n].filter(Boolean).map(String));
+    const hotPairs = (e && e.stage === 'relation' && e.data) ? [[String(e.data.end1), String(e.data.end2)]] : [];
+    const cursor = (e && e.data && (e.data.n || e.data.end1)) ? String(e.data.n || e.data.end1) : null;
+    return { nodes, edges, docs:[{ id:'source', title:T.doc.label }], occ:T.occ, odd:new Map(), hot, hotPairs, cursor, sig:`${St.refs.size}:${St.rels.length}` };
+  }
+  // a real affordance: the map's "Open in source →" lands on the exact bytes
+  function openSourceAt(s, e2){
+    setTab('source');
+    requestAnimationFrame(() => {
+      const host = pane.querySelector('.src'); if (!host) return;
+      const spans = [...host.querySelectorAll('span[data-s]')];
+      const t = spans.find(x => +x.dataset.s <= s && +x.dataset.e >= e2) || spans.find(x => +x.dataset.s === s);
+      if (t){ t.classList.add('hit'); t.scrollIntoView({ block:'center' }); setTimeout(() => t.classList.remove('hit'), 1800); }
+    });
+  }
+
+  // ── tabs ──
+  let tab = LAST_TAB;
+  let wordsKey = '', wordsSort = { key: 'n', dir: -1 };
+  const tabBtns = [...app.querySelectorAll('#p-tabs [data-tab]')];
+  function setTab(t){ LAST_TAB = t; tab = t; tabBtns.forEach(b => b.setAttribute('aria-selected', String(b.dataset.tab === t))); render(false); }
+  tabBtns.forEach(b => b.addEventListener('click', () => setTab(b.dataset.tab)));
+  tabBtns.forEach(b => b.setAttribute('aria-selected', String(b.dataset.tab === tab)));
+
+  function renderPane(St, e){
+    const hot = e.stage === 'relation' ? e.data : null;
+    const graph = tab === 'graph';
+    $('p-graph').hidden = !graph; pane.hidden = graph;
+    if (graph){ map.set(mapData(St, e)); return; }
+    if (tab === 'source') pane.innerHTML = sourcePane(St, hot);
+    else if (tab === 'words'){ const sig = 'W' + T.words.length + '|' + wordsSort.key + wordsSort.dir; if (sig !== wordsKey){ wordsKey = sig; pane.innerHTML = wordsPane(); wireSort(); } return; }
+    else if (tab === 'pos') pane.innerHTML = posPane(St);
+    else if (tab === 'morph') pane.innerHTML = morphPane(St);
+    else if (tab === 'refs') pane.innerHTML = refsPane(St);
+    else if (tab === 'props') pane.innerHTML = propsPane(St, hot);
+    else if (tab === 'render') pane.innerHTML = renderPaneHTML();
+    else if (tab === 'eot') pane.innerHTML = eotPane(St);
+    else if (tab === 'json') pane.innerHTML = `<div class="h">the whole reading as JSON</div><div class="fig">The same reading the page draws — propositions with confidence, referents, the render, and the EOT ledger — as one document.</div><pre class="json">${esc(JSON.stringify(readingJSON(T), null, 2))}</pre>`;
+    wireReopen(pane);
+  }
+  const standingOf = c => standingOfClaim(c);
+
+  function sourcePane(St, hot){
+    // the ORIGINAL source, whole, byte-addressed, with the reading's own marks
+    const a = T.doc.analysis; const marks = St.marks.slice().sort((x, y) => x.s - y.s);
+    const cuts = new Set([0, a.length]); marks.forEach(m => { if (m.cls) { cuts.add(Math.max(0, m.s)); cuts.add(Math.min(a.length, m.e)); } });
+    const P = [...cuts].sort((x, y) => x - y); let h = '';
+    for (let i = 0; i < P.length - 1; i++){ const x = P[i], y = P[i+1]; if (y <= x) continue; const cls = new Set();
+      marks.forEach(m => { if (m.s <= x && m.e >= y && m.cls) cls.add(m.cls); });
+      const t = a.slice(x, y); const cl = [...cls].join(' ');
+      h += `<span${cl ? ` class="${cl}"` : ''} data-s="${x}" data-e="${y}">${esc(t)}</span>`; }
+    const hex = [...enc.encode(a.slice(0, 48))].map(b => b.toString(16).padStart(2, '0')).join(' ');
+    const X = T.extraction;
+    const xcard = X ? `<div class="h">extraction — parallel readings; one has collapsed as the reading (revisable)</div>
+      <div class="fig">Held: <b>${X.held}</b> reading${X.held === 1 ? '' : 's'} · collapsed: <b>${esc((X.readings[X.collapsed] || {}).extractor || '—')}</b>. ${X.gap ? esc(X.gap) : 'Plural grounds stay parallel and are never averaged.'} The floor is <b>${X.floor}</b> — received; giver: ${esc((X.readings[X.collapsed] || {}).sniff ? X.readings[X.collapsed].sniff.floorGiver : 'the extraction gate')}.</div>
+      <table class="t"><thead><tr><th>reading (extractor)</th><th>reads as words</th><th>verdict</th><th></th></tr></thead><tbody>${X.readings.map((r, i) => r.ok
+        ? `<tr${i === X.collapsed ? ' class="cur"' : ''}><td>${esc(r.extractor)}</td><td class="mono">${(r.sniff.reads * 100).toFixed(0)}%</td><td><span class="chip ${r.sniff.verdict === 'confirmed' ? 'g' : 'v'}">${esc(r.sniff.verdict)}</span></td><td>${i === X.collapsed ? '<span class="chip a">collapsed</span>' : `<button class="reopen" data-pick="${i}">read from this one</button>`}</td></tr>`
+        : `<tr><td>${esc(r.extractor)}</td><td class="mono">—</td><td><span class="chip">skipped</span></td><td class="mono">${esc(r.why)}</td></tr>`).join('')}</tbody></table>
+      ${(X.revisions && X.revisions.length) ? `<div class="fig">revisions (append-only): ${X.revisions.map(v => `collapsed to <b>${esc(v.extractor)}</b>`).join(' · ')}</div>` : ''}` : '';
+    return `<div class="h">the original source — whole, byte-addressed, with the reading's marks</div>
+      <div class="fig"><b>${esc(T.doc.label)}</b> · ${T.nBytes.toLocaleString()} bytes utf-8 · sha-256 <span class="mono">${hx(T.hash, 44)}</span> · source id <span class="mono">${esc(T.srcId)}</span></div>
+      ${xcard}
+      <div class="src">${h}</div>
+      <div class="h">the first 48 bytes, as bytes</div><pre class="json">${esc(hex)}</pre>`;
+  }
+  function wordsPane(){
+    const seen = new Map();
+    T.words.forEach(w => { const k = w.w.toLowerCase(); const s = seen.get(k) || { w:w.w, n:0, s:w.s, e:w.e }; s.n++; if (w.s < s.s){ s.s = w.s; s.e = w.e; } seen.set(k, s); });
+    const arr = [...seen.values()];
+    const { key, dir } = wordsSort;
+    arr.sort((a, b) => { let d = key === 'w' ? a.w.toLowerCase().localeCompare(b.w.toLowerCase()) : (a[key] - b[key]); if (d === 0) d = a.w.toLowerCase().localeCompare(b.w.toLowerCase()); return d * dir; });
+    const arrow = k => key === k ? (dir < 0 ? ' ▼' : ' ▲') : '';
+    const rows = arr.slice(0, 2000).map(s => `<tr><td>${esc(s.w)}</td><td class="mono">${s.n.toLocaleString()}</td><td class="mono">${charToByte(T.doc.analysis, s.s).toLocaleString()}</td><td class="mono">${charToByte(T.doc.analysis, s.s)}–${charToByte(T.doc.analysis, s.e)}</td></tr>`).join('');
+    return `<div class="h">words — ${T.words.length.toLocaleString()} form occurrences · ${arr.length.toLocaleString()} distinct</div>
+      <div class="fig">The material split into the forms it is made of. Each carries the byte it was read at. Nothing is stemmed or merged here — identity is decided later, in the referents. <b>Click a column to sort.</b></div>
+      <table class="t"><thead><tr>
+        <th data-sort="w">word${arrow('w')}</th>
+        <th data-sort="n">occurrences${arrow('n')}</th>
+        <th data-sort="s">first byte${arrow('s')}</th>
+        <th>first span (bytes)</th>
+      </tr></thead><tbody>${rows}</tbody></table>${arr.length > 2000 ? `<div class="fig">showing the first 2,000 of ${arr.length.toLocaleString()} distinct forms.</div>` : ''}`;
+  }
+  function wireSort(){
+    pane.querySelectorAll('th[data-sort]').forEach(th => th.addEventListener('click', () => {
+      const k = th.dataset.sort;
+      if (wordsSort.key === k) wordsSort.dir = -wordsSort.dir; else { wordsSort.key = k; wordsSort.dir = k === 'w' ? 1 : -1; }
+      wordsKey = ''; render(false);
+    }));
+  }
+  function posPane(St){
+    if (T.features.pos === false) return `<div class="h">POS — layer OFF</div><div class="fig">The class prior is switched off. Every form is carried as a bare string; no class is attested, so the reading names no part of speech — a typed gap, never a guess.</div>`;
+    const rows = St.grammar.filter(Boolean).slice(-400).reverse().map(g => {
+      if (!g.found) return `<tr><td class="mono">${esc(g.w)}</td><td colspan="2" class="gap">no entry — typed gap</td></tr>`;
+      const bits = g.candidates.map(k => `<span class="mono">${esc(k.upos)}</span> ${(k.share*100).toFixed(0)}% → ${k.thraxClass ? esc(k.thraxClass) : '<span class="gap">—</span>'}`).join('<br>');
+      const bar = `<span class="bar" style="width:${Math.max(3, Math.round(g.candidates[0].share * 46))}px"></span>`;
+      return `<tr><td class="mono">${esc(g.w)}</td><td>${bar}</td><td>${bits}</td></tr>`;
+    }).join('');
+    return `<div class="h">POS — each form → the classes it is ATTESTED as (Thrax over UD)</div>
+      <div class="fig"><b>Ambiguity is preserved, not resolved.</b> A type-level table cannot answer an instance-level question, so no winner is picked. Giver: ${esc(POS_PRIOR_META.giver)} → ${esc(THRAX_META.giver)}. ${[...THRAX_OUT_OF_SCOPE].length} categories are kept out, never forced.</div>
+      <table class="t"><thead><tr><th>form</th><th></th><th>classes attested</th></tr></thead><tbody>${rows}</tbody></table>`;
+  }
+  function morphPane(St){
+    if (T.features.morph === false) return `<div class="h">Morphology — layer OFF</div><div class="fig">The UniMorph lemmatizer is switched off. Same-act is now exact string equality: "underwent" no longer binds a source's "undergoes". Disclosed, not hidden.</div>`;
+    const rows = St.morph.filter(Boolean).slice(-400).reverse().map(m => `<tr><td class="mono">${esc(m.w)}</td><td class="mono">${m.lemmas.map(l => esc(l)).join(', ') || '—'}</td><td class="mono">${m.stems.map(esc).join(', ') || '—'}</td></tr>`).join('');
+    const prov = (PRIORS.morphRaw && PRIORS.morphRaw.provenance) || {};
+    return `<div class="h">Morphology — each form → the act it belongs to</div>
+      <div class="fig"><b>The prior decides sameness; the material decides presence.</b> Identity lives in the referent, never in a string — the lemma is a SET, never reduced to one. Giver: ${esc(prov.source || 'UniMorph English')} (${esc((PRIORS.morphRaw && PRIORS.morphRaw.schema) || '—')}).</div>
+      <table class="t"><thead><tr><th>form</th><th>lemma candidates (a set)</th><th>rule-recovered stem</th></tr></thead><tbody>${rows}</tbody></table>`;
+  }
+  function refsPane(St){
+    return `<div class="h">Referents — the participants this material establishes</div>
+      <div>${[...St.refs.values()].map(r => `<span class="chip b">${esc(r.n)} <span style="color:var(--dim)">×${r.c}</span></span>`).join('') || '<span class="noprop">—</span>'}</div>
+      <div class="fig">Each with the byte it was first read at. A participant that never appears in a bound relation is not invented here.</div>`;
+  }
+  function propsPane(St, hot){
+    const sents = T.sents, inSent = sents.map(() => []), unlocated = [];
+    T.claims.forEach((c, i) => { if (!c.located){ unlocated.push(i); return; }
+      for (let j = 0; j < sents.length; j++){ const s = sents[j]; if (c.s >= s.offset && c.s < s.offset + s.text.length){ inSent[j].push(i); return; } } unlocated.push(i); });
+    const counts = { read:0, unbound:0, contradicted:0, far:0, unheard:0 };
+    T.claims.forEach(c => { const s = standingOfClaim(c); counts[s === 'beyond reach' ? 'far' : s]++; });
+    const CAP = 500;
+    const rows = sents.slice(0, CAP).map((s, j) => {
+      const idxs = inSent[j], isCur = !!hot && idxs.some(i => T.claims[i].s === hot.s && T.claims[i].e === hot.e);
+      if (!idxs.length) return `<tr${isCur ? ' class="cur"' : ''}><td class="n">${j + 1}</td><td class="stmt">${marked(s, [])}</td><td colspan="4"><span class="noprop">— no proposition bound: this statement named no act the reader could bind. A refusal is a result, never an error.</span></td></tr>`;
+      const n = idxs.length;
+      return idxs.map((ci, kk) => {
+        const c = T.claims[ci], st = standingOf(c), re = T.reopened && T.reopened.get(ci);
+        let h = `<tr${isCur ? ' class="cur"' : ''}>`;
+        if (kk === 0) h += `<td class="n" rowspan="${n}">${j + 1}</td><td class="stmt" rowspan="${n}">${marked(s, idxs)}</td>`;
+        h += `<td>${diagram(c, ci)}</td>`;
+        h += `<td>${confHTML(c)}</td>`;
+        h += `<td><span class="chip ${re ? 'a' : st === 'read' ? 'g' : st === 'unbound' || st === 'beyond reach' ? 'a' : 'v'}">${re ? 'reopened' : st}</span></td>`;
+        h += `<td class="mono" title="${esc(c.tense.why)}">${esc(c.tense.v)}</td>`;
+        h += `<td class="mono">${c.b0 == null ? '—' : c.b0 + '–' + c.b1}</td>`;
+        return h + '</tr>';
+      }).join('');
+    }).join('');
+    const unloc = unlocated.length ? `<div class="h">unlocated propositions — stated, but no span to place them</div>
+      <table class="t"><thead><tr><th></th><th>the proposition it makes</th><th>confidence</th><th>standing</th><th>tense</th></tr></thead><tbody>${unlocated.map(ci => { const c = T.claims[ci], st = T.reopened && T.reopened.get(ci) ? 'reopened' : standingOf(c);
+        return `<tr><td class="n">—</td><td>${diagram(c, ci)}</td><td>${confHTML(c)}</td><td><span class="chip ${st === 'read' ? 'g' : 'a'}">${st}</span></td><td class="mono">${esc(c.tense.v)}</td></tr>`; }).join('')}</tbody></table>` : '';
+    return `<div class="h">the propositions this reading makes — the source in order, each one drawn, with its confidence</div>
+      <div class="fig"><b>${counts.read}</b> read · <b>${counts.unbound}</b> unbound · <b>${counts.contradicted}</b> contradicted · <b>${counts.far}</b> beyond reach · <b>${counts.unheard}</b> unheard${unlocated.length ? ` · <b>${unlocated.length}</b> unlocated` : ''} over <b>${sents.length.toLocaleString()}</b> statements.
+      Each row shows the <b>original words</b> (the span that carried the proposition underlined), the proposition as <b>subject —act→ object</b>, a <b>confidence</b> derived from the engine's own signals (hover it), the <b>standing</b>, the clause's own <b>tense</b>, and the <b>byte range</b>.</div>
+      <table class="t"><thead><tr><th>#</th><th>the statement</th><th>the proposition it makes</th><th>confidence</th><th>standing</th><th>tense</th><th>bytes</th></tr></thead><tbody>${rows}</tbody></table>${unloc}`;
+  }
+  function marked(s, idxs){
+    const a0 = s.offset, b0 = s.offset + s.text.length;
+    const parts = idxs.map(i => T.claims[i]).sort((x, y) => x.s - y.s);
+    let html = '', curp = a0;
+    for (const c of parts){ const a = Math.max(a0, c.s), b = Math.min(b0, c.e); if (b <= a) continue;
+      if (a > curp) html += esc(T.doc.analysis.slice(curp, a));
+      html += `<span class="mrel">${esc(T.doc.analysis.slice(a, b))}</span>`; if (b > curp) curp = b; }
+    if (curp < b0) html += esc(T.doc.analysis.slice(curp, b0));
+    return html.replace(/[ \t]+/g, ' ');
+  }
+  function diagram(c, i){
+    const neg = c.polarity === '-', far = c.verdict !== 'bound', re = T.reopened && T.reopened.get(i);
+    return `<div class="prop" data-r="${i}"><span class="pnode s">${esc(c.end1)}</span>`
+      + `<span class="parc${neg ? ' neg' : ''}${far ? ' far' : ''}"><span class="plabel">${esc(c.label)}</span><span class="pline"></span><span class="phead"></span></span>`
+      + `<span class="pnode o">${esc(c.end2)}</span>`
+      + (re ? `<span class="chip a">revised</span>` : `<button class="reopen" data-reopen="${i}" style="all:unset;cursor:pointer;font:11px var(--mono);color:var(--dim);border-bottom:1px dotted var(--dim);margin-left:2px" title="Hold this assertion open for re-reading — the revision is appended to the ledger">revisit</button>`)
+      + `</div>`;
+  }
+  function renderPaneHTML(){
+    return `<div class="h">Render — the same triple in a reader's word order, zero model</div>
+      <div class="fig">A proposition is language-neutral: an <b>end1 · act · end2</b> with its standing. The render lens is a <b>declared scaffold</b> (WALS-style), never a model — the content words are the material's own; only the order and the scaffolding are supplied.</div>
+      ${ORDERS.map(o => `<div class="ord"><h3>${esc(o.label)}</h3><div class="giver">${esc(o.giver)}</div>${T.claims.slice(0, 60).map(c => `<div class="line">${esc(o.line(c))}</div>`).join('') || '<div class="line">—</div>'}</div>`).join('')}`;
+  }
+  function eotPane(St){
+    const srcs = T.eot.sources || [], evs = T.eot.events || [];
+    return `<div class="h">EOT — the folded, append-only ledger (Provenance@${T.eot.schema || 2})</div>
+      <div class="fig">Not citations but <b>transformations</b>: read → arrange → classify → bind → eot. Ids are <span class="mono">evt_ + first 20 hex of sha256(JSON.stringify(value))</span> — the same reading always yields the same ids, and a third party can recompute the whole log. Address space: <b>${esc((T.eot.addressSpace && T.eot.addressSpace.artifact) || 'folded-bytes')}</b>, unit byte.</div>
+      <div class="h">sources — stored once under their own bytes</div>
+      ${srcs.map(s => `<div class="evt"><span class="id">${esc(hx(s.source_id, 18))}</span><span class="st">${esc(s.kind)}</span><span class="rd">${esc(clamp(s.locator, 44))} · anchor ${esc(JSON.stringify(s.anchor || {}))}</span></div>`).join('')}
+      <div class="h">events — every step a transformation (${evs.length})</div>
+      ${evs.map(x => `<div class="evt"><span class="id">${esc(hx(x.event_id, 18))}</span><span class="st">${esc(x.stage)}</span><span class="rd">${esc(x.transform || '')}${x.range ? ` · bytes ${x.range.start}–${x.range.end}` : ''}${x.parent ? ` · parent ${esc(hx(x.parent, 12))}` : ''}</span></div>`).join('')}
+      <div class="h">the whole artifact as JSON</div><pre class="json">${esc(JSON.stringify(T.eot, null, 2))}</pre>`;
+  }
+
+  // ── revisable assertions ──
+  function reopen(i){
+    const c = T.claims[i]; if (!c) return;
+    const id = T.led.event({ stage:'revisit', source_id:T.srcId, transform:'assertion→revision', detail:{ of:`${c.end1}—${c.label}→${c.end2}`, act:'reopened', note:'standing held open for re-reading' } });
+    ev.push({ i:ev.length, t:performance.now() - (T.ev._t0 || 0), stage:'ledger', kind:'revisit', msg:`${id} · revisit assertion→revision · “${c.end1}—${c.label}→${c.end2}” reopened — the standing is held open`, s:c.s, e:c.e, data:{ id, revisits:i } });
+    if (!T.reopened) T.reopened = new Map(); T.reopened.set(i, id);
+    N = ev.length; render(true);
+  }
+  // re-collapse the extraction: pick another held reading as THE reading. Append-only, revisable.
+  function recollapse(idx){
+    const E = T.extraction; if (!E) return;
+    const r = E.readings[idx]; if (!r || !r.ok) return;
+    E.collapsed = idx;
+    E.revisions = (E.revisions || []).concat([{ to: idx, extractor: r.extractor, reads: r.sniff.reads, at: new Date().toISOString() }]);
+    read(r.text, T.doc.label + ' — ' + r.extractor, features, { animate: false, extraction: E });
+  }
+  function wireReopen(scope){
+    scope.querySelectorAll('[data-reopen]').forEach(b => b.addEventListener('click', () => reopen(+b.dataset.reopen)));
+    scope.querySelectorAll('[data-pick]').forEach(b => b.addEventListener('click', () => recollapse(+b.dataset.pick)));
+  }
+
+  // ── ribbon ──
+  let dpr = 1;
+  function size(){ dpr = window.devicePixelRatio || 1; const q = rc.getBoundingClientRect(); rc.width = Math.max(1, q.width * dpr); rc.height = Math.max(1, q.height * dpr); drawRibbon(); }
+  function drawRibbon(){ const g = rc.getContext('2d'), w = rc.width, h = rc.height; if (!w) return; g.clearRect(0, 0, w, h); const mp = maxPos();
+    for (let i = 0; i < N; i++){ const x0 = clockOf(i) / mp * w, x1 = i + 1 < N ? clockOf(i + 1) / mp * w : w; g.fillStyle = cssVar((L[ev[i].stage] || { color:'--dim' }).color); g.globalAlpha = 0.85; g.fillRect(x0, h * 0.22, Math.max(1, x1 - x0), h * 0.56); }
+    g.globalAlpha = 1; const x = pos / mp * w; g.fillStyle = cssVar('--ink'); g.fillRect(x - dpr, 0, 2 * dpr, h); }
+  const scrub = e => { const r = rc.getBoundingClientRect(); const f = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)); setDir(0); pos = f * maxPos(); k = idxAt(pos); render(true); };
+  let dragging = false; const rib = app.querySelector('.rib');
+  rib.addEventListener('pointerdown', e => { dragging = true; e.target.setPointerCapture && e.target.setPointerCapture(e.pointerId); scrub(e); });
+  rib.addEventListener('pointermove', e => { if (dragging) scrub(e); });
+  rib.addEventListener('pointerup', () => { dragging = false; });
+
+  // ── render ──
+  function render(follow){
+    const St = stateAt(k), e = ev[k];
+    renderSpine(St, e); renderLog(follow); renderLens(St); renderPane(St, e); map.set(mapData(St, e)); drawRibbon(); updateStats(St, e);
+    rdEl.textContent = (real ? 't = ' + ms(pos) + ' of ' + ms(ev[N-1].t) + ' ms' : 'step ' + (k + 1).toLocaleString() + ' of ' + N.toLocaleString())
+      + ' · layer ' + ((L[e.stage] || {}).i + 1) + '/' + LAYERS.length + ' · real ' + ms(e.t) + ' ms';
+  }
+  function updateStats(St, e){
+    statsEl.innerHTML =
+      `<span>statements <b>${(St.counts.statement || 0).toLocaleString()}</b></span>` +
+      `<span>forms <b>${St.tokens.length.toLocaleString()}</b></span>` +
+      `<span>referents <b>${St.refs.size.toLocaleString()}</b></span>` +
+      `<span>relations <b>${St.rels.length.toLocaleString()}</b></span>` +
+      `<span>ledger <b>${St.led.length.toLocaleString()}</b></span>` +
+      `<span class="g">layer <b>${(L[e.stage] || {}).i + 1}</b>/${LAYERS.length} · <b>${esc((L[e.stage] || { label:e.stage }).label)}</b></span>` +
+      `<span class="g">real run <b>${ms(T.totalMs)}</b> ms · model calls <b>${T.net.models}</b></span>`;
+    metaEl.textContent = `${N.toLocaleString()} steps · read in ${ms(T.totalMs)} ms · ${T.net.requests.length} network request${T.net.requests.length === 1 ? '' : 's'} (no model — static priors + any format library)`;
+  }
+
+  // ── loop ──
+  function loop(now){ const dt = Math.min(100, now - last); last = now;
+    if (dir && dt > 0){ pos += dir * (real ? dt * speed : dt / 1000 * speed);
+      if (pos >= maxPos()){ pos = maxPos(); setDir(0); } else if (pos < 0){ pos = 0; setDir(0); }
+      else { const nk = idxAt(pos); if (nk !== k){ k = nk; render(true); } else drawRibbon(); } }
+    raf = requestAnimationFrame(loop); }
+
+  // ── controls ──
+  function wireSwitches(){
+    spineEl.querySelectorAll('.sw[data-feature]').forEach(sw => {
+      const go = () => { const f = sw.dataset.feature; features = { ...features, [f]: !(features[f] !== false) }; rerun(); };
+      sw.addEventListener('click', go);
+      sw.addEventListener('keydown', e => { if (e.key === ' ' || e.key === 'Enter'){ e.preventDefault(); go(); } });
+    });
+  }
+  const onClick = e => { const a = e.target.closest('[data-a]'); if (!a) return; const act = a.dataset.a;
+    if (act === 'close') close(); else if (act === 'play') setDir(dir === 1 ? 0 : (k >= N - 1 ? (seek(0), 1) : 1));
+    else if (act === 'rev') setDir(dir === -1 ? 0 : (k <= 0 ? (seek(N - 1), -1) : -1));
+    else if (act === 'start'){ setDir(0); seek(0); } else if (act === 'back'){ setDir(0); seek(k - 1); } else if (act === 'fwd'){ setDir(0); seek(k + 1); }
+    else if (act === 'steps') setClock(false); else if (act === 'real') setClock(true);
+    else if (act === 'reset'){ features = { ...DEFAULT_FEATURES }; rerun(); }
+    else if (act === 'toggle-all'){ const anyOn = OPTIONAL.some(f => features[f] !== false); const v = anyOn ? false : true; const nf = {}; OPTIONAL.forEach(f => nf[f] = v); features = { ...features, ...nf }; rerun(); }
+    else if (act === 'copy'){ const txt = JSON.stringify(readingJSON(T), null, 1); navigator.clipboard && navigator.clipboard.writeText(txt).then(() => { a.textContent = 'Copied'; setTimeout(() => { a.textContent = 'Copy trace (JSON)'; }, 1400); }, () => { a.textContent = 'Copy failed'; }); }
+    else if (act === 'dl-json'){ download(`${slugOf(T)}-reading.json`, JSON.stringify(readingJSON(T), null, 2), 'application/json'); a.textContent = 'Saved'; setTimeout(() => { a.textContent = '⤓ Reading (JSON)'; }, 1400); } };
+  const onKey = e => { if (e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') return;
+    if (!app.classList.contains('on')) return;
+    if (e.key === 'Escape') close(); else if (e.key === ' '){ e.preventDefault(); setDir(dir ? 0 : 1); }
+    else if (e.key === 'ArrowLeft'){ setDir(0); seek(k - 1); } else if (e.key === 'ArrowRight'){ setDir(0); seek(k + 1); }
+    else if (e.key === 'j' || e.key === 'J') setDir(-1); else if (e.key === 'k' || e.key === 'K') setDir(0); else if (e.key === 'l' || e.key === 'L') setDir(1);
+    else if (e.key === 'Home'){ setDir(0); seek(0); } else if (e.key === 'End'){ setDir(0); seek(N - 1); } };
+  function close(){ cancelAnimationFrame(raf); try { map.destroy && map.destroy(); } catch (e) {} app.classList.remove('on'); cur = null; }
+  const ro = new ResizeObserver(() => size());
+  app.addEventListener('click', onClick);
+  document.addEventListener('keydown', onKey);
+  speedSel.addEventListener('change', () => { speed = +speedSel.value; });
+
+  T.ev._t0 = performance.now();
+  fillSpeeds(); ro.observe(app.querySelector('.right')); size();
+  seek(0);
+  if (!matchMedia('(prefers-reduced-motion: reduce)').matches) setDir(1);
+  raf = requestAnimationFrame(loop);
+  return { close, root:app, T, seek, setTab, features:() => features };
+}
+
+// ── re-run the reading with the current layers, keeping the view; show the delta ─
+async function rerun(){
+  if (!lastRaw) return;
+  const T = await read(lastRaw, lastLabel, features, { animate:false });
+  if (cur && cur.setTab) cur.setTab(LAST_TAB);
+  showDelta(T);
+}
+function propKey(c){ return `${String(c.end1).toLowerCase()}|${String(c.label).toLowerCase()}|${String(c.end2).toLowerCase()}|${c.polarity}`; }
+function showDelta(T){
+  const el = $('p-delta'); if (!el) return;
+  if (!BASELINE){ el.hidden = true; return; }
+  const b = new Set(BASELINE.claims.map(propKey)), n = new Set(T.claims.map(propKey));
+  let lost = 0, gained = 0; b.forEach(k => { if (!n.has(k)) lost++; }); n.forEach(k => { if (!b.has(k)) gained++; });
+  const off = Object.keys(features).filter(k => features[k] === false);
+  const bs = BASELINE.stats || {}, cs = T.stats || {};
+  const parts = [];
+  if (features.furniture === false) parts.push(`furniture: <b>${cs.blanked||0}</b> chars blanked (was ${bs.blanked||0}) — markup folded as content, disclosed`);
+  if (features.pos === false) parts.push(`POS: <b>${cs.classified||0}</b> of ${cs.words||0} forms carry an attested class (was ${bs.classified||0}) — every class is now a typed gap`);
+  if (features.morph === false) parts.push(`morphology: <b>${cs.acts||0}</b> acts recovered (was ${bs.acts||0}) — same-act is exact string equality now`);
+  if (features.stance === false) parts.push(`stance: <b>${cs.positions||0}</b> positions read as a class (was ${bs.positions||0})`);
+  if (features.npSubj === false) parts.push(`noun-phrase subjects: off — subjects read only as the token before the verb`);
+  if (features.phrasal === false) parts.push(`phrasal predicates: off — a verb + particle is no longer one act`);
+  el.hidden = false;
+  el.innerHTML = off.length
+    ? `<b>layers off: ${off.join(', ')}</b> · propositions: <b>+${gained}</b> gained, <b>−${lost}</b> lost, of <b>${BASELINE.claims.length}</b> · ` + parts.join(' · ') + `. The reading re-ran, no model.`
+    : `every layer on — the full reading. Switch a layer off in the left rail to see what it was carrying.`;
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+//  READ → BUILD TRACE → OPEN
+// ═════════════════════════════════════════════════════════════════════════════
+function mapClaims(raw, analysis){
+  return (raw || []).map(c => {
+    const sp = (c.spans || [])[0] || {};
+    const hasSpan = sp.text != null && sp.text !== '';
+    const at = hasSpan ? analysis.indexOf(sp.text) : -1;
+    const s = at >= 0 ? at : (sp.start ?? 0);
+    const e = s + (hasSpan ? sp.text.length : 0);
+    const polarityMeasured = !(sp.text && /^(not|no|never|n't)\b/i.test(String(sp.text).trim()));
+    return { end1:c.end1, end2:c.end2, label:c.label, polarity:c.polarity || '+', verdict:c.verdict || 'bound',
+      reason:c.reason || '', grammar:c.grammar || null, formBased:!!c.formBased,
+      fillers:(c.cardinality && c.cardinality.fillers && c.cardinality.fillers.length) || 0,
+      standing:(c.assertion && c.assertion.standing) || 'single-witness',
+      contested:!!c.contested, corroboration:c.corroboration || null,
+      span:sp.text || '', s, e, grounded:at >= 0, hasSpan, located:hasSpan, polarityMeasured,
+      b0:hasSpan ? charToByte(analysis, s) : null, b1:hasSpan ? charToByte(analysis, e) : null,
+      tense:hasSpan ? localTense(sp.text) : { v:'unlocated', why:'the claim carried no span — nothing to place' } };
+  }).sort((a, b) => a.s - b.s || a.b0 - b.b0);
+}
+
+async function read(text, label, feat, opt = {}){
+  const raw = String(text || '');
+  if (raw.trim().length < 8){ alert('Nothing to read yet — drop a document or paste text.'); return null; }
+  await ready();
+  lastRaw = raw; lastLabel = label || 'pasted text';
+  const LIMIT = 14000;
+  const analysis = raw.length > LIMIT ? raw.slice(0, LIMIT) : raw;
+  const truncated = raw.length > LIMIT;
+  const clean = feat.furniture === false ? analysis : blankMarkup(analysis);
+  const R = await makeEngineRelationReader({ features: feat });
+  let read0 = { claims: [] };
+  try { read0 = R([{ ref:'source', text: clean }]).read(clean); } catch (e) { console.error(e); }
+  const claims = mapClaims(read0.claims, analysis);
+  const doc = { label: lastLabel, analysis, truncated };
+  const T = buildTrace(doc, clean, claims, feat, opt.extraction || null);
+  if (!BASELINE) BASELINE = T;
+  $('model').textContent = `model calls: ${T.net.models}`;
+  if (opt.animate !== false){ openTrace(T); }
+  else if (cur){ cur.close(); cur = mount(T); }
+  return T;
+}
+
+// ── WHAT KIND OF BYTES ARE THESE? A binary file decoded as text is mojibake,
+// never a reading. Sniff the magic, read a PDF's own text layer with pdf.js,
+// and refuse anything that is not text with a typed gap — never a guess.
+function sniff(buf){
+  const ascii = (o, s) => { for (let i = 0; i < s.length; i++) if (buf[o + i] !== s.charCodeAt(i)) return false; return true; };
+  if (buf.length >= 4 && ascii(0, '%PDF')) return 'pdf';
+  if (buf.length >= 4 && buf[0] === 0x89 && buf[1] === 0x50 && buf[2] === 0x4e && buf[3] === 0x47) return 'image';
+  if (buf.length >= 3 && buf[0] === 0xff && buf[1] === 0xd8 && buf[2] === 0xff) return 'image';
+  if (buf.length >= 4 && ascii(0, 'GIF8')) return 'image';
+  if (buf.length >= 12 && ascii(0, 'RIFF') && ascii(8, 'WEBP')) return 'image';
+  if (buf.length >= 2 && buf[0] === 0x42 && buf[1] === 0x4d) return 'image';
+  if (buf.length >= 12 && ascii(0, 'RIFF') && ascii(8, 'WAVE')) return 'audio';
+  if (buf.length >= 4 && (ascii(0, 'ID3') || ascii(0, 'OggS') || ascii(0, 'fLaC'))) return 'audio';
+  if (buf.length >= 2 && buf[0] === 0xff && (buf[1] & 0xe0) === 0xe0) return 'audio';
+  if (buf.length >= 8 && ascii(4, 'ftyp')) return 'video';
+  if (buf.length >= 2 && buf[0] === 0x50 && buf[1] === 0x4b) return 'archive';
+  const n = Math.min(buf.length, 4096); let nul = 0, ctrl = 0;
+  for (let i = 0; i < n; i++){ const c = buf[i]; if (c === 0) nul++; else if (c < 9 || (c > 13 && c < 32)) ctrl++; }
+  if (nul > 0 || ctrl / Math.max(1, n) > 0.10) return 'binary';
+  return 'text';
+}
+async function pdfText(buf){
+  const m = await import('https://cdn.jsdelivr.net/npm/pdfjs-dist@4.4.168/build/pdf.min.mjs');
+  m.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.4.168/build/pdf.worker.min.mjs';
+  const pdf = await m.getDocument({ data: buf.slice() }).promise;
+  const pages = Math.min(pdf.numPages, 40); let raw = '';
+  await ready();
+  for (let i = 1; i <= pages; i++){
+    const c = await (await pdf.getPage(i)).getTextContent();
+    for (const it of c.items) raw += (it.str || '') + (it.hasEOL ? '\n' : ' ');
+    raw += '\n\n';
+  }
+  return { raw, pages, numPages: pdf.numPages };
+}
+function refuse(name, kind, extra = {}){
+  $('app').classList.remove('on');
+  const M = {
+    image:['an image', 'The reading here is text. The full holodeck reads an image through its own 2D visual model and OCR (tesseract, in this browser), then folds the words — no model, no server.'],
+    audio:['audio', 'The full holodeck transcribes audio in this browser (Whisper) and reads the transcript. This page reads text only.'],
+    video:['a recording', 'The full holodeck reads a recording through its caption track or in-browser ASR. This page reads text only.'],
+    archive:['an archive (zip / office file)', 'Not a single text document — there is nothing here to read as prose.'],
+    binary:['binary', 'These bytes are not text. Decoding them as characters would only produce mojibake, so the reading names the gap rather than guessing.'],
+    'pdf-no-text':['a scanned PDF with no text layer', 'Its pages are pixels. The full holodeck reads them with its visual model + OCR; this page reads text only, so it refuses rather than invent.'],
+    'pdf-failed':['a PDF whose text layer could not be read', 'pdf.js could not be loaded (offline?). The reading names the gap.'],
+    'pdf-unreadable':['a PDF whose text does not read as words', 'The extraction did not read as words the prior holds, and no converter is available on this host. The reading names the gap rather than guessing — install poppler (pdftotext), or serve this page from the fold’s dev server, which converts with it.'],
+  }[kind] || ['not text', '—'];
+  const note = $('refuse'); note.hidden = false;
+  note.innerHTML = `<b>“${esc(name)}” is ${esc(M[0])}.</b> ${esc(M[1])}${extra.err ? ` <span class="mono">(${esc(extra.err)})</span>` : ''}${extra.numPages ? ` <span class="mono">(${extra.pages} of ${extra.numPages} pages carried no text layer)</span>` : ''}`;
+  return null;
+}
+// the platform's own converter, when the page is served by the fold's dev server (tools/serve.mjs):
+// pdftotext/textutil reconstruct WORDS from the page's glyph advances — the wheel, not reinvented.
+async function convert(buf){
+  try {
+    const r = await fetch('/convert', { method: 'POST', body: buf });
+    if (!r.ok) return null;
+    const text = await r.text();
+    return { text, converter: r.headers.get('X-Converter') || 'converter' };
+  } catch (e) { return null; }
+}
+async function readFile(file){
+  const d = $('refuse'); if (d) d.hidden = true;
+  const buf = new Uint8Array(await file.arrayBuffer());
+  const kind = sniff(buf);
+  const head = new TextDecoder('latin1').decode(buf.slice(0, 1024));
+  const isHtml = /^\s*<(?:!doctype html|html|\?xml)/i.test(head);
+  if (kind !== 'pdf' && kind !== 'text') return refuse(file.name, kind);
+  await ready();
+  const prior = { name: 'English vocabulary', giver: (PRIORS.posPrior && PRIORS.posPrior.provenance && PRIORS.posPrior.provenance.source) || 'UD/Thrax + UniMorph', known: knownWord, longest: LEXICON_LONGEST };
+  let E = null;
+  if (kind === 'pdf'){
+    // parallel readings (eigenvalues): pdf.js (local) and the platform converter; one collapses as the reading
+    E = await extractReadings({ prior, extractors: [
+      { name: 'pdf.js text layer (browser)', run: async () => (await pdfText(buf)).raw },
+      { name: 'pdftotext (poppler)', run: async () => { const c = await convert(buf); return c && c.text; } },
+    ] });
+  } else if (isHtml){
+    E = await extractReadings({ prior, extractors: [
+      { name: 'textutil (macOS)', run: async () => { const c = await convert(buf); return c && c.text; } },
+      { name: 'the browser’s own parse', run: async () => new TextDecoder().decode(buf) },
+    ] });
+  } else {
+    return run(new TextDecoder().decode(buf), file.name);
+  }
+  const chosen = E.collapsed != null ? E.readings[E.collapsed] : null;
+  if (!chosen || !chosen.text || chosen.text.trim().length < 8) return refuse(file.name, kind === 'pdf' ? 'pdf-no-text' : 'binary', {});
+  if (chosen.sniff.verdict === 'unconfirmed') return refuse(file.name, 'pdf-unreadable', { reads: chosen.sniff.reads });
+  return run(chosen.text, file.name + ' — ' + chosen.extractor, { extraction: E });
+}
+
+// ── input wiring ──
+const drop = $('drop'), file = $('file'), ta = $('ta');
+drop.addEventListener('click', () => file.click());
+file.addEventListener('change', async () => { const f = file.files[0]; if (f) readFile(f); });
+['dragenter','dragover'].forEach(e => drop.addEventListener(e, ev => { ev.preventDefault(); drop.classList.add('hot'); }));
+['dragleave','drop'].forEach(e => drop.addEventListener(e, ev => { ev.preventDefault(); drop.classList.remove('hot'); }));
+drop.addEventListener('drop', async ev => { const f = ev.dataTransfer.files && ev.dataTransfer.files[0]; if (f) return readFile(f); const t = ev.dataTransfer.getData('text'); if (t) run(t, 'dropped text'); });
+$('read').addEventListener('click', () => run(ta.value, 'pasted text'));
+$('clear').addEventListener('click', () => { ta.value = ''; });
+$('samples').addEventListener('click', e => { const s = e.target.dataset.s; if (s){ ta.value = SAMPLES[s]; run(SAMPLES[s], 'sample · ' + s); } });
+
+async function run(text, label, opt = {}){
+  const btn = $('read'); const was = btn.textContent; btn.textContent = 'reading…'; btn.disabled = true;
+  features = { ...DEFAULT_FEATURES }; BASELINE = null; LAST_TAB = 'source';
+  const d = $('p-delta'); if (d) d.hidden = true; const r = $('refuse'); if (r) r.hidden = true;
+  try { await read(text, label, features, { animate:true, extraction: opt.extraction || null }); }
+  catch (err){ alert('The reading failed: ' + (err && err.message || err)); console.error(err); }
+  finally { btn.textContent = was; btn.disabled = false; }
+}
+
+window.__demo = { read, run, json:() => (cur ? readingJSON(cur.T) : null), text:() => (cur ? diagrammedText(cur.T) : null), current:() => (cur ? cur.T : null), features:() => features, net };
+</script>
+</body>
+</html>

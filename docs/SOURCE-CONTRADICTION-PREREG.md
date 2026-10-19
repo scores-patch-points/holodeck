@@ -336,3 +336,62 @@ not a tuned threshold. Only the tonnage pair recurs (corroborated).
   gate does not yet split (neither question's terms name "capacity"). It is
   disclosed as a topic with the `differs` badge, and no try question asks it; but
   it is a named residual, not a settled contradiction.
+
+### R5 — the engine is not Titanic-only; the relation is read from grammar and decided by recurrence (2026-10-16, `topics-holograph-profile`)
+
+**The overfit.** `figsOf` read a figure's MEASURE from a hand-grown,
+corpus-specific word list (`MW`/`VB`): the budget/housing corpus's words and the
+Titanic's own casualty/nautical words. Any corpus whose figures use other verbs
+got a bare unit, stayed anchorless (`via: null`), and formed no measure topic — so
+its disagreement was never surfaced at all. Measured on an unseen corpus (the 1906
+San Francisco earthquake, three sources the engine had never read, ingested through
+the app's own `addDocs` path): "3,000 people died", "500 persons have been killed",
+"700 deaths" each read a unit but no relation and no being.
+
+**The generality measurement (falsification).** A harness (`.falsify/run.mjs`)
+opens the fold BARE (no sample), ingests the three unseen sources, and runs the
+surface's own machinery (`holoTopics` → `contradictionForTopic` → `contradictionsOf`).
+Before the fix it already found one real contradiction — `San Andreas Fault ·
+distance`, **296 · 310 miles**, corroborated — so "the engine can only investigate
+the Titanic" was already false. After the fix that contradiction is preserved **and**
+the death-toll disagreement surfaces as `San Francisco · killed people` — **300 ·
+3,000**, single-witness — read from the corpus's own verb through the vendored POS
+prior, with no Titanic vocabulary and no injected list. The Titanic's own three
+contradictions are unchanged, and its four measure topics are identical to the
+committed baseline (measured: `tonnage` 45,328/46,328/60,000 corroborated; `aboard`
+2201/2340 and `saved` 705/711 each single-witness; "How many lives were lost?" still
+the named gap).
+
+**The two failure modes measured, and the rule that avoids both.**
+
+* **Relation always in the measure key fragments a real slot.** Measured: "296
+  miles" read `felt mile` in one source and `mile` in another (two incidental
+  matrix verbs), and the San Andreas distance contradiction **vanished**.
+* **Unit alone over-folds different referents.** Measured: deaths and homelessness
+  folded into one `San Francisco · people` slot (300/3,000/300,000/40,000/16,448) —
+  the E1 false contradiction the whole design exists to prevent.
+* **The rule (the codebase's own "nominate, never decide").** A relation
+  **nominates**; cross-source **recurrence decides**. A relation qualifies the
+  measure and EARNS the being only when ≥2 sources carry it for the same being+unit;
+  an incidental verb one source happens to use does not. And a unit that already
+  NAMES a measure (`UNIT_TOPIC`: ton→tonnage, mile→distance) **is** the measure, so a
+  verb may supply one only for a count noun the sources share ("people") or a
+  unit-less figure. `figureRelation` reads the verb from the vendored POS prior
+  (`pos-eng.json`), so a corpus the engine has never seen reads its own verbs; the
+  `MW`/`VB` list and the source's own label still NOMINATE (witness knowledge), never
+  decide.
+
+**What remains open (named, not guessed).**
+
+* **A bare counted head noun reads no relation.** "700 deaths" — the POS prior tags
+  *death* a NOUN, and the reader invents no list word for it. A corpus that names its
+  disagreement only through a noun head ("700 deaths" vs "3,000 deaths") is a NAMED
+  GAP, not a folded contradiction. This is the honest refusal, not a miss to paper
+  over with a word list.
+* **The witness list is still hardcoded in `figsOf`.** It nominates (recurrence
+  decides) so it cannot mint a slot alone, but making it an injected per-corpus prior
+  — the same shape as the synonym prior `contradictionsOf` already takes — is the next
+  honest step if a corpus needs a word the engine cannot read.
+* **The residual `R.M.S. Titanic · passengers`** (2208 vs 2500, complement vs
+  capacity) is unchanged: recurrence does not separate them and no try question asks
+  it.
