@@ -234,6 +234,22 @@
   .insp .lkq button{all:unset;cursor:pointer;font:600 12.5px var(--sans);color:var(--ink);padding:6px 11px;border:1px solid var(--acc);border-radius:6px}.insp .lkq button[disabled]{opacity:.4;cursor:not-allowed;border-color:var(--line2)}
   .insp .ent{padding:3px 0 5px;font:13px/1.45 var(--sans)}.insp .ent a,.insp .st a{color:var(--blue)}.insp .nom{font:12px/1.8 var(--mono)}.insp .nom em{color:var(--acc);font-style:normal}
   .insp .lgl{font:11.5px/1.7 var(--mono);color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.insp .lgl .dim{color:var(--dim)}
+  /* referents: a table; ids shown; spans are not what a referent is */
+  .insp .rtw{padding:2px 10px 6px;overflow-x:auto}
+  .insp .rtbl{width:100%;border-collapse:collapse;font:12.5px/1.4 var(--sans)}
+  .insp .rtbl th{position:sticky;top:0;text-align:left;font:600 10.5px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--dim);padding:5px 6px;border-bottom:1px solid var(--line);background:var(--bg);white-space:nowrap}
+  .insp .rtbl th[data-sort]{cursor:pointer}.insp .rtbl th.on{color:var(--ink)}
+  .insp .rtbl td{padding:5px 6px;border-bottom:1px solid var(--line);vertical-align:top}.insp .rtbl .num{text-align:right;white-space:nowrap}
+  .insp .rtbl tbody tr{cursor:pointer}.insp .rtbl tbody tr:hover{background:var(--sel)}.insp .rtbl tr.sel{background:var(--sel);box-shadow:inset 3px 0 0 var(--acc)}
+  .insp .rtbl .idc{color:var(--ink2);font-size:11.5px;white-space:nowrap}.insp .rtbl .nm{color:var(--ink);font-weight:500;min-width:90px}.insp .rtbl .srf{color:var(--dim);font-size:11px;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .insp .rtbl .sw{display:inline-block;width:10px;height:10px;border-radius:3px}.insp .rtbl .dim,.insp .dim{color:var(--dim)}.insp .more{padding:4px 8px;font-size:11.5px}.insp .more a{cursor:pointer;color:var(--blue);text-decoration:underline}
+  .insp .rprof{padding:6px 16px 22px;border-top:1px solid var(--line);margin-top:8px}.insp .rph{display:flex;align-items:center;gap:8px;padding-top:8px;font:600 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--dim)}
+  .insp .rph .sw{display:inline-block;width:12px;height:12px;border-radius:3px}.insp .rph .big{font:600 14px var(--mono);letter-spacing:0;text-transform:none;color:var(--ink);word-break:break-all}
+  .insp .rpn{font:500 20px/1.3 var(--serif);color:var(--ink);padding:4px 0 2px}.insp .rprof .why{padding:2px 0 8px}
+  .insp .rprof select{background:var(--panel);color:var(--ink);border:1px solid var(--line2);border-radius:5px;padding:3px 5px;font:12px var(--sans);max-width:100%}
+  .insp .rtbl.m td,.insp .rtbl.m th{font-size:12px}.insp .rtbl.m tr[data-span]{cursor:default}.insp .rtbl.m tr.sel{box-shadow:inset 3px 0 0 var(--acc)}
+  .insp .you{font:12px/1.8 var(--sans);color:var(--ink2)}.insp .you button{all:unset;cursor:pointer;color:var(--blue);text-decoration:underline;margin-left:6px;font:12px var(--sans)}.insp .small{font-size:11px;color:var(--dim)}
+  .lens .txt .mn{box-shadow:inset 0 -3px 0 var(--rc);cursor:pointer}.lens .txt .mn.sel{background:color-mix(in srgb, var(--rc) 22%, transparent)}.lens .txt .pick{outline:2px dashed var(--acc);outline-offset:1px;border-radius:2px}
   @media (min-width:1200px){
     .body{grid-template-columns:300px minmax(0,1fr) minmax(340px,400px)}
     .right{grid-template-rows:auto minmax(0,1fr) auto;min-width:0}
@@ -380,7 +396,7 @@ import { classifyForm, lookupForm, documentClassifier } from '../holodeck-surfac
 import { extractSurfaces, discoverReferents, diaNorm } from '../vendor/eoreader7/native/adapters/text/surfaces.js';
 import { sha256 } from '../vendor/eoreader7/native/kernel/sha256.js';
 import { resolvePronouns } from '../vendor/eoreader7/native/adapters/text/pronouns.js';
-import { buildReadingTimeline } from '../vendor/eoreader7/native/adapters/text/reading-timeline.js';
+import { buildReadingTimeline, foldLog, CELLS } from '../vendor/eoreader7/native/adapters/text/reading-timeline.js';
 import { makeLookup } from '../holodeck-lookup.js';
 import { sha256Hex, stableProvenanceId, byteRange, EotLedger } from '../vendor/fold-chat/fold-chat-eot.js';
 
@@ -716,6 +732,10 @@ function openTrace(T){ if (cur) cur.close(); cur = mount(T); return cur; }
 
 function mount(T){
   const ev = T.ev; let N = ev.length;
+  // every listener this mount puts on a PERSISTENT element (the app, the document, the lens, the lanes, the inspector, the tabs, the ribbon)
+  // is bound to this signal and removed when the mount closes — otherwise each document read stacks another set and the old ones fire too
+  const ac = new AbortController();
+  const bind = (el, type, fn, opt) => el.addEventListener(type, fn, { ...(opt && typeof opt === 'object' ? opt : {}), signal: ac.signal });
   const app = $('app'); app.classList.add('on');
   const rowsEl = app.querySelector('.rows'), sz = app.querySelector('.sz'), nowEl = $('p-now'), lens = $('p-lens'), pane = $('p-pane');
   const statsEl = $('p-stats'), metaEl = $('p-meta'), rc = app.querySelector('.rib canvas'), rdEl = $('p-rd'), speedSel = $('p-speed'), keyEl = $('p-key'), spineEl = $('spine');
@@ -801,26 +821,50 @@ function mount(T){
     const e = ev[k], S0 = L[e.stage] || { label:e.stage, color:'--dim' }, dt = k ? e.t - ev[k-1].t : e.t;
     nowEl.innerHTML = `<div class="k" style="color:var(${S0.color})">layer ${S0.i + 1} of ${LAYERS.length} · ${esc(S0.label)} · ${esc(e.kind)} · +${ms(dt)} ms</div><p>${esc(e.msg)}</p>`;
   }
-  rowsEl.addEventListener('scroll', () => { if (!dir) renderLog(false); });
-  rowsEl.addEventListener('click', e => { const r = e.target.closest('.row-ev'); if (r){ setDir(0); seek(+r.dataset.i); } });
+  bind(rowsEl, 'scroll', () => { if (!dir) renderLog(false); });
+  bind(rowsEl, 'click', e => { const r = e.target.closest('.row-ev'); if (r){ setDir(0); seek(+r.dataset.i); } });
 
   // ── lens ──
   function renderLens(St){
     const e = ev[k], at = (e.s != null && e.s > 0) ? e.s : (St.on ? St.on.s : 0);
     const wideNow = matchMedia('(min-width:1200px)').matches; const a = Math.max(0, at - (wideNow ? 700 : 300)), b = Math.min(T.doc.analysis.length, at + (wideNow ? 1900 : 760));
+    const pack = getPack(), MEN = [];
+    if (pack) for (const m of pack.fold.mentions.values()){ const raw = pack.fold.assign.get(m.id), ref = raw ? pack.fold.resolve(raw) : null; if (ref && pack.fold.referents.has(ref) && m.e > a && m.s < b) MEN.push({ ...m, ref }); }
     const cuts = new Set([a, b]); const M = St.marks.filter(m => m.e > a && m.s < b);
     M.forEach(m => { cuts.add(Math.max(a, m.s)); cuts.add(Math.min(b, m.e)); });
+    MEN.forEach(m => { cuts.add(Math.max(a, m.s)); cuts.add(Math.min(b, m.e)); });
     const cur = (e.s != null && e.e != null && e.e > e.s) ? e : null; if (cur){ cuts.add(Math.max(a, cur.s)); cuts.add(Math.min(b, cur.e)); }
+    if (selSpan){ cuts.add(Math.max(a, selSpan.s)); cuts.add(Math.min(b, selSpan.e)); }
     const P = [...cuts].sort((x, y) => x - y); let h = a ? '…' : '';
     for (let i = 0; i < P.length - 1; i++){ const x = P[i], y = P[i+1]; if (y <= x) continue; const cls = new Set();
       M.forEach(m => { if (m.s <= x && m.e >= y && m.cls) cls.add(m.cls); });
       if (St.on && St.on.s <= x && St.on.e >= y && cls.has('s')) cls.add('on');
       if (cur && cur.s <= x && cur.e >= y) cls.add('hit');
-      const t = T.doc.analysis.slice(x, y); h += cls.size ? `<span class="${[...cls].join(' ')}">${esc(t)}</span>` : esc(t); }
-    lens.innerHTML = `<div class="doc">${esc(T.doc.label)} · characters ${a.toLocaleString()}–${b.toLocaleString()} of ${T.doc.analysis.length.toLocaleString()} · the marks are the layers that reached these bytes</div><div class="txt">${h}${b < T.doc.analysis.length ? '…' : ''}</div>`;
+      const mn = MEN.find(m => m.s <= x && m.e >= y);
+      let attrs = ` data-s="${x}" data-e="${y}"`;
+      if (mn){ cls.add('mn'); if (mn.ref === selRef) cls.add('sel'); attrs += ` data-ref="${mn.ref}" data-mid="${mn.id}" style="--rc:${colOfRef(pack, mn.ref)}" title="${esc(mn.ref)} · ${esc((pack.fold.referents.get(mn.ref) || {}).name || '')} — this span is ${esc(mn.id)}; the referent is not defined by it"`; }
+      if (selSpan && selSpan.s <= x && selSpan.e >= y) cls.add('pick');
+      const t = T.doc.analysis.slice(x, y); h += `<span class="${[...cls].join(' ')}"${attrs}>${esc(t)}</span>`; }
+    lens.innerHTML = `<div class="doc">${esc(T.doc.label)} · characters ${a.toLocaleString()}–${b.toLocaleString()} of ${T.doc.analysis.length.toLocaleString()} · the marks are the layers that reached these bytes${pack ? ' · coloured underline = a referent (select any span to open its profile)' : ''}</div><div class="txt">${h}${b < T.doc.analysis.length ? '…' : ''}</div>`;
     const hit = lens.querySelector('.hit') || lens.querySelector('.on'); if (hit && dir) hit.scrollIntoView({ block:'nearest' });
   }
-
+  // select in the hero document → the right panel pivots to that referent (or says the span is no referent's)
+  function selectionRange(){
+    const sel = getSelection(); if (!sel || sel.isCollapsed || !sel.anchorNode || !lens.contains(sel.anchorNode)) return null;
+    const off = (node, o) => { const el = node.nodeType === 3 ? node.parentElement : node; const sp = el && el.closest && el.closest('[data-s]'); return sp ? +sp.dataset.s + Math.min(o, +sp.dataset.e - +sp.dataset.s) : null; };
+    const a = off(sel.anchorNode, sel.anchorOffset), b = off(sel.focusNode, sel.focusOffset);
+    return (a == null || b == null || a === b) ? null : [Math.min(a, b), Math.max(a, b)];
+  }
+  function pivotTo(ref, mid){ selRef = ref; selSpan = null; inspTab = LAST_INSP = 'referents'; lastViewKey = ''; if (mid) selMention = mid; renderInsp(ev[k]); renderLens(stateAt(k)); const row = inspEl.querySelector(`tr[data-ref="${ref}"]`); if (row) row.scrollIntoView({ block:'nearest' }); }
+  function pivotSpan(s0, e0){
+    const pack = getPack(); if (!pack){ return; }
+    let best = null, bo = 0;
+    for (const m of pack.fold.mentions.values()){ const raw = pack.fold.assign.get(m.id), ref = raw ? pack.fold.resolve(raw) : null; if (!ref) continue; const o = Math.min(e0, m.e) - Math.max(s0, m.s); if (o > bo){ bo = o; best = { ref, mid:m.id }; } }
+    if (best) return pivotTo(best.ref, best.mid);
+    selRef = null; selSpan = { s:s0, e:e0, text:T.doc.analysis.slice(s0, e0) }; inspTab = LAST_INSP = 'referents'; lastViewKey = ''; renderInsp(ev[k]); renderLens(stateAt(k));
+  }
+  bind(lens, 'mouseup', () => { const r = selectionRange(); if (r) pivotSpan(r[0], r[1]); });
+  bind(lens, 'click', e2 => { const sel = getSelection(); if (sel && !sel.isCollapsed) return; const m = e2.target.closest('[data-ref]'); if (m) pivotTo(m.dataset.ref, m.dataset.mid); });
 
   // ── wide screens: the sentence lane by lane, and the inspector for the selected step ──
   const lanesEl = $('p-lanes'), inspEl = $('p-insp'), drawer = $('p-drawer'), dtBtn = $('p-dt');
@@ -832,7 +876,7 @@ function mount(T){
     else if (e.stage === 'morph' && e.s != null && tokAt.get(e.s)){ const t = tokAt.get(e.s); t.m = e.data; t.im = i; lookupIdx.push(i); }
   });
   const setDrawer = on => { drawer.classList.toggle('open', on); dtBtn.setAttribute('aria-expanded', String(on)); dtBtn.textContent = (on ? '▾' : '▸') + ' Details'; };
-  dtBtn.addEventListener('click', () => setDrawer(!drawer.classList.contains('open')));
+  bind(dtBtn, 'click', () => setDrawer(!drawer.classList.contains('open')));
   const classLabel = g => { if (!g || !g.found) return null; const c = g.candidates[0]; return c ? c.upos : null; };
   function renderLanes(e){
     const at = e.s != null ? e.s : (T.sents[0] ? T.sents[0].offset : 0);
@@ -856,7 +900,7 @@ function mount(T){
     lanesEl.innerHTML = `<div class="h">the sentence being read, lane by lane — word · class · act</div>${rowFor(si - 1, false)}${rowFor(si, true)}${rowFor(si + 1, false)}<div class="lg">class lane = the class prior · “+” ambiguous · ·lexicon / ·shape / ·doc / ·lemma name the giver when it was not the treebank · act lane = UniMorph prior or the rule · click any word to jump to its lookup</div>`;
     const c = lanesEl.querySelector('.col.cur'); if (c && dir) c.scrollIntoView({ block:'nearest', inline:'nearest' });
   }
-  lanesEl.addEventListener('click', ev2 => { const c = ev2.target.closest('.col'); if (c){ setDir(0); seek(+c.dataset.i); } });
+  bind(lanesEl, 'click', ev2 => { const c = ev2.target.closest('.col'); if (c){ setDir(0); seek(+c.dataset.i); } });
 
   const GIVERS = () => {
     const P = PRIORS.posPrior || {}, pv = P.provenance || {}, mv = (PRIORS.morphRaw && PRIORS.morphRaw.provenance) || {}, lv = (P.lexicon && P.lexicon.provenance) || {};
@@ -901,13 +945,33 @@ function mount(T){
     const recent = lookupIdx.slice(Math.max(0, j - 7), j).reverse().map(i => { const x = ev[i]; const g = x.data || {}; const out = x.stage === 'grammar' ? (g.found ? classLabel(g) + (g.via && g.via.length ? ' ·' + (g.via.find(v => ['lexicon','shape','lemma','document-evidence'].includes(v.step)) || g.via[0]).step.replace('document-evidence','doc') : '') : 'gap') : ((g.lemmas && g.lemmas[0]) || (g.stems && g.stems[0]) || '—'); return `<div class="r" data-i="${i}"><span>${x.stage === 'grammar' ? 'class' : 'act'}</span><b>${esc(g.w)}</b><span>→ ${esc(out)}</span></div>`; }).join('');
     return `<div class="ih"><div class="k" style="color:var(${S0.color})">layer ${S0.i + 1} of ${LAYERS.length} · ${esc(S0.label)} · ${esc(e.kind)} · +${ms(dt)} ms</div><div class="ttl">${ttl}</div><div class="sub">${e.s != null && e.e != null && e.e > e.s ? 'characters ' + e.s.toLocaleString() + '–' + e.e.toLocaleString() + ' · ' : ''}step ${(k + 1).toLocaleString()} of ${N.toLocaleString()}</div></div>${body}${recent ? `<div class="rec"><div class="n" style="font:600 10.5px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--dim);padding-bottom:4px">recent lookups</div>${recent}</div>` : ''}`;
   }
-  inspEl.addEventListener('click', ev2 => { const r = ev2.target.closest('.r'); if (r){ setDir(0); seek(+r.dataset.i); } });
+  bind(inspEl, 'click', ev2 => { const r = ev2.target.closest('.r'); if (r){ setDir(0); seek(+r.dataset.i); } });
   // ── the reading over time: the WHOLE text is always on screen; what changes is the READING of it ──
-  const INSP_TABS = [['reading', 'Reading'], ['lookup', 'Look up'], ['plain', 'Plain'], ['diagram', 'Diagrammed'], ['json', 'JSON'], ['why', 'Why this step']];
+  const INSP_TABS = [['reading', 'Reading'], ['referents', 'Referents'], ['lookup', 'Look up'], ['plain', 'Plain'], ['diagram', 'Diagrammed'], ['json', 'JSON'], ['why', 'Why this step']];
   let inspTab = LAST_INSP, tf = -1, tfTimer = 0, lastViewKey = '';
+  // ── referents: ids, the fold at the frontier, and what the person has appended on top of it ──
+  const overlay = T.overlay || (T.overlay = []);   // a person's own INS / CON / SYN events — the reader's log is never edited
+  let selMention = null, selRef = null, selSpan = null, refSort = { key:'mentions', dir:-1 }, packKey = '', packVal = null;
+  const canonJ = x => JSON.stringify(x, (_k, v) => (v && typeof v === 'object' && !Array.isArray(v) ? Object.fromEntries(Object.keys(v).sort().map(kk => [kk, v[kk]])) : v));
+  const mkEv = body => { const h = sha256(canonJ(body)).slice(0, 16), e0 = { id:'evt_' + h, ...body }; if (body.op === 'INS' && body.kind === 'referent') e0.ref = 'ref_' + h; return e0; };
+  const shortId = id => id ? id.slice(0, 4 + 8) + '…' : '—';
+  function getPack(){
+    const TL = T.timeline; if (!TL || !TL.snapshots || !TL.snapshots.length) return null;
+    const i = tfIdx(), sn = TL.snapshots[i], key = i + '|' + overlay.length + '|' + (overlay.length ? overlay[overlay.length - 1].id : '');
+    if (key === packKey && packVal) return packVal;
+    const fold = foldLog(TL.log.slice(0, sn.logTo), { overlay });
+    const order = [...fold.referents.values()].sort((a, b) => (a.born ?? 0) - (b.born ?? 0) || (a.id < b.id ? -1 : 1));
+    packKey = key; packVal = { TL, sn, i, fold, idx:new Map(order.map((r, j) => [r.id, j])) };
+    return packVal;
+  }
+  const colOfRef = (pack, ref) => (pack && ref != null && pack.idx.has(ref)) ? REFCOL[pack.idx.get(ref) % REFCOL.length] : 'var(--dim)';
+  const rootOf = (pack, ref) => (pack && ref) ? pack.fold.resolve(ref) : null;
+  const sentenceOf = (TL, at) => TL.sentences.findIndex(x => x.offset <= at && at < x.end) + 1;
+  const spanIdOf = (TL, s0, e0) => 'spn_' + sha256(`${TL.sourceId}|${s0}|${e0}`).slice(0, 16);
+
   const REFCOL = ['#5aa9ff', '#c68bff', '#ffb454', '#6ee7a8', '#ff8fa3', '#7fe0e0', '#d6e36b', '#f29de4'];
   const tfIdx = () => { const TL = T.timeline; if (!TL || !TL.snapshots.length) return -1; return tf < 0 ? TL.snapshots.length - 1 : Math.min(tf, TL.snapshots.length - 1); };
-  T.onTimeline = () => { lastViewKey = ''; if (wide.matches) renderInsp(ev[k]); };
+  T.onTimeline = () => { lastViewKey = ''; packKey = ''; if (wide.matches){ renderInsp(ev[k]); renderLens(stateAt(k)); } };
   const refKey = n => String(n || '').toLowerCase().split(/\s+/).pop();
   const stopTL = () => { if (tfTimer){ clearInterval(tfTimer); tfTimer = 0; } };
   const refsFromClaims = claims => { const refs = new Map(); for (const c of claims) for (const nm of [c.end1, c.end2]) { if (!nm) continue; const kk = String(nm); const r = refs.get(kk) || { n:kk, c:0, s:c.s, e:c.e, b0:c.b0 }; r.c++; if (c.s < r.s){ r.s = c.s; r.e = c.e; r.b0 = c.b0; } refs.set(kk, r); } return refs; };
@@ -950,37 +1014,37 @@ function mount(T){
     const i = tfIdx(), sn = TL.snapshots[i], m = TL.snapshots.length, text = T.doc.analysis, readUpTo = TL.sentences[sn.frontier - 1].end;
     const tok = new Map(sn.tokens.map(t => [t.s, t]));
     const revAt = new Map(); sn.revisions.forEach(r => { (revAt.get(r.s) || revAt.set(r.s, []).get(r.s)).push(r); });
-    const keys = []; sn.referents.forEach(r => { const kk = refKey(r.name); if (kk && !keys.includes(kk)) keys.push(kk); });
-    const colOf = n => REFCOL[Math.max(0, keys.indexOf(refKey(n))) % REFCOL.length];
+    const pack = getPack(); const fold = pack.fold;
+    const MENS = [...fold.mentions.values()].map(m => { const raw = fold.assign.get(m.id), ref = raw ? fold.resolve(raw) : null, R = ref ? fold.referents.get(ref) : null; return { ...m, ref, name: R ? R.name : null }; });
     const wm = new Map();
-    for (const mt of sn.mentions) for (const w of TL.words) if (w.s >= mt.s && w.e <= mt.e) wm.set(w.s, { mt });
+    for (const mt of MENS) for (const w of TL.words) if (w.s >= mt.s && w.e <= mt.e && (mt.ref || mt.kind === 'pronoun')) wm.set(w.s, { mt });
     let h = '', pos = 0;
     for (const w of TL.words){
       if (w.s > pos) h += esc(text.slice(pos, w.s));
       const t = tok.get(w.s), read = w.s < readUpTo, men = wm.get(w.s), rv = revAt.get(w.s);
       let u = '', tag = '·', tip = read ? '' : 'not read yet';
       if (t){ u = t.upos || 'gap'; tag = t.upos ? t.upos + (t.ambiguous ? '+' : '') : 'no entry'; tip = `${t.upos || 'no entry'}${t.attested && t.attested !== 'treebank' ? ' · ' + t.attested : ''}${t.via && t.via.length ? ' · via ' + t.via.join(' + ') : ''}`; if (t.attested === 'document') tag += '·doc'; else if (t.attested === 'lexicon') tag += '·lex'; else if (t.attested === 'dictionary') tag += '·dict'; else if (t.attested === 'wikidata') tag += '·wd'; }
-      if (men && men.mt.kind === 'pronoun'){ tag = men.mt.name ? '→ ' + men.mt.name : '→ ?'; tip += ` · pronoun ${men.mt.name ? 'bound to ' + men.mt.name : 'unresolved — the engine could not bind it'}`; }
-      else if (men) tip += ` · mention of ${men.mt.name || '?'}`;
+      if (men && men.mt.kind === 'pronoun'){ tag = men.mt.name ? '→ ' + men.mt.name : '→ ?'; tip += ` · pronoun ${men.mt.name ? 'CON’d to ' + men.mt.name + ' (' + men.mt.ref + ')' : 'unresolved — the engine could not bind it'} · span ${men.mt.id}`; }
+      else if (men) tip += ` · mention of ${men.mt.name || '?'} · ${men.mt.ref} · span ${men.mt.id}`;
       if (rv) tip += ' · ' + rv.map(r => `REVISED (${r.kind}): ${r.from} ⇒ ${r.to}`).join(' · ');
-      h += `<span class="w${read ? '' : ' un'}${rv ? ' rev' : ''}${men ? ' men' + (men.mt.kind === 'pronoun' ? ' pron' : '') : ''}" data-s="${w.s}" data-u="${u}"${men ? ` style="--rc:${colOf(men.mt.name)}"` : ''} title="${esc(tip)}"><span class="tx">${esc(text.slice(w.s, w.e))}</span><i class="tg">${read ? esc(tag) : ''}</i></span>`;
+      h += `<span class="w${read ? '' : ' un'}${rv ? ' rev' : ''}${men ? ' men' + (men.mt.kind === 'pronoun' ? ' pron' : '') : ''}" data-s="${w.s}" data-u="${u}"${men ? ` style="--rc:${colOfRef(pack, men.mt.ref)}" data-ref="${men.mt.ref || ''}"` : ''} title="${esc(tip)}"><span class="tx">${esc(text.slice(w.s, w.e))}</span><i class="tg">${read ? esc(tag) : ''}</i></span>`;
       pos = w.e;
     }
     h += esc(text.slice(pos));
     const revs = sn.revisions.map((r, j) => `<div class="rvi" data-rs="${r.s}"><span class="kd k-${r.kind}">${esc(r.kind === 'pos' ? 'class' : r.kind)}</span><b>${esc(r.text)}</b><span class="ft">${esc(r.from)} <em>⇒</em> ${esc(r.to)}</span><span class="bc">because statement ${r.because.sentence}${r.because.kinds ? ' · ' + esc(r.because.kinds.join(' + ')) : ''}</span></div>`).join('');
     const up = TL.snapshots.slice(0, i + 1).reduce((n, x) => n + x.revisions.length, 0);
-    const refl = sn.referents.map(r => `<span class="rf" style="--rc:${colOf(r.name)}"><b>${esc(r.name)}</b> ${r.surfaces.length > 1 ? '<em>(' + esc(r.surfaces.join(' = ')) + ')</em> ' : ''}×${r.mentions}</span>`).join('');
-    const unres = sn.mentions.filter(x => x.kind === 'pronoun' && !x.name).length;
+    const unres = MENS.filter(x => x.kind === 'pronoun' && !x.ref).length;
     return `<div class="tl"><button type="button" data-tl="start" title="Before anything is read">|◀</button><button type="button" data-tl="back" title="One statement back">◀</button><input type="range" min="0" max="${m - 1}" value="${i}" aria-label="How much of the text has been read"><button type="button" data-tl="fwd" title="One statement on">▶</button><button type="button" data-tl="play" class="pl">${tfTimer ? '❚❚ Pause' : '▶ Watch it being read'}</button></div>
       <div class="tls">read through statement <b>${sn.frontier}</b> of <b>${TL.sentences.length}</b>${TL.stride > 1 ? ` <span class="mono">(every ${TL.stride}th statement)</span>` : ''} · ${sn.claims.length} propositions · ${sn.referents.length} referents · <b>${up}</b> revision${up === 1 ? '' : 's'} so far</div>
       <div class="rt">${h}</div>
       <div class="rsec"><div class="rh2">revised by what was just read ${sn.revisions.length ? '' : '<span class="mono">— nothing earlier changed at this step</span>'}</div>${revs}</div>
-      <div class="rsec"><div class="rh2">referents as of now${unres ? ` <span class="mono">· ${unres} pronoun${unres === 1 ? '' : 's'} the engine could not bind</span>` : ''}</div><div class="rfs">${refl || '<span class="mono">none established yet</span>'}</div></div>
+      <div class="rsec"><div class="rh2">referents as of now${unres ? ` <span class="mono">· ${unres} pronoun${unres === 1 ? '' : 's'} the engine could not bind</span>` : ''}</div><div class="rtw">${refTable(pack, { limit:8, compact:true })}</div></div>
       <div class="legend mono">underline = class (blue noun · violet name · green verb · amber adjective) · colour bar = referent · ↺ flash = revised by later reading · dim = not read yet · click a word to jump the pipeline to it</div>`;
   }
   function renderInsp(e){
     const tabs = `<div class="itabs" role="tablist" aria-label="Right panel">${INSP_TABS.map(([id, lab]) => `<button type="button" role="tab" data-itab="${id}" aria-selected="${id === inspTab}">${lab}</button>`).join('')}</div>`;
     if (inspTab === 'why'){ lastViewKey = ''; inspEl.innerHTML = tabs + whyHTML(e); return; }
+    if (inspTab === 'referents'){ const key = `refs|${T.timeline ? tfIdx() : 'x'}|${overlay.length}|${selRef}|${selMention}|${selSpan ? selSpan.s + '-' + selSpan.e : ''}|${refSort.key}${refSort.dir}|${LOOKUP.count()}`; if (key === lastViewKey && inspEl.querySelector('.rtw')) return; lastViewKey = key; const keep = inspEl.scrollTop; inspEl.innerHTML = tabs + `<div class="rd refv">${refsHTML()}</div>`; inspEl.scrollTop = keep; return; }
     if (inspTab === 'lookup'){ lastViewKey = ''; const keep = inspEl.scrollTop, had = (inspEl.querySelector('#lk-in') || {}).value; inspEl.innerHTML = tabs + `<div class="rd lkv">${lookupHTML(e)}</div>`; inspEl.scrollTop = keep; return; }
     const key = `${inspTab}|${T.timeline ? tfIdx() : 'x'}|${tfTimer ? 'p' : ''}`;
     if (key === lastViewKey && inspEl.querySelector('.rv, .rd')) return;      // the layer cursor moving does not change the reading
@@ -1030,16 +1094,118 @@ function mount(T){
     lkBusy = `${words.length} looked up — re-reading with what came back…`; lastViewKey = ''; renderInsp(ev[k]);
     rebuildTL(); lkBusy = '';
   }
-  inspEl.addEventListener('change', ev2 => { if (ev2.target.matches('[data-lkon]')){ LOOKUPS_ON = ev2.target.checked; lastViewKey = ''; renderInsp(ev[k]); } });
-  inspEl.addEventListener('click', ev2 => {
+  bind(inspEl, 'change', ev2 => { if (ev2.target.matches('[data-lkon]')){ LOOKUPS_ON = ev2.target.checked; lastViewKey = ''; renderInsp(ev[k]); } });
+  bind(inspEl, 'click', ev2 => {
     const b = ev2.target.closest('[data-lk]'); if (!b || b.disabled) return;
     if (b.dataset.lk === 'look'){ const w = bareWord((inspEl.querySelector('#lk-in') || {}).value); if (w){ selWord = w; doLook([w]); } }
     else if (b.dataset.lk === 'batch') doLook(unplacedForms().slice(0, 12));
   });
 
+
+  // ── Referents: a TABLE of beings (hash ids) — each a row; a row opens its profile; its spans are CON'd to it, never what it is ──
+  const sortVal = { id:r => r.id, name:r => (r.name || '').toLowerCase(), mentions:r => r.mentions.length, born:r => r.born ?? 0 };
+  function lookedUp(r){ const rec = r.name ? LOOKUP.get(r.name) : null; if (!rec) return '<span class="dim">—</span>'; const wd = rec.wikidata; const bits = []; if (rec.dictionary && rec.dictionary.found) bits.push('dict'); if (rec.wikipedia && rec.wikipedia.found) bits.push('wiki'); if (wd && wd.found) bits.push(`Q×${wd.candidates.length}`); return bits.length ? esc(bits.join(' · ')) : '<span class="dim">looked up: none</span>'; }
+  function refRows(pack){
+    return [...pack.fold.referents.values()].map(r => ({ ...r, np:r.mentions.filter(m => m.kind === 'pronoun').length }));
+  }
+  function refTable(pack, { limit = 0, compact = false } = {}){
+    const rows = refRows(pack), key = sortVal[refSort.key] || sortVal.mentions;
+    rows.sort((a, b) => { const x = key(a), y = key(b); return (x < y ? -1 : x > y ? 1 : 0) * refSort.dir || (a.id < b.id ? -1 : 1); });
+    const shown = limit ? rows.slice(0, limit) : rows;
+    const th = (k, lab, cls = '') => `<th class="${cls}${refSort.key === k ? ' on' : ''}" ${compact ? '' : `data-sort="${k}"`}>${lab}${refSort.key === k && !compact ? (refSort.dir < 0 ? ' ▾' : ' ▴') : ''}</th>`;
+    const body = shown.map(r => {
+      const notes = [r.absorbed.length ? `⊕ ${r.absorbed.length} merged in` : '', r.giver === 'you' ? 'yours' : ''].filter(Boolean).join(' · ');
+      return `<tr data-ref="${r.id}" class="${r.id === selRef ? 'sel' : ''}"><td><span class="sw" style="background:${colOfRef(pack, r.id)}"></span></td><td class="mono idc" title="${esc(r.id)}">${esc(shortId(r.id))}</td><td class="nm">${esc(r.name || '—')}</td><td class="num">${r.mentions.length}${r.np ? `<span class="dim"> (${r.np} pron.)</span>` : ''}</td>${compact ? '' : `<td class="srf mono">${esc(r.surfaces.slice(0, 4).join(' · '))}${r.surfaces.length > 4 ? ' …' : ''}</td><td class="num">s${r.born ?? '—'}</td><td>${notes ? esc(notes) : '<span class="dim">—</span>'}</td><td>${lookedUp(r)}</td>`}</tr>`;
+    }).join('');
+    return `<table class="rtbl"><thead><tr><th></th>${th('id', 'id')}${th('name', 'name')}${th('mentions', 'mentions', 'num')}${compact ? '' : `<th>surfaces</th>${th('born', 'born', 'num')}<th>history</th><th>looked up</th>`}</tr></thead><tbody>${body || `<tr><td colspan="8" class="dim">no referent established yet</td></tr>`}</tbody></table>${limit && rows.length > limit ? `<div class="mono dim more">+ ${rows.length - limit} more — <a data-itab="referents">all ${rows.length} in the Referents tab</a></div>` : ''}`;
+  }
+  const opt = (pack, exceptRef) => [...pack.fold.referents.values()].filter(r => r.id !== exceptRef).sort((a, b) => b.mentions.length - a.mentions.length).slice(0, 80).map(r => `<option value="${r.id}">${esc(shortId(r.id))} · ${esc(r.name || '—')} (×${r.mentions.length})</option>`).join('');
+  function refProfile(pack){
+    const TL = pack.TL, f = pack.fold;
+    if (!selRef){
+      if (selSpan) return `<div class="rprof"><div class="rph">no referent at this span</div><div class="why">“${esc(selSpan.text.slice(0, 120))}” <span class="mono">[${selSpan.s}–${selSpan.e}] · ${esc(spanIdOf(TL, selSpan.s, selSpan.e))}</span><br>It is a span with an id, and no referent has been CON’d to it — the reading did not take it for a mention of anything it has established. You can make it one:</div><div class="lkq"><button type="button" data-rf="newspan">Make a referent from this span</button><select data-rf="connectspan"><option value="">connect it to an existing referent…</option>${opt(pack, null)}</select></div></div>`;
+      return `<div class="rprof"><div class="why">Select a row, or select text in the document, to open that referent’s profile.</div></div>`;
+    }
+    const root = f.resolve(selRef), r = f.referents.get(root);
+    if (!r) return `<div class="rprof"><div class="why">${esc(selRef)} is no longer a referent of its own.</div></div>`;
+    const mine = overlay.filter(x => x.giver === 'you');
+    const mrows = r.mentions.map(m => {
+      const hist = f.history.get(m.id) || [], last = hist[hist.length - 1];
+      const tip = hist.map(h => `s${h.frontier} · ${h.giver || 'reader'} · ${h.ref ? shortId(h.ref) : 'severed'}${h.supersedes ? ' (supersedes)' : ''} — ${h.basis || ''}`).join('\n');
+      return `<tr data-span="${m.id}" class="${m.id === selMention ? 'sel' : ''}"><td class="mono idc" title="${esc(m.id)}">${esc(shortId(m.id))}</td><td class="nm">${esc(m.text)}</td><td>${esc(m.kind)}</td><td class="num">s${sentenceOf(TL, m.s)}</td><td class="mono">[${m.s}–${m.e}]</td><td class="mono" title="${esc(tip)}">${hist.length} CON${last && last.giver === 'you' ? ' · you' : ''}</td><td><select data-rf="reassign" data-span="${m.id}"><option value="">reassign…</option><option value="__new">→ a new referent</option><option value="__none">→ none (sever)</option>${opt(pack, root)}</select></td></tr>`;
+    }).join('');
+    return `<div class="rprof"><div class="rph"><span class="sw" style="background:${colOfRef(pack, root)}"></span><span class="mono big" title="${esc(root)}">${esc(root)}</span></div>
+      <div class="rpn">${esc(r.name || '—')}${r.absorbed.length ? ` <span class="pill">⊕ ${r.absorbed.length} merged in</span>` : ''}${r.giver === 'you' ? ' <span class="pill">yours</span>' : ''}</div>
+      <div class="why">An instance (INS) minted at statement ${r.born ?? '—'} by ${esc(r.giver || 'reader')}; its id is the hash of that event, not of any spelling. It has ${r.mentions.length} mention${r.mentions.length === 1 ? '' : 's'} — spans CON’d to it, each with an id of its own. Reassign a span and this id does not change; merge it into another and the id is kept as an alias. Nothing is edited: each change below is one more event.</div>
+      <div class="lkq"><select data-rf="merge"><option value="">merge this referent into…</option>${opt(pack, root)}</select></div>
+      <div class="rh2">its spans (${r.mentions.length})</div>
+      <table class="rtbl m"><thead><tr><th>span id</th><th>text</th><th>kind</th><th class="num">stmt</th><th>range</th><th>links</th><th></th></tr></thead><tbody>${mrows}</tbody></table>
+      ${r.absorbed.length ? `<div class="rh2">folded into this one</div><div class="mono small">${r.absorbed.map(a => esc(a)).join('<br>')}</div>` : ''}
+      ${mine.length ? `<div class="rh2">what you have done (${actionsOf(mine).length} action${actionsOf(mine).length === 1 ? '' : 's'}, ${mine.length} events appended — the reader’s log is untouched)</div>${actionsOf(mine).map(g => `<div class="you">${esc(describeAction(g, pack))} <span class="mono dim">${g.map(x => x.op).join(' · ')}</span> <button type="button" data-rf="undo" data-act="${g[0].action}">undo</button></div>`).join('')}` : ''}</div>`;
+  }
+  function refsHTML(){
+    const pack = getPack();
+    if (!pack) return '<div class="rd0">Reading the text sentence by sentence… the referents appear here as the reading establishes them.</div>';
+    const n = pack.fold.referents.size, un = [...pack.fold.mentions.values()].filter(m => m.kind === 'pronoun' && !pack.fold.assign.get(m.id)).length;
+    return `<div class="tls">${n} referent${n === 1 ? '' : 's'} as of statement <b>${pack.sn.frontier}</b> of ${pack.TL.sentences.length} · ${pack.fold.mentions.size} spans · ${overlay.length ? `<b>${overlay.length}</b> event${overlay.length === 1 ? '' : 's'} from you · ` : ''}${un ? `${un} pronoun${un === 1 ? '' : 's'} unresolved · ` : ''}a referent is a being with an id; its spans are how the text mentions it</div>
+      <div class="rtw">${refTable(pack)}</div>${refProfile(pack)}`;
+  }
+  // events a person appends: always CON / SYN / INS, always giver "you", never an edit to the reader's log
+  const actionsOf = list => { const m = new Map(); for (const e of list) (m.get(e.action || e.id) || m.set(e.action || e.id, []).get(e.action || e.id)).push(e); return [...m.values()]; };
+  const describeAction = (g, pack) => {
+    const ins = g.find(x => x.op === 'INS' && x.kind === 'referent'), syn = g.find(x => x.op === 'SYN'), con = g.find(x => x.op === 'CON'), men = g.find(x => x.kind === 'mention');
+    const nameOf = id => { const r = pack && pack.fold.referents.get(pack.fold.resolve(id)); return r ? (r.name || shortId(id)) : shortId(id); };
+    const span = con && pack && pack.fold.mentions.get(con.span);
+    if (ins) return `made a referent from “${(span && span.text) || (men && men.text) || 'a span'}”`;
+    // a folded referent is described by what it was called when it stood alone: its own seed mention
+    const was = id => { const all = pack.TL.log.concat(overlay), ins = all.find(x => x.op === 'INS' && x.kind === 'referent' && x.ref === id), m = ins && all.find(x => x.op === 'INS' && x.kind === 'mention' && x.span === ins.seed); return m ? m.text : nameOf(id); };
+    if (syn) return `merged ${syn.from.map(was).join(', ')} into ${nameOf(syn.into)}`;
+    if (con) return con.ref ? `reassigned “${(span && span.text) || shortId(con.span)}” to ${nameOf(con.ref)}` : `severed “${(span && span.text) || shortId(con.span)}”`;
+    return g.map(x => x.op).join(' · ');
+  };
+  // undoing an event takes with it everything that stands on it — a link to a referent you made, a merge into it, a later reassignment that supersedes it —
+  // so what is left is always a log that means something (never a link to a referent that is no longer there)
+  function undoClosure(id){
+    const S = new Set([id]); let grew = true;
+    while (grew){ grew = false;
+      const refs = new Set(overlay.filter(e => S.has(e.id) && e.ref && e.op === 'INS' && e.kind === 'referent').map(e => e.ref));
+      const spans = new Set(overlay.filter(e => S.has(e.id) && e.op === 'INS' && e.kind === 'mention').map(e => e.span));
+      for (const e of overlay){ if (S.has(e.id)) continue;
+        if ((e.supersedes && S.has(e.supersedes)) || (e.op === 'CON' && ((e.ref && refs.has(e.ref)) || spans.has(e.span))) || (e.op === 'SYN' && (refs.has(e.into) || (e.from || []).some(f => refs.has(f))))){ S.add(e.id); grew = true; } }
+    }
+    return S;
+  }
+  function addYou(evs){ const act = 'act_' + evs[0].id.slice(4, 14); evs.forEach(x => { x.action = act; }); overlay.push(...evs); packKey = ''; lastViewKey = ''; renderInsp(ev[k]); renderLens(stateAt(k)); }
+  function ensureMention(pack, spanId, s0, e0, out){ if (!pack.fold.mentions.has(spanId)) out.push(mkEv({ op:'INS', ...CELLS.INS, kind:'mention', span:spanId, at:[s0, e0], text:T.doc.analysis.slice(s0, e0), mentionKind:'name', frontier:pack.sn.frontier, giver:'you' })); }
+  function reassign(spanId, to){
+    const pack = getPack(); if (!pack) return; const m = pack.fold.mentions.get(spanId) || (selSpan && spanIdOf(pack.TL, selSpan.s, selSpan.e) === spanId ? { s:selSpan.s, e:selSpan.e } : null); if (!m) return;
+    const out = []; ensureMention(pack, spanId, m.s, m.e, out);
+    let ref = to;
+    if (to === '__new'){ const ins = mkEv({ op:'INS', ...CELLS.INS, kind:'referent', frontier:pack.sn.frontier, seed:spanId, giver:'you', basis:'a referent you made from this span' }); out.push(ins); ref = ins.ref; }
+    if (to === '__none') ref = null;
+    out.push(mkEv({ op:'CON', ...CELLS.CON, span:spanId, ref, supersedes:pack.fold.cons.get(spanId) || null, frontier:pack.sn.frontier, giver:'you', basis: ref ? 'reassigned by you' : 'severed by you' }));
+    if (ref) selRef = ref;
+    addYou(out);
+  }
+  function mergeInto(from, into){ const pack = getPack(); if (!pack || !from || !into) return; addYou([mkEv({ op:'SYN', ...CELLS.SYN, frontier:pack.sn.frontier, from:[from], into, giver:'you', basis:'merged by you' })]); selRef = into; lastViewKey = ''; renderInsp(ev[k]); }
+  bind(inspEl, 'click', e2 => {
+    const sh = e2.target.closest('th[data-sort]'); if (sh){ const kk = sh.dataset.sort; refSort = { key:kk, dir: refSort.key === kk ? -refSort.dir : (kk === 'mentions' || kk === 'born' ? -1 : 1) }; lastViewKey = ''; renderInsp(ev[k]); return; }
+    const tr = e2.target.closest('tr[data-ref]'); if (tr){ selMention = null; pivotTo(tr.dataset.ref, null); return; }
+    const sp = e2.target.closest('tr[data-span]'); if (sp && !e2.target.closest('select')){ selMention = sp.dataset.span; const pack = getPack(); const m = pack && pack.fold.mentions.get(sp.dataset.span); if (m){ const el = lens.querySelector(`[data-mid="${sp.dataset.span}"]`); if (el){ el.scrollIntoView({ block:'center', behavior:'smooth' }); } } lastViewKey = ''; renderInsp(ev[k]); return; }
+    const b = e2.target.closest('[data-rf]'); if (!b) return;
+    if (b.dataset.rf === 'newspan' && selSpan){ const pack = getPack(); reassign(spanIdOf(pack.TL, selSpan.s, selSpan.e), '__new'); selSpan = null; }
+    else if (b.dataset.rf === 'undo'){ const gone = new Set(); for (const x of overlay.filter(o => (o.action || o.id) === b.dataset.act)) for (const id of undoClosure(x.id)) gone.add(id); if (gone.size){ for (let i = overlay.length - 1; i >= 0; i--) if (gone.has(overlay[i].id)) overlay.splice(i, 1); packKey = ''; lastViewKey = ''; renderInsp(ev[k]); renderLens(stateAt(k)); } }
+  });
+  bind(inspEl, 'change', e2 => {
+    const t = e2.target.closest('select[data-rf]'); if (!t || !t.value) return;
+    if (t.dataset.rf === 'reassign') reassign(t.dataset.span, t.value);
+    else if (t.dataset.rf === 'merge') mergeInto(selRef && getPack().fold.resolve(selRef), t.value);
+    else if (t.dataset.rf === 'connectspan' && selSpan){ const pack = getPack(); reassign(spanIdOf(pack.TL, selSpan.s, selSpan.e), t.value); selSpan = null; }
+  });
+
   const tlMove = d => { const TL = T.timeline; if (!TL || !TL.snapshots.length) return; stopTL(); tf = Math.max(0, Math.min(TL.snapshots.length - 1, d(tfIdx()))); lastViewKey = ''; renderInsp(ev[k]); };
-  inspEl.addEventListener('input', ev2 => { if (ev2.target.matches('.tl input[type=range]')) tlMove(() => +ev2.target.value); });
-  inspEl.addEventListener('click', ev2 => {
+  bind(inspEl, 'input', ev2 => { if (ev2.target.matches('.tl input[type=range]')) tlMove(() => +ev2.target.value); });
+  bind(inspEl, 'click', ev2 => {
     const tb = ev2.target.closest('[data-itab]'); if (tb){ inspTab = LAST_INSP = tb.dataset.itab; lastViewKey = ''; renderInsp(ev[k]); return; }
     const tl = ev2.target.closest('[data-tl]');
     if (tl){ const a = tl.dataset.tl;
@@ -1083,7 +1249,7 @@ function mount(T){
   let wordsKey = '', wordsSort = { key: 'n', dir: -1 };
   const tabBtns = [...app.querySelectorAll('#p-tabs [data-tab]')];
   function setTab(t){ LAST_TAB = t; tab = t; if (wide.matches) setDrawer(true); tabBtns.forEach(b => b.setAttribute('aria-selected', String(b.dataset.tab === t))); render(false); }
-  tabBtns.forEach(b => b.addEventListener('click', () => setTab(b.dataset.tab)));
+  tabBtns.forEach(b => bind(b, 'click', () => setTab(b.dataset.tab)));
   tabBtns.forEach(b => b.setAttribute('aria-selected', String(b.dataset.tab === tab)));
 
   function renderPane(St, e){
@@ -1271,9 +1437,9 @@ function mount(T){
     g.globalAlpha = 1; const x = pos / mp * w; g.fillStyle = cssVar('--ink'); g.fillRect(x - dpr, 0, 2 * dpr, h); }
   const scrub = e => { const r = rc.getBoundingClientRect(); const f = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)); setDir(0); pos = f * maxPos(); k = idxAt(pos); render(true); };
   let dragging = false; const rib = app.querySelector('.rib');
-  rib.addEventListener('pointerdown', e => { dragging = true; e.target.setPointerCapture && e.target.setPointerCapture(e.pointerId); scrub(e); });
-  rib.addEventListener('pointermove', e => { if (dragging) scrub(e); });
-  rib.addEventListener('pointerup', () => { dragging = false; });
+  bind(rib, 'pointerdown', e => { dragging = true; e.target.setPointerCapture && e.target.setPointerCapture(e.pointerId); scrub(e); });
+  bind(rib, 'pointermove', e => { if (dragging) scrub(e); });
+  bind(rib, 'pointerup', () => { dragging = false; });
 
   // ── render ──
   function render(follow){
@@ -1324,11 +1490,11 @@ function mount(T){
     else if (e.key === 'ArrowLeft'){ setDir(0); seek(k - 1); } else if (e.key === 'ArrowRight'){ setDir(0); seek(k + 1); }
     else if (e.key === 'j' || e.key === 'J') setDir(-1); else if (e.key === 'k' || e.key === 'K') setDir(0); else if (e.key === 'l' || e.key === 'L') setDir(1);
     else if (e.key === 'Home'){ setDir(0); seek(0); } else if (e.key === 'End'){ setDir(0); seek(N - 1); } };
-  function close(){ cancelAnimationFrame(raf); try { map.destroy && map.destroy(); } catch (e) {} app.classList.remove('on'); cur = null; }
+  function close(){ ac.abort(); stopTL(); try { ro.disconnect(); } catch (e) {} cancelAnimationFrame(raf); try { map.destroy && map.destroy(); } catch (e) {} app.classList.remove('on'); cur = null; }
   const ro = new ResizeObserver(() => size());
-  app.addEventListener('click', onClick);
-  document.addEventListener('keydown', onKey);
-  speedSel.addEventListener('change', () => { speed = +speedSel.value; });
+  bind(app, 'click', onClick);
+  bind(document, 'keydown', onKey);
+  bind(speedSel, 'change', () => { speed = +speedSel.value; });
 
   T.ev._t0 = performance.now();
   fillSpeeds(); ro.observe(app.querySelector('.right')); size();
