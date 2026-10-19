@@ -10,6 +10,7 @@ import { splitSentences } from '../vendor/khora/native/adapters/text/spans.js';
 import { extractSurfaces, discoverReferents, diaNorm, namesCorefer, genericTokens } from '../vendor/khora/native/adapters/text/surfaces.js';
 import { resolvePronouns } from '../vendor/khora/native/adapters/text/pronouns.js';
 import { classifyWord } from '../vendor/khora/native/adapters/text/wordclass.js';
+import { makeSameBeing } from '../vendor/khora/native/adapters/text/corpus-identity.js';
 import { readDocumentEvidence, classifyWithDocument } from '../vendor/khora/native/adapters/text/document-evidence.js';
 
 const P = new URL('../vendor/khora/native/priors/', import.meta.url);
@@ -18,8 +19,10 @@ const memo = new Map(); const base = (f) => { let c = memo.get(f); if (c === und
 const wordsIn = (text, off) => [...text.matchAll(/[\p{L}\p{N}][\p{L}\p{N}'’.\-]*/gu)].map((m) => ({ w: m[0], s: off + m.index, e: off + m.index + m[0].length }));
 const hash = (x) => createHash('sha256').update(String(x)).digest('hex');
 const isVerb = (w) => { const c = base(String(w).toLowerCase()); return !!(c.found && c.candidates?.[0]?.upos === 'VERB'); };
-const deps = { hash, diaNorm, namesCorefer, genericTokens, splitSentences, wordsIn, extractSurfaces, discoverReferents, resolvePronouns, isVerb, classifyAt: (prefix) => classifyWithDocument(base, readDocumentEvidence(prefix, { classify: base })) };
-const read = (sources, o = {}) => { const c = buildCorpusTimeline(sources, deps, { maxSnapshots: 6, ...o }); return { c, f: foldLog(c.log) }; };
+// the mechanics claims below are about the LINK (ends, provenance, split); identity is decided elsewhere, so they inject a yes. The identity claims use the real test.
+const sameYes = { prepare: () => () => ({ same: true, verdict: 'bound', forWhom: null, basis: 'decided by the test' }) };
+const deps = { sameBeing: sameYes, hash, diaNorm, namesCorefer, genericTokens, splitSentences, wordsIn, extractSurfaces, discoverReferents, resolvePronouns, isVerb, classifyAt: (prefix) => classifyWithDocument(base, readDocumentEvidence(prefix, { classify: base })) };
+const read = (sources, o = {}, d = deps) => { const c = buildCorpusTimeline(sources, d, { maxSnapshots: 6, ...o }); return { c, f: foldLog(c.log) }; };
 
 const TEST = 'Senator Smith asked Bruce Ismay whether he had been warned. Bruce Ismay said that Captain Smith told him that ice was reported. Ismay said that Thomas Andrews told him that the ship would sink. Thomas Andrews had gone below, Ismay said.';
 const NEWS = 'The Tribune reported that Bruce Ismay left the ship in a lifeboat. Thomas Andrews was last seen in the smoking room, according to survivors. Andrews helped women into the lifeboats, survivors said.';
@@ -110,20 +113,22 @@ test("CLAIM nesting's wall: 'X says P' in two sources is not two witnesses of P"
   for (const l of f.links) assert.ok(/Ismay/.test(l.from.name) && /Ismay/.test(l.to.name), 'only the speaker is joined; the content is not a witness');
 });
 
-// ── attacks that broke something ──
-test('FINDING: two different people with one surname are joined when the surname is the only name each source gives', () => {
+// ── attacks that broke something, now closed ──
+test('CLAIM identity, not a surname: two different people who share one never join (holographic identity decides, a name only nominates)', () => {
   const a = 'Senator Smith asked Bruce Ismay about the lifeboats. Senator Smith asked again. Smith adjourned the hearing.';
   const b = 'Captain Smith stayed on the bridge. Captain Smith gave the order. Smith never left the ship.';
-  const { f } = read([S('a', a, 'testimony'), S('b', b, 'journalism')]);
-  const joined = f.links.some((l) => /Smith/.test(l.from.name) && /Smith/.test(l.to.name));
-  // A correct reader would NOT join Senator Smith (a legislator) and Captain Smith (a ship's master). This one does: a name-level
-  // correspondence is "weaker than a corroborated bridge" (its own checkedBy says so) but it is still emitted as a link.
-  assert.equal(joined, true, 'FINDING still present: the shared surname links two people (fix in khora: require a compatible title/role or a second shared signal)');
+  const { f, c } = (() => { const r = read([S('a', a, 'testimony'), S('b', b, 'journalism')], {}, { ...deps, sameBeing: makeSameBeing() }); return r; })();
+  assert.equal(f.links.filter((l) => /Smith/.test(l.from.name) && /Smith/.test(l.to.name)).length, 0);
+  for (const k of c.candidates) assert.notEqual(k.identity.verdict, 'contradicted', 'a thin reading is a typed gap, never a verdict of difference');
 });
 
-test('FINDING: a source copied twice is two corroborating sources', () => {
-  const { f } = read([S('a', NEWS, 'journalism'), S('b', NEWS, 'journalism')]);
-  const corroborations = f.links.filter((l) => l.split.kind === 'corroborates').length;
-  // identical bytes are not independent witnesses; the mechanics count independence "elsewhere" (the link's own note), and nothing here does.
-  assert.ok(corroborations > 0, 'FINDING still present: byte-identical sources corroborate each other (fix: refuse or flag a link whose two ends share their source bytes)');
+test('CLAIM with no identity test injected, nothing joins and the nominated pairs say why', () => {
+  const { sameBeing: _x, ...none } = deps;
+  const { c } = read([S('a', TEST, 'testimony'), S('b', NEWS, 'journalism')], {}, none);
+  assert.equal(c.links.length, 0); assert.ok(c.candidates.length > 0); assert.equal(c.candidates[0].identity.reason, 'no_identity_test_injected');
+});
+
+test('CLAIM a source copied twice is one witness: nothing is corroborated between a source and its own copy', () => {
+  const { c, f } = read([S('a', NEWS, 'journalism'), S('b', NEWS, 'journalism')]);
+  assert.equal(f.links.length, 0); assert.equal(c.duplicates.length, 1); assert.equal(c.duplicates[0].reason, 'identical_bytes');
 });
