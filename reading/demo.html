@@ -1107,12 +1107,12 @@ async function pdfText(buf){
 function refuse(name, kind, extra = {}){
   $('app').classList.remove('on');
   const M = {
-    image:['an image', 'The reading here is text. The full holodeck reads an image through its own 2D visual model and OCR (tesseract, in this browser), then folds the words — no model, no server.'],
+    image:['an image', 'An image is pixels. Reading it needs OCR — tesseract, run by the fold’s dev server (node tools/serve.mjs), never a language model. This page was served without it (or the OCR found no words), so the reading names the gap.'],
     audio:['audio', 'The full holodeck transcribes audio in this browser (Whisper) and reads the transcript. This page reads text only.'],
     video:['a recording', 'The full holodeck reads a recording through its caption track or in-browser ASR. This page reads text only.'],
     archive:['an archive (zip / office file)', 'Not a single text document — there is nothing here to read as prose.'],
     binary:['binary', 'These bytes are not text. Decoding them as characters would only produce mojibake, so the reading names the gap rather than guessing.'],
-    'pdf-no-text':['a scanned PDF with no text layer', 'Its pages are pixels. The full holodeck reads them with its visual model + OCR; this page reads text only, so it refuses rather than invent.'],
+    'pdf-no-text':['a scanned PDF with no text layer', 'Its pages are pixels. Reading them needs OCR — tesseract, run by the fold’s dev server (node tools/serve.mjs). This page was served without it (or the OCR found no words), so it refuses rather than invent.'],
     'pdf-failed':['a PDF whose text layer could not be read', 'pdf.js could not be loaded (offline?). The reading names the gap.'],
     'pdf-unreadable':['a PDF whose text does not read as words', 'The extraction did not read as words the prior holds, and no converter is available on this host. The reading names the gap rather than guessing — install poppler (pdftotext), or serve this page from the fold’s dev server, which converts with it.'],
   }[kind] || ['not text', '—'];
@@ -1130,22 +1130,64 @@ async function convert(buf){
     return { text, converter: r.headers.get('X-Converter') || 'converter' };
   } catch (e) { return null; }
 }
+let OCR_META = null;
+// read PIXELS with the platform's own recogniser (tesseract, via the dev server's POST /ocr) — never a model.
+// The server streams one JSON line per page; the text arrives in the box as each page is read, with the
+// engine's own mean word confidence, so the reading can be watched before the layers animate.
+async function ocr(buf){
+  const note = $('refuse');
+  const show = h => { note.hidden = false; note.innerHTML = h; };
+  let r;
+  try { r = await fetch('/ocr', { method: 'POST', body: buf }); } catch (e) { return null; }
+  if (!r.ok || !r.body) return null;
+  const rd = r.body.getReader(), dec = new TextDecoder();
+  let pending = '', text = '', pages = 0, total = 0, words = 0, confSum = 0;
+  for (;;){
+    const { done, value } = await rd.read(); if (done) break;
+    pending += dec.decode(value, { stream: true });
+    let nl;
+    while ((nl = pending.indexOf('\n')) >= 0){
+      const l = pending.slice(0, nl); pending = pending.slice(nl + 1);
+      if (!l.trim()) continue;
+      let m; try { m = JSON.parse(l); } catch (e) { continue; }
+      if (m.event === 'start'){ total = m.total; show(`<b>Reading pixels</b> — tesseract (OCR, no model) · page 0 of ${total}${m.pages > m.total ? ` (first ${m.total} of ${m.pages})` : ''}`); }
+      else if (m.event === 'page'){
+        pages++;
+        if (m.text){ text += (text ? '\n\n' : '') + m.text; ta.value = text; }
+        if (m.conf != null){ words += m.words; confSum += m.conf * m.words; }
+        show(`<b>Reading pixels</b> — tesseract (OCR, no model) · page ${pages} of ${total}${m.conf != null ? ` · ${m.conf}% mean word confidence` : ''}${m.error ? ` · <span class="mono">${esc(m.error)}</span>` : ''}`);
+      }
+    }
+  }
+  OCR_META = { pages, total, words, conf: words ? Math.round(confSum / words) : null };
+  note.hidden = true;
+  return text;
+}
 async function readFile(file){
   const d = $('refuse'); if (d) d.hidden = true;
   const buf = new Uint8Array(await file.arrayBuffer());
   const kind = sniff(buf);
   const head = new TextDecoder('latin1').decode(buf.slice(0, 1024));
   const isHtml = /^\s*<(?:!doctype html|html|\?xml)/i.test(head);
-  if (kind !== 'pdf' && kind !== 'text') return refuse(file.name, kind);
+  if (kind !== 'pdf' && kind !== 'text' && kind !== 'image') return refuse(file.name, kind);
   await ready();
   const prior = { name: 'English vocabulary', giver: (PRIORS.posPrior && PRIORS.posPrior.provenance && PRIORS.posPrior.provenance.source) || 'UD/Thrax + UniMorph', known: knownWord, longest: LEXICON_LONGEST };
   let E = null;
-  if (kind === 'pdf'){
-    // parallel readings (eigenvalues): pdf.js (local) and the platform converter; one collapses as the reading
-    E = await extractReadings({ prior, extractors: [
+  OCR_META = null;
+  const ocrReading = { name: 'tesseract OCR (this machine)', run: async () => ocr(buf) };
+  if (kind === 'image'){
+    // pixels only: the one reading is the recogniser's
+    E = await extractReadings({ prior, extractors: [ocrReading] });
+  } else if (kind === 'pdf'){
+    // parallel readings (eigenvalues): pdf.js (local) and the platform converter; one collapses as the reading.
+    // If neither reads as words (a scan: its pages are pixels), the recogniser joins them and the gate chooses.
+    const textual = [
       { name: 'pdf.js text layer (browser)', run: async () => (await pdfText(buf)).raw },
       { name: 'pdftotext (poppler)', run: async () => { const c = await convert(buf); return c && c.text; } },
-    ] });
+    ];
+    E = await extractReadings({ prior, extractors: textual });
+    const c0 = E.collapsed != null ? E.readings[E.collapsed] : null;
+    if (!c0 || !c0.text || c0.text.trim().length < 8 || c0.sniff.verdict === 'unconfirmed') E = await extractReadings({ prior, extractors: [...textual, ocrReading] });
   } else if (isHtml){
     E = await extractReadings({ prior, extractors: [
       { name: 'textutil (macOS)', run: async () => { const c = await convert(buf); return c && c.text; } },
@@ -1155,9 +1197,10 @@ async function readFile(file){
     return run(new TextDecoder().decode(buf), file.name);
   }
   const chosen = E.collapsed != null ? E.readings[E.collapsed] : null;
-  if (!chosen || !chosen.text || chosen.text.trim().length < 8) return refuse(file.name, kind === 'pdf' ? 'pdf-no-text' : 'binary', {});
+  if (!chosen || !chosen.text || chosen.text.trim().length < 8) return refuse(file.name, kind === 'pdf' ? 'pdf-no-text' : kind === 'image' ? 'image' : 'binary', {});
   if (chosen.sniff.verdict === 'unconfirmed') return refuse(file.name, 'pdf-unreadable', { reads: chosen.sniff.reads });
-  return run(chosen.text, file.name + ' — ' + chosen.extractor, { extraction: E });
+  const viaOcr = OCR_META && /tesseract/.test(chosen.extractor);
+  return run(chosen.text, file.name + ' — ' + chosen.extractor + (viaOcr ? ` · ${OCR_META.pages} page${OCR_META.pages === 1 ? '' : 's'}, ${OCR_META.conf}% mean word confidence` : ''), { extraction: E });
 }
 
 // ── input wiring ──

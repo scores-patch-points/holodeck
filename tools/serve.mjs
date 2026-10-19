@@ -15,7 +15,7 @@
 // Usage: node tools/serve.mjs [port]   (default 8813)
 
 import { createServer } from 'node:http';
-import { readFile, writeFile, rm, stat } from 'node:fs/promises';
+import { readFile, writeFile, rm, stat, mkdir } from 'node:fs/promises';
 import { createReadStream } from 'node:fs';
 import { execFile, spawn } from 'node:child_process';
 import { tmpdir } from 'node:os';
@@ -170,6 +170,58 @@ const server = createServer(async (req, res) => {
       }
       if (text == null) return send(res, 502, failure || 'the converter failed', { 'Content-Type': 'text/plain; charset=utf-8' });
       return send(res, 200, text, { 'Content-Type': 'text/plain; charset=utf-8', 'Cache-Control': 'no-store', 'X-Converter': converter });
+    }
+
+    // POST /ocr — read PIXELS. A scanned PDF has no text layer and an image is only pixels; the platform's
+    // own tools read them: pdftoppm rasterises a page, tesseract reads it (a recogniser, never a language
+    // model). The response streams one JSON line per page — {event:'start'|'page'|'done'} — so the page
+    // can show the text arriving and each page's mean word confidence; a page that fails says why and the
+    // rest still read. Pages are capped (?max=, default 40, ceiling 200): a resource guard, declared.
+    if (req.method === 'POST' && url.pathname === '/ocr') {
+      const chunks = []; let n = 0;
+      for await (const c of req) { n += c.length; if (n > MAX_BODY) { req.destroy(); return send(res, 413, 'too large', { 'Content-Type': 'text/plain' }); } chunks.push(c); }
+      const buf = Buffer.concat(chunks);
+      const head = buf.slice(0, 16).toString('latin1');
+      const isPdf = head.startsWith('%PDF');
+      const isImg = /^(\x89PNG|\xff\xd8\xff|GIF8|II\*\x00|MM\x00\*|BM|RIFF[\s\S]{4}WEBP)/.test(head);
+      if (!isPdf && !isImg) return send(res, 415, 'not a PDF or an image', { 'Content-Type': 'text/plain' });
+      const max = Math.min(Math.max(parseInt(url.searchParams.get('max') || '40', 10) || 40, 1), 200);
+      const dir = join(tmpdir(), 'hd-ocr-' + randomUUID());
+      let gone = false; res.on('close', () => { gone = true; });
+      res.writeHead(200, { 'Content-Type': 'application/x-ndjson; charset=utf-8', 'Cache-Control': 'no-store', 'X-Converter': 'tesseract (OCR)' });
+      const line = (o) => { if (!gone) res.write(JSON.stringify(o) + '\n'); };
+      try {
+        await mkdir(dir, { recursive: true });
+        const src = join(dir, 'in'); await writeFile(src, buf);
+        let pages = 1;
+        if (isPdf) { const info = await pipe('pdfinfo', [src], null); pages = parseInt((/Pages:\s+(\d+)/.exec(info.out || '') || [])[1], 10) || 1; }
+        const total = Math.min(pages, max);
+        line({ event: 'start', kind: isPdf ? 'pdf' : 'image', pages, total, engine: 'tesseract', lang: 'eng' });
+        for (let i = 1; i <= total && !gone; i++) {
+          let img = src;
+          if (isPdf) {
+            const base = join(dir, 'p' + i);
+            const r = await pipe('pdftoppm', ['-r', '200', '-f', String(i), '-l', String(i), '-png', '-singlefile', src, base], null);
+            if (r.code !== 0) { line({ event: 'page', page: i, error: 'pdftoppm: ' + (r.err || 'exit ' + r.code) }); continue; }
+            img = base + '.png';
+          }
+          const t = await pipe('tesseract', [img, 'stdout', '-l', 'eng', '--psm', '3', 'tsv'], null);
+          if (isPdf) rm(img, { force: true }).catch(() => {});
+          if (t.code !== 0) { line({ event: 'page', page: i, error: 'tesseract: ' + (t.err || 'exit ' + t.code) }); continue; }
+          // tsv → text: words (level 5) regrouped into their own lines and paragraphs, with the engine's confidence kept
+          const rows = t.out.split('\n').slice(1).map((l) => l.split('\t')).filter((c) => c.length >= 12 && c[0] === '5' && c[11].trim() && parseFloat(c[10]) >= 0);
+          let text = '', prev = '', sum = 0;
+          for (const c of rows) {
+            const key = c[2] + '.' + c[3] + '.' + c[4]; const par = c[2] + '.' + c[3];
+            if (prev) text += key === prev ? ' ' : (par === prev.split('.').slice(0, 2).join('.') ? '\n' : '\n\n');
+            text += c[11]; prev = key; sum += parseFloat(c[10]);
+          }
+          line({ event: 'page', page: i, text, words: rows.length, conf: rows.length ? Math.round(sum / rows.length) : null });
+        }
+        line({ event: 'done', pages, total });
+      } catch (e) { line({ event: 'error', error: String((e && e.message) || e) }); }
+      finally { rm(dir, { recursive: true, force: true }).catch(() => {}); res.end(); }
+      return;
     }
 
     let p = decodeURIComponent(url.pathname);
