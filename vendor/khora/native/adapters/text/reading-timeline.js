@@ -213,7 +213,9 @@ export function buildReadingTimeline(text, deps, opts = {}) {
   const registerOf = srcMeta ? (srcMeta.register ?? null) : null;
   const spanId = (s0, e0) => `spn_${hash(`${sourceId}|${s0}|${e0}`).slice(0, 16)}`;
   const log = [];
-  const emit = (body0) => { const body = { source: sourceId, register: registerOf, ...body0 }; const h = hash(canon(body)).slice(0, 16); const ev = { id: `evt_${h}`, ...body }; if (body.op === "INS" && body.kind === "referent") ev.ref = `ref_${h}`; log.push(ev); return ev; };
+  // The REGISTER rides on every event but is NOT part of an id: it is a property of the source (declared, and correctable), not of who a referent is.
+  // Correcting a register must change the split on a link, never mint a new referent — or every merge/sever/reassignment made on the old id is orphaned.
+  const emit = (body0) => { const body = { source: sourceId, register: registerOf, ...body0 }; const { register: _r, ...idBody } = body; const h = hash(canon(idBody)).slice(0, 16); const ev = { id: `evt_${h}`, ...body }; if (body.op === "INS" && body.kind === "referent") ev.ref = `ref_${h}`; log.push(ev); return ev; };
   const engineRef = new Map(), alias = new Map(), curCon = new Map(), seenMention = new Set();
   const resolve = (r) => { let g = 0; while (r && alias.has(r) && g++ < 64) r = alias.get(r); return r; };
 
