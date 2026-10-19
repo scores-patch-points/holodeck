@@ -31,6 +31,7 @@ td{padding:8px;border-bottom:1px solid var(--line);vertical-align:top}tr.row{cur
 <textarea id="src" spellcheck="false">Councilmember O’Connell asked the Department. The mayor condemned the raid, and Marie Curie praised the method. Zzxqy underwent review.</textarea>
 <div class="tg">
   <label><input type="checkbox" id="fPos" checked> class prior (UD English-EWT)</label>
+  <label><input type="checkbox" id="fLex" checked> received class lexicon (UniMorph + closed class)</label>
   <label><input type="checkbox" id="fNorm" checked> written-form normalisation</label>
   <label><input type="checkbox" id="fMorph" checked> UniMorph + rule</label>
   <label><input type="checkbox" id="fLemma" checked> lemma hop (inferred)</label>
@@ -53,21 +54,23 @@ import { classifyForm } from '../holodeck-surface.js';
 const $ = id => document.getElementById(id);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const get = async p => (await fetch(p)).json();
-const [pos, morphRaw] = await Promise.all([get('../vendor/eoreader7/native/priors/pos-eng.json'), get('../vendor/eoreader7/native/priors/morphology-eng.json')]);
+const [pos, morphRaw, lex] = await Promise.all([get('../vendor/eoreader7/native/priors/pos-eng.json'), get('../vendor/eoreader7/native/priors/morphology-eng.json'), get('../vendor/eoreader7/native/priors/pos-eng-lexicon.json')]);
+pos.lexicon = lex; const posNoLex = { ...pos, lexicon: undefined };
 const morph = morphologyFromPrior(morphRaw), lemmatizer = createLemmatizer(morph.forms, { language: morph.language });
 const pp = pos.provenance, mp = morphRaw.provenance;
 $('cards').innerHTML = `
  <div class="card"><b>Part of speech</b><span class="n">${pp.distinct_forms.toLocaleString()}</span> forms<small>${pp.tokens_read.toLocaleString()} tokens · ${pp.sentences_read.toLocaleString()} sentences · ${pp.ambiguous_forms.toLocaleString()} ambiguous forms kept ambiguous</small><small>giver: ${esc(POS_PRIOR_META.giver)}</small></div>
  <div class="card"><b>Morphology (UniMorph)</b><span class="n">${mp.kept.toLocaleString()}</span> irregular forms<small>${mp.pairs_read.toLocaleString()} pairs read · ${mp.rule_recoverable_dropped.toLocaleString()} dropped because a rule recovers them</small><small>giver: ${esc(mp.source)}</small></div>
+ <div class="card"><b>Class lexicon (UniMorph + closed class)</b><span class="n">${Object.values(lex.provenance.counts).reduce((a, b) => a + b, 0).toLocaleString()}</span> forms<small>attestation only — no frequencies; N|V stays ambiguous</small><small>${lex.provenance.givers.map(g => esc(g.name)).join(' · ')}</small></div>
  <div class="card"><b>The rule</b><span class="n">stemsOf</span><small>regular inflection (-ed, -s, -ing…) is recovered at read time, not stored</small></div>`;
 const rawHit = w => pos.forms[w.toLowerCase()];
-const bars = c => c.slice(0, 3).map(k => `<span class="bar" style="width:${Math.max(3, Math.round(k.share * 60))}px"></span><span class="mono">${esc(k.upos)}</span> ${(k.share * 100).toFixed(0)}%${k.thraxClass ? ' → ' + esc(k.thraxClass) : ''}`).join('<br>');
+const bars = c => c.slice(0, 3).map(k => `<span class="bar" style="width:${Math.max(3, Math.round((k.share ?? 0) * 60))}px"></span><span class="mono">${esc(k.upos)}</span> ${k.share == null ? 'attested' : (k.share * 100).toFixed(0) + '%'}${k.thraxClass ? ' → ' + esc(k.thraxClass) : ''}`).join('<br>');
 function readOne(w, f) {
   const out = { w, cls: null, via: [], form: w, inferred: false, by: [] };
   if (f.pos) {
-    if (f.norm) { const c = classifyForm(w, { posPrior: pos, lemmatizer: f.lemma ? lemmatizer : null }); if (c.found) out.cls = c; out.via = c.via || []; out.form = c.form || w; out.inferred = !!c.inferred; }
+    if (f.norm) { const c = classifyForm(w, { posPrior: f.lex ? pos : posNoLex, lemmatizer: f.lemma ? lemmatizer : null }); if (c.found) out.cls = c; out.via = c.via || []; out.form = c.form || w; out.inferred = !!c.inferred; }
     else { const r = rawHit(w); if (r) out.cls = classifyWord(w.toLowerCase(), { posPrior: pos }); }
-    if (out.cls) out.by.push(out.inferred ? 'class prior (via act, inferred)' : out.via.length ? 'class prior (after normalisation)' : 'class prior');
+    if (out.cls) out.by.push(out.inferred ? 'class prior (via act, inferred)' : out.cls.attested ? out.cls.attested + ' (' + (out.cls.attested === 'lexicon' ? 'attested, not measured' : 'declared grammar') + ')' : out.via.length ? 'class prior (after normalisation)' : 'class prior');
   }
   const lf = f.norm ? normalizeForm(w).form : w;
   out.morph = null;
@@ -79,10 +82,10 @@ function readOne(w, f) {
 }
 const sig = r => (r.cls ? '1' : '0') + (r.morph ? '1' : '0');
 function render() {
-  const f = { pos: $('fPos').checked, norm: $('fNorm').checked, morph: $('fMorph').checked, lemma: $('fLemma').checked };
+  const f = { lex: $('fLex').checked, pos: $('fPos').checked, norm: $('fNorm').checked, morph: $('fMorph').checked, lemma: $('fLemma').checked };
   const words = $('src').value.split(/\s+/).filter(Boolean);
   const rs = words.map(w => readOne(w, f));
-  const base = words.map(w => readOne(w, { pos: true, norm: true, morph: true, lemma: true }));
+  const base = words.map(w => readOne(w, { lex: true, pos: true, norm: true, morph: true, lemma: true }));
   $('rows').innerHTML = rs.map((r, i) => {
     const cls = r.cls ? bars(r.cls.candidates) : `<span class="t-gap">no entry — typed gap</span>`;
     const hop = r.via.length ? r.via.map(v => `<span class="pill t-${v.step === 'lemma' ? 'inf' : 'hop'}" title="${esc(v.note)}">${esc(v.step)}</span>`).join('') + `<span class="mono">${esc(r.form)}</span>` : `<span class="dim mono">${esc(r.form)}</span>`;
@@ -97,6 +100,6 @@ function render() {
     $('detail').textContent = JSON.stringify({ written: r.w, lookedUpAs: r.form, hops: r.via, 'pos-eng.json forms[…]': pos.forms[key] ?? null, 'morphology-eng.json forms[…]': morph.forms[key] ?? null, rule: r.morph ? r.morph.stems : [], thrax: Object.fromEntries(Object.keys(pos.forms[key] || {}).map(u => [u, THRAX_MAP[u] ?? null])) }, null, 2);
   });
 }
-['src', 'fPos', 'fNorm', 'fMorph', 'fLemma'].forEach(id => $(id).addEventListener('input', render));
+['src', 'fLex', 'fPos', 'fNorm', 'fMorph', 'fLemma'].forEach(id => $(id).addEventListener('input', render));
 render();
 </script></body></html>

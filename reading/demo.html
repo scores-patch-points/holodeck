@@ -455,7 +455,7 @@ function buildTrace(doc, clean, claims, features, extraction){
     if (!c.found){ gaps++; push('grammar', 'gap', `“${w.w}” → no entry in the class prior — a typed gap, never a guess`, { s:w.s, e:w.e, data:{ w:w.w, found:false } }); return; }
     classified++;
     if (c.candidates.length > 1) ambiguous++;
-    const parts = c.candidates.slice(0, 3).map(k => `${k.upos} ${(k.share * 100).toFixed(0)}%→${k.thraxClass || '—'}`).join(' · ');
+    const parts = c.candidates.slice(0, 3).map(k => `${k.upos} ${k.share == null ? 'attested' : (k.share * 100).toFixed(0) + '%'}→${k.thraxClass || '—'}`).join(' · ');
     push('grammar', 'class', `“${w.w}” → ${c.via.length ? `(looked up as “${c.form}” — ${c.via.map(v => v.step).join(' + ')}) ` : ''}${parts}${c.inferred ? ' — INFERRED from the act, not attested for this form' : ''}${c.candidates.length > 1 ? ' — ambiguous, left unresolved' : ''}`, { s:w.s, e:w.e, data:{ w:w.w, found:true, inferred:!!c.inferred, candidates:c.candidates.slice(0,3), total:c.total, form:c.form, via:c.via } });
   });
 
@@ -815,8 +815,8 @@ function mount(T){
     if (T.features.pos === false) return `<div class="h">POS — layer OFF</div><div class="fig">The class prior is switched off. Every form is carried as a bare string; no class is attested, so the reading names no part of speech — a typed gap, never a guess.</div>`;
     const rows = St.grammar.filter(Boolean).slice(-400).reverse().map(g => {
       if (!g.found) return `<tr><td class="mono">${esc(g.w)}</td><td colspan="2" class="gap">no entry — typed gap</td></tr>`;
-      const bits = g.candidates.map(k => `<span class="mono">${esc(k.upos)}</span> ${(k.share*100).toFixed(0)}% → ${k.thraxClass ? esc(k.thraxClass) : '<span class="gap">—</span>'}`).join('<br>');
-      const bar = `<span class="bar" style="width:${Math.max(3, Math.round(g.candidates[0].share * 46))}px"></span>`;
+      const bits = g.candidates.map(k => `<span class="mono">${esc(k.upos)}</span> ${k.share == null ? 'attested' : (k.share*100).toFixed(0) + '%'} → ${k.thraxClass ? esc(k.thraxClass) : '<span class="gap">—</span>'}`).join('<br>');
+      const bar = `<span class="bar" style="width:${Math.max(3, Math.round((g.candidates[0].share ?? 0) * 46))}px"></span>`;
       const hop = g.via && g.via.length ? `<br><span class="mono" style="opacity:.65">looked up as ${esc(g.form)} · ${esc(g.via.map(v => v.step).join(' + '))}</span>` : '';
       return `<tr><td class="mono">${esc(g.w)}${hop}</td><td>${bar}</td><td>${bits}</td></tr>`;
     }).join('');

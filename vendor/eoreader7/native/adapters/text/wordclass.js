@@ -126,6 +126,34 @@ export const normalizeForm = (surface) => {
   return { form: f, steps };
 };
 
+const SHAPES = [
+  ["email", /^[\w.+-]+@[\w-]+(?:\.[\w-]+)+$/, "X", "an e-mail address"],
+  ["url", /^(?:https?:\/\/|www\.)\S+$/i, "X", "a URL"],
+  ["ordinal", /^\d+(?:st|nd|rd|th)$/i, "ADJ", "an ordinal numeral"],
+  ["number", /^[+-]?[$€£]?\d[\d,]*(?:\.\d+)?%?$/, "NUM", "a numeral (digits, grouping, currency or percent)"],
+  ["identifier", /^[A-Z]{1,3}\d{4,}(?:\.\d+)?$/, "X", "a document or account identifier (letters then a digit run)"],
+];
+
+/** A DECLARED shape grammar: the class a form's orthography settles, whatever any corpus says. */
+export const shapeClass = (form) => {
+  for (const [rule, re, upos, note] of SHAPES) if (re.test(form)) return { rule, upos, note };
+  return null;
+};
+
+const LEXICON_INDEX = new WeakMap();
+const lexiconIndex = (lex) => {
+  let m = LEXICON_INDEX.get(lex);
+  if (!m) {
+    m = new Map();
+    for (const [key, forms] of Object.entries(lex?.classes ?? {})) {
+      const upos = key.split("|");
+      for (const f of forms) if (!m.has(f)) m.set(f, { key, upos });
+    }
+    LEXICON_INDEX.set(lex, m);
+  }
+  return m;
+};
+
 /**
  * Every class this occurrence's own FORM is attested as, with real counts
  * from the treebank and the Thrax-tradition reading of each — never
@@ -146,15 +174,35 @@ export const classifyWord = (surface, { posPrior } = {}) => {
   const hit = (form) => posPrior?.forms?.[form.toLowerCase()];
   let counts = hit(surface ?? "");
   let form = surface, via = [];
-  if (!counts) {
+  const norm = counts ? null : normalizeForm(surface);
+  if (!counts && norm.steps.length && norm.form) {
     // The prior is keyed on bare forms with a straight apostrophe. A form arrives as written —
     // "O’Connell" (curly mark), "Department." (the sentence's own period still attached). Those
     // are differences of typing, not absences from the prior. Tried only on a miss, so an exact
     // entry is never second-guessed, and the hop is named so no one reads it as the form itself.
-    const n = normalizeForm(surface);
-    if (n.steps.length && n.form) { counts = hit(n.form); if (counts) { form = n.form; via = n.steps; } }
+    counts = hit(norm.form);
+    if (counts) { form = norm.form; via = norm.steps; }
   }
-  if (!counts) return { surface, found: false, total: 0, candidates: [] };
+  if (!counts) {
+    // Not in the treebank. Two further givers, in order, each named in `via` and in `attested`:
+    // a DECLARED shape grammar (a digit run is a numeral whatever any corpus says), then the
+    // received class lexicon (posPrior.lexicon, POSLexicon@1 — attestation only, no frequencies).
+    const probe = norm.form || "";
+    const hops = norm.steps;
+    const sh = probe ? shapeClass(probe) : null;
+    if (sh) {
+      return { surface, found: true, total: 0, form: probe, via: [...hops, { step: "shape", rule: sh.rule, note: sh.note }], attested: "shape",
+        candidates: [{ upos: sh.upos, count: 0, share: 1, thraxClass: THRAX_MAP[sh.upos] ?? null, attested: "shape" }] };
+    }
+    const lex = posPrior?.lexicon;
+    const ent = lex && probe ? lexiconIndex(lex).get(probe.toLowerCase()) : null;
+    if (ent) {
+      const giver = lex.provenance?.givers ?? null;
+      return { surface, found: true, total: 0, form: probe, via: [...hops, { step: "lexicon", class: ent.key, note: "not in the treebank prior; attested in the received class lexicon — attestation only, no frequency" }], attested: "lexicon", givers: giver,
+        candidates: ent.upos.map((upos) => ({ upos, count: 0, share: null, thraxClass: THRAX_MAP[upos] ?? null, attested: "lexicon" })) };
+    }
+    return { surface, found: false, total: 0, candidates: [] };
+  }
 
   const total = Object.values(counts).reduce((a, b) => a + b, 0);
   const candidates = Object.entries(counts)
@@ -188,6 +236,7 @@ export const dominantClass = (classification, { minShare } = {}) => {
   if (!Number.isFinite(minShare) || minShare < 0 || minShare > 1)
     throw new TypeError("dominantClass: minShare is declared — how dominant a candidate must be is never a default");
   const top = classification?.candidates?.[0];
-  if (!top || top.share < minShare) return null;
+  // a lexicon candidate is attested, not measured (share:null) — it never settles a class
+  if (!top || top.share == null || top.share < minShare) return null;
   return top;
 };

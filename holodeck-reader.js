@@ -21,7 +21,8 @@ export function loadPriors() {
   if (_priors) return _priors;
   _priors = (async () => {
     const get = async p => { try { const r = await fetch(here(p)); return r.ok ? await r.json() : null; } catch (e) { return null; } };
-    const [posPrior, morphRaw] = await Promise.all([get('./vendor/eoreader7/native/priors/pos-eng.json'), get('./vendor/eoreader7/native/priors/morphology-eng.json')]);
+    const [posPrior, morphRaw, posLexicon] = await Promise.all([get('./vendor/eoreader7/native/priors/pos-eng.json'), get('./vendor/eoreader7/native/priors/morphology-eng.json'), get('./vendor/eoreader7/native/priors/pos-eng-lexicon.json')]);
+    if (posPrior && posLexicon) posPrior.lexicon = posLexicon; // POSLexicon@1 — classifyWord consults it only where the treebank has no entry
     const morph = morphRaw ? morphologyFromPrior(morphRaw) : null;
     const forms = new Set();
     for (const k of Object.keys((morph && morph.forms) || {})) { forms.add(String(k).toLowerCase()); const v = morph.forms[k]; for (const x of Array.isArray(v) ? v : [v]) if (typeof x === 'string') forms.add(x.toLowerCase()); }

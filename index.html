@@ -4196,7 +4196,9 @@ Promise.all([
   fetch(new URL('vendor/eoreader7/native/priors/role-config-eng.json', location.href)).then(r => r.ok ? r.json() : null).catch(() => null),
   // classifyWord reads the written form through holodeck-surface.js (curly apostrophe, edge punctuation) — the vendored organs stay byte-identical
   import(new URL('holodeck-surface.js', location.href)),
-]).then(([RL, WC, rc, SF]) => { HD_ROLE = { relationExtractorsFor: RL.relationExtractorsFor, classifyWord: SF.classifyForm, dominantClass: WC.dominantClass, roleConfig: rc }; }).catch(() => {});
+  // POSLexicon@1 — the received class lexicon; classifyWord consults it only where the treebank has no entry
+  fetch(new URL('vendor/eoreader7/native/priors/pos-eng-lexicon.json', location.href)).then(r => r.ok ? r.json() : null).catch(() => null),
+]).then(([RL, WC, rc, SF, lex]) => { HD_ROLE = { relationExtractorsFor: RL.relationExtractorsFor, classifyWord: SF.classifyForm, dominantClass: WC.dominantClass, roleConfig: rc, lexicon: lex }; }).catch(() => {});
 const hdHoldReady = () => !!(HD_ROLE && HD_ATTR);
 // The RECEIVED ground for "normal": live_priors' General English set (books, encyclopedia articles, US/UK law), the same
 // baseline the surprise view uses, read for how often each word is capitalised mid-sentence. It is independent of the
@@ -4789,7 +4791,7 @@ function analyze(corpus, htmlMap) {
   // { holder, depth, via, basis, gap } in perspective.js's own vocabulary.
   if (HD_ATTR && HD_ROLE) {
     try {
-      const front = HD_ROLE.relationExtractorsFor({ language: 'eng', roleConfig: HD_ROLE.roleConfig, posPrior: { forms: HD_POS, language: 'en' }, classifyWord: HD_ROLE.classifyWord, dominantClass: HD_ROLE.dominantClass });
+      const front = HD_ROLE.relationExtractorsFor({ language: 'eng', roleConfig: HD_ROLE.roleConfig, posPrior: { forms: HD_POS, language: 'en', lexicon: HD_ROLE.lexicon }, classifyWord: HD_ROLE.classifyWord, dominantClass: HD_ROLE.dominantClass });
       const relationsOf = t => { try { return front.extractRelations(t, {}) || []; } catch (e) { return []; } };
       const held = HD_ATTR.attributeStatements(sts, docs, { relationsOf });
       sts.forEach(st => { st.heldBy = held.get(st.id) || null; });
