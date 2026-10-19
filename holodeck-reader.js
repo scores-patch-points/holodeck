@@ -8,7 +8,8 @@ import { splitSentences } from './vendor/eoreader7/native/adapters/text/spans.js
 import { extractSurfaces, discoverReferents, namesCorefer, diaNorm } from './vendor/eoreader7/native/adapters/text/surfaces.js';
 import { resolvePronouns } from './vendor/eoreader7/native/adapters/text/pronouns.js';
 import { relationExtractorsFor } from './vendor/eoreader7/native/adapters/text/relations-language.js';
-import { classifyWord, dominantClass } from './vendor/eoreader7/native/adapters/text/wordclass.js';
+import { dominantClass } from './vendor/eoreader7/native/adapters/text/wordclass.js';
+import { classifyForm as classifyWord } from './holodeck-surface.js'; // wraps the vendored classifyWord: the written form is normalised before lookup
 import { createLemmatizer, morphologyFromPrior } from './vendor/eoreader7/native/adapters/text/morphology.js';
 import { stanceWords } from './vendor/eoreader7/native/organs/stance.js';
 import * as P from './vendor/eoreader7/native/adapters/text/priors.js';
@@ -20,7 +21,8 @@ export function loadPriors() {
   if (_priors) return _priors;
   _priors = (async () => {
     const get = async p => { try { const r = await fetch(here(p)); return r.ok ? await r.json() : null; } catch (e) { return null; } };
-    const [posPrior, morphRaw] = await Promise.all([get('./vendor/eoreader7/native/priors/pos-eng.json'), get('./vendor/eoreader7/native/priors/morphology-eng.json')]);
+    const [posPrior, morphRaw, posLexicon] = await Promise.all([get('./vendor/eoreader7/native/priors/pos-eng.json'), get('./vendor/eoreader7/native/priors/morphology-eng.json'), get('./vendor/eoreader7/native/priors/pos-eng-lexicon.json')]);
+    if (posPrior && posLexicon) posPrior.lexicon = posLexicon; // POSLexicon@1 — classifyWord consults it only where the treebank has no entry
     const morph = morphRaw ? morphologyFromPrior(morphRaw) : null;
     const forms = new Set();
     for (const k of Object.keys((morph && morph.forms) || {})) { forms.add(String(k).toLowerCase()); const v = morph.forms[k]; for (const x of Array.isArray(v) ? v : [v]) if (typeof x === 'string') forms.add(x.toLowerCase()); }
@@ -93,9 +95,16 @@ const dispatch = () => _dispatch || (_dispatch = relationExtractorsFor({ languag
 // (GFP, clause-aware) stands.
 const baseExtract = (text, opts) => { const d = dispatch(); return d.extractRelations(text, d.mode === 'gfp' ? { ...opts, clauseAware: true } : opts); };
 // the base reader's triples, plus the copula positions it cannot hear.
-const extractRelations = (text, opts = {}) => { let base = []; try { base = baseExtract(text, opts) || []; } catch (e) { base = []; }
-  const extra = copulaStanceTriples(text).concat(base.length ? [] : verbStanceTriples(text));
-  return base.map(foldStanceObject).concat(extra.map(foldStanceObject)); };
+// `stance: false` drops BOTH stance passes, so a caller can show the reading
+// the base GFP reader makes on its own — the demo's layer toggles read the
+// same material with the stance class off and disclose what it costs.
+function makeExtractRelations({ stance = true } = {}) {
+  return (text, opts = {}) => { let base = []; try { base = baseExtract(text, opts) || []; } catch (e) { base = []; }
+    if (!stance) return base.map(foldStanceObject);
+    const extra = copulaStanceTriples(text).concat(base.length ? [] : verbStanceTriples(text));
+    return base.map(foldStanceObject).concat(extra.map(foldStanceObject)); };
+}
+const extractRelations = makeExtractRelations();
 
 // ── READ A WHOLE CORPUS, FAST ──────────────────────────────────────────────
 // A book-sized source read as ONE passage is superlinear: the reader's
@@ -224,26 +233,38 @@ export async function readCorpus(docs, { reader = null, chunkChars = 60000 } = {
 const cleanText = (s) => String(s == null ? '' : s).replace(/\s+/g, ' ').trim();
 
 export async function makeEngineRelationReader(extra = {}) {
+  const { features = {}, ...rest } = extra;
   const { posPrior, verbForms, lemmatizer } = await loadPriors();
   // hand the composed reader its priors, once — the same received closed class
   // the dispatch reader already uses, plus the measured role config.
   // sameAct is widened by stance class, so "is pro" binds a source's "in
   // support of" without either label being rewritten.
-  const sameAct = lemmatizer
-    ? (a, b) => { const x = stanceClass(a), y = stanceClass(b); if (x && y) return x === y; return lemmatizer.sameAct(a, b); }
-    : (a, b) => { const x = stanceClass(a), y = stanceClass(b); if (x && y) return x === y; return String(a).toLowerCase() === String(b).toLowerCase(); };
+  //
+  // FEATURES (the demo's layer toggles; every one defaults ON, so omitting
+  // `features` is byte-identical to before this option existed):
+  //   posPrior   — the class prior classifyWord reads (Thrax over UD)
+  //   morphology — the UniMorph lemmatizer that widens same-act
+  //   stance     — the two stance passes this module adds over the base reader
+  //   nounPhraseSubjects / phrasalPredicates — reader shape, passed through
+  const useMorph = features.morphology !== false && !!lemmatizer;
+  const useStance = features.stance !== false;
+  const usePos = features.posPrior !== false;
+  const sameAct = (a, b) => {
+    if (useStance) { const x = stanceClass(a), y = stanceClass(b); if (x && y) return x === y; }
+    return useMorph ? lemmatizer.sameAct(a, b) : String(a).toLowerCase() === String(b).toLowerCase();
+  };
   return makeRelationReader({
     splitSentences, extractSurfaces, discoverReferents, namesCorefer, diaNorm,
     discoverRelationVocab: (...a) => dispatch().discoverRelationVocab(...a),
-    extractRelations,
-    extractorsMode: 'dispatch', tokenize, posPriorFor: () => posPrior, verbForms, oovLexicon: verbForms, attestedVerbs: true,
+    extractRelations: useStance ? extractRelations : makeExtractRelations({ stance: false }),
+    extractorsMode: 'dispatch', tokenize, posPriorFor: () => (usePos ? posPrior : null), verbForms, oovLexicon: verbForms, attestedVerbs: true,
     determiners: DETERMINERS, definiteDeterminers: new Set(P.DEFINITE_DETERMINERS), negationWords: P.NEGATION_WORDS, firstPerson: P.FIRST_PERSON,
     // createLemmatizer's mere presence toggles object-side form identity in
     // endpoint(); it is passed only when a real lemmatizer exists (as before),
     // but sameAct itself always carries the stance class.
-    ...(lemmatizer ? { createLemmatizer: () => ({ sameAct }), morphologyIndex: {} } : {}),
+    ...(useMorph ? { createLemmatizer: () => ({ sameAct }), morphologyIndex: {} } : {}),
     blankFurniture: text => blankLabelRows(text, { minRun: 4, maxCell: 60 }),
-    resolvePronouns, nounPhraseSubjects: true, phrasalPredicates: true, ...extra,
+    resolvePronouns, nounPhraseSubjects: features.nounPhraseSubjects !== false, phrasalPredicates: features.phrasalPredicates !== false, ...rest,
   });
 }
 

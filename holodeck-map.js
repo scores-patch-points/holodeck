@@ -168,6 +168,23 @@ export function mountMap(host, opts = {}) {
   }
 
   const fill = x => { const c = x.color; if (!c) return x.mine ? col.acc : col.blue; if (!c.startsWith('var(')) return c; if (!cc.has(c)) cc.set(c, css(c.slice(4, -1).trim())); return cc.get(c); };
+  // OHS: a CURSOR on the solar system — a pulsing crosshair that marks where the
+  // reading is right now (D.cursor names the node). Drawn over whatever layer is
+  // showing; absent unless the caller sets D.cursor, so every other surface is
+  // byte-identical to before this option existed.
+  function drawCursor(g, sx, sy, label) {
+    const t = (simulate._t || 0), pulse = 9 + 5 * (0.5 + 0.5 * Math.sin(t * 0.09)), R = pulse + 7;
+    g.save(); g.strokeStyle = col.acc; g.lineWidth = 2; g.setLineDash([]); g.globalAlpha = 0.95;
+    g.beginPath(); g.arc(sx, sy, pulse, 0, 6.283); g.stroke();
+    g.beginPath();
+    g.moveTo(sx - R, sy); g.lineTo(sx - R + 6, sy); g.moveTo(sx + R - 6, sy); g.lineTo(sx + R, sy);
+    g.moveTo(sx, sy - R); g.lineTo(sx, sy - R + 6); g.moveTo(sx, sy + R - 6); g.lineTo(sx, sy + R); g.stroke();
+    if (label) { g.font = "11px ui-monospace, Menlo, monospace"; g.textAlign = 'center';
+      const w = g.measureText(label).width + 10;
+      g.globalAlpha = 0.92; g.fillStyle = col.bg; g.fillRect(sx - w / 2, sy - R - 17, w, 14);
+      g.globalAlpha = 1; g.fillStyle = col.acc; g.fillText(label, sx, sy - R - 6); }
+    g.restore();
+  }
   function drawNames(g) {
     const M = buildModel(), hot = new Set([...(D.hot || [])].map(n => M.rep.get(n) || n)), odd = D.odd || new Map();
     const hotE = new Set((D.hotPairs || []).map(([a, b]) => { const x = M.rep.get(a), y = M.rep.get(b); return x && y && x !== y ? eKey(x, y) : ''; }));
@@ -195,6 +212,7 @@ export function mountMap(host, opts = {}) {
     g.font = "12px 'Hanken Grotesk', sans-serif";
     const meas = t => { let w = wcache.get(t); if (w == null) { w = g.measureText(t).width; wcache.set(t, w); } return w; };
     placeLabels(items, W, H - padBottom + 10, meas, 13, topPad - 6).forEach(L => { hitsAt.push({ id: L.id, x: L.x, y: L.y - 4, r: 11 }); g.textAlign = L.align; g.fillStyle = hot.has(L.id) || sel === L.id ? col.ink : col.ink2; g.fillText(L.text, L.x, L.y); });
+    if (D.cursor) { const cr = M.rep.get(D.cursor) || (M.nest.has(D.cursor) ? D.cursor : null), cp = cr && P.get(cr); if (cp) drawCursor(g, X(cp.x), Y(cp.y), 'reading'); }
     g.textAlign = 'center';
     if (!D.nodes.length) { g.fillStyle = col.dim; g.font = "13px 'Hanken Grotesk', sans-serif"; g.fillText(opts.empty || 'Names appear here as they are found.', W / 2, H / 2); }
   }
@@ -213,6 +231,7 @@ export function mountMap(host, opts = {}) {
       g.beginPath(); g.arc(sx, sy, r, 0, 6.283); g.fillStyle = isP ? col.blue : col.acc; g.globalAlpha = 0.9; g.fill(); g.globalAlpha = 1; if (sel === n.id) { g.strokeStyle = col.ink; g.lineWidth = 2; g.stroke(); }
       hitsAt.push({ id: n.id, x: sx, y: sy, r });
       g.textAlign = 'center'; g.fillStyle = col.ink; g.fillText(n.label.length > 34 ? n.label.slice(0, 33) + '…' : n.label, sx, sy + r + 15); g.fillStyle = col.dim; g.fillText(isP ? plural(n.c, 'name') : plural(n.c, 'statement'), sx, sy + r + 29); });
+    if (D.cursor && String(D.cursor).startsWith('doc:')) { const cp = pos.get(D.cursor); if (cp) drawCursor(g, X(cp.x), Y(cp.y), 'reading'); }
   }
   function draw() {
     const g = gc.getContext('2d'); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H); g.textAlign = 'center'; g.globalAlpha = 1;
@@ -263,8 +282,8 @@ export function mountMap(host, opts = {}) {
   // ---------- levels, zoom and pan ----------
   const after = () => { heat = 1; dirty = true; renderCard(); };
   const setLayer = l => { selectedEdge = null; if (l !== 'names') root.querySelector('.hm-position').textContent = docMap.size + ' sources in this map · links count shared names; placement is a display arrangement'; if ((l === 'sources') !== (layer === 'sources')) sel = null; layer = l; after(); };
-  function levelDown() { if (!D) return; if (layer === 'sources') { layer = 'names'; level = 0; manual.clear(); } else if (layer === 'names') { buildModel(); if (level < model.max) { level++; manual.clear(); } } after(); }
-  function levelUp() { if (layer === 'names') { if (level > 0) { level--; manual.clear(); } else { layer = 'sources'; sel = null; } } after(); }
+  function levelDown() { if (!D) return; userLeveled = true; if (layer === 'sources') { layer = 'names'; level = 0; manual.clear(); } else if (layer === 'names') { buildModel(); if (level < model.max) { level++; manual.clear(); } } after(); }
+  function levelUp() { if (layer === 'names') { userLeveled = true; if (level > 0) { level--; manual.clear(); } else { layer = 'sources'; sel = null; } } after(); }
   function zoomAt(mx, my, f) { const nk = Math.max(0.35, Math.min(8, view.k * f)), s = nk / view.k; view.x = mx - (mx - view.x) * s; view.y = my - (my - view.y) * s; view.k = nk; dirty = true; }
   const fit = () => { view.k = 1; view.x = 0; view.y = 0; dirty = true; };
   function focusName(n) { selectedEdge = null; buildModel(); sel = n; layer = 'names'; for (let p = model.nest.parent.get(n); p != null; p = model.nest.parent.get(p)) manual.set(p, true); heat = 1; dirty = true; }
@@ -311,11 +330,14 @@ export function mountMap(host, opts = {}) {
     }
     return best;
   }
-  let autoDone = false;
+  let autoKey = '', userLeveled = false;
   function set(d) {
     D = d; selectedEdge = null; if (d.sig == null || d.sig !== sig) { sig = d.sig; rebuild(); heat = Math.max(heat, 0.8); }
     if ((d.sel || null) !== lastSel) { lastSel = d.sel || null; if (lastSel && nodeMap.has(lastSel)) focusName(lastSel); }
-    if (!autoDone && !d.sel) { buildModel(); if (nest0) { const bl = busiestLevel(); if (bl !== level) { level = bl; manual.clear(); } } autoDone = true; }
+    // Re-pick the busiest level whenever the picture GROWS (a reading that fills
+    // in name by name must not latch its level on the first, empty frame), but
+    // never once the person has levelled it themselves.
+    if (!d.sel) { buildModel(); if (nest0 && nest0.key !== autoKey) { autoKey = nest0.key; if (!manual.size && !userLeveled) { const bl = busiestLevel(); if (bl !== level) { level = bl; manual.clear(); } } } }
     dirty = true; renderCard();
   }
   function destroy() { alive = false; cancelAnimationFrame(raf); ro.disconnect(); root.remove(); }
