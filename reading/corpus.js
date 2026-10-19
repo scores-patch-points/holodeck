@@ -38,7 +38,7 @@ const CSS = `
 
 export function mountSources(host, { makeDeps, openInReader, currentText }) {
   if (!document.getElementById('src-css')) { const s = document.createElement('style'); s.id = 'src-css'; s.textContent = CSS; document.head.appendChild(s); }
-  const st = { sources: [], corpus: null, fold: null, overlay: [], sel: null, voiceSrc: null, onlyShared: false, busy: false, err: null };
+  const st = { sources: [], corpus: null, fold: null, overlay: [], sel: null, voiceSrc: null, onlyShared: true, busy: false, err: null };
   let nextId = 1;
   let PRIOR; const prior = () => (PRIOR ??= fetch('./register-prior.json').then((r) => r.json()).catch(() => null));
   // the type of a source is SNIFFED (Zenodotus-measured vocabulary + structural cues, a small local model only when thin); a pick overrides it
@@ -54,7 +54,7 @@ export function mountSources(host, { makeDeps, openInReader, currentText }) {
   function regChip(r) { return r ? `<span class="chip">${esc(r)}</span>` : '<span class="chip dim">undeclared</span>'; }
   function render() {
     const autoLabel = (s) => (s.pending ? 'sniffing…' : s.auto ? (eff(s) ? `${eff(s)} · ${Math.round(s.auto.p * 100)}% · sniffed${s.auto.model && s.auto.model.used ? ' + local model' : ''}` : `unsure${s.auto.reason ? ' — ' + s.auto.reason : ''} — pick one, or it is read but not linked`) : '…');
-    const sc = st.sources.map((s) => `<div class="src-card" data-src="${s.id}"><b>${esc(s.label)}</b><select data-f="register" aria-label="type of source" title="${esc(s.auto ? s.auto.ranked.slice(0, 2).map((r) => r.register + ' ' + r.p.toFixed(2) + ': ' + r.why.join('; ')).join('\n') : '')}"><option value="">${esc(autoLabel(s))}</option>${REGS.map(([v, l]) => `<option value="${v}"${v === s.register ? ' selected' : ''}>${l}</option>`).join('')}</select><span><button type="button" data-a="rm">remove</button></span><div class="tx">${esc(s.text.slice(0, 200))}${s.text.length > 200 ? '…' : ''}</div></div>`).join('') || '<div class="dim" style="font-size:12.5px"></div>';
+    const sc = st.sources.map((s) => `<div class="src-card" data-src="${s.id}"><b>${esc(s.label)}</b><select data-f="register" aria-label="type of source" title="${esc(s.auto ? s.auto.ranked.slice(0, 2).map((r) => r.register + ' ' + r.p.toFixed(2) + ': ' + r.why.join('; ')).join('\n') : '')}"><option value="">${esc(autoLabel(s))}</option>${REGS.map(([v, l]) => `<option value="${v}"${v === s.register ? ' selected' : ''}>${l}</option>`).join('')}</select><span><button type="button" data-a="rm">remove</button></span></div>`).join('') || '<div class="dim" style="font-size:12.5px"></div>';
     host.innerHTML = `<div class="src-panel"><h2>Sources</h2>
       ${sc}
       <div class="src-row"><button type="button" data-a="addcur">add the text above</button><button type="button" data-a="titanic">example: three sources on one ship</button>${st.busy ? '<span class="dim">reading…</span>' : ''}</div>
@@ -66,28 +66,27 @@ export function mountSources(host, { makeDeps, openInReader, currentText }) {
     const beings = f.beings.filter((b) => b.ends.length).sort((a, b) => new Set(b.ends.map((e) => e.source)).size - new Set(a.ends.map((e) => e.source)).size || b.ends.reduce((n, e) => n + e.mentions, 0) - a.ends.reduce((n, e) => n + e.mentions, 0));
     const shown = (st.onlyShared ? beings.filter((b) => new Set(b.ends.map((e) => e.source)).size > 1) : beings).slice(0, 60);
     const kinds = {}; for (const l of f.links) kinds[l.split.kind] = (kinds[l.split.kind] || 0) + 1;
-    const rows = shown.map((b) => `<tr data-being="${esc(b.id)}" class="${b.id === st.sel ? 'sel' : ''}"><td class="mono" title="${esc(b.id)}">${esc(short(b.id))}</td><td>${esc(b.name || '—')}</td><td><span class="chip ${esc(b.reality)}">${esc(b.reality)}</span></td><td>${b.ends.map((e) => `${esc(lab(e.source))} ${regChip(e.register)}×${e.mentions}`).join('<br>')}</td></tr>`).join('');
-    return `<div class="src-row dim" style="font-size:12.5px">${c.log.length.toLocaleString()} events in one log · ${f.referents.size} referents · ${(n => `${n} being${n === 1 ? '' : 's'} span${n === 1 ? 's' : ''} more than one source`)(f.beings.filter((b) => new Set(b.ends.map((e) => e.source)).size > 1).length)} · ${f.links.length} cross-source link${f.links.length === 1 ? '' : 's'} ${Object.entries(kinds).map(([k, n]) => `<span class="chip">${esc(k)} ${n}</span>`).join('')}${c.refused.length ? ` · ${c.refused.length} source${c.refused.length === 1 ? '' : 's'} read but not linked (no register declared)` : ''}${st.overlay.length ? ` · <b>${st.overlay.length}</b> event${st.overlay.length === 1 ? '' : 's'} from you` : ''}</div>
-      <label style="font-size:12.5px"><input type="checkbox" data-f="shared"${st.onlyShared ? ' checked' : ''}> only beings met in more than one source</label>
-      <table class="src-tbl"><thead><tr><th>being</th><th>name</th><th>reality</th><th>ends — the source it was met in, the register that source speaks in, mentions</th></tr></thead><tbody>${rows || '<tr><td colspan="4" class="dim">no referent established</td></tr>'}</tbody></table>${profile()}${voices()}`;
+    const rows = shown.map((b) => `<tr data-being="${esc(b.id)}" class="${b.id === st.sel ? 'sel' : ''}"><td>${esc(b.name || '—')}</td><td><span class="chip ${esc(b.reality)}">${esc(b.reality)}</span></td><td>${b.ends.map((e) => `${esc(lab(e.source))} ${regChip(e.register)}×${e.mentions}`).join('<br>')}</td></tr>`).join('');
+    return `<div class="src-row dim">${f.links.length} cross-source link${f.links.length === 1 ? '' : 's'} ${Object.entries(kinds).map(([k, n]) => `<span class="chip">${esc(k)} ${n}</span>`).join('')}${c.refused.length ? ` · ${c.refused.length} not linked (type unsure)` : ''}${st.overlay.length ? ` · ${st.overlay.length} severed by you` : ''}</div>
+      <table class="src-tbl"><thead><tr><th>name</th><th>reality</th><th>met in</th></tr></thead><tbody>${rows || '<tr><td colspan="3" class="dim">nothing shared across these sources yet</td></tr>'}</tbody></table>${profile()}${voices()}`;
   }
 
   function profile() {
-    const c = st.corpus, f = st.fold, b = f.beings.find((x) => x.id === st.sel); if (!b) return `<div class="src-prof dim">Select a being to see its ends, the links that join them and the split on each.</div>`;
+    const c = st.corpus, f = st.fold, b = f.beings.find((x) => x.id === st.sel); if (!b) return '';
     const lab = (id) => (c.sources.find((s) => s.id === id) || {}).label || id;
     const links = f.links.filter((l) => b.members.includes(l.fromRoot) || b.members.includes(l.toRoot));
     return `<div class="src-prof"><div><b>${esc(b.name || '—')}</b> <span class="mono dim" title="${esc(b.id)}">${esc(b.id)}</span> <span class="chip ${esc(b.reality)}">${esc(b.reality)}</span></div>
-      <div class="why">${esc(b.basis || '')} Its ${b.members.length} referent${b.members.length === 1 ? '' : 's'} stay separate; the being is the view over the links between them.</div>
+      
       <table class="src-tbl"><thead><tr><th>referent (end)</th><th>source</th><th>register</th><th>mentions</th></tr></thead><tbody>${b.ends.map((e) => `<tr><td class="mono" title="${esc(e.ref)}">${esc(short(e.ref))} ${esc(e.name || '')}</td><td>${esc(lab(e.source))}</td><td>${regChip(e.register)} ${e.truthClaiming ? '<span class="dim">claims truth</span>' : e.truthClaiming === false ? '<span class="dim">tells</span>' : ''}</td><td>${e.mentions}</td></tr>`).join('')}</tbody></table>
-      ${links.length ? `<div class="why" style="margin-top:8px">${links.length} link${links.length === 1 ? '' : 's'} (provenance kept on each):</div>${links.map((l) => `<div style="margin:3px 0"><span class="chip">${esc(l.split.kind)}</span> ${esc(l.from.name)} <span class="dim">(${esc(lab(l.from.source))}, ${esc(l.from.register)})</span> ⟶ ${esc(l.to.name)} <span class="dim">(${esc(lab(l.to.source))}, ${esc(l.to.register)})</span><br><span class="dim mono">matched “${esc(l.matched?.from)}” ~ “${esc(l.matched?.to)}” · ${esc(l.checkedBy)}</span> <button type="button" data-a="sever" data-link="${esc(l.id)}">sever this link</button></div>`).join('')}` : '<div class="why">No cross-source link: this being is met in one source only.</div>'}</div>`;
+      ${links.length ? links.map((l) => `<div style="margin:6px 0" title="${esc('matched “' + (l.matched?.from ?? '') + '” ~ “' + (l.matched?.to ?? '') + '” — ' + (l.checkedBy ?? ''))}"><span class="chip">${esc(l.split.kind)}</span> ${esc(lab(l.from.source))} <span class="dim">(${esc(l.from.register)})</span> ⟶ ${esc(lab(l.to.source))} <span class="dim">(${esc(l.to.register)})</span> <button type="button" data-a="sever" data-link="${esc(l.id)}">sever</button></div>`).join('') : ''}</div>`;
   }
 
   function voices() {
     const c = st.corpus; const src = c.sources.find((s) => s.id === (st.voiceSrc || c.sources[0].id)) || c.sources[0];
     const text = st.sources.find((s) => s.id === src.id)?.text ?? '';
-    return `<div class="src-prof"><div><b>Who is saying it</b> — pick a source, then click a word in its text.</div>
+    return `<details class="src-prof"><summary><b>Who is saying it</b></summary>
       <div class="src-row">${c.sources.map((s) => `<button type="button" data-a="vsrc" data-src="${s.id}"${s.id === src.id ? ' class="primary"' : ''}>${esc(s.label)}</button>`).join('')}</div>
-      <div class="voice-text" id="voice-text" data-src="${src.id}">${esc(text)}</div><div class="voice-chain" id="voice-chain" aria-live="polite"><span class="dim">no position chosen</span></div></div>`;
+      <div class="voice-text" id="voice-text" data-src="${src.id}">${esc(text)}</div><div class="voice-chain" id="voice-chain" aria-live="polite"><span class="dim">click a word</span></div></details>`;
   }
 
   function showVoices(srcId, off) {
