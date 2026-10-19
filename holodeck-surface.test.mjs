@@ -58,3 +58,13 @@ test('documentClassifier answers a defined acronym from the document and leaves 
   assert.equal(c('Zzxqy.').found, false);
   assert.equal(c('the').attested, undefined);
 });
+
+test('documentClassifier answers from what was looked up, and a form never looked up stays a typed gap', () => {
+  const lookups = new Map([['hereunder', { dictionary: { found: true, upos: ['ADV'], entries: [{ heading: 'Adverb', upos: 'ADV', gloss: 'Under this.' }] } }]]);
+  const c = documentClassifier('The Contractor shall pay hereunder. Zzxqy waits.', { posPrior, lemmatizer, lookups });
+  const h = c('hereunder.');
+  assert.equal(h.found, true); assert.equal(h.attested, 'dictionary'); assert.equal(h.candidates[0].upos, 'ADV');
+  assert.equal(c('Zzxqy').found, false);
+  const without = documentClassifier('The Contractor shall pay hereunder.', { posPrior, lemmatizer });
+  assert.equal(without('hereunder').found, false);
+});

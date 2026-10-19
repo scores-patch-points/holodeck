@@ -7,6 +7,7 @@
 import { classifyWord, normalizeForm } from './vendor/eoreader7/native/adapters/text/wordclass.js';
 import { stemsOf } from './vendor/eoreader7/native/adapters/text/morphology.js';
 import { readDocumentEvidence, classifyWithDocument } from './vendor/eoreader7/native/adapters/text/document-evidence.js';
+import { classifyWithLookups, lookupWitness } from './vendor/eoreader7/native/adapters/text/external-evidence.js';
 
 export const normalizeSurface = normalizeForm;
 
@@ -35,7 +36,13 @@ export const lookupForm = surface => normalizeForm(surface).form;
  * ranges that earned it). Anything the document does not settle stays a typed gap.
  */
 export function documentClassifier(text, opts = {}) {
-  const base = (form) => classifyForm(form, opts);
-  const doc = readDocumentEvidence(text, { classify: base });
+  // `lookups` is a cache of what a dictionary / Wikipedia / Wikidata lookup already returned (holodeck-lookup.js):
+  // the chain answers from it, never reaches the network, and a form never looked up stays a typed gap.
+  // `memo`: classification of a written form is pure, so a replay that re-reads many prefixes shares one cache — measured 13x on a
+  // 30,000-character contract (the same words were being re-classified on every prefix). It sits BELOW the lookups, which can change.
+  const { lookups = null, memo = null, ...cls } = opts;
+  const baseForm = memo ? (form) => { let c = memo.get(form); if (c === undefined) { c = classifyForm(form, cls); memo.set(form, c); } return c; } : (form) => classifyForm(form, cls);
+  const base = lookups ? classifyWithLookups(baseForm, lookups) : baseForm;
+  const doc = readDocumentEvidence(text, { classify: base, witnesses: lookups ? [lookupWitness(lookups)] : [] });
   return Object.assign(classifyWithDocument(base, doc), { doc });
 }

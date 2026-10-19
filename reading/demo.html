@@ -193,6 +193,47 @@
   .insp .why{font:12px/1.5 var(--sans);color:var(--dim);margin-top:4px}
   .insp .pill{display:inline-block;border:1px solid var(--line2);border-radius:99px;padding:0 8px;margin:0 4px 3px 0;font:11px var(--mono);color:var(--ink2)}
   .insp .rec{padding:10px 18px}.insp .rec .r{display:flex;gap:10px;font:12px/1.9 var(--mono);color:var(--ink2);cursor:pointer;border-radius:5px;padding:0 4px}.insp .rec .r:hover{background:var(--sel)}.insp .rec .r b{color:var(--ink);font-weight:500}.insp .rec .r span:first-child{color:var(--dim);min-width:42px}
+  .insp .itabs{position:sticky;top:0;z-index:2;display:flex;gap:2px;padding:0 10px;background:var(--bg);border-bottom:1px solid var(--line)}
+  .insp .itabs button{all:unset;cursor:pointer;font:600 12.5px var(--sans);color:var(--dim);padding:9px 11px;border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap}
+  .insp .itabs button:hover{color:var(--ink)}.insp .itabs button[aria-selected=true]{color:var(--ink);border-bottom-color:var(--acc)}
+  .insp .rv .rh{display:flex;align-items:center;gap:8px;padding:10px 16px 6px;font:600 10.5px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
+  .insp .rv .rh .sp{flex:1}.insp .rv .rh button{all:unset;cursor:pointer;font:600 12px var(--sans);letter-spacing:0;text-transform:none;color:var(--mut);padding:3px 8px;border:1px solid var(--line2);border-radius:5px}.insp .rv .rh button:hover{color:var(--ink)}
+  .insp .rv pre{margin:0;padding:4px 16px 24px;font:12.5px/1.6 var(--mono);color:var(--ink2);overflow-x:auto;white-space:pre}
+  .insp .rv pre.plain{font:15px/1.65 var(--serif);white-space:pre-wrap;color:var(--ink)}
+  /* the Reading view: the whole text, always; the reading of it is what moves */
+  .insp .rd{padding:0 0 28px}.insp .rd0{padding:18px;color:var(--dim);font:13px/1.6 var(--sans)}
+  .insp .tl{display:flex;align-items:center;gap:6px;padding:10px 14px 4px}
+  .insp .tl button{all:unset;cursor:pointer;color:var(--mut);font:600 12px var(--sans);padding:3px 7px;border:1px solid var(--line2);border-radius:5px}.insp .tl button:hover{color:var(--ink)}
+  .insp .tl .pl{margin-left:auto;color:var(--ink);border-color:var(--acc);white-space:nowrap}
+  .insp .tl input[type=range]{flex:1;accent-color:var(--acc);min-width:0}
+  .insp .tls{padding:2px 16px 8px;font:12px/1.5 var(--mono);color:var(--dim)}.insp .tls b{color:var(--ink)}
+  .insp .rt{padding:6px 16px 12px;font:15px/1.5 var(--serif);color:var(--ink);white-space:pre-wrap;word-break:break-word}
+  .insp .rt .w{display:inline-block;vertical-align:top;text-align:center;border-radius:4px;padding:0 1px;cursor:pointer;position:relative;--c:var(--dim)}
+  .insp .rt .w:hover{background:var(--sel)}
+  .insp .rt .w .tx{display:block;border-bottom:2px solid var(--c)}
+  .insp .rt .w .tg{display:block;font:9.5px/1.15 var(--mono);font-style:normal;color:var(--c);min-height:11px;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;letter-spacing:.02em}
+  .insp .rt .w.un .tx{border-bottom-color:transparent;color:var(--dim);opacity:.5}
+  .insp .rt .w[data-u=NOUN]{--c:var(--blue)}.insp .rt .w[data-u=PROPN]{--c:#c68bff}.insp .rt .w[data-u=VERB]{--c:var(--green)}.insp .rt .w[data-u=AUX]{--c:#4f9c72}
+  .insp .rt .w[data-u=ADJ]{--c:var(--amber)}.insp .rt .w[data-u=ADV]{--c:#e0a35a}.insp .rt .w[data-u=NUM]{--c:#ff9d6e}.insp .rt .w[data-u=gap]{--c:#e57373}
+  .insp .rt .w[data-u=DET],.insp .rt .w[data-u=ADP],.insp .rt .w[data-u=CCONJ],.insp .rt .w[data-u=SCONJ],.insp .rt .w[data-u=PRON],.insp .rt .w[data-u=PART]{--c:#7d7d8c}
+  .insp .rt .w[data-u=gap] .tx{border-bottom-style:dotted}
+  .insp .rt .w.men .tx{box-shadow:inset 0 3px 0 var(--rc);padding-top:3px}
+  .insp .rt .w.pron .tx{font-style:italic}.insp .rt .w.pron .tg{color:var(--rc)}
+  .insp .rt .w.rev .tx{animation:revflash 1.6s ease-out 2}.insp .rt .w.rev .tg::before{content:"↺ ";color:var(--acc)}
+  @keyframes revflash{0%,40%{background:var(--acc);color:#04121c}100%{background:transparent}}
+  .insp .rsec{padding:6px 16px 4px;border-top:1px solid var(--line)}.insp .rh2{font:600 10.5px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--dim);padding:6px 0 6px}
+  .insp .rvi{display:grid;grid-template-columns:auto auto 1fr;gap:2px 8px;align-items:baseline;padding:5px 6px;border-radius:6px;cursor:pointer;font:13px/1.4 var(--sans)}.insp .rvi:hover{background:var(--sel)}
+  .insp .rvi .kd{font:600 10px var(--mono);letter-spacing:.06em;text-transform:uppercase;padding:1px 6px;border-radius:99px;background:var(--line);color:var(--ink2)}
+  .insp .rvi .kd.k-pos{background:#1d3a52;color:#8fc7f7}.insp .rvi .kd.k-referent,.insp .rvi .kd.k-pronoun{background:#3a2a52;color:#d3b4f7}.insp .rvi .kd.k-claim,.insp .rvi .kd.k-claim-retracted{background:#2a4a35;color:#9ee2b4}
+  .insp .rvi .ft{color:var(--ink)}.insp .rvi .ft em{color:var(--acc);font-style:normal}.insp .rvi .bc{grid-column:1/-1;font:11.5px var(--mono);color:var(--dim)}
+  .insp .rfs{display:flex;flex-wrap:wrap;gap:6px}.insp .rf{font:12px var(--sans);padding:2px 9px;border-radius:99px;border:1px solid var(--rc);color:var(--ink)}.insp .rf em{color:var(--dim);font-style:normal}
+  .insp .legend{padding:8px 16px 0;font:11px/1.6 var(--mono);color:var(--dim)}
+  .insp .itabs{overflow-x:auto;scrollbar-width:none}.insp .itabs::-webkit-scrollbar{display:none}
+  .insp .lkt{padding:12px 16px 10px;border-bottom:1px solid var(--line)}.insp .lksw{display:flex;gap:8px;align-items:center;font:600 13px var(--sans);color:var(--ink);cursor:pointer}
+  .insp .lkq{display:flex;gap:6px;margin-top:8px}.insp .lkq input{flex:1;min-width:0;background:var(--panel);color:var(--ink);border:1px solid var(--line2);border-radius:6px;padding:6px 9px;font:14px var(--sans)}
+  .insp .lkq button{all:unset;cursor:pointer;font:600 12.5px var(--sans);color:var(--ink);padding:6px 11px;border:1px solid var(--acc);border-radius:6px}.insp .lkq button[disabled]{opacity:.4;cursor:not-allowed;border-color:var(--line2)}
+  .insp .ent{padding:3px 0 5px;font:13px/1.45 var(--sans)}.insp .ent a,.insp .st a{color:var(--blue)}.insp .nom{font:12px/1.8 var(--mono)}.insp .nom em{color:var(--acc);font-style:normal}
+  .insp .lgl{font:11.5px/1.7 var(--mono);color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.insp .lgl .dim{color:var(--dim)}
   @media (min-width:1200px){
     .body{grid-template-columns:300px minmax(0,1fr) minmax(340px,400px)}
     .right{grid-template-rows:auto minmax(0,1fr) auto;min-width:0}
@@ -336,6 +377,11 @@ import { morphologyFromPrior, createLemmatizer, stemsOf } from '../vendor/eoread
 import { splitSentences } from '../vendor/eoreader7/native/adapters/text/spans.js';
 import { tokenize } from '../vendor/eoreader7/native/organs/source.js';
 import { classifyForm, lookupForm, documentClassifier } from '../holodeck-surface.js';
+import { extractSurfaces, discoverReferents, diaNorm } from '../vendor/eoreader7/native/adapters/text/surfaces.js';
+import { sha256 } from '../vendor/eoreader7/native/kernel/sha256.js';
+import { resolvePronouns } from '../vendor/eoreader7/native/adapters/text/pronouns.js';
+import { buildReadingTimeline } from '../vendor/eoreader7/native/adapters/text/reading-timeline.js';
+import { makeLookup } from '../holodeck-lookup.js';
 import { sha256Hex, stableProvenanceId, byteRange, EotLedger } from '../vendor/fold-chat/fold-chat-eot.js';
 
 const $ = (id) => document.getElementById(id);
@@ -439,6 +485,9 @@ const ORDERS = [
 ];
 
 let PRIORS = null, READER = null, LEXICON = null, LEXICON_LONGEST = 0;
+// dictionary · Wikipedia · Wikidata: a crossing the page makes only when asked — see holodeck-lookup.js. Starts OFF.
+const LOOKUP = makeLookup();
+let LOOKUPS_ON = false;
 const knownWord = w => !!(LEXICON && LEXICON.has(String(w).toLowerCase()));
 async function ready(){
   if (READER) return;
@@ -502,7 +551,7 @@ function buildTrace(doc, clean, claims, features, extraction){
 
   const pos = features.pos === false ? null : PRIORS.posPrior;
   // the document's own definitions and typography settle capitalised forms the priors cannot place (candidates, with ranges)
-  const DOCC = pos ? documentClassifier(clean, { posPrior: pos, lemmatizer: PRIORS.lemmatizer }) : null;
+  const DOCC = pos ? documentClassifier(clean, { posPrior: pos, lemmatizer: PRIORS.lemmatizer, lookups: LOOKUP.cache }) : null;
   let gaps = 0, ambiguous = 0, classified = 0;
   shown.forEach(w => {
     if (!pos){ push('grammar', 'off', `“${w.w}” → POS layer OFF — no class prior is read; the form is carried as a bare string`, { s:w.s, e:w.e, data:{ w:w.w, found:false, off:true } }); return; }
@@ -661,7 +710,7 @@ const REAL_SPEEDS = [[1,'1×'],[0.1,'1/10×'],[0.01,'1/100×'],[0.001,'1/1,000×
 let cur = null, BASELINE = null;
 let features = { ...DEFAULT_FEATURES };
 let lastRaw = '', lastLabel = '';
-let LAST_TAB = 'source';
+let LAST_TAB = 'source', LAST_INSP = 'reading';
 
 function openTrace(T){ if (cur) cur.close(); cur = mount(T); return cur; }
 
@@ -840,7 +889,7 @@ function mount(T){
     h += step(3, stems.length ? 'hop' : 'ok', 'act by rule', stems.length ? stems.map(l => `<span class="pill">${esc(l)}</span>`).join('') + '<div class="why">regular inflection is recovered at read time, not stored.</div>' : 'no stem rule applied.');
     return h + step(4, 'ok', 'sameness', 'the prior decides sameness; the material decides presence. The act is a SET, never one chosen.');
   }
-  function renderInsp(e){
+  function whyHTML(e){
     const S0 = L[e.stage] || { label:e.stage, color:'--dim', i:0 }, dt = k ? e.t - ev[k - 1].t : e.t;
     let body;
     if (e.stage === 'grammar') body = inspectGrammar(e);
@@ -850,9 +899,162 @@ function mount(T){
     // the last few lookups, each a way back
     let j = lookupIdx.length; { let lo = 0, hi = lookupIdx.length; while (lo < hi){ const m = (lo + hi) >> 1; if (lookupIdx[m] <= k) lo = m + 1; else hi = m; } j = lo; }
     const recent = lookupIdx.slice(Math.max(0, j - 7), j).reverse().map(i => { const x = ev[i]; const g = x.data || {}; const out = x.stage === 'grammar' ? (g.found ? classLabel(g) + (g.via && g.via.length ? ' ·' + (g.via.find(v => ['lexicon','shape','lemma','document-evidence'].includes(v.step)) || g.via[0]).step.replace('document-evidence','doc') : '') : 'gap') : ((g.lemmas && g.lemmas[0]) || (g.stems && g.stems[0]) || '—'); return `<div class="r" data-i="${i}"><span>${x.stage === 'grammar' ? 'class' : 'act'}</span><b>${esc(g.w)}</b><span>→ ${esc(out)}</span></div>`; }).join('');
-    inspEl.innerHTML = `<div class="ih"><div class="k" style="color:var(${S0.color})">layer ${S0.i + 1} of ${LAYERS.length} · ${esc(S0.label)} · ${esc(e.kind)} · +${ms(dt)} ms</div><div class="ttl">${ttl}</div><div class="sub">${e.s != null && e.e != null && e.e > e.s ? 'characters ' + e.s.toLocaleString() + '–' + e.e.toLocaleString() + ' · ' : ''}step ${(k + 1).toLocaleString()} of ${N.toLocaleString()}</div></div>${body}${recent ? `<div class="rec"><div class="n" style="font:600 10.5px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--dim);padding-bottom:4px">recent lookups</div>${recent}</div>` : ''}`;
+    return `<div class="ih"><div class="k" style="color:var(${S0.color})">layer ${S0.i + 1} of ${LAYERS.length} · ${esc(S0.label)} · ${esc(e.kind)} · +${ms(dt)} ms</div><div class="ttl">${ttl}</div><div class="sub">${e.s != null && e.e != null && e.e > e.s ? 'characters ' + e.s.toLocaleString() + '–' + e.e.toLocaleString() + ' · ' : ''}step ${(k + 1).toLocaleString()} of ${N.toLocaleString()}</div></div>${body}${recent ? `<div class="rec"><div class="n" style="font:600 10.5px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--dim);padding-bottom:4px">recent lookups</div>${recent}</div>` : ''}`;
   }
   inspEl.addEventListener('click', ev2 => { const r = ev2.target.closest('.r'); if (r){ setDir(0); seek(+r.dataset.i); } });
+  // ── the reading over time: the WHOLE text is always on screen; what changes is the READING of it ──
+  const INSP_TABS = [['reading', 'Reading'], ['lookup', 'Look up'], ['plain', 'Plain'], ['diagram', 'Diagrammed'], ['json', 'JSON'], ['why', 'Why this step']];
+  let inspTab = LAST_INSP, tf = -1, tfTimer = 0, lastViewKey = '';
+  const REFCOL = ['#5aa9ff', '#c68bff', '#ffb454', '#6ee7a8', '#ff8fa3', '#7fe0e0', '#d6e36b', '#f29de4'];
+  const tfIdx = () => { const TL = T.timeline; if (!TL || !TL.snapshots.length) return -1; return tf < 0 ? TL.snapshots.length - 1 : Math.min(tf, TL.snapshots.length - 1); };
+  T.onTimeline = () => { lastViewKey = ''; if (wide.matches) renderInsp(ev[k]); };
+  const refKey = n => String(n || '').toLowerCase().split(/\s+/).pop();
+  const stopTL = () => { if (tfTimer){ clearInterval(tfTimer); tfTimer = 0; } };
+  const refsFromClaims = claims => { const refs = new Map(); for (const c of claims) for (const nm of [c.end1, c.end2]) { if (!nm) continue; const kk = String(nm); const r = refs.get(kk) || { n:kk, c:0, s:c.s, e:c.e, b0:c.b0 }; r.c++; if (c.s < r.s){ r.s = c.s; r.e = c.e; r.b0 = c.b0; } refs.set(kk, r); } return refs; };
+  function viewTk(sn){
+    const claims = sn.claims.map(c => c.raw).filter(Boolean);
+    return Object.assign(Object.create(T), { sents:T.sents.slice(0, sn.frontier), claims, refs:refsFromClaims(claims), reopened:new Map(), words:new Array(sn.tokens.length), toks:sn.tokens.map(t => t.w),
+      gaps:sn.tokens.filter(t => !t.upos).length, ambiguous:sn.tokens.filter(t => t.ambiguous).length });
+  }
+  const frontierNote = (sn, i) => { const TL = T.timeline, upTo = TL.snapshots.slice(0, i + 1).flatMap(x => x.revisions);
+    return { read_through_statement:sn.frontier, of_statements:TL.sentences.length, snapshot:i + 1, of_snapshots:TL.snapshots.length, stride:TL.stride, propositions_bound:sn.claims.length, revisions_so_far:upTo.length, complete:sn.frontier >= TL.sentences.length,
+      note:'the reading of the text as of the end of this statement — made from what came before it, never from what comes after; later statements may revise it' }; };
+  const revLine = r => `statement ${r.because.sentence} revised “${r.text}” (${r.kind}): ${r.from} ⇒ ${r.to}${r.because.kinds ? ' — ' + r.because.kinds.join(' + ') : ''}`;
+  function plainAt(sn, i){
+    const TL = T.timeline, Tk = viewTk(sn), f = frontierNote(sn, i), Ls = [];
+    Ls.push(`the reading through statement ${f.read_through_statement} of ${f.of_statements}${f.complete ? ' — the whole text' : ''}`);
+    Ls.push(`${f.propositions_bound} propositions bound · ${Tk.refs.size} referents · ${f.revisions_so_far} revisions so far`); Ls.push('');
+    TL.sentences.forEach((sn2, j) => {
+      Ls.push(sn2.text.replace(/\s+/g, ' ').trim());
+      if (j >= sn.frontier){ Ls.push('   — not read yet'); Ls.push(''); return; }
+      const mine = Tk.claims.filter(cl => cl.located && cl.s >= sn2.offset && cl.s < sn2.end);
+      mine.forEach(cl => { const st = standingOfClaim(cl); Ls.push(`   ${ORDERS[0].line(cl)}${cl.polarity === '-' ? '  (negated)' : ''}${st === 'read' ? '' : '  — ' + st}`); });
+      if (!mine.length) Ls.push('   (no proposition bound)');
+      Ls.push('');
+    });
+    const up = TL.snapshots.slice(0, i + 1).flatMap(x => x.revisions);
+    if (up.length){ Ls.push('revised while reading:'); up.slice(-40).forEach(r => Ls.push('   ' + revLine(r))); }
+    return Ls.join('\n');
+  }
+  function viewText(which){
+    const TL = T.timeline, i = tfIdx(), sn = TL.snapshots[i], f = frontierNote(sn, i);
+    if (which === 'plain') return plainAt(sn, i);
+    const Tk = viewTk(sn), up = TL.snapshots.slice(0, i + 1).flatMap(x => x.revisions);
+    if (which === 'diagram') return `▌ the reading through statement ${f.read_through_statement} of ${f.of_statements}${f.complete ? ' — the whole text' : ''}\n▌ ${f.propositions_bound} propositions · ${f.revisions_so_far} revisions so far — made from what came before; later statements may revise it\n\n` + diagrammedText(Tk) + (up.length ? '\n\nrevised while reading\n' + '-'.repeat(66) + '\n' + up.map(r => '  ' + revLine(r)).join('\n') : '');
+    return JSON.stringify({ cursor:f, ...readingJSON(Tk), revisions:up.map(r => ({ kind:r.kind, text:r.text, at:[r.s, r.e], from:r.from, to:r.to, because:r.because })) }, null, 2);
+  }
+  function renderReading(){
+    const TL = T.timeline;
+    if (!TL) return '<div class="rd0">Reading the text sentence by sentence… <span class="mono">each sentence is read from what came before it, never from what comes after</span></div>';
+    if (!TL.snapshots.length) return `<div class="rd0">${esc(TL.error || 'Nothing to replay.')}</div>`;
+    const i = tfIdx(), sn = TL.snapshots[i], m = TL.snapshots.length, text = T.doc.analysis, readUpTo = TL.sentences[sn.frontier - 1].end;
+    const tok = new Map(sn.tokens.map(t => [t.s, t]));
+    const revAt = new Map(); sn.revisions.forEach(r => { (revAt.get(r.s) || revAt.set(r.s, []).get(r.s)).push(r); });
+    const keys = []; sn.referents.forEach(r => { const kk = refKey(r.name); if (kk && !keys.includes(kk)) keys.push(kk); });
+    const colOf = n => REFCOL[Math.max(0, keys.indexOf(refKey(n))) % REFCOL.length];
+    const wm = new Map();
+    for (const mt of sn.mentions) for (const w of TL.words) if (w.s >= mt.s && w.e <= mt.e) wm.set(w.s, { mt });
+    let h = '', pos = 0;
+    for (const w of TL.words){
+      if (w.s > pos) h += esc(text.slice(pos, w.s));
+      const t = tok.get(w.s), read = w.s < readUpTo, men = wm.get(w.s), rv = revAt.get(w.s);
+      let u = '', tag = '·', tip = read ? '' : 'not read yet';
+      if (t){ u = t.upos || 'gap'; tag = t.upos ? t.upos + (t.ambiguous ? '+' : '') : 'no entry'; tip = `${t.upos || 'no entry'}${t.attested && t.attested !== 'treebank' ? ' · ' + t.attested : ''}${t.via && t.via.length ? ' · via ' + t.via.join(' + ') : ''}`; if (t.attested === 'document') tag += '·doc'; else if (t.attested === 'lexicon') tag += '·lex'; else if (t.attested === 'dictionary') tag += '·dict'; else if (t.attested === 'wikidata') tag += '·wd'; }
+      if (men && men.mt.kind === 'pronoun'){ tag = men.mt.name ? '→ ' + men.mt.name : '→ ?'; tip += ` · pronoun ${men.mt.name ? 'bound to ' + men.mt.name : 'unresolved — the engine could not bind it'}`; }
+      else if (men) tip += ` · mention of ${men.mt.name || '?'}`;
+      if (rv) tip += ' · ' + rv.map(r => `REVISED (${r.kind}): ${r.from} ⇒ ${r.to}`).join(' · ');
+      h += `<span class="w${read ? '' : ' un'}${rv ? ' rev' : ''}${men ? ' men' + (men.mt.kind === 'pronoun' ? ' pron' : '') : ''}" data-s="${w.s}" data-u="${u}"${men ? ` style="--rc:${colOf(men.mt.name)}"` : ''} title="${esc(tip)}"><span class="tx">${esc(text.slice(w.s, w.e))}</span><i class="tg">${read ? esc(tag) : ''}</i></span>`;
+      pos = w.e;
+    }
+    h += esc(text.slice(pos));
+    const revs = sn.revisions.map((r, j) => `<div class="rvi" data-rs="${r.s}"><span class="kd k-${r.kind}">${esc(r.kind === 'pos' ? 'class' : r.kind)}</span><b>${esc(r.text)}</b><span class="ft">${esc(r.from)} <em>⇒</em> ${esc(r.to)}</span><span class="bc">because statement ${r.because.sentence}${r.because.kinds ? ' · ' + esc(r.because.kinds.join(' + ')) : ''}</span></div>`).join('');
+    const up = TL.snapshots.slice(0, i + 1).reduce((n, x) => n + x.revisions.length, 0);
+    const refl = sn.referents.map(r => `<span class="rf" style="--rc:${colOf(r.name)}"><b>${esc(r.name)}</b> ${r.surfaces.length > 1 ? '<em>(' + esc(r.surfaces.join(' = ')) + ')</em> ' : ''}×${r.mentions}</span>`).join('');
+    const unres = sn.mentions.filter(x => x.kind === 'pronoun' && !x.name).length;
+    return `<div class="tl"><button type="button" data-tl="start" title="Before anything is read">|◀</button><button type="button" data-tl="back" title="One statement back">◀</button><input type="range" min="0" max="${m - 1}" value="${i}" aria-label="How much of the text has been read"><button type="button" data-tl="fwd" title="One statement on">▶</button><button type="button" data-tl="play" class="pl">${tfTimer ? '❚❚ Pause' : '▶ Watch it being read'}</button></div>
+      <div class="tls">read through statement <b>${sn.frontier}</b> of <b>${TL.sentences.length}</b>${TL.stride > 1 ? ` <span class="mono">(every ${TL.stride}th statement)</span>` : ''} · ${sn.claims.length} propositions · ${sn.referents.length} referents · <b>${up}</b> revision${up === 1 ? '' : 's'} so far</div>
+      <div class="rt">${h}</div>
+      <div class="rsec"><div class="rh2">revised by what was just read ${sn.revisions.length ? '' : '<span class="mono">— nothing earlier changed at this step</span>'}</div>${revs}</div>
+      <div class="rsec"><div class="rh2">referents as of now${unres ? ` <span class="mono">· ${unres} pronoun${unres === 1 ? '' : 's'} the engine could not bind</span>` : ''}</div><div class="rfs">${refl || '<span class="mono">none established yet</span>'}</div></div>
+      <div class="legend mono">underline = class (blue noun · violet name · green verb · amber adjective) · colour bar = referent · ↺ flash = revised by later reading · dim = not read yet · click a word to jump the pipeline to it</div>`;
+  }
+  function renderInsp(e){
+    const tabs = `<div class="itabs" role="tablist" aria-label="Right panel">${INSP_TABS.map(([id, lab]) => `<button type="button" role="tab" data-itab="${id}" aria-selected="${id === inspTab}">${lab}</button>`).join('')}</div>`;
+    if (inspTab === 'why'){ lastViewKey = ''; inspEl.innerHTML = tabs + whyHTML(e); return; }
+    if (inspTab === 'lookup'){ lastViewKey = ''; const keep = inspEl.scrollTop, had = (inspEl.querySelector('#lk-in') || {}).value; inspEl.innerHTML = tabs + `<div class="rd lkv">${lookupHTML(e)}</div>`; inspEl.scrollTop = keep; return; }
+    const key = `${inspTab}|${T.timeline ? tfIdx() : 'x'}|${tfTimer ? 'p' : ''}`;
+    if (key === lastViewKey && inspEl.querySelector('.rv, .rd')) return;      // the layer cursor moving does not change the reading
+    lastViewKey = key;
+    const keepTop = inspEl.scrollTop;
+    if (inspTab === 'reading'){ inspEl.innerHTML = tabs + `<div class="rd">${renderReading()}</div>`; inspEl.scrollTop = keepTop; return; }
+    const TL = T.timeline;
+    if (!TL || !TL.snapshots.length){ inspEl.innerHTML = tabs + '<div class="rd"><div class="rd0">Reading the text sentence by sentence…</div></div>'; return; }
+    const txt = viewText(inspTab), i = tfIdx(), sn = TL.snapshots[i];
+    const label = { plain:'In plain words', diagram:'Diagrammed sentences', json:'JSON' }[inspTab] + ` — read through statement ${sn.frontier} of ${TL.sentences.length}`;
+    inspEl.innerHTML = tabs + `<div class="rv"><div class="tl"><button type="button" data-tl="start">|◀</button><button type="button" data-tl="back">◀</button><input type="range" min="0" max="${TL.snapshots.length - 1}" value="${i}" aria-label="How much of the text has been read"><button type="button" data-tl="fwd">▶</button></div><div class="rh"><span>${label}</span><span class="sp"></span><button type="button" data-iact="copy">Copy</button><button type="button" data-iact="dl">Download</button></div><pre class="${inspTab}">${esc(txt)}</pre></div>`;
+    inspEl._txt = txt; inspEl.scrollTop = keepTop;
+  }
+
+  // ── Look up: a dictionary, Wikipedia and Wikidata — witnesses the hyperlexicon holds as candidates, never givers ──
+  let selWord = '', lkBusy = '';
+  const bareWord = w => String(w || '').replace(/^[^\p{L}\p{N}]+|[^\p{L}\p{N}]+$/gu, '');
+  const link = (u, t) => u ? `<a href="${esc(u)}" target="_blank" rel="noopener noreferrer">${esc(t)}</a>` : esc(t);
+  const unplacedForms = () => { const TL = T.timeline; if (!TL || !TL.snapshots.length) return []; const cnt = new Map();
+    for (const t of TL.snapshots.at(-1).tokens) if (!t.upos && bareWord(t.w).length >= 3) { const kk = bareWord(t.w).toLowerCase(); cnt.set(kk, (cnt.get(kk) || 0) + 1); }
+    return [...cnt].filter(([kk]) => !LOOKUP.get(kk)).sort((a, b) => b[1] - a[1]).map(([kk]) => kk); };
+  function lookupHTML(e){
+    const w = selWord || (e.stage === 'grammar' || e.stage === 'morph' ? bareWord(e.data && e.data.w) : ''), r = w ? LOOKUP.get(w) : null, un = unplacedForms();
+    const on = LOOKUPS_ON, HLc = Object.values(LOOKUP.hyperlexicon().composition || {});
+    let h = `<div class="lkt"><label class="lksw"><input type="checkbox" data-lkon ${on ? 'checked' : ''}> Allow lookups over the network</label>
+      <div class="why">Sends only the word to <span class="mono">en.wiktionary.org</span>, <span class="mono">en.wikipedia.org</span> and <span class="mono">www.wikidata.org</span>. It is off until you switch it on; each request is listed below and counted in the page’s network total.</div>
+      <div class="lkq"><input type="text" id="lk-in" value="${esc(w)}" placeholder="a word or a name" spellcheck="false"><button type="button" data-lk="look" ${on ? '' : 'disabled'}>Look up</button></div>
+      <div class="lkq"><button type="button" data-lk="batch" ${on && un.length ? '' : 'disabled'}>Look up the ${un.length} form${un.length === 1 ? '' : 's'} this reading could not place</button></div>
+      ${lkBusy ? `<div class="why mono">${esc(lkBusy)}</div>` : ''}</div>`;
+    if (w && !r) h += `<div class="rd0">Nothing looked up for “${esc(w)}” yet.</div>`;
+    if (r){
+      const d = r.dictionary, wp = r.wikipedia, wd = r.wikidata;
+      h += step(1, d && d.found ? 'ok' : 'gap', 'dictionary · Wiktionary', d && d.found ? d.entries.map(x => `<div class="ent"><b>${esc(x.heading || '')}</b> ${x.upos ? `<span class="pill">${esc(x.upos)}</span>` : '<span class="pill">no class</span>'} ${esc(x.gloss || '')}</div>`).join('') + '<div class="why">attested as these parts of speech — attestation, no frequency</div>' : `no entry${d && d.error ? ' · ' + esc(d.error) : ''}`);
+      h += step(2, wp && wp.found ? (wp.disambiguation ? 'hop' : 'ok') : 'gap', 'Wikipedia', wp && wp.found ? `${link(wp.url, wp.title)} ${wp.disambiguation ? '<span class="pill">disambiguation page — not read as an entity</span>' : ''} ${wp.qid ? `<span class="pill">${esc(wp.qid)}</span>` : ''}${wp.description ? `<div class="why"><em>${esc(wp.description)}</em> — an editorial summary, not a type</div>` : ''}` : `no article${wp && wp.error ? ' · ' + esc(wp.error) : ''}`);
+      h += step(3, wd && wd.found ? 'hop' : 'gap', 'Wikidata', wd && wd.found ? `<div class="why">${wd.candidates.length} entit${wd.candidates.length === 1 ? 'y' : 'ies'} for this name${wd.exact ? ` — ${wd.exact} bear${wd.exact === 1 ? 's' : ''} it exactly` : ''}. Which one this text means is identity, settled by consequence — not by the name.</div>` + wd.candidates.map(c => `<div class="ent">${link('https://www.wikidata.org/wiki/' + c.qid, c.qid)} <b>${esc(c.label || '')}</b> ${c.exact ? '<span class="pill">exact</span>' : ''}<div class="why">${esc(c.description || '')}</div></div>`).join('') : `nothing found${wd && wd.error ? ' · ' + esc(wd.error) : ''}`);
+      const noms = LOOKUP.nominations(w);
+      h += `<div class="st"><div class="n"><i>4</i>hyperlexicon — nominated</div><div class="v">${noms.length ? noms.map(n => `<div class="nom"><span class="mono">${esc(n.left)}</span> <em>→</em> <span class="mono">${esc(n.right)}</span> <span class="pill">candidate</span> <span class="pill">${esc(n.giver)}</span></div>`).join('') : 'nothing to nominate.'}<div class="why">${HLc.length} candidate${HLc.length === 1 ? '' : 's'} held across ${LOOKUP.count()} lookup${LOOKUP.count() === 1 ? '' : 's'} · <b>${HLc.filter(x => x.standing === 'given').length} given</b>. A lookup can nominate and witness; only a named giver bound to a charter can give, so nothing here licenses anything.</div></div></div>`;
+    }
+    if (LOOKUP.log.length) h += `<div class="rsec"><div class="rh2">requests made (${LOOKUP.log.length})</div>${LOOKUP.log.slice(-8).reverse().map(x => `<div class="mono lgl">${esc(x.source)} · ${x.status != null ? x.status : 'failed'} · ${x.ms != null ? x.ms + ' ms' : ''} <span class="dim">${esc(x.url.replace(/^https:\/\//, '').slice(0, 78))}</span></div>`).join('')}</div>`;
+    return h;
+  }
+  const rebuildTL = () => { T.timeline = null; lastViewKey = ''; renderInsp(ev[k]); startTimeline(T); };
+  async function doLook(words){
+    if (!LOOKUPS_ON) return;
+    let i = 0;
+    for (const w of words){ i++; lkBusy = `looking up “${w}” (${i} of ${words.length})…`; lastViewKey = ''; renderInsp(ev[k]); try { await LOOKUP.look(w); } catch (err) { console.error(err); } }
+    lkBusy = `${words.length} looked up — re-reading with what came back…`; lastViewKey = ''; renderInsp(ev[k]);
+    rebuildTL(); lkBusy = '';
+  }
+  inspEl.addEventListener('change', ev2 => { if (ev2.target.matches('[data-lkon]')){ LOOKUPS_ON = ev2.target.checked; lastViewKey = ''; renderInsp(ev[k]); } });
+  inspEl.addEventListener('click', ev2 => {
+    const b = ev2.target.closest('[data-lk]'); if (!b || b.disabled) return;
+    if (b.dataset.lk === 'look'){ const w = bareWord((inspEl.querySelector('#lk-in') || {}).value); if (w){ selWord = w; doLook([w]); } }
+    else if (b.dataset.lk === 'batch') doLook(unplacedForms().slice(0, 12));
+  });
+
+  const tlMove = d => { const TL = T.timeline; if (!TL || !TL.snapshots.length) return; stopTL(); tf = Math.max(0, Math.min(TL.snapshots.length - 1, d(tfIdx()))); lastViewKey = ''; renderInsp(ev[k]); };
+  inspEl.addEventListener('input', ev2 => { if (ev2.target.matches('.tl input[type=range]')) tlMove(() => +ev2.target.value); });
+  inspEl.addEventListener('click', ev2 => {
+    const tb = ev2.target.closest('[data-itab]'); if (tb){ inspTab = LAST_INSP = tb.dataset.itab; lastViewKey = ''; renderInsp(ev[k]); return; }
+    const tl = ev2.target.closest('[data-tl]');
+    if (tl){ const a = tl.dataset.tl;
+      if (a === 'start') tlMove(() => 0); else if (a === 'back') tlMove(i => i - 1); else if (a === 'fwd') tlMove(i => i + 1);
+      else if (a === 'play'){ const TL = T.timeline; if (!TL || !TL.snapshots.length) return; if (tfTimer){ stopTL(); lastViewKey = ''; renderInsp(ev[k]); return; }
+        if (tfIdx() >= TL.snapshots.length - 1) tf = 0; else tf = tfIdx();
+        tfTimer = setInterval(() => { const n = TL.snapshots.length; if (tfIdx() >= n - 1){ stopTL(); lastViewKey = ''; renderInsp(ev[k]); return; } tf = tfIdx() + 1; lastViewKey = ''; renderInsp(ev[k]); }, 1100); lastViewKey = ''; renderInsp(ev[k]); }
+      return; }
+    const w = ev2.target.closest('.rt .w'); if (w){ selWord = bareWord(w.querySelector('.tx') && w.querySelector('.tx').textContent); const t = tokAt.get(+w.dataset.s); if (t && (t.ig != null || t.it != null)){ setDir(0); seek(t.ig != null ? t.ig : t.it); } return; }
+    const ri = ev2.target.closest('.rvi'); if (ri){ const el = inspEl.querySelector(`.rt .w[data-s="${ri.dataset.rs}"]`); if (el){ el.scrollIntoView({ block:'center', behavior:'smooth' }); el.classList.remove('rev'); void el.offsetWidth; el.classList.add('rev'); } return; }
+    const ac = ev2.target.closest('[data-iact]'); if (ac){ const txt = inspEl._txt || ''; if (ac.dataset.iact === 'copy'){ navigator.clipboard && navigator.clipboard.writeText(txt).then(() => { ac.textContent = 'Copied'; setTimeout(() => { ac.textContent = 'Copy'; }, 1400); }); }
+      else { const ext = inspTab === 'json' ? 'json' : 'txt'; download(`${slugOf(T)}-through-statement-${T.timeline.snapshots[tfIdx()].frontier}-${inspTab}.${ext}`, txt, inspTab === 'json' ? 'application/json' : 'text/plain;charset=utf-8'); ac.textContent = 'Saved'; setTimeout(() => { ac.textContent = 'Download'; }, 1400); } return; }
+    const r = ev2.target.closest('.r'); if (r){ setDir(0); seek(+r.dataset.i); }
+  });
+  if (!T.timeline) lastViewKey = '';
 
   // ── graph ──
   const gh = $('p-graph'); gh.innerHTML = '';
@@ -1089,7 +1291,7 @@ function mount(T){
       `<span>ledger <b>${St.led.length.toLocaleString()}</b></span>` +
       `<span class="g">layer <b>${(L[e.stage] || {}).i + 1}</b>/${LAYERS.length} · <b>${esc((L[e.stage] || { label:e.stage }).label)}</b></span>` +
       `<span class="g">real run <b>${ms(T.totalMs)}</b> ms · model calls <b>${T.net.models}</b></span>`;
-    metaEl.textContent = `${N.toLocaleString()} steps · read in ${ms(T.totalMs)} ms · ${T.net.requests.length} network request${T.net.requests.length === 1 ? '' : 's'} (no model — static priors + any format library)`;
+    metaEl.textContent = `${N.toLocaleString()} steps · read in ${ms(T.totalMs)} ms · ${T.net.requests.length} network request${T.net.requests.length === 1 ? '' : 's'} (no model — static priors + any format library)` + (LOOKUP.log.length ? ` · + ${LOOKUP.log.length} lookup request${LOOKUP.log.length === 1 ? '' : 's'} you asked for (dictionary · Wikipedia · Wikidata)` : '');
   }
 
   // ── loop ──
@@ -1186,6 +1388,23 @@ function mapClaims(raw, analysis){
   }).sort((a, b) => a.s - b.s || a.b0 - b.b0);
 }
 
+
+// the reading over time: replay the text sentence by sentence, after the first paint (it re-reads each prefix)
+function startTimeline(T){
+  setTimeout(() => {
+    try {
+      const pos = T.feat.pos === false ? null : PRIORS.posPrior, R = T.R;
+      const memo = new Map();   // one classification cache for every prefix of this replay
+      T.timeline = buildReadingTimeline(T.clean, {
+        hash: sha256, diaNorm, splitSentences, wordsIn, extractSurfaces, discoverReferents, resolvePronouns,
+        classifyAt: prefix => pos ? documentClassifier(prefix, { posPrior: pos, lemmatizer: PRIORS.lemmatizer, lookups: LOOKUP.cache, memo }) : (f => classifyForm(f, { posPrior: null })),
+        readClaims: prefix => mapClaims(R([{ ref:'source', text:prefix }]).read(prefix).claims, prefix),
+      }, { maxSnapshots: 40 });
+    } catch (err) { console.error(err); T.timeline = { schema:'EOReadingTimeline@1', sentences:[], words:[], snapshots:[], revisions:[], error:String(err && err.message || err) }; }
+    if (T.onTimeline) T.onTimeline();
+  }, 40);
+}
+
 async function read(text, label, feat, opt = {}){
   const raw = String(text || '');
   if (raw.trim().length < 8){ alert('Nothing to read yet — drop a document or paste text.'); return null; }
@@ -1201,6 +1420,8 @@ async function read(text, label, feat, opt = {}){
   const claims = mapClaims(read0.claims, analysis);
   const doc = { label: lastLabel, analysis, truncated };
   const T = buildTrace(doc, clean, claims, feat, opt.extraction || null);
+  T.clean = clean; T.R = R; T.feat = feat;
+  startTimeline(T);
   if (!BASELINE) BASELINE = T;
   $('model').textContent = `model calls: ${T.net.models}`;
   if (opt.animate !== false){ openTrace(T); }
