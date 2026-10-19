@@ -271,42 +271,25 @@
 </head>
 <body>
 <header>
-  <h1>How to read without a model — the pipeline, layer by layer</h1>
-  <div class="sub">
-    Drop any text in. It is read <b>the way the fold reads it</b> — and you can watch every layer do its work, then
-    <b>switch a layer off</b> and see exactly what it was carrying. The pipeline:
-    <b>bytes → decode → furniture → statements → words → POS → morphology → stance → referents → relations → render → EOT</b>.
-    Every organ is the fold's own vendored code, running here in your browser. <b>No language model is called at any point</b> —
-    and the page counts every network request to prove it. Every name is the <b>giver</b> that supplied it, every claim is
-    anchored to the <b>bytes</b> it was read from, and every assertion stays <b>revisable</b>.
-  </div>
+  <h1>Reading</h1>
 </header>
 <div class="wrap">
   <div id="drop" class="drop">
     <div class="big">drop a document here, or click to choose a file</div>
-    <div class="small">.txt · .md · .html · .json · .csv · source · .pdf (its own text layer) — anything that is text, up to a few MB</div>
   </div>
   <input id="file" type="file" hidden>
-  <textarea id="ta" placeholder="…or paste text here, then press Read."></textarea>
+  <textarea id="ta" placeholder="paste text"></textarea>
   <div class="row">
-    <button id="read" class="primary">Read it — walk the pipeline</button>
+    <button id="read" class="primary">Read</button>
     <button id="clear">Clear</button>
     <span class="samples" id="samples">
-      <button data-s="positions">sample · positions</button>
-      <button data-s="dossier">sample · dossier</button>
-      <button data-s="history">sample · history</button>
+      <button data-s="positions">positions</button>
+      <button data-s="dossier">dossier</button>
+      <button data-s="history">history</button>
     </span>
-    <span id="model" class="badge live" style="margin-left:auto">model calls: 0</span>
+    <span id="model" class="badge live" hidden>model calls: 0</span>
   </div>
   <div id="refuse" class="refuse" hidden></div>
-  <div class="legend-note" id="landing-note">
-    <b>Propositions</b> shows the source in reading order with each proposition drawn as <b>subject —act→ object</b>, carrying a
-    <b>confidence</b> derived from the engine's own signals. <b>POS / Morphology</b> open the priors that did the work.
-    <b>Render</b> shows the same triple in English (SVO), SOV and VSO. <b>EOT</b> is the folded, append-only ledger. Switch any
-    layer in the left rail off and the reading re-runs — with the cost disclosed. A PDF is read through its own text layer
-    (pdf.js); an image, a recording or a binary file is <b>refused with a typed gap</b>, never decoded into mojibake — the full
-    holodeck reads those with its own visual model, OCR and ASR.
-  </div>
 </div>
 
 <div id="sources"></div>
