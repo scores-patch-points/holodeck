@@ -31,6 +31,7 @@ td{padding:8px;border-bottom:1px solid var(--line);vertical-align:top}tr.row{cur
 <textarea id="src" spellcheck="false">Councilmember O’Connell asked the Department. The mayor condemned the raid, and Marie Curie praised the method. Zzxqy underwent review.</textarea>
 <div class="tg">
   <label><input type="checkbox" id="fPos" checked> class prior (UD English-EWT)</label>
+  <label><input type="checkbox" id="fDoc" checked> this document’s own evidence (definitions, typography)</label>
   <label><input type="checkbox" id="fLex" checked> received class lexicon (UniMorph + closed class)</label>
   <label><input type="checkbox" id="fNorm" checked> written-form normalisation</label>
   <label><input type="checkbox" id="fMorph" checked> UniMorph + rule</label>
@@ -50,7 +51,7 @@ td{padding:8px;border-bottom:1px solid var(--line);vertical-align:top}tr.row{cur
 <script type="module">
 import { classifyWord, normalizeForm, POS_PRIOR_META, THRAX_MAP } from '../vendor/eoreader7/native/adapters/text/wordclass.js';
 import { morphologyFromPrior, createLemmatizer, stemsOf } from '../vendor/eoreader7/native/adapters/text/morphology.js';
-import { classifyForm } from '../holodeck-surface.js';
+import { classifyForm, documentClassifier } from '../holodeck-surface.js';
 const $ = id => document.getElementById(id);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const get = async p => (await fetch(p)).json();
@@ -68,9 +69,9 @@ const bars = c => c.slice(0, 3).map(k => `<span class="bar" style="width:${Math.
 function readOne(w, f) {
   const out = { w, cls: null, via: [], form: w, inferred: false, by: [] };
   if (f.pos) {
-    if (f.norm) { const c = classifyForm(w, { posPrior: f.lex ? pos : posNoLex, lemmatizer: f.lemma ? lemmatizer : null }); if (c.found) out.cls = c; out.via = c.via || []; out.form = c.form || w; out.inferred = !!c.inferred; }
+    if (f.norm) { const c = f.docC ? f.docC(w) : classifyForm(w, { posPrior: f.lex ? pos : posNoLex, lemmatizer: f.lemma ? lemmatizer : null }); if (c.found) out.cls = c; out.via = c.via || []; out.form = c.form || w; out.inferred = !!c.inferred; }
     else { const r = rawHit(w); if (r) out.cls = classifyWord(w.toLowerCase(), { posPrior: pos }); }
-    if (out.cls) out.by.push(out.inferred ? 'class prior (via act, inferred)' : out.cls.attested ? out.cls.attested + ' (' + (out.cls.attested === 'lexicon' ? 'attested, not measured' : 'declared grammar') + ')' : out.via.length ? 'class prior (after normalisation)' : 'class prior');
+    if (out.cls) out.by.push(out.inferred ? 'class prior (via act, inferred)' : out.cls.attested ? out.cls.attested + ' (' + (out.cls.attested === 'lexicon' ? 'attested, not measured' : out.cls.attested === 'document' ? 'a candidate from this text’s own evidence' : 'declared grammar') + ')' : out.via.length ? 'class prior (after normalisation)' : 'class prior');
   }
   const lf = f.norm ? normalizeForm(w).form : w;
   out.morph = null;
@@ -82,10 +83,12 @@ function readOne(w, f) {
 }
 const sig = r => (r.cls ? '1' : '0') + (r.morph ? '1' : '0');
 function render() {
-  const f = { lex: $('fLex').checked, pos: $('fPos').checked, norm: $('fNorm').checked, morph: $('fMorph').checked, lemma: $('fLemma').checked };
+  const f = { doc: $('fDoc').checked, lex: $('fLex').checked, pos: $('fPos').checked, norm: $('fNorm').checked, morph: $('fMorph').checked, lemma: $('fLemma').checked };
+  f.docC = f.doc && f.pos && f.norm ? documentClassifier($('src').value, { posPrior: f.lex ? pos : posNoLex, lemmatizer: f.lemma ? lemmatizer : null }) : null;
+  const fullDocC = documentClassifier($('src').value, { posPrior: pos, lemmatizer });
   const words = $('src').value.split(/\s+/).filter(Boolean);
   const rs = words.map(w => readOne(w, f));
-  const base = words.map(w => readOne(w, { lex: true, pos: true, norm: true, morph: true, lemma: true }));
+  const base = words.map(w => readOne(w, { docC: fullDocC, lex: true, pos: true, norm: true, morph: true, lemma: true }));
   $('rows').innerHTML = rs.map((r, i) => {
     const cls = r.cls ? bars(r.cls.candidates) : `<span class="t-gap">no entry — typed gap</span>`;
     const hop = r.via.length ? r.via.map(v => `<span class="pill t-${v.step === 'lemma' ? 'inf' : 'hop'}" title="${esc(v.note)}">${esc(v.step)}</span>`).join('') + `<span class="mono">${esc(r.form)}</span>` : `<span class="dim mono">${esc(r.form)}</span>`;
@@ -100,6 +103,6 @@ function render() {
     $('detail').textContent = JSON.stringify({ written: r.w, lookedUpAs: r.form, hops: r.via, 'pos-eng.json forms[…]': pos.forms[key] ?? null, 'morphology-eng.json forms[…]': morph.forms[key] ?? null, rule: r.morph ? r.morph.stems : [], thrax: Object.fromEntries(Object.keys(pos.forms[key] || {}).map(u => [u, THRAX_MAP[u] ?? null])) }, null, 2);
   });
 }
-['src', 'fLex', 'fPos', 'fNorm', 'fMorph', 'fLemma'].forEach(id => $(id).addEventListener('input', render));
+['src', 'fDoc', 'fLex', 'fPos', 'fNorm', 'fMorph', 'fLemma'].forEach(id => $(id).addEventListener('input', render));
 render();
 </script></body></html>

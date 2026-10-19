@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { classifyForm, normalizeSurface, lookupForm } from './holodeck-surface.js';
+import { classifyForm, normalizeSurface, lookupForm, documentClassifier } from './holodeck-surface.js';
 import { createLemmatizer, morphologyFromPrior } from './vendor/eoreader7/native/adapters/text/morphology.js';
 
 const posPrior = JSON.parse(fs.readFileSync(new URL('./vendor/eoreader7/native/priors/pos-eng.json', import.meta.url), 'utf8'));
@@ -45,4 +45,16 @@ test('a form the prior and the rule both lack stays a typed gap', () => {
 test('lookupForm hands a lemmatizer the same normalised form', () => {
   assert.equal(lookupForm('Department.'), 'Department');
   assert.equal(normalizeSurface('plain').steps.length, 0);
+});
+
+test('documentClassifier answers a defined acronym from the document and leaves a stranger a typed gap', () => {
+  const text = 'The Metropolitan Nashville Public Schools (MNPS) shall inspect the work. MNPS shall pay. Call MNPS. See MNPS. Ask MNPS. Zzxqy.';
+  const c = documentClassifier(text, { posPrior, lemmatizer });
+  const m = c('MNPS,');
+  assert.equal(m.found, true);
+  assert.equal(m.attested, 'document');
+  assert.equal(m.candidates[0].upos, 'PROPN');
+  assert.ok(m.evidence.every(e => Array.isArray(e.at) || e.at === null));
+  assert.equal(c('Zzxqy.').found, false);
+  assert.equal(c('the').attested, undefined);
 });

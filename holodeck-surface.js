@@ -6,6 +6,7 @@
 // so no one reads it as attested for the form.
 import { classifyWord, normalizeForm } from './vendor/eoreader7/native/adapters/text/wordclass.js';
 import { stemsOf } from './vendor/eoreader7/native/adapters/text/morphology.js';
+import { readDocumentEvidence, classifyWithDocument } from './vendor/eoreader7/native/adapters/text/document-evidence.js';
 
 export const normalizeSurface = normalizeForm;
 
@@ -27,3 +28,14 @@ export function classifyForm(surface, opts = {}) {
 
 /** The form to hand a lemmatizer / stemmer: punctuation-free, straight apostrophe. */
 export const lookupForm = surface => normalizeForm(surface).form;
+
+/**
+ * A classifier that also answers from the document it is reading: its own definitions and typography
+ * settle capitalised forms the priors cannot place (document-evidence.js — candidates, each with the
+ * ranges that earned it). Anything the document does not settle stays a typed gap.
+ */
+export function documentClassifier(text, opts = {}) {
+  const base = (form) => classifyForm(form, opts);
+  const doc = readDocumentEvidence(text, { classify: base });
+  return Object.assign(classifyWithDocument(base, doc), { doc });
+}
