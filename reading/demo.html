@@ -312,6 +312,8 @@
   </div>
 </div>
 
+<div id="sources"></div>
+
 <div id="app">
   <div class="top">
     <h2 id="p-title">how it was read</h2>
@@ -396,12 +398,13 @@ import { morphologyFromPrior, createLemmatizer, stemsOf } from '../vendor/khora/
 import { splitSentences } from '../vendor/khora/native/adapters/text/spans.js';
 import { tokenize } from '../vendor/khora/native/organs/source.js';
 import { classifyForm, lookupForm, documentClassifier } from '../holodeck-surface.js';
-import { extractSurfaces, discoverReferents, diaNorm } from '../vendor/khora/native/adapters/text/surfaces.js';
+import { namesCorefer, genericTokens, extractSurfaces, discoverReferents, diaNorm } from '../vendor/khora/native/adapters/text/surfaces.js';
 import { sha256 } from '../vendor/khora/native/kernel/sha256.js';
 import { resolvePronouns } from '../vendor/khora/native/adapters/text/pronouns.js';
 import { buildReadingTimeline, foldLog, CELLS } from '../vendor/khora/native/adapters/text/reading-timeline.js';
 import { makeLookup } from '../holodeck-lookup.js';
 import { startOffline } from './offline.js';
+import { mountSources } from './corpus.js';
 import { browserOcr, loadPdfjs } from '../holodeck-ocr.js';
 import { sha256Hex, stableProvenanceId, byteRange, EotLedger } from '../vendor/fold-chat/fold-chat-eot.js';
 
@@ -1766,8 +1769,17 @@ async function run(text, label, opt = {}){
   finally { btn.textContent = was; btn.disabled = false; }
 }
 
+// several sources, one log (reading/corpus.js): the page supplies the priors and the verb test, the organ owns none
+async function corpusDeps(){
+  await ready();
+  const pos = PRIORS.posPrior, memo = new Map();
+  const isVerb = w => { const c = classifyForm(String(w).toLowerCase(), { posPrior: pos, lemmatizer: PRIORS.lemmatizer }); return !!(c.found && c.candidates && c.candidates[0] && c.candidates[0].upos === 'VERB'); };
+  return { hash: sha256, diaNorm, splitSentences, wordsIn, extractSurfaces, discoverReferents, resolvePronouns, namesCorefer, genericTokens, isVerb,
+    classifyAt: prefix => documentClassifier(prefix, { posPrior: pos, lemmatizer: PRIORS.lemmatizer, lookups: LOOKUP.cache, memo }) };
+}
+const SOURCES = mountSources($('sources'), { makeDeps: corpusDeps, openInReader: (t, l) => { ta.value = t; run(t, l); }, currentText: () => ta.value });
 const OFFLINE = startOffline({ chip: $('offline-chip') });
-window.__demo = { offline: OFFLINE, read, run, json:() => (cur ? readingJSON(cur.T) : null), text:() => (cur ? diagrammedText(cur.T) : null), current:() => (cur ? cur.T : null), features:() => features, net };
+window.__demo = { offline: OFFLINE, sources: SOURCES, read, run, json:() => (cur ? readingJSON(cur.T) : null), text:() => (cur ? diagrammedText(cur.T) : null), current:() => (cur ? cur.T : null), features:() => features, net };
 </script>
 </body>
 </html>
