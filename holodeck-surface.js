@@ -1,0 +1,48 @@
+// holodeck-surface.js — the one hop the vendored classifyWord does not take: a form missing from the
+// class prior whose ACT is in it ("condemned" → "condemn"). The written-form normalisation (curly
+// apostrophe, the sentence's own punctuation) lives upstream in khora's wordclass.js and arrives
+// through the vendored copy, so every consumer inherits it. This wrapper adds the lemma hop, which
+// is an inference rather than a typing difference — it is carried as `inferred` with the act named,
+// so no one reads it as attested for the form.
+import { classifyWord, normalizeForm } from './vendor/eoreader7/native/adapters/text/wordclass.js';
+import { stemsOf } from './vendor/eoreader7/native/adapters/text/morphology.js';
+import { readDocumentEvidence, classifyWithDocument } from './vendor/eoreader7/native/adapters/text/document-evidence.js';
+import { classifyWithLookups, lookupWitness } from './vendor/eoreader7/native/adapters/text/external-evidence.js';
+
+export const normalizeSurface = normalizeForm;
+
+/** classifyWord, then — only on a miss, only with the act in the prior — the lemma hop. */
+export function classifyForm(surface, opts = {}) {
+  const { lemmatizer = null, ...cls } = opts;
+  const c = classifyWord(surface, cls);
+  if (c.found) return { ...c, form: c.form ?? surface, via: c.via ?? [] };
+  const { form, steps } = normalizeForm(surface);
+  const lower = form.toLowerCase();
+  const acts = new Set([...(lemmatizer ? lemmatizer.lemmasOf(lower) : []), ...stemsOf(lower)]);
+  acts.delete(lower);
+  for (const act of acts) {
+    const a = classifyWord(act, cls);
+    if (a.found) return { ...a, surface, form, via: [...steps, { step: 'lemma', note: `“${form}” is not in the class prior; its act “${act}” is — the class is the act’s, not the form’s` }], inferred: true, act };
+  }
+  return { ...c, form: surface, via: [] };
+}
+
+/** The form to hand a lemmatizer / stemmer: punctuation-free, straight apostrophe. */
+export const lookupForm = surface => normalizeForm(surface).form;
+
+/**
+ * A classifier that also answers from the document it is reading: its own definitions and typography
+ * settle capitalised forms the priors cannot place (document-evidence.js — candidates, each with the
+ * ranges that earned it). Anything the document does not settle stays a typed gap.
+ */
+export function documentClassifier(text, opts = {}) {
+  // `lookups` is a cache of what a dictionary / Wikipedia / Wikidata lookup already returned (holodeck-lookup.js):
+  // the chain answers from it, never reaches the network, and a form never looked up stays a typed gap.
+  // `memo`: classification of a written form is pure, so a replay that re-reads many prefixes shares one cache — measured 13x on a
+  // 30,000-character contract (the same words were being re-classified on every prefix). It sits BELOW the lookups, which can change.
+  const { lookups = null, memo = null, ...cls } = opts;
+  const baseForm = memo ? (form) => { let c = memo.get(form); if (c === undefined) { c = classifyForm(form, cls); memo.set(form, c); } return c; } : (form) => classifyForm(form, cls);
+  const base = lookups ? classifyWithLookups(baseForm, lookups) : baseForm;
+  const doc = readDocumentEvidence(text, { classify: base, witnesses: lookups ? [lookupWitness(lookups)] : [] });
+  return Object.assign(classifyWithDocument(base, doc), { doc });
+}

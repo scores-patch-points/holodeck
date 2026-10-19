@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>How it reads — the priors behind every word</title>
+<style>
+:root{--bg:#141418;--panel:#1c1c22;--line:#2d2d36;--fg:#e8e8ee;--dim:#9a9aa8;--ok:#7bd88f;--hop:#e0b252;--inf:#7aa8ff;--gap:#e57373}
+@media(prefers-color-scheme:light){:root{--bg:#fafafb;--panel:#fff;--line:#dcdce4;--fg:#1a1a20;--dim:#62626e;--ok:#1e8a3a;--hop:#9a6b00;--inf:#2a5fd0;--gap:#c0392b}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.5 system-ui,sans-serif}
+main{max-width:980px;margin:0 auto;padding:28px 16px 80px}
+h1{font-size:24px;margin:0 0 6px}h2{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);margin:30px 0 10px}
+p.lead{color:var(--dim);margin:0 0 18px;max-width:70ch}.mono{font-family:ui-monospace,Menlo,monospace;font-size:13px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.card b{display:block;margin-bottom:4px}.card .n{font-size:22px;font-weight:600}.card small{color:var(--dim);display:block}
+textarea{width:100%;min-height:84px;background:var(--panel);color:var(--fg);border:1px solid var(--line);border-radius:10px;padding:10px;font:inherit}
+.tg{display:flex;flex-wrap:wrap;gap:14px;margin:10px 0;color:var(--dim)}.tg label{cursor:pointer}
+table{width:100%;border-collapse:collapse}th{text-align:left;color:var(--dim);font-weight:500;font-size:12px;padding:6px 8px;border-bottom:1px solid var(--line)}
+td{padding:8px;border-bottom:1px solid var(--line);vertical-align:top}tr.row{cursor:pointer}tr.row:hover{background:var(--panel)}
+.bar{display:inline-block;height:8px;border-radius:4px;background:var(--ok);vertical-align:middle;margin-right:6px}
+.t-ok{color:var(--ok)}.t-hop{color:var(--hop)}.t-inf{color:var(--inf)}.t-gap{color:var(--gap)}.dim{color:var(--dim)}
+.pill{display:inline-block;border:1px solid var(--line);border-radius:99px;padding:0 8px;font-size:12px;margin-right:4px}
+#diff{margin:10px 0;padding:10px 12px;border:1px dashed var(--line);border-radius:10px;color:var(--dim)}
+#detail{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 14px;white-space:pre-wrap;overflow:auto;max-height:320px}
+</style></head><body><main>
+<h1>How it reads — the priors behind every word</h1>
+<p class="lead">No model is called. Each written form is looked up in received tables: a part-of-speech prior from a human-annotated treebank, and a morphology prior from UniMorph. Every answer names the store that gave it, every hop taken to reach it, and every miss stays a typed gap.</p>
+
+<h2>The priors in use</h2>
+<div class="cards" id="cards"><div class="card dim">loading priors…</div></div>
+
+<h2>Text to read</h2>
+<textarea id="src" spellcheck="false">Councilmember O’Connell asked the Department. The mayor condemned the raid, and Marie Curie praised the method. Zzxqy underwent review.</textarea>
+<div class="tg">
+  <label><input type="checkbox" id="fPos" checked> class prior (UD English-EWT)</label>
+  <label><input type="checkbox" id="fDoc" checked> this document’s own evidence (definitions, typography)</label>
+  <label><input type="checkbox" id="fLex" checked> received class lexicon (UniMorph + closed class)</label>
+  <label><input type="checkbox" id="fNorm" checked> written-form normalisation</label>
+  <label><input type="checkbox" id="fMorph" checked> UniMorph + rule</label>
+  <label><input type="checkbox" id="fLemma" checked> lemma hop (inferred)</label>
+</div>
+<div id="diff"></div>
+
+<h2>Word by word — click a row for the raw prior entry</h2>
+<table><thead><tr><th>written form</th><th>looked up as</th><th>class prior says</th><th>morphology says</th><th>answered by</th></tr></thead><tbody id="rows"></tbody></table>
+
+<h2>Raw entry</h2>
+<div id="detail" class="mono dim">Click a word above.</div>
+
+<h2>Where the priors come from</h2>
+<p class="lead">The class prior counts every tag a form received across a treebank of 12,544 hand-annotated sentences, and keeps ambiguity rather than picking a winner. The morphology prior keeps only UniMorph's irregular tail; regular inflection is recovered by rule at read time. Priors are derived and checked against the Zenodotus corpus (24 categories, 2,100+ source documents); its POS-vocabulary gate was validated on 10 deliberately diverse specimens.</p>
+</main>
+<script type="module">
+import { classifyWord, normalizeForm, POS_PRIOR_META, THRAX_MAP } from '../vendor/eoreader7/native/adapters/text/wordclass.js';
+import { morphologyFromPrior, createLemmatizer, stemsOf } from '../vendor/eoreader7/native/adapters/text/morphology.js';
+import { classifyForm, documentClassifier } from '../holodeck-surface.js';
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const get = async p => (await fetch(p)).json();
+const [pos, morphRaw, lex] = await Promise.all([get('../vendor/eoreader7/native/priors/pos-eng.json'), get('../vendor/eoreader7/native/priors/morphology-eng.json'), get('../vendor/eoreader7/native/priors/pos-eng-lexicon.json')]);
+pos.lexicon = lex; const posNoLex = { ...pos, lexicon: undefined };
+const morph = morphologyFromPrior(morphRaw), lemmatizer = createLemmatizer(morph.forms, { language: morph.language });
+const pp = pos.provenance, mp = morphRaw.provenance;
+$('cards').innerHTML = `
+ <div class="card"><b>Part of speech</b><span class="n">${pp.distinct_forms.toLocaleString()}</span> forms<small>${pp.tokens_read.toLocaleString()} tokens · ${pp.sentences_read.toLocaleString()} sentences · ${pp.ambiguous_forms.toLocaleString()} ambiguous forms kept ambiguous</small><small>giver: ${esc(POS_PRIOR_META.giver)}</small></div>
+ <div class="card"><b>Morphology (UniMorph)</b><span class="n">${mp.kept.toLocaleString()}</span> irregular forms<small>${mp.pairs_read.toLocaleString()} pairs read · ${mp.rule_recoverable_dropped.toLocaleString()} dropped because a rule recovers them</small><small>giver: ${esc(mp.source)}</small></div>
+ <div class="card"><b>Class lexicon (UniMorph + closed class)</b><span class="n">${Object.values(lex.provenance.counts).reduce((a, b) => a + b, 0).toLocaleString()}</span> forms<small>attestation only — no frequencies; N|V stays ambiguous</small><small>${lex.provenance.givers.map(g => esc(g.name)).join(' · ')}</small></div>
+ <div class="card"><b>The rule</b><span class="n">stemsOf</span><small>regular inflection (-ed, -s, -ing…) is recovered at read time, not stored</small></div>`;
+const rawHit = w => pos.forms[w.toLowerCase()];
+const bars = c => c.slice(0, 3).map(k => `<span class="bar" style="width:${Math.max(3, Math.round((k.share ?? 0) * 60))}px"></span><span class="mono">${esc(k.upos)}</span> ${k.share == null ? 'attested' : (k.share * 100).toFixed(0) + '%'}${k.thraxClass ? ' → ' + esc(k.thraxClass) : ''}`).join('<br>');
+function readOne(w, f) {
+  const out = { w, cls: null, via: [], form: w, inferred: false, by: [] };
+  if (f.pos) {
+    if (f.norm) { const c = f.docC ? f.docC(w) : classifyForm(w, { posPrior: f.lex ? pos : posNoLex, lemmatizer: f.lemma ? lemmatizer : null }); if (c.found) out.cls = c; out.via = c.via || []; out.form = c.form || w; out.inferred = !!c.inferred; }
+    else { const r = rawHit(w); if (r) out.cls = classifyWord(w.toLowerCase(), { posPrior: pos }); }
+    if (out.cls) out.by.push(out.inferred ? 'class prior (via act, inferred)' : out.cls.attested ? out.cls.attested + ' (' + (out.cls.attested === 'lexicon' ? 'attested, not measured' : out.cls.attested === 'document' ? 'a candidate from this text’s own evidence' : 'declared grammar') + ')' : out.via.length ? 'class prior (after normalisation)' : 'class prior');
+  }
+  const lf = f.norm ? normalizeForm(w).form : w;
+  out.morph = null;
+  if (f.morph) {
+    const lemmas = [...lemmatizer.lemmasOf(lf.toLowerCase())].filter(x => x !== lf.toLowerCase()), stems = [...stemsOf(lf.toLowerCase())].filter(x => x !== lf.toLowerCase());
+    if (lemmas.length || stems.length) { out.morph = { lemmas, stems }; out.by.push(lemmas.length ? 'UniMorph prior' : 'stemsOf rule'); }
+  }
+  return out;
+}
+const sig = r => (r.cls ? '1' : '0') + (r.morph ? '1' : '0');
+function render() {
+  const f = { doc: $('fDoc').checked, lex: $('fLex').checked, pos: $('fPos').checked, norm: $('fNorm').checked, morph: $('fMorph').checked, lemma: $('fLemma').checked };
+  f.docC = f.doc && f.pos && f.norm ? documentClassifier($('src').value, { posPrior: f.lex ? pos : posNoLex, lemmatizer: f.lemma ? lemmatizer : null }) : null;
+  const fullDocC = documentClassifier($('src').value, { posPrior: pos, lemmatizer });
+  const words = $('src').value.split(/\s+/).filter(Boolean);
+  const rs = words.map(w => readOne(w, f));
+  const base = words.map(w => readOne(w, { docC: fullDocC, lex: true, pos: true, norm: true, morph: true, lemma: true }));
+  $('rows').innerHTML = rs.map((r, i) => {
+    const cls = r.cls ? bars(r.cls.candidates) : `<span class="t-gap">no entry — typed gap</span>`;
+    const hop = r.via.length ? r.via.map(v => `<span class="pill t-${v.step === 'lemma' ? 'inf' : 'hop'}" title="${esc(v.note)}">${esc(v.step)}</span>`).join('') + `<span class="mono">${esc(r.form)}</span>` : `<span class="dim mono">${esc(r.form)}</span>`;
+    const m = r.morph ? (r.morph.lemmas.length ? `act {${r.morph.lemmas.slice(0, 3).map(esc).join(', ')}}` : `rule {${r.morph.stems.slice(0, 2).map(esc).join(', ')}}`) : `<span class="dim">stays a form</span>`;
+    return `<tr class="row" data-i="${i}"><td class="mono">${esc(r.w)}</td><td>${hop}</td><td>${cls}${r.inferred ? '<br><span class="t-inf">inferred from the act — not attested for this form</span>' : ''}</td><td>${m}</td><td class="${r.by.length ? 't-ok' : 't-gap'}">${r.by.join(' + ') || 'nothing — a typed gap'}</td></tr>`;
+  }).join('');
+  const lost = rs.filter((r, i) => sig(r) !== sig(base[i])).map(r => r.w);
+  const gaps = rs.filter(r => !r.cls).length;
+  $('diff').innerHTML = `<b>${words.length}</b> forms · <b class="${gaps ? 't-gap' : 't-ok'}">${gaps}</b> without a class · ${lost.length ? `switching these off changes <b>${lost.length}</b>: <span class="mono">${lost.map(esc).join(', ')}</span>` : 'all layers on — this is the full reading'}`;
+  $('rows').querySelectorAll('tr.row').forEach(tr => tr.onclick = () => {
+    const r = rs[+tr.dataset.i], key = r.form.toLowerCase();
+    $('detail').textContent = JSON.stringify({ written: r.w, lookedUpAs: r.form, hops: r.via, 'pos-eng.json forms[…]': pos.forms[key] ?? null, 'morphology-eng.json forms[…]': morph.forms[key] ?? null, rule: r.morph ? r.morph.stems : [], thrax: Object.fromEntries(Object.keys(pos.forms[key] || {}).map(u => [u, THRAX_MAP[u] ?? null])) }, null, 2);
+  });
+}
+['src', 'fDoc', 'fLex', 'fPos', 'fNorm', 'fMorph', 'fLemma'].forEach(id => $(id).addEventListener('input', render));
+render();
+</script></body></html>
