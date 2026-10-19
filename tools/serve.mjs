@@ -15,9 +15,11 @@
 // Usage: node tools/serve.mjs [port]   (default 8813)
 
 import { createServer } from 'node:http';
-import { readFile, stat } from 'node:fs/promises';
+import { readFile, writeFile, rm, stat } from 'node:fs/promises';
 import { createReadStream } from 'node:fs';
 import { execFile, spawn } from 'node:child_process';
+import { tmpdir } from 'node:os';
+import { randomUUID } from 'node:crypto';
 import { gzipSync, brotliCompressSync, constants as zc } from 'node:zlib';
 import { extname, join, normalize, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -47,6 +49,17 @@ const COMPRESSIBLE = /^(text\/|application\/(json|javascript|xml|x-ndjson)|image
 const zcache = new Map(); // compressed static responses, keyed by file+mtime+encoding
 
 const send = (res, status, body, headers) => res.writeHead(status, headers).end(body);
+// a request body cap (a resource guard, not a decision): DECLARED, giver = this server (II.11).
+const MAX_BODY = 48 * 1024 * 1024;
+// pipe(cmd, args, input) -> { code, out, err } — the stderr is KEPT, never swallowed, so a converter
+// failure names its reason instead of returning a bare null (Feynman).
+const pipe = (cmd, args, input) => new Promise((resolve) => {
+  let p; try { p = spawn(cmd, args, { stdio: ['pipe', 'pipe', 'pipe'] }); } catch (e) { return resolve({ code: -1, err: String((e && e.message) || e) }); }
+  const o = [], e = []; p.stdout.on('data', d => o.push(d)); p.stderr.on('data', d => e.push(d));
+  p.on('error', (err) => resolve({ code: -1, err: String((err && err.message) || err) }));
+  p.on('close', (code) => resolve({ code, out: Buffer.concat(o).toString('utf8'), err: Buffer.concat(e).toString('utf8') }));
+  p.stdin.end(input || undefined);
+});
 
 async function grab(url, viaWorker) {
   const target = viaWorker ? WORKER + encodeURIComponent(url) : url;
@@ -132,6 +145,31 @@ const server = createServer(async (req, res) => {
       const h = { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' };
       try { return send(res, 200, await syncStatus(), h); }
       catch (e) { return send(res, 502, JSON.stringify({ error: String((e && e.message) || e) }), h); }
+    }
+
+    // POST /convert — turn a dropped PDF or HTML page into text with the platform's OWN converter
+    // (pdftotext from poppler; textutil on macOS), never a model. Those tools reconstruct WORDS from
+    // the page's glyph advances, which a browser-side extractor (pdf.js getTextContent) does not: a
+    // letterspaced PDF comes back as "F R O M" through pdf.js and as "FROM" through poppler. The
+    // converter that ran is named in X-Converter. (Measured 2026-10-18, propublica-memo.pdf.)
+    if (req.method === 'POST' && url.pathname === '/convert') {
+      const chunks = []; let n = 0;
+      for await (const c of req) { n += c.length; if (n > MAX_BODY) { req.destroy(); return send(res, 413, 'too large', { 'Content-Type': 'text/plain' }); } chunks.push(c); }
+      const buf = Buffer.concat(chunks);
+      const head = buf.slice(0, 1024).toString('latin1');
+      let text = null, converter = '', failure = '';
+      if (buf.length >= 4 && head.startsWith('%PDF')) {
+        const r = await pipe('pdftotext', ['-enc', 'UTF-8', '-', '-'], buf);
+        if (r.code === 0) { text = r.out; converter = 'pdftotext (poppler)'; } else failure = 'pdftotext: ' + (r.err || ('exit ' + r.code));
+      } else if (/^\s*<(?:!doctype html|html|\?xml)/i.test(head)) {
+        const tmp = join(tmpdir(), 'hd-convert-' + randomUUID() + '.html');
+        try { await writeFile(tmp, buf); const r = await pipe('textutil', ['-convert', 'txt', '-stdout', tmp], null); if (r.code === 0) { text = r.out; converter = 'textutil (macOS)'; } else failure = 'textutil: ' + (r.err || ('exit ' + r.code)); }
+        finally { rm(tmp, { force: true }).catch(() => {}); }
+      } else {
+        text = buf.toString('utf8'); converter = 'none (already text)';
+      }
+      if (text == null) return send(res, 502, failure || 'the converter failed', { 'Content-Type': 'text/plain; charset=utf-8' });
+      return send(res, 200, text, { 'Content-Type': 'text/plain; charset=utf-8', 'Cache-Control': 'no-store', 'X-Converter': converter });
     }
 
     let p = decodeURIComponent(url.pathname);
