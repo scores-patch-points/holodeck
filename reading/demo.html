@@ -163,6 +163,52 @@
   .key i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:5px;vertical-align:-1px}
   .delta{margin:8px 0;border:1px solid #5c4d1d;border-radius:9px;background:#221d10;color:#f0d9a0;padding:8px 11px;font-size:13px}
   .delta b{color:#fff}
+
+  /* ── wide screens: rail | document + lanes | inspector, with the detail tabs in a drawer ── */
+  .drawer,.dh{display:contents}
+  .dt,.lanes,.insp{display:none}
+  .lanes .col{display:inline-grid;justify-items:center;gap:2px;padding:4px 7px 5px;border-radius:7px;cursor:pointer;min-width:38px;border:1px solid transparent}
+  .lanes .col:hover{background:var(--sel)}
+  .lanes .col.cur{border-color:var(--acc);background:var(--sel)}
+  .lanes .w{font:500 15px var(--serif);color:var(--ink)}
+  .lanes .c{font:600 10.5px var(--mono);color:var(--blue);letter-spacing:.04em}
+  .lanes .c.gap{color:#e57373}.lanes .c.inf{color:var(--amber)}.lanes .c.pend,.lanes .m.pend{color:var(--dim);opacity:.45}
+  .lanes .m{font:11px var(--mono);color:var(--amber);max-width:92px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .lanes .h{font:600 10.5px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--dim);padding:0 2px 6px}
+  .lanes .row{display:flex;flex-wrap:wrap;gap:2px 4px}
+  .lanes .lg{font:11px var(--mono);color:var(--dim);padding-top:6px}
+  .insp .ih{padding:12px 18px 8px;border-bottom:1px solid var(--line)}
+  .insp .ih .k{font:600 11px var(--mono);letter-spacing:.1em;text-transform:uppercase}
+  .insp .ih .ttl{font:500 22px/1.25 var(--serif);color:var(--ink);margin:4px 0 2px;word-break:break-word}
+  .insp .ih .sub{font:12px var(--mono);color:var(--dim)}
+  .insp .st{padding:10px 18px;border-bottom:1px solid var(--line)}
+  .insp .st .n{font:600 10.5px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--dim);display:flex;gap:8px;align-items:center}
+  .insp .st .n i{font-style:normal;display:inline-grid;place-items:center;width:17px;height:17px;border-radius:50%;border:1px solid var(--line2);color:var(--ink2);font-size:10px}
+  .insp .st .v{margin-top:5px;font:13.5px/1.5 var(--sans);color:var(--ink)}
+  .insp .st .v .mono{font:12.5px var(--mono)}
+  .insp .st.ok .n i{background:var(--green);border-color:var(--green);color:#06210f}.insp .st.gap .n i{background:#e57373;border-color:#e57373;color:#2a0505}.insp .st.hop .n i{background:var(--amber);border-color:var(--amber);color:#2a1d02}
+  .insp .bars{display:grid;gap:5px;margin-top:2px}
+  .insp .bar{display:grid;grid-template-columns:58px 1fr auto;gap:8px;align-items:center;font:12px var(--mono)}
+  .insp .bar .tr{height:9px;border-radius:4px;background:var(--line);overflow:hidden}.insp .bar .tr b{display:block;height:100%;background:var(--blue)}
+  .insp .why{font:12px/1.5 var(--sans);color:var(--dim);margin-top:4px}
+  .insp .pill{display:inline-block;border:1px solid var(--line2);border-radius:99px;padding:0 8px;margin:0 4px 3px 0;font:11px var(--mono);color:var(--ink2)}
+  .insp .rec{padding:10px 18px}.insp .rec .r{display:flex;gap:10px;font:12px/1.9 var(--mono);color:var(--ink2);cursor:pointer;border-radius:5px;padding:0 4px}.insp .rec .r:hover{background:var(--sel)}.insp .rec .r b{color:var(--ink);font-weight:500}.insp .rec .r span:first-child{color:var(--dim);min-width:42px}
+  @media (min-width:1200px){
+    .body{grid-template-columns:300px minmax(0,1fr) minmax(340px,400px)}
+    .right{grid-template-rows:auto minmax(0,1fr) auto;min-width:0}
+    .lens{max-height:46vh;padding:6px 32px 18px;overflow:auto}
+    .lens .txt{font-size:19px;line-height:1.9;max-width:78ch}
+    .lanes{display:block;border-top:1px solid var(--line);padding:10px 22px 12px;overflow:auto;min-height:0}
+    .lanes .sent{padding:6px 0 10px;border-bottom:1px dashed var(--line)}.lanes .sent.cur{padding-top:8px}.lanes .sent:not(.cur) .col{opacity:.55}
+    .lanes .w{font-size:17px}
+    .drawer{display:grid;grid-template-rows:auto 0fr;border-top:1px solid var(--line);min-height:0}
+    .drawer.open{grid-template-rows:auto minmax(0,1fr);height:42vh}
+    .dh{display:flex;align-items:stretch;min-width:0}
+    .dt{display:block;all:unset;cursor:pointer;font:600 12.5px var(--sans);color:var(--ink);padding:8px 14px;white-space:nowrap;border-right:1px solid var(--line)}
+    .dh .tabs{flex:1;border-bottom:0}
+    .drawer .pane-wrap{overflow:hidden;min-height:0}
+    .insp{display:block;border-left:1px solid var(--line);overflow:auto;min-height:0}
+  }
   @media (max-width:900px){.body{grid-template-columns:1fr;grid-template-rows:44% 56%}.left{border-right:0;border-bottom:1px solid var(--line)}}
 </style>
 </head>
@@ -228,23 +274,30 @@
     </div>
     <div class="right">
       <div class="lens" id="p-lens"></div>
-      <div class="tabs" id="p-tabs" role="tablist" aria-label="View">
-        <button type="button" data-tab="source" role="tab" aria-selected="true">Source</button>
-        <button type="button" data-tab="words" role="tab" aria-selected="false">Words</button>
-        <button type="button" data-tab="pos" role="tab" aria-selected="false">POS</button>
-        <button type="button" data-tab="morph" role="tab" aria-selected="false">Morphology</button>
-        <button type="button" data-tab="refs" role="tab" aria-selected="false">Referents</button>
-        <button type="button" data-tab="props" role="tab" aria-selected="false">Propositions</button>
-        <button type="button" data-tab="render" role="tab" aria-selected="false">Render</button>
-        <button type="button" data-tab="eot" role="tab" aria-selected="false">EOT</button>
-        <button type="button" data-tab="json" role="tab" aria-selected="false">JSON</button>
-        <button type="button" data-tab="graph" role="tab" aria-selected="false">Graph</button>
-      </div>
-      <div class="pane-wrap">
-        <div class="pane" id="p-pane"></div>
-        <div class="pane graph-host" id="p-graph" hidden></div>
+      <div class="lanes" id="p-lanes" aria-label="The current sentence, lane by lane"></div>
+      <div class="drawer" id="p-drawer">
+        <div class="dh">
+          <button type="button" class="dt" id="p-dt" aria-expanded="false" title="Show or hide the detail views">▸ Details</button>
+          <div class="tabs" id="p-tabs" role="tablist" aria-label="View">
+            <button type="button" data-tab="source" role="tab" aria-selected="true">Source</button>
+            <button type="button" data-tab="words" role="tab" aria-selected="false">Words</button>
+            <button type="button" data-tab="pos" role="tab" aria-selected="false">POS</button>
+            <button type="button" data-tab="morph" role="tab" aria-selected="false">Morphology</button>
+            <button type="button" data-tab="refs" role="tab" aria-selected="false">Referents</button>
+            <button type="button" data-tab="props" role="tab" aria-selected="false">Propositions</button>
+            <button type="button" data-tab="render" role="tab" aria-selected="false">Render</button>
+            <button type="button" data-tab="eot" role="tab" aria-selected="false">EOT</button>
+            <button type="button" data-tab="json" role="tab" aria-selected="false">JSON</button>
+            <button type="button" data-tab="graph" role="tab" aria-selected="false">Graph</button>
+          </div>
+        </div>
+        <div class="pane-wrap">
+          <div class="pane" id="p-pane"></div>
+          <div class="pane graph-host" id="p-graph" hidden></div>
+        </div>
       </div>
     </div>
+    <aside class="insp" id="p-insp" aria-label="Inspector — why this step"></aside>
   </div>
   <div class="bar2">
     <div class="rib" title="Drag to scrub"><canvas></canvas></div>
@@ -282,7 +335,7 @@ import { classifyWord, THRAX_MAP, THRAX_OUT_OF_SCOPE, THRAX_META, POS_PRIOR_META
 import { morphologyFromPrior, createLemmatizer, stemsOf } from '../vendor/eoreader7/native/adapters/text/morphology.js';
 import { splitSentences } from '../vendor/eoreader7/native/adapters/text/spans.js';
 import { tokenize } from '../vendor/eoreader7/native/organs/source.js';
-import { classifyForm, lookupForm } from '../holodeck-surface.js';
+import { classifyForm, lookupForm, documentClassifier } from '../holodeck-surface.js';
 import { sha256Hex, stableProvenanceId, byteRange, EotLedger } from '../vendor/fold-chat/fold-chat-eot.js';
 
 const $ = (id) => document.getElementById(id);
@@ -448,15 +501,17 @@ function buildTrace(doc, clean, claims, features, extraction){
   if (words.length > WORDS_ANIMATED) push('token', 'cap', `+${(words.length - WORDS_ANIMATED).toLocaleString()} more form occurrences — the per-form layers animate the first ${WORDS_ANIMATED.toLocaleString()} (the reading covers all)`, { s:0, e:0 });
 
   const pos = features.pos === false ? null : PRIORS.posPrior;
+  // the document's own definitions and typography settle capitalised forms the priors cannot place (candidates, with ranges)
+  const DOCC = pos ? documentClassifier(clean, { posPrior: pos, lemmatizer: PRIORS.lemmatizer }) : null;
   let gaps = 0, ambiguous = 0, classified = 0;
   shown.forEach(w => {
     if (!pos){ push('grammar', 'off', `“${w.w}” → POS layer OFF — no class prior is read; the form is carried as a bare string`, { s:w.s, e:w.e, data:{ w:w.w, found:false, off:true } }); return; }
-    const c = classifyForm(w.w, { posPrior: pos, lemmatizer: PRIORS.lemmatizer });
+    const c = DOCC ? DOCC(w.w) : classifyForm(w.w, { posPrior: pos, lemmatizer: PRIORS.lemmatizer });
     if (!c.found){ gaps++; push('grammar', 'gap', `“${w.w}” → no entry in the class prior — a typed gap, never a guess`, { s:w.s, e:w.e, data:{ w:w.w, found:false } }); return; }
     classified++;
     if (c.candidates.length > 1) ambiguous++;
     const parts = c.candidates.slice(0, 3).map(k => `${k.upos} ${k.share == null ? 'attested' : (k.share * 100).toFixed(0) + '%'}→${k.thraxClass || '—'}`).join(' · ');
-    push('grammar', 'class', `“${w.w}” → ${c.via.length ? `(looked up as “${c.form}” — ${c.via.map(v => v.step).join(' + ')}) ` : ''}${parts}${c.inferred ? ' — INFERRED from the act, not attested for this form' : ''}${c.candidates.length > 1 ? ' — ambiguous, left unresolved' : ''}`, { s:w.s, e:w.e, data:{ w:w.w, found:true, inferred:!!c.inferred, candidates:c.candidates.slice(0,3), total:c.total, form:c.form, via:c.via } });
+    push('grammar', 'class', `“${w.w}” → ${c.via.length ? `(looked up as “${c.form}” — ${c.via.map(v => v.step).join(' + ')}) ` : ''}${parts}${c.inferred ? ' — INFERRED from the act, not attested for this form' : ''}${c.candidates.length > 1 ? ' — ambiguous, left unresolved' : ''}`, { s:w.s, e:w.e, data:{ w:w.w, found:true, inferred:!!c.inferred, candidates:c.candidates.slice(0,3), total:c.total, form:c.form, via:c.via, attested:c.attested || null, act:c.act || null, evidence:c.evidence ? c.evidence.map(x => ({ kind:x.kind, at:x.at })) : null } });
   });
 
   const lem = features.morph === false ? null : PRIORS.lemmatizer;
@@ -662,6 +717,7 @@ function mount(T){
       return `<div class="ly ${cur ? 'cur' : ''} ${on ? '' : 'off'}"><span class="n">${l.i + 1}</span><span class="lab" style="color:var(${l.color})">${esc(l.label)}</span>${sw}<span class="why">${esc(l.why)}</span><span class="cnt" style="grid-column:2/3">${cnt}</span></div>`;
     }).join('');
     wireSwitches();
+    if (wide.matches){ const c = spineEl.querySelector('.ly.cur'); if (c){ const top = c.offsetTop, h = spineEl.clientHeight; if (top < spineEl.scrollTop || top + c.offsetHeight > spineEl.scrollTop + h) spineEl.scrollTop = Math.max(0, top - h / 3); } }
   }
   function layerCount(key, St){
     switch (key){
@@ -702,7 +758,7 @@ function mount(T){
   // ── lens ──
   function renderLens(St){
     const e = ev[k], at = (e.s != null && e.s > 0) ? e.s : (St.on ? St.on.s : 0);
-    const a = Math.max(0, at - 300), b = Math.min(T.doc.analysis.length, at + 760);
+    const wideNow = matchMedia('(min-width:1200px)').matches; const a = Math.max(0, at - (wideNow ? 700 : 300)), b = Math.min(T.doc.analysis.length, at + (wideNow ? 1900 : 760));
     const cuts = new Set([a, b]); const M = St.marks.filter(m => m.e > a && m.s < b);
     M.forEach(m => { cuts.add(Math.max(a, m.s)); cuts.add(Math.min(b, m.e)); });
     const cur = (e.s != null && e.e != null && e.e > e.s) ? e : null; if (cur){ cuts.add(Math.max(a, cur.s)); cuts.add(Math.min(b, cur.e)); }
@@ -715,6 +771,88 @@ function mount(T){
     lens.innerHTML = `<div class="doc">${esc(T.doc.label)} · characters ${a.toLocaleString()}–${b.toLocaleString()} of ${T.doc.analysis.length.toLocaleString()} · the marks are the layers that reached these bytes</div><div class="txt">${h}${b < T.doc.analysis.length ? '…' : ''}</div>`;
     const hit = lens.querySelector('.hit') || lens.querySelector('.on'); if (hit && dir) hit.scrollIntoView({ block:'nearest' });
   }
+
+
+  // ── wide screens: the sentence lane by lane, and the inspector for the selected step ──
+  const lanesEl = $('p-lanes'), inspEl = $('p-insp'), drawer = $('p-drawer'), dtBtn = $('p-dt');
+  const wide = matchMedia('(min-width:1200px)');
+  const TOK = [], tokAt = new Map(), lookupIdx = [];
+  ev.forEach((e, i) => {
+    if (e.stage === 'token' && e.kind === 'word' && e.s != null){ const t = { s:e.s, e:e.e, w:e.data && e.data.w, it:i }; tokAt.set(e.s, t); TOK.push(t); }
+    else if (e.stage === 'grammar' && e.s != null && tokAt.get(e.s)){ const t = tokAt.get(e.s); t.g = e.data; t.ig = i; lookupIdx.push(i); }
+    else if (e.stage === 'morph' && e.s != null && tokAt.get(e.s)){ const t = tokAt.get(e.s); t.m = e.data; t.im = i; lookupIdx.push(i); }
+  });
+  const setDrawer = on => { drawer.classList.toggle('open', on); dtBtn.setAttribute('aria-expanded', String(on)); dtBtn.textContent = (on ? '▾' : '▸') + ' Details'; };
+  dtBtn.addEventListener('click', () => setDrawer(!drawer.classList.contains('open')));
+  const classLabel = g => { if (!g || !g.found) return null; const c = g.candidates[0]; return c ? c.upos : null; };
+  function renderLanes(e){
+    const at = e.s != null ? e.s : (T.sents[0] ? T.sents[0].offset : 0);
+    let si = T.sents.findIndex(x => x.offset <= at && at < x.offset + x.text.length); if (si < 0) si = 0;
+    if (!T.sents.length){ lanesEl.innerHTML = ''; return; }
+    const col = t => {
+      const cur = e.s != null && t.s === e.s;
+      const g = t.ig != null && t.ig <= k ? t.g : null, m = t.im != null && t.im <= k ? t.m : null;
+      let c = '<span class="c pend">·</span>';
+      if (g){ if (!g.found) c = '<span class="c gap" title="typed gap — no entry, and none inferred">no entry</span>'; else { const via = (g.via || []).find(v => ['lexicon','shape','lemma','document-evidence'].includes(v.step)); c = `<span class="c${g.inferred ? ' inf' : ''}" title="${esc(via ? via.note || via.step : 'attested in the class prior')}">${esc(classLabel(g))}${g.candidates.length > 1 ? '+' : ''}${via ? ' ·' + esc(via.step === 'document-evidence' ? 'doc' : via.step) : ''}</span>`; } }
+      let mm = '<span class="m pend">·</span>';
+      if (m){ const a2 = (m.lemmas && m.lemmas[0]) || (m.stems && m.stems[0]); mm = a2 ? `<span class="m" title="act: ${esc((m.lemmas || []).join(', '))}${m.stems && m.stems.length ? ' · rule: ' + esc(m.stems.join(', ')) : ''}">${esc(a2)}</span>` : '<span class="m pend" title="stays a form">—</span>'; }
+      return `<span class="col${cur ? ' cur' : ''}" data-i="${t.ig != null ? t.ig : t.it}"><span class="w">${esc(t.w || '')}</span>${c}${mm}</span>`;
+    };
+    const rowFor = (i, isCur) => {
+      const sent = T.sents[i]; if (!sent) return '';
+      let toks = TOK.filter(t => t.s >= sent.offset && t.s < sent.offset + sent.text.length); if (!toks.length) return '';
+      const ci = toks.findIndex(t => t.s === e.s); if (toks.length > 60){ const a = Math.max(0, (ci < 0 ? 0 : ci) - 24); toks = toks.slice(a, a + 60); }
+      return `<div class="sent${isCur ? ' cur' : ''}"><div class="row">${toks.map(col).join('')}</div></div>`;
+    };
+    lanesEl.innerHTML = `<div class="h">the sentence being read, lane by lane — word · class · act</div>${rowFor(si - 1, false)}${rowFor(si, true)}${rowFor(si + 1, false)}<div class="lg">class lane = the class prior · “+” ambiguous · ·lexicon / ·shape / ·doc / ·lemma name the giver when it was not the treebank · act lane = UniMorph prior or the rule · click any word to jump to its lookup</div>`;
+    const c = lanesEl.querySelector('.col.cur'); if (c && dir) c.scrollIntoView({ block:'nearest', inline:'nearest' });
+  }
+  lanesEl.addEventListener('click', ev2 => { const c = ev2.target.closest('.col'); if (c){ setDir(0); seek(+c.dataset.i); } });
+
+  const GIVERS = () => {
+    const P = PRIORS.posPrior || {}, pv = P.provenance || {}, mv = (PRIORS.morphRaw && PRIORS.morphRaw.provenance) || {}, lv = (P.lexicon && P.lexicon.provenance) || {};
+    return { pos:`UD English-EWT treebank · ${(pv.tokens_read || 0).toLocaleString()} tokens, ${(pv.distinct_forms || 0).toLocaleString()} forms`, morph:`${mv.source || 'UniMorph English'} · ${(mv.kept || 0).toLocaleString()} irregular forms kept, the rest recovered by rule`, lex:(lv.givers || []).map(g => g.name).join(' + ') || 'received class lexicon' };
+  };
+  const bars = g => (g.candidates || []).slice(0, 4).map(c => `<div class="bar"><span>${esc(c.upos)}</span><span class="tr"><b style="width:${Math.max(3, Math.round((c.share == null ? 1 : c.share) * 100))}%"></b></span><span>${c.share == null ? 'attested' : (c.share * 100).toFixed(0) + '%'}${c.thraxClass ? ' → ' + esc(c.thraxClass) : ''}</span></div>`).join('');
+  const step = (n, cls, name, body) => `<div class="st ${cls}"><div class="n"><i>${n}</i>${esc(name)}</div><div class="v">${body}</div></div>`;
+  function inspectGrammar(e){
+    const d = e.data || {}, G = GIVERS(); let h = '';
+    h += step(1, 'ok', 'as written', `<span class="mono">${esc(d.w)}</span>`);
+    if (d.off){ return h + step(2, 'gap', 'class prior', 'switched off — the form is carried as a bare string.'); }
+    const hops = (d.via || []);
+    if (!d.found){
+      return h + step(2, 'gap', 'tried, in order', 'exact entry · normalised form · declared shapes · received class lexicon · the lemma hop · this document’s own evidence') + step(3, 'gap', 'answer', '<b>typed gap</b> — nothing attested this form. It stays a form; nothing is guessed.<div class="why">The reading names what it does not know instead of inventing a class.</div>');
+    }
+    h += step(2, hops.length ? 'hop' : 'ok', hops.length ? 'hops taken' : 'exact entry', hops.length ? hops.map(v => `<span class="pill">${esc(v.step)}</span>`).join('') + `<div class="why">${hops.map(v => esc(v.note || '')).join('<br>')}</div>` : 'no normalisation needed.');
+    h += step(3, 'ok', 'looked up as', `<span class="mono">${esc(d.form || d.w)}</span>`);
+    const who = d.attested === 'lexicon' ? G.lex + ' — attestation only, no frequencies' : d.attested === 'shape' ? 'a declared shape grammar — orthography settles it, whatever any corpus says' : d.attested === 'document' ? 'this document’s own definitions and typography — a candidate, with the ranges that earned it' : d.inferred ? `the act “${esc(d.act)}” — the class is the act’s, not the form’s` : G.pos;
+    h += step(4, d.inferred ? 'hop' : 'ok', 'answered by', esc(who) + (d.total ? `<div class="why">${d.total.toLocaleString()} attestations of this form</div>` : ''));
+    h += step(5, 'ok', 'classes' + (d.candidates.length > 1 ? ' — ambiguity kept' : ''), `<div class="bars">${bars(d)}</div>` + (d.candidates.length > 1 ? '<div class="why">a type-level table cannot answer an instance-level question, so no winner is picked.</div>' : ''));
+    if (d.evidence && d.evidence.length) h += step(6, 'hop', 'evidence in this document', d.evidence.map(x => `<span class="pill">${esc(x.kind)}</span>${x.at ? `<span class="mono">[${x.at[0]}–${x.at[1]}]</span>` : ''}`).join(' '));
+    return h;
+  }
+  function inspectMorph(e){
+    const d = e.data || {}, G = GIVERS(); let h = step(1, 'ok', 'as written', `<span class="mono">${esc(d.w)}</span>`);
+    if (d.off) return h + step(2, 'gap', 'morphology', 'switched off — the form stays itself.');
+    const lemmas = d.lemmas || [], stems = d.stems || [];
+    if (!lemmas.length && !stems.length) return h + step(2, 'gap', 'answer', '<b>stays a form</b> — the prior does not know it and the rule cannot recover it.');
+    h += step(2, 'ok', 'act from the prior', lemmas.length ? lemmas.map(l => `<span class="pill">${esc(l)}</span>`).join('') + `<div class="why">${esc(G.morph)}</div>` + (lemmas.some(l => /\s/.test(l)) ? '<div class="why">a multiword act — a UniMorph phrase entry, not a clean lemma.</div>' : '') : 'nothing in the irregular tail.');
+    h += step(3, stems.length ? 'hop' : 'ok', 'act by rule', stems.length ? stems.map(l => `<span class="pill">${esc(l)}</span>`).join('') + '<div class="why">regular inflection is recovered at read time, not stored.</div>' : 'no stem rule applied.');
+    return h + step(4, 'ok', 'sameness', 'the prior decides sameness; the material decides presence. The act is a SET, never one chosen.');
+  }
+  function renderInsp(e){
+    const S0 = L[e.stage] || { label:e.stage, color:'--dim', i:0 }, dt = k ? e.t - ev[k - 1].t : e.t;
+    let body;
+    if (e.stage === 'grammar') body = inspectGrammar(e);
+    else if (e.stage === 'morph') body = inspectMorph(e);
+    else body = step(1, 'ok', 'what happened', esc(e.msg)) + (e.data ? step(2, 'ok', 'data', `<span class="mono">${esc(JSON.stringify(e.data, (kk, v) => (Array.isArray(v) && v.length > 6 ? v.slice(0, 6).concat(['…']) : v)).slice(0, 700))}</span>`) : '');
+    const ttl = (e.stage === 'grammar' || e.stage === 'morph') && e.data ? '“' + esc(e.data.w) + '”' : esc(S0.label);
+    // the last few lookups, each a way back
+    let j = lookupIdx.length; { let lo = 0, hi = lookupIdx.length; while (lo < hi){ const m = (lo + hi) >> 1; if (lookupIdx[m] <= k) lo = m + 1; else hi = m; } j = lo; }
+    const recent = lookupIdx.slice(Math.max(0, j - 7), j).reverse().map(i => { const x = ev[i]; const g = x.data || {}; const out = x.stage === 'grammar' ? (g.found ? classLabel(g) + (g.via && g.via.length ? ' ·' + (g.via.find(v => ['lexicon','shape','lemma','document-evidence'].includes(v.step)) || g.via[0]).step.replace('document-evidence','doc') : '') : 'gap') : ((g.lemmas && g.lemmas[0]) || (g.stems && g.stems[0]) || '—'); return `<div class="r" data-i="${i}"><span>${x.stage === 'grammar' ? 'class' : 'act'}</span><b>${esc(g.w)}</b><span>→ ${esc(out)}</span></div>`; }).join('');
+    inspEl.innerHTML = `<div class="ih"><div class="k" style="color:var(${S0.color})">layer ${S0.i + 1} of ${LAYERS.length} · ${esc(S0.label)} · ${esc(e.kind)} · +${ms(dt)} ms</div><div class="ttl">${ttl}</div><div class="sub">${e.s != null && e.e != null && e.e > e.s ? 'characters ' + e.s.toLocaleString() + '–' + e.e.toLocaleString() + ' · ' : ''}step ${(k + 1).toLocaleString()} of ${N.toLocaleString()}</div></div>${body}${recent ? `<div class="rec"><div class="n" style="font:600 10.5px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--dim);padding-bottom:4px">recent lookups</div>${recent}</div>` : ''}`;
+  }
+  inspEl.addEventListener('click', ev2 => { const r = ev2.target.closest('.r'); if (r){ setDir(0); seek(+r.dataset.i); } });
 
   // ── graph ──
   const gh = $('p-graph'); gh.innerHTML = '';
@@ -742,7 +880,7 @@ function mount(T){
   let tab = LAST_TAB;
   let wordsKey = '', wordsSort = { key: 'n', dir: -1 };
   const tabBtns = [...app.querySelectorAll('#p-tabs [data-tab]')];
-  function setTab(t){ LAST_TAB = t; tab = t; tabBtns.forEach(b => b.setAttribute('aria-selected', String(b.dataset.tab === t))); render(false); }
+  function setTab(t){ LAST_TAB = t; tab = t; if (wide.matches) setDrawer(true); tabBtns.forEach(b => b.setAttribute('aria-selected', String(b.dataset.tab === t))); render(false); }
   tabBtns.forEach(b => b.addEventListener('click', () => setTab(b.dataset.tab)));
   tabBtns.forEach(b => b.setAttribute('aria-selected', String(b.dataset.tab === tab)));
 
@@ -938,7 +1076,7 @@ function mount(T){
   // ── render ──
   function render(follow){
     const St = stateAt(k), e = ev[k];
-    renderSpine(St, e); renderLog(follow); renderLens(St); renderPane(St, e); map.set(mapData(St, e)); drawRibbon(); updateStats(St, e);
+    renderSpine(St, e); renderLog(follow); renderLens(St); if (wide.matches){ renderLanes(e); renderInsp(e); } renderPane(St, e); map.set(mapData(St, e)); drawRibbon(); updateStats(St, e);
     rdEl.textContent = (real ? 't = ' + ms(pos) + ' of ' + ms(ev[N-1].t) + ' ms' : 'step ' + (k + 1).toLocaleString() + ' of ' + N.toLocaleString())
       + ' · layer ' + ((L[e.stage] || {}).i + 1) + '/' + LAYERS.length + ' · real ' + ms(e.t) + ' ms';
   }
