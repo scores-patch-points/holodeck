@@ -12,8 +12,6 @@
   button{font:inherit}
   /* ── landing ───────────────────────────────────────────────────────────── */
   header{padding:30px 28px 16px;border-bottom:1px solid var(--line);position:relative}
-  .offchip{position:absolute;top:12px;right:16px;font:11px/1 ui-monospace,monospace;padding:5px 9px;border:1px solid var(--line);border-radius:999px;background:transparent;color:inherit;opacity:.8;cursor:pointer}
-  .offchip[data-state=full]{border-color:#2a9d6f;color:#2a9d6f;opacity:1}.offchip[data-state=err]{border-color:#c0392b;color:#c0392b}
   header h1{margin:0 0 6px;font-size:22px;letter-spacing:-.01em;font-family:var(--serif);font-weight:500}
   header .sub{color:var(--dim);max-width:960px;font-size:14px}
   header .sub b{color:var(--ink);font-weight:600}
@@ -273,7 +271,6 @@
 </head>
 <body>
 <header>
-  <button id="offline-chip" class="offchip" type="button" title="">offline: starting…</button>
   <h1>How to read without a model — the pipeline, layer by layer</h1>
   <div class="sub">
     Drop any text in. It is read <b>the way the fold reads it</b> — and you can watch every layer do its work, then
@@ -1778,7 +1775,7 @@ async function corpusDeps(){
     classifyAt: prefix => documentClassifier(prefix, { posPrior: pos, lemmatizer: PRIORS.lemmatizer, lookups: LOOKUP.cache, memo }) };
 }
 const SOURCES = mountSources($('sources'), { makeDeps: corpusDeps, openInReader: (t, l) => { ta.value = t; run(t, l); }, currentText: () => ta.value });
-const OFFLINE = startOffline({ chip: $('offline-chip') });
+const OFFLINE = startOffline();   // silent: it only makes the files local; nothing on the page announces it
 window.__demo = { offline: OFFLINE, sources: SOURCES, read, run, json:() => (cur ? readingJSON(cur.T) : null), text:() => (cur ? diagrammedText(cur.T) : null), current:() => (cur ? cur.T : null), features:() => features, net };
 </script>
 </body>

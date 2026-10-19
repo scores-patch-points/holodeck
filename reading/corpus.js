@@ -5,8 +5,9 @@
 // (corroborates / fictionalizes / comments-on / …). A "being" is a view over the links; its ends stay ends. Severing a wrong link is one
 // more event on top of the log. Voices: for any position in a source, who is saying it, and who they are relaying, to any depth.
 import { buildCorpusTimeline, foldLog } from '../vendor/khora/native/adapters/text/reading-timeline.js';
+import { sniffRegister, steerWithLocalModel } from './sniff.js';
 
-const REGS = [['', 'undeclared (read, not linked)'], ['testimony', 'testimony'], ['report', 'report'], ['journalism', 'journalism'], ['reference', 'reference'], ['data', 'data'], ['comment', 'comment'], ['fiction', 'fiction']];
+const REGS = [['testimony', 'testimony'], ['report', 'report'], ['journalism', 'journalism'], ['reference', 'reference'], ['data', 'data'], ['comment', 'comment'], ['fiction', 'fiction']];
 const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const short = (id) => String(id).replace(/^(being:|ref_)/, '').slice(0, 8);
 
@@ -20,7 +21,7 @@ export const TITANIC = [
 const CSS = `
 .src-panel{max-width:1180px;margin:18px auto;padding:0 18px}
 .src-panel h2{font-size:15px;margin:0 0 4px}.src-panel .lede{font-size:12.5px;opacity:.78;margin:0 0 10px;max-width:84ch}
-.src-card{border:1px solid var(--line,#8884);border-radius:8px;padding:8px 10px;margin:6px 0;display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center}
+.src-card{border:1px solid var(--line,#8884);border-radius:8px;padding:8px 10px;margin:6px 0;display:grid;grid-template-columns:1fr minmax(0,2fr) auto;gap:8px;align-items:center}
 .src-card input[type=text]{font:inherit;padding:4px 6px;min-width:0}.src-card select{font:inherit;padding:3px}
 @media(max-width:760px){.src-card{grid-template-columns:1fr}.src-card input[type=text]{width:100%;box-sizing:border-box}}
 .src-card .tx{grid-column:1/-1;font:11.5px/1.45 ui-monospace,monospace;opacity:.8;max-height:3.1em;overflow:hidden;white-space:pre-wrap}
@@ -39,15 +40,25 @@ export function mountSources(host, { makeDeps, openInReader, currentText }) {
   if (!document.getElementById('src-css')) { const s = document.createElement('style'); s.id = 'src-css'; s.textContent = CSS; document.head.appendChild(s); }
   const st = { sources: [], corpus: null, fold: null, overlay: [], sel: null, voiceSrc: null, onlyShared: false, busy: false, err: null };
   let nextId = 1;
-  const add = (label, text, register = '') => { st.sources.push({ id: `src_${nextId++}`, label, text, register }); st.corpus = null; };
+  let PRIOR; const prior = () => (PRIOR ??= fetch('./register-prior.json').then((r) => r.json()).catch(() => null));
+  // the type of a source is SNIFFED (Zenodotus-measured vocabulary + structural cues, a small local model only when thin); a pick overrides it
+  const eff = (s) => s.register || (s.auto && (!s.auto.thin || (s.auto.model && s.auto.model.used)) ? s.auto.register : '');
+  let timer = null; const soon = () => { clearTimeout(timer); timer = setTimeout(() => { if (st.sources.length && st.sources.every((x) => !x.pending)) readAll(); }, 250); };
+  async function sniffOne(s) {
+    s.pending = true; render();
+    try { s.auto = sniffRegister(s.text, await prior()); render(); if (s.auto.thin) { s.auto = await steerWithLocalModel(s.auto); } } catch (e) { console.error(e); }
+    s.pending = false; render(); soon();
+  }
+  const add = (label, text, register = '') => { const s = { id: `src_${nextId++}`, label: label || text.trim().split(/\s+/).slice(0, 5).join(' ') + '…', text, register, auto: null, pending: false }; st.sources.push(s); st.corpus = null; sniffOne(s); };
 
   function regChip(r) { return r ? `<span class="chip">${esc(r)}</span>` : '<span class="chip dim">undeclared</span>'; }
   function render() {
-    const sc = st.sources.map((s) => `<div class="src-card" data-src="${s.id}"><input type="text" data-f="label" value="${esc(s.label)}" aria-label="source name"><select data-f="register" aria-label="register (declared by the giver)">${REGS.map(([v, l]) => `<option value="${v}"${v === s.register ? ' selected' : ''}>${l}</option>`).join('')}</select><span><button type="button" data-a="open">open in the reader</button> <button type="button" data-a="rm">remove</button></span><div class="tx">${esc(s.text.slice(0, 300))}${s.text.length > 300 ? '…' : ''} <span class="dim">(${s.text.length.toLocaleString()} chars)</span></div></div>`).join('') || '<div class="dim" style="font-size:12.5px">No sources yet — add the text in the box below (or a dropped file), or load the example.</div>';
+    const autoLabel = (s) => (s.pending ? 'sniffing…' : s.auto ? (eff(s) ? `${eff(s)} · ${Math.round(s.auto.p * 100)}% · sniffed${s.auto.model && s.auto.model.used ? ' + local model' : ''}` : `unsure${s.auto.reason ? ' — ' + s.auto.reason : ''} — pick one, or it is read but not linked`) : '…');
+    const sc = st.sources.map((s) => `<div class="src-card" data-src="${s.id}"><b>${esc(s.label)}</b><select data-f="register" aria-label="type of source" title="${esc(s.auto ? s.auto.ranked.slice(0, 2).map((r) => r.register + ' ' + r.p.toFixed(2) + ': ' + r.why.join('; ')).join('\n') : '')}"><option value="">${esc(autoLabel(s))}</option>${REGS.map(([v, l]) => `<option value="${v}"${v === s.register ? ' selected' : ''}>${l}</option>`).join('')}</select><span><button type="button" data-a="rm">remove</button></span><div class="tx">${esc(s.text.slice(0, 200))}${s.text.length > 200 ? '…' : ''}</div></div>`).join('') || '<div class="dim" style="font-size:12.5px">No sources yet — add the text in the box below (or a dropped file), or load the example.</div>';
     host.innerHTML = `<div class="src-panel"><h2>Sources — read several, link across them</h2>
       <p class="lede">Each source is read on its own. Whoever supplies it <b>declares the register</b> it speaks in (testimony, journalism, fiction …); an undeclared source is read but never linked. A link joins one source’s referent to another’s and <b>always keeps both ends, both registers and the split between them</b>; it is never a merge of the sources. A <i>being</i> is only a view over those links.</p>
       ${sc}
-      <div class="src-row"><button type="button" data-a="addcur">+ add the text below as a source</button><button type="button" data-a="titanic">load example: three sources on one ship</button><button type="button" data-a="read" class="primary"${st.sources.length ? '' : ' disabled'}>${st.busy ? 'reading…' : 'Read the sources together'}</button></div>
+      <div class="src-row"><button type="button" data-a="addcur">+ add the text below</button><button type="button" data-a="titanic">example: three sources on one ship</button>${st.busy ? '<span class="dim">reading…</span>' : ''}</div>
       ${st.err ? `<div class="dim mono">${esc(st.err)}</div>` : ''}${st.corpus ? result() : ''}</div>`;
   }
 
@@ -92,7 +103,7 @@ export function mountSources(host, { makeDeps, openInReader, currentText }) {
     await new Promise((r) => setTimeout(r, 30));
     try {
       const deps = await makeDeps();
-      st.corpus = buildCorpusTimeline(st.sources.map((s) => ({ id: s.id, label: s.label, text: s.text, register: s.register, giver: 'you' })), deps, { maxSnapshots: 8 });
+      st.corpus = buildCorpusTimeline(st.sources.map((s) => ({ id: s.id, label: s.label, text: s.text, register: eff(s), giver: s.register ? 'you' : 'sniffed' })), deps, { maxSnapshots: 8 });
       st.overlay = []; st.fold = foldLog(st.corpus.log); st.sel = null; st.voiceSrc = null;
     } catch (e) { console.error(e); st.err = 'The sources could not be read together: ' + (e && e.message || e); }
     st.busy = false; render();
@@ -103,18 +114,16 @@ export function mountSources(host, { makeDeps, openInReader, currentText }) {
     const vt = ev.target.closest('#voice-text'); if (vt && st.fold) { const sel = getSelection(); if (sel && sel.anchorNode && vt.contains(sel.anchorNode)) showVoices(vt.dataset.src, sel.anchorOffset); return; }
     const b = ev.target.closest('[data-a]'); if (!b) return; const a = b.dataset.a, card = ev.target.closest('[data-src]');
     if (a === 'rm') { st.sources = st.sources.filter((s) => s.id !== card.dataset.src); st.corpus = null; render(); }
-    else if (a === 'open') { const s = st.sources.find((x) => x.id === card.dataset.src); openInReader(s.text, s.label); }
-    else if (a === 'addcur') { const t = (currentText() || '').trim(); if (t.length < 8) { st.err = 'Put some text in the box below first.'; render(); return; } add(`source ${st.sources.length + 1}`, t); st.err = null; render(); }
-    else if (a === 'titanic') { st.sources = []; for (const t of TITANIC) add(t.label, t.text, t.register); render(); readAll(); }
-    else if (a === 'read') readAll();
-    else if (a === 'vsrc') { st.voiceSrc = b.dataset.src; render(); }
+        else if (a === 'addcur') { const t = (currentText() || '').trim(); if (t.length < 8) { st.err = 'Put some text in the box below first.'; render(); return; } add("", t); st.err = null; render(); }
+    else if (a === 'titanic') { st.sources = []; for (const t of TITANIC) add(t.label, t.text, t.register); render(); }
+        else if (a === 'vsrc') { st.voiceSrc = b.dataset.src; render(); }
     else if (a === 'sever') { st.overlay.push({ op: 'CON', cell: 'Link', kind: 'correspondence', severs: b.dataset.link, giver: 'you', id: 'you_' + st.overlay.length + '_' + b.dataset.link, basis: 'severed by you' }); st.fold = foldLog(st.corpus.log, { overlay: st.overlay }); render(); }
   });
   host.addEventListener('change', (ev) => {
     const f = ev.target.dataset.f, card = ev.target.closest('[data-src]');
     if (f === 'shared') { st.onlyShared = ev.target.checked; render(); return; }
     if (!f || !card) return; const s = st.sources.find((x) => x.id === card.dataset.src); if (!s) return;
-    s[f] = ev.target.value; if (f === 'register') st.corpus = null; if (st.corpus === null) render();
+    s[f] = ev.target.value; if (f === 'register') { st.corpus = null; render(); soon(); }
   });
   render();
   return { add, readAll, state: st };
