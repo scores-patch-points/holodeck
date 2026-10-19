@@ -282,6 +282,7 @@ import { classifyWord, THRAX_MAP, THRAX_OUT_OF_SCOPE, THRAX_META, POS_PRIOR_META
 import { morphologyFromPrior, createLemmatizer, stemsOf } from '../vendor/eoreader7/native/adapters/text/morphology.js';
 import { splitSentences } from '../vendor/eoreader7/native/adapters/text/spans.js';
 import { tokenize } from '../vendor/eoreader7/native/organs/source.js';
+import { classifyForm, lookupForm } from '../holodeck-surface.js';
 import { sha256Hex, stableProvenanceId, byteRange, EotLedger } from '../vendor/fold-chat/fold-chat-eot.js';
 
 const $ = (id) => document.getElementById(id);
@@ -450,19 +451,19 @@ function buildTrace(doc, clean, claims, features, extraction){
   let gaps = 0, ambiguous = 0, classified = 0;
   shown.forEach(w => {
     if (!pos){ push('grammar', 'off', `“${w.w}” → POS layer OFF — no class prior is read; the form is carried as a bare string`, { s:w.s, e:w.e, data:{ w:w.w, found:false, off:true } }); return; }
-    const c = classifyWord(w.w, { posPrior: pos });
+    const c = classifyForm(w.w, { posPrior: pos, lemmatizer: PRIORS.lemmatizer });
     if (!c.found){ gaps++; push('grammar', 'gap', `“${w.w}” → no entry in the class prior — a typed gap, never a guess`, { s:w.s, e:w.e, data:{ w:w.w, found:false } }); return; }
     classified++;
     if (c.candidates.length > 1) ambiguous++;
     const parts = c.candidates.slice(0, 3).map(k => `${k.upos} ${(k.share * 100).toFixed(0)}%→${k.thraxClass || '—'}`).join(' · ');
-    push('grammar', 'class', `“${w.w}” → ${parts}${c.candidates.length > 1 ? ' — ambiguous, left unresolved' : ''}`, { s:w.s, e:w.e, data:{ w:w.w, found:true, candidates:c.candidates.slice(0,3), total:c.total } });
+    push('grammar', 'class', `“${w.w}” → ${c.via.length ? `(looked up as “${c.form}” — ${c.via.map(v => v.step).join(' + ')}) ` : ''}${parts}${c.inferred ? ' — INFERRED from the act, not attested for this form' : ''}${c.candidates.length > 1 ? ' — ambiguous, left unresolved' : ''}`, { s:w.s, e:w.e, data:{ w:w.w, found:true, inferred:!!c.inferred, candidates:c.candidates.slice(0,3), total:c.total, form:c.form, via:c.via } });
   });
 
   const lem = features.morph === false ? null : PRIORS.lemmatizer;
   let acts = 0, morphGaps = 0;
   shown.forEach(w => {
     if (!lem){ push('morph', 'off', `“${w.w}” → morphology layer OFF — no lemma is recovered; the form stays itself`, { s:w.s, e:w.e, data:{ w:w.w, lemmas:[], stems:[], off:true } }); return; }
-    const lemmas = [...lem.lemmasOf(w.w)]; const stems = [...stemsOf(w.w)];
+    const lf = lookupForm(w.w); const lemmas = [...lem.lemmasOf(lf)]; const stems = [...stemsOf(lf)];
     if (!lemmas.length && !stems.length){ morphGaps++; push('morph', 'gap', `“${w.w}” → no act recovered — a form the prior does not know and the rule cannot recover stays a form`, { s:w.s, e:w.e, data:{ w:w.w, lemmas:[], stems:[] } }); return; }
     acts++;
     push('morph', 'act', `“${w.w}” → act {${lemmas.slice(0,3).map(l=>`“${l}”`).join(', ') || '—'}}${stems.length ? ` · rule {${stems.slice(0,2).join(', ')}}` : ''}${lemmas.length > 1 ? ' — a SET, never one chosen' : ''}`, { s:w.s, e:w.e, data:{ w:w.w, lemmas:lemmas.slice(0,4), stems:stems.slice(0,3) } });
@@ -816,7 +817,8 @@ function mount(T){
       if (!g.found) return `<tr><td class="mono">${esc(g.w)}</td><td colspan="2" class="gap">no entry — typed gap</td></tr>`;
       const bits = g.candidates.map(k => `<span class="mono">${esc(k.upos)}</span> ${(k.share*100).toFixed(0)}% → ${k.thraxClass ? esc(k.thraxClass) : '<span class="gap">—</span>'}`).join('<br>');
       const bar = `<span class="bar" style="width:${Math.max(3, Math.round(g.candidates[0].share * 46))}px"></span>`;
-      return `<tr><td class="mono">${esc(g.w)}</td><td>${bar}</td><td>${bits}</td></tr>`;
+      const hop = g.via && g.via.length ? `<br><span class="mono" style="opacity:.65">looked up as ${esc(g.form)} · ${esc(g.via.map(v => v.step).join(' + '))}</span>` : '';
+      return `<tr><td class="mono">${esc(g.w)}${hop}</td><td>${bar}</td><td>${bits}</td></tr>`;
     }).join('');
     return `<div class="h">POS — each form → the classes it is ATTESTED as (Thrax over UD)</div>
       <div class="fig"><b>Ambiguity is preserved, not resolved.</b> A type-level table cannot answer an instance-level question, so no winner is picked. Giver: ${esc(POS_PRIOR_META.giver)} → ${esc(THRAX_META.giver)}. ${[...THRAX_OUT_OF_SCOPE].length} categories are kept out, never forced.</div>

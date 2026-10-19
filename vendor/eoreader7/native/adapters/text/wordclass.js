@@ -107,6 +107,25 @@ export const POS_PRIOR_META = Object.freeze({
   scope: "lang/en",
 });
 
+const APOSTROPHES = /[\u2019\u2018\u02BC\u2032\uFF07`\u00B4]/g;
+const EDGE_NON_WORD = /^[^\p{L}\p{N}]+|[^\p{L}\p{N}]+$/gu;
+
+/**
+ * The looked-up form of a written form, each step named ([] steps = nothing to normalise).
+ * NFKC, then the prior's straight apostrophe, then the sentence's own edge punctuation.
+ */
+export const normalizeForm = (surface) => {
+  const steps = [];
+  let f = String(surface ?? "");
+  const nfkc = f.normalize("NFKC");
+  if (nfkc !== f) { steps.push({ step: "unicode", note: "NFKC — compatibility characters folded" }); f = nfkc; }
+  const ap = f.replace(APOSTROPHES, "'");
+  if (ap !== f) { steps.push({ step: "apostrophe", note: "curly/modifier apostrophe → the prior's straight apostrophe" }); f = ap; }
+  const edge = f.replace(EDGE_NON_WORD, "");
+  if (edge && edge !== f) { steps.push({ step: "edge-punctuation", note: `“${f.match(EDGE_NON_WORD).join("")}” is the sentence's punctuation, not part of the form` }); f = edge; }
+  return { form: f, steps };
+};
+
 /**
  * Every class this occurrence's own FORM is attested as, with real counts
  * from the treebank and the Thrax-tradition reading of each — never
@@ -124,8 +143,17 @@ export const POS_PRIOR_META = Object.freeze({
  *   (THRAX_OUT_OF_SCOPE) — a disclosed absence, never a guess.
  */
 export const classifyWord = (surface, { posPrior } = {}) => {
-  const lower = (surface ?? "").toLowerCase();
-  const counts = posPrior?.forms?.[lower];
+  const hit = (form) => posPrior?.forms?.[form.toLowerCase()];
+  let counts = hit(surface ?? "");
+  let form = surface, via = [];
+  if (!counts) {
+    // The prior is keyed on bare forms with a straight apostrophe. A form arrives as written —
+    // "O’Connell" (curly mark), "Department." (the sentence's own period still attached). Those
+    // are differences of typing, not absences from the prior. Tried only on a miss, so an exact
+    // entry is never second-guessed, and the hop is named so no one reads it as the form itself.
+    const n = normalizeForm(surface);
+    if (n.steps.length && n.form) { counts = hit(n.form); if (counts) { form = n.form; via = n.steps; } }
+  }
   if (!counts) return { surface, found: false, total: 0, candidates: [] };
 
   const total = Object.values(counts).reduce((a, b) => a + b, 0);
@@ -138,7 +166,7 @@ export const classifyWord = (surface, { posPrior } = {}) => {
     }))
     .sort((a, b) => b.count - a.count);
 
-  return { surface, found: true, total, candidates };
+  return via.length ? { surface, found: true, total, candidates, form, via } : { surface, found: true, total, candidates };
 };
 
 /**

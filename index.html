@@ -4194,7 +4194,9 @@ Promise.all([
   import(new URL('vendor/eoreader7/native/adapters/text/relations-language.js', location.href)),
   import(new URL('vendor/eoreader7/native/adapters/text/wordclass.js', location.href)),
   fetch(new URL('vendor/eoreader7/native/priors/role-config-eng.json', location.href)).then(r => r.ok ? r.json() : null).catch(() => null),
-]).then(([RL, WC, rc]) => { HD_ROLE = { relationExtractorsFor: RL.relationExtractorsFor, classifyWord: WC.classifyWord, dominantClass: WC.dominantClass, roleConfig: rc }; }).catch(() => {});
+  // classifyWord reads the written form through holodeck-surface.js (curly apostrophe, edge punctuation) — the vendored organs stay byte-identical
+  import(new URL('holodeck-surface.js', location.href)),
+]).then(([RL, WC, rc, SF]) => { HD_ROLE = { relationExtractorsFor: RL.relationExtractorsFor, classifyWord: SF.classifyForm, dominantClass: WC.dominantClass, roleConfig: rc }; }).catch(() => {});
 const hdHoldReady = () => !!(HD_ROLE && HD_ATTR);
 // The RECEIVED ground for "normal": live_priors' General English set (books, encyclopedia articles, US/UK law), the same
 // baseline the surprise view uses, read for how often each word is capitalised mid-sentence. It is independent of the

@@ -8,7 +8,8 @@ import { splitSentences } from './vendor/eoreader7/native/adapters/text/spans.js
 import { extractSurfaces, discoverReferents, namesCorefer, diaNorm } from './vendor/eoreader7/native/adapters/text/surfaces.js';
 import { resolvePronouns } from './vendor/eoreader7/native/adapters/text/pronouns.js';
 import { relationExtractorsFor } from './vendor/eoreader7/native/adapters/text/relations-language.js';
-import { classifyWord, dominantClass } from './vendor/eoreader7/native/adapters/text/wordclass.js';
+import { dominantClass } from './vendor/eoreader7/native/adapters/text/wordclass.js';
+import { classifyForm as classifyWord } from './holodeck-surface.js'; // wraps the vendored classifyWord: the written form is normalised before lookup
 import { createLemmatizer, morphologyFromPrior } from './vendor/eoreader7/native/adapters/text/morphology.js';
 import { stanceWords } from './vendor/eoreader7/native/organs/stance.js';
 import * as P from './vendor/eoreader7/native/adapters/text/priors.js';
