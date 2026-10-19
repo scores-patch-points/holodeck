@@ -23,6 +23,7 @@
 //
 //   node tools/vendor-er7.mjs [--dry] [--src /path/eoreader7]
 import fs from "node:fs";
+import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -30,7 +31,7 @@ const HERE = path.dirname(fileURLToPath(import.meta.url));
 const FOLD = path.resolve(HERE, "..");
 const SRC = process.argv.includes("--src")
   ? process.argv[process.argv.indexOf("--src") + 1]
-  : "/Users/mlacy/Documents/3.0/khora";
+  : (process.env.KHORA_DIR || path.join(os.homedir(), ".khora")); // THE CANONICAL: scores-patch-points/khora (the live checkout); the old default was a non-git 3.0 copy
 const DEST = path.join(FOLD, "vendor", "eoreader7");
 const DRY = process.argv.includes("--dry");
 
