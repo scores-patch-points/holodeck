@@ -375,23 +375,59 @@ export function buildCorpusTimeline(sources, deps, opts = {}) {
   if (genericTokens) { try { generic = genericTokens(represented, {}); } catch { generic = new Set(); } }
   const norm = diaNorm ?? ((x) => String(x ?? "").toLowerCase());
   const tokens = (x) => norm(x).split(/\s+/).filter((t) => t.length > 2);
+  // A shared name only NOMINATES a pair; it never joins one. Whether two referents are one being is IDENTITY, and the organ owns no identity test:
+  // the caller injects one (deps.sameBeing — adapters/text/corpus-identity.js is the holographic one). With none injected nothing joins, and the
+  // nominated pairs are returned as `candidates` saying so.
   const sharesNonGeneric = (a, b) => { const tb = new Set(tokens(b)); return tokens(a).some((t) => tb.has(t) && !generic.has(t)); };
+  const sameBeing = deps.sameBeing ?? null;
+  const keyOf = (name) => { const t = tokens(name); return t.length ? t[t.length - 1] : ""; };
 
-  const linkEvents = [];
+  // the record the identity test reads: one node per referent (sources are never merged), one occurrence per mention. An occurrence's
+  // features are the sentence's OTHER named referents (w:, keyed by surname so a name means the same in two sources) and its verbs (v:), hop 1.
+  let judge = null;
+  if (sameBeing) {
+    const record = new Map();
+    pool.forEach((p, pi) => {
+      const f = foldLog(timelines[metas.indexOf(p.m)].log), sents = deps.splitSentences(p.m.text);
+      const sentOf = (off) => { let k = 0; for (let q = 0; q < sents.length; q++) { if (sents[q].offset <= off) k = q; else break; } return k; };
+      const inSent = sents.map(() => []);
+      for (const r of f.referents.values()) for (const m of r.mentions) inSent[sentOf(m.s)].push({ ref: r.id, name: r.name, s: m.s });
+      const verbsIn = sents.map((st) => (deps.isVerb && deps.wordsIn ? [...new Set(deps.wordsIn(st.text, 0).map((w) => w.w.toLowerCase()).filter((w) => deps.isVerb(w)))] : []));
+      for (const r of f.referents.values()) {
+        const occs = [];
+        for (const m of r.mentions) {
+          const k = sentOf(m.s), own = keyOf(r.name ?? "");
+          const feats = new Set();
+          for (const o of inSent[k]) if (o.ref !== r.id) { const key = keyOf(o.name ?? ""); if (key && key !== own) feats.add("w:" + key); }
+          for (const v of verbsIn[k]) feats.add("v:" + v);
+          occs.push([...feats].map((x) => ({ f: x, hop: 1 })));
+        }
+        if (occs.length) record.set(r.id, occs);
+      }
+    });
+    judge = sameBeing.prepare(record);
+  }
+
+  const linkEvents = [], candidates = [];
   const emitLink = (body) => { const h = hash(canon(body)).slice(0, 16); const ev = { id: `evt_${h}`, ...body }; linkEvents.push(ev); return ev; };
+  const duplicates = [];
   for (let i = 0; i < pool.length; i++) for (let j = i + 1; j < pool.length; j++) {
+    // byte-identical sources are one witness, not two: nothing is linked (or corroborated) between a source and its own copy
+    if (hash(pool[i].m.text) === hash(pool[j].m.text)) { duplicates.push({ a: pool[i].m.id, b: pool[j].m.id, reason: "identical_bytes", note: "one witness, not two" }); continue; }
     for (const ra of pool[i].refs) for (const rb of pool[j].refs) {
       let matched = null;
       outer: for (const sa of ra.surfaces) for (const sb of rb.surfaces) if (namesCorefer(sa, sb) && sharesNonGeneric(sa, sb)) { matched = { from: sa, to: sb }; break outer; }
       if (!matched) continue;
+      const A = { ref: ra.id, source: pool[i].m.id, register: pool[i].m.register, name: ra.name }, B = { ref: rb.id, source: pool[j].m.id, register: pool[j].m.register, name: rb.name };
+      const verdict = judge ? judge(ra.id, rb.id) : { same: false, verdict: "none", reason: "no_identity_test_injected", basis: "a shared name only nominates; no identity test was injected, so nothing joins" };
+      if (!verdict.same) { candidates.push({ from: A, to: B, matched, identity: verdict }); continue; }
       const split = splitOf(pool[i].m.register, pool[j].m.register);
       // orient the link: the telling-end first when one end is a telling and the other makes truth-claims
       const flip = split.kind === "fictionalizes" && isTruthClaiming(pool[i].m.register);
-      const A = { ref: ra.id, source: pool[i].m.id, register: pool[i].m.register, name: ra.name }, B = { ref: rb.id, source: pool[j].m.id, register: pool[j].m.register, name: rb.name };
       const [from, to] = flip ? [B, A] : [A, B];
-      emitLink({ op: "CON", ...CELLS.CON, kind: "correspondence", at: "corpus", from, to, split: { ...split, registers: [from.register, to.register], truthClaiming: [isTruthClaiming(from.register), isTruthClaiming(to.register)] }, matched: flip ? { from: matched.to, to: matched.from } : matched, checkedBy: "namesCorefer + a shared non-generic token (a name-level correspondence — weaker than a corroborated bridge)", giver: "reader", basis: `${from.name} (${from.register}) ↔ ${to.name} (${to.register}): ${split.kind}` });
+      emitLink({ op: "CON", ...CELLS.CON, kind: "correspondence", at: "corpus", from, to, split: { ...split, registers: [from.register, to.register], truthClaiming: [isTruthClaiming(from.register), isTruthClaiming(to.register)] }, matched: flip ? { from: matched.to, to: matched.from } : matched, identity: { verdict: verdict.verdict, forWhom: verdict.forWhom ?? null, basis: verdict.basis }, checkedBy: "holographic identity (identity-induction, for-whom " + (verdict.forWhom?.question ?? "—") + "): " + verdict.basis, giver: "reader", basis: `${from.name} (${from.register}) ↔ ${to.name} (${to.register}): ${split.kind}` });
     }
   }
   const log = [...timelines.flatMap((t) => t.log), ...linkEvents];
-  return { schema: "EOCorpusTimeline@1", sources: metas.map(({ text, ...m }) => m), refused, timelines, log, links: linkEvents, pooled: pool.map((p) => ({ source: p.m.id, referents: p.refs.length })) };
+  return { schema: "EOCorpusTimeline@1", candidates, duplicates, sources: metas.map(({ text, ...m }) => m), refused, timelines, log, links: linkEvents, pooled: pool.map((p) => ({ source: p.m.id, referents: p.refs.length })) };
 }
