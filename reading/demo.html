@@ -391,15 +391,15 @@ window.fetch = (u, o) => { net.requests.push(String(u)); return _fetch(u, o); };
 import { makeEngineRelationReader, loadPriors, blankMarkup } from '../holodeck-reader.js';
 import { extractReadings } from './extract.js';
 import { mountMap } from '../holodeck-map.js';
-import { classifyWord, THRAX_MAP, THRAX_OUT_OF_SCOPE, THRAX_META, POS_PRIOR_META } from '../vendor/eoreader7/native/adapters/text/wordclass.js';
-import { morphologyFromPrior, createLemmatizer, stemsOf } from '../vendor/eoreader7/native/adapters/text/morphology.js';
-import { splitSentences } from '../vendor/eoreader7/native/adapters/text/spans.js';
-import { tokenize } from '../vendor/eoreader7/native/organs/source.js';
+import { classifyWord, THRAX_MAP, THRAX_OUT_OF_SCOPE, THRAX_META, POS_PRIOR_META } from '../vendor/khora/native/adapters/text/wordclass.js';
+import { morphologyFromPrior, createLemmatizer, stemsOf } from '../vendor/khora/native/adapters/text/morphology.js';
+import { splitSentences } from '../vendor/khora/native/adapters/text/spans.js';
+import { tokenize } from '../vendor/khora/native/organs/source.js';
 import { classifyForm, lookupForm, documentClassifier } from '../holodeck-surface.js';
-import { extractSurfaces, discoverReferents, diaNorm } from '../vendor/eoreader7/native/adapters/text/surfaces.js';
-import { sha256 } from '../vendor/eoreader7/native/kernel/sha256.js';
-import { resolvePronouns } from '../vendor/eoreader7/native/adapters/text/pronouns.js';
-import { buildReadingTimeline, foldLog, CELLS } from '../vendor/eoreader7/native/adapters/text/reading-timeline.js';
+import { extractSurfaces, discoverReferents, diaNorm } from '../vendor/khora/native/adapters/text/surfaces.js';
+import { sha256 } from '../vendor/khora/native/kernel/sha256.js';
+import { resolvePronouns } from '../vendor/khora/native/adapters/text/pronouns.js';
+import { buildReadingTimeline, foldLog, CELLS } from '../vendor/khora/native/adapters/text/reading-timeline.js';
 import { makeLookup } from '../holodeck-lookup.js';
 import { startOffline } from './offline.js';
 import { browserOcr, loadPdfjs } from '../holodeck-ocr.js';
@@ -513,7 +513,7 @@ const knownWord = w => !!(LEXICON && LEXICON.has(String(w).toLowerCase()));
 async function ready(){
   if (READER) return;
   PRIORS = await loadPriors();
-  try { const r = await fetch('../vendor/eoreader7/native/priors/morphology-eng.json'); PRIORS.morphRaw = await r.json(); PRIORS.morph = morphologyFromPrior(PRIORS.morphRaw); } catch (e) { PRIORS.morphRaw = { provenance:{} }; }
+  try { const r = await fetch('../vendor/khora/native/priors/morphology-eng.json'); PRIORS.morphRaw = await r.json(); PRIORS.morph = morphologyFromPrior(PRIORS.morphRaw); } catch (e) { PRIORS.morphRaw = { provenance:{} }; }
   LEXICON = new Set(); LEXICON_LONGEST = 0;
   try { Object.keys((PRIORS.posPrior && PRIORS.posPrior.forms) || {}).forEach(w => { LEXICON.add(w.toLowerCase()); if (w.length > LEXICON_LONGEST) LEXICON_LONGEST = w.length; }); } catch (e) {}
   try { Object.keys((PRIORS.morphRaw && PRIORS.morphRaw.forms) || {}).forEach(w => { LEXICON.add(w.toLowerCase()); if (w.length > LEXICON_LONGEST) LEXICON_LONGEST = w.length; }); } catch (e) {}

@@ -1,6 +1,6 @@
 // holodeck-profile.js — AN ENTITY'S PROFILE ON THE HOLODECK.
 //
-// Built on eoreader7's kind induction (vendored under vendor/eoreader7/native/
+// Built on eoreader7's kind induction (vendored under vendor/khora/native/
 // kernel/). A being's profile is its induced kind(s) and its key parameters —
 // whatever the relations are — each carrying the functional standing the kind
 // earned (fixed · one at a time · many-valued · time unknown · unexposed). No
@@ -9,7 +9,7 @@
 // The relation source is the reading index's own bonds (holodeck's cast/bonds,
 // eoreader7's witness of which referents are held together and how). A bond's
 // dominant relation term is the verb; its two ends are the subject and object.
-import { assertionsFromTriples, buildEntityProfiles, profileLines } from './vendor/eoreader7/native/kernel/entity-profile.js';
+import { assertionsFromTriples, buildEntityProfiles, profileLines } from './vendor/khora/native/kernel/entity-profile.js';
 
 const clean = (s) => String(s == null ? '' : s).replace(/\s+/g, ' ').trim();
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));

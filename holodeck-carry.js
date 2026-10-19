@@ -14,7 +14,7 @@
 // khora's DECLARED one (no `dmdWindow` is injected here) and the basis says so.
 //
 // Pure: no DOM, no IO, no model.
-import { atmosphereBlock, lensBlock, activeReferents } from './vendor/eoreader7/native/the-fold/resolutions.js';
+import { atmosphereBlock, lensBlock, activeReferents } from './vendor/khora/native/the-fold/resolutions.js';
 
 const fold = (s) => String(s == null ? '' : s).normalize('NFD').replace(/\p{M}+/gu, '').toLowerCase();
 const UNSPACED = /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Thai}]/u;

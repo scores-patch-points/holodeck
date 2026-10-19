@@ -1,6 +1,6 @@
 // Portable Penelope overview materializer. One canonical reading contract in eoreader7.
 // UTF-8 text bundles only; original PDF/audio/image address mapping remains a named gap.
-import { composeOverview, verifyOverview, reopen, blocksAt, canonical, digest } from '../../../eoreader7/native/organs/overview.js';
+import { composeOverview, verifyOverview, reopen, blocksAt, canonical, digest } from '../../../khora/native/organs/overview.js';
 export { composeOverview, verifyOverview, reopen, blocksAt };
 export const esc = s => String(s ?? '').replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#39;');
 const linkId = id => 'block-' + id;

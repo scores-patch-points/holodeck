@@ -33,11 +33,11 @@
 // window (born/died) and its position terms must overlap the referent's
 // witnessed period and its tenure years; a candidate out of that window fails
 // the validity-window check FIRST — the khora's Kelsen precedence order
-// (vendor/eoreader7/native/organs/regime.js: step 1, validity before force,
+// (vendor/khora/native/organs/regime.js: step 1, validity before force,
 // before entrenchment, never a silent pick) — before any kind match is ever
 // consulted.
 
-import { inValidityWindow } from "./vendor/eoreader7/native/organs/regime.js";
+import { inValidityWindow } from "./vendor/khora/native/organs/regime.js";
 
 export const LINKS_SCHEMA = "EOReferentLinks@1";
 
@@ -391,7 +391,7 @@ export function gate(ground, cand, { opts = {} } = {}) {
   const support = [];
 
   // THE ARROW OF TIME — validity window FIRST (Kelsen's precedence step 1,
-  // vendor/eoreader7/native/organs/regime.js): a candidate whose existence
+  // vendor/khora/native/organs/regime.js): a candidate whose existence
   // window does not cover the referent's witnessed period, or whose office
   // terms never cover the referent's tenure years, fails here before any kind
   // match is consulted. Two people with the same life, one difference, living

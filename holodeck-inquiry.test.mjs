@@ -5,7 +5,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { answerFromFold, renderInquiry, standingForDoor, detectContests, asksFreshness, planNextEncounter, INQUIRY_SCHEMA } from './holodeck-inquiry.js';
-import { createDeclarationLog, proposeCandidate, promote } from './vendor/eoreader7/native/interpretation/declarations.js';
+import { createDeclarationLog, proposeCandidate, promote } from './vendor/khora/native/interpretation/declarations.js';
 import { mathInstance, aboutArithmetic } from './holodeck-math.js';
 
 const PASSAGES = [

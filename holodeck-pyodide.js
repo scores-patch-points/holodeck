@@ -6,9 +6,9 @@
 // every run — so the pane's chains still verify here, and an exported .ipynb still re-runs elsewhere. The only thing
 // that leaves the tab is the one-time download of the runtime from the CDN the page already loads from; the cells run
 // with no network (Pyodide has no sockets), and the workspace (cells, outputs, files) is kept in this browser.
-import { sha256, sha256Bytes } from './vendor/eoreader7/native/kernel/sha256.js';
-import { addCell, editCell, recordExec, sourceOf, execsOf, dataOf, addData, cellOf } from './vendor/eoreader7/native/the-fold/surface/notebook.mjs';
-import { seal, emptyBench, addCard, addRun, promote, statusOf } from './vendor/eoreader7/native/the-fold/surface/bench.mjs';
+import { sha256, sha256Bytes } from './vendor/khora/native/kernel/sha256.js';
+import { addCell, editCell, recordExec, sourceOf, execsOf, dataOf, addData, cellOf } from './vendor/khora/native/the-fold/surface/notebook.mjs';
+import { seal, emptyBench, addCard, addRun, promote, statusOf } from './vendor/khora/native/the-fold/surface/bench.mjs';
 
 export const PYODIDE_VERSION = '314.0.7';
 export const PYODIDE_INDEX = `https://cdn.jsdelivr.net/pyodide/v${PYODIDE_VERSION}/full/`;

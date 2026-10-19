@@ -67,12 +67,12 @@ const clean = (s) => String(s == null ? '' : s).replace(/\s+/g, ' ').trim();
 // Ground·Figure·Pattern (kernel/gfp-claim.js); EOT = the append-only,
 // byte-addressed observation (EOTObservation@1). A proposition goes
 // NL → GFP → (language grammar) → NL, never NL → NL.
-const GFP = await import('../eoreader7/native/kernel/gfp-claim.js').catch(() => import('./vendor/eoreader7/native/kernel/gfp-claim.js')).catch(() => null);
+const GFP = await import('../khora/native/kernel/gfp-claim.js').catch(() => import('./vendor/khora/native/kernel/gfp-claim.js')).catch(() => null);
 
 // The English evaluative lens (one giver for the fold and the archons). Vendored
 // byte-identical; imported at the top so `stanceLens`/`STANCE_GIVER` are bound for
 // conclusionOf and worth() on first call, never left in a temporal dead zone.
-const _stance = await import('./vendor/eoreader7/native/organs/stance.js').catch(() => ({ stanceLens: () => 0, GIVER: null }));
+const _stance = await import('./vendor/khora/native/organs/stance.js').catch(() => ({ stanceLens: () => 0, GIVER: null }));
 export const stanceLens = _stance.stanceLens;
 export const STANCE_GIVER = _stance.GIVER;
 
@@ -254,7 +254,7 @@ export function stateVector(obs, dims) {
 export async function dmdBaseline(obsList, { rank = 6 } = {}) {
   const keys = new Set(); obsList.forEach((o) => o.forEach((_v, k) => keys.add(k)));
   const dims = [...keys].sort();
-  const { createStreamingDmd } = await import('../eoreader7/native/kernel/dmd-stream.js').catch(() => import('./vendor/eoreader7/native/kernel/dmd-stream.js'));
+  const { createStreamingDmd } = await import('../khora/native/kernel/dmd-stream.js').catch(() => import('./vendor/khora/native/kernel/dmd-stream.js'));
   if (!dims.length) return { modes: [], dims, gap: 'no_observables' };
   const dmd = createStreamingDmd({ dims: dims.length });
   for (const obs of obsList) dmd.push(stateVector(obs, dims));
@@ -520,7 +520,7 @@ export function turnAgainstPrior(A, docId, attested) {
 // a document always changes its own conclusion, so the conclusion must be drawn
 // elsewhere.
 
-const { dmdWindow } = await import('./vendor/eoreader7/native/kernel/activation.js').catch(() => ({ dmdWindow: null }));
+const { dmdWindow } = await import('./vendor/khora/native/kernel/activation.js').catch(() => ({ dmdWindow: null }));
 
 /** conclusionOf(claims, A) -> a small structured conclusion — the propositions
  *  a set of claims collectively holds: the top names with their frame, the

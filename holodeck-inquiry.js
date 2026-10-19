@@ -50,11 +50,11 @@
 // are the caller's already-held local evidence, injected. An `offline-only`
 // privacy frame is honored by construction: this module makes zero external
 // requests on any path.
-import { answerBeforeTheModel, wantsProse } from './vendor/eoreader7/native/the-fold/answerable.js';
-import { declare, frameOf } from './vendor/eoreader7/native/kernel/retrieval-frame.js';
-import { relationCompositionChains, evaluateRelationCompositions } from './vendor/eoreader7/native/kernel/relation-composition.js';
-import { hyperedge } from './vendor/eoreader7/native/kernel/hypergraph.js';
-import { chemistryFor } from './vendor/eoreader7/native/organs/derivation.js';
+import { answerBeforeTheModel, wantsProse } from './vendor/khora/native/the-fold/answerable.js';
+import { declare, frameOf } from './vendor/khora/native/kernel/retrieval-frame.js';
+import { relationCompositionChains, evaluateRelationCompositions } from './vendor/khora/native/kernel/relation-composition.js';
+import { hyperedge } from './vendor/khora/native/kernel/hypergraph.js';
+import { chemistryFor } from './vendor/khora/native/organs/derivation.js';
 import { answerSpan, shownText } from './vendor/fold-chat/fold-chat-answerspan.js';
 
 export const INQUIRY_SCHEMA = 'FoldInquiry@1';

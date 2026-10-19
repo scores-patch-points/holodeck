@@ -4,10 +4,10 @@
 // through the vendored copy, so every consumer inherits it. This wrapper adds the lemma hop, which
 // is an inference rather than a typing difference — it is carried as `inferred` with the act named,
 // so no one reads it as attested for the form.
-import { classifyWord, normalizeForm } from './vendor/eoreader7/native/adapters/text/wordclass.js';
-import { stemsOf } from './vendor/eoreader7/native/adapters/text/morphology.js';
-import { readDocumentEvidence, classifyWithDocument } from './vendor/eoreader7/native/adapters/text/document-evidence.js';
-import { classifyWithLookups, lookupWitness } from './vendor/eoreader7/native/adapters/text/external-evidence.js';
+import { classifyWord, normalizeForm } from './vendor/khora/native/adapters/text/wordclass.js';
+import { stemsOf } from './vendor/khora/native/adapters/text/morphology.js';
+import { readDocumentEvidence, classifyWithDocument } from './vendor/khora/native/adapters/text/document-evidence.js';
+import { classifyWithLookups, lookupWitness } from './vendor/khora/native/adapters/text/external-evidence.js';
 
 export const normalizeSurface = normalizeForm;
 
