@@ -19,10 +19,10 @@
 // admitted is framed by construction (holodeck-reading.js gates a frameless one
 // into a typed gap), so a gap-marked row is never indexed here, and the frame
 // rides with the entry the engine resolves.
-import { mentionBook, activate } from './vendor/eoreader7/native/the-fold/activation-wiring.js';
-import { readingIndexFromLog } from './vendor/eoreader7/native/the-fold/reading-log.js';
-import { namesCorefer, diaNorm } from './vendor/eoreader7/native/adapters/text/surfaces.js';
-import { splitSentences } from './vendor/eoreader7/native/adapters/text/spans.js';
+import { mentionBook, activate } from './vendor/khora/native/the-fold/activation-wiring.js';
+import { readingIndexFromLog } from './vendor/khora/native/the-fold/reading-log.js';
+import { namesCorefer, diaNorm } from './vendor/khora/native/adapters/text/surfaces.js';
+import { splitSentences } from './vendor/khora/native/adapters/text/spans.js';
 
 const INDEX_CACHE = new WeakMap(); // rix -> index (the engine's own identity face)
 const BOOK_CACHE = new WeakMap(); // index -> Map<IX, {sentences, byId}> — the

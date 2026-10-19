@@ -7,9 +7,9 @@
 // ever rides in as the mouth of this full pipeline — it never runs outside it.
 import * as FOLD from './vendor/the-fold/fold.js';
 import { mechanicalRefresh } from './holodeck-carry.js';
-import { chunkSource, retrieve, buildSourceBlock, openQuestions, readRange, tokenize, foldDiacritics } from './vendor/eoreader7/native/organs/source.js';
-import { meetingBoundaries } from './vendor/eoreader7/native/organs/speaker.js';
-import { buildFactBlock, dedupeSourceText } from './vendor/eoreader7/native/organs/fact-block.js';
+import { chunkSource, retrieve, buildSourceBlock, openQuestions, readRange, tokenize, foldDiacritics } from './vendor/khora/native/organs/source.js';
+import { meetingBoundaries } from './vendor/khora/native/organs/speaker.js';
+import { buildFactBlock, dedupeSourceText } from './vendor/khora/native/organs/fact-block.js';
 import { makeEngineRelationReader, readCorpus, blankMarkup } from './holodeck-reader.js';
 import * as HH from './holodeck-chat-lane.js';
 import { answerFromFold } from './holodeck-inquiry.js';
@@ -39,10 +39,10 @@ import { ladder, conclusionOf, select } from './holodeck-summary.js';
 // the fold must be at an IDENTITY or it does not see a turn (empty 0/5), and
 // markup must be blanked (a CSS document folded as "CSS styles" until
 // blankMarkup). Gary's door keeps the fold a FACT and the question last.
-import { makeGary } from './vendor/eoreader7/native/organs/gary.js';
+import { makeGary } from './vendor/khora/native/organs/gary.js';
 let _gary = null; const gary = () => _gary || (_gary = makeGary());
-import { coverage, stripSelfCitations } from './vendor/eoreader7/native/organs/cite.js';
-import { checkGrounding, unsupportedClaims } from './vendor/eoreader7/native/organs/grounding.js';
+import { coverage, stripSelfCitations } from './vendor/khora/native/organs/cite.js';
+import { checkGrounding, unsupportedClaims } from './vendor/khora/native/organs/grounding.js';
 export { FOLD, retrieve };
 
 export const WEBLLM_MODELS = [

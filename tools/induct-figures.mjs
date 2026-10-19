@@ -11,7 +11,7 @@
 import { readFileSync, writeFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { kindEvidence, createKindInductionIndex, kindCandidates, kindDiagnostics } from '../vendor/eoreader7/native/kernel/kind-induction.js';
+import { kindEvidence, createKindInductionIndex, kindCandidates, kindDiagnostics } from '../vendor/khora/native/kernel/kind-induction.js';
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url));
 const args = Object.fromEntries(process.argv.slice(2).flatMap(a => a.startsWith('--') ? [[a.slice(2), process.argv[process.argv.indexOf(a) + 1]]] : []));

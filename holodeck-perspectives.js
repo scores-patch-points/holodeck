@@ -1,7 +1,7 @@
 // holodeck-perspectives.js — three embodied readers, kept apart. Not one
 // aggregate baseline: live_priors' three genres (books, encyclopedic,
 // government & legal) are each a reader with its OWN expectations, kept as
-// its own holograph (vendor/eoreader7/native/kernel/bayes-surprise.js).
+// its own holograph (vendor/khora/native/kernel/bayes-surprise.js).
 //
 // WHAT A READER EXPECTS IS STRUCTURE, NEVER WORDS. The unit is what one
 // sentence does to the running picture of who is in it and who is held
@@ -26,9 +26,9 @@
 // perspective.js (Mahavira / anekantavada: true from a standpoint,
 // standpoints kept apart) surfaces exactly where readers disagree.
 
-import { createHolograph, admit, predict } from './vendor/eoreader7/native/kernel/bayes-surprise.js';
-import { STANCE, BASIS, perspectiveOperation, projectPerspectives, divergence } from './vendor/eoreader7/native/kernel/perspective.js';
-import * as PR from './vendor/eoreader7/native/adapters/text/priors.js';
+import { createHolograph, admit, predict } from './vendor/khora/native/kernel/bayes-surprise.js';
+import { STANCE, BASIS, perspectiveOperation, projectPerspectives, divergence } from './vendor/khora/native/kernel/perspective.js';
+import * as PR from './vendor/khora/native/adapters/text/priors.js';
 // The for-whom's own conclusion (the fold at an identity) — the surface's
 // existing "no view from nowhere" machinery, reused rather than re-derived.
 import { conclusionOf } from './holodeck-summary.js';

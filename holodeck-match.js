@@ -8,9 +8,9 @@
 //                (Reed/Reid, Allen/Allan: one edit apart, homophones, different people).
 // Shape — Company (kind-standing.js::contextVectors + cosine): names whose surrounding words match a name's,
 // ranked against the same scores for every other pair, so "like this" means "beats what any name gets for free".
-import { isNearMissSpelling } from './vendor/eoreader7/native/adapters/text/surfaces.js';
-import { foldDiacritics } from './vendor/eoreader7/native/organs/source.js';
-import { contextVectors, cosine } from './vendor/eoreader7/native/organs/kind-standing.js';
+import { isNearMissSpelling } from './vendor/khora/native/adapters/text/surfaces.js';
+import { foldDiacritics } from './vendor/khora/native/organs/source.js';
+import { contextVectors, cosine } from './vendor/khora/native/organs/kind-standing.js';
 
 export function modeLine(r) {
   if (!r || r.mode === 'exact') return '';

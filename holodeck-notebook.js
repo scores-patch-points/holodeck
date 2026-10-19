@@ -3,8 +3,8 @@
 // edits, forks and claims use the existing EOReader7 append-only ledger code;
 // every chain is verified again in this browser. The older EOReader7 data
 // notebook server is still supported where its richer state API is available.
-import { verifyChain, phrase, statusOf, support, STATUSES } from './vendor/eoreader7/native/the-fold/surface/bench.mjs';
-import { sourceOf, execsOf, editsOf, dataOf, stale } from './vendor/eoreader7/native/the-fold/surface/notebook.mjs';
+import { verifyChain, phrase, statusOf, support, STATUSES } from './vendor/khora/native/the-fold/surface/bench.mjs';
+import { sourceOf, execsOf, editsOf, dataOf, stale } from './vendor/khora/native/the-fold/surface/notebook.mjs';
 
 export const DEFAULT_SERVER = 'http://127.0.0.1:8900';
 const LOOPBACK = /^https?:\/\/(localhost|127\.0\.0\.1|\[::1\])(:\d+)?$/;

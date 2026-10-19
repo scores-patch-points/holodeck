@@ -4104,7 +4104,7 @@ function splitSentences(text, tr) {
 //     smallest region that differs from its surroundings (this document, its kind, the workspace, the prior), so a
 //     contract's capitalised defined terms stay names there. Without the prior loaded, none of this runs.
 let HD_POS = null;
-const HD_POS_P = (typeof fetch === 'function' ? fetch(new URL('vendor/eoreader7/native/priors/pos-eng.json', location.href)).then(r => r.ok ? r.json() : null).then(j => { HD_POS = (j && j.forms) || null; return !!HD_POS; }).catch(() => false) : Promise.resolve(false));
+const HD_POS_P = (typeof fetch === 'function' ? fetch(new URL('vendor/khora/native/priors/pos-eng.json', location.href)).then(r => r.ok ? r.json() : null).then(j => { HD_POS = (j && j.forms) || null; return !!HD_POS; }).catch(() => false) : Promise.resolve(false));
 const HD_NOM = ['NOUN', 'PROPN', 'ADJ', 'NUM', 'X', 'SYM'];
 const hdPos = w => { if (!HD_POS || (/^[A-Z]{1,3}$/.test(w))) return null; return HD_POS[String(w).toLowerCase().replace(/['’]s$/, '').replace(/[.,;:!?)"”]+$/, '')] || null; };
 
@@ -4115,8 +4115,8 @@ const hdPos = w => { if (!HD_POS || (/^[A-Z]{1,3}$/.test(w))) return null; retur
 // false merge would need two unrelated real surfaces to coincide on one transform.
 let HD_DECL = null, HD_ENDINGS = null;
 Promise.all([
-  import(new URL('vendor/eoreader7/native/adapters/text/declension.js', location.href)),
-  fetch(new URL('vendor/eoreader7/native/priors/declension-rus.json', location.href)).then(r => r.ok ? r.json() : null),
+  import(new URL('vendor/khora/native/adapters/text/declension.js', location.href)),
+  fetch(new URL('vendor/khora/native/priors/declension-rus.json', location.href)).then(r => r.ok ? r.json() : null),
 ]).then(([D, prior]) => { try { HD_DECL = D.createDeclensionFolder(prior); HD_ENDINGS = new Set((prior?.rules || []).map(r => r.from).filter(Boolean)); } catch (e) { HD_DECL = null; HD_ENDINGS = null; } }).catch(() => { HD_DECL = null; HD_ENDINGS = null; });
 const hdDeclReady = () => !!HD_DECL;
 // THE PIPELINE, not a re-invention: analyze feeds the engine's OWN organs the same
@@ -4125,8 +4125,8 @@ const hdDeclReady = () => !!HD_DECL;
 // the reader's own declared gates (PRONOUN_MIN_ACTIVATION/MARGIN, hypergraph.js).
 let HD_ENGINE = null;
 Promise.all([
-  import(new URL('vendor/eoreader7/native/adapters/text/surfaces.js', location.href)),
-  import(new URL('vendor/eoreader7/native/adapters/text/pronouns.js', location.href)),
+  import(new URL('vendor/khora/native/adapters/text/surfaces.js', location.href)),
+  import(new URL('vendor/khora/native/adapters/text/pronouns.js', location.href)),
 ]).then(([S, Pr]) => { HD_ENGINE = { discoverReferents: S.discoverReferents, resolvePronouns: Pr.resolvePronouns }; }).catch(() => { HD_ENGINE = null; });
 const hdEngineReady = () => !!HD_ENGINE;
 // For emergent TYPING the pipeline must also be ready: the relation reader
@@ -4181,9 +4181,9 @@ const hdAttrReady = () => !!HD_ATTR;
 // triples ride beside it as `st.eot`. Injected, never re-derived (P3).
 let HD_ROLE = null;
 Promise.all([
-  import(new URL('vendor/eoreader7/native/adapters/text/relations-language.js', location.href)),
-  import(new URL('vendor/eoreader7/native/adapters/text/wordclass.js', location.href)),
-  fetch(new URL('vendor/eoreader7/native/priors/role-config-eng.json', location.href)).then(r => r.ok ? r.json() : null).catch(() => null),
+  import(new URL('vendor/khora/native/adapters/text/relations-language.js', location.href)),
+  import(new URL('vendor/khora/native/adapters/text/wordclass.js', location.href)),
+  fetch(new URL('vendor/khora/native/priors/role-config-eng.json', location.href)).then(r => r.ok ? r.json() : null).catch(() => null),
 ]).then(([RL, WC, rc]) => { HD_ROLE = { relationExtractorsFor: RL.relationExtractorsFor, classifyWord: WC.classifyWord, dominantClass: WC.dominantClass, roleConfig: rc }; }).catch(() => {});
 const hdHoldReady = () => !!(HD_ROLE && HD_ATTR);
 // The RECEIVED ground for "normal": live_priors' General English set (books, encyclopedia articles, US/UK law), the same
@@ -11953,7 +11953,7 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
   _extRepaint() { const el = this._extEl; if (el) { el._extKey = null; try { this.paintExtracted(); } catch (e) {} } }
   // Which language this document is in, from the engine (its /v1/read names it); English when the engine cannot be reached,
   // and the status line says so. The lexicon is the engine's own part-of-speech prior for that language
-  // (vendor/eoreader7/native/priors/pos-<iso3>.json); the sample-wide adjacency priors exist for English only so far.
+  // (vendor/khora/native/priors/pos-<iso3>.json); the sample-wide adjacency priors exist for English only so far.
   async foldLanguage(rec) {
     let text = ''; for (const pg of rec) { text += ' ' + String(pg.text || (pg.elements || []).map(e => e.text).join(' ')); if (text.length > 3000) break; }
     for (const host of hdEngineHosts()) {
@@ -11965,7 +11965,7 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
   }
   async posForms(code) {
     this._posLangs = this._posLangs || {};
-    if (this._posLangs[code] === undefined) this._posLangs[code] = fetch(new URL('vendor/eoreader7/native/priors/pos-' + code + '.json', location.href)).then(r => (r.ok ? r.json() : null)).then(j => (j && j.forms) || null).catch(() => null);
+    if (this._posLangs[code] === undefined) this._posLangs[code] = fetch(new URL('vendor/khora/native/priors/pos-' + code + '.json', location.href)).then(r => (r.ok ? r.json() : null)).then(j => (j && j.forms) || null).catch(() => null);
     return this._posLangs[code];
   }
   ensureFold(d, tok, rec) {
@@ -12554,7 +12554,7 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
     this._realityByName = new Map();
     this._realityFoldA = A;
     try {
-      const base = new URL('vendor/eoreader7/native/kernel/', location.href).href;
+      const base = new URL('vendor/khora/native/kernel/', location.href).href;
       const RR = await import(base + 'reality-register.js');
       this._realityRR = RR;
       // the khora's profile-page renderer (one owner per capability: the khora owns the page
@@ -12820,8 +12820,8 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
     this._langPriors = true;
     const load = u => fetch(new URL(u, location.href)).then(r => r.ok ? r.json() : null).catch(() => null);
     Promise.all([
-      load('vendor/eoreader7/native/priors/morphology-eng.json'),
-      load('vendor/eoreader7/native/priors/declension-rus.json'),
+      load('vendor/khora/native/priors/morphology-eng.json'),
+      load('vendor/khora/native/priors/declension-rus.json'),
     ]).then(([engMorph, rusDecl]) => { if (_hdLang) _hdLang.setPriors({ engMorph, rusDecl }); this.forceUpdate(); });
   }
   pfLang() {
@@ -12878,7 +12878,7 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
       showProps: size === 'full', props,
     };
   }
-  // THE RECORD: the khora's own page for a being (vendor/eoreader7/native/kernel/profile-page.js),
+  // THE RECORD: the khora's own page for a being (vendor/khora/native/kernel/profile-page.js),
   // wired as one owner per capability (window.__hdRealityProfileCard). The shape is fixed — badge ·
   // WHAT IT IS · TOLD BY · WHAT THE SOURCES SAY · DISAGREEMENTS · FOR WHOM · the muted engine line —
   // and the keys under WHAT THE SOURCES SAY are the induced kind's own (holodeck-profile.js): no key
