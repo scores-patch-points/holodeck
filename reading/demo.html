@@ -299,10 +299,12 @@
   <div class="row">
     <button id="read" class="primary">Read</button>
     <button id="clear">Clear</button>
+    <button id="addsrc" title="Keep this text as one of several sources to read together">+ source</button>
     <span class="samples" id="samples">
       <button data-s="positions">positions</button>
       <button data-s="dossier">dossier</button>
       <button data-s="history">history</button>
+      <button id="exsrc" title="Three sources on one ship">ship</button>
     </span>
     <span id="model" class="badge live" hidden>model calls: 0</span>
   </div>
@@ -1775,6 +1777,8 @@ async function corpusDeps(){
     classifyAt: prefix => documentClassifier(prefix, { posPrior: pos, lemmatizer: PRIORS.lemmatizer, lookups: LOOKUP.cache, memo }) };
 }
 const SOURCES = mountSources($('sources'), { makeDeps: corpusDeps, openInReader: (t, l) => { ta.value = t; run(t, l); }, currentText: () => ta.value });
+$('addsrc').addEventListener('click', () => SOURCES.addCurrent());
+$('exsrc').addEventListener('click', () => SOURCES.example());
 const OFFLINE = startOffline();   // silent: it only makes the files local; nothing on the page announces it
 window.__demo = { offline: OFFLINE, sources: SOURCES, read, run, json:() => (cur ? readingJSON(cur.T) : null), text:() => (cur ? diagrammedText(cur.T) : null), current:() => (cur ? cur.T : null), features:() => features, net };
 </script>

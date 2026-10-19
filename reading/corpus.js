@@ -19,9 +19,9 @@ export const TITANIC = [
 ];
 
 const CSS = `
-.src-panel{max-width:1180px;margin:18px auto;padding:0 18px}
+.src-panel{max-width:1180px;margin:10px auto;padding:0 18px}
 .src-panel h2{font-size:15px;margin:0 0 4px}.src-panel .lede{font-size:12.5px;opacity:.78;margin:0 0 10px;max-width:84ch}
-.src-card{border:1px solid var(--line,#8884);border-radius:8px;padding:8px 10px;margin:6px 0;display:grid;grid-template-columns:1fr minmax(0,2fr) auto;gap:8px;align-items:center}
+.src-card{display:flex;gap:10px;align-items:center;padding:3px 0;margin:0}.src-card b{font-weight:500;flex:0 1 auto}.src-card select{flex:0 0 auto;font-size:12.5px;padding:2px 4px;max-width:70%}.src-card .x{background:none;border:0;opacity:.55;font-size:15px;cursor:pointer;padding:0 4px}.src-card .x:hover{opacity:1}
 .src-card input[type=text]{font:inherit;padding:4px 6px;min-width:0}.src-card select{font:inherit;padding:3px}
 @media(max-width:760px){.src-card{grid-template-columns:1fr}.src-card input[type=text]{width:100%;box-sizing:border-box}}
 .src-card .tx{grid-column:1/-1;font:11.5px/1.45 ui-monospace,monospace;opacity:.8;max-height:3.1em;overflow:hidden;white-space:pre-wrap}
@@ -54,10 +54,11 @@ export function mountSources(host, { makeDeps, openInReader, currentText }) {
   function regChip(r) { return r ? `<span class="chip">${esc(r)}</span>` : '<span class="chip dim">undeclared</span>'; }
   function render() {
     const autoLabel = (s) => (s.pending ? 'sniffing…' : s.auto ? (eff(s) ? `${eff(s)} · ${Math.round(s.auto.p * 100)}% · sniffed${s.auto.model && s.auto.model.used ? ' + local model' : ''}` : `unsure${s.auto.reason ? ' — ' + s.auto.reason : ''} — pick one, or it is read but not linked`) : '…');
-    const sc = st.sources.map((s) => `<div class="src-card" data-src="${s.id}"><b>${esc(s.label)}</b><select data-f="register" aria-label="type of source" title="${esc(s.auto ? s.auto.ranked.slice(0, 2).map((r) => r.register + ' ' + r.p.toFixed(2) + ': ' + r.why.join('; ')).join('\n') : '')}"><option value="">${esc(autoLabel(s))}</option>${REGS.map(([v, l]) => `<option value="${v}"${v === s.register ? ' selected' : ''}>${l}</option>`).join('')}</select><span><button type="button" data-a="rm">remove</button></span></div>`).join('') || '<div class="dim" style="font-size:12.5px"></div>';
-    host.innerHTML = `<div class="src-panel"><h2>Sources</h2>
+    const sc = st.sources.map((s) => `<div class="src-card" data-src="${s.id}"><b>${esc(s.label)}</b><select data-f="register" aria-label="type of source" title="${esc(s.auto ? s.auto.ranked.slice(0, 2).map((r) => r.register + ' ' + r.p.toFixed(2) + ': ' + r.why.join('; ')).join('\n') : '')}"><option value="">${esc(autoLabel(s))}</option>${REGS.map(([v, l]) => `<option value="${v}"${v === s.register ? ' selected' : ''}>${l}</option>`).join('')}</select><button type="button" data-a="rm" class="x" title="remove this source" aria-label="remove">×</button></div>`).join('') || '<div class="dim" style="font-size:12.5px"></div>';
+    if (!st.sources.length) { host.innerHTML = ''; return; }
+    host.innerHTML = `<div class="src-panel">
       ${sc}
-      <div class="src-row"><button type="button" data-a="addcur">add the text above</button><button type="button" data-a="titanic">example: three sources on one ship</button>${st.busy ? '<span class="dim">reading…</span>' : ''}</div>
+      ${st.busy ? '<div class="src-row dim">reading…</div>' : ''}
       ${st.err ? `<div class="dim mono">${esc(st.err)}</div>` : ''}${st.corpus ? result() : ''}</div>`;
   }
 
@@ -102,7 +103,7 @@ export function mountSources(host, { makeDeps, openInReader, currentText }) {
     try {
       const deps = await makeDeps();
       st.corpus = buildCorpusTimeline(st.sources.map((s) => ({ id: s.id, label: s.label, text: s.text, register: eff(s), giver: s.register ? 'you' : 'sniffed' })), deps, { maxSnapshots: 8 });
-      st.overlay = []; st.fold = foldLog(st.corpus.log); st.sel = null; st.voiceSrc = null;
+      st.fold = foldLog(st.corpus.log, { overlay: st.overlay }); st.sel = null; st.voiceSrc = null;
     } catch (e) { console.error(e); st.err = 'The sources could not be read together: ' + (e && e.message || e); }
     st.busy = false; render();
   }
@@ -124,5 +125,7 @@ export function mountSources(host, { makeDeps, openInReader, currentText }) {
     s[f] = ev.target.value; if (f === 'register') { st.corpus = null; render(); soon(); }
   });
   render();
-  return { add, readAll, state: st };
+  const addCurrent = () => { const t = (currentText() || '').trim(); if (t.length < 8) return false; add('', t); return true; };
+  const example = () => { st.sources = []; for (const t of TITANIC) add(t.label, t.text, t.register); render(); };
+  return { add, addCurrent, example, readAll, state: st };
 }
