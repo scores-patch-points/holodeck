@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { makeLookup } from './holodeck-lookup.js';
-import { compositionAffordance, licenseStanding } from './vendor/eoreader7/native/kernel/hyperlexicon.js';
+import { compositionAffordance, licenseStanding } from './vendor/khora/native/kernel/hyperlexicon.js';
 
 const WIKT = { en: [{ partOfSpeech: 'Adverb', language: 'English', definitions: [{ definition: 'Under this.' }] }] };
 const WIKI = { type: 'standard', title: 'Andrew Johnson', wikibase_item: 'Q8612', pageid: 1624, revision: '1', timestamp: 't', description: 'President', extract: 'x', content_urls: { desktop: { page: 'https://en.wikipedia.org/wiki/Andrew_Johnson' } } };

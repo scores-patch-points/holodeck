@@ -11,10 +11,10 @@
 //   4. Refuse     more than one candidate left, or none supported: the token is left as read and says why.
 // A form is "established" by DOCUMENT frequency (how many other contracts hold it), so a page's own misreads cannot
 // vouch for themselves: the page's own document is subtracted before it asks.
-import { osaDistanceAtMost1, opticalReferentForm } from './vendor/eoreader7/native/adapters/text/surfaces.js';
-import { wordFloor } from './vendor/eoreader7/native/adapters/text/script-floor.js';
-import { isUnspacedScript } from './vendor/eoreader7/native/adapters/text/script-segment.js';
-import { createHolograph, predict } from './vendor/eoreader7/native/kernel/bayes-surprise.js';
+import { osaDistanceAtMost1, opticalReferentForm } from './vendor/khora/native/adapters/text/surfaces.js';
+import { wordFloor } from './vendor/khora/native/adapters/text/script-floor.js';
+import { isUnspacedScript } from './vendor/khora/native/adapters/text/script-segment.js';
+import { createHolograph, predict } from './vendor/khora/native/kernel/bayes-surprise.js';
 
 const MIN_LEN = 4;                                   // the engine's own floor for alphabetic scripts, lowered per script below
 // how short a word may be and still carry a meaning, per script (script-floor.js): a Han character is a morpheme, an

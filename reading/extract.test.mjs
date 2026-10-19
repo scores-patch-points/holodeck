@@ -5,7 +5,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { readsAsWords, sniffExtraction, extractReadings, READS_FLOOR } from './extract.js';
 
-const P = new URL('../vendor/eoreader7/native/priors/', import.meta.url);
+const P = new URL('../vendor/khora/native/priors/', import.meta.url);
 const posRaw = JSON.parse(readFileSync(new URL('pos-eng.json', P), 'utf8'));
 const morphRaw = JSON.parse(readFileSync(new URL('morphology-eng.json', P), 'utf8'));
 const words = [...Object.keys(posRaw.forms), ...Object.keys(morphRaw.forms)];

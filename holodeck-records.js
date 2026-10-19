@@ -6,7 +6,7 @@
 // which tables link to which and how many-to-how-many, and each of those readings is itself a DEF on the
 // same log with the evidence it was read from. State is never stored; it is fold(events).
 import { fold, foldFrom } from './vendor/bare-metal/src/fold.js';
-import { delimitedTable } from './vendor/eoreader7/native/organs/source.js';
+import { delimitedTable } from './vendor/khora/native/organs/source.js';
 
 const NS = 'io.holodeck';
 const clean = s => String(s == null ? '' : s).replace(/\s+/g, ' ').trim();

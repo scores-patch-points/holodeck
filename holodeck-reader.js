@@ -2,17 +2,17 @@
 // A line-for-line port of eoreader7/native/the-fold/reader-bundle.js: the same organs, the same options,
 // the same GFP dispatch with clause-aware adjacency. The only difference is how the received priors
 // arrive (fetch instead of fs). Built once; every turn reads its passages through it.
-import { makeRelationReader } from './vendor/eoreader7/native/organs/hypergraph.js';
-import { tokenize, blankLabelRows } from './vendor/eoreader7/native/organs/source.js';
-import { splitSentences } from './vendor/eoreader7/native/adapters/text/spans.js';
-import { extractSurfaces, discoverReferents, namesCorefer, diaNorm } from './vendor/eoreader7/native/adapters/text/surfaces.js';
-import { resolvePronouns } from './vendor/eoreader7/native/adapters/text/pronouns.js';
-import { relationExtractorsFor } from './vendor/eoreader7/native/adapters/text/relations-language.js';
-import { dominantClass } from './vendor/eoreader7/native/adapters/text/wordclass.js';
+import { makeRelationReader } from './vendor/khora/native/organs/hypergraph.js';
+import { tokenize, blankLabelRows } from './vendor/khora/native/organs/source.js';
+import { splitSentences } from './vendor/khora/native/adapters/text/spans.js';
+import { extractSurfaces, discoverReferents, namesCorefer, diaNorm } from './vendor/khora/native/adapters/text/surfaces.js';
+import { resolvePronouns } from './vendor/khora/native/adapters/text/pronouns.js';
+import { relationExtractorsFor } from './vendor/khora/native/adapters/text/relations-language.js';
+import { dominantClass } from './vendor/khora/native/adapters/text/wordclass.js';
 import { classifyForm as classifyWord } from './holodeck-surface.js'; // wraps the vendored classifyWord: the written form is normalised before lookup
-import { createLemmatizer, morphologyFromPrior } from './vendor/eoreader7/native/adapters/text/morphology.js';
-import { stanceWords } from './vendor/eoreader7/native/organs/stance.js';
-import * as P from './vendor/eoreader7/native/adapters/text/priors.js';
+import { createLemmatizer, morphologyFromPrior } from './vendor/khora/native/adapters/text/morphology.js';
+import { stanceWords } from './vendor/khora/native/organs/stance.js';
+import * as P from './vendor/khora/native/adapters/text/priors.js';
 
 const DETERMINERS = new Set([...P.DEFINITE_DETERMINERS, ...P.INDEFINITE_DETERMINERS]);
 const here = p => new URL(p, import.meta.url).href;
@@ -21,7 +21,7 @@ export function loadPriors() {
   if (_priors) return _priors;
   _priors = (async () => {
     const get = async p => { try { const r = await fetch(here(p)); return r.ok ? await r.json() : null; } catch (e) { return null; } };
-    const [posPrior, morphRaw, posLexicon] = await Promise.all([get('./vendor/eoreader7/native/priors/pos-eng.json'), get('./vendor/eoreader7/native/priors/morphology-eng.json'), get('./vendor/eoreader7/native/priors/pos-eng-lexicon.json')]);
+    const [posPrior, morphRaw, posLexicon] = await Promise.all([get('./vendor/khora/native/priors/pos-eng.json'), get('./vendor/khora/native/priors/morphology-eng.json'), get('./vendor/khora/native/priors/pos-eng-lexicon.json')]);
     if (posPrior && posLexicon) posPrior.lexicon = posLexicon; // POSLexicon@1 — classifyWord consults it only where the treebank has no entry
     const morph = morphRaw ? morphologyFromPrior(morphRaw) : null;
     const forms = new Set();

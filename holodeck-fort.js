@@ -40,7 +40,7 @@ const LQ = '“', RQ = '”', qt = s => LQ + s + RQ;
 
 // eoreader7's received English POS prior (UD tag counts per form). Loaded once; without it the POS raisers stay silent.
 let POS = null;
-try { POS = await fetch(new URL('./vendor/eoreader7/native/priors/pos-eng.json', import.meta.url)).then(r => r.ok ? r.json() : null).then(j => j && j.forms); } catch (e) { POS = null; }
+try { POS = await fetch(new URL('./vendor/khora/native/priors/pos-eng.json', import.meta.url)).then(r => r.ok ? r.json() : null).then(j => j && j.forms); } catch (e) { POS = null; }
 const NOMINAL = ['NOUN', 'PROPN', 'ADJ', 'NUM', 'X', 'SYM'];
 const posOf = w => (POS && POS[String(w).toLowerCase().replace(/[.,;:]+$/, '')]) || null;
 const onlyIn = (w, classes) => { const c = posOf(w); if (!c) return null; const k = Object.keys(c); return k.length && k.every(x => classes.includes(x)) ? c : null; };

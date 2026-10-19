@@ -2,10 +2,10 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { classifyForm, normalizeSurface, lookupForm, documentClassifier } from './holodeck-surface.js';
-import { createLemmatizer, morphologyFromPrior } from './vendor/eoreader7/native/adapters/text/morphology.js';
+import { createLemmatizer, morphologyFromPrior } from './vendor/khora/native/adapters/text/morphology.js';
 
-const posPrior = JSON.parse(fs.readFileSync(new URL('./vendor/eoreader7/native/priors/pos-eng.json', import.meta.url), 'utf8'));
-const morph = morphologyFromPrior(JSON.parse(fs.readFileSync(new URL('./vendor/eoreader7/native/priors/morphology-eng.json', import.meta.url), 'utf8')));
+const posPrior = JSON.parse(fs.readFileSync(new URL('./vendor/khora/native/priors/pos-eng.json', import.meta.url), 'utf8'));
+const morph = morphologyFromPrior(JSON.parse(fs.readFileSync(new URL('./vendor/khora/native/priors/morphology-eng.json', import.meta.url), 'utf8')));
 const lemmatizer = createLemmatizer(morph.forms, { language: morph.language });
 
 test('a curly apostrophe is a typing difference, not a gap', () => {

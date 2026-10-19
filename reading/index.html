@@ -133,10 +133,10 @@ window.fetch = (u, o) => { net.requests.push(String(u)); return _fetch(u, o); };
 const t0 = performance.now();
 
 import { makeEngineRelationReader, loadPriors, blankMarkup } from '../holodeck-reader.js';
-import { classifyWord, THRAX_MAP, THRAX_OUT_OF_SCOPE, THRAX_META, POS_PRIOR_META } from '../vendor/eoreader7/native/adapters/text/wordclass.js';
-import { morphologyFromPrior, createLemmatizer, stemsOf } from '../vendor/eoreader7/native/adapters/text/morphology.js';
-import { splitSentences } from '../vendor/eoreader7/native/adapters/text/spans.js';
-import { tokenize } from '../vendor/eoreader7/native/organs/source.js';
+import { classifyWord, THRAX_MAP, THRAX_OUT_OF_SCOPE, THRAX_META, POS_PRIOR_META } from '../vendor/khora/native/adapters/text/wordclass.js';
+import { morphologyFromPrior, createLemmatizer, stemsOf } from '../vendor/khora/native/adapters/text/morphology.js';
+import { splitSentences } from '../vendor/khora/native/adapters/text/spans.js';
+import { tokenize } from '../vendor/khora/native/organs/source.js';
 import { sha256Hex, stableProvenanceId, byteRange, EotLedger } from '../vendor/fold-chat/fold-chat-eot.js';
 
 const $ = (id) => document.getElementById(id);
@@ -163,7 +163,7 @@ async function ready(){
   if (READER) return;
   $('out').innerHTML = `<section><div class="b"><span class="spin">loading the fold's priors and organs…</span></div></section>`;
   PRIORS = await loadPriors();
-  PRIORS.morphRaw = await (await fetch('../vendor/eoreader7/native/priors/morphology-eng.json')).json();
+  PRIORS.morphRaw = await (await fetch('../vendor/khora/native/priors/morphology-eng.json')).json();
   PRIORS.morph = morphologyFromPrior(PRIORS.morphRaw);
   READER = await makeEngineRelationReader();
 }

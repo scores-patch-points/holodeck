@@ -7,7 +7,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { contradictionsOf, observerFrame, referentVocabulary, referentOf, referentParts, contradictionForField, contradictionForTopic, SCHEMA, GAP, MEET_SCHEMA, VERDICTS } from './holodeck-contradiction.js';
-import { WITNESS_FLOOR } from './vendor/eoreader7/native/organs/asserted.js';
+import { WITNESS_FLOOR } from './vendor/khora/native/organs/asserted.js';
 
 // The Titanic's own numbers, as the eight sources state them. `referent` is the measure phrase the figure stands
 // under — the column head or the verb beside it, which is what the observer's question reads the referent off (a

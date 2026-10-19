@@ -60,9 +60,9 @@
 //      nested-narration driver reads; it is its own organ (a reported clause is
 //      a nested proposition), named here so it is not silently lost.
 
-import { holderAt, narrationFrames, quotationFrames } from './vendor/eoreader7/native/adapters/text/attribution.js';
-import { speakerSections } from './vendor/eoreader7/native/organs/speaker.js';
-import { READER, BASIS, perspectiveOperation, projectPerspectives } from './vendor/eoreader7/native/kernel/perspective.js';
+import { holderAt, narrationFrames, quotationFrames } from './vendor/khora/native/adapters/text/attribution.js';
+import { speakerSections } from './vendor/khora/native/organs/speaker.js';
+import { READER, BASIS, perspectiveOperation, projectPerspectives } from './vendor/khora/native/kernel/perspective.js';
 
 const freeze = Object.freeze;
 

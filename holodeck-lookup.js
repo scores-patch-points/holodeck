@@ -16,8 +16,8 @@
 // Wikidata client is written. fetch is injected, so the whole thing is falsified deterministically in
 // holodeck-lookup.test.mjs.
 import { searchWikidata } from './holodeck-links.js';
-import { createHyperlexicon } from './vendor/eoreader7/native/kernel/hyperlexicon.js';
-import { parseWiktionary, parseWikipediaSummary, parseWikidataSearch, admitLookup, evidenceRows, nominations, keyOf, SOURCES } from './vendor/eoreader7/native/adapters/text/external-evidence.js';
+import { createHyperlexicon } from './vendor/khora/native/kernel/hyperlexicon.js';
+import { parseWiktionary, parseWikipediaSummary, parseWikidataSearch, admitLookup, evidenceRows, nominations, keyOf, SOURCES } from './vendor/khora/native/adapters/text/external-evidence.js';
 
 export const LOOKUP_SOURCES = Object.freeze(['dictionary', 'wikipedia', 'wikidata']);
 const enc = encodeURIComponent;

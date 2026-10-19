@@ -51,10 +51,10 @@
 //
 // Provenance: docs/SOURCE-CONTRADICTION-PREREG.md (predictions registered before this file existed).
 
-import { createForWhom, questionTerms } from './vendor/eoreader7/native/kernel/for-whom.js';
-import { identityAlternative } from './vendor/eoreader7/native/kernel/identity.js';
-import { survivingIdentity, survivingIdentityAtPoints } from './vendor/eoreader7/native/kernel/identity-meet.js';
-import { standingOf, WITNESS_FLOOR } from './vendor/eoreader7/native/organs/asserted.js';
+import { createForWhom, questionTerms } from './vendor/khora/native/kernel/for-whom.js';
+import { identityAlternative } from './vendor/khora/native/kernel/identity.js';
+import { survivingIdentity, survivingIdentityAtPoints } from './vendor/khora/native/kernel/identity-meet.js';
+import { standingOf, WITNESS_FLOOR } from './vendor/khora/native/organs/asserted.js';
 
 export const SCHEMA = 'HolodeckContradiction@1';
 export const MEET_SCHEMA = 'EOIdentityMeet@1';

@@ -7,9 +7,9 @@ import { fileURLToPath } from 'node:url';
 import { spawn } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { createInterface } from 'node:readline';
-import { openWorkspace } from '../vendor/eoreader7/native/the-fold/surface/notebook-workspace.mjs';
-import { addCell, editCell, addData, recordExec, sourceOf, execsOf, dataOf } from '../vendor/eoreader7/native/the-fold/surface/notebook.mjs';
-import { seal, promote, statusOf } from '../vendor/eoreader7/native/the-fold/surface/bench.mjs';
+import { openWorkspace } from '../vendor/khora/native/the-fold/surface/notebook-workspace.mjs';
+import { addCell, editCell, addData, recordExec, sourceOf, execsOf, dataOf } from '../vendor/khora/native/the-fold/surface/notebook.mjs';
+import { seal, promote, statusOf } from '../vendor/khora/native/the-fold/surface/bench.mjs';
 
 const ROOT = fileURLToPath(new URL('../', import.meta.url));
 const hash = s => createHash('sha256').update(s).digest('hex');

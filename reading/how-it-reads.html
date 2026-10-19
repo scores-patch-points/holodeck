@@ -49,13 +49,13 @@ td{padding:8px;border-bottom:1px solid var(--line);vertical-align:top}tr.row{cur
 <p class="lead">The class prior counts every tag a form received across a treebank of 12,544 hand-annotated sentences, and keeps ambiguity rather than picking a winner. The morphology prior keeps only UniMorph's irregular tail; regular inflection is recovered by rule at read time. Priors are derived and checked against the Zenodotus corpus (24 categories, 2,100+ source documents); its POS-vocabulary gate was validated on 10 deliberately diverse specimens.</p>
 </main>
 <script type="module">
-import { classifyWord, normalizeForm, POS_PRIOR_META, THRAX_MAP } from '../vendor/eoreader7/native/adapters/text/wordclass.js';
-import { morphologyFromPrior, createLemmatizer, stemsOf } from '../vendor/eoreader7/native/adapters/text/morphology.js';
+import { classifyWord, normalizeForm, POS_PRIOR_META, THRAX_MAP } from '../vendor/khora/native/adapters/text/wordclass.js';
+import { morphologyFromPrior, createLemmatizer, stemsOf } from '../vendor/khora/native/adapters/text/morphology.js';
 import { classifyForm, documentClassifier } from '../holodeck-surface.js';
 const $ = id => document.getElementById(id);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const get = async p => (await fetch(p)).json();
-const [pos, morphRaw, lex] = await Promise.all([get('../vendor/eoreader7/native/priors/pos-eng.json'), get('../vendor/eoreader7/native/priors/morphology-eng.json'), get('../vendor/eoreader7/native/priors/pos-eng-lexicon.json')]);
+const [pos, morphRaw, lex] = await Promise.all([get('../vendor/khora/native/priors/pos-eng.json'), get('../vendor/khora/native/priors/morphology-eng.json'), get('../vendor/khora/native/priors/pos-eng-lexicon.json')]);
 pos.lexicon = lex; const posNoLex = { ...pos, lexicon: undefined };
 const morph = morphologyFromPrior(morphRaw), lemmatizer = createLemmatizer(morph.forms, { language: morph.language });
 const pp = pos.provenance, mp = morphRaw.provenance;

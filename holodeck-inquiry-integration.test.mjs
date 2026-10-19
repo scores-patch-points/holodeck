@@ -15,8 +15,8 @@ const realFetch = globalThis.fetch;
 const localJson = (rel) => { try { return JSON.parse(fs.readFileSync(new URL(rel, import.meta.url), 'utf8')); } catch { return null; } };
 globalThis.fetch = async (url, opts) => {
   const u = typeof url === 'string' ? url : String(url?.url ?? url);
-  if (/pos-eng\.json/.test(u)) { const j = localJson('./vendor/eoreader7/native/priors/pos-eng.json'); return { ok: !!j, status: j ? 200 : 404, json: async () => j ?? {} }; }
-  if (/morphology-eng\.json/.test(u)) { const j = localJson('./vendor/eoreader7/native/priors/morphology-eng.json'); return { ok: !!j, status: j ? 200 : 404, json: async () => j ?? {} }; }
+  if (/pos-eng\.json/.test(u)) { const j = localJson('./vendor/khora/native/priors/pos-eng.json'); return { ok: !!j, status: j ? 200 : 404, json: async () => j ?? {} }; }
+  if (/morphology-eng\.json/.test(u)) { const j = localJson('./vendor/khora/native/priors/morphology-eng.json'); return { ok: !!j, status: j ? 200 : 404, json: async () => j ?? {} }; }
   throw new Error('NETWORK TOUCHED — the Fold should have answered without it: ' + u);
 };
 
