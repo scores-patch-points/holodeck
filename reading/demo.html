@@ -11,7 +11,9 @@
   a{color:var(--acc)}
   button{font:inherit}
   /* ── landing ───────────────────────────────────────────────────────────── */
-  header{padding:30px 28px 16px;border-bottom:1px solid var(--line)}
+  header{padding:30px 28px 16px;border-bottom:1px solid var(--line);position:relative}
+  .offchip{position:absolute;top:12px;right:16px;font:11px/1 ui-monospace,monospace;padding:5px 9px;border:1px solid var(--line);border-radius:999px;background:transparent;color:inherit;opacity:.8;cursor:pointer}
+  .offchip[data-state=full]{border-color:#2a9d6f;color:#2a9d6f;opacity:1}.offchip[data-state=err]{border-color:#c0392b;color:#c0392b}
   header h1{margin:0 0 6px;font-size:22px;letter-spacing:-.01em;font-family:var(--serif);font-weight:500}
   header .sub{color:var(--dim);max-width:960px;font-size:14px}
   header .sub b{color:var(--ink);font-weight:600}
@@ -271,6 +273,7 @@
 </head>
 <body>
 <header>
+  <button id="offline-chip" class="offchip" type="button" title="">offline: starting…</button>
   <h1>How to read without a model — the pipeline, layer by layer</h1>
   <div class="sub">
     Drop any text in. It is read <b>the way the fold reads it</b> — and you can watch every layer do its work, then
@@ -398,6 +401,8 @@ import { sha256 } from '../vendor/eoreader7/native/kernel/sha256.js';
 import { resolvePronouns } from '../vendor/eoreader7/native/adapters/text/pronouns.js';
 import { buildReadingTimeline, foldLog, CELLS } from '../vendor/eoreader7/native/adapters/text/reading-timeline.js';
 import { makeLookup } from '../holodeck-lookup.js';
+import { startOffline } from './offline.js';
+import { browserOcr, loadPdfjs } from '../holodeck-ocr.js';
 import { sha256Hex, stableProvenanceId, byteRange, EotLedger } from '../vendor/fold-chat/fold-chat-eot.js';
 
 const $ = (id) => document.getElementById(id);
@@ -1617,8 +1622,7 @@ function sniff(buf){
   return 'text';
 }
 async function pdfText(buf){
-  const m = await import('https://cdn.jsdelivr.net/npm/pdfjs-dist@4.4.168/build/pdf.min.mjs');
-  m.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.4.168/build/pdf.worker.min.mjs';
+  const m = await loadPdfjs();
   const pdf = await m.getDocument({ data: buf.slice() }).promise;
   const pages = Math.min(pdf.numPages, 40); let raw = '';
   await ready();
@@ -1656,6 +1660,20 @@ async function convert(buf){
   } catch (e) { return null; }
 }
 let OCR_META = null;
+// no server recogniser (a static host, or offline): tesseract.js runs in this browser from files the service worker keeps
+async function ocrInBrowser(buf, show){
+  try {
+    const kind = sniff(buf) === 'pdf' ? 'pdf' : 'image';
+    show('<b>Reading pixels</b> — tesseract.js (OCR, no model) · in this browser · starting');
+    const r = await browserOcr(buf, kind, {
+      onStatus: st => show(`<b>Reading pixels</b> — tesseract.js (OCR, no model) · in this browser · ${esc(st)}`),
+      onPage: p => { if (p.text.trim()) ta.value = (ta.value ? ta.value + '\n\n' : '') + p.text.trim(); show(`<b>Reading pixels</b> — tesseract.js (OCR, no model) · in this browser · page ${p.n} of ${p.total}${p.conf != null ? ` · ${p.conf}% mean word confidence` : ''}`); },
+    });
+    OCR_META = { pages: r.pages, total: r.total, words: r.words, conf: r.conf, where: 'browser' };
+    $('refuse').hidden = true;
+    return r.text;
+  } catch (e) { show(`<b>In-browser OCR failed</b> <span class="mono">${esc(e && e.message || e)}</span> — the engine files may not be saved yet (see the offline chip).`); return null; }
+}
 // read PIXELS with the platform's own recogniser (tesseract, via the dev server's POST /ocr) — never a model.
 // The server streams one JSON line per page; the text arrives in the box as each page is read, with the
 // engine's own mean word confidence, so the reading can be watched before the layers animate.
@@ -1663,8 +1681,8 @@ async function ocr(buf){
   const note = $('refuse');
   const show = h => { note.hidden = false; note.innerHTML = h; };
   let r;
-  try { r = await fetch('/ocr', { method: 'POST', body: buf }); } catch (e) { return null; }
-  if (!r.ok || !r.body) return null;
+  try { r = await fetch('/ocr', { method: 'POST', body: buf }); } catch (e) { r = null; }
+  if (!r || !r.ok || !r.body) return await ocrInBrowser(buf, show);
   const rd = r.body.getReader(), dec = new TextDecoder();
   let pending = '', text = '', pages = 0, total = 0, words = 0, confSum = 0;
   for (;;){
@@ -1748,7 +1766,8 @@ async function run(text, label, opt = {}){
   finally { btn.textContent = was; btn.disabled = false; }
 }
 
-window.__demo = { read, run, json:() => (cur ? readingJSON(cur.T) : null), text:() => (cur ? diagrammedText(cur.T) : null), current:() => (cur ? cur.T : null), features:() => features, net };
+const OFFLINE = startOffline({ chip: $('offline-chip') });
+window.__demo = { offline: OFFLINE, read, run, json:() => (cur ? readingJSON(cur.T) : null), text:() => (cur ? diagrammedText(cur.T) : null), current:() => (cur ? cur.T : null), features:() => features, net };
 </script>
 </body>
 </html>
