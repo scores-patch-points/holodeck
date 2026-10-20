@@ -4,6 +4,7 @@
 //
 // Pure of the page: it takes bytes and an onPage callback and returns { text, pages, total, words, conf }.
 import { PINNED, hasSimd } from './reading/offline.js';
+import { rulesOf } from './reading/page-views.js'; // (page-views loads Alhazen, which sets self.Alhazen)
 
 let tessP = null, pdfP = null;
 const loadScript = (src) => new Promise((res, rej) => { const s = document.createElement('script'); s.src = src; s.crossOrigin = 'anonymous'; s.onload = res; s.onerror = () => rej(new Error('could not load ' + src)); document.head.appendChild(s); });
@@ -84,7 +85,44 @@ export async function browserOcr(buf, kind, { maxPages = 40, onPage = () => {}, 
       const w = img.width || data.imageWidth || null, h = img.height || data.imageHeight || null;
       const image = img.toDataURL ? img.toDataURL('image/jpeg', 0.72) : URL.createObjectURL(img);
       let size = { w, h }; if (!w || !h) { try { const bm = await createImageBitmap(img); size = { w: bm.width, h: bm.height }; } catch (e) {} }
-      layout.pages.push({ n: p.n, w: size.w, h: size.h, image, words: L.words, lines: L.lines });
+      // the form's boxes, from the page's own ink, while its pixels are at hand
+      let rules = null;
+      try { const cv = img.getContext ? img : await (async () => { const bm = await createImageBitmap(img); const c = document.createElement('canvas'); c.width = bm.width; c.height = bm.height; c.getContext('2d').drawImage(bm, 0, 0); return c; })();
+        const hs = L.words.filter((x) => /[a-z]/i.test(x.t)).map((x) => x.b[3] - x.b[1]).sort((a, b) => a - b), hMed = hs[Math.floor(hs.length / 2)] || 10;
+        rules = rulesOf(cv.getContext('2d').getImageData(0, 0, cv.width, cv.height).data, cv.width, cv.height, hMed); } catch (e) { rules = null; }
+      // A SECOND LOOK: ink the recogniser did not read. Alhazen marks where ink sits (readImage → text-like regions); any ink with no word on
+      // it — small bold type in a shaded header cell ("Prior Year", "Current Year"), white type on a dark bar ("Part I  Summary") — is cut
+      // out, enlarged 3×, inverted if it is light on dark, and read again. Its words go where the ink is, appended to the page's text so they
+      // carry offsets too, and they say they came from a second look.
+      try { const cv = img.getContext ? img : null; if (cv && self.Alhazen) {
+        const W = cv.width, H = cv.height, d = cv.getContext('2d').getImageData(0, 0, W, H).data;
+        const hs2 = L.words.filter((x) => /[a-z]/i.test(x.t)).map((x) => x.b[3] - x.b[1]).sort((a, b) => a - b), hM = hs2[Math.floor(hs2.length / 2)] || 10;
+        const regs = self.Alhazen.readImage(d, W, H).regions.filter((g) => g.kind === 'text' && g.region[3] >= hM * 0.6 && g.region[3] <= hM * 4);
+        const covered = (b) => L.words.some((w) => w.c >= 30 && Math.min(w.b[2], b[0] + b[2]) - Math.max(w.b[0], b[0]) > 0 && Math.min(w.b[3], b[1] + b[3]) - Math.max(w.b[1], b[1]) > 0);
+        const loose = regs.map((g) => g.region).filter((b) => !covered(b));
+        // gather loose ink into strips along a line
+        const strips = []; for (const b of loose.sort((p, q) => p[1] - q[1] || p[0] - q[0])) { const cy = b[1] + b[3] / 2; const st = strips.find((t) => Math.abs(t.cy - cy) < hM * 0.7 && b[0] - t.x1 < hM * 2.5 && t.x0 - (b[0] + b[2]) < hM * 2.5);
+          if (st) { st.x0 = Math.min(st.x0, b[0]); st.x1 = Math.max(st.x1, b[0] + b[2]); st.y0 = Math.min(st.y0, b[1]); st.y1 = Math.max(st.y1, b[1] + b[3]); st.n++; } else strips.push({ x0: b[0], x1: b[0] + b[2], y0: b[1], y1: b[1] + b[3], cy, n: 1 }); }
+        let looked = 0;
+        for (const st of strips.filter((t) => t.x1 - t.x0 >= hM * 2 && t.n >= 2).slice(0, 40)) {
+          const px = 4, X0 = Math.max(0, st.x0 - px), Y0 = Math.max(0, st.y0 - px), X1 = Math.min(W, st.x1 + px), Y1 = Math.min(H, st.y1 + px);
+          let sum = 0, n = 0; for (let y = Y0; y < Y1; y += 2) for (let x = X0; x < X1; x += 2) { const i = (y * W + x) * 4; sum += d[i] + d[i + 1] + d[i + 2]; n++; }
+          const lightOnDark = sum / n / 3 < 110;
+          const S = 3, c2 = document.createElement('canvas'); c2.width = (X1 - X0) * S; c2.height = (Y1 - Y0) * S; const g = c2.getContext('2d');
+          if (lightOnDark) g.filter = 'invert(1)';
+          g.drawImage(cv, X0, Y0, X1 - X0, Y1 - Y0, 0, 0, c2.width, c2.height);
+          const { data: bd } = await worker.recognize(c2, {}, { text: true, blocks: true }); looked++;
+          const bw = (bd.words || []).filter((w) => w.text && /[A-Za-z0-9]/.test(w.text) && w.confidence > 55);
+          if (!bw.length) continue;
+          const base = text.length + 1, ls = L.words.length; let line = '';
+          for (const w of bw) { if (line) line += ' '; const s0 = base + line.length; line += w.text.trim();
+            L.words.push({ t: w.text.trim(), s: s0, e: base + line.length, b: [X0 + w.bbox.x0 / S, Y0 + w.bbox.y0 / S, X0 + w.bbox.x1 / S, Y0 + w.bbox.y1 / S], c: Math.round(w.confidence), line: L.lines.length, block: -1, second: lightOnDark ? 'inverted' : 'enlarged' }); }
+          L.lines.push({ s: base, e: base + line.length, words: [ls, L.words.length], block: -1, b: [X0, Y0, X1, Y1], second: true });
+          text += '\n' + line;
+        }
+        L.secondLook = looked;
+      } } catch (e) { /* the page is read as the first pass read it */ }
+      layout.pages.push({ n: p.n, w: size.w, h: size.h, image, words: L.words, lines: L.lines, rules, secondLook: L.secondLook || 0 });
       if (s.conf != null) { words += s.words; confSum += s.conf * s.words; }
       onPage({ n: p.n, total, text: data.text || '', conf: s.conf, words: s.words });
     }

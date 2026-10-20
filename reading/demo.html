@@ -747,7 +747,7 @@ function openTrace(T){ return openReader(T); }
 function openReader(T, keep = null){
   if (cur){ const old = cur; cur = null; old.close(); }
   const ctx = {
-    hash: sha256, readingJSON, download, features, keep,
+    hash: sha256, readingJSON, download, features, keep, known: knownWord,
     explainWord: w => { try { return classifyForm(w, { posPrior: PRIORS.posPrior, lemmatizer: PRIORS.lemmatizer }); } catch (e) { return null; } },
     actsOf: w => { const lw = lookupForm(w).toLowerCase(); const out = new Set(); try { for (const x of (PRIORS.lemmatizer ? PRIORS.lemmatizer.lemmasOf(lw) : [])) out.add(x); } catch (e) {} try { for (const x of stemsOf(lw)) out.add(x); } catch (e) {} return [...out]; },
     layers: LAYERS.filter(l => l.feature).map(l => ({ feature:l.feature, label:l.label, why:l.why })),
