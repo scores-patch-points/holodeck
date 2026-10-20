@@ -250,6 +250,8 @@
   .insp .rtbl.m td,.insp .rtbl.m th{font-size:12.5px}.insp .rtbl.m tr[data-span]{cursor:default}.insp .rtbl.m tr.sel{box-shadow:inset 3px 0 0 var(--acc)}
   .insp .you{font:12.5px/1.8 var(--sans);color:var(--ink2)}.insp .you button{all:unset;cursor:pointer;color:var(--blue);text-decoration:underline;margin-left:6px;font:12.5px var(--sans)}.insp .small{font-size:12.5px;color:var(--dim)}
   .lens .txt .mn{box-shadow:inset 0 -3px 0 var(--rc);cursor:pointer}.lens .txt .mn.sel{background:color-mix(in srgb, var(--rc) 22%, transparent)}.lens .txt .pick{outline:2px dashed var(--acc);outline-offset:1px;border-radius:2px}
+  /* the lens never paints outside its own box, and the tabs sit on an opaque ground, so a long line can never run under the drawer */
+  .lens{contain:paint}.drawer,.dh,#p-tabs{background:var(--bg)}.dh,#p-tabs{position:relative;z-index:2}
   @media (min-width:1200px){
     .body{grid-template-columns:300px minmax(0,1fr) minmax(340px,400px)}
     .right{grid-template-rows:auto minmax(0,1fr) auto;min-width:0}
@@ -322,6 +324,7 @@
   #app .ly .n{display:none}
   @media (max-width:1199px){ #app .spine{max-height:26vh} #app .ly{margin:4px 0;padding:7px 12px} }
 
+.tups{margin-top:6px;font-size:12px}.tups .tup{padding:1px 0}
 </style>
 </head>
 <body>
@@ -443,6 +446,8 @@ import { layerNoteHTML, tabNoteHTML, LAYER_NOTES } from './layer-notes.js';
 import { buildRows, sortRows, nextSort, tableHTML as refTableHTML } from './referent-table.js';
 import { scanPunctuation, loadPunctuation, moodAt, containersAt, cuesFromBlankLines, cuesFromLayout } from './punctuation.js';
 import { tokenize } from '../vendor/khora/native/organs/source.js';
+import { loadModel as loadParser, analyse as parseRows, tokenize as parseTokens } from '../vendor/khora/native/adapters/text/english-parser.js';
+import { tuplesOf, tupleLabel } from './propositions.js';
 import { classifyForm, lookupForm, documentClassifier } from '../holodeck-surface.js';
 import { namesCorefer, genericTokens, extractSurfaces, discoverReferents, diaNorm } from '../vendor/khora/native/adapters/text/surfaces.js';
 import { sha256 } from '../vendor/khora/native/kernel/sha256.js';
@@ -746,6 +751,7 @@ function readingJSON(T){
     run:{ steps:T.ev.length, ms:Math.round(T.totalMs * 100) / 100, model_calls:T.net.models, network:T.net.requests.slice() },
     summary:{ statements:T.sents.length, propositions:T.claims.length, read:counts.read, unbound:counts.unbound, contradicted:counts.contradicted, beyond_reach:counts['beyond reach'], unheard:counts.unheard, referents:T.refs.size, forms:T.words.length, distinct_forms:new Set(T.toks).size, grammar_gaps:T.gaps, grammar_ambiguous:T.ambiguous },
     statements:T.sents.map((s, i) => ({ n:i + 1, bytes:[charToByte(T.doc.analysis, s.offset), charToByte(T.doc.analysis, s.offset + s.text.length)], text:s.text.replace(/\s+/g, ' ').trim() })),
+    tuples:(T.tuples || []).map((l, j) => l.map(t => ({ statement:j + 1, id:t.id, parent:t.parent, order:t.order, kind:t.kind, relation:t.relation, subject:t.subject, act:t.act, object:t.object, polarity:t.polarity, modal:t.modal || null, tense:t.tense || null, voice:t.voice || null, mood:t.mood || null, at:t.at, end:t.end }))),
     propositions:T.claims.map((c, i) => ({ n:i + 1, located:!!c.located, statement:stmtOf(c), mood:c.mood || null, held_in:c.holds || [], subject:c.end1, act:c.label, object:c.end2, polarity:c.polarity === '-' ? '-' : '+', standing:reopened(i) ? 'reopened' : standingOfClaim(c), confidence:confidenceOf(c).pct, tense:c.tense.v, tense_why:c.tense.why, bytes:c.b0 == null ? null : [c.b0, c.b1], span:c.span || null, grounded:!!c.grounded, revised_by:reopened(i), render:{ en:ORDERS[0].line(c), sov:ORDERS[1].line(c), vso:ORDERS[2].line(c) } })),
     punctuation:(() => { const P = T.punctuation || { sentences:[], containers:[], boundaries:[], notes:{} }, by = (xs, f) => xs.reduce((m, x) => { const k = f(x); m[k] = (m[k] || 0) + 1; return m; }, {});
       return { norms:{ language:P.notes.lang, declared:P.notes.normsKnown }, marks:T.punct ? T.punct.length : 0, by_role:by(T.punct || [], p => p.role || 'mark'), sentences:by(P.sentences, s => s.mood), containers:by(P.containers, c => c.kind), boundaries_by_source:by(P.boundaries, b => b.source), abbreviations_attached:P.notes.abbreviations, unclosed:P.notes.unclosed || [] }; })(),
@@ -1368,6 +1374,7 @@ function mount(T){
   tabBtns.forEach(b => b.setAttribute('aria-selected', String(b.dataset.tab === tab)));
 
   function renderPane(St, e){
+    LAST = [St, e]; if (tab === 'props') ensureTuples();
     const hot = e.stage === 'relation' ? e.data : null;
     const graph = tab === 'graph';
     $('p-graph').hidden = !graph; pane.hidden = graph; { const gn = $('p-graph-note'); gn.hidden = !graph; if (graph) gn.innerHTML = tabNoteHTML('graph', { collapsed:true }); }
@@ -1464,6 +1471,19 @@ function mount(T){
     return `<div class="h">Referents — the participants this material establishes</div>
       ${n ? refTableHTML(sortRows(rows, refTabSort.key, refTabSort.dir), { nSources:1, sort:refTabSort, caption:'Referents of this reading', selectKind: r => ({ kind:'ref', ref:r.id }) }) : '<span class="noprop">No referents yet — the reading has not reached one at this step.</span>'}`;
   }
+
+  // PROPOSITIONS AS TUPLES: the smallest meaningful tuples, nested and in order, read from the English parser's dependency rows (loaded on first need: 16 MB).
+  let PARSER = null, tupBusy = false, LAST = [null, null];
+  async function ensureTuples(){
+    if (T.tuples || tupBusy) return; tupBusy = true;
+    try {
+      PARSER ??= loadParser(await (await fetch('../vendor/khora/native/priors/parser-eng-ewt.json')).json());
+      const mood = (o) => { const x = (T.punctuation && T.punctuation.sentences || []).find(q => o >= q.s && o < q.e); return x ? x.mood : 'declarative'; };
+      T.tuples = T.sents.slice(0, 400).map(sn => { try { const tk = parseTokens(sn.text); if (!tk.length) return []; const rows = parseRows(PARSER, tk.map(t => t.form)); rows.forEach((r, k) => { r.start = tk[k].start; r.end = tk[k].end; }); return tuplesOf(rows, { mood: mood(sn.offset), base: sn.offset }).tuples; } catch (e) { return []; } });
+    } catch (e) { T.tuples = null; T.tuplesErr = String(e && e.message || e); }
+    tupBusy = false; if (tab === 'props') { renderPane(LAST[0], LAST[1]); }
+  }
+  const tuplesHTML = (j) => { const ts = T.tuples && T.tuples[j]; if (!ts || !ts.length) return ''; return ts.map(t => `<div class="tup" style="margin-left:${(t.parent ? (t.kind === 'relation' ? 2 : 1) : 0) * 14}px"><span class="mono dim">${t.order + 1}</span> <span class="chip ${t.kind === 'relation' ? 'v' : 'g'}">${esc(t.kind === 'relation' ? 'prep' : t.relation)}${t.mood && t.mood !== 'declarative' ? ' · ' + esc(t.mood) : ''}</span> ${esc(tupleLabel(t))}${t.tense ? ` <span class="dim">${esc(t.tense)}${t.voice === 'passive' ? ', passive' : ''}</span>` : ''}</div>`).join(''); };
   function propsPane(St, hot){
     const sents = T.sents, inSent = sents.map(() => []), unlocated = [];
     T.claims.forEach((c, i) => { if (!c.located){ unlocated.push(i); return; }
@@ -1473,12 +1493,12 @@ function mount(T){
     const CAP = 500;
     const rows = sents.slice(0, CAP).map((s, j) => {
       const idxs = inSent[j], isCur = !!hot && idxs.some(i => T.claims[i].s === hot.s && T.claims[i].e === hot.e);
-      if (!idxs.length) return `<tr${isCur ? ' class="cur"' : ''}><td class="n">${j + 1}</td><td class="stmt">${marked(s, [])}</td><td colspan="4"><span class="noprop">— no proposition bound: this statement named no act the reader could bind. A refusal is a result, never an error.</span></td></tr>`;
+      if (!idxs.length) return `<tr${isCur ? ' class="cur"' : ''}><td class="n">${j + 1}</td><td class="stmt">${marked(s, [])}${tuplesHTML(j) ? `<div class="tups">${tuplesHTML(j)}</div>` : ''}</td><td colspan="4"><span class="noprop">— no named-referent proposition bound: this statement names fewer than two referents the engine can tie. ${T.tuples ? 'Its parsed tuples are shown with the statement.' : tupBusy ? 'Reading its structure…' : 'A refusal is a result, never an error.'}</span></td></tr>`;
       const n = idxs.length;
       return idxs.map((ci, kk) => {
         const c = T.claims[ci], st = standingOf(c), re = T.reopened && T.reopened.get(ci);
         let h = `<tr${isCur ? ' class="cur"' : ''}>`;
-        if (kk === 0) h += `<td class="n" rowspan="${n}">${j + 1}</td><td class="stmt" rowspan="${n}">${marked(s, idxs)}</td>`;
+        if (kk === 0) h += `<td class="n" rowspan="${n}">${j + 1}</td><td class="stmt" rowspan="${n}">${marked(s, idxs)}${tuplesHTML(j) ? `<div class="tups">${tuplesHTML(j)}</div>` : ''}</td>`;
         h += `<td>${diagram(c, ci)}</td>`;
         h += `<td>${confHTML(c)}</td>`;
         h += `<td><span class="chip ${re ? 'a' : st === 'read' ? 'g' : st === 'unbound' || st === 'beyond reach' ? 'a' : 'v'}">${re ? 'reopened' : st}</span></td>`;
@@ -1751,7 +1771,19 @@ async function pdfText(buf){
   await ready();
   for (let i = 1; i <= pages; i++){
     const c = await (await pdf.getPage(i)).getTextContent();
-    for (const it of c.items) raw += (it.str || '') + (it.hasEOL ? '\n' : ' ');
+    // words are joined by GEOMETRY, not by item: a PDF often sets "K" and "ristin" (a drop cap, kerning, letter-spaced glyphs) as separate items, so a space goes
+    // between two items only when the gap between them is a real word gap (a fraction of the type size), or when a new line begins
+    let prev = null;
+    for (const it of c.items){
+      const str = it.str || '', t = it.transform || [], x = t[4], y = t[5], h = it.height || Math.abs(t[3]) || 10;
+      if (prev && str){
+        const sameLine = Math.abs(y - prev.y) < h * 0.5, gap = x - prev.end;
+        if (!sameLine) { if (!/\s$/.test(raw)) raw += ' '; }
+        else if (gap > h * 0.22 && !/\s$/.test(raw) && !/^\s/.test(str)) raw += ' ';
+      }
+      raw += str; if (it.hasEOL) raw += '\n';
+      if (str) prev = { y, end: x + (it.width || 0) };
+    }
     raw += '\n\n';
   }
   return { raw, pages, numPages: pdf.numPages };
