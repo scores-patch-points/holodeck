@@ -23,7 +23,7 @@ export function labelOf(f, words, fields) {
 /** A column's heading over a box: title-case printed words directly above it. */
 export function headingOf(f, words) {
   const [x0, y0, x1] = f.rect;
-  const over = words.filter((w) => w[4] <= y0 && w[4] >= y0 - 80 && Math.min(w[3], x1) - Math.max(w[1], x0) > (w[3] - w[1]) * 0.5 && /^[A-Z][a-z]+$|^of$|^\(?[A-D]\)?$/.test(w[0]));
+  const over = words.filter((w) => w[4] <= y0 && w[4] >= y0 - 80 && Math.min(w[3], x1) - Math.max(w[1], x0) > (w[3] - w[1]) * 0.5 && /^\p{Lu}\p{Ll}+$|^\p{Lo}{2,}$|^\p{Ll}{2,3}$|^\(?\p{Lu}\)?$/u.test(w[0]));
   if (!over.length) return null;
   const yb = Math.max(...over.map((w) => w[2]));
   return over.filter((w) => Math.abs(w[2] - yb) < 10).sort((a, b) => a[2] - b[2] || a[1] - b[1]).map((w) => w[0]).join(' ') || null;
