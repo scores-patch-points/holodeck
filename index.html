@@ -11156,7 +11156,8 @@ class Component extends DCLogic {
       // the switcher: the few most recent workspaces in a menu under the name (the manager, with search and sort, is
       // one row away); rename is in the menu or by double-clicking the name; delete asks inside the menu
       wsPopOpen: !!S.wsPop, wsPopToggle: () => this.setState(st => ({ wsPop: !st.wsPop, wsAdding: false, wsDeleting: false })), wsPopClose: () => this.setState({ wsPop: false, wsAdding: false, wsDeleting: false }),
-      wsQuick: wsAll.slice().sort((a, b) => (a.id === cid ? -1 : b.id === cid ? 1 : (b.at - a.at) || a.name.localeCompare(b.name))).slice(0, 6).map(w => ({ name: w.name, n: String(w.n), current: w.id === cid, mark: w.id === cid ? '✓' : '', bg: w.id === cid ? 'var(--sel)' : 'transparent', onOpen: () => { wsOpenIt(w.id); this.setState({ wsPop: false }); } })),
+      // the six shown are the current one plus the most recently opened; their ORDER is fixed (Your content, then A–Z) so the rows never reshuffle under the pointer when you switch
+      wsQuick: wsAll.slice().sort((a, b) => (a.id === cid ? -1 : b.id === cid ? 1 : (b.at - a.at) || a.name.localeCompare(b.name))).slice(0, 6).sort((a, b) => (a.id === 'custom' ? -1 : b.id === 'custom' ? 1 : a.name.localeCompare(b.name))).map(w => ({ name: w.name, n: String(w.n), current: w.id === cid, mark: w.id === cid ? '✓' : '', bg: w.id === cid ? 'var(--sel)' : 'transparent', onOpen: () => { wsOpenIt(w.id); this.setState({ wsPop: false }); } })),
       wsHasMore: true, wsMoreLabel: (wsAll.length > 6 ? 'All ' + wsAll.length + ' workspaces' : 'All workspaces') + ' & people…',
       wsAdding: !!S.wsAdding, wsNotAdding: !S.wsAdding, wsAddStart: () => this.setState({ wsAdding: true, wsNewName: '' }),
       wsNotRenaming: !S.wsRenaming,
