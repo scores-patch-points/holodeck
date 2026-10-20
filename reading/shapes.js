@@ -36,7 +36,7 @@ export const hasWord = (s, n = 3) => new RegExp(`\\p{L}{${n}}`, 'u').test(String
 /** A numbered row of a table: "8", "16a", "(c)", "b", "١٢", "IV" at the start of a line. */
 export const ROW = /^[^\p{L}\p{N}]{0,3}\(?(\p{Nd}{1,2}\p{Ll}?|\p{L}|[IVXLC]{1,4})\)?[\s.)|]/u;
 /** A section marker: a short word and a numeral at the start of a short line ("Part I", "Teil 2", "Partie III", "第三部") — tolerant of OCR's I/l/1/| confusion. */
-export const MARKER = /^(\p{L}{2,14})\s*(\p{Nd}{1,3}|[IVXLCivxlc1|!]{1,5})\b|^第[\p{N}一二三四五六七八九十百]+\p{Lo}/u;
+export const MARKER = /^(\p{L}{2,14})\s+(\p{Nd}{1,3}|[IVXLC1|!l]{1,5})\b|^(\p{L}{2,14})\p{Nd}{1,3}\b|^第[\p{N}一二三四五六七八九十百]+\p{Lo}/u;
 /** A code a document prints about itself: a short word, then a token with a digit in it, maybe a year in parentheses ("Form 990 (2018)",
  *  "Cat. No. 11282Y", "Formulaire 2042", "Vordruck ESt 1 A"). */
 export const CODE = /(\p{Lu}[\p{L}.]{1,14}(?:\s?\p{L}{1,4}\.)?)\s*([\p{Nd}\p{Lu}][\p{L}\p{Nd}.\-/]{0,12})(?:\s*\((\p{Nd}{4})\))?/gu;

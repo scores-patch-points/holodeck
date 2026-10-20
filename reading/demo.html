@@ -1614,7 +1614,7 @@ async function read(text, label, feat, opt = {}){
   if (raw.trim().length < 8){ alert('Nothing to read yet — drop a document or paste text.'); return null; }
   await ready();
   lastRaw = raw; lastLabel = label || 'pasted text';
-  const LIMIT = 14000;
+  const LIMIT = 80000;
   const analysis = raw.length > LIMIT ? raw.slice(0, LIMIT) : raw;
   const truncated = raw.length > LIMIT;
   const clean = feat.furniture === false ? analysis : blankMarkup(analysis);

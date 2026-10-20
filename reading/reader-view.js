@@ -11,7 +11,8 @@ import { foldLog, CELLS } from '../vendor/khora/native/adapters/text/reading-tim
 import { hunt } from './prior-hunt.js';
 import { tiltOf } from './prior-tilt.js';
 import { MARKER } from './shapes.js';
-import { fieldsOf, htmlExport, pageHTML, placeHTML, pdfHTML, semanticOf, tupleHTML, tupleChildren, tupleAt, readForm } from './page-views.js';
+import { primeFor, gainsAt } from './sections.js';
+import { fieldsOf, htmlExport, pageHTML, placeHTML, pdfHTML, semanticOf, blockStarts, tupleHTML, tupleChildren, tupleAt, readForm } from './page-views.js';
 
 const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const ROOT_PATH = String.fromCharCode(36);
@@ -164,7 +165,7 @@ export function mountReader(T, ctx) {
   let structMemo = null, structKey = '';
   const structure = () => { const k = foldKey; if (structMemo && structKey === k) return structMemo; structKey = k; const f = fold(), tl = TL();
     const src = ['source', [['bytes', T.nBytes], ['sha-256', T.hash], ['source id', T.srcId], ...(extracted ? [['text from', extracted]] : []), ['read', `${text.length} characters`]]];
-    const body = L ? semanticOf(L, text, fields()) : (tl ? tl.sentences.map((s) => [`statement ${s.n}`, s.text.trim(), { chars: [s.offset, s.end] }]) : []);
+    const body = L ? semanticOf(L, text, fields(), { gains: st.gains }) : (tl ? tl.sentences.map((s) => [`statement ${s.n}`, s.text.trim(), { chars: [s.offset, s.end] }]) : []);
     const names = f ? f.order.filter((r) => r.mentions.length && !formWord(r)).map((r) => [r.name || short(r.id), r.mentions.map((m) => ['mention', m.text, { chars: [m.s, m.e], span: m.id }]), { id: r.id }]) : [];
     const cls = (isForm() && !st.showClaims) ? [] : claims().map((c) => [c.end1, [[c.label, c.end2]], { chars: [c.s, c.e], polarity: c.polarity === '-' ? 'negated' : 'affirmed' }]);
     // every proposition the form makes, nested as the page nests it: filer → section (Part …) → the row's act → [column, value] — one tuple per proposition
@@ -189,6 +190,15 @@ export function mountReader(T, ctx) {
     } catch (e) { st.hunt = { status: 'the hunt failed: ' + (e && e.message || e), result: null }; }
     render();
   })();
+
+  // ── the ground for surprise (sections.js): what a reader of this register already knew, so that a section is where the earlier text stops helping ──
+  st.gains = null; st.ground = null;
+  if (L) setTimeout(async () => {
+    try { const pr = await primeFor(text, { base: new URL('./', import.meta.url) }), res = gainsAt(text, blockStarts(L, text), { prime: pr.prime });
+      st.gains = res.gains; st.ground = { genre: pr.genre, giver: pr.giver, why: pr.why, register: pr.register, tokens: res.tokens, nullMedian: res.nullMedian, refused: res.refused || null, cuts: res.gains.size };
+      structMemo = null; render();
+    } catch (e) { st.ground = { refused: String(e && e.message || e) }; }
+  }, 0);
 
   // ── selection, crumbs ──
   const select = (sel) => { if ((sel.kind === 'ref' || sel.kind === 'mention') && !sel.name) { const f = fold(); const r = f && f.referents.get(f.resolve(sel.ref)); if (r && r.name) sel = { ...sel, name: r.name }; else if (st.sel.name && st.sel.ref === sel.ref) sel = { ...sel, name: st.sel.name }; } st.sel = sel; render(); };
@@ -310,6 +320,7 @@ export function mountReader(T, ctx) {
     if (s.kind === 'doc' || !f) {
       const J = ctx.readingJSON(T); const sn = snapAt(); const revs = tl && st.frontier != null ? tl.revisions.filter((r) => r.because && r.because.sentence === st.frontier) : [];
       return `<div class="ph">This reading</div><div class="kv">${extracted ? `<span class="k">text from</span><span>${esc(extracted)}</span>` : ''}${T.doc.truncated ? `<span class="k">read</span><span>the first ${text.length.toLocaleString()} characters</span>` : ''}<span class="k">bytes</span><span class="mono">${T.nBytes.toLocaleString()} · utf-8</span><span class="k">sha-256</span><span class="mono">${esc(T.hash)}</span><span class="k">source id</span><span class="mono">${esc(T.srcId)}</span><span class="k">statements</span><span>${nStmts()}</span><span class="k">words</span><span>${tokens().length.toLocaleString()} · ${unplaced().reduce((n, [, ts]) => n + ts.length, 0)} not placed</span></div>
+        ${st.ground ? `<div class="ph">Its ground for surprise</div><div class="ev">${st.ground.refused ? `<div>${esc(st.ground.refused)}</div>` : `<div>${esc(st.ground.genre)} prime · ${st.ground.tokens} tokens read · ${st.ground.cuts} cuts weighed</div><div class="h">${esc(st.ground.why)} · ${esc(st.ground.giver || '')}</div><div class="h">A section is where the earlier text stops predicting the later: each cut is ranked against random cuts in this document (median ${st.ground.nullMedian} bits/token).</div>`}</div>` : ''}
         ${st.hunt ? (() => { const H = st.hunt, r = H.result; if (!r) return `<div class="ph">Its prior</div><div class="ev"><div>${esc(H.status)}</div></div>`;
           if (!r.prior) return `<div class="ph">Its prior</div><div class="ev"><div>none found — read from the page alone</div><div class="h">${esc(r.steps.map((x) => x.step + (x.query ? ' “' + x.query + '”' : '') + (x.result ? ' → ' + x.result : x.why ? ' → ' + x.why : '')).join(' · '))}</div></div>`;
           const t = st.tilt; return `<div class="ph">Its prior</div><div class="ev"><div>${esc(r.prior.title || '')} ${r.prior.year || ''}</div><div class="h">${esc(r.prior.giver || '')} · <span class="mono">${esc(r.prior.source || '')}</span> · sha-256 ${esc(String(r.prior.sha256 || '').slice(0, 16))}…</div><div class="h">found in ${esc(r.where)} — ${esc(r.matched || '')}${r.query ? ' · query “' + esc(r.query) + '” by ' + esc(r.by) : ''}</div></div>${t ? t.pages.map((p) => `<div class="ev"><div>scan page ${p.n} → form page ${p.tn ?? '—'}</div><div class="h">${p.matched ? `aligned on ${p.align.pairs} shared words (±${p.align.rms}px) · ${Math.round(p.agreement * 100)}% of the form's print found on the scan` : esc(p.why)}</div></div>`).join('') : ''}<div class="dim">The prior only tilts the reading: a word the blank form prints here is weighed as printed, a word inside a box it leaves is weighed as filled in. Every label and value shown is the scan's own text.</div>`; })() : ''}
