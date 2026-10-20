@@ -18,6 +18,25 @@ const A = () => self.Alhazen;
 const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const union = (bs) => bs.length ? [Math.min(...bs.map((b) => b[0])), Math.min(...bs.map((b) => b[1])), Math.max(...bs.map((b) => b[2])), Math.max(...bs.map((b) => b[3]))] : null;
 
+/** A line's SEGMENTS: runs of words with no wide gap between them (a gap of more than 1.5 type-heights is a column break). */
+const segmentsOf = (ws) => { const h = ws.map((w) => w.b[3] - w.b[1]).sort((a, b) => a - b)[Math.floor(ws.length / 2)] || 10, segs = []; for (const w of ws) { const g = segs[segs.length - 1]; if (g && w.b[0] - g.ws[g.ws.length - 1].b[2] <= 1.5 * h) g.ws.push(w); else segs.push({ ws: [w] }); } for (const g of segs) { g.t = g.ws.map((w) => w.t).join(' '); g.b = union(g.ws.map((w) => w.b)); g.s = g.ws[0].s; g.e = g.ws[g.ws.length - 1].e; } return { segs, h }; };
+/** Label and value by GEOMETRY, for a page that is not ruled: a segment ending in a colon takes the next segment on its line, else the segment just below it;
+ *  a short wordy segment followed by a segment shaped like an amount, date, id, phone or e-mail takes that. A line that already read as "label: value" is left alone. */
+function gapFields(pg, text, have, idStart) {
+  const out = [], lines = pg.lines.filter((ln) => ln.s < text.length && !have.has(ln)), seg = new Map(); for (const ln of pg.lines) seg.set(ln, segmentsOf(pg.words.slice(ln.words[0], ln.words[1])));
+  const below = (ln, g, h) => { const cand = pg.lines.filter((l) => l !== ln && l.b[1] >= g.b[3] - 2 && l.b[1] - g.b[3] < 2.5 * h).sort((a, b) => a.b[1] - b.b[1])[0]; if (!cand) return null; return seg.get(cand).segs.find((k) => k.b[0] >= g.b[0] - h && k.b[0] <= g.b[2] + 3 * h) || null; };
+  for (const ln of lines) { const { segs, h } = seg.get(ln);
+    for (let i = 0; i < segs.length; i++) { const g = segs[i], colon = /[:?]$/.test(g.t.trim()), letters = (g.t.match(/\p{L}/gu) || []).length;
+      if (letters < 2 || g.ws.length > 7) continue;
+      let v = null, how = '';
+      if (colon) { v = segs[i + 1] || below(ln, g, h); how = segs[i + 1] ? 'label: gap value' : 'label: value below'; }
+      else if (segs[i + 1] && g.ws.length <= 4 && !/\p{N}/u.test(g.t) && /^(amount|date|id-number|phone|email)$/.test(shapeOf(segs[i + 1].t))) { v = segs[i + 1]; how = 'label gap typed value'; }
+      if (!v || !v.t.trim()) continue;
+      out.push({ id: `fld_${idStart + out.length + 1}`, page: pg.n, label: g.t.replace(/[:?]+$/, '').trim(), value: v.t.trim(), format: shapeOf(v.t), lb: g.b, vb: v.b, s: g.s, e: v.e, conf: Math.round(v.ws.reduce((n, w) => n + (w.c ?? 0), 0) / v.ws.length), words: [...g.ws, ...v.ws], how });
+      if (v === segs[i + 1]) i++; } }
+  return out;
+}
+
 /** Form fields: label → value, each with the words (and so the boxes) it was read from. */
 export function fieldsOf(layout, text, tilt = null) {
   if (!layout || !A()) return [];
@@ -27,6 +46,7 @@ export function fieldsOf(layout, text, tilt = null) {
   let cells = []; const out = [];
   for (const pg of layout.pages) {
     if (ruled(pg)) { cells = cells.concat(cellFieldsOf(pg, text, cells.length + out.length)); continue; }
+    const have = new Set();
     for (const ln of pg.lines) {
       if (ln.s >= text.length) continue;
       const line = text.slice(ln.s, Math.min(ln.e, text.length));
@@ -35,8 +55,9 @@ export function fieldsOf(layout, text, tilt = null) {
       const ws = pg.words.slice(ln.words[0], ln.words[1]);
       const inR = (a, b) => ws.filter((w) => w.s >= ln.s + a && w.e <= ln.s + b + 1);
       const lw = inR(li, li + f.label.length), vw = inR(vi, vi + f.value.length); if (!lw.length || !vw.length) continue;
-      out.push({ id: `fld_${cells.length + out.length + 1}`, page: pg.n, label: f.label, value: f.value, format: shapeOf(f.value), lb: union(lw.map((w) => w.b)), vb: union(vw.map((w) => w.b)), s: ln.s + li, e: ln.s + vi + f.value.length, conf: Math.round(vw.reduce((n, w) => n + w.c, 0) / vw.length), words: [...lw, ...vw] });
+      have.add(ln); out.push({ id: `fld_${cells.length + out.length + 1}`, page: pg.n, label: f.label, value: f.value, format: shapeOf(f.value), lb: union(lw.map((w) => w.b)), vb: union(vw.map((w) => w.b)), s: ln.s + li, e: ln.s + vi + f.value.length, conf: Math.round(vw.reduce((n, w) => n + w.c, 0) / vw.length), words: [...lw, ...vw] });
     }
+    out.push(...gapFields(pg, text, have, cells.length + out.length));
   }
   const all = cells.concat(out);
   return tilt && cells.length ? tiltFields(all, tilt, layout, text) : all;

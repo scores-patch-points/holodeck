@@ -78,7 +78,13 @@ export async function browserOcr(buf, kind, { maxPages = 40, onPage = () => {}, 
         // intent 'print': pdf.js then renders without requestAnimationFrame, so a page in a background tab still renders (found live: a hidden tab stalled OCR forever)
         await page.render({ canvasContext: cv.getContext('2d'), viewport: vp, intent: 'print' }).promise; return cv;
       } });
-    } else canvases.push({ n: 1, get: async () => new Blob([buf]) });
+    } else canvases.push({ n: 1, get: async () => {
+      // a small picture (a fax, a thumbnail, a phone's low-resolution scan) is read at a size the recogniser is trained for: enlarged with smoothing
+      // so that every coordinate it reports is in the enlarged picture, which is also the page image the reading is drawn on
+      const blob = new Blob([buf]); let bm = null; try { bm = await createImageBitmap(blob); } catch (e) { return blob; }
+      const S = bm.width >= 1400 ? 1 : Math.min(2, Math.ceil(1400 / bm.width)); if (S === 1) return blob;
+      const cv = document.createElement('canvas'); cv.width = bm.width * S; cv.height = bm.height * S; const g = cv.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, cv.width, cv.height); g.imageSmoothingEnabled = true; g.imageSmoothingQuality = 'high'; g.drawImage(bm, 0, 0, cv.width, cv.height); return cv;
+    } });
     let text = '', pages = 0, words = 0, confSum = 0; const layout = { schema: 'OcrLayout@1', engine: 'tesseract.js (this browser)', pages: [] };
     for (const p of canvases) {
       onStatus(`page ${p.n} of ${total}`);
