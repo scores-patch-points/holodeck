@@ -40,7 +40,7 @@ import { sedimentPrior, predictNext, shapeOf, lcg, shuffled } from "./continuati
 const freeze = (v) => Object.freeze(v);
 
 /** surprises(events, { order, alphabetSize }) — each event's bits under the ground so far (the prior grows as it reads). */
-export function surprises(events, { order, alphabetSize = null } = {}) {
+export function surprises(events, { order, alphabetSize = null, prime = null } = {}) {
   if (!Number.isInteger(order) || order < 1) throw new TypeError("surprises: order is declared");
   const ev = (events ?? []).map(String);
   const out = new Float64Array(ev.length);
@@ -49,6 +49,17 @@ export function surprises(events, { order, alphabetSize = null } = {}) {
   for (let k = 1; k <= order; k += 1) tables.set(k, new Map());
   const prior = { order, alphabet, tables };
   const floorOf = () => 1 / ((alphabetSize ?? alphabet.size) + 1);
+  // PRIME — the ground is never empty ("no view from nowhere"): a stream the caller received from a named giver (a register's own text) is
+  // sedimented FIRST, at every grain, and produces no output. The null below shuffles only the material, never the prime.
+  const sediment = (seq, i) => {
+    alphabet.set(seq[i], (alphabet.get(seq[i]) ?? 0) + 1);
+    for (let k = 1; k <= order && i - k >= 0; k += 1) {
+      const ctx = seq.slice(i - k, i).join(" "), t = tables.get(k);
+      if (!t.has(ctx)) t.set(ctx, new Map());
+      const m = t.get(ctx); m.set(seq[i], (m.get(seq[i]) ?? 0) + 1);
+    }
+  };
+  if (prime && prime.length) { const pv = prime.map(String); for (let i = 0; i < pv.length; i += 1) sediment(pv, i); }
   for (let i = 0; i < ev.length; i += 1) {
     const p = i ? predictNext(prior, ev.slice(Math.max(0, i - order), i)) : { dist: new Map() };
     const prob = p.dist.get(ev[i]) ?? 0;
@@ -75,15 +86,15 @@ export const quantile = (sorted, q) => sorted[Math.min(sorted.length - 1, Math.m
  * not its shoulder). `minLength` (declared) refuses cuts that would make a
  * segment shorter than it — a figure needs room to be one.
  */
-export function segmentBySurprise(events, { order, alpha, draws, seed, minLength, alphabetSize = null } = {}) {
+export function segmentBySurprise(events, { order, alpha, draws, seed, minLength, alphabetSize = null, prime = null } = {}) {
   for (const [k, v] of Object.entries({ alpha, draws, seed, minLength })) if (!Number.isFinite(v)) throw new TypeError(`segmentBySurprise: ${k} is declared`);
   const ev = (events ?? []).map(String);
   if (ev.length < 2) return freeze({ boundaries: [], segments: [ev], cut: 0, surprises: [], nullCut: 0, figures: 0, refused: ev.length < 2 ? "too_short" : null });
-  const s = surprises(ev, { order, alphabetSize });
+  const s = surprises(ev, { order, alphabetSize, prime });
   // THE NULL: the same reader over the same events with their order destroyed
   const rng = lcg(seed);
   const pooled = [];
-  for (let d = 0; d < draws; d += 1) for (const x of surprises(shuffled(ev, rng), { order, alphabetSize })) pooled.push(x);
+  for (let d = 0; d < draws; d += 1) for (const x of surprises(shuffled(ev, rng), { order, alphabetSize, prime })) pooled.push(x);
   pooled.sort((a, b) => a - b);
   const cut = quantile(pooled, 1 - alpha);
   const boundaries = [];

@@ -272,7 +272,10 @@
   #app .top .stats, #app .top [data-a="toggle-all"], #app .top [data-a="reset"], #app .top [data-a="copy"]{display:none}
   #app .left .log, #app .bar2 .key, #app .bar2 .seg, #app .bar2 label, #app .bar2 [data-a="rev"], #app .bar2 .rd{display:none}
   #app .lanes .h, #app .lanes .lg, #app .lens .doc, #app .insp .legend, #app .insp .lg{display:none}
-  #app .drawer #p-dt[aria-expanded="false"] ~ .tabs{display:none}
+  /* three panels: layers · the document · the inspector. The Details drawer repeated the inspector's views, so it is gone. */
+  #app #p-drawer{display:none}
+  #app .right{grid-template-rows:minmax(0,1fr) auto}
+  #app .lens{overflow:auto;min-height:0}
   #app .spine .why, #app .spine .cnt, #app .spine .h{display:none}
   #app .top h2{font-size:17px;font-weight:600}
   #app .lens{line-height:1.9;font-size:16px}
@@ -303,9 +306,9 @@
     <button id="clear">Clear</button>
     <button id="addsrc" title="Keep this text as one of several sources to read together">+ source</button>
     <span class="samples" id="samples">
-      <button data-s="positions">positions</button>
-      <button data-s="dossier">dossier</button>
-      <button data-s="history">history</button>
+      <button data-s="positions">sample 1</button>
+      <button data-s="dossier">sample 2</button>
+      <button data-s="history">sample 3</button>
       <button id="exsrc" title="Three sources on one ship">ship</button>
     </span>
     <span id="model" class="badge live" hidden>model calls: 0</span>
@@ -391,6 +394,8 @@ const net = { requests: [], models: 0 };
 const _fetch = window.fetch.bind(window);
 window.fetch = (u, o) => { net.requests.push(String(u)); return _fetch(u, o); };
 
+import { detectLang } from '../vendor/fold-chat/fold-chat-lang.js';
+import { htmlReading, csvReading } from '../holodeck-read.js';
 import { makeEngineRelationReader, loadPriors, blankMarkup } from '../holodeck-reader.js';
 import { extractReadings } from './extract.js';
 import { mountMap } from '../holodeck-map.js';
@@ -406,8 +411,10 @@ import { buildReadingTimeline, foldLog, CELLS } from '../vendor/khora/native/ada
 import { makeLookup } from '../holodeck-lookup.js';
 import { startOffline } from './offline.js';
 import { mountSources } from './corpus.js';
+import { mountReader } from './reader-view.js';
 import { makeSameBeing } from '../vendor/khora/native/adapters/text/corpus-identity.js';
 import { browserOcr, loadPdfjs } from '../holodeck-ocr.js';
+import { recordOcr } from './scan-ledger.js';
 import { sha256Hex, stableProvenanceId, byteRange, EotLedger } from '../vendor/fold-chat/fold-chat-eot.js';
 
 const $ = (id) => document.getElementById(id);
@@ -634,8 +641,10 @@ function buildTrace(doc, clean, claims, features, extraction){
   const led = new EotLedger({ artifact:'reading-demo', encoding:'utf8' });
   const srcId = led.source({ kind:'document', locator:srcKey, anchor:byteRange(0, nBytes), meta:{ label:doc.label } });
   push('ledger', 'source', `source stored once under its own bytes → ${srcId} · anchor byteRange(0, ${nBytes})`, { s:0, e:0, data:{ srcId } });
-  if (extraction) led.event({ stage:'extract', source_id:srcId, transform:'container→readings', detail:{ readings: extraction.readings.map(r => r.ok ? { extractor:r.extractor, reads:r.sniff.reads, verdict:r.sniff.verdict } : { extractor:r.extractor, skipped:r.why }), collapsed: extraction.collapsed, floor: extraction.floor, revisions: extraction.revisions || [] } });
-  const readEvt = led.event({ stage:'read', source_id:srcId, transform:'bytes→statements' });
+  // a scan: every layer of reading it, from the pixels up, goes into the same log (scan-ledger.js); the layers above are recorded by the reader as they settle
+  const scanned = doc.layout ? recordOcr(led, srcId, doc.layout) : null;
+  if (extraction) led.event({ stage:'extract', source_id:srcId, ...(scanned ? { parent:scanned.last } : {}), transform:'container→readings', detail:{ readings: extraction.readings.map(r => r.ok ? { extractor:r.extractor, reads:r.sniff.reads, verdict:r.sniff.verdict } : { extractor:r.extractor, skipped:r.why }), collapsed: extraction.collapsed, floor: extraction.floor, revisions: extraction.revisions || [] } });
+  const readEvt = led.event({ stage:'read', source_id:srcId, ...(scanned ? { parent:scanned.last } : {}), transform:'bytes→statements' });
   push('ledger', 'event', `${readEvt} · stage read · transform bytes→statements`, { s:0, e:0, data:{ id:readEvt } });
   led.event({ stage:'arrange', source_id:srcId, parent:readEvt, transform:'statements→tokens' });
   led.event({ stage:'classify', source_id:srcId, parent:readEvt, transform:'tokens→classes', detail:{ giver:features.pos === false ? null : POS_PRIOR_META.giver } });
@@ -655,7 +664,7 @@ function buildTrace(doc, clean, claims, features, extraction){
     const list = occ.get(k) || (occ.set(k, []), occ.get(k));
     list.push({ doc:'source', id:i, s:c.s, e:c.e, t:c.span || analysis.slice(c.s, c.e) }); } });
 
-  return { ev, claims, refs, occ, words, shown, sents, blanks:blankRuns, gaps, ambiguous, toks, nBytes, hash, srcId, led, eot, doc, features, extraction, net:{ ...net }, totalMs:performance.now() - t0,
+  return { ev, claims, refs, occ, words, shown, sents, blanks:blankRuns, gaps, ambiguous, toks, nBytes, hash, srcId, led, eot, scanPages:scanned ? scanned.pages : null, scanOcr:scanned ? scanned.last : null, doc, features, extraction, net:{ ...net }, totalMs:performance.now() - t0,
     stats:{ words:words.length, classified, gaps, ambiguous, acts, morphGaps, positions:stanceClaims.length, blanked:blanks.length } };
 }
 
@@ -680,7 +689,7 @@ function readingJSON(T){
     propositions:T.claims.map((c, i) => ({ n:i + 1, located:!!c.located, statement:stmtOf(c), subject:c.end1, act:c.label, object:c.end2, polarity:c.polarity === '-' ? '-' : '+', standing:reopened(i) ? 'reopened' : standingOfClaim(c), confidence:confidenceOf(c).pct, tense:c.tense.v, tense_why:c.tense.why, bytes:c.b0 == null ? null : [c.b0, c.b1], span:c.span || null, grounded:!!c.grounded, revised_by:reopened(i), render:{ en:ORDERS[0].line(c), sov:ORDERS[1].line(c), vso:ORDERS[2].line(c) } })),
     referents:[...T.refs.values()].map(r => ({ name:r.n, relations:r.c, first_byte:r.b0 == null ? null : r.b0 })),
     priors:[
-      { name:'part of speech', giver:POS_PRIOR_META.giver, schema:PRIORS.posPrior && PRIORS.posPrior.schema, on:T.features.pos !== false },
+      { name:'part of speech', giver:(PRIORS.lang && PRIORS.posPrior !== PRIORS.posEng && PRIORS.posPrior.provenance ? `${PRIORS.posPrior.provenance.giver} — chosen because the text measures as ${PRIORS.lang.name || PRIORS.lang.lang}` : POS_PRIOR_META.giver), schema:PRIORS.posPrior && PRIORS.posPrior.schema, on:T.features.pos !== false },
       { name:'morphology', giver:(PRIORS.morphRaw && PRIORS.morphRaw.provenance && PRIORS.morphRaw.provenance.source) || 'UniMorph English', schema:PRIORS.morphRaw && PRIORS.morphRaw.schema, on:T.features.morph !== false },
       { name:'Thrax map', giver:THRAX_META.giver, schema:'declared', on:T.features.pos !== false },
     ],
@@ -738,7 +747,29 @@ let features = { ...DEFAULT_FEATURES };
 let lastRaw = '', lastLabel = '';
 let LAST_TAB = 'source', LAST_INSP = 'reading';
 
-function openTrace(T){ if (cur) cur.close(); cur = mount(T); return cur; }
+function openTrace(T){ return openReader(T); }
+// the reading, in three panels (reading/reader-view.js): what was read · the selected thing · where it came from
+function openReader(T, keep = null){
+  if (cur){ const old = cur; cur = null; old.close(); }
+  const ctx = {
+    hash: sha256, readingJSON, download, features, keep, ledger: () => ({ led:T.led, srcId:T.srcId, pages:T.scanPages, refresh:() => { T.eot = T.led.eot({ root:T.eot && T.eot.root }); return T.eot; } }), known: knownWord, pdfjs: loadPdfjs,
+    explainWord: w => { try { return classifyForm(w, { posPrior: PRIORS.posPrior, lemmatizer: PRIORS.lemmatizer }); } catch (e) { return null; } },
+    actsOf: w => { const lw = lookupForm(w).toLowerCase(); const out = new Set(); try { for (const x of (PRIORS.lemmatizer ? PRIORS.lemmatizer.lemmasOf(lw) : [])) out.add(x); } catch (e) {} try { for (const x of stemsOf(lw)) out.add(x); } catch (e) {} return [...out]; },
+    layers: LAYERS.filter(l => l.feature).map(l => ({ feature:l.feature, label:l.label, why:l.why })),
+    sources: () => (SOURCES && SOURCES.state && SOURCES.state.corpus ? { corpus:SOURCES.state.corpus, fold:SOURCES.state.fold, sources:SOURCES.state.sources } : null),
+    delta: keep && keep.delta || null,
+    onClose: () => { cur = null; },
+    rerun: async (feat, k) => {
+      const prev = cur && cur.T; features = feat;
+      const off = Object.keys(feat).filter(x => feat[x] === false);
+      const T2 = await read(lastRaw, lastLabel, feat, { animate:false, layout: prev && prev.doc.layout, keep:{ ...k, layout: prev && prev.doc.layout } });
+      if (prev && cur){ const n = t => ({ claims:t.claims.length, names:t.refs.size }); const a = n(prev), b = n(T2);
+        cur.state.delta = `${off.length ? off.join(', ') + ' off' : 'every layer on'} — claims ${a.claims} → ${b.claims}, names ${a.names} → ${b.names}. The reading re-ran in this browser, no model.`; cur.render(); }
+    },
+  };
+  cur = mountReader(T, ctx);
+  return cur;
+}
 
 function mount(T){
   const ev = T.ev; let N = ev.length;
@@ -1586,22 +1617,23 @@ async function read(text, label, feat, opt = {}){
   if (raw.trim().length < 8){ alert('Nothing to read yet — drop a document or paste text.'); return null; }
   await ready();
   lastRaw = raw; lastLabel = label || 'pasted text';
-  const LIMIT = 14000;
+  const LIMIT = 80000;
   const analysis = raw.length > LIMIT ? raw.slice(0, LIMIT) : raw;
   const truncated = raw.length > LIMIT;
   const clean = feat.furniture === false ? analysis : blankMarkup(analysis);
-  const R = await makeEngineRelationReader({ features: feat });
+  // a non-English document's relations are read against ITS language's prior (the suite's dispatch reader picks the extractor from it)
+  const foreign = PRIORS.posPrior !== PRIORS.posEng && PRIORS.langIso3 ? { iso3: PRIORS.langIso3, posPrior: PRIORS.posPrior } : null, R = await makeEngineRelationReader({ features: feat, foreign });
   let read0 = { claims: [] };
   try { read0 = R([{ ref:'source', text: clean }]).read(clean); } catch (e) { console.error(e); }
   const claims = mapClaims(read0.claims, analysis);
-  const doc = { label: lastLabel, analysis, truncated };
+  const doc = { label: lastLabel, analysis, truncated, layout: opt.layout || (opt.keep && opt.keep.layout) || null };
   const T = buildTrace(doc, clean, claims, feat, opt.extraction || null);
   T.clean = clean; T.R = R; T.feat = feat;
   startTimeline(T);
   if (!BASELINE) BASELINE = T;
   $('model').textContent = `model calls: ${T.net.models}`;
   if (opt.animate !== false){ openTrace(T); }
-  else if (cur){ cur.close(); cur = mount(T); }
+  else if (opt.keep || cur){ openReader(T, opt.keep || null); }
   return T;
 }
 
@@ -1674,7 +1706,7 @@ async function ocrInBrowser(buf, show){
       onStatus: st => show(`<b>Reading pixels</b> — tesseract.js (OCR, no model) · in this browser · ${esc(st)}`),
       onPage: p => { if (p.text.trim()) ta.value = (ta.value ? ta.value + '\n\n' : '') + p.text.trim(); show(`<b>Reading pixels</b> — tesseract.js (OCR, no model) · in this browser · page ${p.n} of ${p.total}${p.conf != null ? ` · ${p.conf}% mean word confidence` : ''}`); },
     });
-    OCR_META = { pages: r.pages, total: r.total, words: r.words, conf: r.conf, where: 'browser' };
+    OCR_META = { pages: r.pages, total: r.total, words: r.words, conf: r.conf, where: 'browser', layout: r.layout };
     $('refuse').hidden = true;
     return r.text;
   } catch (e) { show(`<b>In-browser OCR failed</b> <span class="mono">${esc(e && e.message || e)}</span> — the engine files may not be saved yet (see the offline chip).`); return null; }
@@ -1739,16 +1771,19 @@ async function readFile(file){
   } else if (isHtml){
     E = await extractReadings({ prior, extractors: [
       { name: 'textutil (macOS)', run: async () => { const c = await convert(buf); return c && c.text; } },
-      { name: 'the browser’s own parse', run: async () => new TextDecoder().decode(buf) },
+      { name: 'the browser’s own parse (readable text, markup dropped)', run: async () => { const d = new DOMParser().parseFromString(htmlReading(new TextDecoder().decode(buf)).html, 'text/html'); return [...d.body.querySelectorAll('h1,h2,h3,h4,h5,h6,p,li,pre,blockquote,td,th')].filter((e) => !e.querySelector('p,li,pre,blockquote')).map((e) => e.textContent.trim()).filter(Boolean).join('\n'); } },
     ] });
   } else {
-    return run(new TextDecoder().decode(buf), file.name);
+    const raw = new TextDecoder().decode(buf);
+    // a delimited table: each row is read as a statement about its first cell, the way its columns name it
+    if (/\.(csv|tsv)$/i.test(file.name)) { const c = csvReading(raw, file.name); if (c.statements) return run(c.statements, file.name); }
+    return run(raw, file.name);
   }
   const chosen = E.collapsed != null ? E.readings[E.collapsed] : null;
   if (!chosen || !chosen.text || chosen.text.trim().length < 8) return refuse(file.name, kind === 'pdf' ? 'pdf-no-text' : kind === 'image' ? 'image' : 'binary', {});
   if (chosen.sniff.verdict === 'unconfirmed') return refuse(file.name, 'pdf-unreadable', { reads: chosen.sniff.reads });
   const viaOcr = OCR_META && /tesseract/.test(chosen.extractor);
-  return run(chosen.text, file.name + ' — ' + chosen.extractor + (viaOcr ? ` · ${OCR_META.pages} page${OCR_META.pages === 1 ? '' : 's'}, ${OCR_META.conf}% mean word confidence` : ''), { extraction: E });
+  return run(chosen.text, file.name + (viaOcr ? ` — ${chosen.extractor} · ${OCR_META.pages} page${OCR_META.pages === 1 ? '' : 's'}, ${OCR_META.conf}% mean word confidence` : ''), { extraction: E, layout: viaOcr && OCR_META.layout && OCR_META.layout.pages.length ? OCR_META.layout : null });
 }
 
 // ── input wiring ──
@@ -1760,13 +1795,24 @@ file.addEventListener('change', async () => { const f = file.files[0]; if (f) re
 drop.addEventListener('drop', async ev => { const f = ev.dataTransfer.files && ev.dataTransfer.files[0]; if (f) return readFile(f); const t = ev.dataTransfer.getData('text'); if (t) run(t, 'dropped text'); });
 $('read').addEventListener('click', () => run(ta.value, 'pasted text'));
 $('clear').addEventListener('click', () => { ta.value = ''; });
-$('samples').addEventListener('click', e => { const s = e.target.dataset.s; if (s){ ta.value = SAMPLES[s]; run(SAMPLES[s], 'sample · ' + s); } });
+$('samples').addEventListener('click', e => { const s = e.target.dataset.s; if (s){ ta.value = SAMPLES[s]; run(SAMPLES[s], 'Sample extraction'); } });
 
+// The document's language is MEASURED (the suite's own detector: script, then words and character n-grams; it abstains rather than guess),
+// and its part-of-speech prior is that language's, from the same shipped priors. English stays the default and the fallback.
+const POS_FILE = { en:'eng', fr:'fra', de:'deu', es:'spa', it:'ita', pt:'por', nl:'nld', sv:'swe', da:'dan', no:'nob', pl:'pol', cs:'ces', ro:'ron', ru:'rus', uk:'ukr', tr:'tur', fi:'fin', id:'ind', ca:'cat', hu:'hun', el:'ell', he:'heb', ar:'arb', hi:'hin', vi:'vie', ko:'kor', ja:'jpn', fa:'fas', la:'lat' };
+async function priorFor(text){
+  await ready(); PRIORS.posEng ??= PRIORS.posPrior; PRIORS.lemEng ??= PRIORS.lemmatizer;
+  let d = null; try { d = detectLang(text); } catch (e) {}
+  const f = d && d.confident && d.lang !== 'en' ? POS_FILE[d.lang] : null;
+  if (f) { try { const p = await (await fetch(`../vendor/khora/native/priors/pos-${f}.json`)).json(); if (p && p.forms) { PRIORS.posPrior = p; PRIORS.lemmatizer = null; PRIORS.lang = d; PRIORS.langIso3 = f; return d; } } catch (e) {} }
+  PRIORS.posPrior = PRIORS.posEng; PRIORS.lemmatizer = PRIORS.lemEng; PRIORS.lang = d; PRIORS.langIso3 = null; return d;
+}
 async function run(text, label, opt = {}){
+  try { await priorFor(text); } catch (e) { console.warn('language prior', e); }
   const btn = $('read'); const was = btn.textContent; btn.textContent = 'reading…'; btn.disabled = true;
   features = { ...DEFAULT_FEATURES }; BASELINE = null; LAST_TAB = 'source';
   const d = $('p-delta'); if (d) d.hidden = true; const r = $('refuse'); if (r) r.hidden = true;
-  try { await read(text, label, features, { animate:true, extraction: opt.extraction || null }); }
+  try { await read(text, label, features, { animate:true, extraction: opt.extraction || null, layout: opt.layout || null }); }
   catch (err){ alert('The reading failed: ' + (err && err.message || err)); console.error(err); }
   finally { btn.textContent = was; btn.disabled = false; }
 }
@@ -1783,7 +1829,7 @@ const SOURCES = mountSources($('sources'), { makeDeps: corpusDeps, openInReader:
 $('addsrc').addEventListener('click', () => SOURCES.addCurrent());
 $('exsrc').addEventListener('click', () => SOURCES.example());
 const OFFLINE = startOffline();   // silent: it only makes the files local; nothing on the page announces it
-window.__demo = { offline: OFFLINE, sources: SOURCES, read, run, json:() => (cur ? readingJSON(cur.T) : null), text:() => (cur ? diagrammedText(cur.T) : null), current:() => (cur ? cur.T : null), features:() => features, net };
+window.__demo = { offline: OFFLINE, sources: SOURCES, view: () => cur, read, run, json:() => (cur ? readingJSON(cur.T) : null), text:() => (cur ? diagrammedText(cur.T) : null), current:() => (cur ? cur.T : null), features:() => features, net };
 </script>
 </body>
 </html>

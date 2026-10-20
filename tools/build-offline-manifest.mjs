@@ -6,7 +6,7 @@
 //
 // Usage: node tools/build-offline-manifest.mjs            (writes reading/offline-manifest.json)
 //        node tools/build-offline-manifest.mjs --check    (exits 1 if the committed manifest is stale)
-import { readFileSync, writeFileSync, existsSync, statSync } from 'node:fs';
+import { readFileSync, writeFileSync, existsSync, statSync, readdirSync } from 'node:fs';
 import { dirname, resolve, relative, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
@@ -43,6 +43,10 @@ const crawl = (abs) => {
 const manifest = () => {
   seen.clear(); files.length = 0;
   for (const e of ENTRIES) crawl(resolve(ROOT, e));
+  // priors the page loads by a computed name (the form it recognises): every file in the shipped library
+  for (const n of readdirSync(resolve(ROOT, 'reading/form-priors')).filter((x) => x.endsWith('.json'))) crawl(resolve(ROOT, 'reading/form-priors', n));
+  for (const n of readdirSync(resolve(ROOT, 'reading/surprise-priors')).filter((x) => x.endsWith('.json'))) crawl(resolve(ROOT, 'reading/surprise-priors', n));
+  for (const n of readdirSync(resolve(ROOT, 'reading/learned-priors')).filter((x) => x.endsWith('.json'))) crawl(resolve(ROOT, 'reading/learned-priors', n));
   const local = files.map((abs) => ({ url: '/' + relative(ROOT, abs).split(sep).join('/'), bytes: statSync(abs).size, group: abs.endsWith('.json') ? 'data' : 'core' })).sort((a, b) => (a.url < b.url ? -1 : 1));
   const all = [...local, ...EXTERNAL.map((e) => ({ ...e, bytes: null }))];
   // the version is the hash of WHAT is listed (not when it was built), so an unchanged page never re-downloads
