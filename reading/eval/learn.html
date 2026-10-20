@@ -1,6 +1,6 @@
 <!doctype html><meta charset="utf-8"><title>Reader eval and rule learning</title>
 <style>body{font:13px/1.5 system-ui;margin:20px;max-width:1100px}pre{background:#f4f4f4;padding:10px;overflow:auto}td,th{padding:2px 8px;border-bottom:1px solid #ddd;text-align:left}</style>
-<h1>Reader eval and rule learning</h1><button id="go">Run</button> <button id="real">Real documents</button> <button id="funsd">FUNSD</button> <button id="cord">CORD</button> <span id="st"></span><div id="out"></div>
+<h1>Reader eval and rule learning</h1><script>window.saveRun = (name, obj) => fetch('/save?name=' + encodeURIComponent(name), { method: 'POST', body: JSON.stringify(obj) }).then((r) => r.text());</script><button id="go">Run</button> <button id="real">Real documents</button> <button id="funsd">FUNSD</button> <button id="cord">CORD</button> <span id="st"></span><div id="out"></div>
 <script type="module">
 import { corpus, toPng } from './corpus.js';
 import { browserOcr } from '../../holodeck-ocr.js';
@@ -39,7 +39,7 @@ $('go').onclick = async () => {
     const titles = []; const walkS = (t) => { if (Array.isArray(t) && Array.isArray(t[1]) && t[2] && t[2].by && /heading|marker|type set|shift|capitals/.test(t[2].by)) titles.push(String(t[0])); if (Array.isArray(t)) t.forEach(walkS); }; walkS(sem);
     const heads = d.truth.headings || [], headHit = heads.filter((h) => titles.some((t) => similarity(t, h) > 0.75)).length;
     obs.push({ ...ob, id: d.id, family: d.family, lang: d.lang }); store.push({ d, layout, text, fields });
-    rows.push({ id: d.id, family: d.family, lang: d.lang, face: d.face, px: d.px, deg: d.deg, ocrMs, ocrWords: res.words, ocrConf: res.conf, wordRecall: +wordHit.toFixed(3), fields: d.truth.fields.length, valuesInText: inText, bound, labelOk: ob.bound.filter((b) => b.read && b.labelSim >= 0.8).length, fmtOk: ob.bound.filter((b) => b.read && shapeOfSafe(fields, b)).length, tableFound: !!tbl, tables: tables.length, recs: recs.length, recHit, heads: heads.length, headHit });
+    rows.push({ id: d.id, family: d.family, lang: d.lang, face: d.face, px: d.px, deg: d.deg, ocrMs, ocrWords: res.words, ocrConf: res.conf, wordRecall: +wordHit.toFixed(3), fields: d.truth.fields.length, valuesInText: inText, bound, labelOk: ob.bound.filter((b) => b.read && b.labelSim >= 0.8).length, boundStrict: ob.bound.filter((b) => b.read && b.labelSim >= 0.5).length, fmtOk: ob.bound.filter((b) => b.read && shapeOfSafe(fields, b)).length, tableFound: !!tbl, tables: tables.length, recs: recs.length, recHit, heads: heads.length, headHit });
     } catch (er) { rows.push({ id: d.id, error: String(er && er.stack || er).slice(0, 200) }); }
   }
   // learn on the even documents, test on the odd (held out), then falsify what does not help
@@ -60,6 +60,7 @@ $('go').onclick = async () => {
   const kept = rules.map((r) => { const without = rules.filter((x) => x !== r); const a = score(without, test), b = score(rules, test); const gain = (b.labelOk - a.labelOk) + (b.fmtOk - a.fmtOk) + (b.fixes - a.fixes) - 2 * (b.wrongFixes - a.wrongFixes); return { ...r, heldOutGain: gain, falsified: r.type === 'key' ? false : gain < 0 ? 'lowers the held-out score' : undefined }; });
   const program = { schema: 'ReadingProgram@1', giver: 'learned from a synthetic corpus whose truth was known (reading/eval/corpus.js), by reading/learned.js; held-out test on alternate documents', corpus: { n: docs.length, seed: SEED, trained: train.length, heldOut: test.length, families: [...new Set(docs.map((d) => d.family))], langs: [...new Set(docs.map((d) => d.lang))] }, heldOut: { before, after }, structure, rules: kept };
   window.RESULT = { rows, program }; window.STORE = store;
+  await window.saveRun('synthetic-run.json', { rows, program, details: store.map(({ d, text, fields }) => ({ id: d.id, family: d.family, lang: d.lang, face: d.face, deg: d.deg, truth: { fields: d.truth.fields, headings: d.truth.headings, columns: d.truth.columns, records: (d.truth.records || []).slice(0, 8) }, readFields: fields.map((f) => ({ label: f.label, value: f.value, format: f.format, how: f.how || null })), ocrText: text.slice(0, 3000) })) });
   $('st').textContent = 'done';
   $('out').innerHTML = `<h2>Held-out</h2><pre>${JSON.stringify({ before, after }, null, 1)}</pre><h2>Structure</h2><pre>${JSON.stringify(structure, null, 1)}</pre><h2>Rules (${kept.length})</h2><pre>${JSON.stringify(kept.slice(0, 40))}</pre><h2>Per document</h2><table><tr>${Object.keys(rows.find((r) => !r.error) || rows[0]).filter((k) => k !== 'deg').map((k) => `<th>${k}</th>`).join('')}</tr>${rows.map((r) => `<tr>${Object.entries(r).filter(([k]) => k !== 'deg').map(([, v]) => `<td>${v}</td>`).join('')}</tr>`).join('')}</table>`;
 };
@@ -83,7 +84,7 @@ document.getElementById('real').onclick = async () => {
     const fields = fieldsOf(hit.layout, hit.text);
     out.push({ f, words: hit.words, conf: hit.conf, fields: fields.length, default: count(semanticOf(hit.layout, hit.text, fields)), learned: count(semanticOf(hit.layout, hit.text, fields, { rules: learned })) });
   }
-  window.REAL = out; document.getElementById('st').textContent = 'real done';
+  window.REAL = out; await window.saveRun('real-run.json', out); document.getElementById('st').textContent = 'real done';
 };
 </script>
 
@@ -97,7 +98,7 @@ const idb = () => new Promise((res, rej) => { const q = indexedDB.open('reader-e
 const kv = async (mode, fn) => { const db = await idb(); return new Promise((res) => { const t = db.transaction('ocr', mode), r = fn(t.objectStore('ocr')); t.oncomplete = () => res(r && r.result); t.onerror = () => res(null); }); };
 const alnum = (s) => canon(s).replace(/_/g, '');
 async function runSet(set) {
-  const limit = +(new URLSearchParams(location.search).get('limit') || 50), man = (await (await fetch(`/.scratch-datasets/${set}-manifest.json`)).json()).slice(0, limit), rows = [], obs = [], learnedStruct = (await (await fetch('../learned-priors/reading-program-synthetic-v1.json')).json()).structure.learned.rules;
+  const details = [], limit = +(new URLSearchParams(location.search).get('limit') || 50), man = (await (await fetch(`/.scratch-datasets/${set}-manifest.json`)).json()).slice(0, limit), rows = [], obs = [], learnedStruct = (await (await fetch('../learned-priors/reading-program-synthetic-v1.json')).json()).structure.learned.rules;
   for (const [i, m] of man.entries()) {
     document.getElementById('st').textContent = `${i + 1}/${man.length} ${m.id}`;
     try {
@@ -110,16 +111,17 @@ async function runSet(set) {
       const tables = []; { const w = (x) => { if (Array.isArray(x) && x[0] === 'table' && x[2] && x[2].columns) tables.push(x); if (Array.isArray(x)) x.forEach(w); }; w(semanticOf(hit.layout, hit.text, fields, { rules: learnedStruct })); }
       const tablesD = []; { const w = (x) => { if (Array.isArray(x) && x[0] === 'table' && x[2] && x[2].columns) tablesD.push(x); if (Array.isArray(x)) x.forEach(w); }; w(semanticOf(hit.layout, hit.text, fields)); }
       const recs = t.records || [], col0 = (t.columns || [])[0], rowHit = (tb) => tb.length ? recs.filter((rec) => tb.some((T) => T[1].some((row) => similarity(String(row[0]), String(rec[col0])) > 0.7))).length : 0;
+      details.push({ id: m.id, conf: hit.conf, truthFields: t.fields.slice(0, 60), truthHeadings: t.headings, truthRecords: (t.records || []).slice(0, 20), readFields: fields.slice(0, 80).map((f) => ({ label: f.label, value: String(f.value).slice(0, 160), format: f.format, how: f.how || null, conf: f.conf, page: f.page })), bound: ob.bound.map((b) => ({ truth: b.truth.label + ' = ' + String(b.truth.value).slice(0, 80), read: b.read ? b.read.label + ' = ' + String(b.read.value).slice(0, 80) : null, valueSim: b.valueSim ?? null, labelSim: b.labelSim ?? null })), titlesDefault: hd.slice(0, 40), titlesLearned: hl.slice(0, 40), tables: tablesD.map((x) => ({ columns: x[2].columns, rows: x[1].length, headerless: !!x[2].headerless })), ocrText: hit.text.slice(0, 5000) });
       obs.push({ ...ob, id: m.id });
-      rows.push({ recs: recs.length, recsDefault: rowHit(tablesD), recsLearned: rowHit(tables), tablesDefault: tablesD.length, tablesLearned: tables.length, id: m.id, conf: hit.conf, words: hit.words, wordRecall: +(t.words.filter((w) => flat.includes(alnum(w))).length / Math.max(1, t.words.length)).toFixed(3), fields: t.fields.length, valuesInText: t.fields.filter((f) => flat.includes(alnum(f.value))).length, readFields: fields.length, bound: ob.bound.filter((b) => b.read).length, labelOk: ob.bound.filter((b) => b.read && b.labelSim >= 0.8).length, heads: t.headings.length, headsDefault: hh(hd), headsLearned: hh(hl), titlesDefault: hd.length, titlesLearned: hl.length });
+      rows.push({ recs: recs.length, recsDefault: rowHit(tablesD), recsLearned: rowHit(tables), tablesDefault: tablesD.length, tablesLearned: tables.length, id: m.id, conf: hit.conf, words: hit.words, wordRecall: +(t.words.filter((w) => flat.includes(alnum(w))).length / Math.max(1, t.words.length)).toFixed(3), fields: t.fields.length, valuesInText: t.fields.filter((f) => flat.includes(alnum(f.value))).length, readFields: fields.length, bound: ob.bound.filter((b) => b.read).length, labelOk: ob.bound.filter((b) => b.read && b.labelSim >= 0.8).length, boundStrict: ob.bound.filter((b) => b.read && b.labelSim >= 0.5).length, heads: t.headings.length, headsDefault: hh(hd), headsLearned: hh(hl), titlesDefault: hd.length, titlesLearned: hl.length });
     } catch (er) { rows.push({ id: m.id, error: String(er && er.stack || er).slice(0, 200) }); }
   }
   const good = rows.map((r, i) => [r, obs[i]]).filter(([r]) => !r.error), O = good.map(([, o]) => o), side = (i) => i % 2;
   const train = O.filter((_, i) => side(i) === 0), test = O.filter((_, i) => side(i) === 1), rules = learn(train, { minSupport: 2 });
   const kept = rules.map((r) => { const a = score(rules.filter((x) => x !== r), test), b = score(rules, test); const gain = (b.labelOk - a.labelOk) + (b.fmtOk - a.fmtOk) + (b.fixes - a.fixes) - 2 * (b.wrongFixes - a.wrongFixes); return { ...r, heldOutGain: gain, falsified: r.type === 'key' ? false : gain < 0 ? 'lowers the held-out score' : false }; });
   const sum = (k) => good.reduce((a, [r]) => a + (r[k] || 0), 0);
-  window.FUNSD = { rows, summary: { forms: good.length, errors: rows.length - good.length, meanConf: Math.round(sum('conf') / good.length), wordRecall: +(good.reduce((a, [r]) => a + r.wordRecall, 0) / good.length).toFixed(3), fields: sum('fields'), valuesInText: sum('valuesInText'), readFields: sum('readFields'), bound: sum('bound'), labelOk: sum('labelOk'), recs: sum('recs'), recsDefault: sum('recsDefault'), recsLearned: sum('recsLearned'), tablesDefault: sum('tablesDefault'), tablesLearned: sum('tablesLearned'), heads: sum('heads'), headsDefault: sum('headsDefault'), headsLearned: sum('headsLearned'), titlesDefault: sum('titlesDefault'), titlesLearned: sum('titlesLearned') }, heldOut: { before: score([], test), after: score(kept, test) }, rules: kept };
-  document.getElementById('st').textContent = set + ' done'; window[set.toUpperCase()] = window.FUNSD;
+  window.FUNSD = { rows, summary: { forms: good.length, errors: rows.length - good.length, meanConf: Math.round(sum('conf') / good.length), wordRecall: +(good.reduce((a, [r]) => a + r.wordRecall, 0) / good.length).toFixed(3), fields: sum('fields'), valuesInText: sum('valuesInText'), readFields: sum('readFields'), bound: sum('bound'), boundStrict: sum('boundStrict'), labelOk: sum('labelOk'), recs: sum('recs'), recsDefault: sum('recsDefault'), recsLearned: sum('recsLearned'), tablesDefault: sum('tablesDefault'), tablesLearned: sum('tablesLearned'), heads: sum('heads'), headsDefault: sum('headsDefault'), headsLearned: sum('headsLearned'), titlesDefault: sum('titlesDefault'), titlesLearned: sum('titlesLearned') }, heldOut: { before: score([], test), after: score(kept, test) }, rules: kept };
+  document.getElementById('st').textContent = set + ' done'; window[set.toUpperCase()] = window.FUNSD; await window.saveRun(set + '-run.json', { set, ...window.FUNSD, details });
 }
 document.getElementById('funsd').onclick = () => runSet('funsd');
 document.getElementById('cord').onclick = () => runSet('cord');
