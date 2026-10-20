@@ -4,7 +4,7 @@
 // they scale what is drawn, and more labels fit as you zoom in. Nesting and label placement are holodeck-holons.js:
 // pure, from the ties alone, no model.
 //
-//   const map = mountMap(hostEl, { legend, onProfile, sentence, padBottom, wheelZoom, empty });
+//   const map = mountMap(hostEl, { legend, onProfile, sentence, padBottom, wheelZoom, empty, bonds });  // bonds: 'all' | 'hot'
 //   map.set({ sig?, nodes:[{ n, c, mine?, st?, color? }], edges:[{ a, b, c, mine?, neg? }], docs:[{ id, title }],
 //             occ: Map(name -> [{ doc, id, t? }]), hot?: Set(name), hotPairs?: [[a, b]], odd?: Map(name -> standing), sel?: name });
 //   map.destroy();
@@ -193,7 +193,8 @@ export function mountMap(host, opts = {}) {
     // solar system (faint concentric circles around the origin).
     if (simulate._rings) { const ocx = W / 2, ocy = (H - padBottom + topPad) / 2, ox = X(ocx), oy = Y(ocy); g.save(); g.setLineDash([3, 6]); g.strokeStyle = col.line2; g.globalAlpha = 0.5; g.lineWidth = 1;
       simulate._rings.forEach(rad => { g.beginPath(); g.arc(ox, oy, Rz(rad), 0, 6.283); g.stroke(); }); g.restore(); }
-    M.agg.forEach((E, key) => { const a = P.get(E.a), b = P.get(E.b); if (!a || !b) return; g.beginPath(); g.moveTo(X(a.x), Y(a.y)); g.lineTo(X(b.x), Y(b.y));
+    // opts.bonds: 'all' (default) draws every bond; 'hot' draws only the relation the reading is on and the selected name's — on an orbiting layout the ring already says how near two names are, so a line between spinning bodies is only noise
+    M.agg.forEach((E, key) => { const a = P.get(E.a), b = P.get(E.b); if (!a || !b) return; if (opts.bonds === 'hot' && !hotE.has(key) && !(sel && (E.a === sel || E.b === sel))) return; g.beginPath(); g.moveTo(X(a.x), Y(a.y)); g.lineTo(X(b.x), Y(b.y));
       g.strokeStyle = E.neg ? col.bad : E.mine ? col.acc : col.edge; g.globalAlpha = hotE.has(key) ? 1 : E.mine ? 0.7 : 0.35; g.lineWidth = Math.min(5, 0.8 + Math.log2(1 + E.c)) + (hotE.has(key) ? 1.5 : 0); g.setLineDash(E.neg ? [5, 4] : []); g.stroke(); edgeHits.push({ a:E.a, b:E.b, x1:X(a.x), y1:Y(a.y), x2:X(b.x), y2:Y(b.y) }); });
     g.setLineDash([]); g.globalAlpha = 1;
     const items = [];
