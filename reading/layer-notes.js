@@ -56,7 +56,7 @@ export const TAB_NOTES = {
   render:  { what: 'The same propositions written back out in several word orders, and the text with each sentence diagrammed.', how: 'This is output, not input: nothing here feeds back into the reading.' },
   eot:     { what: 'The ledger: every step of this reading as an unchangeable event, in order, each with an id anyone can recompute.', how: 'Use it to check the reading, or to see exactly which step produced a claim.' },
   json:    { what: 'The whole reading as one structured object, every part addressed by byte range — what you would download or hand to another program.', how: 'Open any part to see where in the text it came from.' },
-  graph:   { what: 'The names as a solar system: how near a name sits to the centre is how closely it is tied — by sharing statements — to the name in the middle. The centre is whatever you select, otherwise the best-connected name.', how: 'A line is drawn only for the relation the replay is on, or for the name you have selected; otherwise the orbits themselves say how near two names are.' },
+  graph:   { what: 'The referents as a solar system: how near a referent sits to the centre is how closely it is tied — by sharing statements — to the referent in the middle. The centre is whatever you select, otherwise the best-connected referent.', how: 'A line is drawn only for the relation the replay is on, or for the referent you have selected; otherwise the orbits themselves say how near two referents are. A body can hold more referents: click it to open it.' },
 };
 
 const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));

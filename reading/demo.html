@@ -1339,7 +1339,7 @@ function mount(T){
 
   // ── graph ──
   const gh = $('p-graph'); gh.innerHTML = '';
-  const map = mountMap(gh, { padBottom:24, wheelZoom:true, bonds:'hot', empty:'Referents and relations appear here as the reading reaches them.', sentence:o => o.t || '', onWitness:o => openSourceAt(o.s, o.e) });
+  const map = mountMap(gh, { padBottom:24, wheelZoom:true, bonds:'hot', noun:'referent', empty:'Referents and relations appear here as the reading reaches them.', sentence:o => o.t || '', onWitness:o => openSourceAt(o.s, o.e) });
   function mapData(St, e){
     const nodes = [...St.refs.values()].map(r => ({ n:r.n, c:r.c, mine:true, st:'fold' }));
     const edges = St.rels.map(c => ({ a:String(c.end1), b:String(c.end2), c:1, mine:true, neg:c.polarity === '-' }));
