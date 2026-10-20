@@ -18,7 +18,8 @@ export function observe(readFields, truthFields, { page = null } = {}) {
   const pool = readFields.filter((f) => page == null || f.page === page), used = new Set(), bound = [];
   for (const tf of truthFields) {
     let best = null, bs = 0;
-    for (const f of pool) { if (used.has(f)) continue; const s = Math.max(similarity(alnum(f.value), alnum(tf.value)), alnum(f.value).includes(alnum(tf.value)) && alnum(tf.value).length >= 4 ? 0.85 : 0); if (s > bs) { bs = s; best = f; } }
+    for (const f of pool) { if (used.has(f)) continue; // a read value that is a substantial part of a longer true one (a paragraph answer) counts
+    const a = alnum(f.value), b = alnum(tf.value), s = Math.max(similarity(a, b), a.includes(b) && b.length >= 4 ? 0.85 : 0, b.includes(a) && a.length >= 6 && a.length >= b.length * 0.25 ? 0.7 : 0); if (s > bs) { bs = s; best = f; } }
     if (best && bs >= 0.6) { used.add(best); bound.push({ truth: tf, read: best, valueSim: +bs.toFixed(2), labelSim: +similarity(canon(best.label), canon(tf.label)).toFixed(2) }); } else bound.push({ truth: tf, read: null });
   }
   return { bound, readFields: pool.length };
