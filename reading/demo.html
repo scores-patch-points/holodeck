@@ -394,6 +394,7 @@ const net = { requests: [], models: 0 };
 const _fetch = window.fetch.bind(window);
 window.fetch = (u, o) => { net.requests.push(String(u)); return _fetch(u, o); };
 
+import { detectLang } from '../vendor/fold-chat/fold-chat-lang.js';
 import { htmlReading, csvReading } from '../holodeck-read.js';
 import { makeEngineRelationReader, loadPriors, blankMarkup } from '../holodeck-reader.js';
 import { extractReadings } from './extract.js';
@@ -685,7 +686,7 @@ function readingJSON(T){
     propositions:T.claims.map((c, i) => ({ n:i + 1, located:!!c.located, statement:stmtOf(c), subject:c.end1, act:c.label, object:c.end2, polarity:c.polarity === '-' ? '-' : '+', standing:reopened(i) ? 'reopened' : standingOfClaim(c), confidence:confidenceOf(c).pct, tense:c.tense.v, tense_why:c.tense.why, bytes:c.b0 == null ? null : [c.b0, c.b1], span:c.span || null, grounded:!!c.grounded, revised_by:reopened(i), render:{ en:ORDERS[0].line(c), sov:ORDERS[1].line(c), vso:ORDERS[2].line(c) } })),
     referents:[...T.refs.values()].map(r => ({ name:r.n, relations:r.c, first_byte:r.b0 == null ? null : r.b0 })),
     priors:[
-      { name:'part of speech', giver:POS_PRIOR_META.giver, schema:PRIORS.posPrior && PRIORS.posPrior.schema, on:T.features.pos !== false },
+      { name:'part of speech', giver:(PRIORS.lang && PRIORS.posPrior !== PRIORS.posEng && PRIORS.posPrior.provenance ? `${PRIORS.posPrior.provenance.giver} — chosen because the text measures as ${PRIORS.lang.name || PRIORS.lang.lang}` : POS_PRIOR_META.giver), schema:PRIORS.posPrior && PRIORS.posPrior.schema, on:T.features.pos !== false },
       { name:'morphology', giver:(PRIORS.morphRaw && PRIORS.morphRaw.provenance && PRIORS.morphRaw.provenance.source) || 'UniMorph English', schema:PRIORS.morphRaw && PRIORS.morphRaw.schema, on:T.features.morph !== false },
       { name:'Thrax map', giver:THRAX_META.giver, schema:'declared', on:T.features.pos !== false },
     ],
@@ -1792,7 +1793,18 @@ $('read').addEventListener('click', () => run(ta.value, 'pasted text'));
 $('clear').addEventListener('click', () => { ta.value = ''; });
 $('samples').addEventListener('click', e => { const s = e.target.dataset.s; if (s){ ta.value = SAMPLES[s]; run(SAMPLES[s], 'Sample extraction'); } });
 
+// The document's language is MEASURED (the suite's own detector: script, then words and character n-grams; it abstains rather than guess),
+// and its part-of-speech prior is that language's, from the same shipped priors. English stays the default and the fallback.
+const POS_FILE = { en:'eng', fr:'fra', de:'deu', es:'spa', it:'ita', pt:'por', nl:'nld', sv:'swe', da:'dan', no:'nob', pl:'pol', cs:'ces', ro:'ron', ru:'rus', uk:'ukr', tr:'tur', fi:'fin', id:'ind', ca:'cat', hu:'hun', el:'ell', he:'heb', ar:'arb', hi:'hin', vi:'vie', ko:'kor', ja:'jpn', fa:'fas', la:'lat' };
+async function priorFor(text){
+  await ready(); PRIORS.posEng ??= PRIORS.posPrior; PRIORS.lemEng ??= PRIORS.lemmatizer;
+  let d = null; try { d = detectLang(text); } catch (e) {}
+  const f = d && d.confident && d.lang !== 'en' ? POS_FILE[d.lang] : null;
+  if (f) { try { const p = await (await fetch(`../vendor/khora/native/priors/pos-${f}.json`)).json(); if (p && p.forms) { PRIORS.posPrior = p; PRIORS.lemmatizer = null; PRIORS.lang = d; return d; } } catch (e) {} }
+  PRIORS.posPrior = PRIORS.posEng; PRIORS.lemmatizer = PRIORS.lemEng; PRIORS.lang = d; return d;
+}
 async function run(text, label, opt = {}){
+  try { await priorFor(text); } catch (e) { console.warn('language prior', e); }
   const btn = $('read'); const was = btn.textContent; btn.textContent = 'reading…'; btn.disabled = true;
   features = { ...DEFAULT_FEATURES }; BASELINE = null; LAST_TAB = 'source';
   const d = $('p-delta'); if (d) d.hidden = true; const r = $('refuse'); if (r) r.hidden = true;
