@@ -99,7 +99,11 @@ export function words(text) {
 
 // Dates and figures a statement states, as value tokens: two sources that state the same date state the same
 // token, whatever the surrounding words. `s`/`e` are absolute offsets into the source's text.
-export function valuesOf(st) {
+// `keyed` (optional) is the holograph's reading of the statement's figures: each one KEYED by what it measures and
+// of whom ({ key, measure, anchor, v, raw, s, e }, offsets relative to the statement). When it is given a figure is
+// compared by that key and a figure the holograph could not key is not compared at all: the unit string may
+// nominate a pair, it may not decide one (FOLD-CONSTITUTION II.7).
+export function valuesOf(st, keyed = null, roles = null) {
   const out = []; const t = st.text || ''; const base = st.s || 0; const seen = new Set();
   const push = v => { const k = v.token + '@' + v.s; if (!seen.has(k)) { seen.add(k); out.push(v); } };
   const date = (m, mo, d, y) => { if (!mo || d < 1 || d > 31) return;
@@ -111,6 +115,13 @@ export function valuesOf(st) {
   while ((m = b.exec(t))) date(m, MONTHS[m[2].toLowerCase()], +m[1], m[3] && +m[3]);
   const c = /\b((?:19|20)\d{2})-(\d{2})-(\d{2})\b/g;
   while ((m = c.exec(t))) date(m, +m[2] >= 1 && +m[2] <= 12 ? +m[2] : 0, +m[3], +m[1]);
+  // A role a source gives a being at a body (holodeck-offices.js): the slot is the key, the role is the value.
+  (roles || []).forEach(r => push({ kind: 'role', token: 'r:' + r.key + ':' + r.role, key: 'r:' + r.key, value: r.role, raw: r.raw, measure: 'role' + (r.body ? ' at ' + r.body : ''), anchor: r.person, s: base + r.s, e: base + r.e }));
+  if (keyed) {
+    keyed.forEach(f => { if (!f || !f.key || !isFinite(+f.v)) return;
+      push({ kind: 'fig', token: 'm:' + f.key + ':' + (+f.v), key: 'm:' + f.key, value: +f.v, raw: f.raw || String(f.v), measure: f.measure || '', anchor: f.anchor || '', s: base + f.s, e: base + f.e }); });
+    return out;
+  }
   let figList = st.figs;
   if (!figList) { // text that has not been through the app's figure finder (a draft): currency amounts and percents
     figList = []; const fr = /([$£€])\s?(\d[\d,]*(?:\.\d+)?)|(\d[\d,]*(?:\.\d+)?)\s?(%|percent)/g; let q;
@@ -253,8 +264,8 @@ export function importOrigins(map, A) {
 // ── wording: pairs proposed by the words, labelled by the figures ───────────────────────────────────────────────
 // The index is built once per analysis: per statement a bag of word and value tokens, per token its document
 // frequency over statements. A pair's score is the idf-sum of the tokens the two share.
-export function bagOf(st) {
-  const vals = valuesOf(st); const ws = words(st.text); const toks = new Set(ws);
+export function bagOf(st, keyed = null, roles = null) {
+  const vals = valuesOf(st, keyed, roles); const ws = words(st.text); const toks = new Set(ws);
   for (let i = 0; i + 1 < ws.length; i++) toks.add(ws[i] + ' ' + ws[i + 1]);           // adjacent words: a shared phrase is more than a shared bag
   vals.forEach(v => { toks.add(v.token); toks.add('u:' + v.key); });                    // the value, and the kind of value it is
   return { toks, vals };
@@ -266,9 +277,14 @@ export function buildIndex(A, { onlyDocs = null, cues = false } = {}) {
     const list = ((A.stsByDoc && A.stsByDoc[d.id]) || []).filter(st => (st.text || '').trim().length >= 12);
     byDoc.set(d.id, list); list.forEach(st => sts.push(st));
   }
+  // A.keyedFigs(st) is the app's holograph reading of a statement's figures (what each measures, of whom). Absent
+  // (a bare analysis, the tests' fixtures) the figures are compared as before.
+  const keyedOf = typeof A.keyedFigs === 'function' ? A.keyedFigs : null;
   const info = new Map(); const df = new Map();
   for (const st of sts) {
-    const { toks, vals } = bagOf(st);
+    let keyed = null; if (keyedOf) { try { keyed = keyedOf(st) || []; } catch (e) { keyed = null; } }
+    let roles = null; if (typeof A.rolesOf === 'function') { try { roles = A.rolesOf(st) || []; } catch (e) { roles = null; } }
+    const { toks, vals } = bagOf(st, keyed, roles);
     info.set(st.id, { st, toks, vals }); toks.forEach(t => df.set(t, (df.get(t) || 0) + 1));
   }
   const N = sts.length || 1; // surprisal in bits: 0 for a token in every statement
@@ -287,7 +303,7 @@ export function buildIndex(A, { onlyDocs = null, cues = false } = {}) {
   vocab.forEach((t, i) => { tot += df.get(t); cum[i] = tot; });
   const draw = u => { const x = u * tot; let lo = 0, hi = vocab.length - 1; while (lo < hi) { const m = (lo + hi) >> 1; if (cum[m] < x) lo = m + 1; else hi = m; } return vocab[lo]; };
   // `cues` switches on the findings that read English negators (a denial). Off by default: no cue list runs unless asked.
-  return { docs, sts, byDoc, info, df, N, idf, inv, score, draw, vocabSize: vocab.length, cues: !!cues };
+  return { docs, sts, byDoc, info, df, N, idf, inv, score, draw, vocabSize: vocab.length, cues: !!cues, keyed: !!keyedOf };
 }
 // A fixed-seed generator so the null is the same on every run (no clock, no Math.random).
 function lcg(seed) { let x = (seed >>> 0) || 1; return () => (x = (Math.imul(x, 1664525) + 1013904223) >>> 0) / 4294967296; }
@@ -452,7 +468,9 @@ export function findingFor(ix, a, b, verdictInfo) {
   const { verdict, via } = verdictInfo || verdictOf(ix, a.id, b.id);
   if (verdict === 'differs' && via) {
     const x = via[0].raw, y = via[1].raw;
-    return { kind: 'differs', headline: 'Different figures for the same thing: “' + x + '” here, “' + y + '” there', terms, marks: { from: [[via[0].s, via[0].e]].concat(ma), to: [[via[1].s, via[1].e]].concat(mb) } };
+    if (via[0].kind === 'role') return { kind: 'differs', headline: 'Two roles for ' + via[0].anchor + (via[0].measure.slice(4) ? via[0].measure.slice(4) : '') + ': “' + x + '” here, “' + y + '” there', terms, marks: { from: [[via[0].s, via[0].e]].concat(ma), to: [[via[1].s, via[1].e]].concat(mb) } };
+    const what = via[0].measure && via[0].anchor ? via[0].anchor + ' · ' + via[0].measure : '';
+    return { kind: 'differs', headline: what ? 'Two figures for ' + what + ': “' + x + '” here, “' + y + '” there' : 'Different figures for the same thing: “' + x + '” here, “' + y + '” there', terms, marks: { from: [[via[0].s, via[0].e]].concat(ma), to: [[via[1].s, via[1].e]].concat(mb) } };
   }
   const na = negIn(a.text), nb = negIn(b.text);
   if (ix.cues && !!na !== !!nb && terms.length) {
@@ -579,6 +597,18 @@ export function seamOf(A, docA, docB, ix = buildIndex(A)) {
     if (p) { used.add(p.b.id); const L = linkFromPair(ix, a, p.b, p.score, p.beatsNull); rows.push({ a, b: p.b, link: L, verdict: L.verdict || 'related', score: p.score, weak: !p.beatsNull }); }
     else rows.push({ a, b: null, link: null, verdict: 'alone', score: 0 });
   });
+  // Reasoned, not worded: two statements that state a figure of the same measure and being (the holograph's key) are
+  // held together whatever words surround them. The wording match nominates; the key is what makes them comparable.
+  if (ix.keyed) {
+    const byKey = new Map(); lb.forEach(b => (ix.info.get(b.id).vals || []).forEach(v => { if (v.kind === 'fig' || v.kind === 'role') (byKey.get(v.key) || byKey.set(v.key, []).get(v.key)).push(b); }));
+    rows.forEach(r => { if (!r.a || r.b) return;
+      let best = null;
+      for (const v of ix.info.get(r.a.id).vals) { if (v.kind !== 'fig' && v.kind !== 'role') continue;
+        for (const b of byKey.get(v.key) || []) { if (used.has(b.id)) continue; const sc = ix.score(r.a.id, b.id); if (!best || sc > best.sc) best = { b, sc }; } }
+      if (!best) return;
+      used.add(best.b.id); const L = linkFromPair(ix, r.a, best.b, best.sc, true);
+      r.b = best.b; r.link = L; r.verdict = L.verdict || 'related'; r.score = best.sc; r.keyed = true; });
+  }
   // an unpaired denial (or the statement it denies) is shown against its best candidate in the other source
   const denial = (st, pool, docOther) => { if (!negIn(st.text)) return null; const f = nullFloor(ix, st.id, docOther); let best = null;
     for (const C of pool) { if (negIn(C.text)) continue; const sc = dscore(ix, st.id, C.id); if (sc > f && (!best || sc > best.sc)) best = { C, sc }; }
