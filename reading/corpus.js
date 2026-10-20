@@ -6,23 +6,23 @@
 // more event on top of the log. Voices: for any position in a source, who is saying it, and who they are relaying, to any depth.
 import { buildCorpusTimeline, foldLog, splitOf, CELLS } from '../vendor/khora/native/adapters/text/reading-timeline.js';
 import { isTruthClaiming } from '../vendor/khora/native/kernel/reality-register.js';
-import { sniffRegister, steerWithLocalModel } from './sniff.js';
+import { sniffRegister } from './sniff.js';
 
 const REGS = [['testimony', 'testimony'], ['report', 'report'], ['journalism', 'journalism'], ['reference', 'reference'], ['data', 'data'], ['comment', 'comment'], ['fiction', 'fiction']];
 const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const short = (id) => String(id).replace(/^(being:|ref_)/, '').slice(0, 8);
 
-// illustrative paragraphs written for this demo (not quotations from the record): one testimony, one journalism, one telling
+// illustrative paragraphs written for this demo (not quotations from the record). Their types are not declared: the page infers them.
 export const TITANIC = [
-  { label: 'Inquiry testimony', register: 'testimony', text: 'Senator Smith asked Bruce Ismay whether he had been warned. Bruce Ismay said that Captain Smith told him that ice was reported ahead. Ismay said that Thomas Andrews told him that the ship would sink. “I did not give the order,” said Ismay. Lightoller testified that the officer reported the ice. Thomas Andrews had gone below, Ismay said.' },
-  { label: 'Newspaper report', register: 'journalism', text: 'The Tribune reported that Bruce Ismay left the ship in a lifeboat. Thomas Andrews was last seen in the smoking room, according to survivors. Captain Edward Smith stayed on the bridge. Survivors said that Lightoller kept order at the boats. Andrews helped women into the lifeboats, survivors said.' },
-  { label: 'Screenplay', register: 'fiction', text: 'Jack Dawson drew Rose DeWitt Bukater in the dark. Cal Hockley told Rose that Thomas Andrews had warned him. Bruce Ismay urged the captain to go faster. “Faster,” said Ismay. Andrews showed Rose the plans of the ship.' },
+  { label: 'Inquiry testimony', text: 'Senator Smith asked Bruce Ismay whether he had been warned of the ice. Bruce Ismay said that Captain Smith told him that ice was reported ahead. Ismay said that Thomas Andrews told him that the ship would sink. “I did not give the order,” said Ismay. Thomas Andrews had gone below, Ismay said. The Senator asked whether the boats were full. Ismay answered that he did not know, and that he left only when no women were left on the deck.' },
+  { label: 'Newspaper report', text: 'NEW YORK (AP) — The Tribune reported that Bruce Ismay left the ship in a lifeboat. Thomas Andrews was last seen in the smoking room, according to survivors. Captain Edward Smith stayed on the bridge. Survivors said that Lightoller kept order at the boats. Andrews helped women into the lifeboats, survivors said. According to the company, Ismay will testify next week, and the line has declined further comment.' },
+  { label: 'Screenplay', text: 'Jack Dawson drew Rose DeWitt Bukater in the dark. Cal Hockley told Rose that Thomas Andrews had warned him. Bruce Ismay urged the captain to go faster. “Faster,” said Ismay. Andrews showed Rose the plans of the ship, and she watched his hands tremble. Jack laughed and said that nothing could sink her. Rose turned away, and the cold came up through the floor of the cabin like a held breath.' },
 ];
 
 const CSS = `
 .src-panel{max-width:1180px;margin:10px auto;padding:0 18px}
 .src-panel h2{font-size:15px;margin:0 0 4px}.src-panel .lede{font-size:12.5px;opacity:.78;margin:0 0 10px;max-width:84ch}
-.src-card{display:flex;gap:10px;align-items:center;padding:3px 0;margin:0}.src-card b{font-weight:500;flex:0 1 auto}.src-card select{flex:0 0 auto;font-size:12.5px;padding:2px 4px;max-width:70%}.src-card .x{background:none;border:0;opacity:.55;font-size:15px;cursor:pointer;padding:0 4px}.src-card .x:hover{opacity:1}
+.src-card{display:flex;gap:10px;align-items:center;padding:3px 0;margin:0}.src-card b{font-weight:500;flex:0 1 auto}.src-card select{appearance:none;-webkit-appearance:none;border:0;background:none;color:inherit;opacity:.65;font:inherit;font-size:13px;cursor:pointer;padding:0 2px}.src-card select:hover{opacity:1;text-decoration:underline dotted}.being{margin:8px 0;cursor:pointer}.src-card .x{background:none;border:0;opacity:.55;font-size:15px;cursor:pointer;padding:0 4px}.src-card .x:hover{opacity:1}
 .src-card input[type=text]{font:inherit;padding:4px 6px;min-width:0}.src-card select{font:inherit;padding:3px}
 @media(max-width:760px){.src-card{grid-template-columns:1fr}.src-card input[type=text]{width:100%;box-sizing:border-box}}
 .src-card .tx{grid-column:1/-1;font:11.5px/1.45 ui-monospace,monospace;opacity:.8;max-height:3.1em;overflow:hidden;white-space:pre-wrap}
@@ -42,19 +42,19 @@ export function mountSources(host, { makeDeps, openInReader, currentText }) {
   const st = { sources: [], corpus: null, fold: null, overlay: [], sel: null, voiceSrc: null, onlyShared: true, busy: false, err: null };
   let nextId = 1;
   let PRIOR; const prior = () => (PRIOR ??= fetch('./register-prior.json').then((r) => r.json()).catch(() => null));
-  // the type of a source is SNIFFED (Zenodotus-measured vocabulary + structural cues, a small local model only when thin); a pick overrides it
-  const eff = (s) => s.register || (s.auto && (!s.auto.thin || (s.auto.model && s.auto.model.used)) ? s.auto.register : '');
+  // the type of a source is SNIFFED (Zenodotus-measured vocabulary + structural cues); a pick overrides it
+  const eff = (s) => s.register || (s.auto && !s.auto.thin ? s.auto.register : '');
   let timer = null; const soon = () => { clearTimeout(timer); timer = setTimeout(() => { if (st.sources.length && st.sources.every((x) => !x.pending)) readAll(); }, 250); };
   async function sniffOne(s) {
     s.pending = true; render();
-    try { s.auto = sniffRegister(s.text, await prior()); render(); if (s.auto.thin) { s.auto = await steerWithLocalModel(s.auto); } } catch (e) { console.error(e); }
+    try { s.auto = sniffRegister(s.text, await prior()); render();  } catch (e) { console.error(e); }
     s.pending = false; render(); soon();
   }
   const add = (label, text, register = '') => { const s = { id: `src_${nextId++}`, label: label || text.trim().split(/\s+/).slice(0, 5).join(' ') + '…', text, register, auto: null, pending: false }; st.sources.push(s); st.corpus = null; sniffOne(s); };
 
   function regChip(r) { return r ? `<span class="chip">${esc(r)}</span>` : '<span class="chip dim">undeclared</span>'; }
   function render() {
-    const autoLabel = (s) => (s.pending ? 'sniffing…' : s.auto ? (eff(s) ? `${eff(s)} · ${Math.round(s.auto.p * 100)}% · sniffed${s.auto.model && s.auto.model.used ? ' + local model' : ''}` : `unsure${s.auto.reason ? ' — ' + s.auto.reason : ''} — pick one, or it is read but not linked`) : '…');
+    const autoLabel = (s) => (s.pending ? 'sniffing…' : s.auto ? (eff(s) ? `${eff(s)} · ${Math.round(s.auto.p * 100)}%` : `unsure${s.auto.reason ? ' — ' + s.auto.reason : ''} — pick one, or it is read but not linked`) : '…');
     const sc = st.sources.map((s) => `<div class="src-card" data-src="${s.id}"><b>${esc(s.label)}</b><select data-f="register" aria-label="type of source" title="${esc(s.auto ? s.auto.ranked.slice(0, 2).map((r) => r.register + ' ' + r.p.toFixed(2) + ': ' + r.why.join('; ')).join('\n') : '')}"><option value="">${esc(autoLabel(s))}</option>${REGS.map(([v, l]) => `<option value="${v}"${v === s.register ? ' selected' : ''}>${l}</option>`).join('')}</select><button type="button" data-a="rm" class="x" title="remove this source" aria-label="remove">×</button></div>`).join('') || '<div class="dim" style="font-size:12.5px"></div>';
     if (!st.sources.length) { host.innerHTML = ''; return; }
     host.innerHTML = `<div class="src-panel">
@@ -65,12 +65,11 @@ export function mountSources(host, { makeDeps, openInReader, currentText }) {
 
   function result() {
     const c = st.corpus, f = st.fold, lab = (id) => (c.sources.find((s) => s.id === id) || {}).label || id;
-    const beings = f.beings.filter((b) => b.ends.length).sort((a, b) => new Set(b.ends.map((e) => e.source)).size - new Set(a.ends.map((e) => e.source)).size || b.ends.reduce((n, e) => n + e.mentions, 0) - a.ends.reduce((n, e) => n + e.mentions, 0));
-    const shown = (st.onlyShared ? beings.filter((b) => new Set(b.ends.map((e) => e.source)).size > 1) : beings).slice(0, 60);
-    const kinds = {}; for (const l of f.links) kinds[l.split.kind] = (kinds[l.split.kind] || 0) + 1;
-    const rows = shown.map((b) => `<tr data-being="${esc(b.id)}" class="${b.id === st.sel ? 'sel' : ''}"><td>${esc(b.name || '—')}</td><td><span class="chip ${esc(b.reality)}">${esc(b.reality)}</span></td><td>${b.ends.map((e) => `${esc(lab(e.source))} ${regChip(e.register)}×${e.mentions}`).join('<br>')}</td></tr>`).join('');
-    return `<div class="src-row dim">${f.links.length} cross-source link${f.links.length === 1 ? '' : 's'} ${Object.entries(kinds).map(([k, n]) => `<span class="chip">${esc(k)} ${n}</span>`).join('')}${c.refused.length ? ` · ${c.refused.length} not linked (type unsure)` : ''}${st.overlay.length ? ` · ${st.overlay.length} from you` : ''}</div>
-      <table class="src-tbl"><thead><tr><th>name</th><th>reality</th><th>met in</th></tr></thead><tbody>${rows || '<tr><td colspan="3" class="dim">nothing shared across these sources yet</td></tr>'}</tbody></table>${undecided()}${profile()}${voices()}`;
+    const sources = (b) => [...new Set(b.ends.map((e) => e.source))];
+    const beings = f.beings.filter((b) => sources(b).length > 1).sort((x, y) => y.ends.reduce((n, e) => n + e.mentions, 0) - x.ends.reduce((n, e) => n + e.mentions, 0)).slice(0, 12);
+    const rows = beings.map((b) => { const ks = [...new Set(f.links.filter((l) => b.members.includes(l.fromRoot) || b.members.includes(l.toRoot)).map((l) => l.split.kind))];
+      return `<div class="being" data-being="${esc(b.id)}"><b>${esc(b.name || '—')}</b> <span class="dim">${esc(ks.join(', ') || b.reality)} · ${sources(b).map((s) => esc(lab(s))).join(', ')}</span></div>`; }).join('');
+    return `${rows}${undecided()}${profile()}${voices()}`;
   }
 
   // A shared name only NOMINATES. The identity test (holographic, for-whom 'who is this?') joins when it can; when there is not enough reading it
@@ -125,7 +124,7 @@ export function mountSources(host, { makeDeps, openInReader, currentText }) {
     const b = ev.target.closest('[data-a]'); if (!b) return; const a = b.dataset.a, card = ev.target.closest('[data-src]');
     if (a === 'rm') { st.sources = st.sources.filter((s) => s.id !== card.dataset.src); st.corpus = null; render(); }
         else if (a === 'addcur') { const t = (currentText() || '').trim(); if (t.length < 8) { st.err = 'Put some text in the box below first.'; render(); return; } add("", t); st.err = null; render(); }
-    else if (a === 'titanic') { st.sources = []; for (const t of TITANIC) add(t.label, t.text, t.register); render(); }
+    else if (a === 'titanic') { st.sources = []; for (const t of TITANIC) add(t.label, t.text); render(); }
         else if (a === 'vsrc') { st.voiceSrc = b.dataset.src; render(); }
     else if (a === 'same') {
       const k = st.corpus.candidates[+b.dataset.i]; if (!k) return;
