@@ -272,7 +272,10 @@
   #app .top .stats, #app .top [data-a="toggle-all"], #app .top [data-a="reset"], #app .top [data-a="copy"]{display:none}
   #app .left .log, #app .bar2 .key, #app .bar2 .seg, #app .bar2 label, #app .bar2 [data-a="rev"], #app .bar2 .rd{display:none}
   #app .lanes .h, #app .lanes .lg, #app .lens .doc, #app .insp .legend, #app .insp .lg{display:none}
-  #app .drawer #p-dt[aria-expanded="false"] ~ .tabs{display:none}
+  /* three panels: layers · the document · the inspector. The Details drawer repeated the inspector's views, so it is gone. */
+  #app #p-drawer{display:none}
+  #app .right{grid-template-rows:minmax(0,1fr) auto}
+  #app .lens{overflow:auto;min-height:0}
   #app .spine .why, #app .spine .cnt, #app .spine .h{display:none}
   #app .top h2{font-size:17px;font-weight:600}
   #app .lens{line-height:1.9;font-size:16px}
@@ -303,9 +306,9 @@
     <button id="clear">Clear</button>
     <button id="addsrc" title="Keep this text as one of several sources to read together">+ source</button>
     <span class="samples" id="samples">
-      <button data-s="positions">positions</button>
-      <button data-s="dossier">dossier</button>
-      <button data-s="history">history</button>
+      <button data-s="positions">sample 1</button>
+      <button data-s="dossier">sample 2</button>
+      <button data-s="history">sample 3</button>
       <button id="exsrc" title="Three sources on one ship">ship</button>
     </span>
     <span id="model" class="badge live" hidden>model calls: 0</span>
@@ -406,6 +409,7 @@ import { buildReadingTimeline, foldLog, CELLS } from '../vendor/khora/native/ada
 import { makeLookup } from '../holodeck-lookup.js';
 import { startOffline } from './offline.js';
 import { mountSources } from './corpus.js';
+import { mountReader } from './reader-view.js';
 import { makeSameBeing } from '../vendor/khora/native/adapters/text/corpus-identity.js';
 import { browserOcr, loadPdfjs } from '../holodeck-ocr.js';
 import { sha256Hex, stableProvenanceId, byteRange, EotLedger } from '../vendor/fold-chat/fold-chat-eot.js';
@@ -738,7 +742,29 @@ let features = { ...DEFAULT_FEATURES };
 let lastRaw = '', lastLabel = '';
 let LAST_TAB = 'source', LAST_INSP = 'reading';
 
-function openTrace(T){ if (cur) cur.close(); cur = mount(T); return cur; }
+function openTrace(T){ return openReader(T); }
+// the reading, in three panels (reading/reader-view.js): what was read · the selected thing · where it came from
+function openReader(T, keep = null){
+  if (cur){ const old = cur; cur = null; old.close(); }
+  const ctx = {
+    hash: sha256, readingJSON, download, features, keep,
+    explainWord: w => { try { return classifyForm(w, { posPrior: PRIORS.posPrior, lemmatizer: PRIORS.lemmatizer }); } catch (e) { return null; } },
+    actsOf: w => { const lw = lookupForm(w).toLowerCase(); const out = new Set(); try { for (const x of (PRIORS.lemmatizer ? PRIORS.lemmatizer.lemmasOf(lw) : [])) out.add(x); } catch (e) {} try { for (const x of stemsOf(lw)) out.add(x); } catch (e) {} return [...out]; },
+    layers: LAYERS.filter(l => l.feature).map(l => ({ feature:l.feature, label:l.label, why:l.why })),
+    sources: () => (SOURCES && SOURCES.state && SOURCES.state.corpus ? { corpus:SOURCES.state.corpus, fold:SOURCES.state.fold, sources:SOURCES.state.sources } : null),
+    delta: keep && keep.delta || null,
+    onClose: () => { cur = null; },
+    rerun: async (feat, k) => {
+      const prev = cur && cur.T; features = feat;
+      const off = Object.keys(feat).filter(x => feat[x] === false);
+      const T2 = await read(lastRaw, lastLabel, feat, { animate:false, layout: prev && prev.doc.layout, keep:{ ...k, layout: prev && prev.doc.layout } });
+      if (prev && cur){ const n = t => ({ claims:t.claims.length, names:t.refs.size }); const a = n(prev), b = n(T2);
+        cur.state.delta = `${off.length ? off.join(', ') + ' off' : 'every layer on'} — claims ${a.claims} → ${b.claims}, names ${a.names} → ${b.names}. The reading re-ran in this browser, no model.`; cur.render(); }
+    },
+  };
+  cur = mountReader(T, ctx);
+  return cur;
+}
 
 function mount(T){
   const ev = T.ev; let N = ev.length;
@@ -1594,14 +1620,14 @@ async function read(text, label, feat, opt = {}){
   let read0 = { claims: [] };
   try { read0 = R([{ ref:'source', text: clean }]).read(clean); } catch (e) { console.error(e); }
   const claims = mapClaims(read0.claims, analysis);
-  const doc = { label: lastLabel, analysis, truncated };
+  const doc = { label: lastLabel, analysis, truncated, layout: opt.layout || (opt.keep && opt.keep.layout) || null };
   const T = buildTrace(doc, clean, claims, feat, opt.extraction || null);
   T.clean = clean; T.R = R; T.feat = feat;
   startTimeline(T);
   if (!BASELINE) BASELINE = T;
   $('model').textContent = `model calls: ${T.net.models}`;
   if (opt.animate !== false){ openTrace(T); }
-  else if (cur){ cur.close(); cur = mount(T); }
+  else if (opt.keep || cur){ openReader(T, opt.keep || null); }
   return T;
 }
 
@@ -1674,7 +1700,7 @@ async function ocrInBrowser(buf, show){
       onStatus: st => show(`<b>Reading pixels</b> — tesseract.js (OCR, no model) · in this browser · ${esc(st)}`),
       onPage: p => { if (p.text.trim()) ta.value = (ta.value ? ta.value + '\n\n' : '') + p.text.trim(); show(`<b>Reading pixels</b> — tesseract.js (OCR, no model) · in this browser · page ${p.n} of ${p.total}${p.conf != null ? ` · ${p.conf}% mean word confidence` : ''}`); },
     });
-    OCR_META = { pages: r.pages, total: r.total, words: r.words, conf: r.conf, where: 'browser' };
+    OCR_META = { pages: r.pages, total: r.total, words: r.words, conf: r.conf, where: 'browser', layout: r.layout };
     $('refuse').hidden = true;
     return r.text;
   } catch (e) { show(`<b>In-browser OCR failed</b> <span class="mono">${esc(e && e.message || e)}</span> — the engine files may not be saved yet (see the offline chip).`); return null; }
@@ -1748,7 +1774,7 @@ async function readFile(file){
   if (!chosen || !chosen.text || chosen.text.trim().length < 8) return refuse(file.name, kind === 'pdf' ? 'pdf-no-text' : kind === 'image' ? 'image' : 'binary', {});
   if (chosen.sniff.verdict === 'unconfirmed') return refuse(file.name, 'pdf-unreadable', { reads: chosen.sniff.reads });
   const viaOcr = OCR_META && /tesseract/.test(chosen.extractor);
-  return run(chosen.text, file.name + ' — ' + chosen.extractor + (viaOcr ? ` · ${OCR_META.pages} page${OCR_META.pages === 1 ? '' : 's'}, ${OCR_META.conf}% mean word confidence` : ''), { extraction: E });
+  return run(chosen.text, file.name + ' — ' + chosen.extractor + (viaOcr ? ` · ${OCR_META.pages} page${OCR_META.pages === 1 ? '' : 's'}, ${OCR_META.conf}% mean word confidence` : ''), { extraction: E, layout: viaOcr && OCR_META.layout && OCR_META.layout.pages.length ? OCR_META.layout : null });
 }
 
 // ── input wiring ──
@@ -1760,13 +1786,13 @@ file.addEventListener('change', async () => { const f = file.files[0]; if (f) re
 drop.addEventListener('drop', async ev => { const f = ev.dataTransfer.files && ev.dataTransfer.files[0]; if (f) return readFile(f); const t = ev.dataTransfer.getData('text'); if (t) run(t, 'dropped text'); });
 $('read').addEventListener('click', () => run(ta.value, 'pasted text'));
 $('clear').addEventListener('click', () => { ta.value = ''; });
-$('samples').addEventListener('click', e => { const s = e.target.dataset.s; if (s){ ta.value = SAMPLES[s]; run(SAMPLES[s], 'sample · ' + s); } });
+$('samples').addEventListener('click', e => { const s = e.target.dataset.s; if (s){ ta.value = SAMPLES[s]; run(SAMPLES[s], 'Sample extraction'); } });
 
 async function run(text, label, opt = {}){
   const btn = $('read'); const was = btn.textContent; btn.textContent = 'reading…'; btn.disabled = true;
   features = { ...DEFAULT_FEATURES }; BASELINE = null; LAST_TAB = 'source';
   const d = $('p-delta'); if (d) d.hidden = true; const r = $('refuse'); if (r) r.hidden = true;
-  try { await read(text, label, features, { animate:true, extraction: opt.extraction || null }); }
+  try { await read(text, label, features, { animate:true, extraction: opt.extraction || null, layout: opt.layout || null }); }
   catch (err){ alert('The reading failed: ' + (err && err.message || err)); console.error(err); }
   finally { btn.textContent = was; btn.disabled = false; }
 }
@@ -1783,7 +1809,7 @@ const SOURCES = mountSources($('sources'), { makeDeps: corpusDeps, openInReader:
 $('addsrc').addEventListener('click', () => SOURCES.addCurrent());
 $('exsrc').addEventListener('click', () => SOURCES.example());
 const OFFLINE = startOffline();   // silent: it only makes the files local; nothing on the page announces it
-window.__demo = { offline: OFFLINE, sources: SOURCES, read, run, json:() => (cur ? readingJSON(cur.T) : null), text:() => (cur ? diagrammedText(cur.T) : null), current:() => (cur ? cur.T : null), features:() => features, net };
+window.__demo = { offline: OFFLINE, sources: SOURCES, view: () => cur, read, run, json:() => (cur ? readingJSON(cur.T) : null), text:() => (cur ? diagrammedText(cur.T) : null), current:() => (cur ? cur.T : null), features:() => features, net };
 </script>
 </body>
 </html>
