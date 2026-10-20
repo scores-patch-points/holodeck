@@ -20,19 +20,25 @@ const union = (bs) => bs.length ? [Math.min(...bs.map((b) => b[0])), Math.min(..
 /** Form fields: label → value, each with the words (and so the boxes) it was read from. */
 export function fieldsOf(layout, text, tilt = null) {
   if (!layout || !A()) return [];
-  if (layout.pages.some((pg) => pg.rules)) { let all = []; for (const pg of layout.pages) all = all.concat(pg.rules ? cellFieldsOf(pg, text, all.length) : []); return tilt ? tiltFields(all, tilt, layout, text) : all; }
-  const out = [];
-  for (const pg of layout.pages) for (const ln of pg.lines) {
-    if (ln.s >= text.length) continue;
-    const line = text.slice(ln.s, Math.min(ln.e, text.length));
-    const f = A().extractFormFields(line)[0]; if (!f) continue;
-    const li = line.indexOf(f.label), vi = line.indexOf(f.value, li + f.label.length); if (li < 0 || vi < 0) continue;
-    const ws = pg.words.slice(ln.words[0], ln.words[1]);
-    const inR = (a, b) => ws.filter((w) => w.s >= ln.s + a && w.e <= ln.s + b + 1);
-    const lw = inR(li, li + f.label.length), vw = inR(vi, vi + f.value.length); if (!lw.length || !vw.length) continue;
-    out.push({ id: `fld_${out.length + 1}`, page: pg.n, label: f.label, value: f.value, format: shapeOf(f.value), lb: union(lw.map((w) => w.b)), vb: union(vw.map((w) => w.b)), s: ln.s + li, e: ln.s + vi + f.value.length, conf: Math.round(vw.reduce((n, w) => n + w.c, 0) / vw.length), words: [...lw, ...vw] });
+  // A page is read as BOXES only when its own ink is ruled like a form (several long horizontal rules); a page of prose, even one with a stray
+  // rule or column line, is read line by line — one label and value per line — and never as one giant cell.
+  const ruled = (pg) => !!(pg.rules && pg.rules.h && pg.rules.h.length >= 5);
+  let cells = []; const out = [];
+  for (const pg of layout.pages) {
+    if (ruled(pg)) { cells = cells.concat(cellFieldsOf(pg, text, cells.length + out.length)); continue; }
+    for (const ln of pg.lines) {
+      if (ln.s >= text.length) continue;
+      const line = text.slice(ln.s, Math.min(ln.e, text.length));
+      const f = A().extractFormFields(line)[0]; if (!f) continue;
+      const li = line.indexOf(f.label), vi = line.indexOf(f.value, li + f.label.length); if (li < 0 || vi < 0) continue;
+      const ws = pg.words.slice(ln.words[0], ln.words[1]);
+      const inR = (a, b) => ws.filter((w) => w.s >= ln.s + a && w.e <= ln.s + b + 1);
+      const lw = inR(li, li + f.label.length), vw = inR(vi, vi + f.value.length); if (!lw.length || !vw.length) continue;
+      out.push({ id: `fld_${cells.length + out.length + 1}`, page: pg.n, label: f.label, value: f.value, format: shapeOf(f.value), lb: union(lw.map((w) => w.b)), vb: union(vw.map((w) => w.b)), s: ln.s + li, e: ln.s + vi + f.value.length, conf: Math.round(vw.reduce((n, w) => n + w.c, 0) / vw.length), words: [...lw, ...vw] });
+    }
   }
-  return out;
+  const all = cells.concat(out);
+  return tilt && cells.length ? tiltFields(all, tilt, layout, text) : all;
 }
 
 /** What each word on a page was read as: field label/value, a referent's mention, part of a claim, a word not placed — or nothing. */
@@ -199,7 +205,7 @@ export function pdfHTML(layout, R, { selected } = {}) {
       const on = selected && ((selected.kind === 'field' && r && r.field && r.field.id === selected.id) || (selected.kind === 'word' && selected.s === w.s) || (selected.kind === 'ref' && r && r.ref === selected.ref));
       return `<span class="ow ${k}${on ? ' on' : ''}" style="left:${pct(w.b[0], pg.w)};top:${pct(w.b[1], pg.h)};width:${pct(w.b[2] - w.b[0], pg.w)};height:${pct(w.b[3] - w.b[1], pg.h)};font-size:${size.toFixed(3)}cqw;--c:${c}" data-sel='${esc(sel)}' title="${esc(w.t)} · ${esc(k)} · ${w.c}% confidence">${esc(w.t)}</span>`;
     }).join('');
-    return `<div class="pgh">page ${pg.n} — the scan, with the text read from it laid on top</div><div class="pg pdf" style="aspect-ratio:${pg.w}/${pg.h}"><img src="${pg.image}" alt="page ${pg.n} as scanned">${ws}${fb}</div>`;
+    return `<div class="pgh">page ${pg.n} — raw, with the text read from it laid on top</div><div class="pg pdf" style="aspect-ratio:${pg.w}/${pg.h}"><img src="${pg.image}" alt="page ${pg.n} as scanned">${ws}${fb}</div>`;
   }).join('');
 }
 
