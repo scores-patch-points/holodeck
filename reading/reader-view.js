@@ -34,7 +34,7 @@ const CSS = `
 #rv button{font:13px var(--sans);background:var(--s1);color:var(--ink);border:1px solid var(--line2);border-radius:7px;padding:4px 10px;cursor:pointer}
 #rv button:hover{border-color:var(--acc3)}
 #rv .body{display:grid;grid-template-columns:260px minmax(0,1fr) 380px;grid-template-rows:minmax(0,1fr);min-height:0}
-@media (min-width:1001px) and (max-width:1320px){#rv .body{grid-template-columns:210px minmax(0,1fr) 300px}}
+@media (min-width:1001px) and (max-width:1320px){#rv .body{grid-template-columns:240px minmax(0,1fr) 300px}}
 #rv .modes{display:flex;gap:4px;margin:0 0 14px;flex-wrap:wrap}
 #rv .modes button{background:none;border-color:var(--line)}#rv .modes button.on{background:var(--sel2);border-color:var(--acc3)}
 #rv .pgh{font:12px var(--mono);color:var(--dim);margin:18px 0 6px}
@@ -76,7 +76,7 @@ const CSS = `
 #rv .rt thead button{all:unset;cursor:pointer;color:inherit;font:inherit}#rv .rt thead button:hover,#rv .rt thead button:focus-visible{color:var(--ink)}
 #rv .rt .ar{margin-left:3px;font-size:9px}#rv .rt .num{text-align:right;font-family:var(--mono);font-size:12.5px;color:var(--dim)}
 #rv .rt tbody tr{cursor:pointer}#rv .rt tbody tr:hover{background:var(--s1)}#rv .rt tbody tr.sel{background:var(--sel2)}
-#rv .rt .c-name{overflow-wrap:anywhere}#rv .rt .c-name .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px}
+#rv .rt .c-name{overflow-wrap:normal;word-break:normal;hyphens:manual;min-width:9ch}#rv .rt .c-name>span:last-child{display:inline}#rv .rt .num{width:1%;white-space:nowrap}#rv .rt thead th.num,#rv .rt thead th:not(:first-child){white-space:normal}#rv .rt .c-name .dot{float:left;width:8px;height:8px;border-radius:50%;margin:5px 6px 0 0}
 #rv .rt .sm{display:inline-block;width:8px;height:8px;border-radius:2px;margin-left:2px}#rv .rt .c-reality{text-align:center;cursor:help}
 #rv .rt .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 #rv .crumbs{font-size:13px;color:var(--dim);margin:0 0 14px}
