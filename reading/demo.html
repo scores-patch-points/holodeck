@@ -441,8 +441,8 @@ const LAYERS = [
   { id:'stance',    label:'Stance',     color:'--pink',  feature:'stance', why:'a position read as its class ("is pro" = a source\'s "in support of")' },
   { id:'referent',  label:'Referents',  color:'--acc2',  fixed:true, why:'the participants this material establishes, by name' },
   { id:'relation',  label:'Relations',  color:'--green', fixed:true, why:'subject —act→ object, bound clause-aware, with a verdict' },
-  { id:'np',        label:'Noun-phrase subjects', color:'--dim', feature:'npSubj', why:'a subject read as a noun phrase, not just the token before the verb' },
-  { id:'phrasal',   label:'Phrasal predicates',   color:'--dim', feature:'phrasal', why:'a verb + particle read as one act ("gave up")' },
+  { id:'np',        label:'Noun-phrase subjects', color:'--dim', fixed:true, why:'a subject read as a noun phrase, not just the token before the verb' },
+  { id:'phrasal',   label:'Phrasal predicates',   color:'--dim', fixed:true, why:'a verb + particle read as one act ("gave up")' },
   { id:'render',    label:'Render',     color:'--blue',  fixed:true, why:'the triple → a reader\'s word order (English SVO · SOV · VSO)' },
   { id:'ledger',    label:'EOT',        color:'--green', fixed:true, why:'every step appended as a transform, with a recomputable id' },
 ];
@@ -791,7 +791,7 @@ function mount(T){
       const on = l.fixed || T.features[l.feature] !== false;
       const cnt = layerCount(l.id, St);
       const cur = l.id === active;
-      const sw = l.fixed ? `<span class="sw" aria-disabled="true" aria-checked="true" title="always runs"></span>`
+      const sw = l.fixed ? ''
         : `<span class="sw" role="switch" tabindex="0" aria-checked="${on}" data-feature="${l.feature}" title="switch ${esc(l.label)} ${on ? 'off' : 'on'} — the reading re-runs"></span>`;
       return `<div class="ly ${cur ? 'cur' : ''} ${on ? '' : 'off'}"><span class="n">${l.i + 1}</span><span class="lab" style="color:var(${l.color})">${esc(l.label)}</span>${sw}<span class="why">${esc(l.why)}</span><span class="cnt" style="grid-column:2/3">${cnt}</span></div>`;
     }).join('');
