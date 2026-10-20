@@ -394,6 +394,7 @@ const net = { requests: [], models: 0 };
 const _fetch = window.fetch.bind(window);
 window.fetch = (u, o) => { net.requests.push(String(u)); return _fetch(u, o); };
 
+import { htmlReading, csvReading } from '../holodeck-read.js';
 import { makeEngineRelationReader, loadPriors, blankMarkup } from '../holodeck-reader.js';
 import { extractReadings } from './extract.js';
 import { mountMap } from '../holodeck-map.js';
@@ -1765,16 +1766,19 @@ async function readFile(file){
   } else if (isHtml){
     E = await extractReadings({ prior, extractors: [
       { name: 'textutil (macOS)', run: async () => { const c = await convert(buf); return c && c.text; } },
-      { name: 'the browser’s own parse', run: async () => new TextDecoder().decode(buf) },
+      { name: 'the browser’s own parse (readable text, markup dropped)', run: async () => { const d = new DOMParser().parseFromString(htmlReading(new TextDecoder().decode(buf)).html, 'text/html'); return [...d.body.querySelectorAll('h1,h2,h3,h4,h5,h6,p,li,pre,blockquote,td,th')].filter((e) => !e.querySelector('p,li,pre,blockquote')).map((e) => e.textContent.trim()).filter(Boolean).join('\n'); } },
     ] });
   } else {
-    return run(new TextDecoder().decode(buf), file.name);
+    const raw = new TextDecoder().decode(buf);
+    // a delimited table: each row is read as a statement about its first cell, the way its columns name it
+    if (/\.(csv|tsv)$/i.test(file.name)) { const c = csvReading(raw, file.name); if (c.statements) return run(c.statements, file.name); }
+    return run(raw, file.name);
   }
   const chosen = E.collapsed != null ? E.readings[E.collapsed] : null;
   if (!chosen || !chosen.text || chosen.text.trim().length < 8) return refuse(file.name, kind === 'pdf' ? 'pdf-no-text' : kind === 'image' ? 'image' : 'binary', {});
   if (chosen.sniff.verdict === 'unconfirmed') return refuse(file.name, 'pdf-unreadable', { reads: chosen.sniff.reads });
   const viaOcr = OCR_META && /tesseract/.test(chosen.extractor);
-  return run(chosen.text, file.name + ' — ' + chosen.extractor + (viaOcr ? ` · ${OCR_META.pages} page${OCR_META.pages === 1 ? '' : 's'}, ${OCR_META.conf}% mean word confidence` : ''), { extraction: E, layout: viaOcr && OCR_META.layout && OCR_META.layout.pages.length ? OCR_META.layout : null });
+  return run(chosen.text, file.name + (viaOcr ? ` — ${chosen.extractor} · ${OCR_META.pages} page${OCR_META.pages === 1 ? '' : 's'}, ${OCR_META.conf}% mean word confidence` : ''), { extraction: E, layout: viaOcr && OCR_META.layout && OCR_META.layout.pages.length ? OCR_META.layout : null });
 }
 
 // ── input wiring ──

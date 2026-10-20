@@ -10,7 +10,8 @@
 import { foldLog, CELLS } from '../vendor/khora/native/adapters/text/reading-timeline.js';
 import { hunt } from './prior-hunt.js';
 import { tiltOf } from './prior-tilt.js';
-import { fieldsOf, pageHTML, placeHTML, pdfHTML, semanticOf, tupleHTML, tupleChildren, tupleAt, readForm } from './page-views.js';
+import { MARKER } from './shapes.js';
+import { fieldsOf, htmlExport, pageHTML, placeHTML, pdfHTML, semanticOf, tupleHTML, tupleChildren, tupleAt, readForm } from './page-views.js';
 
 const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const ROOT_PATH = String.fromCharCode(36);
@@ -46,9 +47,11 @@ const CSS = `
 #rv .pg .pw.mention{color:var(--c);filter:brightness(.6);font-weight:600}
 #rv .pg .pw.value{color:#0b7a43;font-weight:600}#rv .pg .pw.label{color:#3359a8}#rv .pg .pw.unplaced{color:#a86b00;text-decoration:underline dotted}
 #rv .pg .pw.on{outline:2px solid #f0b429;background:rgba(240,180,41,.25)}
-#rv .pg.pdf .ow{position:absolute;white-space:nowrap;overflow:hidden;line-height:1;color:var(--c);background:rgba(255,255,255,.84);font-family:var(--sans);cursor:pointer;display:flex;align-items:center}
-#rv .pg.pdf .ow.plain{color:#1b1b1f}#rv .pg.pdf .ow.mention{font-weight:700;filter:brightness(.62)}#rv .pg.pdf .ow.value{color:#0b7a43;font-weight:700}#rv .pg.pdf .ow.label{color:#3359a8}#rv .pg.pdf .ow.unplaced{color:#a86b00;text-decoration:underline dotted}
-#rv .pg.pdf .ow:hover{background:transparent;color:transparent;outline:1px solid #f0b429}
+#rv .pg.pdf .ow{position:absolute;white-space:nowrap;overflow:hidden;line-height:1;color:transparent;background:transparent;font-family:var(--sans);cursor:pointer;display:flex;align-items:center;border-radius:2px}
+#rv .pg.pdf .ow.plain{background:transparent}
+#rv .pg.pdf .ow.mention,#rv .pg.pdf .ow.value,#rv .pg.pdf .ow.label,#rv .pg.pdf .ow.unplaced{background:color-mix(in srgb,var(--c) 22%,transparent);box-shadow:inset 0 -2px 0 color-mix(in srgb,var(--c) 70%,transparent)}
+#rv .pg.pdf .ow.unplaced{box-shadow:inset 0 -2px 0 #a86b0099;background:rgba(168,107,0,.12)}
+#rv .pg.pdf .ow:hover{outline:1px solid #f0b429;background:rgba(240,180,41,.18)}
 #rv .pg.pdf .ow.on{outline:3px solid #f0b429;background:rgba(240,180,41,.35)}
 #rv .tp{font:12.5px/1.7 var(--mono);padding-left:2px;cursor:default}#rv .tp[data-sel]{cursor:pointer}#rv .tp[data-sel]:hover{background:var(--s1)}#rv .jw{color:var(--dim);font-size:11.5px;margin-left:6px}
 #rv .jt{margin-left:2px}#rv .jt summary{cursor:pointer;font:12.5px var(--mono)}#rv .jc{margin-left:16px;border-left:1px solid var(--line);padding-left:8px}
@@ -118,7 +121,7 @@ export function mountReader(T, ctx) {
   if (!document.getElementById('rv-css')) { const s = document.createElement('style'); s.id = 'rv-css'; s.textContent = CSS; document.head.appendChild(s); }
   let root = document.getElementById('rv');
   if (!root) { root = document.createElement('div'); root.id = 'rv'; document.body.appendChild(root); }
-  root.innerHTML = `<div class="top"><h2></h2><span class="proof"></span><span class="sp"></span><button type="button" data-a="json">⤓ the reading as JSON</button><button type="button" data-a="close" title="Esc">✕ Close</button></div>
+  root.innerHTML = `<div class="top"><h2></h2><span class="proof"></span><span class="sp"></span><button type="button" data-a="json">⤓ the reading as JSON</button><button type="button" data-a="html" title="The scan's words as standalone semantic HTML, filled-in values carrying their provenance">⤓ as HTML</button><button type="button" data-a="close" title="Esc">✕ Close</button></div>
     <div class="body"><div class="col idx"></div><div class="col hero"></div><div class="col prov"></div></div>
     <div class="bar"></div>`;
   root.classList.add('on');
@@ -164,7 +167,14 @@ export function mountReader(T, ctx) {
     const body = L ? semanticOf(L, text, fields()) : (tl ? tl.sentences.map((s) => [`statement ${s.n}`, s.text.trim(), { chars: [s.offset, s.end] }]) : []);
     const names = f ? f.order.filter((r) => r.mentions.length && !formWord(r)).map((r) => [r.name || short(r.id), r.mentions.map((m) => ['mention', m.text, { chars: [m.s, m.e], span: m.id }]), { id: r.id }]) : [];
     const cls = (isForm() && !st.showClaims) ? [] : claims().map((c) => [c.end1, [[c.label, c.end2]], { chars: [c.s, c.e], polarity: c.polarity === '-' ? 'negated' : 'affirmed' }]);
-    const said = isForm() ? (() => { const F = form(); return [['what the form says', [['said by', F.filer.name, { by: F.filer.basis }], ...(F.voice ? [['signed', F.voice.name, { by: F.voice.basis }]] : []), ...F.claims.map((c) => [c.subject, [[c.act, c.object]], { type: c.type, page: c.page, chars: c.chars, label_box: c.label_box, value_box: c.value_box, confidence: c.conf, by: 'a field read as the filer\'s statement' }])]]]; })() : [];
+    // every proposition the form makes, nested as the page nests it: filer → section (Part …) → the row's act → [column, value] — one tuple per proposition
+    const said = isForm() ? (() => { const F = form();
+      const cleanHead = (t) => { const ws = t.split(/\s+/); return ws.filter((w) => /^\p{L}{3,}[,.;:]?$/u.test(w)).length >= Math.max(2, ws.length * 0.7) && (t.match(/[\p{L}\s]/gu) || []).length >= t.length * 0.85; };
+      const heads = (L ? body : []).flatMap((pg) => pg[1].filter((sec) => sec[2] && sec[2].chars && (MARKER.test(sec[0]) || cleanHead(sec[0]))).map((sec) => ({ page: sec[2].page, at: sec[2].chars[0], name: sec[0] })));
+      const secOf = (c) => { const h = heads.filter((x) => x.page === c.page && x.at <= c.chars[0]).pop(); return h ? h.name : `page ${c.page}`; };
+      const bySec = new Map(); for (const c of F.claims) { const k = secOf(c), sec = bySec.get(k) || bySec.set(k, new Map()).get(k), [act, col] = c.act.split(' · '), row = sec.get(c.field) || sec.set(c.field, { act, cols: [], c }).get(c.field); row.cols.push([col || 'value', c.object, { type: c.type, chars: c.chars, value_box: c.value_box, confidence: c.conf }]); }
+      const props = [...bySec].map(([name, rows]) => [name, [...rows.values()].map((r) => r.cols.length === 1 && r.cols[0][0] === 'value' ? [r.act, r.cols[0][1], { type: r.c.type, page: r.c.page, chars: r.c.chars, label_box: r.c.label_box, value_box: r.c.value_box, confidence: r.c.conf, by: 'a field read as the filer\'s statement' }] : [r.act, r.cols, { page: r.c.page, label_box: r.c.label_box, by: 'a table row read as the filer\'s statement, one value per column' }]), { by: 'the section the page prints it under' }]);
+      return [['what the form says', [['said by', F.filer.name, { by: F.filer.basis }], ...(F.voice ? [['signed', F.voice.name, { by: F.voice.basis }]] : []), [F.filer.name, props, { by: 'every proposition, nested as the form nests it' }]]]]; })() : [];
     return (structMemo = ['reading', [['title', title], src, ...said, ...(L ? body : [['statements', body]]), ['names', names], ['claims', cls]]]); };
   // a FORM's printed words (Yes, No, Part VIII) are labels, not people: a referent whose every mention sits inside a field's label, or whose name is a choice, is form furniture
   const formWord = (r) => { if (!L) return false; const fs = fields(); if (A_choice(r.name)) return true; return fs.length > 0 && r.mentions.every((m) => fs.some((x) => m.s >= x.s && m.e <= x.s + x.label.length)); };
@@ -405,7 +415,7 @@ export function mountReader(T, ctx) {
     if (w && st.sel.kind === 'doc' || w && e.target.closest('.hero')) { if (w.dataset.ref) return select({ kind: 'ref', ref: w.dataset.ref }); const t = tokens()[+w.dataset.t]; if (t) return select({ kind: 'word', w: t.w, s: t.s, e: t.e }); }
     const b = e.target.closest('button[data-a], a[data-a]'); if (!b) return; const a = b.dataset.a;
     if (a === 'mode') { st.mode = b.dataset.m; return render(); } if (a === 'showclaims') { st.showClaims = true; return render(); }
-    if (a === 'close') close(); else if (a === 'json') ctx.download(`${(T.doc.label || 'reading').replace(/[^\w]+/g, '-').slice(0, 40)}-reading.json`, JSON.stringify({ reading: structure(), run: ctx.readingJSON(T).run, corrections: st.overlay }, null, 2), 'application/json');
+    if (a === 'html' && L) ctx.download(`${(T.doc.label || 'reading').replace(/[^\w]+/g, '-').slice(0, 40)}-reading.html`, htmlExport(L, R(), { title: T.doc.label || 'reading', tilt: st.tilt }), 'text/html;charset=utf-8'); else if (a === 'close') close(); else if (a === 'json') ctx.download(`${(T.doc.label || 'reading').replace(/[^\w]+/g, '-').slice(0, 40)}-reading.json`, JSON.stringify({ reading: structure(), run: ctx.readingJSON(T).run, corrections: st.overlay }, null, 2), 'application/json');
     else if (a === 'play') play(); else if (a === 'sever') act('sever', { mid: b.dataset.mid }); else if (a === 'undo') act('undo', { act: b.dataset.act });
   });
   on(root, 'change', async (e) => {
