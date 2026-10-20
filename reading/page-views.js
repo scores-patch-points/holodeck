@@ -20,16 +20,22 @@ const union = (bs) => bs.length ? [Math.min(...bs.map((b) => b[0])), Math.min(..
 
 /** A line's SEGMENTS: runs of words with no wide gap between them (a gap of more than 1.5 type-heights is a column break). */
 const segmentsOf = (ws) => { const h = ws.map((w) => w.b[3] - w.b[1]).sort((a, b) => a - b)[Math.floor(ws.length / 2)] || 10, segs = []; for (const w of ws) { const g = segs[segs.length - 1]; if (g && w.b[0] - g.ws[g.ws.length - 1].b[2] <= 1.5 * h) g.ws.push(w); else segs.push({ ws: [w] }); } for (const g of segs) { g.t = g.ws.map((w) => w.t).join(' '); g.b = union(g.ws.map((w) => w.b)); g.s = g.ws[0].s; g.e = g.ws[g.ws.length - 1].e; } return { segs, h }; };
+/** A line's CHUNKS: segments (no wide gap) that also break after a word ending in a colon — the printed end of a label. A chunk that ends so is a label. */
+const COLON = /^[^:]*\p{L}[^:]*:$/u;
+const chunksOf = (ws) => { const { segs, h } = segmentsOf(ws), out = [];
+  for (const g of segs) { let cur = []; for (const w of g.ws) { cur.push(w); if (COLON.test(w.t) && !/\p{Nd}:$/u.test(w.t)) { out.push({ ws: cur, label: true }); cur = []; } } if (cur.length) out.push({ ws: cur, label: false }); }
+  for (const c of out) { c.t = c.ws.map((w) => w.t).join(' '); c.b = union(c.ws.map((w) => w.b)); c.s = c.ws[0].s; c.e = c.ws[c.ws.length - 1].e; }
+  return { segs: out, h }; };
 /** Label and value by GEOMETRY, for a page that is not ruled: a segment ending in a colon takes the next segment on its line, else the segment just below it;
  *  a short wordy segment followed by a segment shaped like an amount, date, id, phone or e-mail takes that. A line that already read as "label: value" is left alone. */
 function gapFields(pg, text, have, idStart) {
-  const out = [], lines = pg.lines.filter((ln) => ln.s < text.length && !have.has(ln)), seg = new Map(); for (const ln of pg.lines) seg.set(ln, segmentsOf(pg.words.slice(ln.words[0], ln.words[1])));
+  const out = [], lines = pg.lines.filter((ln) => ln.s < text.length && !have.has(ln)), seg = new Map(); for (const ln of pg.lines) seg.set(ln, chunksOf(pg.words.slice(ln.words[0], ln.words[1])));
   const below = (ln, g, h) => { const cand = pg.lines.filter((l) => l !== ln && l.b[1] >= g.b[3] - 2 && l.b[1] - g.b[3] < 2.5 * h).sort((a, b) => a.b[1] - b.b[1])[0]; if (!cand) return null; return seg.get(cand).segs.find((k) => k.b[0] >= g.b[0] - h && k.b[0] <= g.b[2] + 3 * h) || null; };
   for (const ln of lines) { const { segs, h } = seg.get(ln);
-    for (let i = 0; i < segs.length; i++) { const g = segs[i], colon = /[:?]$/.test(g.t.trim()), letters = (g.t.match(/\p{L}/gu) || []).length;
-      if (letters < 2 || g.ws.length > 7) continue;
+    for (let i = 0; i < segs.length; i++) { const g = segs[i], colon = !!g.label || /[?]$/.test(g.t.trim()), letters = (g.t.match(/\p{L}/gu) || []).length;
+      if (letters < (colon ? 1 : 2) || g.ws.length > 7) continue;
       let v = null, how = '';
-      if (colon) { v = segs[i + 1] || below(ln, g, h); how = segs[i + 1] ? 'label: gap value' : 'label: value below'; }
+      if (colon) { const nx = segs[i + 1] && !segs[i + 1].label ? segs[i + 1] : null; v = nx || below(ln, g, h); how = nx ? 'label: value' : 'label: value below'; }
       else if (segs[i + 1] && g.ws.length <= 4 && !/\p{N}/u.test(g.t) && /^(amount|date|id-number|phone|email)$/.test(shapeOf(segs[i + 1].t))) { v = segs[i + 1]; how = 'label gap typed value'; }
       if (!v || !v.t.trim()) continue;
       out.push({ id: `fld_${idStart + out.length + 1}`, page: pg.n, label: g.t.replace(/[:?]+$/, '').trim(), value: v.t.trim(), format: shapeOf(v.t), lb: g.b, vb: v.b, s: g.s, e: v.e, conf: Math.round(v.ws.reduce((n, w) => n + (w.c ?? 0), 0) / v.ws.length), words: [...g.ws, ...v.ws], how });
@@ -42,7 +48,7 @@ export function fieldsOf(layout, text, tilt = null) {
   if (!layout || !A()) return [];
   // A page is read as BOXES only when its own ink is ruled like a form (several long horizontal rules); a page of prose, even one with a stray
   // rule or column line, is read line by line — one label and value per line — and never as one giant cell.
-  const ruled = (pg) => !!(pg.rules && pg.rules.h && pg.rules.h.length >= 5);
+  const ruled = (pg) => !!(pg.rules && pg.rules.h && pg.rules.h.length >= 5 && pg.rules.v && pg.rules.v.length >= 3); // boxes need both: underlines alone are not cells
   let cells = []; const out = [];
   for (const pg of layout.pages) {
     if (ruled(pg)) { cells = cells.concat(cellFieldsOf(pg, text, cells.length + out.length)); continue; }
@@ -50,6 +56,7 @@ export function fieldsOf(layout, text, tilt = null) {
     for (const ln of pg.lines) {
       if (ln.s >= text.length) continue;
       const line = text.slice(ln.s, Math.min(ln.e, text.length));
+      if (pg.words.slice(ln.words[0], ln.words[1]).some((w) => COLON.test(w.t) && !/\p{Nd}:$/u.test(w.t))) continue; // a printed colon ends a label: paired by gapFields below
       const f = A().extractFormFields(line)[0]; if (!f) continue;
       const li = line.indexOf(f.label), vi = line.indexOf(f.value, li + f.label.length); if (li < 0 || vi < 0) continue;
       const ws = pg.words.slice(ln.words[0], ln.words[1]);
@@ -191,6 +198,9 @@ const cellsOf = (line) => line.split(/\s{2,}/).filter(Boolean);
 // residue: a ruled line or a smudge read as glyphs ("sessSSSSSSSSSSS") — a token that repeats one character, or is mostly one character
 const residue = (t) => /(.)\1{4,}/u.test(t) || (t.length >= 8 && Math.max(...Object.values([...t.toLowerCase()].reduce((m, c) => (m[c] = (m[c] || 0) + 1, m), {}))) >= t.length * 0.5);
 const noisy = (line) => { const ts = line.split(/\s+/).filter(Boolean); return ts.length > 0 && ts.filter(residue).length >= Math.ceil(ts.length / 2); };
+// a heading is a few words, mostly real ones, and not a label that ends in a colon (the heading ant: 9% of colon labels are headings)
+const wordQuality = (t) => { const ws = t.split(/\s+/).filter(Boolean); return ws.length ? ws.filter((w) => /^\p{L}[\p{L}'’-]{2,}[,.;:]?$|^\p{Nd}{1,3}[.)]?$|^[IVXLC]{1,4}$/u.test(w)).length / ws.length : 0; };
+const headingOk = (t) => t.split(/\s+/).length <= 6 && wordQuality(t) >= 0.75 && !/:\s*$/.test(t);
 const allCaps = (t) => { const L = t.match(/\p{L}/gu) || []; return L.length >= 3 && !/\p{Ll}/u.test(t) && /\p{Lu}/u.test(t); };
 
 export function semanticOf(layout, text, fields, { gains = null, rules = null } = {}) {
@@ -213,7 +223,7 @@ export function semanticOf(layout, text, fields, { gains = null, rules = null } 
       const f = inTable.has(ln) ? null : fields.find((x) => x.page === pg.n && x.s >= ln.s && x.e <= ln.e + 1);
       const h = typeOf(ln), words = line.split(/\s+/).length;
       const cells = cellsOf(line);
-      const heading = !f && !inTable.has(ln) && words <= S.headMaxWords && (MARKER.test(line) || (h > hMed * S.headSize && hasWord(line, 3)) || (S.headCaps && allCaps(line) && cells.length < 3));
+      const heading = !f && !inTable.has(ln) && words <= S.headMaxWords && headingOk(line) && (MARKER.test(line) || (h > hMed * S.headSize && hasWord(line, 3)) || (S.headCaps && allCaps(line) && cells.length < 3));
       const g = gains && gains.get(ln.s), said = g ? ` · surprise: the cut saves ${g.gain} bits/token, more than ${Math.round(g.rank * 100)}% of random cuts` : '';
       if (heading) { flush(); sections.push([line, [], { page: pg.n, box: ln.b, chars: [ln.s, ln.e], by: (MARKER.test(line) ? 'a printed section marker' : allCaps(line) && !(h > hMed * S.headSize) ? 'a line set in capitals' : 'type set larger than the page’s own lines') + said + (g && g.rank < UNSUPPORTED_RANK ? ' — the text before it still predicts the text after, so this heading does not reduce surprise' : ''), ...(g ? { surprise: g } : {}) }]); continue; }
       // a block with no heading of its own that still starts a new ground: the earlier text stops helping, so the page has a section here
