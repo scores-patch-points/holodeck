@@ -51,10 +51,16 @@ export function layoutText(data, base = 0) {
   return { text, words, lines };
 }
 
-export async function browserOcr(buf, kind, { maxPages = 40, onPage = () => {}, onStatus = () => {} } = {}) {
+// The recogniser reads the scripts it has a model for. Which models: the person's own languages (navigator.languages), mapped to tesseract's
+// model names by this DECLARED table (ISO 639-1 → tesseract), always with English, the one the page keeps offline. Others download on first use.
+export const TESS_LANG = { en: 'eng', es: 'spa', fr: 'fra', de: 'deu', it: 'ita', pt: 'por', nl: 'nld', sv: 'swe', da: 'dan', no: 'nor', nb: 'nor', fi: 'fin', pl: 'pol', cs: 'ces', sk: 'slk', hu: 'hun', ro: 'ron', tr: 'tur', el: 'ell', ru: 'rus', uk: 'ukr', bg: 'bul', sr: 'srp', hr: 'hrv', ar: 'ara', fa: 'fas', he: 'heb', hi: 'hin', bn: 'ben', ta: 'tam', te: 'tel', th: 'tha', vi: 'vie', id: 'ind', ms: 'msa', zh: 'chi_sim', 'zh-TW': 'chi_tra', ja: 'jpn', ko: 'kor', sw: 'swa', am: 'amh', ur: 'urd' };
+export function ocrLangs(langs = (typeof navigator !== 'undefined' && navigator.languages) || ['en']) {
+  const out = new Set(['eng']); for (const l of langs) { const t = TESS_LANG[l] || TESS_LANG[String(l).split('-')[0]]; if (t) out.add(t); } return [...out].join('+');
+}
+export async function browserOcr(buf, kind, { maxPages = 40, onPage = () => {}, onStatus = () => {}, langs = ocrLangs() } = {}) {
   const T = await loadTesseract();
-  onStatus('starting the recogniser');
-  const worker = await T.createWorker('eng', 1, {
+  onStatus(`starting the recogniser (${langs})`);
+  const worker = await T.createWorker(langs, 1, {
     workerPath: PINNED.tesseractWorker,
     corePath: PINNED.tesseractCore, // a directory: tesseract.js picks the SIMD or plain core from it
     langPath: PINNED.tessdata, gzip: true,
@@ -126,6 +132,7 @@ export async function browserOcr(buf, kind, { maxPages = 40, onPage = () => {}, 
       if (s.conf != null) { words += s.words; confSum += s.conf * s.words; }
       onPage({ n: p.n, total, text: data.text || '', conf: s.conf, words: s.words });
     }
+    layout.langs = langs;
     return { text, pages, total, words, conf: words ? Math.round(confSum / words) : null, simd: hasSimd(), layout };
   } finally { await worker.terminate(); }
 }

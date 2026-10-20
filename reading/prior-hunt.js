@@ -10,24 +10,27 @@
 // Every step is disclosed: what was looked for, where, by what, and what was found.
 import { measurePdf } from './prior-measure.js';
 import { tiltOf } from './prior-tilt.js';
+import { CODE } from './shapes.js';
 
 const RELAY = 'https://holodeck-proxy.prometheoid.workers.dev';
-const CODE = /\b(Form|Schedule|Cat\.?\s*No\.?|OMB\s*No\.?|Rev\.?)\s*([0-9A-Z][\w.\-]{0,12})(?:\s*\((\d{4})\))?/gi;
 
 /** 1 — what the document says about itself. */
 export function identify(layout, text) {
   const p1 = layout.pages[0], med = (xs) => { const s = xs.slice().sort((a, b) => a - b); return s[Math.floor(s.length / 2)] || 0; };
   const typeOf = (ln) => med(p1.words.slice(ln.words[0], ln.words[1]).map((w) => w.b[3] - w.b[1]));
   const lineText = (pg, ln) => pg.words.slice(ln.words[0], ln.words[1]).map((w) => w.t).join(' ');
-  const wordy = (t) => { const ws = t.split(/\s+/); return ws.length >= 3 && ws.filter((w) => /^[A-Za-z][a-z]{2,}[,.;:]?$/.test(w)).length >= ws.length * 0.6; };
+  const wordy = (t) => { const ws = t.split(/\s+/); return ws.length >= 3 && ws.filter((w) => /^\p{L}{3,}[,.;:]?$/u.test(w) || /^\p{Lo}{2,}$/u.test(w)).length >= ws.length * 0.6; };
   const bigLines = p1.lines.filter((ln) => ln.words[1] - ln.words[0] >= 3).map((ln) => ({ t: lineText(p1, ln), h: typeOf(ln), y: ln.b[1] })).filter((x) => wordy(x.t)).sort((a, b) => b.h - a.h).slice(0, 3);
   const footers = layout.pages.flatMap((pg) => pg.lines.filter((ln) => ln.b[1] > pg.h * 0.9).map((ln) => lineText(pg, ln)));
   const codes = [];
-  for (const m of (text.slice(0, 6000) + '\n' + footers.join('\n')).matchAll(CODE)) { const code = m[2].replace(/[.,]$/, ''); if (!/\d/.test(code) || /^(rev|enue)/i.test(code)) continue; codes.push({ kind: m[1].replace(/\s+/g, ' ').replace(/^form$/i, 'Form'), code, year: m[3] ? +m[3] : null }); }
+  for (const m of (text.slice(0, 6000) + '\n' + footers.join('\n')).matchAll(CODE)) { const code = m[2].replace(/[.,]$/, ''); if (!/\p{Nd}/u.test(code)) continue; codes.push({ kind: m[1].replace(/\s+/g, ' '), code, year: m[3] ? +m[3] : null }); }
+  // the document's own code: the one it prints most often (a form repeats its number in every footer), a printed year counting double
+  const tally = new Map(); for (const c of codes) tally.set(c.code, (tally.get(c.code) || 0) + 1 + (c.year ? 1 : 0));
+  codes.sort((x, y) => (tally.get(y.code) || 0) - (tally.get(x.code) || 0));
   // a form's year: printed with its code ("Form 990 (2018)"), else the most frequent four-digit year in its own text
   const yc = new Map(); for (const m of text.slice(0, 8000).matchAll(/\b(19[5-9]\d|20[0-4]\d)\b/g)) yc.set(+m[1], (yc.get(+m[1]) || 0) + 1);
   const yearGuess = [...yc.entries()].sort((a, b) => b[1] - a[1])[0];
-  for (const c of codes) if (!c.year && /^form$/i.test(c.kind) && yearGuess) c.year = yearGuess[0];
+  for (const c of codes) if (!c.year && yearGuess) c.year = yearGuess[0];
   const years = [...new Set(codes.map((c) => c.year).filter(Boolean))];
   const issuer = (p1.lines.map((ln) => lineText(p1, ln)).find((t) => /\b(department|service|agency|bureau|ministry|office)\b/i.test(t)) || '').slice(0, 80);
   return { title: bigLines[0] ? bigLines[0].t : '', titles: bigLines.map((x) => x.t), codes: codes.slice(0, 8), years, footers: footers.slice(0, 4), issuer };
@@ -35,14 +38,14 @@ export function identify(layout, text) {
 
 /** The search a projection suggests, with no model: the form's own code and year, its title, "pdf". */
 export function mechanicalQuery(pr) {
-  const form = pr.codes.find((c) => /^form$/i.test(c.kind)) || pr.codes[0];
+  const form = pr.codes[0];
   return [form ? `${form.kind} ${form.code}` : '', form && form.year ? form.year : pr.years[0] || '', pr.title.replace(/[^\w\s()'-]/g, ' ').split(/\s+/).slice(0, 8).join(' '), 'pdf'].filter(Boolean).join(' ').replace(/\s+/g, ' ').trim();
 }
 
 /** 2 — the local library: shipped priors, then this browser's own. */
 async function localPrior(pr, { base, fetchImpl }) {
   let idx = null; try { idx = await (await fetchImpl(new URL('form-priors/index.json', base))).json(); } catch (e) { idx = null; }
-  const form = pr.codes.find((c) => /^form$/i.test(c.kind));
+  const form = pr.codes.find((c) => idx && idx.forms.some((f) => f.form.toLowerCase() === String(c.code).toLowerCase())) || pr.codes[0];
   const cand = idx ? idx.forms.filter((f) => form && f.form.toLowerCase() === String(form.code).toLowerCase()) : [];
   const year = form && form.year ? form.year : pr.years[0];
   const hit = cand.find((f) => f.year === year) || null;

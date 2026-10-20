@@ -9,6 +9,7 @@
 // Pure of the page: they take the reading and return data or HTML. Nothing here reads anything new.
 import '../alhazen.js'; // UMD: sets self.Alhazen
 import { weighField } from './prior-tilt.js';
+import { shapeOf, hasWord, ROW, MARKER, AMOUNT } from './shapes.js';
 import { labelOf as printedBeside, headingOf as headingOver } from './prior-measure.js';
 const A = () => self.Alhazen;
 
@@ -28,7 +29,7 @@ export function fieldsOf(layout, text, tilt = null) {
     const ws = pg.words.slice(ln.words[0], ln.words[1]);
     const inR = (a, b) => ws.filter((w) => w.s >= ln.s + a && w.e <= ln.s + b + 1);
     const lw = inR(li, li + f.label.length), vw = inR(vi, vi + f.value.length); if (!lw.length || !vw.length) continue;
-    out.push({ id: `fld_${out.length + 1}`, page: pg.n, label: f.label, value: f.value, format: A().valueFormat(f.value), lb: union(lw.map((w) => w.b)), vb: union(vw.map((w) => w.b)), s: ln.s + li, e: ln.s + vi + f.value.length, conf: Math.round(vw.reduce((n, w) => n + w.c, 0) / vw.length), words: [...lw, ...vw] });
+    out.push({ id: `fld_${out.length + 1}`, page: pg.n, label: f.label, value: f.value, format: shapeOf(f.value), lb: union(lw.map((w) => w.b)), vb: union(vw.map((w) => w.b)), s: ln.s + li, e: ln.s + vi + f.value.length, conf: Math.round(vw.reduce((n, w) => n + w.c, 0) / vw.length), words: [...lw, ...vw] });
   }
   return out;
 }
@@ -70,18 +71,34 @@ export function pageHTML(layout, R, { selected } = {}) {
   }).join('');
 }
 
-/** The page re-set as clean type: each word where the page printed it, at the size the page printed it. */
-export function placeHTML(layout, R, { selected } = {}) {
+/** The page re-set as clean type, where the page has it. One type size per LINE (its words' median height, clamped to the page's own range —
+ *  a word's own box also catches checkboxes and rules), each word squeezed to its box so the layout holds, OCR's stray marks left out.
+ *  Two inks, as on a filed form: what was PRINTED (grey) and what was FILLED IN (blue) — from the field reading, and from a prior's tilt
+ *  when there is one. Everything shown is the scan's own words. */
+export function placeHTML(layout, R, { selected, tilt = null } = {}) {
+  const med = (xs) => { const v = xs.slice().sort((p, q) => p - q); return v[Math.floor(v.length / 2)] || 0; };
   return layout.pages.map((pg) => {
-    const kind = readingOfWords(pg, R);
-    const ws = pg.words.map((w) => {
-      const r = kind.get(w), k = r ? r.k : 'plain', size = ((w.b[3] - w.b[1]) / pg.w) * 100 * 0.78;
-      const c = r && r.k === 'mention' ? r.rc : COLORS[k] || 'var(--ink2)';
-      const sel = r && r.k === 'mention' ? JSON.stringify({ kind: 'ref', ref: r.ref }) : r && r.field ? JSON.stringify({ kind: 'field', id: r.field.id }) : JSON.stringify({ kind: 'word', w: w.t, s: w.s, e: w.e });
-      const on = selected && ((selected.kind === 'field' && r && r.field && r.field.id === selected.id) || (selected.kind === 'word' && selected.s === w.s));
-      return `<span class="pw ${k}${on ? ' on' : ''}" style="left:${pct(w.b[0], pg.w)};top:${pct(w.b[1], pg.h)};font-size:${size.toFixed(3)}cqw;--c:${c}" data-sel='${esc(sel)}' title="${esc(k)}${w.c != null ? ' · ' + w.c + '% confidence' : ''}">${esc(w.t)}</span>`;
-    }).join('');
-    return `<div class="pgh">page ${pg.n} — re-set where the page has it</div><div class="pg place" style="aspect-ratio:${pg.w}/${pg.h}">${ws}</div>`;
+    const T = tilt && tilt.pages.find((p) => p.n === pg.n && p.matched);
+    const valueOf = new Map(), labelOf_ = new Map();
+    for (const f of R.fields.filter((x) => x.page === pg.n)) { for (const w of f.vwords || []) valueOf.set(w.s, f); for (const w of f.lwords || []) labelOf_.set(w.s, f); }
+    const lineH = pg.lines.map((ln) => med(pg.words.slice(ln.words[0], ln.words[1]).filter((w) => /[\p{L}\p{N}]/u.test(w.t)).map((w) => w.b[3] - w.b[1])));
+    const pageH = med(lineH.filter(Boolean)) || 10;
+    const out = [];
+    pg.lines.forEach((ln, li) => {
+      const h = Math.min(pageH * 1.7, Math.max(pageH * 0.75, lineH[li] || pageH)), size = (h / pg.w) * 100 * 0.86;
+      for (const w of pg.words.slice(ln.words[0], ln.words[1])) {
+        if (!/[\p{L}\p{N}$€£¥%]/u.test(w.t) || w.c < 45) continue; // stray marks, rules and graphics read as glyphs
+        const fv = valueOf.get(w.s), fl = labelOf_.get(w.s), tw = T && T.per.get(w.s);
+        // the prior tilts: what the blank form prints here is printed, whatever the cell reading guessed; a word in a box it leaves is filled in
+        const k = tw && tw.printed ? 'printed' : fv ? 'filled' : tw && tw.field ? 'filled' : 'printed';
+        const field = fv || fl;
+        const sel = field ? JSON.stringify({ kind: 'field', id: field.id }) : JSON.stringify({ kind: 'word', w: w.t, s: w.s, e: w.e });
+        const on = selected && ((selected.kind === 'field' && field && field.id === selected.id) || (selected.kind === 'word' && selected.s === w.s));
+        const boxW = ((w.b[2] - w.b[0]) / pg.w) * 100, guess = Math.max(1, [...w.t].length) * size * 0.5, sx = Math.max(0.55, Math.min(1.35, boxW / guess));
+        out.push('<span class="pw ' + k + (fv ? ' fv' : '') + (on ? ' on' : '') + '" style="left:' + pct(w.b[0], pg.w) + ';top:' + pct(w.b[3] - h * 0.95, pg.h) + ';font-size:' + size.toFixed(3) + 'cqw;transform:scaleX(' + sx.toFixed(3) + ')" data-sel=\'' + esc(sel) + '\' title="' + esc(k) + (w.c != null ? ' · ' + w.c + '% confidence' : '') + (field ? ' · ' + esc(field.label) : '') + '">' + esc(w.t) + '</span>');
+      }
+    });
+    return '<div class="pgh">page ' + pg.n + ' — re-set where the page has it · <span style="color:#6b7280">printed</span> · <span style="color:#1d4ed8">filled in</span></div><div class="pg place" style="aspect-ratio:' + pg.w + '/' + pg.h + '">' + out.join('') + '</div>';
   }).join('');
 }
 
@@ -130,12 +147,11 @@ export const atPath = (root, path) => path.split('.').slice(1).reduce((o, k) => 
 //   a field     [label, value, {format, page, label_box, value_box, chars, by}] — Alhazen's own field reader
 //   a table     ["table", [records…], {columns, page, box}]; a record is [first cell, [[column, cell]…]]
 //   a line      ["text", line, {page, box, chars}]
-const MARKER = /^(part|section|schedule|article|chapter|item)\s*([0-9]+|[ivxlc1|!]{1,5}|[a-z])\b/i;
 export function semanticOf(layout, text, fields) {
   const pages = [];
   for (const pg of layout.pages) {
     const med = (xs) => { const s = xs.slice().sort((a, b) => a - b); return s[Math.floor(s.length / 2)] || 1; };
-    const typeOf = (ln) => med(pg.words.slice(ln.words[0], ln.words[1]).filter((w) => /[a-z]/i.test(w.t)).map((w) => w.b[3] - w.b[1]));
+    const typeOf = (ln) => med(pg.words.slice(ln.words[0], ln.words[1]).filter((w) => /\p{L}/u.test(w.t)).map((w) => w.b[3] - w.b[1]));
     const hMed = med(pg.lines.map(typeOf));
     const sections = [], cur = () => sections[sections.length - 1];
     sections.push(['(before any heading)', [], { page: pg.n }]);
@@ -146,7 +162,7 @@ export function semanticOf(layout, text, fields) {
       const line = text.slice(ln.s, Math.min(ln.e, text.length)).trim(); if (!line) continue;
       const f = fields.find((x) => x.page === pg.n && x.s >= ln.s && x.e <= ln.e + 1);
       const h = typeOf(ln), words = line.split(/\s+/).length;
-      const heading = !f && words <= 12 && (MARKER.test(line) || (h > hMed * 1.35 && /[a-z]{3}/i.test(line)));
+      const heading = !f && words <= 12 && (MARKER.test(line) || (h > hMed * 1.35 && hasWord(line, 3)));
       const cells = line.split(/\s{2,}/).filter(Boolean);
       if (heading) { flush(); sections.push([line, [], { page: pg.n, box: ln.b, chars: [ln.s, ln.e], by: MARKER.test(line) ? 'a printed section marker' : 'type set larger than the page’s own lines' }]); continue; }
       if (f) { flush(); cur()[1].push([f.label, f.value, { format: f.format, page: f.page, label_box: f.lb, value_box: f.vb, chars: [f.s, f.e], confidence: f.conf, by: 'Alhazen extractFormFields + valueFormat', id: f.id }]); continue; }
@@ -197,23 +213,28 @@ export function pdfHTML(layout, R, { selected } = {}) {
 const INFORMATIVE = new Set(['identifier', 'id-number', 'amount', 'date', 'currency', 'phone', 'email', 'integer', 'decimal', 'name', 'choice', 'time']);
 const tidy = (s) => String(s).replace(/[|_©®»«¥]+/g, ' ').replace(/\s+/g, ' ').trim();
 const tidyLabel = (s) => { let t = tidy(s);
-  t = t.replace(/^[\W\d_]*(?:[A-Za-z]{1,2}\s+)?(?:\d{1,2}[a-z]?\s+)?/, '');                 // row codes: "& 9", "B 10", "D "
+  t = t.replace(/^[^\p{L}]*?(?:\p{L}{1,2}\s+)?(?:\p{Nd}{1,2}\p{Ll}?\s+)?(?=\p{L})/u, '');                 // row codes: "& 9", "B 10", "D "
   const paren = t.indexOf('('); if (paren > 0 && t.slice(0, paren).trim().split(/\s+/).length >= 2) t = t.slice(0, paren); // "(Part VIII, line 1h)"
   t = t.replace(/\s(add|subtract|enter|attach|see|must)\s+(line|lines|schedule|equal|the)\b.*$/i, '');                   // "Add lines 13-17"
   t = t.replace(/\s[.+•·»]\s?.*$/, '').replace(/[\s.,;:+»•·]+$/, '');                                                    // leader dots
   return t.replace(/\s+/g, ' ').trim(); };
 export function readForm(fields, { referents = [], formWord = () => false, known = null } = {}) {
-  const real = (label) => !known || tidyLabel(label).split(/\s+/).some((w) => w.length >= 4 && known(w.toLowerCase().replace(/[^a-z]/g, '')));
+  // a label must have a real word in it: the reader's lexicon says which for the language it holds; in a script it holds no lexicon for, a word of letters is enough
+  const real = (label) => { const L = tidyLabel(label); if (!known || !/^[\p{Script=Latin}\p{P}\p{N}\s]+$/u.test(L)) return hasWord(L, 2); return L.split(/\s+/).some((w) => w.length >= 4 && known(w.toLowerCase().replace(/[^\p{L}]/gu, ''))); };
   // a value is read as a statement when its SHAPE says it is a value (an amount, an id number, a date, a name…), or when the page shows it
   // was FILLED IN: free text in a box whose printed label is set in smaller type above it. Same-size printed text is the form talking, not the filer.
-  const usable = fields.filter((f) => real(f.label)).filter((f) => INFORMATIVE.has(f.format) || (f.value.trim().split(/\s+/).length >= 2 && f.conf >= 80 && /[a-z]{3}/i.test(f.value) && /^printed label in smaller type/.test(f.how || '')));
+  const usable = fields.filter((f) => real(f.label)).filter((f) => INFORMATIVE.has(f.format) || (f.value.trim().split(/\s+/).length >= 2 && f.conf >= 80 && hasWord(f.value, 3) && /^printed label in smaller type/.test(f.how || '')));
   // the filer: the organisation the form names (a "name" field, else the most-mentioned multi-word referent)
   const named = fields.find((f) => /\bname of (the )?organi[sz]ation\b/i.test(f.label) && f.format === 'name') || fields.find((f) => /doing business/i.test(f.label) && /[a-z]{3}/i.test(f.value)) || fields.find((f) => /\bname\b/i.test(f.label) && f.format === 'name' && !/\bofficer|preparer|print|principal/i.test(f.label));
+  // in any language: the first name-shaped value at the top of the first page is the filer's name; the name-shaped value beside the last date is the signer
+  const topName = fields.filter((f) => f.page === Math.min(...fields.map((x) => x.page)) && f.format === 'name').sort((x, y) => x.lb[1] - y.lb[1])[0] || null;
   const org = referents.filter((r) => r.name && r.name.split(/\s+/).length >= 2 && r.mentions.length >= 2 && !formWord(r) && !/^(part|schedule|section|form|page|line)\b/i.test(r.name)).sort((a, b) => b.mentions.length - a.mentions.length)[0];
-  const filer = named ? { name: tidy(named.value), basis: `the form's own “${tidy(named.label)}” field`, field: named.id } : org ? { name: org.name, ref: org.id, basis: 'the most-mentioned organisation the form names' } : { name: 'the filer', basis: 'the form names no filer the reader could find' };
+  const filer = named ? { name: tidy(named.value), basis: `the form's own “${tidy(named.label)}” field`, field: named.id } : topName ? { name: tidy(topName.value), basis: 'the first name-shaped value at the top of the form', field: topName.id } : org ? { name: org.name, ref: org.id, basis: 'the most-mentioned organisation the form names' } : { name: 'the filer', basis: 'the form names no filer the reader could find' };
   // the voice: whoever signs it
   const sig = fields.find((f) => /signature|sign here/i.test(f.label) && /[a-z]{3}/i.test(f.value) && !/signature|date/i.test(f.value)) || fields.find((f) => /sign|here/i.test(f.label) && !/principal/i.test(f.label) && (f.format === 'name' || /^[A-Z][a-z]+ [A-Z][a-z]+/.test(f.value.trim())) && !/signature|date|officer/i.test(f.value));
-  const voice = sig ? { name: tidy(sig.value), basis: `the “${tidy(sig.label)}” field`, field: sig.id } : null;
+  const lastDate = fields.filter((f) => f.format === 'date').sort((x, y) => y.page - x.page || y.lb[1] - x.lb[1])[0];
+  const besideDate = !sig && lastDate ? fields.filter((f) => f.page === lastDate.page && f.format === 'name' && Math.abs(f.lb[1] - lastDate.lb[1]) < 80).sort((x, y) => Math.abs(x.lb[1] - lastDate.lb[1]) - Math.abs(y.lb[1] - lastDate.lb[1]))[0] : null;
+  const voice = !sig && besideDate ? { name: tidy(besideDate.value), basis: 'the name-shaped value beside the last date on the form', field: besideDate.id } : sig ? { name: tidy(sig.value), basis: `the “${tidy(sig.label)}” field`, field: sig.id } : null;
   const rows = usable.flatMap((f) => f.columns && f.columns.length > 1 ? f.columns.map((c, j) => ({ ...f, value: c, colName: (f.headers && f.headers[j]) || `column ${j + 1}`, _j: j })) : [f]);
   const claims = rows.map((f) => ({ id: `fc_${f.id}${f._j != null ? '_' + f._j : ''}`, field: f.id, subject: filer.name, act: tidyLabel(f.label).toLowerCase() + (f.colName ? ` · ${f.colName}` : ''), object: tidy(f.value).replace(/^~/, '-'), type: f.format, page: f.page, conf: f.conf, chars: [f.s, f.e], label_box: f.lb, value_box: f.vb }));
   return { filer, voice, claims, skipped: fields.length - usable.length };
@@ -236,8 +257,7 @@ export function rulesOf(data, w, h, hMed) {
   return { h: H.map((s) => [s.x0, s.y0, s.x1, s.y1]), v: V.map((s) => [s.x0, s.y0, s.x1, s.y1]), by: `Alhazen inkMask; horizontal ≥ ${minH}px, vertical ≥ ${minV}px` };
 }
 const med = (xs) => { const s = xs.slice().sort((a, b) => a - b); return s[Math.floor(s.length / 2)] || 0; };
-const ROW = /^\(?([0-9]{1,2}[a-z]?|[a-h])\)?[\s.]/i;
-const AMOUNT = /^[$~\-−(]?\s?\d{1,3}(,\d{3})+(\.\d+)?\)?$|^[$~\-−]?\d+$/;
+
 export function cellFieldsOf(pg, text, idStart = 0) {
   const R = pg.rules; if (!R) return [];
   const cellOf = (b) => { const cx = (b[0] + b[2]) / 2, cy = (b[1] + b[3]) / 2; let top = -1, bot = pg.h, lef = -1, rig = pg.w;
@@ -252,8 +272,8 @@ export function cellFieldsOf(pg, text, idStart = 0) {
   const push = (lab, vals, how, cell, extra = {}) => {
     const lt = lab.map((w) => w.t).join(' ').replace(/[\s.:·+\-–—]+$/, '').trim(), vt = vals.map((w) => w.t).join(' ').trim();
     if (!lt || !vt || lt.split(/\s+/).length > 14 || /^[\W_]+$/.test(vt)) return;
-    if (!lt.split(/\s+/).some((x) => /^[A-Za-z][a-z]{3,}$/.test(x.replace(/[^A-Za-z]/g, '')))) return;
-    const all = [...lab, ...vals]; out.push({ id: `fld_${++n}`, page: pg.n, label: lt, value: vt, format: AMOUNT.test(vt.replace(/[|]/g, '').trim()) || (extra.columns && extra.columns.every((c) => AMOUNT.test(c.replace(/[|]/g, '').trim()))) ? 'amount' : /^\d{2,}[-/]\d{3,}([-/]\d+)*$/.test(vt.trim()) ? 'id-number' : A().valueFormat(vt.replace(/^\$\s*/, '$')), lb: union(lab.map((w) => w.b)), vb: union(vals.map((w) => w.b)), s: Math.min(...all.map((w) => w.s)), e: Math.max(...all.map((w) => w.e)), conf: Math.round(vals.reduce((a, w) => a + w.c, 0) / vals.length), words: all, lwords: lab, vwords: vals, how, cell, ...extra });
+    if (!lt.split(/\s+/).some((x) => /\p{L}{4,}|\p{Lo}{2,}/u.test(x))) return;
+    const all = [...lab, ...vals]; out.push({ id: `fld_${++n}`, page: pg.n, label: lt, value: vt, format: extra.columns && extra.columns.length > 1 && extra.columns.every((c) => AMOUNT.test(c.replace(/[|]/g, '').trim())) ? 'amount' : shapeOf(vt.replace(/[|]+$/, '')), lb: union(lab.map((w) => w.b)), vb: union(vals.map((w) => w.b)), s: Math.min(...all.map((w) => w.s)), e: Math.max(...all.map((w) => w.e)), conf: Math.round(vals.reduce((a, w) => a + w.c, 0) / vals.length), words: all, lwords: lab, vwords: vals, how, cell, ...extra });
   };
   for (const c of cells.values()) {
     const ls = linesOf(c.ws); if (!ls.length) continue;
@@ -262,7 +282,7 @@ export function cellFieldsOf(pg, text, idStart = 0) {
       for (const l of ls) { const right = words.filter((w) => w.b[0] >= c.box[2] - 1 && Math.abs((w.b[1] + w.b[3]) / 2 - l.cy) < Math.max(6, l.h * 0.7) && /\d/.test(w.t));
         const byCell = new Map(); for (const w of right) { const k = cellOf(w.b).join(','); (byCell.get(k) || byCell.set(k, []).get(k)).push(w); }
         const cols = [...byCell.values()].map((ws) => ws.sort((a, b) => a.b[0] - b.b[0])).sort((a, b) => a[0].b[0] - b[0].b[0]);
-        const headerOf = (ws) => { const x0 = ws[0].b[0] - 40, x1 = ws[ws.length - 1].b[2] + 40; const near = words.filter((w) => w.b[3] < l.cy - 4 && l.cy - w.b[3] < 140 && /^(?:[A-Z][a-z]{2,}|of|Year\|?)$/.test(w.t.replace(/[|]$/, '')) && Math.min(w.b[2], x1) - Math.max(w.b[0], x0) > (w.b[2] - w.b[0]) * 0.4); if (!near.length) return null; const yBest = Math.max(...near.map((w) => w.b[1])); const lineWs = words.filter((w) => Math.abs(w.b[1] - yBest) < 8 && /[A-Za-z]/.test(w.t) && w.b[2] > x0 - 60 && w.b[0] < x1 + 20); return lineWs.sort((a, b) => a.b[0] - b.b[0]).map((w) => w.t.replace(/[|]+$/, '')).join(' '); };
+        const headerOf = (ws) => { const x0 = ws[0].b[0] - 40, x1 = ws[ws.length - 1].b[2] + 40; const near = words.filter((w) => w.b[3] < l.cy - 4 && l.cy - w.b[3] < 140 && /^(\p{Lu}\p{Ll}{2,}|\p{Lo}{2,}|\p{Ll}{2,3})$/u.test(w.t.replace(/[|]$/, '')) && Math.min(w.b[2], x1) - Math.max(w.b[0], x0) > (w.b[2] - w.b[0]) * 0.4); if (!near.length) return null; const yBest = Math.max(...near.map((w) => w.b[1])); const lineWs = words.filter((w) => Math.abs(w.b[1] - yBest) < 8 && /\p{L}/u.test(w.t) && w.b[2] > x0 - 60 && w.b[0] < x1 + 20); return lineWs.sort((a, b) => a.b[0] - b.b[0]).map((w) => w.t.replace(/[|]+$/, '')).join(' '); };
         if (cols.length) push(l.ws, cols.flat(), 'a numbered row; its values are the cells to its right on the same line', c.box, { columns: cols.map((ws) => ws.map((w) => w.t).join(' ')), headers: cols.map(headerOf), colX: cols.map((ws) => ws[0].b[0]) }); }
       continue;
     }
@@ -296,10 +316,10 @@ function tiltFields(fields, tilt, layout, text) {
       const inside = pg.words.filter((w) => { const r = T.per.get(w.s); return r && r.field && r.field.name === box.name && !r.printed && !used.has(w.s) && w.s < text.length; });
       if (!inside.length) continue;
       const label = printedBeside(box, ocr, boxes), heading = headingOver(box, ocr);
-      if (!label || !/[A-Za-z]{3}/.test(label)) continue;
+      if (!label || !hasWord(label, 2)) continue;
       const lw = ocr.filter((o) => label.includes(o[0]) && o[3] <= box.rect[0] + 2 && Math.abs((o[2] + o[4]) / 2 - (box.rect[1] + box.rect[3]) / 2) < 12).map((o) => o[5]);
       const vt = inside.map((w) => w.t).join(' ');
-      const f = { id: 'fld_' + (++n), page: pg.n, label, value: vt, format: AMOUNT.test(vt.replace(/[|]/g, '').trim()) ? 'amount' : A().valueFormat(vt), lb: lw.length ? union(lw.map((w) => w.b)) : box.rect, vb: union(inside.map((w) => w.b)), s: Math.min(...inside.map((w) => w.s), ...lw.map((w) => w.s)), e: Math.max(...inside.map((w) => w.e)), conf: Math.round(inside.reduce((a, w) => a + w.c, 0) / inside.length), words: [...lw, ...inside], lwords: lw, vwords: inside, how: 'a box the blank form leaves for filling in, filled on this page (the label and value are the scan’s own words)', cell: box.rect };
+      const f = { id: 'fld_' + (++n), page: pg.n, label, value: vt, format: shapeOf(vt), lb: lw.length ? union(lw.map((w) => w.b)) : box.rect, vb: union(inside.map((w) => w.b)), s: Math.min(...inside.map((w) => w.s), ...lw.map((w) => w.s)), e: Math.max(...inside.map((w) => w.e)), conf: Math.round(inside.reduce((a, w) => a + w.c, 0) / inside.length), words: [...lw, ...inside], lwords: lw, vwords: inside, how: 'a box the blank form leaves for filling in, filled on this page (the label and value are the scan’s own words)', cell: box.rect };
       if (heading) Object.assign(f, { headers: [heading], columns: [vt], colX: [inside[0].b[0]] });
       const w = weighField(f, tilt); f.amp = Math.round(w.amp * 100) / 100; f.prior = w.evidence; f.fromPrior = true;
       for (const x of inside) used.add(x.s); kept.push(f);
