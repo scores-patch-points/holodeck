@@ -289,9 +289,28 @@
     #p-graph .hm-top{left:8px;right:8px}
     #app .bar2 button{min-height:40px;min-width:40px}
   }
+  /* referents as a table — the same module as the reader's index (referent-table.js) */
+  #app .rt{width:100%;border-collapse:collapse;font-size:13px}#app .rt th,#app .rt td{padding:6px 8px;text-align:left;font-weight:400;line-height:1.35;border-bottom:1px solid var(--line)}
+  #app .rt thead th{font:600 11px var(--mono);color:var(--dim);white-space:nowrap}#app .rt thead button{all:unset;cursor:pointer;color:inherit;font:inherit}#app .rt thead button:hover{color:var(--ink)}
+  #app .rt .ar{margin-left:3px;font-size:9px}#app .rt .num{text-align:right;font-family:var(--mono);font-size:12.5px;color:var(--dim)}
+  #app .rt tbody tr{cursor:pointer}#app .rt tbody tr:hover{background:var(--s1)}#app .rt tbody tr.sel{background:#1a1f2b}
+  #app .rt .c-name{overflow-wrap:anywhere}#app .rt .c-name .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px}
+  #app .rt .sm{display:inline-block;width:8px;height:8px;border-radius:2px;margin-left:2px}#app .rt .c-reality{text-align:center;cursor:help}
+  #app .rt .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  @media (max-width:900px){#app .rt tbody th,#app .rt tbody td,#app .rt thead th{height:40px}#app .rt .c-first{display:none}}
   /* the Layers view keeps its drawer: Source · Words · POS · Morphology · Referents · Propositions · Render · EOT · JSON · Graph (the solar system) */
   #app .lens{overflow:auto;min-height:0}
-  #app .spine .why, #app .spine .cnt, #app .spine .h{display:none}
+  #app .spine .h{display:none}
+  /* every section says what it is doing: the rail's notes, the tab notes, the phone's note line */
+  .ly .why{font-size:12.5px;line-height:1.4}.ly .cnt{font:12.5px var(--mono);color:var(--ink2)}
+  .ly .how{display:none;grid-column:2 / 4;font-size:12px;line-height:1.45;color:var(--dim);margin-top:2px}.ly.cur .how{display:block}.ly .how b{color:var(--ink2);font-weight:600}
+  .pnote{border:1px solid var(--line);border-radius:9px;padding:9px 12px;margin:0 0 12px;font-size:13.5px;line-height:1.55;background:var(--s1)}.pnote b{color:var(--ink2)}
+  #p-graph-note{align-self:start;z-index:3;margin:6px 10px 0;font-size:13px;line-height:1.5}#p-graph-note .pnote{margin:0;background:var(--s1);opacity:.96}#p-graph-note summary{cursor:pointer}
+  .lnote{display:none}
+  @media (max-width:900px){
+    #app .lnote{display:block;padding:8px 14px;font-size:13px;line-height:1.5;border-bottom:1px solid var(--line);max-height:30vh;overflow:auto}#app .lnote b{color:var(--ink2)}
+    #app .spine .why,#app .spine .how,#app .spine .cnt{display:none}
+  }
   #app .top h2{font-size:17px;font-weight:600}
   #app .lens{line-height:1.9;font-size:16px}
   #app .insp{line-height:1.55}
@@ -349,6 +368,7 @@
   <div class="body">
     <div class="left">
       <div class="spine" id="spine"></div>
+      <div class="lnote" id="p-lnote" aria-live="polite"></div>
       <div class="log">
         <div class="rows" tabindex="0"><div class="sz"></div></div>
         <div class="now" id="p-now"></div>
@@ -375,6 +395,7 @@
         </div>
         <div class="pane-wrap">
           <div class="pane" id="p-pane"></div>
+          <div id="p-graph-note" hidden></div>
           <div class="pane graph-host" id="p-graph" hidden></div>
         </div>
       </div>
@@ -418,7 +439,9 @@ import { mountMap } from '../holodeck-map.js';
 import { classifyWord, THRAX_MAP, THRAX_OUT_OF_SCOPE, THRAX_META, POS_PRIOR_META } from '../vendor/khora/native/adapters/text/wordclass.js';
 import { morphologyFromPrior, createLemmatizer, stemsOf } from '../vendor/khora/native/adapters/text/morphology.js';
 import { splitSentences, deriveAbbreviations } from '../vendor/khora/native/adapters/text/spans.js';
-import { wordsIn as tokWordsIn, punctIn as tokPunctIn } from './tokenize.js';
+import { layerNoteHTML, tabNoteHTML, LAYER_NOTES } from './layer-notes.js';
+import { buildRows, sortRows, nextSort, tableHTML as refTableHTML } from './referent-table.js';
+import { scanPunctuation, loadPunctuation, moodAt, containersAt, cuesFromBlankLines, cuesFromLayout } from './punctuation.js';
 import { tokenize } from '../vendor/khora/native/organs/source.js';
 import { classifyForm, lookupForm, documentClassifier } from '../holodeck-surface.js';
 import { namesCorefer, genericTokens, extractSurfaces, discoverReferents, diaNorm } from '../vendor/khora/native/adapters/text/surfaces.js';
@@ -458,6 +481,7 @@ const LAYERS = [
   { id:'bytes',     label:'Bytes',      color:'--dim',   fixed:true, why:'the material as bytes — one addressable source' },
   { id:'decode',    label:'Decode',     color:'--pink',  fixed:true, why:'utf-8 bytes → characters; the address space stays bytes' },
   { id:'furniture', label:'Furniture',  color:'--mut',   feature:'furniture', why:'markup / CSS / URLs blanked in place — offsets untouched' },
+  { id:'punct',     label:'Punctuation', color:'--amber', fixed:true, why:'every mark kept, with its role: sentence ends and their mood, quotations, brackets, separators' },
   { id:'statement', label:'Statements', color:'--ink2',  fixed:true, why:'the material split into the statements it makes' },
   { id:'token',     label:'Words',      color:'--blue',  fixed:true, why:'each statement split into the forms it is made of' },
   { id:'grammar',   label:'POS',        color:'--acc',   feature:'pos', why:'each form → the classes it is ATTESTED as (Thrax over UD)' },
@@ -552,8 +576,14 @@ async function ready(){
 // ── build the trace: run the real organs, recording each transformation ──────
 // punctuation is settled at tokenization (reading/tokenize.js): POS is only ever asked about word forms
 let ABBREV = null;   // the splitter's own abbreviation knowledge for the text being read
+let PUNCT = null;    // the language's punctuation norms (declared) and its abbreviation prior (measured): reading/punctuation.js
 const abbrevOf = text => deriveAbbreviations(String(text ?? '').replace(/\r\n/g, '\n').replace(/\r/g, '\n'));
-const wordsIn = (text, base) => tokWordsIn(text, base, { abbreviations: ABBREV });
+// the document's own abbreviations (the splitter's) joined to the language's measured ones: "Dr." is one word, its dot kept, wherever it comes from
+const abbrevAll = () => new Set([...(PUNCT ? PUNCT.abbreviations : []), ...(ABBREV || [])].map(x => String(x).toLowerCase()));
+// the splitter compares case-sensitively ("Dr"), the measured prior is lower case: hand it every case a title takes
+const abbrevForSplitter = () => new Set([...abbrevAll()].flatMap(a => [a, a.charAt(0).toUpperCase() + a.slice(1), a.toUpperCase()]));
+const scanOpts = (extra = {}) => ({ norms: PUNCT && PUNCT.norms, abbreviations: abbrevAll(), ...extra });
+const wordsIn = (text, base) => scanPunctuation(text, scanOpts({ base })).words.map(({ w, s, e }) => ({ w, s, e }));
 const WORDS_ANIMATED = 700;
 
 function buildTrace(doc, clean, claims, features, extraction){
@@ -588,14 +618,23 @@ function buildTrace(doc, clean, claims, features, extraction){
     { s:0, e:analysis.length, data:{ runs:blankRuns } });
 
   ABBREV = abbrevOf(clean);
-  const sents = splitSentences(clean, { abbreviations: ABBREV });
+  // the splitter and the punctuation scan share ONE abbreviation knowledge: the language's measured prior joined to this text's own
+  const sents = splitSentences(clean, { abbreviations: abbrevForSplitter() });
   sents.forEach((s, i) => push('statement', 'statement',
     `statement ${i + 1} of ${sents.length} · bytes ${charToByte(analysis, s.offset)}–${charToByte(analysis, s.offset + s.text.length)} · “${clamp(s.text.replace(/\s+/g,' ').trim(), 74)}”`,
     { s:s.offset, e:s.offset + s.text.length, data:{ order:i, len:sents.length } }));
 
   const words = [];
   const punct = [];   // PUNCT/SYM by Unicode category: their own tokens, never sent to the class prior
-  for (const s of sents) { for (const w of wordsIn(s.text, s.offset)) words.push(w); for (const p of tokPunctIn(s.text, s.offset)) punct.push(p); }
+  // the whole text is scanned once for punctuation: every mark kept with its role, the sentences with their mood, the containers a proposition nests in,
+  // and — for a scan, or a text with line structure — the boundaries the page's own layout supplies
+  const SCAN = scanPunctuation(clean, scanOpts({ cues: [...cuesFromBlankLines(clean), ...(doc.layout ? cuesFromLayout(doc.layout, clean) : [])] }));
+  for (const s of sents) for (const w of wordsIn(s.text, s.offset)) words.push(w);
+  for (const p of SCAN.punct) punct.push(p);
+  { const P = SCAN.structure, moods = {}; P.sentences.forEach(x => { moods[x.mood] = (moods[x.mood] || 0) + 1; });
+    push('punct', 'scan', `${SCAN.punct.length} marks kept · ${P.sentences.length} sentences (${Object.entries(moods).map(([k, v]) => v + ' ' + k).join(', ') || 'none'}) · ${P.containers.length} container${P.containers.length === 1 ? '' : 's'} · ${P.notes.abbreviations} abbreviation dot${P.notes.abbreviations === 1 ? '' : 's'} attached · norms for “${P.notes.lang || 'default'}” ${P.notes.normsKnown ? 'declared' : 'not declared — default used'}`, { s:0, e:0, data:{ moods } });
+    P.containers.slice(0, 40).forEach(c => push('punct', 'container', `${c.kind} ${c.mark} · depth ${c.depth}${c.mood ? ' · ' + c.mood : ''} · “${clamp(clean.slice(c.s, c.e).replace(/\s+/g, ' '), 56)}”`, { s:c.s, e:c.e, data:{ container:c } }));
+    P.notes.unclosed.forEach(u => push('punct', 'gap', `an opening ${u.w} that never closes — kept as a gap, not guessed at`, { s:u.s, e:u.s + 1, data:u })); }
 
   const shown = words.slice(0, WORDS_ANIMATED);
   const toks = tokenize(clean);
@@ -685,18 +724,18 @@ function buildTrace(doc, clean, claims, features, extraction){
     const list = occ.get(k) || (occ.set(k, []), occ.get(k));
     list.push({ doc:'source', id:i, s:c.s, e:c.e, t:c.span || analysis.slice(c.s, c.e) }); } });
 
-  return { ev, claims, refs, occ, words, punct, shown, sents, blanks:blankRuns, gaps, ambiguous, toks, nBytes, hash, srcId, led, eot, scanPages:scanned ? scanned.pages : null, scanOcr:scanned ? scanned.last : null, doc, features, extraction, net:{ ...net }, totalMs:performance.now() - t0,
+  return { ev, claims, refs, occ, words, punct, punctuation:SCAN.structure, shown, sents, blanks:blankRuns, gaps, ambiguous, toks, nBytes, hash, srcId, led, eot, scanPages:scanned ? scanned.pages : null, scanOcr:scanned ? scanned.last : null, doc, features, extraction, net:{ ...net }, totalMs:performance.now() - t0,
     stats:{ words:words.length, classified, gaps, ambiguous, acts, morphGaps, positions:stanceClaims.length, blanked:blanks.length } };
 }
 
 // ── the OUTPUT: the reading as text (each sentence diagrammed) and as JSON ────
-const standingOfClaim = (c) => c.verdict === 'bound' ? 'read' : c.verdict === 'beyond-reach' ? 'beyond reach' : c.verdict === 'unbound' ? 'unbound' : c.verdict === 'contradicted' ? 'contradicted' : 'unheard';
+const standingOfClaim = (c) => c.mood === 'interrogative' ? 'asked' : c.mood === 'exclamative' ? 'exclaimed' : c.verdict === 'bound' ? 'read' : c.verdict === 'beyond-reach' ? 'beyond reach' : c.verdict === 'unbound' ? 'unbound' : c.verdict === 'contradicted' ? 'contradicted' : 'unheard';
 const arrowOf = (c) => `${c.end1} ──${c.polarity === '-' ? '¬' : ''}${c.label}──▶ ${c.end2}`;
 const slugOf = (T) => String(T.doc.label || 'reading').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60) || 'reading';
 
 function readingJSON(T){
   const reopened = i => (T.reopened && T.reopened.get(i)) || null;
-  const counts = { read:0, 'beyond reach':0, unbound:0, contradicted:0, unheard:0 };
+  const counts = { read:0, 'beyond reach':0, unbound:0, contradicted:0, unheard:0, asked:0, exclaimed:0 };
   T.claims.forEach(c => counts[standingOfClaim(c)]++);
   const stmtOf = (c) => { if (!c.located) return null; for (let j = 0; j < T.sents.length; j++){ const s = T.sents[j]; if (c.s >= s.offset && c.s < s.offset + s.text.length) return j + 1; } return null; };
   return {
@@ -707,7 +746,9 @@ function readingJSON(T){
     run:{ steps:T.ev.length, ms:Math.round(T.totalMs * 100) / 100, model_calls:T.net.models, network:T.net.requests.slice() },
     summary:{ statements:T.sents.length, propositions:T.claims.length, read:counts.read, unbound:counts.unbound, contradicted:counts.contradicted, beyond_reach:counts['beyond reach'], unheard:counts.unheard, referents:T.refs.size, forms:T.words.length, distinct_forms:new Set(T.toks).size, grammar_gaps:T.gaps, grammar_ambiguous:T.ambiguous },
     statements:T.sents.map((s, i) => ({ n:i + 1, bytes:[charToByte(T.doc.analysis, s.offset), charToByte(T.doc.analysis, s.offset + s.text.length)], text:s.text.replace(/\s+/g, ' ').trim() })),
-    propositions:T.claims.map((c, i) => ({ n:i + 1, located:!!c.located, statement:stmtOf(c), subject:c.end1, act:c.label, object:c.end2, polarity:c.polarity === '-' ? '-' : '+', standing:reopened(i) ? 'reopened' : standingOfClaim(c), confidence:confidenceOf(c).pct, tense:c.tense.v, tense_why:c.tense.why, bytes:c.b0 == null ? null : [c.b0, c.b1], span:c.span || null, grounded:!!c.grounded, revised_by:reopened(i), render:{ en:ORDERS[0].line(c), sov:ORDERS[1].line(c), vso:ORDERS[2].line(c) } })),
+    propositions:T.claims.map((c, i) => ({ n:i + 1, located:!!c.located, statement:stmtOf(c), mood:c.mood || null, held_in:c.holds || [], subject:c.end1, act:c.label, object:c.end2, polarity:c.polarity === '-' ? '-' : '+', standing:reopened(i) ? 'reopened' : standingOfClaim(c), confidence:confidenceOf(c).pct, tense:c.tense.v, tense_why:c.tense.why, bytes:c.b0 == null ? null : [c.b0, c.b1], span:c.span || null, grounded:!!c.grounded, revised_by:reopened(i), render:{ en:ORDERS[0].line(c), sov:ORDERS[1].line(c), vso:ORDERS[2].line(c) } })),
+    punctuation:(() => { const P = T.punctuation || { sentences:[], containers:[], boundaries:[], notes:{} }, by = (xs, f) => xs.reduce((m, x) => { const k = f(x); m[k] = (m[k] || 0) + 1; return m; }, {});
+      return { norms:{ language:P.notes.lang, declared:P.notes.normsKnown }, marks:T.punct ? T.punct.length : 0, by_role:by(T.punct || [], p => p.role || 'mark'), sentences:by(P.sentences, s => s.mood), containers:by(P.containers, c => c.kind), boundaries_by_source:by(P.boundaries, b => b.source), abbreviations_attached:P.notes.abbreviations, unclosed:P.notes.unclosed || [] }; })(),
     referents:[...T.refs.values()].map(r => ({ name:r.n, relations:r.c, first_byte:r.b0 == null ? null : r.b0 })),
     priors:[
       { name:'part of speech', giver:(PRIORS.lang && PRIORS.posPrior !== PRIORS.posEng && PRIORS.posPrior.provenance ? `${PRIORS.posPrior.provenance.giver} — chosen because the text measures as ${PRIORS.lang.name || PRIORS.lang.lang}` : POS_PRIOR_META.giver), schema:PRIORS.posPrior && PRIORS.posPrior.schema, on:T.features.pos !== false },
@@ -855,8 +896,9 @@ function mount(T){
       const cur = l.id === active;
       const sw = l.fixed ? ''
         : `<span class="sw" role="switch" tabindex="0" aria-checked="${on}" data-feature="${l.feature}" title="switch ${esc(l.label)} ${on ? 'off' : 'on'} — the reading re-runs"></span>`;
-      return `<div class="ly ${cur ? 'cur' : ''} ${on ? '' : 'off'}"><span class="n">${l.i + 1}</span><span class="lab" style="color:var(${l.color})">${esc(l.label)}</span>${sw}<span class="why">${esc(l.why)}</span><span class="cnt" style="grid-column:2/3">${cnt}</span></div>`;
+      return `<div class="ly ${cur ? 'cur' : ''} ${on ? '' : 'off'}"><span class="n">${l.i + 1}</span><span class="lab" style="color:var(${l.color})">${esc(l.label)}</span>${sw}${layerNoteHTML(l.id, { full:cur })}<span class="cnt" style="grid-column:2/3">${cnt}</span></div>`;
     }).join('');
+    { const n = LAYER_NOTES[active], lab = (L[active] || {}).label, ln = $('p-lnote'); if (ln) ln.innerHTML = n ? `<b>${esc(lab)}</b> ${esc(n.what)} <span class="dim"><b>Rests on</b> ${esc(n.rests)} <b>Cannot decide</b> ${esc(n.cannot)}</span>` : ''; }
     wireSwitches();
     if (wide.matches){ const c = spineEl.querySelector('.ly.cur'); if (c){ const top = c.offsetTop, h = spineEl.clientHeight; if (top < spineEl.scrollTop || top + c.offsetHeight > spineEl.scrollTop + h) spineEl.scrollTop = Math.max(0, top - h / 3); } }
   }
@@ -866,6 +908,7 @@ function mount(T){
       case 'bytes': return esc(T.doc.label) + ' · ' + T.nBytes.toLocaleString() + ' bytes';
       case 'decode': return T.doc.analysis.length.toLocaleString() + ' chars';
       case 'furniture': return T.features.furniture === false ? 'off' : (T.blanks.length ? T.blanks.length.toLocaleString() + ' chars blanked' : 'nothing to blank');
+      case 'punct': { const P = T.punctuation || { sentences:[], containers:[] }, q = P.sentences.filter(x => x.mood === 'interrogative').length, x2 = P.sentences.filter(x => x.mood === 'exclamative').length; return (T.punct ? T.punct.length : 0) + ' marks · ' + P.sentences.length + ' sentences' + (q ? ' · ' + q + ' ask' : '') + (x2 ? ' · ' + x2 + ' exclaim' : '') + (P.containers.length ? ' · ' + P.containers.length + ' nested' : ''); }
       case 'statement': return T.sents.length + ' statements';
       case 'token': return St.tokens.length.toLocaleString() + ' forms';
       case 'grammar': return T.features.pos === false ? 'off' : (St.grammar.length.toLocaleString() + ' classified · ' + T.gaps + ' gaps · ' + T.ambiguous + ' ambiguous');
@@ -1303,7 +1346,7 @@ function mount(T){
     const hot = new Set([e && e.data && e.data.end1, e && e.data && e.data.end2, e && e.data && e.data.n].filter(Boolean).map(String));
     const hotPairs = (e && e.stage === 'relation' && e.data) ? [[String(e.data.end1), String(e.data.end2)]] : [];
     const cursor = (e && e.data && (e.data.n || e.data.end1)) ? String(e.data.n || e.data.end1) : null;
-    return { nodes, edges, docs:[{ id:'source', title:T.doc.label }], occ:T.occ, odd:new Map(), hot, hotPairs, cursor, sig:`${St.refs.size}:${St.rels.length}` };
+    return { nodes, edges, docs:[{ id:'source', title:T.doc.label }], occ:T.occ, odd:new Map(), hot, hotPairs, cursor, sel:graphSel, sig:`${St.refs.size}:${St.rels.length}:${graphSel || ''}` };
   }
   // a real affordance: the map's "Open in source →" lands on the exact bytes
   function openSourceAt(s, e2){
@@ -1327,10 +1370,10 @@ function mount(T){
   function renderPane(St, e){
     const hot = e.stage === 'relation' ? e.data : null;
     const graph = tab === 'graph';
-    $('p-graph').hidden = !graph; pane.hidden = graph;
+    $('p-graph').hidden = !graph; pane.hidden = graph; { const gn = $('p-graph-note'); gn.hidden = !graph; if (graph) gn.innerHTML = tabNoteHTML('graph', { collapsed:true }); }
     if (graph){ map.set(mapData(St, e)); return; }
     if (tab === 'source') pane.innerHTML = sourcePane(St, hot);
-    else if (tab === 'words'){ const sig = 'W' + T.words.length + '|' + wordsSort.key + wordsSort.dir; if (sig !== wordsKey){ wordsKey = sig; pane.innerHTML = wordsPane(); wireSort(); } return; }
+    else if (tab === 'words'){ const sig = 'W' + T.words.length + '|' + wordsSort.key + wordsSort.dir; if (sig !== wordsKey){ wordsKey = sig; pane.innerHTML = tabNoteHTML('words') + wordsPane(); wireSort(); } return; }
     else if (tab === 'pos') pane.innerHTML = posPane(St);
     else if (tab === 'morph') pane.innerHTML = morphPane(St);
     else if (tab === 'refs') pane.innerHTML = refsPane(St);
@@ -1338,6 +1381,7 @@ function mount(T){
     else if (tab === 'render') pane.innerHTML = renderPaneHTML();
     else if (tab === 'eot') pane.innerHTML = eotPane(St);
     else if (tab === 'json') pane.innerHTML = `<div class="h">the whole reading as JSON</div><div class="fig">The same reading the page draws — propositions with confidence, referents, the render, and the EOT ledger — as one document.</div><pre class="json">${esc(JSON.stringify(readingJSON(T), null, 2))}</pre>`;
+    pane.insertAdjacentHTML('afterbegin', tabNoteHTML(tab));
     wireReopen(pane);
   }
   const standingOf = c => standingOfClaim(c);
@@ -1410,10 +1454,15 @@ function mount(T){
       <div class="fig"><b>The prior decides sameness; the material decides presence.</b> Identity lives in the referent, never in a string — the lemma is a SET, never reduced to one. Giver: ${esc(prov.source || 'UniMorph English')} (${esc((PRIORS.morphRaw && PRIORS.morphRaw.schema) || '—')}).</div>
       <table class="t"><thead><tr><th>form</th><th>lemma candidates (a set)</th><th>rule-recovered stem</th></tr></thead><tbody>${rows}</tbody></table>`;
   }
+  // REFERENTS: the participants this material establishes, as a table (the same table the reader's index uses). A row opens that name in the Graph.
+  let refTabSort = { key:'mentions', dir:'desc' }, graphSel = null;
+  const hueOf = (s) => { let h = 7; for (const ch of String(s)) h = (h * 31 + ch.codePointAt(0)) % 360; return `hsl(${h} 70% 68%)`; };
+  const stmtNoOf = (c) => { if (c == null) return null; const j = T.sents.findIndex(s => c >= s.offset && c < s.offset + s.text.length); return j < 0 ? null : j + 1; };
   function refsPane(St){
+    const rows = buildRows([...St.refs.values()].map(r => ({ id:String(r.n), name:String(r.n), mentions:r.c, born:stmtNoOf(r.s), dot:hueOf(r.n) })), { selectedId:graphSel });
+    const n = rows.length;
     return `<div class="h">Referents — the participants this material establishes</div>
-      <div>${[...St.refs.values()].map(r => `<span class="chip b">${esc(r.n)} <span style="color:var(--dim)">×${r.c}</span></span>`).join('') || '<span class="noprop">—</span>'}</div>
-      <div class="fig">Each with the byte it was first read at. A participant that never appears in a bound relation is not invented here.</div>`;
+      ${n ? refTableHTML(sortRows(rows, refTabSort.key, refTabSort.dir), { nSources:1, sort:refTabSort, caption:'Referents of this reading', selectKind: r => ({ kind:'ref', ref:r.id }) }) : '<span class="noprop">No referents yet — the reading has not reached one at this step.</span>'}`;
   }
   function propsPane(St, hot){
     const sents = T.sents, inSent = sents.map(() => []), unlocated = [];
@@ -1547,7 +1596,10 @@ function mount(T){
       sw.addEventListener('keydown', e => { if (e.key === ' ' || e.key === 'Enter'){ e.preventDefault(); go(); } });
     });
   }
-  const onClick = e => { const a = e.target.closest('[data-a]'); if (!a) return; const act = a.dataset.a;
+  const onClick = e => {
+    const rs = e.target.closest('[data-rsort]'); if (rs){ refTabSort = nextSort(refTabSort, rs.dataset.rsort); render(false); return; }
+    const rr = e.target.closest('#p-pane .rt tbody tr[data-sel]'); if (rr){ try { graphSel = JSON.parse(rr.dataset.sel).ref; } catch (er) { graphSel = null; } setTab('graph'); return; }
+    const a = e.target.closest('[data-a]'); if (!a) return; const act = a.dataset.a;
     if (act === 'close') close(); else if (act === 'play') setDir(dir === 1 ? 0 : (k >= N - 1 ? (seek(0), 1) : 1));
     else if (act === 'rev') setDir(dir === -1 ? 0 : (k <= 0 ? (seek(N - 1), -1) : -1));
     else if (act === 'start'){ setDir(0); seek(0); } else if (act === 'back'){ setDir(0); seek(k - 1); } else if (act === 'fwd'){ setDir(0); seek(k + 1); }
@@ -1661,6 +1713,8 @@ async function read(text, label, feat, opt = {}){
   const doc = { label: lastLabel, analysis, truncated, layout: opt.layout || (opt.keep && opt.keep.layout) || null };
   const T = buildTrace(doc, clean, claims, feat, opt.extraction || null);
   T.clean = clean; T.R = R; T.feat = feat;
+  // a proposition is held in the MOOD of its sentence (a question asks; it does not assert) and NESTED in the containers around it (speech, aside), in order
+  T.claims.forEach(c => { if (c.located){ c.mood = moodAt(T.punctuation, c.s); c.holds = containersAt(T.punctuation, c.s).map(k => ({ kind:k.kind, mark:k.mark, mood:k.mood })); } });
   startTimeline(T);
   if (!BASELINE) BASELINE = T;
   $('model').textContent = `model calls: ${T.net.models}`;
@@ -1835,6 +1889,7 @@ const POS_FILE = { en:'eng', fr:'fra', de:'deu', es:'spa', it:'ita', pt:'por', n
 async function priorFor(text){
   await ready(); PRIORS.posEng ??= PRIORS.posPrior; PRIORS.lemEng ??= PRIORS.lemmatizer;
   let d = null; try { d = detectLang(text); } catch (e) {}
+  try { PUNCT = await loadPunctuation(new URL('./', import.meta.url), d && d.confident ? d.lang : 'en'); } catch (e) { PUNCT = null; }
   const f = d && d.confident && d.lang !== 'en' ? POS_FILE[d.lang] : null;
   if (f) { try { const p = await (await fetch(`../vendor/khora/native/priors/pos-${f}.json`)).json(); if (p && p.forms) { PRIORS.posPrior = p; PRIORS.lemmatizer = null; PRIORS.lang = d; PRIORS.langIso3 = f; return d; } } catch (e) {} }
   PRIORS.posPrior = PRIORS.posEng; PRIORS.lemmatizer = PRIORS.lemEng; PRIORS.lang = d; PRIORS.langIso3 = null; return d;
@@ -1854,7 +1909,7 @@ async function corpusDeps(){
   await ready();
   const pos = PRIORS.posPrior, memo = new Map();
   const isVerb = w => { const c = classifyForm(String(w).toLowerCase(), { posPrior: pos, lemmatizer: PRIORS.lemmatizer }); return !!(c.found && c.candidates && c.candidates[0] && c.candidates[0].upos === 'VERB'); };
-  return { hash: sha256, diaNorm, splitSentences, wordsIn: (t, b) => tokWordsIn(t, b), extractSurfaces, discoverReferents, resolvePronouns, namesCorefer, genericTokens, isVerb, sameBeing: makeSameBeing(),
+  return { hash: sha256, diaNorm, splitSentences, wordsIn, extractSurfaces, discoverReferents, resolvePronouns, namesCorefer, genericTokens, isVerb, sameBeing: makeSameBeing(),
     classifyAt: prefix => documentClassifier(prefix, { posPrior: pos, lemmatizer: PRIORS.lemmatizer, lookups: LOOKUP.cache, memo }) };
 }
 const SOURCES = mountSources($('sources'), { makeDeps: corpusDeps, openInReader: (t, l) => { ta.value = t; run(t, l); }, currentText: () => ta.value });
