@@ -8,15 +8,17 @@
 //                 that point into it by id — rendered as a tree that opens on demand
 // Pure of the page: they take the reading and return data or HTML. Nothing here reads anything new.
 import '../alhazen.js'; // UMD: sets self.Alhazen
+import { weighField } from './prior-tilt.js';
+import { labelOf as printedBeside, headingOf as headingOver } from './prior-measure.js';
 const A = () => self.Alhazen;
 
 const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const union = (bs) => bs.length ? [Math.min(...bs.map((b) => b[0])), Math.min(...bs.map((b) => b[1])), Math.max(...bs.map((b) => b[2])), Math.max(...bs.map((b) => b[3]))] : null;
 
 /** Form fields: label → value, each with the words (and so the boxes) it was read from. */
-export function fieldsOf(layout, text) {
+export function fieldsOf(layout, text, tilt = null) {
   if (!layout || !A()) return [];
-  if (layout.pages.some((pg) => pg.rules)) { let all = []; for (const pg of layout.pages) all = all.concat(pg.rules ? cellFieldsOf(pg, text, all.length) : []); return all; }
+  if (layout.pages.some((pg) => pg.rules)) { let all = []; for (const pg of layout.pages) all = all.concat(pg.rules ? cellFieldsOf(pg, text, all.length) : []); return tilt ? tiltFields(all, tilt, layout, text) : all; }
   const out = [];
   for (const pg of layout.pages) for (const ln of pg.lines) {
     if (ln.s >= text.length) continue;
@@ -251,7 +253,7 @@ export function cellFieldsOf(pg, text, idStart = 0) {
     const lt = lab.map((w) => w.t).join(' ').replace(/[\s.:·+\-–—]+$/, '').trim(), vt = vals.map((w) => w.t).join(' ').trim();
     if (!lt || !vt || lt.split(/\s+/).length > 14 || /^[\W_]+$/.test(vt)) return;
     if (!lt.split(/\s+/).some((x) => /^[A-Za-z][a-z]{3,}$/.test(x.replace(/[^A-Za-z]/g, '')))) return;
-    const all = [...lab, ...vals]; out.push({ id: `fld_${++n}`, page: pg.n, label: lt, value: vt, format: AMOUNT.test(vt.replace(/[|]/g, '').trim()) || (extra.columns && extra.columns.every((c) => AMOUNT.test(c.replace(/[|]/g, '').trim()))) ? 'amount' : /^\d{2,}[-/]\d{3,}([-/]\d+)*$/.test(vt.trim()) ? 'id-number' : A().valueFormat(vt.replace(/^\$\s*/, '$')), lb: union(lab.map((w) => w.b)), vb: union(vals.map((w) => w.b)), s: Math.min(...all.map((w) => w.s)), e: Math.max(...all.map((w) => w.e)), conf: Math.round(vals.reduce((a, w) => a + w.c, 0) / vals.length), words: all, how, cell, ...extra });
+    const all = [...lab, ...vals]; out.push({ id: `fld_${++n}`, page: pg.n, label: lt, value: vt, format: AMOUNT.test(vt.replace(/[|]/g, '').trim()) || (extra.columns && extra.columns.every((c) => AMOUNT.test(c.replace(/[|]/g, '').trim()))) ? 'amount' : /^\d{2,}[-/]\d{3,}([-/]\d+)*$/.test(vt.trim()) ? 'id-number' : A().valueFormat(vt.replace(/^\$\s*/, '$')), lb: union(lab.map((w) => w.b)), vb: union(vals.map((w) => w.b)), s: Math.min(...all.map((w) => w.s)), e: Math.max(...all.map((w) => w.e)), conf: Math.round(vals.reduce((a, w) => a + w.c, 0) / vals.length), words: all, lwords: lab, vwords: vals, how, cell, ...extra });
   };
   for (const c of cells.values()) {
     const ls = linesOf(c.ws); if (!ls.length) continue;
@@ -274,4 +276,34 @@ export function cellFieldsOf(pg, text, idStart = 0) {
   for (const f of tab.slice().sort((x, y) => x.lb[1] - y.lb[1])) f.colX.forEach((x, j) => { if (f.headers[j] && !heads.find((q) => Math.abs(q.x - x) < 60)) heads.push({ x, name: f.headers[j] }); });
   for (const f of tab) f.headers = f.colX.map((x, j) => f.headers[j] || (heads.find((q) => Math.abs(q.x - x) < 60) || {}).name || null);
   return out.sort((a, b) => a.lb[1] - b.lb[1] || a.lb[0] - b.lb[0]);
+}
+
+// ── a PRIOR tilts the field reading; it never writes it ─────────────────────────────────────────────────────────────────────────────
+// Each field read from the page is weighed (prior-tilt.weighField): a value the blank form itself prints is the form talking and is not
+// read as a field; a value inside a box the form leaves for filling in counts for more. A box the form leaves that holds words on the scan —
+// where the page's own rules were not found — becomes a field too. In every case the label, the value and the column heading are the OCR's
+// own words (labelOf / headingOf run on the SCAN's words, with the form's boxes only as positions). What the form says is kept as evidence.
+function tiltFields(fields, tilt, layout, text) {
+  const kept = [];
+  for (const f of fields) { const w = weighField(f, tilt); f.amp = Math.round(w.amp * 100) / 100; f.prior = w.evidence; if (w.amp >= 0.6) kept.push(f); }
+  const used = new Set(kept.flatMap((f) => (f.vwords || []).map((w) => w.s)));
+  let n = fields.length;
+  for (const T of tilt.pages) {
+    if (!T.matched) continue; const pg = layout.pages.find((p) => p.n === T.n); if (!pg) continue;
+    const ocr = pg.words.filter((w) => w.s < text.length).map((w) => [w.t, w.b[0], w.b[1], w.b[2], w.b[3], w]);
+    const boxes = T.fields.map((f) => ({ name: f.name, type: 'text', rect: f.b }));
+    for (const box of boxes) {
+      const inside = pg.words.filter((w) => { const r = T.per.get(w.s); return r && r.field && r.field.name === box.name && !r.printed && !used.has(w.s) && w.s < text.length; });
+      if (!inside.length) continue;
+      const label = printedBeside(box, ocr, boxes), heading = headingOver(box, ocr);
+      if (!label || !/[A-Za-z]{3}/.test(label)) continue;
+      const lw = ocr.filter((o) => label.includes(o[0]) && o[3] <= box.rect[0] + 2 && Math.abs((o[2] + o[4]) / 2 - (box.rect[1] + box.rect[3]) / 2) < 12).map((o) => o[5]);
+      const vt = inside.map((w) => w.t).join(' ');
+      const f = { id: 'fld_' + (++n), page: pg.n, label, value: vt, format: AMOUNT.test(vt.replace(/[|]/g, '').trim()) ? 'amount' : A().valueFormat(vt), lb: lw.length ? union(lw.map((w) => w.b)) : box.rect, vb: union(inside.map((w) => w.b)), s: Math.min(...inside.map((w) => w.s), ...lw.map((w) => w.s)), e: Math.max(...inside.map((w) => w.e)), conf: Math.round(inside.reduce((a, w) => a + w.c, 0) / inside.length), words: [...lw, ...inside], lwords: lw, vwords: inside, how: 'a box the blank form leaves for filling in, filled on this page (the label and value are the scan’s own words)', cell: box.rect };
+      if (heading) Object.assign(f, { headers: [heading], columns: [vt], colX: [inside[0].b[0]] });
+      const w = weighField(f, tilt); f.amp = Math.round(w.amp * 100) / 100; f.prior = w.evidence; f.fromPrior = true;
+      for (const x of inside) used.add(x.s); kept.push(f);
+    }
+  }
+  return kept.sort((a, b) => a.page - b.page || a.lb[1] - b.lb[1] || a.lb[0] - b.lb[0]);
 }

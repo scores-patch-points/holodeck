@@ -8,6 +8,8 @@
 // Nothing here reads anything: it renders the reading the page already made (T, T.timeline and its identity log) and appends a person's
 // corrections as events of their own on top of it. The reader's log is never edited; an undo is one more event.
 import { foldLog, CELLS } from '../vendor/khora/native/adapters/text/reading-timeline.js';
+import { hunt } from './prior-hunt.js';
+import { tiltOf } from './prior-tilt.js';
 import { fieldsOf, pageHTML, placeHTML, pdfHTML, semanticOf, tupleHTML, tupleChildren, tupleAt, readForm } from './page-views.js';
 
 const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -150,7 +152,7 @@ export function mountReader(T, ctx) {
 
   // ── what the page views draw ──
   const L = T.doc.layout || null;
-  let fieldsMemo = null; const fields = () => (fieldsMemo ??= fieldsOf(L, text));
+  let fieldsMemo = null; const fields = () => (fieldsMemo ??= fieldsOf(L, text, st.tilt || null));
   const isForm = () => fields().length >= 5;
   let formMemo = null, formKey = ''; const form = () => { const f = fold(); const k = foldKey; if (formMemo && formKey === k) return formMemo; formKey = k; return (formMemo = readForm(fields(), { referents: f ? f.order : [], formWord, known: ctx.known || null })); };
   const R = () => { const f = fold(), mentions = []; if (f) for (const m of f.mentions.values()) { const r = f.assign.get(m.id), ref = r ? f.resolve(r) : null; if (ref && f.referents.has(ref)) mentions.push({ s: m.s, e: m.e, ref, rc: f.col.get(ref) }); }
@@ -166,6 +168,16 @@ export function mountReader(T, ctx) {
   // a FORM's printed words (Yes, No, Part VIII) are labels, not people: a referent whose every mention sits inside a field's label, or whose name is a choice, is form furniture
   const formWord = (r) => { if (!L) return false; const fs = fields(); if (A_choice(r.name)) return true; return fs.length > 0 && r.mentions.every((m) => fs.some((x) => m.s >= x.s && m.e <= x.s + x.label.length)); };
   const A_choice = (s) => /^(yes|no|did|is|was|were|does|do|part\s+[ivxl]+|schedule\s+[a-z])$/i.test(String(s || '').trim());
+
+  // ── the hunt for a prior (prior-hunt.js): local library first, then a search; a prior that aligns only tilts the reading ──
+  st.hunt = L ? { status: 'looking for this document’s prior…', result: null } : null; st.tilt = null;
+  if (L) (async () => {
+    try { const res = await hunt(L, text, { base: new URL('./', import.meta.url), pdfjs: ctx.pdfjs ? await ctx.pdfjs() : null, onStatus: (s) => { st.hunt.status = s; if (st.sel.kind === 'doc') { const el = root.querySelector('.prov'); if (el) el.innerHTML = prov(); } } });
+      st.hunt = { status: res.prior ? 'found' : 'none found', result: res };
+      if (res.prior) { st.tilt = tiltOf(res.prior, L); fieldsMemo = null; formMemo = null; structMemo = null; }
+    } catch (e) { st.hunt = { status: 'the hunt failed: ' + (e && e.message || e), result: null }; }
+    render();
+  })();
 
   // ── selection, crumbs ──
   const select = (sel) => { if ((sel.kind === 'ref' || sel.kind === 'mention') && !sel.name) { const f = fold(); const r = f && f.referents.get(f.resolve(sel.ref)); if (r && r.name) sel = { ...sel, name: r.name }; else if (st.sel.name && st.sel.ref === sel.ref) sel = { ...sel, name: st.sel.name }; } st.sel = sel; render(); };
@@ -287,6 +299,9 @@ export function mountReader(T, ctx) {
     if (s.kind === 'doc' || !f) {
       const J = ctx.readingJSON(T); const sn = snapAt(); const revs = tl && st.frontier != null ? tl.revisions.filter((r) => r.because && r.because.sentence === st.frontier) : [];
       return `<div class="ph">This reading</div><div class="kv">${extracted ? `<span class="k">text from</span><span>${esc(extracted)}</span>` : ''}${T.doc.truncated ? `<span class="k">read</span><span>the first ${text.length.toLocaleString()} characters</span>` : ''}<span class="k">bytes</span><span class="mono">${T.nBytes.toLocaleString()} · utf-8</span><span class="k">sha-256</span><span class="mono">${esc(T.hash)}</span><span class="k">source id</span><span class="mono">${esc(T.srcId)}</span><span class="k">statements</span><span>${nStmts()}</span><span class="k">words</span><span>${tokens().length.toLocaleString()} · ${unplaced().reduce((n, [, ts]) => n + ts.length, 0)} not placed</span></div>
+        ${st.hunt ? (() => { const H = st.hunt, r = H.result; if (!r) return `<div class="ph">Its prior</div><div class="ev"><div>${esc(H.status)}</div></div>`;
+          if (!r.prior) return `<div class="ph">Its prior</div><div class="ev"><div>none found — read from the page alone</div><div class="h">${esc(r.steps.map((x) => x.step + (x.query ? ' “' + x.query + '”' : '') + (x.result ? ' → ' + x.result : x.why ? ' → ' + x.why : '')).join(' · '))}</div></div>`;
+          const t = st.tilt; return `<div class="ph">Its prior</div><div class="ev"><div>${esc(r.prior.title || '')} ${r.prior.year || ''}</div><div class="h">${esc(r.prior.giver || '')} · <span class="mono">${esc(r.prior.source || '')}</span> · sha-256 ${esc(String(r.prior.sha256 || '').slice(0, 16))}…</div><div class="h">found in ${esc(r.where)} — ${esc(r.matched || '')}${r.query ? ' · query “' + esc(r.query) + '” by ' + esc(r.by) : ''}</div></div>${t ? t.pages.map((p) => `<div class="ev"><div>scan page ${p.n} → form page ${p.tn ?? '—'}</div><div class="h">${p.matched ? `aligned on ${p.align.pairs} shared words (±${p.align.rms}px) · ${Math.round(p.agreement * 100)}% of the form's print found on the scan` : esc(p.why)}</div></div>`).join('') : ''}<div class="dim">The prior only tilts the reading: a word the blank form prints here is weighed as printed, a word inside a box it leaves is weighed as filled in. Every label and value shown is the scan's own text.</div>`; })() : ''}
         <div class="ph">What it read with</div>${(J.priors || []).map((p) => `<div class="ev"><div>${esc(p.name)}${p.on === false ? ' <span class="dim">(switched off)</span>' : ''}</div><div class="h">given by ${esc(p.giver || '—')}</div></div>`).join('')}
         <div class="ph">What left this browser</div><div class="ev"><div>${J.run.model_calls} model calls</div><div class="h">${J.run.network.length} network requests, all for the page's own priors and code: ${J.run.network.map((u) => esc(String(u).split('/').pop())).join(', ') || 'none'}</div></div>
         ${revs.length ? `<div class="ph">What statement ${st.frontier} changed</div>${revs.map((r) => `<div class="ev"><div>${esc(r.kind)}: “${esc(String(r.text).slice(0, 40))}” ${esc(String(r.from).slice(0, 40))} → ${esc(String(r.to).slice(0, 40))}</div></div>`).join('')}` : ''}
@@ -319,6 +334,7 @@ export function mountReader(T, ctx) {
     if (s.kind === 'field') {
       const x = fields().find((y) => y.id === s.id); if (!x) return '';
       return `<div class="ph">This field</div><div class="kv"><span class="k">label</span><span>${esc(x.label)}</span><span class="k">value</span><span><b>${esc(x.value)}</b></span><span class="k">format</span><span>${esc(x.format)} <span class="dim">(the value's shape; Alhazen's valueFormat)</span></span><span class="k">page</span><span>${x.page}</span><span class="k">label box</span><span class="mono">${x.lb.map(Math.round).join(', ')}</span><span class="k">value box</span><span class="mono">${x.vb.map(Math.round).join(', ')}</span><span class="k">characters</span><span class="mono">${x.s}–${x.e}</span><span class="k">OCR confidence</span><span>${x.conf}% (the value's words)</span></div>
+        ${x.prior ? `<div class="ph">What the blank form says here</div><div class="kv"><span class="k">form</span><span>${esc(x.prior.form || '')} ${x.prior.year || ''}, page ${x.prior.page}</span><span class="k">its box</span><span class="mono">${esc(x.prior.box || 'none here')}</span>${x.prior.printed_beside_it ? `<span class="k">prints beside it</span><span>“${esc(x.prior.printed_beside_it)}”</span>` : ''}${x.prior.column_on_form ? `<span class="k">its column</span><span>“${esc(x.prior.column_on_form)}”</span>` : ''}<span class="k">weight</span><span>${x.amp} <span class="dim">(1 = the page alone; ${x.prior.filled}% of the value sits in a fill-in box, ${x.prior.value_printed}% is printed on the blank form)</span></span></div><div class="dim">The form's words are evidence, shown as the form's; the reading keeps the scan's own.</div>` : ''}
         <div class="ph">How it was read</div><div class="ev"><div>a label and a value on one printed line</div><div class="h">Alhazen extractFormFields — a colon, or a wide gap on the page, between them</div></div><div class="ev"><div>the words, from the page's pixels</div><div class="h">${esc(extracted || 'OCR')}</div></div>`;
     }
     if (s.kind === 'word') {
