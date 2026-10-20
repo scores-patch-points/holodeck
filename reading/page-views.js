@@ -10,6 +10,7 @@
 import '../alhazen.js'; // UMD: sets self.Alhazen
 import { weighField } from './prior-tilt.js';
 import { setPage } from './layout-rules.js';
+import { SECTION_RANK, UNSUPPORTED_RANK } from './sections.js';
 import { shapeOf, hasWord, ROW, MARKER, AMOUNT } from './shapes.js';
 import { labelOf as printedBeside, headingOf as headingOver } from './prior-measure.js';
 const A = () => self.Alhazen;
@@ -151,7 +152,19 @@ export const atPath = (root, path) => path.split('.').slice(1).reduce((o, k) => 
 //   a field     [label, value, {format, page, label_box, value_box, chars, by}] — Alhazen's own field reader
 //   a table     ["table", [records…], {columns, page, box}]; a record is [first cell, [[column, cell]…]]
 //   a line      ["text", line, {page, box, chars}]
-export function semanticOf(layout, text, fields) {
+/** Where a block of the page begins: the first line, a line after a blank line (a vertical gap of more than a line), a heading by type or marker. */
+export function blockStarts(layout, text) {
+  const out = [];
+  for (const pg of layout.pages) {
+    const med = (xs) => { const v = xs.slice().sort((a, b) => a - b); return v[Math.floor(v.length / 2)] || 1; };
+    const lines = pg.lines.slice().sort((a, b) => a.b[1] - b.b[1] || a.b[0] - b.b[0]).filter((ln) => ln.s < text.length && text.slice(ln.s, ln.e).trim());
+    const pitch = med(lines.slice(1).map((ln, i) => ln.b[1] - lines[i].b[1]).filter((d) => d > 0)), h = med(lines.map((ln) => ln.b[3] - ln.b[1]));
+    lines.forEach((ln, i) => { const gap = i ? ln.b[1] - lines[i - 1].b[3] : Infinity; if (!i || gap > Math.max(h * 0.9, pitch * 0.45) || MARKER.test(text.slice(ln.s, ln.e).trim())) out.push(ln.s); });
+  }
+  return out;
+}
+
+export function semanticOf(layout, text, fields, { gains = null } = {}) {
   const pages = [];
   for (const pg of layout.pages) {
     const med = (xs) => { const s = xs.slice().sort((a, b) => a - b); return s[Math.floor(s.length / 2)] || 1; };
@@ -168,7 +181,10 @@ export function semanticOf(layout, text, fields) {
       const h = typeOf(ln), words = line.split(/\s+/).length;
       const heading = !f && words <= 12 && (MARKER.test(line) || (h > hMed * 1.35 && hasWord(line, 3)));
       const cells = line.split(/\s{2,}/).filter(Boolean);
-      if (heading) { flush(); sections.push([line, [], { page: pg.n, box: ln.b, chars: [ln.s, ln.e], by: MARKER.test(line) ? 'a printed section marker' : 'type set larger than the page’s own lines' }]); continue; }
+      const g = gains && gains.get(ln.s), said = g ? ` · surprise: the cut saves ${g.gain} bits/token, more than ${Math.round(g.rank * 100)}% of random cuts` : '';
+      if (heading) { flush(); sections.push([line, [], { page: pg.n, box: ln.b, chars: [ln.s, ln.e], by: (MARKER.test(line) ? 'a printed section marker' : 'type set larger than the page’s own lines') + said + (g && g.rank < UNSUPPORTED_RANK ? ' — the text before it still predicts the text after, so this heading does not reduce surprise' : ''), ...(g ? { surprise: g } : {}) }]); continue; }
+      // a block with no heading of its own that still starts a new ground: the earlier text stops helping, so the page has a section here
+      if (g && g.gain > 0 && g.rank >= SECTION_RANK && !f && cur()[1].length >= 2) { flush(); sections.push([line.split(/\s+/).slice(0, 6).join(' ') + ' …', [], { page: pg.n, box: ln.b, chars: [ln.s, ln.e], by: 'no heading; a shift of ground' + said, surprise: g }]); }
       if (f) { flush(); cur()[1].push([f.label, f.value, { format: f.format, page: f.page, label_box: f.lb, value_box: f.vb, chars: [f.s, f.e], confidence: f.conf, by: 'Alhazen extractFormFields + valueFormat', id: f.id }]); continue; }
       if (cells.length >= 3) { (table ??= { rows: [] }).rows.push({ cells, b: ln.b, s: ln.s, e: ln.e }); continue; }
       flush(); cur()[1].push(['text', line, { page: pg.n, box: ln.b, chars: [ln.s, ln.e] }]);
