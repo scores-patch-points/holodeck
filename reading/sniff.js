@@ -1,6 +1,6 @@
 // sniff.js — WHAT KIND OF SOURCE IS THIS? Proposed from the bytes, never typed in.
 //
-// Evidence, in the order the stack reads (ingest and reason BEFORE any model — a model only ever sees this projection, never the text):
+// Evidence, in the order the stack reads (from the fold's own priors; no frontier model — a small local model could be added as one more witness, but the priors suffice here):
 //   1. VOCABULARY — the words a document carries that dwell in one Zenodotus category beyond what their frequency elsewhere predicts
 //      (reading/register-prior.json, built by tools/build-register-prior.mjs, Dunning G², no model, no hand-written list).
 //   2. STRUCTURE — cues the form itself carries: quotation density, first-person rate, a transcript's Q./A. turns, a dateline or byline,
@@ -13,8 +13,7 @@
 const TOKEN = /\p{L}{4,}/gu;
 const WORD = /[\p{L}\p{N}][\p{L}\p{N}'’]*/gu;
 // declared constants (structural; not tuned to any document)
-const MIN_WORDS = 60, VOCAB_WEIGHT = 0.35, FLOOR = 0.2, CUE_WEIGHT = 0.5, MODEL_WEIGHT = 0.4, THIN_P = 0.55, THIN_MARGIN = 0.2;
-const OLLAMA = 'http://localhost:11434';
+const MIN_WORDS = 60, VOCAB_WEIGHT = 0.35, FLOOR = 0.2, CUE_WEIGHT = 0.5, THIN_MARGIN = 0.1;
 
 const REGISTERS = ['fiction', 'reference', 'report', 'testimony', 'journalism'];
 
@@ -54,33 +53,7 @@ const strength = Math.min(1, vsum / 0.6);
   // FLOOR: ignorance is an amplitude too — with no real evidence every candidate stands at the floor, so a weak cue cannot look certain
   const sq = Object.fromEntries(REGISTERS.map((r) => [r, (amp[r] + FLOOR) ** 2])), Z = Object.values(sq).reduce((x, y) => x + y, 0) || 1;
   const ranked = REGISTERS.map((r) => ({ register: r, p: sq[r] / Z, why: why[r] })).sort((a, b) => b.p - a.p);
-  const margin = ranked[0].p - ranked[1].p, thin = ranked[0].p < THIN_P || margin < THIN_MARGIN;
+  const margin = ranked[0].p - ranked[1].p, thin = margin < THIN_MARGIN; // unsure only when two kinds are nearly tied; the leader's p is reported either way
   return { register: ranked[0].register, p: ranked[0].p, ranked, thin, margin, evidence: { words: N, quoted, fp, qa, dateline, accord, vocab },
     gaps: ['journalism has no vocabulary prior (the Zenodotus news category holds 1 document — a named gap); only its structural cues count'] };
-}
-
-/**
- * Ask a small local model (Ollama) to choose among the candidates the evidence already named — only when the sniff is thin.
- * The model sees the evidence PROJECTION (numbers and matched words), never the document. Returns the sniff with the model's
- * choice added as one amplitude, disclosed; or the sniff unchanged, with the reason it was not used.
- */
-export async function steerWithLocalModel(sn, { fetchImpl = globalThis.fetch, timeoutMs = 25000 } = {}) {
-  if (!sn.thin || !sn.ranked.length) return sn;
-  const note = (why) => ({ ...sn, model: { used: false, why } });
-  const get = async (url, init, ms) => { const c = new AbortController(), t = setTimeout(() => c.abort(), ms); try { return await fetchImpl(url, { ...init, signal: c.signal }); } finally { clearTimeout(t); } };
-  let tags; try { const r = await get(OLLAMA + '/api/tags', {}, 1200); if (!r.ok) return note('no local model server answered'); tags = (await r.json()).models || []; } catch { return note('no local model server reachable'); }
-  const m = tags.filter((x) => !/embed/i.test(x.name)).sort((a, b) => (a.size || 1e15) - (b.size || 1e15))[0]; if (!m) return note('a local model server is running but holds no model');
-  const cands = sn.ranked.filter((r) => r.p > 0.05).slice(0, 3).map((r) => r.register);
-  const proj = sn.ranked.slice(0, 3).map((r) => `${r.register}: p=${r.p.toFixed(2)}; evidence: ${r.why.join('; ') || 'none'}`).join('\n');
-  const prompt = `A reader measured a text but could not decide what kind of source it is. Evidence (numbers and matched words only, the text is not shown):\n${proj}\nStructure: first person ${(sn.evidence.fp * 100).toFixed(1)}% of words; dialogue in ${(sn.evidence.quoted * 100).toFixed(0)}% of sentences; dateline ${sn.evidence.dateline ? 'yes' : 'no'}.\nChoose exactly one of: ${cands.join(', ')}. Answer as JSON: {"register":"<one>"}`;
-  try {
-    const r = await get(OLLAMA + '/api/generate', { method: 'POST', body: JSON.stringify({ model: m.name, prompt, stream: false, format: 'json', options: { temperature: 0 } }) }, timeoutMs);
-    if (!r.ok) return note(`the local model (${m.name}) refused the request`);
-    const pick = JSON.parse((await r.json()).response || '{}').register;
-    if (!cands.includes(pick)) return note(`the local model (${m.name}) answered outside the candidates, so it was ignored`);
-    const amp = Object.fromEntries(sn.ranked.map((x) => [x.register, Math.sqrt(x.p)])); amp[pick] += MODEL_WEIGHT;
-    const Z = Object.values(amp).reduce((a, v) => a + v * v, 0);
-    const ranked = sn.ranked.map((x) => ({ ...x, p: amp[x.register] ** 2 / Z, why: x.register === pick ? [...x.why, `a small local model (${m.name}) chose it from the evidence`] : x.why })).sort((a, b) => b.p - a.p);
-    return { ...sn, register: ranked[0].register, p: ranked[0].p, ranked, margin: ranked[0].p - ranked[1].p, model: { used: true, name: m.name, picked: pick } };
-  } catch (e) { return note('the local model did not answer in time'); }
 }

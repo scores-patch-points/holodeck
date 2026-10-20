@@ -267,8 +267,9 @@
     .insp{display:block;border-left:1px solid var(--line);overflow:auto;min-height:0}
   }
   @media (max-width:900px){.body{grid-template-columns:1fr;grid-template-rows:44% 56%}.left{border-right:0;border-bottom:1px solid var(--line)}}
+  header .claim{color:var(--dim);font-size:13px;margin-top:6px}
   /* ── calm: one thing at a time. What is hidden is still there for the code; the page just stops shouting it. ── */
-  #app .top .stats, #app .top .meta, #app .top [data-a="toggle-all"], #app .top [data-a="reset"], #app .top [data-a="copy"]{display:none}
+  #app .top .stats, #app .top [data-a="toggle-all"], #app .top [data-a="reset"], #app .top [data-a="copy"]{display:none}
   #app .left .log, #app .bar2 .key, #app .bar2 .seg, #app .bar2 label, #app .bar2 [data-a="rev"], #app .bar2 .rd{display:none}
   #app .lanes .h, #app .lanes .lg, #app .lens .doc, #app .insp .legend, #app .insp .lg{display:none}
   #app .drawer #p-dt[aria-expanded="false"] ~ .tabs{display:none}
@@ -289,6 +290,7 @@
 <body>
 <header>
   <h1>Reading</h1>
+  <div class="claim">in your browser · no model · every reading traced to its bytes · a correction is a new event, nothing is overwritten</div>
 </header>
 <div class="wrap">
   <div id="drop" class="drop">
@@ -955,7 +957,7 @@ function mount(T){
   }
   bind(inspEl, 'click', ev2 => { const r = ev2.target.closest('.r'); if (r){ setDir(0); seek(+r.dataset.i); } });
   // ── the reading over time: the WHOLE text is always on screen; what changes is the READING of it ──
-  const INSP_TABS = [['reading', 'Reading'], ['referents', 'Referents'], ['lookup', 'Look up'], ['plain', 'Plain'], ['diagram', 'Diagrammed'], ['json', 'JSON'], ['why', 'Why this step']];
+  const INSP_TABS = [['reading', 'Reading'], ['referents', 'Referents'], ['plain', 'Plain'], ['diagram', 'Diagrammed'], ['json', 'JSON'], ['why', 'Why this step']];
   let inspTab = LAST_INSP, tf = -1, tfTimer = 0, lastViewKey = '';
   // ── referents: ids, the fold at the frontier, and what the person has appended on top of it ──
   const overlay = T.overlay || (T.overlay = []);   // a person's own INS / CON / SYN events — the reader's log is never edited
