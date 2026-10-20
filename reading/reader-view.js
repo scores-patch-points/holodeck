@@ -249,7 +249,7 @@ export function mountReader(T, ctx) {
   }
   function hero() {
     const f = fold(), s = st.sel; crumbGo = []; let h = crumbs();
-    const modes = () => `<div class="modes">${[['scan', 'PDF', !!L], ['pdf', 'PDF + text', !!L], ['text', 'Text', true], ['json', 'JSON', true]].filter((m) => m[2]).map(([m, lab]) => `<button type="button" data-a="mode" data-m="${m}" class="${st.mode === m ? 'on' : ''}">${lab}</button>`).join('')}</div>`;
+    const modes = () => `<div class="modes">${[['scan', 'Raw', !!L], ['pdf', 'Raw + text', !!L], ['text', 'Text', true], ['json', 'JSON', true]].filter((m) => m[2]).map(([m, lab]) => `<button type="button" data-a="mode" data-m="${m}" class="${st.mode === m ? 'on' : ''}">${lab}</button>`).join('')}</div>`;
     const body = (sel) => st.mode === 'scan' && L ? L.pages.map((pg) => `<div class="pgh">page ${pg.n} — as scanned</div><div class="pg" style="aspect-ratio:${pg.w}/${pg.h}"><img src="${pg.image}" alt="page ${pg.n} as scanned"></div>`).join('') : st.mode === 'pdf' && L ? pdfHTML(L, R(), { selected: sel }) : st.mode === 'text' && L ? placeHTML(L, R(), { selected: sel, tilt: st.tilt }) : st.mode === 'json' ? `<div class="dim" style="margin-bottom:8px">the document's own structure, as tuples all the way down — [key, value, where]. Hover a grey note for its exact provenance.</div>${tupleHTML(structure())}` : docHTML();
     if (s.kind === 'doc' || !f) return h + modes() + body(null);
     if (s.kind === 'fclaim') {
