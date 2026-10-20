@@ -111,6 +111,16 @@ const CSS = `
 #rv .lyr label{display:flex;gap:6px;align-items:center;font-size:13px;color:var(--ink2);cursor:pointer}
 #rv .delta{position:absolute;left:14px;bottom:100%;font-size:12.5px;color:var(--amber);background:var(--bg);padding:4px 8px;border:1px solid var(--line);border-radius:6px}
 #rv .dim{color:var(--dim)}
+#rv .seg,#rv .mob{display:none}
+@media (max-width:1000px){
+#rv{grid-template-rows:auto auto minmax(0,1fr) auto}
+#rv .seg{display:flex;gap:6px;padding:8px 12px;border-bottom:1px solid var(--line)}#rv .seg button{flex:1;min-height:42px;font-size:14px}#rv .seg button.on{background:var(--sel2);border-color:var(--acc3)}
+#rv .mob{display:inline-block}#rv .dl{display:none;flex-basis:100%;gap:8px;flex-wrap:wrap}#rv .dl.open{display:flex}
+#rv .proof{display:none}#rv .top .sp{display:none}
+#rv button{min-height:40px;padding:6px 12px;font-size:14px}
+#rv .col{display:none}#rv[data-m="hero"] .hero,#rv[data-m="idx"] .idx,#rv[data-m="prov"] .prov{display:block}
+#rv .body{padding-bottom:14px}
+}
 @media (max-width:1000px){#rv .body{display:flex;flex-direction:column;overflow:auto}#rv .col{overflow:visible;flex:0 0 auto}#rv .hero{order:1}#rv .prov{order:2;border-left:0;border-top:1px solid var(--line)}#rv .idx{order:3;border-right:0;border-top:1px solid var(--line)}#rv .top{gap:8px}#rv .top h2{font-size:15px;flex-basis:100%}#rv .doc{font-size:15px;line-height:1.8}#rv .kv{grid-template-columns:96px 1fr}}
 `;
 
@@ -124,10 +134,11 @@ export function mountReader(T, ctx) {
   if (!document.getElementById('rv-css')) { const s = document.createElement('style'); s.id = 'rv-css'; s.textContent = CSS; document.head.appendChild(s); }
   let root = document.getElementById('rv');
   if (!root) { root = document.createElement('div'); root.id = 'rv'; document.body.appendChild(root); }
-  root.innerHTML = `<div class="top"><h2></h2><span class="proof"></span><span class="sp"></span><button type="button" data-a="json">⤓ the reading as JSON</button><button type="button" data-a="scanlog" title="Every layer of reading the scan, from the pixels to the statements, as one append-only log (Provenance@2)">⤓ scan log</button><button type="button" data-a="html" title="The scan's words as standalone semantic HTML, filled-in values carrying their provenance">⤓ as HTML</button><button type="button" data-a="close" title="Esc">✕ Close</button></div>
+  root.innerHTML = `<div class="top"><h2></h2><span class="proof"></span><span class="sp"></span><button type="button" data-a="layers" title="The layered instrument: every layer, the replay, and the relative solar system">▦ Layers</button><button type="button" data-a="more" class="mob" aria-label="More" title="Downloads">⋯</button><span class="dl"><button type="button" data-a="json">⤓ the reading as JSON</button><button type="button" data-a="scanlog" title="Every layer of reading the scan, from the pixels to the statements, as one append-only log (Provenance@2)">⤓ scan log</button><button type="button" data-a="html" title="The scan's words as standalone semantic HTML, filled-in values carrying their provenance">⤓ as HTML</button></span><button type="button" data-a="close" title="Esc">✕ Close</button></div>
+    <div class="seg" role="tablist" aria-label="Panel"><button type="button" data-a="mt" data-m="hero">Reading</button><button type="button" data-a="mt" data-m="idx">What was read</button><button type="button" data-a="mt" data-m="prov">Where from</button></div>
     <div class="body"><div class="col idx"></div><div class="col hero"></div><div class="col prov"></div></div>
     <div class="bar"></div>`;
-  root.classList.add('on');
+  root.classList.add('on'); root.dataset.m = 'hero'; root.querySelector('.seg [data-m="hero"]').classList.add('on');
   const $ = (s) => root.querySelector(s);
   const ac = new AbortController(), on = (el, t, fn) => el.addEventListener(t, fn, { signal: ac.signal });
   const st = { mode: T.doc.layout ? 'pdf' : 'text', showClaims: false, sel: { kind: 'doc' }, overlay: [], frontier: null, playing: null, flash: new Set(), delta: ctx.delta || null, features: { ...ctx.features } };
@@ -215,7 +226,7 @@ export function mountReader(T, ctx) {
   }, 0);
 
   // ── selection, crumbs ──
-  const select = (sel) => { if ((sel.kind === 'ref' || sel.kind === 'mention') && !sel.name) { const f = fold(); const r = f && f.referents.get(f.resolve(sel.ref)); if (r && r.name) sel = { ...sel, name: r.name }; else if (st.sel.name && st.sel.ref === sel.ref) sel = { ...sel, name: st.sel.name }; } st.sel = sel; render(); };
+  const select = (sel) => { if (sel.kind !== 'doc' && matchMedia('(max-width:1000px)').matches && root.dataset.m === 'idx') { root.dataset.m = 'hero'; root.querySelectorAll('.seg button').forEach((x) => x.classList.toggle('on', x.dataset.m === 'hero')); } if ((sel.kind === 'ref' || sel.kind === 'mention') && !sel.name) { const f = fold(); const r = f && f.referents.get(f.resolve(sel.ref)); if (r && r.name) sel = { ...sel, name: r.name }; else if (st.sel.name && st.sel.ref === sel.ref) sel = { ...sel, name: st.sel.name }; } st.sel = sel; render(); };
   function crumbs() {
     const f = fold(), s = st.sel, c = [{ label: title, go: { kind: 'doc' } }];
     if (s.kind === 'ref' || s.kind === 'mention') { c.push({ label: 'People & things', go: { kind: 'doc' } }, { label: (f && f.referents.get(f.resolve(s.ref)) && f.referents.get(f.resolve(s.ref)).name) || s.name || refName(f, s.ref), go: { kind: 'ref', ref: s.ref } }); if (s.kind === 'mention') c.push({ label: `mention ${s.n}` }); }
@@ -443,6 +454,9 @@ export function mountReader(T, ctx) {
     if (w && st.sel.kind === 'doc' || w && e.target.closest('.hero')) { if (w.dataset.ref) return select({ kind: 'ref', ref: w.dataset.ref }); const t = tokens()[+w.dataset.t]; if (t) return select({ kind: 'word', w: t.w, s: t.s, e: t.e }); }
     const b = e.target.closest('button[data-a], a[data-a]'); if (!b) return; const a = b.dataset.a;
     if (a === 'mode') { st.mode = b.dataset.m; return render(); } if (a === 'showclaims') { st.showClaims = true; return render(); }
+    if (a === 'mt') { root.dataset.m = b.dataset.m; root.querySelectorAll('.seg button').forEach((x) => x.classList.toggle('on', x === b)); root.querySelector('.body').scrollTop = 0; return; }
+    if (a === 'more') { root.querySelector('.dl').classList.toggle('open'); return; }
+    if (a === 'layers') { ctx.showLayers && ctx.showLayers(); return; }
     if (a === 'scanlog' && L) { const g = recordLayers(); if (g) ctx.download(`${(T.doc.label || 'reading').replace(/[^\w]+/g, '-').slice(0, 40)}-scan-log.json`, JSON.stringify(g.led.eot({ root: T.eot && T.eot.root }), null, 1), 'application/json'); } else if (a === 'html' && L) ctx.download(`${(T.doc.label || 'reading').replace(/[^\w]+/g, '-').slice(0, 40)}-reading.html`, htmlExport(L, R(), { title: T.doc.label || 'reading', tilt: st.tilt }), 'text/html;charset=utf-8'); else if (a === 'close') close(); else if (a === 'json') ctx.download(`${(T.doc.label || 'reading').replace(/[^\w]+/g, '-').slice(0, 40)}-reading.json`, JSON.stringify({ reading: structure(), run: ctx.readingJSON(T).run, corrections: st.overlay }, null, 2), 'application/json');
     else if (a === 'play') play(); else if (a === 'sever') act('sever', { mid: b.dataset.mid }); else if (a === 'undo') act('undo', { act: b.dataset.act });
   });

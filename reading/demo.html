@@ -272,9 +272,24 @@
   #app .top .stats, #app .top [data-a="toggle-all"], #app .top [data-a="reset"], #app .top [data-a="copy"]{display:none}
   #app .left .log, #app .bar2 .key, #app .bar2 .seg, #app .bar2 label, #app .bar2 [data-a="rev"], #app .bar2 .rd{display:none}
   #app .lanes .h, #app .lanes .lg, #app .lens .doc, #app .insp .legend, #app .insp .lg{display:none}
-  /* three panels: layers · the document · the inspector. The Details drawer repeated the inspector's views, so it is gone. */
-  #app #p-drawer{display:none}
-  #app .right{grid-template-rows:minmax(0,1fr) auto}
+  /* ── on a phone the Layers view is the drawer: the layers become a swipeable row, the sentence and its lanes stay short, and the graph gets the screen ── */
+  @media (max-width:900px){
+    #app .top{padding:8px 12px;gap:6px}#app .top .meta{display:none}#app .top h2{font-size:16px;flex-basis:100%}
+    #app .top button{min-height:40px;padding:6px 12px}#app .top [data-a="dl-json"]{display:none}
+    #app .body{grid-template-columns:1fr;grid-template-rows:auto minmax(0,1fr)}
+    #app .left{border:0;border-bottom:1px solid var(--line);max-height:none}
+    #app .spine{display:flex;flex-direction:row;gap:6px;overflow-x:auto;overflow-y:hidden;max-height:none;padding:8px 12px;-webkit-overflow-scrolling:touch}
+    #app .spine .ly{flex:0 0 auto;margin:0;padding:8px 14px;white-space:nowrap;min-height:40px}
+    #app .right{grid-template-rows:auto auto minmax(46vh,1fr);overflow:auto}
+    #app .lens{max-height:22vh;overflow:auto;font-size:15px;line-height:1.7}
+    #app .lanes{max-height:16vh;overflow:auto}
+    #app #p-drawer{min-height:46vh}
+    #app #p-tabs{overflow-x:auto;white-space:nowrap}#app #p-tabs button{min-height:42px;flex:0 0 auto}
+    #p-graph .hm-tg,#p-graph .hm-position{display:none}
+    #p-graph .hm-top{left:8px;right:8px}
+    #app .bar2 button{min-height:40px;min-width:40px}
+  }
+  /* the Layers view keeps its drawer: Source · Words · POS · Morphology · Referents · Propositions · Render · EOT · JSON · Graph (the solar system) */
   #app .lens{overflow:auto;min-height:0}
   #app .spine .why, #app .spine .cnt, #app .spine .h{display:none}
   #app .top h2{font-size:17px;font-weight:600}
@@ -326,6 +341,7 @@
     <button type="button" data-a="reset" title="Back to every layer on">reset</button>
     <button type="button" data-a="copy">Copy trace (JSON)</button>
     <button type="button" data-a="dl-json" title="Download the whole reading — propositions, referents, and the EOT ledger — as JSON">⤓ Reading (JSON)</button>
+    <button type="button" data-a="to-reader" class="f" title="Back to the reading">◀ Reader</button>
     <button type="button" class="exit" data-a="close" aria-label="Exit" title="Exit (Esc)">✕ Exit</button>
     <span class="stats" id="p-stats"></span>
     <div class="delta" id="p-delta" hidden></div>
@@ -742,17 +758,27 @@ function download(name, text, mime){
 const STEP_SPEEDS = [[1,'1 event/s'],[4,'4 events/s'],[8,'8 events/s'],[30,'30 events/s'],[120,'120 events/s'],[600,'600 events/s']];
 const REAL_SPEEDS = [[1,'1×'],[0.1,'1/10×'],[0.01,'1/100×'],[0.001,'1/1,000×'],[1e-4,'1/10,000×']];
 
-let cur = null, BASELINE = null;
+let cur = null, inst = null, BASELINE = null, LAYERS_SEEN = false;
 let features = { ...DEFAULT_FEATURES };
 let lastRaw = '', lastLabel = '';
 let LAST_TAB = 'source', LAST_INSP = 'reading';
 
 function openTrace(T){ return openReader(T); }
 // the reading, in three panels (reading/reader-view.js): what was read · the selected thing · where it came from
+// the layered instrument (Source · Words · POS · Morphology · Referents · Propositions · Render · EOT · JSON · Graph, the lanes, the inspector and the replay)
+// is a second view of the SAME reading: the reader's "Layers" button opens it, its "Reader" button (or Esc) returns
+function showLayers(){
+  if (!cur) return null; if (inst) inst.close();
+  const rv = $('rv'); if (rv) rv.classList.remove('on');
+  const first = !LAYERS_SEEN; LAYERS_SEEN = true; if (first) LAST_TAB = 'graph';   // the first time, open on the relative solar system
+  inst = mount(cur.T); if (first && inst.setTab) inst.setTab('graph'); return inst;
+}
+document.addEventListener('click', (e) => { if (e.target.closest && e.target.closest('[data-a="to-reader"]') && inst) inst.close(); });
 function openReader(T, keep = null){
+  if (inst) inst.close();
   if (cur){ const old = cur; cur = null; old.close(); }
   const ctx = {
-    hash: sha256, readingJSON, download, features, keep, ledger: () => ({ led:T.led, srcId:T.srcId, pages:T.scanPages, refresh:() => { T.eot = T.led.eot({ root:T.eot && T.eot.root }); return T.eot; } }), known: knownWord, pdfjs: loadPdfjs,
+    showLayers, hash: sha256, readingJSON, download, features, keep, ledger: () => ({ led:T.led, srcId:T.srcId, pages:T.scanPages, refresh:() => { T.eot = T.led.eot({ root:T.eot && T.eot.root }); return T.eot; } }), known: knownWord, pdfjs: loadPdfjs,
     explainWord: w => { try { return classifyForm(w, { posPrior: PRIORS.posPrior, lemmatizer: PRIORS.lemmatizer }); } catch (e) { return null; } },
     actsOf: w => { const lw = lookupForm(w).toLowerCase(); const out = new Set(); try { for (const x of (PRIORS.lemmatizer ? PRIORS.lemmatizer.lemmasOf(lw) : [])) out.add(x); } catch (e) {} try { for (const x of stemsOf(lw)) out.add(x); } catch (e) {} return [...out]; },
     layers: LAYERS.filter(l => l.feature).map(l => ({ feature:l.feature, label:l.label, why:l.why })),
@@ -1531,7 +1557,7 @@ function mount(T){
     else if (e.key === 'ArrowLeft'){ setDir(0); seek(k - 1); } else if (e.key === 'ArrowRight'){ setDir(0); seek(k + 1); }
     else if (e.key === 'j' || e.key === 'J') setDir(-1); else if (e.key === 'k' || e.key === 'K') setDir(0); else if (e.key === 'l' || e.key === 'L') setDir(1);
     else if (e.key === 'Home'){ setDir(0); seek(0); } else if (e.key === 'End'){ setDir(0); seek(N - 1); } };
-  function close(){ ac.abort(); stopTL(); try { ro.disconnect(); } catch (e) {} cancelAnimationFrame(raf); try { map.destroy && map.destroy(); } catch (e) {} app.classList.remove('on'); cur = null; }
+  function close(){ ac.abort(); stopTL(); try { ro.disconnect(); } catch (e) {} cancelAnimationFrame(raf); try { map.destroy && map.destroy(); } catch (e) {} app.classList.remove('on'); inst = null; const rv = $('rv'); if (rv && cur) rv.classList.add('on'); }
   const ro = new ResizeObserver(() => size());
   bind(app, 'click', onClick);
   bind(document, 'keydown', onKey);
