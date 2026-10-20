@@ -12,6 +12,8 @@ import { hunt } from './prior-hunt.js';
 import { tiltOf } from './prior-tilt.js';
 import { MARKER } from './shapes.js';
 import { primeFor, gainsAt } from './sections.js';
+import { loadPrograms, apply as applyLearned } from './learned.js';
+import { recordReading, layerCounts, chainOf } from './scan-ledger.js';
 import { fieldsOf, htmlExport, pageHTML, placeHTML, pdfHTML, semanticOf, blockStarts, tupleHTML, tupleChildren, tupleAt, readForm } from './page-views.js';
 
 const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -122,7 +124,7 @@ export function mountReader(T, ctx) {
   if (!document.getElementById('rv-css')) { const s = document.createElement('style'); s.id = 'rv-css'; s.textContent = CSS; document.head.appendChild(s); }
   let root = document.getElementById('rv');
   if (!root) { root = document.createElement('div'); root.id = 'rv'; document.body.appendChild(root); }
-  root.innerHTML = `<div class="top"><h2></h2><span class="proof"></span><span class="sp"></span><button type="button" data-a="json">⤓ the reading as JSON</button><button type="button" data-a="html" title="The scan's words as standalone semantic HTML, filled-in values carrying their provenance">⤓ as HTML</button><button type="button" data-a="close" title="Esc">✕ Close</button></div>
+  root.innerHTML = `<div class="top"><h2></h2><span class="proof"></span><span class="sp"></span><button type="button" data-a="json">⤓ the reading as JSON</button><button type="button" data-a="scanlog" title="Every layer of reading the scan, from the pixels to the statements, as one append-only log (Provenance@2)">⤓ scan log</button><button type="button" data-a="html" title="The scan's words as standalone semantic HTML, filled-in values carrying their provenance">⤓ as HTML</button><button type="button" data-a="close" title="Esc">✕ Close</button></div>
     <div class="body"><div class="col idx"></div><div class="col hero"></div><div class="col prov"></div></div>
     <div class="bar"></div>`;
   root.classList.add('on');
@@ -157,7 +159,7 @@ export function mountReader(T, ctx) {
 
   // ── what the page views draw ──
   const L = T.doc.layout || null;
-  let fieldsMemo = null; const fields = () => (fieldsMemo ??= fieldsOf(L, text, st.tilt || null));
+  let fieldsMemo = null; const fields = () => (fieldsMemo ??= applyLearned(fieldsOf(L, text, st.tilt || null), (st.learned && st.learned.rules) || []));
   const isForm = () => fields().length >= 5;
   let formMemo = null, formKey = ''; const form = () => { const f = fold(); const k = foldKey; if (formMemo && formKey === k) return formMemo; formKey = k; return (formMemo = readForm(fields(), { referents: f ? f.order : [], formWord, known: ctx.known || null })); };
   const R = () => { const f = fold(), mentions = []; if (f) for (const m of f.mentions.values()) { const r = f.assign.get(m.id), ref = r ? f.resolve(r) : null; if (ref && f.referents.has(ref)) mentions.push({ s: m.s, e: m.e, ref, rc: f.col.get(ref) }); }
@@ -165,7 +167,7 @@ export function mountReader(T, ctx) {
   let structMemo = null, structKey = '';
   const structure = () => { const k = foldKey; if (structMemo && structKey === k) return structMemo; structKey = k; const f = fold(), tl = TL();
     const src = ['source', [['bytes', T.nBytes], ['sha-256', T.hash], ['source id', T.srcId], ...(extracted ? [['text from', extracted]] : []), ['read', `${text.length} characters`]]];
-    const body = L ? semanticOf(L, text, fields(), { gains: st.gains }) : (tl ? tl.sentences.map((s) => [`statement ${s.n}`, s.text.trim(), { chars: [s.offset, s.end] }]) : []);
+    const body = L ? semanticOf(L, text, fields(), { gains: st.gains, rules: st.learned && st.learned.use ? st.learned.structure : null }) : (tl ? tl.sentences.map((s) => [`statement ${s.n}`, s.text.trim(), { chars: [s.offset, s.end] }]) : []);
     const names = f ? f.order.filter((r) => r.mentions.length && !formWord(r)).map((r) => [r.name || short(r.id), r.mentions.map((m) => ['mention', m.text, { chars: [m.s, m.e], span: m.id }]), { id: r.id }]) : [];
     const cls = (isForm() && !st.showClaims) ? [] : claims().map((c) => [c.end1, [[c.label, c.end2]], { chars: [c.s, c.e], polarity: c.polarity === '-' ? 'negated' : 'affirmed' }]);
     // every proposition the form makes, nested as the page nests it: filer → section (Part …) → the row's act → [column, value] — one tuple per proposition
@@ -188,15 +190,27 @@ export function mountReader(T, ctx) {
       st.hunt = { status: res.prior ? 'found' : 'none found', result: res };
       if (res.prior) { st.tilt = tiltOf(res.prior, L); fieldsMemo = null; formMemo = null; structMemo = null; }
     } catch (e) { st.hunt = { status: 'the hunt failed: ' + (e && e.message || e), result: null }; }
-    render();
+    render(); scheduleLayers();
   })();
+
+  // ── the scan log: every layer, recorded into the reading's own ledger as the layers settle (scan-ledger.js) ──
+  let layersTimer = null;
+  const recordLayers = () => { if (!L || !ctx.ledger) return null; const g = ctx.ledger(); if (!g || !g.led) return null;
+    const fs = fields(), sem = semanticOf(L, text, fs, { gains: st.gains, rules: st.learned && st.learned.use ? st.learned.structure : null });
+    recordReading(g.led, g.srcId, g.pages, { layout: L, fields: fs, sem, form: isForm() ? form() : null, hunt: st.hunt, tilt: st.tilt, learned: st.learned, ground: st.ground, structureRules: st.learned && st.learned.use ? st.learned.structure : null });
+    g.refresh(); return g; };
+  const scheduleLayers = () => { clearTimeout(layersTimer); layersTimer = setTimeout(() => { try { recordLayers(); const el = root.querySelector('.prov'); if (el && st.sel.kind === 'doc') el.innerHTML = prov(); } catch (e) { /* the log is a record, never a gate on reading */ } }, 500); };
+
+  // ── learned programs (learned.js): little rule programs measured on documents whose truth was known; they tilt, and say so ──
+  st.learned = null;
+  if (L) setTimeout(async () => { try { const p = await loadPrograms(new URL('./', import.meta.url)); st.learned = { ...p, use: !!p.structure && st.useLearned !== false }; fieldsMemo = null; formMemo = null; structMemo = null; render(); scheduleLayers(); } catch (e) { /* no programs: the reader runs on its declared defaults */ } }, 0);
 
   // ── the ground for surprise (sections.js): what a reader of this register already knew, so that a section is where the earlier text stops helping ──
   st.gains = null; st.ground = null;
   if (L) setTimeout(async () => {
     try { const pr = await primeFor(text, { base: new URL('./', import.meta.url) }), res = gainsAt(text, blockStarts(L, text), { prime: pr.prime });
       st.gains = res.gains; st.ground = { genre: pr.genre, giver: pr.giver, why: pr.why, register: pr.register, tokens: res.tokens, nullMedian: res.nullMedian, refused: res.refused || null, cuts: res.gains.size };
-      structMemo = null; render();
+      structMemo = null; render(); scheduleLayers();
     } catch (e) { st.ground = { refused: String(e && e.message || e) }; }
   }, 0);
 
@@ -320,6 +334,8 @@ export function mountReader(T, ctx) {
     if (s.kind === 'doc' || !f) {
       const J = ctx.readingJSON(T); const sn = snapAt(); const revs = tl && st.frontier != null ? tl.revisions.filter((r) => r.because && r.because.sentence === st.frontier) : [];
       return `<div class="ph">This reading</div><div class="kv">${extracted ? `<span class="k">text from</span><span>${esc(extracted)}</span>` : ''}${T.doc.truncated ? `<span class="k">read</span><span>the first ${text.length.toLocaleString()} characters</span>` : ''}<span class="k">bytes</span><span class="mono">${T.nBytes.toLocaleString()} · utf-8</span><span class="k">sha-256</span><span class="mono">${esc(T.hash)}</span><span class="k">source id</span><span class="mono">${esc(T.srcId)}</span><span class="k">statements</span><span>${nStmts()}</span><span class="k">words</span><span>${tokens().length.toLocaleString()} · ${unplaced().reduce((n, [, ts]) => n + ts.length, 0)} not placed</span></div>
+        ${(() => { if (!L || !ctx.ledger) return ''; const g = ctx.ledger(); if (!g || !g.led) return ''; const c = layerCounts(g.led); return c.length ? `<div class="ph">Layers recorded</div><div class="ev"><div>${c.map(([k, n]) => `${esc(k)} ${n}`).join(' · ')}</div><div class="h">one append-only log, each event parented to the layer below it; “⤓ scan log” exports it</div></div>` : ''; })()}
+        ${st.learned && st.learned.programs.length ? `<div class="ph">Its learned rules</div><div class="ev">${st.learned.structure ? `<div>structure: tables from ${st.learned.structure.tableMinCells} cells in runs of ${st.learned.structure.tableMinRun}, headings in capitals or type ${st.learned.structure.headSize}× the page's own</div><div class="h">${esc(st.learned.structure.from)} · held-out F ${st.learned.structure.default.f ?? ''} → ${st.learned.structure.heldOut.f ?? ''} on documents it never saw; a tilt, never a rewrite</div>` : '<div>no structure rule adopted</div>'}<div class="h">${st.learned.rules.length} label rules</div></div>` : ''}
         ${st.ground ? `<div class="ph">Its ground for surprise</div><div class="ev">${st.ground.refused ? `<div>${esc(st.ground.refused)}</div>` : `<div>${esc(st.ground.genre)} prime · ${st.ground.tokens} tokens read · ${st.ground.cuts} cuts weighed</div><div class="h">${esc(st.ground.why)} · ${esc(st.ground.giver || '')}</div><div class="h">A section is where the earlier text stops predicting the later: each cut is ranked against random cuts in this document (median ${st.ground.nullMedian} bits/token).</div>`}</div>` : ''}
         ${st.hunt ? (() => { const H = st.hunt, r = H.result; if (!r) return `<div class="ph">Its prior</div><div class="ev"><div>${esc(H.status)}</div></div>`;
           if (!r.prior) return `<div class="ph">Its prior</div><div class="ev"><div>none found — read from the page alone</div><div class="h">${esc(r.steps.map((x) => x.step + (x.query ? ' “' + x.query + '”' : '') + (x.result ? ' → ' + x.result : x.why ? ' → ' + x.why : '')).join(' · '))}</div></div>`;
@@ -356,6 +372,7 @@ export function mountReader(T, ctx) {
     if (s.kind === 'field') {
       const x = fields().find((y) => y.id === s.id); if (!x) return '';
       return `<div class="ph">This field</div><div class="kv"><span class="k">label</span><span>${esc(x.label)}</span><span class="k">value</span><span><b>${esc(x.value)}</b></span><span class="k">format</span><span>${esc(x.format)} <span class="dim">(the value's shape; Alhazen's valueFormat)</span></span><span class="k">page</span><span>${x.page}</span><span class="k">label box</span><span class="mono">${x.lb.map(Math.round).join(', ')}</span><span class="k">value box</span><span class="mono">${x.vb.map(Math.round).join(', ')}</span><span class="k">characters</span><span class="mono">${x.s}–${x.e}</span><span class="k">OCR confidence</span><span>${x.conf}% (the value's words)</span></div>
+        ${(() => { const g = ctx.ledger && ctx.ledger(); if (!g || !g.led) return ''; const ev = g.led.events.find((e) => e.stage === 'field' && e.detail && e.detail.id === s.id); if (!ev) return ''; const kids = g.led.events.filter((e) => e.parent === ev.event_id); return `<div class="ph">How it was read</div><div class="ev">${[...kids.map((k) => ({ stage: k.stage, transform: k.transform })).reverse(), ...chainOf(g.led, ev.event_id).map((e) => ({ stage: e.stage, transform: e.transform }))].map((e) => `<div>${esc(e.stage)} <span class="h">${esc(e.transform || '')}</span></div>`).join('')}</div>`; })()}
         ${x.prior ? `<div class="ph">What the blank form says here</div><div class="kv"><span class="k">form</span><span>${esc(x.prior.form || '')} ${x.prior.year || ''}, page ${x.prior.page}</span><span class="k">its box</span><span class="mono">${esc(x.prior.box || 'none here')}</span>${x.prior.printed_beside_it ? `<span class="k">prints beside it</span><span>“${esc(x.prior.printed_beside_it)}”</span>` : ''}${x.prior.column_on_form ? `<span class="k">its column</span><span>“${esc(x.prior.column_on_form)}”</span>` : ''}<span class="k">weight</span><span>${x.amp} <span class="dim">(1 = the page alone; ${x.prior.filled}% of the value sits in a fill-in box, ${x.prior.value_printed}% is printed on the blank form)</span></span></div><div class="dim">The form's words are evidence, shown as the form's; the reading keeps the scan's own.</div>` : ''}
         <div class="ph">How it was read</div><div class="ev"><div>a label and a value on one printed line</div><div class="h">Alhazen extractFormFields — a colon, or a wide gap on the page, between them</div></div><div class="ev"><div>the words, from the page's pixels</div><div class="h">${esc(extracted || 'OCR')}</div></div>`;
     }
@@ -426,7 +443,7 @@ export function mountReader(T, ctx) {
     if (w && st.sel.kind === 'doc' || w && e.target.closest('.hero')) { if (w.dataset.ref) return select({ kind: 'ref', ref: w.dataset.ref }); const t = tokens()[+w.dataset.t]; if (t) return select({ kind: 'word', w: t.w, s: t.s, e: t.e }); }
     const b = e.target.closest('button[data-a], a[data-a]'); if (!b) return; const a = b.dataset.a;
     if (a === 'mode') { st.mode = b.dataset.m; return render(); } if (a === 'showclaims') { st.showClaims = true; return render(); }
-    if (a === 'html' && L) ctx.download(`${(T.doc.label || 'reading').replace(/[^\w]+/g, '-').slice(0, 40)}-reading.html`, htmlExport(L, R(), { title: T.doc.label || 'reading', tilt: st.tilt }), 'text/html;charset=utf-8'); else if (a === 'close') close(); else if (a === 'json') ctx.download(`${(T.doc.label || 'reading').replace(/[^\w]+/g, '-').slice(0, 40)}-reading.json`, JSON.stringify({ reading: structure(), run: ctx.readingJSON(T).run, corrections: st.overlay }, null, 2), 'application/json');
+    if (a === 'scanlog' && L) { const g = recordLayers(); if (g) ctx.download(`${(T.doc.label || 'reading').replace(/[^\w]+/g, '-').slice(0, 40)}-scan-log.json`, JSON.stringify(g.led.eot({ root: T.eot && T.eot.root }), null, 1), 'application/json'); } else if (a === 'html' && L) ctx.download(`${(T.doc.label || 'reading').replace(/[^\w]+/g, '-').slice(0, 40)}-reading.html`, htmlExport(L, R(), { title: T.doc.label || 'reading', tilt: st.tilt }), 'text/html;charset=utf-8'); else if (a === 'close') close(); else if (a === 'json') ctx.download(`${(T.doc.label || 'reading').replace(/[^\w]+/g, '-').slice(0, 40)}-reading.json`, JSON.stringify({ reading: structure(), run: ctx.readingJSON(T).run, corrections: st.overlay }, null, 2), 'application/json');
     else if (a === 'play') play(); else if (a === 'sever') act('sever', { mid: b.dataset.mid }); else if (a === 'undo') act('undo', { act: b.dataset.act });
   });
   on(root, 'change', async (e) => {
