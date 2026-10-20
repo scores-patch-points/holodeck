@@ -169,7 +169,7 @@ export function mountReader(T, ctx) {
     const cls = (isForm() && !st.showClaims) ? [] : claims().map((c) => [c.end1, [[c.label, c.end2]], { chars: [c.s, c.e], polarity: c.polarity === '-' ? 'negated' : 'affirmed' }]);
     // every proposition the form makes, nested as the page nests it: filer → section (Part …) → the row's act → [column, value] — one tuple per proposition
     const said = isForm() ? (() => { const F = form();
-      const cleanHead = (t) => { const ws = t.split(/\s+/); return ws.filter((w) => /^\p{L}{3,}[,.;:]?$/u.test(w)).length >= Math.max(2, ws.length * 0.7) && (t.match(/[\p{L}\s]/gu) || []).length >= t.length * 0.85; };
+      const cleanHead = (t) => { const ws = t.split(/\s+/); return ws.filter((w) => /^\p{L}{3,}[,.;:]?$/u.test(w)).length >= Math.max(3, ws.length * 0.7) && (t.match(/[\p{L}\s]/gu) || []).length >= t.length * 0.85; };
       const heads = (L ? body : []).flatMap((pg) => pg[1].filter((sec) => sec[2] && sec[2].chars && (MARKER.test(sec[0]) || cleanHead(sec[0]))).map((sec) => ({ page: sec[2].page, at: sec[2].chars[0], name: sec[0] })));
       const secOf = (c) => { const h = heads.filter((x) => x.page === c.page && x.at <= c.chars[0]).pop(); return h ? h.name : `page ${c.page}`; };
       const bySec = new Map(); for (const c of F.claims) { const k = secOf(c), sec = bySec.get(k) || bySec.set(k, new Map()).get(k), [act, col] = c.act.split(' · '), row = sec.get(c.field) || sec.set(c.field, { act, cols: [], c }).get(c.field); row.cols.push([col || 'value', c.object, { type: c.type, chars: c.chars, value_box: c.value_box, confidence: c.conf }]); }
