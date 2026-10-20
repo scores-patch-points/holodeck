@@ -14,6 +14,7 @@ import { MARKER } from './shapes.js';
 import { primeFor, gainsAt } from './sections.js';
 import { loadPrograms, apply as applyLearned } from './learned.js';
 import { recordReading, layerCounts, chainOf } from './scan-ledger.js';
+import { buildRows, sortRows, nextSort, tableHTML } from './referent-table.js';
 import { fieldsOf, htmlExport, pageHTML, placeHTML, pdfHTML, semanticOf, blockStarts, tupleHTML, tupleChildren, tupleAt, readForm } from './page-views.js';
 
 const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -69,6 +70,15 @@ const CSS = `
 #rv .it.sel{background:var(--sel2)}
 #rv .it .n{margin-left:auto;color:var(--dim);font:12.5px var(--mono)}
 #rv .it .dot{width:8px;height:8px;border-radius:50%;flex:0 0 auto;transform:translateY(-1px)}
+#rv .rt{width:100%;border-collapse:collapse;table-layout:auto;font-size:13px}
+#rv .rt th,#rv .rt td{padding:4px 5px;text-align:left;font-weight:400;line-height:1.35;border-bottom:1px solid var(--line)}
+#rv .rt thead th{font:600 11px var(--mono);color:var(--dim);white-space:nowrap}
+#rv .rt thead button{all:unset;cursor:pointer;color:inherit;font:inherit}#rv .rt thead button:hover,#rv .rt thead button:focus-visible{color:var(--ink)}
+#rv .rt .ar{margin-left:3px;font-size:9px}#rv .rt .num{text-align:right;font-family:var(--mono);font-size:12.5px;color:var(--dim)}
+#rv .rt tbody tr{cursor:pointer}#rv .rt tbody tr:hover{background:var(--s1)}#rv .rt tbody tr.sel{background:var(--sel2)}
+#rv .rt .c-name{overflow-wrap:anywhere}#rv .rt .c-name .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px}
+#rv .rt .sm{display:inline-block;width:8px;height:8px;border-radius:2px;margin-left:2px}#rv .rt .c-reality{text-align:center;cursor:help}
+#rv .rt .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 #rv .crumbs{font-size:13px;color:var(--dim);margin:0 0 14px}
 #rv .crumbs a{color:var(--acc);cursor:pointer;text-decoration:none}
 #rv .crumbs a:hover{text-decoration:underline}
@@ -121,6 +131,7 @@ const CSS = `
 #rv .col{display:none}#rv[data-m="hero"] .hero,#rv[data-m="idx"] .idx,#rv[data-m="prov"] .prov{display:block}
 #rv .body{padding-bottom:14px}
 }
+@media (max-width:1000px){#rv .rt .c-sources,#rv .rt .c-first{display:none}#rv .rt tbody th,#rv .rt tbody td,#rv .rt thead th{height:40px;padding:4px 6px}}
 @media (max-width:1000px){#rv .body{display:flex;flex-direction:column;overflow:auto}#rv .col{overflow:visible;flex:0 0 auto}#rv .hero{order:1}#rv .prov{order:2;border-left:0;border-top:1px solid var(--line)}#rv .idx{order:3;border-right:0;border-top:1px solid var(--line)}#rv .top{gap:8px}#rv .top h2{font-size:15px;flex-basis:100%}#rv .doc{font-size:15px;line-height:1.8}#rv .kv{grid-template-columns:96px 1fr}}
 `;
 
@@ -248,7 +259,9 @@ export function mountReader(T, ctx) {
     const it = (sel, label, n, cls, dot) => `<div class="it${cls ? ' sel' : ''}" data-sel='${esc(JSON.stringify(sel))}'>${dot ? `<span class="dot" style="background:${dot}"></span>` : ''}<span>${label}</span>${n != null ? `<span class="n">${n}</span>` : ''}</div>`;
     const fs = fields();
     let h = fs.length ? `<div class="grp">Fields · ${fs.length}</div>${fs.slice(0, 40).map((x) => it({ kind: 'field', id: x.id }, `${esc(x.label)} <span class="dim">${esc(x.value.slice(0, 40))}</span>`, null, s.kind === 'field' && s.id === x.id)).join('')}` : '';
-    h += `<div class="grp">People & things</div>${people.map((r) => it({ kind: 'ref', ref: r.id }, esc(r.name || '—'), r.mentions.length, (s.kind === 'ref' || s.kind === 'mention') && f.resolve(s.ref) === r.id, f.col.get(r.id))).join('') || '<div class="dim">none established yet</div>'}${furniture ? `<div class="dim" style="margin:4px 7px">and ${furniture} printed form word${furniture === 1 ? '' : 's'} (Yes, No, Part …), not listed</div>` : ''}`;
+    const C0 = ctx.sources && ctx.sources(), multi = C0 && C0.corpus && C0.sources.length > 1, srt = st.rsort || { key: 'mentions', dir: 'desc' };
+    const rows = sortRows(buildRows(people.map((r) => ({ id: r.id, name: r.name, mentions: r.mentions, born: r.born, dot: f.col.get(r.id) })), { beings: multi ? C0.fold.beings : [], sources: multi ? C0.sources : [], selectedId: (s.kind === 'ref' || s.kind === 'mention') ? f.resolve(s.ref) : null }), srt.key, srt.dir);
+    h += `<div class="grp">People & things</div>${people.length ? tableHTML(rows, { nSources: multi ? C0.sources.length : 1, sort: srt, palette: COL }) : '<div class="dim">none established yet</div>'}${furniture ? `<div class="dim" style="margin:4px 7px">and ${furniture} printed form word${furniture === 1 ? '' : 's'} (Yes, No, Part …), not listed</div>` : ''}`;
     const cl = claims();
     if (isForm()) { const F = form(); h += `<div class="grp">What the form says · ${F.claims.length}</div><div class="dim" style="margin:0 7px 6px">said by ${esc(F.filer.name)}${F.voice ? `, signed ${esc(F.voice.name)}` : ''}</div>${F.claims.slice(0, 60).map((c) => it({ kind: 'fclaim', id: c.id }, `<span class="dim">${esc(c.act)}</span> ${esc(c.object)}`, null, s.kind === 'fclaim' && s.id === c.id)).join('')}${F.skipped ? `<div class="dim" style="margin:4px 7px">${F.skipped} field${F.skipped === 1 ? '' : 's'} too garbled by the scan to read as a statement</div>` : ''}`; }
     if (isForm() && !st.showClaims) h += `<div class="grp">Sentence claims</div><div class="dim" style="margin:0 7px">This reads as a form (${fields().length} fields). Claims are read from sentences, and a form's lines are not sentences, so none are shown. <a data-a="showclaims" style="color:var(--acc);cursor:pointer">show them anyway</a></div>`;
@@ -449,6 +462,7 @@ export function mountReader(T, ctx) {
     render(); timer = setInterval(step, 900); };
   on(root, 'click', (e) => {
     const cr = e.target.closest('[data-crumb]'); if (cr) { const c = [{ kind: 'doc' }]; const s = st.sel; if ((s.kind === 'mention') && +cr.dataset.crumb === 2) return select({ kind: 'ref', ref: s.ref, name: s.name }); return select(c[0]); }
+    const rs = e.target.closest('[data-rsort]'); if (rs) { st.rsort = nextSort(st.rsort || { key: 'mentions', dir: 'desc' }, rs.dataset.rsort); return render(); }
     const it = e.target.closest('[data-sel]'); if (it && !e.target.closest('select')) return select(JSON.parse(it.dataset.sel));
     const w = e.target.closest('.doc .w');
     if (w && st.sel.kind === 'doc' || w && e.target.closest('.hero')) { if (w.dataset.ref) return select({ kind: 'ref', ref: w.dataset.ref }); const t = tokens()[+w.dataset.t]; if (t) return select({ kind: 'word', w: t.w, s: t.s, e: t.e }); }
