@@ -7,7 +7,7 @@
 //   · a box the blank form leaves, with words in it on the scan, is evidence of a field even where the page's own rules were not found
 // What the prior says is kept as attributed evidence (the form, its source and hash, the field's name, what the form prints beside it) for
 // the provenance panel. It is never copied into the reading.
-const norm = (s) => String(s || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+const norm = (s) => String(s || '').normalize('NFKD').replace(/\p{M}+/gu, '').toLowerCase().replace(/[^\p{L}\p{N}]/gu, ''); // any script, accents folded
 function lev(a, b) { if (a === b) return 0; const m = a.length, n = b.length; if (!m || !n) return Math.max(m, n); let prev = Array.from({ length: n + 1 }, (_, j) => j);
   for (let i = 1; i <= m; i++) { const cur = [i]; for (let j = 1; j <= n; j++) cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)); prev = cur; } return prev[n]; }
 export const similarity = (a, b) => { const x = norm(a), y = norm(b); if (!x || !y) return 0; return 1 - lev(x, y) / Math.max(x.length, y.length); };

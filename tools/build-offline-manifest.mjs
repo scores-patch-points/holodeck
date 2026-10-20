@@ -46,6 +46,7 @@ const manifest = () => {
   // priors the page loads by a computed name (the form it recognises): every file in the shipped library
   for (const n of readdirSync(resolve(ROOT, 'reading/form-priors')).filter((x) => x.endsWith('.json'))) crawl(resolve(ROOT, 'reading/form-priors', n));
   for (const n of readdirSync(resolve(ROOT, 'reading/surprise-priors')).filter((x) => x.endsWith('.json'))) crawl(resolve(ROOT, 'reading/surprise-priors', n));
+  for (const n of readdirSync(resolve(ROOT, 'reading/learned-priors')).filter((x) => x.endsWith('.json'))) crawl(resolve(ROOT, 'reading/learned-priors', n));
   const local = files.map((abs) => ({ url: '/' + relative(ROOT, abs).split(sep).join('/'), bytes: statSync(abs).size, group: abs.endsWith('.json') ? 'data' : 'core' })).sort((a, b) => (a.url < b.url ? -1 : 1));
   const all = [...local, ...EXTERNAL.map((e) => ({ ...e, bytes: null }))];
   // the version is the hash of WHAT is listed (not when it was built), so an unchanged page never re-downloads

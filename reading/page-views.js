@@ -164,7 +164,16 @@ export function blockStarts(layout, text) {
   return out;
 }
 
-export function semanticOf(layout, text, fields, { gains = null } = {}) {
+/** The structure rules semanticOf reads with. These are the defaults; a learned program (reading/learned-priors) may carry better ones. */
+export const STRUCTURE_RULES = Object.freeze({ tableMinCells: 3, tableMinRun: 2, headSize: 1.35, headCaps: true, headMaxWords: 12 });
+const cellsOf = (line) => line.split(/\s{2,}/).filter(Boolean);
+// residue: a ruled line or a smudge read as glyphs ("sessSSSSSSSSSSS") — a token that repeats one character, or is mostly one character
+const residue = (t) => /(.)\1{4,}/u.test(t) || (t.length >= 8 && Math.max(...Object.values([...t.toLowerCase()].reduce((m, c) => (m[c] = (m[c] || 0) + 1, m), {}))) >= t.length * 0.5);
+const noisy = (line) => { const ts = line.split(/\s+/).filter(Boolean); return ts.length > 0 && ts.filter(residue).length >= Math.ceil(ts.length / 2); };
+const allCaps = (t) => { const L = t.match(/\p{L}/gu) || []; return L.length >= 3 && !/\p{Ll}/u.test(t) && /\p{Lu}/u.test(t); };
+
+export function semanticOf(layout, text, fields, { gains = null, rules = null } = {}) {
+  const S = { ...STRUCTURE_RULES, ...(rules || {}) };
   const pages = [];
   for (const pg of layout.pages) {
     const med = (xs) => { const s = xs.slice().sort((a, b) => a - b); return s[Math.floor(s.length / 2)] || 1; };
@@ -173,20 +182,23 @@ export function semanticOf(layout, text, fields, { gains = null } = {}) {
     const sections = [], cur = () => sections[sections.length - 1];
     sections.push(['(before any heading)', [], { page: pg.n }]);
     let table = null;
-    const flush = () => { if (table && table.rows.length >= 2) { const [head, ...rows] = table.rows; cur()[1].push(['table', rows.map((r) => [r.cells[0], r.cells.slice(1).map((c, j) => [head.cells[j + 1] ?? `column ${j + 2}`, c]), { page: pg.n, box: r.b, chars: [r.s, r.e] }]), { page: pg.n, columns: head.cells, box: union(table.rows.map((r) => r.b)) }]); } else if (table) for (const r of table.rows) cur()[1].push(['text', text.slice(r.s, r.e), { page: pg.n, box: r.b, chars: [r.s, r.e] }]); table = null; };
-    for (const ln of pg.lines.slice().sort((a, b) => a.b[1] - b.b[1] || a.b[0] - b.b[0])) {
-      if (ln.s >= text.length) continue;
-      const line = text.slice(ln.s, Math.min(ln.e, text.length)).trim(); if (!line) continue;
-      const f = fields.find((x) => x.page === pg.n && x.s >= ln.s && x.e <= ln.e + 1);
+    const flush = () => { if (table && table.rows.length >= 2) { const dataRow = (r) => r.cells.slice(1).filter((c) => /\p{Nd}[.,]\p{Nd}{2}(?!\p{Nd})/u.test(c)).length >= (r.cells.length - 1) / 2; const headed = !dataRow(table.rows[0]), head = headed ? table.rows[0] : { cells: table.rows[0].cells.map((_, j) => (j ? `column ${j + 1}` : 'item')) }, rows = headed ? table.rows.slice(1) : table.rows; cur()[1].push(['table', rows.map((r) => [r.cells[0], r.cells.slice(1).map((c, j) => [head.cells[j + 1] ?? `column ${j + 2}`, c]), { page: pg.n, box: r.b, chars: [r.s, r.e] }]), { page: pg.n, columns: head.cells, ...(headed ? {} : { headerless: true }), box: union(table.rows.map((r) => r.b)) }]); } else if (table) for (const r of table.rows) cur()[1].push(['text', text.slice(r.s, r.e), { page: pg.n, box: r.b, chars: [r.s, r.e] }]); table = null; };
+    const ordered = pg.lines.slice().sort((a, b) => a.b[1] - b.b[1] || a.b[0] - b.b[0]).filter((ln) => ln.s < text.length && text.slice(ln.s, Math.min(ln.e, text.length)).trim() && !noisy(text.slice(ln.s, Math.min(ln.e, text.length))));
+    // a TABLE is a run of lines that break into the same number of cells (at least tableMinCells), at least tableMinRun long — decided before any
+    // line is read as a label and its value, because a table row reads that way too
+    const inTable = new Set(); for (let i = 0; i < ordered.length;) { const k = cellsOf(text.slice(ordered[i].s, Math.min(ordered[i].e, text.length)).trim()).length; let j = i + 1; if (k >= S.tableMinCells) while (j < ordered.length && cellsOf(text.slice(ordered[j].s, Math.min(ordered[j].e, text.length)).trim()).length === k) j++; if (k >= S.tableMinCells && j - i >= S.tableMinRun && (k > 2 || ordered.slice(i, j).filter((l) => /^(amount|integer)$/.test(shapeOf(cellsOf(text.slice(l.s, Math.min(l.e, text.length)).trim())[1]))).length >= (j - i) * 0.8)) for (let q = i; q < j; q++) inTable.add(ordered[q]); i = j; }
+    for (const ln of ordered) {
+      const line = text.slice(ln.s, Math.min(ln.e, text.length)).trim();
+      const f = inTable.has(ln) ? null : fields.find((x) => x.page === pg.n && x.s >= ln.s && x.e <= ln.e + 1);
       const h = typeOf(ln), words = line.split(/\s+/).length;
-      const heading = !f && words <= 12 && (MARKER.test(line) || (h > hMed * 1.35 && hasWord(line, 3)));
-      const cells = line.split(/\s{2,}/).filter(Boolean);
+      const cells = cellsOf(line);
+      const heading = !f && !inTable.has(ln) && words <= S.headMaxWords && (MARKER.test(line) || (h > hMed * S.headSize && hasWord(line, 3)) || (S.headCaps && allCaps(line) && cells.length < 3));
       const g = gains && gains.get(ln.s), said = g ? ` · surprise: the cut saves ${g.gain} bits/token, more than ${Math.round(g.rank * 100)}% of random cuts` : '';
-      if (heading) { flush(); sections.push([line, [], { page: pg.n, box: ln.b, chars: [ln.s, ln.e], by: (MARKER.test(line) ? 'a printed section marker' : 'type set larger than the page’s own lines') + said + (g && g.rank < UNSUPPORTED_RANK ? ' — the text before it still predicts the text after, so this heading does not reduce surprise' : ''), ...(g ? { surprise: g } : {}) }]); continue; }
+      if (heading) { flush(); sections.push([line, [], { page: pg.n, box: ln.b, chars: [ln.s, ln.e], by: (MARKER.test(line) ? 'a printed section marker' : allCaps(line) && !(h > hMed * S.headSize) ? 'a line set in capitals' : 'type set larger than the page’s own lines') + said + (g && g.rank < UNSUPPORTED_RANK ? ' — the text before it still predicts the text after, so this heading does not reduce surprise' : ''), ...(g ? { surprise: g } : {}) }]); continue; }
       // a block with no heading of its own that still starts a new ground: the earlier text stops helping, so the page has a section here
       if (g && g.gain > 0 && g.rank >= SECTION_RANK && !f && cur()[1].length >= 2) { flush(); sections.push([line.split(/\s+/).slice(0, 6).join(' ') + ' …', [], { page: pg.n, box: ln.b, chars: [ln.s, ln.e], by: 'no heading; a shift of ground' + said, surprise: g }]); }
       if (f) { flush(); cur()[1].push([f.label, f.value, { format: f.format, page: f.page, label_box: f.lb, value_box: f.vb, chars: [f.s, f.e], confidence: f.conf, by: 'Alhazen extractFormFields + valueFormat', id: f.id }]); continue; }
-      if (cells.length >= 3) { (table ??= { rows: [] }).rows.push({ cells, b: ln.b, s: ln.s, e: ln.e }); continue; }
+      if (inTable.has(ln)) { (table ??= { rows: [] }).rows.push({ cells, b: ln.b, s: ln.s, e: ln.e }); continue; }
       flush(); cur()[1].push(['text', line, { page: pg.n, box: ln.b, chars: [ln.s, ln.e] }]);
     }
     flush();
