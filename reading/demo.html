@@ -268,6 +268,25 @@
     .drawer .pane-wrap{overflow:hidden;min-height:0}
     .insp{display:block;border-left:1px solid var(--line);overflow:auto;min-height:0}
   }
+  /* ── swappable hero panels: the reading, the details and the inspector each sit in the centre or the right slot (or are hidden) ── */
+  .lay,.slot{display:none}
+  @media (min-width:1200px){
+    .lay{display:inline-flex;align-items:baseline;gap:10px;position:relative}
+    .lay summary{cursor:pointer;color:var(--mut);font:500 13px var(--sans);padding:4px 6px;list-style:none}.lay summary:hover,.lay details[open] summary{color:var(--ink)}
+    .lay-pop{position:absolute;right:0;top:100%;z-index:60;background:var(--panel,var(--bg));border:1px solid var(--line2);border-radius:8px;padding:10px 12px;display:grid;gap:8px;min-width:220px;box-shadow:0 8px 24px rgba(0,0,0,.35)}
+    .lay-pop label{display:flex;justify-content:space-between;align-items:center;gap:12px;font:13px var(--sans);color:var(--ink2)}
+    .lay-pop select{background:var(--panel,var(--bg));color:var(--ink);border:1px solid var(--line2);border-radius:5px;padding:3px 5px;font:12.5px var(--sans)}
+    .slot{display:flex;flex-direction:column;min-height:0;min-width:0}
+    .right{display:flex;flex-direction:column;min-height:0;min-width:0}
+    .blk{display:contents}
+    .right .lens,.slot .lens{flex:0 0 auto}.right .lanes,.slot .lanes{flex:1 1 0}
+    .right .drawer,.slot .drawer{flex:0 0 auto}
+    .right .insp,.slot .insp{flex:1 1 0}
+    .slot .lens{padding:6px 16px 12px}.slot .lens .txt{font-size:16px;line-height:1.8}.slot .lanes{padding:10px 14px}
+    .right>.insp{border-left:0}.slot>.insp{border-left:0}.slot{border-left:1px solid var(--line)}
+    .only-detail>.drawer,.only-detail>.drawer.open{flex:1 1 0;height:auto;grid-template-rows:auto minmax(0,1fr)}
+    .empty-slot::after{content:"nothing here — pick a panel from \201Clayout\201D";color:var(--dim);font:13px var(--sans);padding:24px;display:block}
+  }
   @media (max-width:900px){.body{grid-template-columns:1fr;grid-template-rows:44% 56%}.left{border-right:0;border-bottom:1px solid var(--line)}}
   header .claim{color:var(--dim);font-size:13px;margin-top:6px}
   /* ── calm: one thing at a time. What is hidden is still there for the code; the page just stops shouting it. ── */
@@ -383,6 +402,17 @@
   <div class="top">
     <h2 id="p-title">how it was read</h2>
     <span class="meta" id="p-meta"></span><span class="sp"></span>
+    <span class="lay" id="lay">
+      <button type="button" data-lay="swap" title="Swap the centre and right panels">⇄ swap</button>
+      <details><summary title="Choose what each panel shows">layout</summary>
+        <div class="lay-pop">
+          <label>Reading <select data-blk="read"></select></label>
+          <label>Details <select data-blk="detail"></select></label>
+          <label>Inspector <select data-blk="insp"></select></label>
+          <button type="button" data-lay="reset">reset layout</button>
+        </div>
+      </details>
+    </span>
     <button type="button" class="f" data-a="toggle-all" title="Switch every optional layer off or on">all layers</button>
     <button type="button" data-a="reset" title="Back to every layer on">reset</button>
     <button type="button" data-a="copy">Copy trace (JSON)</button>
@@ -402,9 +432,11 @@
       </div>
     </div>
     <div class="right">
-      <div class="lens" id="p-lens"></div>
-      <div class="lanes" id="p-lanes" aria-label="The current sentence, lane by lane"></div>
-      <div class="drawer" id="p-drawer">
+      <div class="blk" id="b-read" data-blk="read">
+        <div class="lens" id="p-lens"></div>
+        <div class="lanes" id="p-lanes" aria-label="The current sentence, lane by lane"></div>
+      </div>
+      <div class="drawer" id="p-drawer" data-blk="detail">
         <div class="dh">
           <button type="button" class="dt" id="p-dt" aria-expanded="false" title="Show or hide the detail views">▸ Details</button>
           <div class="tabs" id="p-tabs" role="tablist" aria-label="View">
@@ -427,8 +459,9 @@
         </div>
       </div>
     </div>
-    <aside class="insp" id="p-insp" aria-label="Inspector — why this step"></aside>
+    <div class="slot" id="slot-b"><aside class="insp" id="p-insp" data-blk="insp" aria-label="Inspector — why this step"></aside></div>
   </div>
+  <div id="park" hidden></div>
   <div class="bar2">
     <div class="rib" title="Drag to scrub"><canvas></canvas></div>
     <div class="ctl">
@@ -448,6 +481,43 @@
   </div>
 </div>
 
+<script>
+// Swappable panels (wide screens): each of the reading, the details and the inspector sits in the centre slot, the
+// right slot, or is hidden. Blocks are moved, never rebuilt, so every renderer keeps its element and its listeners.
+(() => {
+  const KEY = 'holodeck-demo-layout', DEF = { read:'a', detail:'a', insp:'b' }, ORDER = ['read', 'detail', 'insp'];
+  const NAME = { a:'Centre', b:'Right', h:'Hidden' };
+  const app = document.getElementById('app'), lay = document.getElementById('lay'); if (!app || !lay) return;
+  const slots = { a: app.querySelector('.right'), b: document.getElementById('slot-b'), h: document.getElementById('park') };
+  const blk = { read: document.getElementById('b-read'), detail: document.getElementById('p-drawer'), insp: document.getElementById('p-insp') };
+  const wide = matchMedia('(min-width:1200px)');
+  let L = { ...DEF };
+  try { const v = JSON.parse(localStorage.getItem(KEY) || 'null'); if (v && ORDER.every(k => 'abh'.includes(v[k]))) L = v; } catch (e) {}
+  const save = () => { try { localStorage.setItem(KEY, JSON.stringify(L)); } catch (e) {} };
+  const sels = [...lay.querySelectorAll('select')];
+  sels.forEach(sel => { sel.innerHTML = ['a', 'b', 'h'].map(v => `<option value="${v}">${NAME[v]}</option>`).join(''); });
+  function place(){
+    const use = wide.matches ? L : DEF;
+    ORDER.forEach(k => slots[use[k]].appendChild(blk[k]));
+    for (const id of ['a', 'b']){
+      const here = ORDER.filter(k => use[k] === id);
+      slots[id].classList.toggle('only-detail', here.length === 1 && here[0] === 'detail');
+      slots[id].classList.toggle('empty-slot', !here.length);
+    }
+    sels.forEach(sel => { sel.value = L[sel.dataset.blk]; });
+    window.dispatchEvent(new Event('resize'));
+  }
+  lay.addEventListener('change', e => { const sel = e.target.closest('select'); if (!sel) return; L[sel.dataset.blk] = sel.value; save(); place(); });
+  lay.addEventListener('click', e => {
+    const b = e.target.closest('[data-lay]'); if (!b) return;
+    if (b.dataset.lay === 'swap') ORDER.forEach(k => { if (L[k] !== 'h') L[k] = L[k] === 'a' ? 'b' : 'a'; });
+    else L = { ...DEF };
+    save(); place();
+  });
+  wide.addEventListener('change', place);
+  place();
+})();
+</script>
 <script type="module">
 // ─────────────────────────────────────────────────────────────────────────────
 // "No model was called" is MEASURED: every network request this page makes is
