@@ -417,7 +417,8 @@ import { extractReadings } from './extract.js';
 import { mountMap } from '../holodeck-map.js';
 import { classifyWord, THRAX_MAP, THRAX_OUT_OF_SCOPE, THRAX_META, POS_PRIOR_META } from '../vendor/khora/native/adapters/text/wordclass.js';
 import { morphologyFromPrior, createLemmatizer, stemsOf } from '../vendor/khora/native/adapters/text/morphology.js';
-import { splitSentences } from '../vendor/khora/native/adapters/text/spans.js';
+import { splitSentences, deriveAbbreviations } from '../vendor/khora/native/adapters/text/spans.js';
+import { wordsIn as tokWordsIn, punctIn as tokPunctIn } from './tokenize.js';
 import { tokenize } from '../vendor/khora/native/organs/source.js';
 import { classifyForm, lookupForm, documentClassifier } from '../holodeck-surface.js';
 import { namesCorefer, genericTokens, extractSurfaces, discoverReferents, diaNorm } from '../vendor/khora/native/adapters/text/surfaces.js';
@@ -549,8 +550,10 @@ async function ready(){
 }
 
 // ── build the trace: run the real organs, recording each transformation ──────
-const WORD_RE = /[\p{L}\p{N}][\p{L}\p{N}'’.\-]*/gu;
-function wordsIn(text, base){ const out = []; WORD_RE.lastIndex = 0; let m; while ((m = WORD_RE.exec(text))) out.push({ w:m[0], s:base + m.index, e:base + m.index + m[0].length }); return out; }
+// punctuation is settled at tokenization (reading/tokenize.js): POS is only ever asked about word forms
+let ABBREV = null;   // the splitter's own abbreviation knowledge for the text being read
+const abbrevOf = text => deriveAbbreviations(String(text ?? '').replace(/\r\n/g, '\n').replace(/\r/g, '\n'));
+const wordsIn = (text, base) => tokWordsIn(text, base, { abbreviations: ABBREV });
 const WORDS_ANIMATED = 700;
 
 function buildTrace(doc, clean, claims, features, extraction){
@@ -584,13 +587,15 @@ function buildTrace(doc, clean, claims, features, extraction){
     : blanks.length ? `blanked ${blanks.length.toLocaleString()} characters of markup/CSS/URL furniture to spaces — every offset is unchanged` : `no markup furniture found — this material is already prose, read as it stands`,
     { s:0, e:analysis.length, data:{ runs:blankRuns } });
 
-  const sents = splitSentences(clean);
+  ABBREV = abbrevOf(clean);
+  const sents = splitSentences(clean, { abbreviations: ABBREV });
   sents.forEach((s, i) => push('statement', 'statement',
     `statement ${i + 1} of ${sents.length} · bytes ${charToByte(analysis, s.offset)}–${charToByte(analysis, s.offset + s.text.length)} · “${clamp(s.text.replace(/\s+/g,' ').trim(), 74)}”`,
     { s:s.offset, e:s.offset + s.text.length, data:{ order:i, len:sents.length } }));
 
   const words = [];
-  for (const s of sents) for (const w of wordsIn(s.text, s.offset)) words.push(w);
+  const punct = [];   // PUNCT/SYM by Unicode category: their own tokens, never sent to the class prior
+  for (const s of sents) { for (const w of wordsIn(s.text, s.offset)) words.push(w); for (const p of tokPunctIn(s.text, s.offset)) punct.push(p); }
 
   const shown = words.slice(0, WORDS_ANIMATED);
   const toks = tokenize(clean);
@@ -680,7 +685,7 @@ function buildTrace(doc, clean, claims, features, extraction){
     const list = occ.get(k) || (occ.set(k, []), occ.get(k));
     list.push({ doc:'source', id:i, s:c.s, e:c.e, t:c.span || analysis.slice(c.s, c.e) }); } });
 
-  return { ev, claims, refs, occ, words, shown, sents, blanks:blankRuns, gaps, ambiguous, toks, nBytes, hash, srcId, led, eot, scanPages:scanned ? scanned.pages : null, scanOcr:scanned ? scanned.last : null, doc, features, extraction, net:{ ...net }, totalMs:performance.now() - t0,
+  return { ev, claims, refs, occ, words, punct, shown, sents, blanks:blankRuns, gaps, ambiguous, toks, nBytes, hash, srcId, led, eot, scanPages:scanned ? scanned.pages : null, scanOcr:scanned ? scanned.last : null, doc, features, extraction, net:{ ...net }, totalMs:performance.now() - t0,
     stats:{ words:words.length, classified, gaps, ambiguous, acts, morphGaps, positions:stanceClaims.length, blanked:blanks.length } };
 }
 
@@ -1628,6 +1633,7 @@ function startTimeline(T){
     try {
       const pos = T.feat.pos === false ? null : PRIORS.posPrior, R = T.R;
       const memo = new Map();   // one classification cache for every prefix of this replay
+      ABBREV = abbrevOf(T.clean);
       T.timeline = buildReadingTimeline(T.clean, {
         hash: sha256, diaNorm, splitSentences, wordsIn, extractSurfaces, discoverReferents, resolvePronouns,
         classifyAt: prefix => pos ? documentClassifier(prefix, { posPrior: pos, lemmatizer: PRIORS.lemmatizer, lookups: LOOKUP.cache, memo }) : (f => classifyForm(f, { posPrior: null })),
@@ -1848,7 +1854,7 @@ async function corpusDeps(){
   await ready();
   const pos = PRIORS.posPrior, memo = new Map();
   const isVerb = w => { const c = classifyForm(String(w).toLowerCase(), { posPrior: pos, lemmatizer: PRIORS.lemmatizer }); return !!(c.found && c.candidates && c.candidates[0] && c.candidates[0].upos === 'VERB'); };
-  return { hash: sha256, diaNorm, splitSentences, wordsIn, extractSurfaces, discoverReferents, resolvePronouns, namesCorefer, genericTokens, isVerb, sameBeing: makeSameBeing(),
+  return { hash: sha256, diaNorm, splitSentences, wordsIn: (t, b) => tokWordsIn(t, b), extractSurfaces, discoverReferents, resolvePronouns, namesCorefer, genericTokens, isVerb, sameBeing: makeSameBeing(),
     classifyAt: prefix => documentClassifier(prefix, { posPrior: pos, lemmatizer: PRIORS.lemmatizer, lookups: LOOKUP.cache, memo }) };
 }
 const SOURCES = mountSources($('sources'), { makeDeps: corpusDeps, openInReader: (t, l) => { ta.value = t; run(t, l); }, currentText: () => ta.value });
