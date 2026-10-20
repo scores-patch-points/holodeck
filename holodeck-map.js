@@ -4,7 +4,7 @@
 // they scale what is drawn, and more labels fit as you zoom in. Nesting and label placement are holodeck-holons.js:
 // pure, from the ties alone, no model.
 //
-//   const map = mountMap(hostEl, { legend, onProfile, sentence, padBottom, wheelZoom, empty });
+//   const map = mountMap(hostEl, { legend, onProfile, sentence, padBottom, wheelZoom, empty, bonds });  // bonds: 'all' | 'hot'
 //   map.set({ sig?, nodes:[{ n, c, mine?, st?, color? }], edges:[{ a, b, c, mine?, neg? }], docs:[{ id, title }],
 //             occ: Map(name -> [{ doc, id, t? }]), hot?: Set(name), hotPairs?: [[a, b]], odd?: Map(name -> standing), sel?: name });
 //   map.destroy();
@@ -15,10 +15,10 @@
 // scroll still scrolls the page.
 import { nestByTies, repOf, visibleHolons, rollUp, placeLabels, sourceGraph, statementsOf, levelsOf, openAtLevel } from './holodeck-holons.js';
 
-export function mapOrigin(vis, adj, sel) {
+export function mapOrigin(vis, adj, sel, noun = 'name') {
   if (sel && vis.includes(sel)) return { name: sel, reason: 'you selected it' };
   let name = null, degree = -1; for (const n of vis) { const d = (adj.get(n) || new Set()).size; if (d > degree) { name = n; degree = d; } }
-  return { name, reason: degree > 0 ? 'it has the most visible connections (shared statements)' : 'it is the first visible name; no connections are present' };
+  return { name, reason: degree > 0 ? 'it has the most visible connections (shared statements)' : 'it is the first visible ' + noun + '; no connections are present' };
 }
 
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -62,10 +62,12 @@ const CSS = `
 let styled = false;
 
 export function mountMap(host, opts = {}) {
+  // what the bodies ARE called: a reading's are referents, a name-list's are names (opts.noun); every word the map says about them follows
+  const NOUN = opts.noun || 'name', NOUNS = NOUN === 'name' ? 'names' : NOUN + 's', Cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
   if (!styled) { const st = document.createElement('style'); st.textContent = CSS; document.head.appendChild(st); styled = true; }
   const root = document.createElement('div'); root.className = 'hm';
-  const legend = `<div class="hm-key"><span><i style="border:1.5px dashed var(--dim)"></i>ring: holds more names, click to open</span><span><i style="background:var(--acc)"></i>a name; larger means more statements</span><span>${opts.wheelZoom ? 'scroll' : 'Ctrl + scroll'} to zoom · drag to pan · ↑ ↓ step a level</span></div>`;
-  root.innerHTML = `<div class="hm-stage"><canvas></canvas><div class="hm-top"><div class="hm-layers" role="group" aria-label="Layer"><button type="button" data-layer="sources" title="The readings and the names they share">Sources</button><button type="button" data-layer="names" aria-pressed="true" title="Names, nested into groups that open on click">Names</button></div>` +
+  const legend = `<div class="hm-key"><span><i style="border:1.5px dashed var(--dim)"></i>ring: holds more ${NOUNS}, click to open</span><span><i style="background:var(--acc)"></i>a ${NOUN}; larger means more statements</span><span>${opts.wheelZoom ? 'scroll' : 'Ctrl + scroll'} to zoom · drag to pan · ↑ ↓ step a level</span></div>`;
+  root.innerHTML = `<div class="hm-stage"><canvas></canvas><div class="hm-top"><div class="hm-layers" role="group" aria-label="Layer"><button type="button" data-layer="sources" title="The readings and the ${NOUNS} they share">Sources</button><button type="button" data-layer="names" aria-pressed="true" title="${Cap(NOUNS)}, nested into groups that open on click">${Cap(NOUNS)}</button></div>` +
     `<div class="hm-tools"><span class="hm-tg" title="Zoom the picture"><button type="button" data-z="out" title="Zoom out">−</button><button type="button" data-z="in" title="Zoom in">+</button><button type="button" data-z="fit" title="Fit everything">Fit</button></span>` +
     `<span class="hm-tg" title="Move between levels of nesting"><button type="button" data-lv="up" title="Up a level: fewer, larger groups">↑</button><span class="hm-lv"></span><button type="button" data-lv="down" title="Down a level: open the groups">↓</button></span>` +
     `<span class="hm-tg" title="Orbit speed"><button type="button" data-spd="slow" title="Slower orbit">🐢</button><span class="hm-spd"></span><button type="button" data-spd="fast" title="Faster orbit">🐇</button></span></div><div class="hm-position" aria-label="Map viewpoint"></div></div>${opts.legend ? legend : ''}</div><div class="hm-card" hidden></div>`;
@@ -135,8 +137,8 @@ export function mountMap(host, opts = {}) {
         const ma = wadj.get(a), mb = wadj.get(b); ma.set(b, Math.max(ma.get(b) || 0, ww)); mb.set(a, Math.max(mb.get(a) || 0, ww)); };
       (D.edges || []).forEach(E => addE(E.a, E.b, E.c || (E.sts && E.sts.length)));
       if (M.agg) M.agg.forEach(E => addE(E.a, E.b, E.c));
-      const center = mapOrigin(vis, adj, sel), origin = center.name;
-      root.querySelector('.hm-position').textContent = origin ? 'Centered on ' + origin + ' because ' + center.reason + ' · ' + docMap.size + ' sources · distance follows shared-statement counts, not ownership or control' : 'No origin: no names have been read here.';
+      const center = mapOrigin(vis, adj, sel, NOUN), origin = center.name;
+      root.querySelector('.hm-position').textContent = origin ? 'Centered on ' + origin + ' because ' + center.reason + ' · ' + docMap.size + ' sources · distance follows shared-statement counts, not ownership or control' : 'No origin: no ' + NOUNS + ' have been read here.';
       topPad = topEl.offsetHeight + 16;
       // GRAVITY: orbit radius ∝ 1/bond. Edge length is the bond's inverse
       // (scaled so the strongest bond is length 1), so a strongly-bound name
@@ -193,7 +195,8 @@ export function mountMap(host, opts = {}) {
     // solar system (faint concentric circles around the origin).
     if (simulate._rings) { const ocx = W / 2, ocy = (H - padBottom + topPad) / 2, ox = X(ocx), oy = Y(ocy); g.save(); g.setLineDash([3, 6]); g.strokeStyle = col.line2; g.globalAlpha = 0.5; g.lineWidth = 1;
       simulate._rings.forEach(rad => { g.beginPath(); g.arc(ox, oy, Rz(rad), 0, 6.283); g.stroke(); }); g.restore(); }
-    M.agg.forEach((E, key) => { const a = P.get(E.a), b = P.get(E.b); if (!a || !b) return; g.beginPath(); g.moveTo(X(a.x), Y(a.y)); g.lineTo(X(b.x), Y(b.y));
+    // opts.bonds: 'all' (default) draws every bond; 'hot' draws only the relation the reading is on and the selected name's — on an orbiting layout the ring already says how near two names are, so a line between spinning bodies is only noise
+    M.agg.forEach((E, key) => { const a = P.get(E.a), b = P.get(E.b); if (!a || !b) return; if (opts.bonds === 'hot' && !hotE.has(key) && !(sel && (E.a === sel || E.b === sel))) return; g.beginPath(); g.moveTo(X(a.x), Y(a.y)); g.lineTo(X(b.x), Y(b.y));
       g.strokeStyle = E.neg ? col.bad : E.mine ? col.acc : col.edge; g.globalAlpha = hotE.has(key) ? 1 : E.mine ? 0.7 : 0.35; g.lineWidth = Math.min(5, 0.8 + Math.log2(1 + E.c)) + (hotE.has(key) ? 1.5 : 0); g.setLineDash(E.neg ? [5, 4] : []); g.stroke(); edgeHits.push({ a:E.a, b:E.b, x1:X(a.x), y1:Y(a.y), x2:X(b.x), y2:Y(b.y) }); });
     g.setLineDash([]); g.globalAlpha = 1;
     const items = [];
@@ -214,7 +217,7 @@ export function mountMap(host, opts = {}) {
     placeLabels(items, W, H - padBottom + 10, meas, 13, topPad - 6).forEach(L => { hitsAt.push({ id: L.id, x: L.x, y: L.y - 4, r: 11 }); g.textAlign = L.align; g.fillStyle = hot.has(L.id) || sel === L.id ? col.ink : col.ink2; g.fillText(L.text, L.x, L.y); });
     if (D.cursor) { const cr = M.rep.get(D.cursor) || (M.nest.has(D.cursor) ? D.cursor : null), cp = cr && P.get(cr); if (cp) drawCursor(g, X(cp.x), Y(cp.y), 'reading'); }
     g.textAlign = 'center';
-    if (!D.nodes.length) { g.fillStyle = col.dim; g.font = "13px 'Hanken Grotesk', sans-serif"; g.fillText(opts.empty || 'Names appear here as they are found.', W / 2, H / 2); }
+    if (!D.nodes.length) { g.fillStyle = col.dim; g.font = "13px 'Hanken Grotesk', sans-serif"; g.fillText(opts.empty || '' + Cap(NOUNS) + ' appear here as they are found.', W / 2, H / 2); }
   }
   function drawSources(g) {
     const prior = new Set(D.nodes.filter(x => x.st === 'prior' && !x.mine).map(x => x.n)), SG = sourceGraph({ docs: [...docMap.values()], occ, prior });
@@ -225,12 +228,12 @@ export function mountMap(host, opts = {}) {
     spokes.forEach((n, i) => { const a = -Math.PI / 2 + i * 6.283 / Math.max(1, spokes.length); pos.set(n.id, !hub && spokes.length === 1 ? { x: cx, y: cy } : { x: cx + Math.cos(a) * ring * 1.4, y: cy + Math.sin(a) * ring }); });
     g.font = "12px 'Hanken Grotesk', sans-serif";
     SG.edges.forEach(E => { const a = pos.get(E.a), b = pos.get(E.b); if (!a || !b) return; g.beginPath(); g.moveTo(X(a.x), Y(a.y)); g.lineTo(X(b.x), Y(b.y)); g.strokeStyle = col.edge; g.globalAlpha = 0.6; g.lineWidth = Math.min(8, 1 + Math.log2(1 + E.c) * 1.2); g.stroke(); g.globalAlpha = 1;
-      const t = E.a === 'prior' ? 0.7 : 0.5, lx = X(a.x + (b.x - a.x) * t), ly = Y(a.y + (b.y - a.y) * t), lab = plural(E.c, 'shared name'), lw = g.measureText(lab).width + 8;
+      const t = E.a === 'prior' ? 0.7 : 0.5, lx = X(a.x + (b.x - a.x) * t), ly = Y(a.y + (b.y - a.y) * t), lab = plural(E.c, 'shared ' + NOUN), lw = g.measureText(lab).width + 8;
       g.fillStyle = col.bg; g.globalAlpha = 0.85; g.fillRect(lx - lw / 2, ly - 9, lw, 14); g.globalAlpha = 1; g.fillStyle = col.dim; g.textAlign = 'center'; g.fillText(lab, lx, ly + 2); });
     seen.forEach(n => { const p = pos.get(n.id), r = Rz(Math.min(46, 16 + Math.sqrt(n.c) * 3)), isP = n.id === 'prior', sx = X(p.x), sy = Y(p.y);
       g.beginPath(); g.arc(sx, sy, r, 0, 6.283); g.fillStyle = isP ? col.blue : col.acc; g.globalAlpha = 0.9; g.fill(); g.globalAlpha = 1; if (sel === n.id) { g.strokeStyle = col.ink; g.lineWidth = 2; g.stroke(); }
       hitsAt.push({ id: n.id, x: sx, y: sy, r });
-      g.textAlign = 'center'; g.fillStyle = col.ink; g.fillText(n.label.length > 34 ? n.label.slice(0, 33) + '…' : n.label, sx, sy + r + 15); g.fillStyle = col.dim; g.fillText(isP ? plural(n.c, 'name') : plural(n.c, 'statement'), sx, sy + r + 29); });
+      g.textAlign = 'center'; g.fillStyle = col.ink; g.fillText(n.label.length > 34 ? n.label.slice(0, 33) + '…' : n.label, sx, sy + r + 15); g.fillStyle = col.dim; g.fillText(isP ? plural(n.c, NOUN) : plural(n.c, 'statement'), sx, sy + r + 29); });
     if (D.cursor && String(D.cursor).startsWith('doc:')) { const cp = pos.get(D.cursor); if (cp) drawCursor(g, X(cp.x), Y(cp.y), 'reading'); }
   }
   function draw() {
@@ -250,21 +253,21 @@ export function mountMap(host, opts = {}) {
         const right = new Set((occ.get(x.b) || []).map(o => String(o.doc) + ':' + o.id));
         (occ.get(x.a) || []).filter(o => right.has(String(o.doc) + ':' + o.id)).forEach(o => witnesses.set(String(o.doc) + ':' + o.id, o));
       });
-      return '<div class="hm-ch"><b>Why this connection exists</b></div>' + chipsOf([[e.a,0],[e.b,0]]) + '<p class="hm-mut">Names sharing statements, rolled up through the visible groups. This does not establish ownership, coordination or control.</p>' + (witnesses.size ? [...witnesses.values()].map(o => '<div class="hm-st"><div class="hm-src">' + esc(docTitle(o.doc)) + ' · statement ' + esc(o.id) + '</div>' + esc(sentenceOf(o)) + (opts.onWitness ? '<button type="button" data-witness="' + esc(String(o.doc) + ':' + o.id) + '">Open in source →</button>' : '') + '</div>').join('') : '<p class="hm-mut">No shared-statement witness is available here. This may be a grouping link; do not treat it as a sourced relation.</p>');
+      return '<div class="hm-ch"><b>Why this connection exists</b></div>' + chipsOf([[e.a,0],[e.b,0]]) + '<p class="hm-mut">' + Cap(NOUNS) + ' sharing statements, rolled up through the visible groups. This does not establish ownership, coordination or control.</p>' + (witnesses.size ? [...witnesses.values()].map(o => '<div class="hm-st"><div class="hm-src">' + esc(docTitle(o.doc)) + ' · statement ' + esc(o.id) + '</div>' + esc(sentenceOf(o)) + (opts.onWitness ? '<button type="button" data-witness="' + esc(String(o.doc) + ':' + o.id) + '">Open in source →</button>' : '') + '</div>').join('') : '<p class="hm-mut">No shared-statement witness is available here. This may be a grouping link; do not treat it as a sourced relation.</p>');
     }
 
     if (layer === 'sources') {
       if (!sel) return '';
-      if (sel === 'prior') { const ns = D.nodes.filter(x => x.st === 'prior' && !x.mine).sort((a, b) => b.c - a.c).slice(0, 14).map(x => [x.n, x.c]); return `<div class="hm-ch"><b>Already in the picture</b> · names from your earlier sources</div>${chipsOf(ns)}`; }
+      if (sel === 'prior') { const ns = D.nodes.filter(x => x.st === 'prior' && !x.mine).sort((a, b) => b.c - a.c).slice(0, 14).map(x => [x.n, x.c]); return `<div class="hm-ch"><b>Already in the picture</b> · ${NOUNS} from your earlier sources</div>${chipsOf(ns)}`; }
       const d = [...docMap.values()].find(x => 'doc:' + x.id === sel), id = String(d ? d.id : sel.slice(4)), names = new Map(), sts = new Set();
       occ.forEach((list, n) => list.forEach(o => { if (String(o.doc) === id) { names.set(n, (names.get(n) || 0) + 1); sts.add(o.id); } }));
-      return `<div class="hm-ch"><b>${esc(d ? d.title : 'Source')}</b> · ${plural(sts.size, 'statement')} · ${plural(names.size, 'name')}</div>${chipsOf([...names].sort((a, b) => b[1] - a[1]).slice(0, 14))}`;
+      return `<div class="hm-ch"><b>${esc(d ? d.title : 'Source')}</b> · ${plural(sts.size, 'statement')} · ${plural(names.size, NOUN)}</div>${chipsOf([...names].sort((a, b) => b[1] - a[1]).slice(0, 14))}`;
     }
     if (layer === 'names') {
       if (!sel || !model || !model.nest.has(sel)) return '';
-      if (model.virtNode && sel === VIRT) return `<div class="hm-ch"><b>Names with no strong tie</b> · ${plural(model.nest.size.get(VIRT) - 1, 'name')}</div><p class="hm-mut">None of these shares more statements with another name than chance would give. ${model.open.has(VIRT) ? 'They are spread out below.' : 'Click the ring to spread them out.'}</p>`;
+      if (model.virtNode && sel === VIRT) return `<div class="hm-ch"><b>${Cap(NOUNS)} with no strong tie</b> · ${plural(model.nest.size.get(VIRT) - 1, NOUN)}</div><p class="hm-mut">None of these shares more statements with another name than chance would give. ${model.open.has(VIRT) ? 'They are spread out below.' : 'Click the ring to spread them out.'}</p>`;
       const sts = statementsOf(occ, sel), holds = model.nest.size.get(sel) - 1;
-      return `<div class="hm-ch"><b>${esc(sel)}</b> · ${plural(sts.length, 'statement')}${holds ? ' · holds ' + plural(holds, 'more name') + (model.open.has(sel) ? ' (open)' : ' — click it to open') : ''}</div>` +
+      return `<div class="hm-ch"><b>${esc(sel)}</b> · ${plural(sts.length, 'statement')}${holds ? ' · holds ' + plural(holds, 'more ' + NOUN) + (model.open.has(sel) ? ' (open)' : ' — click it to open') : ''}</div>` +
         sts.slice(0, 3).map(o => `<div class="hm-st"><div class="hm-src">${esc(docTitle(o.doc))}</div>${esc(sentenceOf(o))}</div>`).join('') +
         `<div style="margin-top:6px">${sts.length ? '' : '<p class="hm-mut">Its statements are not among the sources read here.</p>'}${opts.onProfile ? `<button type="button" class="hm-nm" data-profile="${esc(sel)}">Open its profile →</button>` : ''}</div>`;
     }
@@ -274,21 +277,21 @@ export function mountMap(host, opts = {}) {
     layersEl.querySelectorAll('[data-layer]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.layer === layer)));
     if (D && layer === 'names') buildModel();
     const up = root.querySelector('[data-lv=up]'), dn = root.querySelector('[data-lv=down]'); up.disabled = layer === 'sources'; dn.disabled = layer === 'names' && !!model && level >= model.max;
-    lvEl.textContent = layer === 'sources' ? 'Sources' : 'Names · ' + (level + 1) + '/' + ((model ? model.max : 0) + 1);
+    lvEl.textContent = layer === 'sources' ? 'Sources' : Cap(NOUNS) + ' · ' + (level + 1) + '/' + ((model ? model.max : 0) + 1);
     const h = D ? cardHtml() : ''; cardEl.className = 'hm-card'; cardEl.hidden = !h;
     if (h !== lastCard) { lastCard = h; cardEl.innerHTML = h ? '<button type="button" class="hm-x" data-close title="Close this panel">✕</button>' + h : ''; }
   }
 
   // ---------- levels, zoom and pan ----------
   const after = () => { heat = 1; dirty = true; renderCard(); };
-  const setLayer = l => { selectedEdge = null; if (l !== 'names') root.querySelector('.hm-position').textContent = docMap.size + ' sources in this map · links count shared names; placement is a display arrangement'; if ((l === 'sources') !== (layer === 'sources')) sel = null; layer = l; after(); };
+  const setLayer = l => { selectedEdge = null; if (l !== 'names') root.querySelector('.hm-position').textContent = docMap.size + ' sources in this map · links count shared ' + NOUNS + '; placement is a display arrangement'; if ((l === 'sources') !== (layer === 'sources')) sel = null; layer = l; after(); };
   function levelDown() { if (!D) return; userLeveled = true; if (layer === 'sources') { layer = 'names'; level = 0; manual.clear(); } else if (layer === 'names') { buildModel(); if (level < model.max) { level++; manual.clear(); } } after(); }
   function levelUp() { if (layer === 'names') { userLeveled = true; if (level > 0) { level--; manual.clear(); } else { layer = 'sources'; sel = null; } } after(); }
   function zoomAt(mx, my, f) { const nk = Math.max(0.35, Math.min(8, view.k * f)), s = nk / view.k; view.x = mx - (mx - view.x) * s; view.y = my - (my - view.y) * s; view.k = nk; dirty = true; }
   const fit = () => { view.k = 1; view.x = 0; view.y = 0; dirty = true; };
   function focusName(n) { selectedEdge = null; buildModel(); sel = n; layer = 'names'; for (let p = model.nest.parent.get(n); p != null; p = model.nest.parent.get(p)) manual.set(p, true); heat = 1; dirty = true; }
   const pick = e => { const r = gc.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top; let best = null, bd = 1e9; hitsAt.forEach(h => { const d = Math.hypot(h.x - x, h.y - y); if (d <= h.r + 6 && d < bd) { best = h; bd = d; } }); return best; };
-  const tipOf = h => layer === 'sources' ? (docMap.get(h.id.slice(4)) || {}).title || h.id : h.id + (model && model.nest.kids.get(h.id) && model.nest.kids.get(h.id).length ? ' — holds ' + plural(model.nest.size.get(h.id) - 1, 'more name') : '');
+  const tipOf = h => layer === 'sources' ? (docMap.get(h.id.slice(4)) || {}).title || h.id : h.id + (model && model.nest.kids.get(h.id) && model.nest.kids.get(h.id).length ? ' — holds ' + plural(model.nest.size.get(h.id) - 1, 'more ' + NOUN) : '');
 
   gc.addEventListener('pointerdown', e => { drag = { x: e.clientX, y: e.clientY, vx: view.x, vy: view.y }; moved = false; try { gc.setPointerCapture(e.pointerId); } catch (x) {} });
   gc.addEventListener('pointermove', e => {

@@ -16,7 +16,7 @@ import { readDocumentEvidence, classifyWithDocument } from '../vendor/khora/nati
 const P = new URL('../vendor/khora/native/priors/', import.meta.url);
 const posPrior = { ...JSON.parse(fs.readFileSync(new URL('pos-eng.json', P))), lexicon: JSON.parse(fs.readFileSync(new URL('pos-eng-lexicon.json', P))) };
 const memo = new Map(); const base = (f) => { let c = memo.get(f); if (c === undefined) { c = classifyWord(f, { posPrior }); memo.set(f, c); } return c; };
-const wordsIn = (text, off) => [...text.matchAll(/[\p{L}\p{N}][\p{L}\p{N}'’.\-]*/gu)].map((m) => ({ w: m[0], s: off + m.index, e: off + m.index + m[0].length }));
+import { wordsIn } from './tokenize.js';
 const hash = (x) => createHash('sha256').update(String(x)).digest('hex');
 const isVerb = (w) => { const c = base(String(w).toLowerCase()); return !!(c.found && c.candidates?.[0]?.upos === 'VERB'); };
 // the mechanics claims below are about the LINK (ends, provenance, split); identity is decided elsewhere, so they inject a yes. The identity claims use the real test.

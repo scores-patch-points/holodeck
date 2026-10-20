@@ -107,6 +107,53 @@ export const POS_PRIOR_META = Object.freeze({
   scope: "lang/en",
 });
 
+const APOSTROPHES = /[\u2019\u2018\u02BC\u2032\uFF07`\u00B4]/g;
+const EDGE_NON_WORD = /^[^\p{L}\p{N}]+|[^\p{L}\p{N}]+$/gu;
+
+/**
+ * The looked-up form of a written form, each step named ([] steps = nothing to normalise).
+ * NFKC, then the prior's straight apostrophe, then the sentence's own edge punctuation.
+ */
+export const normalizeForm = (surface) => {
+  const steps = [];
+  let f = String(surface ?? "");
+  const nfkc = f.normalize("NFKC");
+  if (nfkc !== f) { steps.push({ step: "unicode", note: "NFKC — compatibility characters folded" }); f = nfkc; }
+  const ap = f.replace(APOSTROPHES, "'");
+  if (ap !== f) { steps.push({ step: "apostrophe", note: "curly/modifier apostrophe → the prior's straight apostrophe" }); f = ap; }
+  const edge = f.replace(EDGE_NON_WORD, "");
+  if (edge && edge !== f) { steps.push({ step: "edge-punctuation", note: `“${f.match(EDGE_NON_WORD).join("")}” is the sentence's punctuation, not part of the form` }); f = edge; }
+  return { form: f, steps };
+};
+
+const SHAPES = [
+  ["email", /^[\w.+-]+@[\w-]+(?:\.[\w-]+)+$/, "X", "an e-mail address"],
+  ["url", /^(?:https?:\/\/|www\.)\S+$/i, "X", "a URL"],
+  ["ordinal", /^\d+(?:st|nd|rd|th)$/i, "ADJ", "an ordinal numeral"],
+  ["number", /^[+-]?[$€£]?\d[\d,]*(?:\.\d+)?%?$/, "NUM", "a numeral (digits, grouping, currency or percent)"],
+  ["identifier", /^[A-Z]{1,3}\d{4,}(?:\.\d+)?$/, "X", "a document or account identifier (letters then a digit run)"],
+];
+
+/** A DECLARED shape grammar: the class a form's orthography settles, whatever any corpus says. */
+export const shapeClass = (form) => {
+  for (const [rule, re, upos, note] of SHAPES) if (re.test(form)) return { rule, upos, note };
+  return null;
+};
+
+const LEXICON_INDEX = new WeakMap();
+const lexiconIndex = (lex) => {
+  let m = LEXICON_INDEX.get(lex);
+  if (!m) {
+    m = new Map();
+    for (const [key, forms] of Object.entries(lex?.classes ?? {})) {
+      const upos = key.split("|");
+      for (const f of forms) if (!m.has(f)) m.set(f, { key, upos });
+    }
+    LEXICON_INDEX.set(lex, m);
+  }
+  return m;
+};
+
 /**
  * Every class this occurrence's own FORM is attested as, with real counts
  * from the treebank and the Thrax-tradition reading of each — never
@@ -124,9 +171,38 @@ export const POS_PRIOR_META = Object.freeze({
  *   (THRAX_OUT_OF_SCOPE) — a disclosed absence, never a guess.
  */
 export const classifyWord = (surface, { posPrior } = {}) => {
-  const lower = (surface ?? "").toLowerCase();
-  const counts = posPrior?.forms?.[lower];
-  if (!counts) return { surface, found: false, total: 0, candidates: [] };
+  const hit = (form) => posPrior?.forms?.[form.toLowerCase()];
+  let counts = hit(surface ?? "");
+  let form = surface, via = [];
+  const norm = counts ? null : normalizeForm(surface);
+  if (!counts && norm.steps.length && norm.form) {
+    // The prior is keyed on bare forms with a straight apostrophe. A form arrives as written —
+    // "O’Connell" (curly mark), "Department." (the sentence's own period still attached). Those
+    // are differences of typing, not absences from the prior. Tried only on a miss, so an exact
+    // entry is never second-guessed, and the hop is named so no one reads it as the form itself.
+    counts = hit(norm.form);
+    if (counts) { form = norm.form; via = norm.steps; }
+  }
+  if (!counts) {
+    // Not in the treebank. Two further givers, in order, each named in `via` and in `attested`:
+    // a DECLARED shape grammar (a digit run is a numeral whatever any corpus says), then the
+    // received class lexicon (posPrior.lexicon, POSLexicon@1 — attestation only, no frequencies).
+    const probe = norm.form || "";
+    const hops = norm.steps;
+    const sh = probe ? shapeClass(probe) : null;
+    if (sh) {
+      return { surface, found: true, total: 0, form: probe, via: [...hops, { step: "shape", rule: sh.rule, note: sh.note }], attested: "shape",
+        candidates: [{ upos: sh.upos, count: 0, share: 1, thraxClass: THRAX_MAP[sh.upos] ?? null, attested: "shape" }] };
+    }
+    const lex = posPrior?.lexicon;
+    const ent = lex && probe ? lexiconIndex(lex).get(probe.toLowerCase()) : null;
+    if (ent) {
+      const giver = lex.provenance?.givers ?? null;
+      return { surface, found: true, total: 0, form: probe, via: [...hops, { step: "lexicon", class: ent.key, note: "not in the treebank prior; attested in the received class lexicon — attestation only, no frequency" }], attested: "lexicon", givers: giver,
+        candidates: ent.upos.map((upos) => ({ upos, count: 0, share: null, thraxClass: THRAX_MAP[upos] ?? null, attested: "lexicon" })) };
+    }
+    return { surface, found: false, total: 0, candidates: [] };
+  }
 
   const total = Object.values(counts).reduce((a, b) => a + b, 0);
   const candidates = Object.entries(counts)
@@ -138,7 +214,7 @@ export const classifyWord = (surface, { posPrior } = {}) => {
     }))
     .sort((a, b) => b.count - a.count);
 
-  return { surface, found: true, total, candidates };
+  return via.length ? { surface, found: true, total, candidates, form, via } : { surface, found: true, total, candidates };
 };
 
 /**
@@ -160,6 +236,7 @@ export const dominantClass = (classification, { minShare } = {}) => {
   if (!Number.isFinite(minShare) || minShare < 0 || minShare > 1)
     throw new TypeError("dominantClass: minShare is declared — how dominant a candidate must be is never a default");
   const top = classification?.candidates?.[0];
-  if (!top || top.share < minShare) return null;
+  // a lexicon candidate is attested, not measured (share:null) — it never settles a class
+  if (!top || top.share == null || top.share < minShare) return null;
   return top;
 };

@@ -14,6 +14,7 @@ import { MARKER } from './shapes.js';
 import { primeFor, gainsAt } from './sections.js';
 import { loadPrograms, apply as applyLearned } from './learned.js';
 import { recordReading, layerCounts, chainOf } from './scan-ledger.js';
+import { buildRows, sortRows, nextSort, tableHTML } from './referent-table.js';
 import { fieldsOf, htmlExport, pageHTML, placeHTML, pdfHTML, semanticOf, blockStarts, tupleHTML, tupleChildren, tupleAt, readForm } from './page-views.js';
 
 const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -33,7 +34,7 @@ const CSS = `
 #rv button{font:13px var(--sans);background:var(--s1);color:var(--ink);border:1px solid var(--line2);border-radius:7px;padding:4px 10px;cursor:pointer}
 #rv button:hover{border-color:var(--acc3)}
 #rv .body{display:grid;grid-template-columns:260px minmax(0,1fr) 380px;grid-template-rows:minmax(0,1fr);min-height:0}
-@media (min-width:1001px) and (max-width:1320px){#rv .body{grid-template-columns:210px minmax(0,1fr) 300px}}
+@media (min-width:1001px) and (max-width:1320px){#rv .body{grid-template-columns:240px minmax(0,1fr) 300px}}
 #rv .modes{display:flex;gap:4px;margin:0 0 14px;flex-wrap:wrap}
 #rv .modes button{background:none;border-color:var(--line)}#rv .modes button.on{background:var(--sel2);border-color:var(--acc3)}
 #rv .pgh{font:12px var(--mono);color:var(--dim);margin:18px 0 6px}
@@ -69,6 +70,15 @@ const CSS = `
 #rv .it.sel{background:var(--sel2)}
 #rv .it .n{margin-left:auto;color:var(--dim);font:12.5px var(--mono)}
 #rv .it .dot{width:8px;height:8px;border-radius:50%;flex:0 0 auto;transform:translateY(-1px)}
+#rv .rt{width:100%;border-collapse:collapse;table-layout:auto;font-size:13px}
+#rv .rt th,#rv .rt td{padding:4px 5px;text-align:left;font-weight:400;line-height:1.35;border-bottom:1px solid var(--line)}
+#rv .rt thead th{font:600 11px var(--mono);color:var(--dim);white-space:nowrap}
+#rv .rt thead button{all:unset;cursor:pointer;color:inherit;font:inherit}#rv .rt thead button:hover,#rv .rt thead button:focus-visible{color:var(--ink)}
+#rv .rt .ar{margin-left:3px;font-size:9px}#rv .rt .num{text-align:right;font-family:var(--mono);font-size:12.5px;color:var(--dim)}
+#rv .rt tbody tr{cursor:pointer}#rv .rt tbody tr:hover{background:var(--s1)}#rv .rt tbody tr.sel{background:var(--sel2)}
+#rv .rt .c-name{overflow-wrap:normal;word-break:normal;hyphens:manual;min-width:9ch}#rv .rt .c-name>span:last-child{display:inline}#rv .rt .num{width:1%;white-space:nowrap}#rv .rt thead th.num,#rv .rt thead th:not(:first-child){white-space:normal}#rv .rt .c-name .dot{float:left;width:8px;height:8px;border-radius:50%;margin:5px 6px 0 0}
+#rv .rt .sm{display:inline-block;width:8px;height:8px;border-radius:2px;margin-left:2px}#rv .rt .c-reality{text-align:center;cursor:help}
+#rv .rt .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 #rv .crumbs{font-size:13px;color:var(--dim);margin:0 0 14px}
 #rv .crumbs a{color:var(--acc);cursor:pointer;text-decoration:none}
 #rv .crumbs a:hover{text-decoration:underline}
@@ -111,6 +121,17 @@ const CSS = `
 #rv .lyr label{display:flex;gap:6px;align-items:center;font-size:13px;color:var(--ink2);cursor:pointer}
 #rv .delta{position:absolute;left:14px;bottom:100%;font-size:12.5px;color:var(--amber);background:var(--bg);padding:4px 8px;border:1px solid var(--line);border-radius:6px}
 #rv .dim{color:var(--dim)}
+#rv .seg,#rv .mob{display:none}
+@media (max-width:1000px){
+#rv{grid-template-rows:auto auto minmax(0,1fr) auto}
+#rv .seg{display:flex;gap:6px;padding:8px 12px;border-bottom:1px solid var(--line)}#rv .seg button{flex:1;min-height:42px;font-size:14px}#rv .seg button.on{background:var(--sel2);border-color:var(--acc3)}
+#rv .mob{display:inline-block}#rv .dl{display:none;flex-basis:100%;gap:8px;flex-wrap:wrap}#rv .dl.open{display:flex}
+#rv .proof{display:none}#rv .top .sp{display:none}
+#rv button{min-height:40px;padding:6px 12px;font-size:14px}
+#rv .col{display:none}#rv[data-m="hero"] .hero,#rv[data-m="idx"] .idx,#rv[data-m="prov"] .prov{display:block}
+#rv .body{padding-bottom:14px}
+}
+@media (max-width:1000px){#rv .rt .c-sources,#rv .rt .c-first{display:none}#rv .rt tbody th,#rv .rt tbody td,#rv .rt thead th{height:40px;padding:4px 6px}}
 @media (max-width:1000px){#rv .body{display:flex;flex-direction:column;overflow:auto}#rv .col{overflow:visible;flex:0 0 auto}#rv .hero{order:1}#rv .prov{order:2;border-left:0;border-top:1px solid var(--line)}#rv .idx{order:3;border-right:0;border-top:1px solid var(--line)}#rv .top{gap:8px}#rv .top h2{font-size:15px;flex-basis:100%}#rv .doc{font-size:15px;line-height:1.8}#rv .kv{grid-template-columns:96px 1fr}}
 `;
 
@@ -124,10 +145,11 @@ export function mountReader(T, ctx) {
   if (!document.getElementById('rv-css')) { const s = document.createElement('style'); s.id = 'rv-css'; s.textContent = CSS; document.head.appendChild(s); }
   let root = document.getElementById('rv');
   if (!root) { root = document.createElement('div'); root.id = 'rv'; document.body.appendChild(root); }
-  root.innerHTML = `<div class="top"><h2></h2><span class="proof"></span><span class="sp"></span><button type="button" data-a="json">⤓ the reading as JSON</button><button type="button" data-a="scanlog" title="Every layer of reading the scan, from the pixels to the statements, as one append-only log (Provenance@2)">⤓ scan log</button><button type="button" data-a="html" title="The scan's words as standalone semantic HTML, filled-in values carrying their provenance">⤓ as HTML</button><button type="button" data-a="close" title="Esc">✕ Close</button></div>
+  root.innerHTML = `<div class="top"><h2></h2><span class="proof"></span><span class="sp"></span><button type="button" data-a="layers" title="The layered instrument: every layer, the replay, and the relative solar system">▦ Layers</button><button type="button" data-a="more" class="mob" aria-label="More" title="Downloads">⋯</button><span class="dl"><button type="button" data-a="json">⤓ the reading as JSON</button><button type="button" data-a="scanlog" title="Every layer of reading the scan, from the pixels to the statements, as one append-only log (Provenance@2)">⤓ scan log</button><button type="button" data-a="html" title="The scan's words as standalone semantic HTML, filled-in values carrying their provenance">⤓ as HTML</button></span><button type="button" data-a="close" title="Esc">✕ Close</button></div>
+    <div class="seg" role="tablist" aria-label="Panel"><button type="button" data-a="mt" data-m="hero">Reading</button><button type="button" data-a="mt" data-m="idx">What was read</button><button type="button" data-a="mt" data-m="prov">Where from</button></div>
     <div class="body"><div class="col idx"></div><div class="col hero"></div><div class="col prov"></div></div>
     <div class="bar"></div>`;
-  root.classList.add('on');
+  root.classList.add('on'); root.dataset.m = 'hero'; root.querySelector('.seg [data-m="hero"]').classList.add('on');
   const $ = (s) => root.querySelector(s);
   const ac = new AbortController(), on = (el, t, fn) => el.addEventListener(t, fn, { signal: ac.signal });
   const st = { mode: T.doc.layout ? 'pdf' : 'text', showClaims: false, sel: { kind: 'doc' }, overlay: [], frontier: null, playing: null, flash: new Set(), delta: ctx.delta || null, features: { ...ctx.features } };
@@ -215,7 +237,7 @@ export function mountReader(T, ctx) {
   }, 0);
 
   // ── selection, crumbs ──
-  const select = (sel) => { if ((sel.kind === 'ref' || sel.kind === 'mention') && !sel.name) { const f = fold(); const r = f && f.referents.get(f.resolve(sel.ref)); if (r && r.name) sel = { ...sel, name: r.name }; else if (st.sel.name && st.sel.ref === sel.ref) sel = { ...sel, name: st.sel.name }; } st.sel = sel; render(); };
+  const select = (sel) => { if (sel.kind !== 'doc' && matchMedia('(max-width:1000px)').matches && root.dataset.m === 'idx') { root.dataset.m = 'hero'; root.querySelectorAll('.seg button').forEach((x) => x.classList.toggle('on', x.dataset.m === 'hero')); } if ((sel.kind === 'ref' || sel.kind === 'mention') && !sel.name) { const f = fold(); const r = f && f.referents.get(f.resolve(sel.ref)); if (r && r.name) sel = { ...sel, name: r.name }; else if (st.sel.name && st.sel.ref === sel.ref) sel = { ...sel, name: st.sel.name }; } st.sel = sel; render(); };
   function crumbs() {
     const f = fold(), s = st.sel, c = [{ label: title, go: { kind: 'doc' } }];
     if (s.kind === 'ref' || s.kind === 'mention') { c.push({ label: 'People & things', go: { kind: 'doc' } }, { label: (f && f.referents.get(f.resolve(s.ref)) && f.referents.get(f.resolve(s.ref)).name) || s.name || refName(f, s.ref), go: { kind: 'ref', ref: s.ref } }); if (s.kind === 'mention') c.push({ label: `mention ${s.n}` }); }
@@ -237,11 +259,13 @@ export function mountReader(T, ctx) {
     const it = (sel, label, n, cls, dot) => `<div class="it${cls ? ' sel' : ''}" data-sel='${esc(JSON.stringify(sel))}'>${dot ? `<span class="dot" style="background:${dot}"></span>` : ''}<span>${label}</span>${n != null ? `<span class="n">${n}</span>` : ''}</div>`;
     const fs = fields();
     let h = fs.length ? `<div class="grp">Fields · ${fs.length}</div>${fs.slice(0, 40).map((x) => it({ kind: 'field', id: x.id }, `${esc(x.label)} <span class="dim">${esc(x.value.slice(0, 40))}</span>`, null, s.kind === 'field' && s.id === x.id)).join('')}` : '';
-    h += `<div class="grp">People & things</div>${people.map((r) => it({ kind: 'ref', ref: r.id }, esc(r.name || '—'), r.mentions.length, (s.kind === 'ref' || s.kind === 'mention') && f.resolve(s.ref) === r.id, f.col.get(r.id))).join('') || '<div class="dim">none established yet</div>'}${furniture ? `<div class="dim" style="margin:4px 7px">and ${furniture} printed form word${furniture === 1 ? '' : 's'} (Yes, No, Part …), not listed</div>` : ''}`;
+    const C0 = ctx.sources && ctx.sources(), multi = C0 && C0.corpus && C0.sources.length > 1, srt = st.rsort || { key: 'mentions', dir: 'desc' };
+    const rows = sortRows(buildRows(people.map((r) => ({ id: r.id, name: r.name, mentions: r.mentions, born: r.born, dot: f.col.get(r.id) })), { beings: multi ? C0.fold.beings : [], sources: multi ? C0.sources : [], selectedId: (s.kind === 'ref' || s.kind === 'mention') ? f.resolve(s.ref) : null }), srt.key, srt.dir);
+    h += `<div class="grp">People & things</div>${people.length ? tableHTML(rows, { nSources: multi ? C0.sources.length : 1, sort: srt, palette: COL }) : '<div class="dim">none established yet</div>'}${furniture ? `<div class="dim" style="margin:4px 7px">and ${furniture} printed form word${furniture === 1 ? '' : 's'} (Yes, No, Part …), not listed</div>` : ''}`;
     const cl = claims();
     if (isForm()) { const F = form(); h += `<div class="grp">What the form says · ${F.claims.length}</div><div class="dim" style="margin:0 7px 6px">said by ${esc(F.filer.name)}${F.voice ? `, signed ${esc(F.voice.name)}` : ''}</div>${F.claims.slice(0, 60).map((c) => it({ kind: 'fclaim', id: c.id }, `<span class="dim">${esc(c.act)}</span> ${esc(c.object)}`, null, s.kind === 'fclaim' && s.id === c.id)).join('')}${F.skipped ? `<div class="dim" style="margin:4px 7px">${F.skipped} field${F.skipped === 1 ? '' : 's'} too garbled by the scan to read as a statement</div>` : ''}`; }
     if (isForm() && !st.showClaims) h += `<div class="grp">Sentence claims</div><div class="dim" style="margin:0 7px">This reads as a form (${fields().length} fields). Claims are read from sentences, and a form's lines are not sentences, so none are shown. <a data-a="showclaims" style="color:var(--acc);cursor:pointer">show them anyway</a></div>`;
-    else h += `<div class="grp">Claims</div>${cl.map((c) => { const i = T.claims.indexOf(c); return it({ kind: 'claim', i }, `${esc(c.end1)} <span class="dim">${esc(c.label)}</span> ${esc(c.end2)}`, null, s.kind === 'claim' && s.i === i); }).join('') || '<div class="dim">no claim read yet</div>'}`;
+    else h += `<div class="grp">Claims</div>${cl.map((c) => { const i = T.claims.indexOf(c); return it({ kind: 'claim', i }, `${c.mood === 'interrogative' ? '<span class="dim">asks · </span>' : c.mood === 'exclamative' ? '<span class="dim">exclaims · </span>' : ''}${esc(c.end1)} <span class="dim">${esc(c.label)}</span> ${esc(c.end2)}`, null, s.kind === 'claim' && s.i === i); }).join('') || '<div class="dim">no claim read yet</div>'}`;
     const un = unplaced().slice(0, 20);
     if (un.length) h += `<div class="grp">Words it could not place</div>${un.map(([k, ts]) => it({ kind: 'word', w: ts[0].w, s: ts[0].s, e: ts[0].e }, esc(ts[0].w), ts.length, s.kind === 'word' && s.w.toLowerCase() === k)).join('')}`;
     const C = ctx.sources && ctx.sources();
@@ -438,11 +462,15 @@ export function mountReader(T, ctx) {
     render(); timer = setInterval(step, 900); };
   on(root, 'click', (e) => {
     const cr = e.target.closest('[data-crumb]'); if (cr) { const c = [{ kind: 'doc' }]; const s = st.sel; if ((s.kind === 'mention') && +cr.dataset.crumb === 2) return select({ kind: 'ref', ref: s.ref, name: s.name }); return select(c[0]); }
+    const rs = e.target.closest('[data-rsort]'); if (rs) { st.rsort = nextSort(st.rsort || { key: 'mentions', dir: 'desc' }, rs.dataset.rsort); return render(); }
     const it = e.target.closest('[data-sel]'); if (it && !e.target.closest('select')) return select(JSON.parse(it.dataset.sel));
     const w = e.target.closest('.doc .w');
     if (w && st.sel.kind === 'doc' || w && e.target.closest('.hero')) { if (w.dataset.ref) return select({ kind: 'ref', ref: w.dataset.ref }); const t = tokens()[+w.dataset.t]; if (t) return select({ kind: 'word', w: t.w, s: t.s, e: t.e }); }
     const b = e.target.closest('button[data-a], a[data-a]'); if (!b) return; const a = b.dataset.a;
     if (a === 'mode') { st.mode = b.dataset.m; return render(); } if (a === 'showclaims') { st.showClaims = true; return render(); }
+    if (a === 'mt') { root.dataset.m = b.dataset.m; root.querySelectorAll('.seg button').forEach((x) => x.classList.toggle('on', x === b)); root.querySelector('.body').scrollTop = 0; return; }
+    if (a === 'more') { root.querySelector('.dl').classList.toggle('open'); return; }
+    if (a === 'layers') { ctx.showLayers && ctx.showLayers(); return; }
     if (a === 'scanlog' && L) { const g = recordLayers(); if (g) ctx.download(`${(T.doc.label || 'reading').replace(/[^\w]+/g, '-').slice(0, 40)}-scan-log.json`, JSON.stringify(g.led.eot({ root: T.eot && T.eot.root }), null, 1), 'application/json'); } else if (a === 'html' && L) ctx.download(`${(T.doc.label || 'reading').replace(/[^\w]+/g, '-').slice(0, 40)}-reading.html`, htmlExport(L, R(), { title: T.doc.label || 'reading', tilt: st.tilt }), 'text/html;charset=utf-8'); else if (a === 'close') close(); else if (a === 'json') ctx.download(`${(T.doc.label || 'reading').replace(/[^\w]+/g, '-').slice(0, 40)}-reading.json`, JSON.stringify({ reading: structure(), run: ctx.readingJSON(T).run, corrections: st.overlay }, null, 2), 'application/json');
     else if (a === 'play') play(); else if (a === 'sever') act('sever', { mid: b.dataset.mid }); else if (a === 'undo') act('undo', { act: b.dataset.act });
   });

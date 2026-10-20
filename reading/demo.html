@@ -92,7 +92,7 @@
   .tabs button{all:unset;cursor:pointer;font:600 12.5px var(--sans);color:var(--dim);padding:8px 12px;border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap}
   .tabs button:hover{color:var(--ink)}
   .tabs button[aria-selected=true]{color:var(--ink);border-bottom-color:var(--acc)}
-  .pane{overflow:auto;min-height:0;padding:0 16px 24px}
+  .pane{overflow:auto;min-height:0;padding:12px 16px 24px}
   .pane-wrap{min-height:0;display:grid;position:relative}
   .pane-wrap > *{grid-area:1/1}
   .graph-host{padding:0;overflow:hidden;position:relative}
@@ -250,6 +250,8 @@
   .insp .rtbl.m td,.insp .rtbl.m th{font-size:12.5px}.insp .rtbl.m tr[data-span]{cursor:default}.insp .rtbl.m tr.sel{box-shadow:inset 3px 0 0 var(--acc)}
   .insp .you{font:12.5px/1.8 var(--sans);color:var(--ink2)}.insp .you button{all:unset;cursor:pointer;color:var(--blue);text-decoration:underline;margin-left:6px;font:12.5px var(--sans)}.insp .small{font-size:12.5px;color:var(--dim)}
   .lens .txt .mn{box-shadow:inset 0 -3px 0 var(--rc);cursor:pointer}.lens .txt .mn.sel{background:color-mix(in srgb, var(--rc) 22%, transparent)}.lens .txt .pick{outline:2px dashed var(--acc);outline-offset:1px;border-radius:2px}
+  /* the lens never paints outside its own box, and the tabs sit on an opaque ground, so a long line can never run under the drawer */
+  .lens{contain:paint}.drawer,.dh,#p-tabs{background:var(--bg)}.dh,#p-tabs{position:relative;z-index:2}
   @media (min-width:1200px){
     .body{grid-template-columns:300px minmax(0,1fr) minmax(340px,400px)}
     .right{grid-template-rows:auto minmax(0,1fr) auto;min-width:0}
@@ -272,11 +274,45 @@
   #app .top .stats, #app .top [data-a="toggle-all"], #app .top [data-a="reset"], #app .top [data-a="copy"]{display:none}
   #app .left .log, #app .bar2 .key, #app .bar2 .seg, #app .bar2 label, #app .bar2 [data-a="rev"], #app .bar2 .rd{display:none}
   #app .lanes .h, #app .lanes .lg, #app .lens .doc, #app .insp .legend, #app .insp .lg{display:none}
-  /* three panels: layers · the document · the inspector. The Details drawer repeated the inspector's views, so it is gone. */
-  #app #p-drawer{display:none}
-  #app .right{grid-template-rows:minmax(0,1fr) auto}
+  /* ── on a phone the Layers view is the drawer: the layers become a swipeable row, the sentence and its lanes stay short, and the graph gets the screen ── */
+  @media (max-width:900px){
+    #app .top{padding:8px 12px;gap:6px}#app .top .meta{display:none}#app .top h2{font-size:16px;flex-basis:100%}
+    #app .top button{min-height:40px;padding:6px 12px}#app .top [data-a="dl-json"]{display:none}
+    #app .body{grid-template-columns:1fr;grid-template-rows:auto minmax(0,1fr)}
+    #app .left{border:0;border-bottom:1px solid var(--line);max-height:none}
+    #app .spine{display:flex;flex-direction:row;gap:6px;overflow-x:auto;overflow-y:hidden;max-height:none;padding:8px 12px;-webkit-overflow-scrolling:touch}
+    #app .spine .ly{flex:0 0 auto;margin:0;padding:8px 14px;white-space:nowrap;min-height:40px}
+    #app .right{grid-template-rows:auto auto minmax(46vh,1fr);overflow:auto}
+    #app .lens{max-height:22vh;overflow:auto;font-size:15px;line-height:1.7}
+    #app .lanes{max-height:16vh;overflow:auto}
+    #app #p-drawer{min-height:46vh}
+    #app #p-tabs{overflow-x:auto;white-space:nowrap}#app #p-tabs button{min-height:42px;flex:0 0 auto}
+    #p-graph .hm-tg,#p-graph .hm-position{display:none}
+    #p-graph .hm-top{left:8px;right:8px}
+    #app .bar2 button{min-height:40px;min-width:40px}
+  }
+  /* referents as a table — the same module as the reader's index (referent-table.js) */
+  #app .rt{width:100%;border-collapse:collapse;font-size:13px}#app .rt th,#app .rt td{padding:6px 8px;text-align:left;font-weight:400;line-height:1.35;border-bottom:1px solid var(--line)}
+  #app .rt thead th{font:600 11px var(--mono);color:var(--dim);white-space:nowrap}#app .rt thead button{all:unset;cursor:pointer;color:inherit;font:inherit}#app .rt thead button:hover{color:var(--ink)}
+  #app .rt .ar{margin-left:3px;font-size:9px}#app .rt .num{text-align:right;font-family:var(--mono);font-size:12.5px;color:var(--dim)}
+  #app .rt tbody tr{cursor:pointer}#app .rt tbody tr:hover{background:var(--s1)}#app .rt tbody tr.sel{background:#1a1f2b}
+  #app .rt .c-name{overflow-wrap:normal;word-break:normal;hyphens:manual;min-width:9ch}#app .rt .c-name>span:last-child{display:inline}#app .rt .num{width:1%;white-space:nowrap}#app .rt thead th.num,#app .rt thead th:not(:first-child){white-space:normal}#app .rt .c-name .dot{float:left;width:8px;height:8px;border-radius:50%;margin:5px 6px 0 0}
+  #app .rt .sm{display:inline-block;width:8px;height:8px;border-radius:2px;margin-left:2px}#app .rt .c-reality{text-align:center;cursor:help}
+  #app .rt .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  @media (max-width:900px){#app .rt tbody th,#app .rt tbody td,#app .rt thead th{height:40px}#app .rt .c-first{display:none}}
+  /* the Layers view keeps its drawer: Source · Words · POS · Morphology · Referents · Propositions · Render · EOT · JSON · Graph (the solar system) */
   #app .lens{overflow:auto;min-height:0}
-  #app .spine .why, #app .spine .cnt, #app .spine .h{display:none}
+  #app .spine .h{display:none}
+  /* every section says what it is doing: the rail's notes, the tab notes, the phone's note line */
+  .ly .why{font-size:12.5px;line-height:1.4}.ly .cnt{font:12.5px var(--mono);color:var(--ink2)}
+  .ly .how{display:none;grid-column:2 / 4;font-size:12px;line-height:1.45;color:var(--dim);margin-top:2px}.ly.cur .how{display:block}.ly .how b{color:var(--ink2);font-weight:600}
+  .pnote{border:1px solid var(--line);border-radius:9px;padding:9px 12px;margin:0 0 12px;font-size:13.5px;line-height:1.55;background:var(--s1)}.pnote b{color:var(--ink2)}
+  #p-graph-note{align-self:start;z-index:3;margin:6px 10px 0;font-size:13px;line-height:1.5}#p-graph-note .pnote{margin:0;background:var(--s1);opacity:.96}#p-graph-note summary{cursor:pointer}
+  .lnote{display:none}
+  @media (max-width:900px){
+    #app .lnote{display:block;padding:8px 14px;font-size:13px;line-height:1.5;border-bottom:1px solid var(--line);max-height:30vh;overflow:auto}#app .lnote b{color:var(--ink2)}
+    #app .spine .why,#app .spine .how,#app .spine .cnt{display:none}
+  }
   #app .top h2{font-size:17px;font-weight:600}
   #app .lens{line-height:1.9;font-size:16px}
   #app .insp{line-height:1.55}
@@ -288,6 +324,31 @@
   #app .ly .n{display:none}
   @media (max-width:1199px){ #app .spine{max-height:26vh} #app .ly{margin:4px 0;padding:7px 12px} }
 
+/* ── panels that read in one direction: the header is one line of title, then one line of controls; the rail fills its column; every tab is visible ── */
+#app .top h2{flex-basis:100%}
+#app .top .meta{flex:1 1 0;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}#app .top .sp{display:none}
+@media (min-width:901px) and (max-width:1199px){ #app .spine{max-height:none} #app .tabs{flex-wrap:wrap;overflow:visible} }
+.pstat{display:flex;flex-wrap:wrap;gap:6px 14px;font:12.5px var(--mono);color:var(--dim);margin:0 0 12px}.pstat b{color:var(--ink);font-weight:600}
+/* propositions: one card per statement — the words, then what the parser made of them, then what the reading tied */
+.pc{border:1px solid var(--line);border-radius:10px;background:var(--s1);margin:0 0 10px;overflow:hidden}
+.pc.cur{border-color:var(--acc3);box-shadow:inset 3px 0 0 var(--acc)}
+.pc.thin{background:none;border-style:dashed}.pc.thin .pc-s{color:var(--dim);font-size:14px}
+.pc-h{display:grid;grid-template-columns:28px 1fr auto;gap:10px;align-items:baseline;padding:10px 12px 8px}
+.pc-n{font:12.5px var(--mono);color:var(--dim);text-align:right}
+.pc-s{font:15.5px/1.6 var(--serif);color:var(--ink2);word-break:break-word}.pc-s .mrel{border-bottom:1.5px solid var(--acc);color:var(--ink)}
+.pc-b{font:12px var(--mono);color:var(--dim);white-space:nowrap}
+.pc-sec{border-top:1px solid var(--line);padding:7px 12px 9px 50px}
+.pc-k{font:600 11.5px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--dim);margin:0 0 4px}.pc-k span{text-transform:none;letter-spacing:0;font-weight:400}
+.pc-why{font:12.5px var(--sans);color:var(--dim)}
+.tup{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:2px 0 2px 0;font-size:12.5px}
+.tup .o{font:12px var(--mono);color:var(--dim);min-width:16px}
+.tup.d1{margin-left:18px;padding-left:10px;border-left:1px solid var(--line2)}.tup.d2{margin-left:36px;padding-left:10px;border-left:1px solid var(--line2)}.tup.d3{margin-left:54px;padding-left:10px;border-left:1px solid var(--line2)}
+.tup .pnode{font-size:12.5px}.tup .pnode.nil{opacity:.45;border-style:dashed}
+.tup .parc{color:var(--green)}.tup.rel .parc{color:var(--blue)}
+.tup .tag{font:11.5px var(--mono);color:var(--dim)}.tup .tag.m{color:var(--amber)}
+.tie{display:grid;grid-template-columns:minmax(0,1fr) auto auto auto;gap:6px 14px;align-items:center;padding:2px 0}
+.tie .mono{color:var(--mut)}
+@media (max-width:700px){.pc-sec{padding-left:12px}.tie{grid-template-columns:1fr;gap:4px}}
 </style>
 </head>
 <body>
@@ -326,6 +387,7 @@
     <button type="button" data-a="reset" title="Back to every layer on">reset</button>
     <button type="button" data-a="copy">Copy trace (JSON)</button>
     <button type="button" data-a="dl-json" title="Download the whole reading — propositions, referents, and the EOT ledger — as JSON">⤓ Reading (JSON)</button>
+    <button type="button" data-a="to-reader" class="f" title="Back to the reading">◀ Reader</button>
     <button type="button" class="exit" data-a="close" aria-label="Exit" title="Exit (Esc)">✕ Exit</button>
     <span class="stats" id="p-stats"></span>
     <div class="delta" id="p-delta" hidden></div>
@@ -333,6 +395,7 @@
   <div class="body">
     <div class="left">
       <div class="spine" id="spine"></div>
+      <div class="lnote" id="p-lnote" aria-live="polite"></div>
       <div class="log">
         <div class="rows" tabindex="0"><div class="sz"></div></div>
         <div class="now" id="p-now"></div>
@@ -359,6 +422,7 @@
         </div>
         <div class="pane-wrap">
           <div class="pane" id="p-pane"></div>
+          <div id="p-graph-note" hidden></div>
           <div class="pane graph-host" id="p-graph" hidden></div>
         </div>
       </div>
@@ -397,12 +461,18 @@ window.fetch = (u, o) => { net.requests.push(String(u)); return _fetch(u, o); };
 import { detectLang } from '../vendor/fold-chat/fold-chat-lang.js';
 import { htmlReading, csvReading } from '../holodeck-read.js';
 import { makeEngineRelationReader, loadPriors, blankMarkup } from '../holodeck-reader.js';
-import { extractReadings } from './extract.js';
+import { extractReadings, sniffExtraction } from './extract.js';
+import { joinItems, decideJunctions, applyJunctions } from './look-joins.js';
 import { mountMap } from '../holodeck-map.js';
 import { classifyWord, THRAX_MAP, THRAX_OUT_OF_SCOPE, THRAX_META, POS_PRIOR_META } from '../vendor/khora/native/adapters/text/wordclass.js';
 import { morphologyFromPrior, createLemmatizer, stemsOf } from '../vendor/khora/native/adapters/text/morphology.js';
-import { splitSentences } from '../vendor/khora/native/adapters/text/spans.js';
+import { splitSentences, deriveAbbreviations } from '../vendor/khora/native/adapters/text/spans.js';
+import { layerNoteHTML, tabNoteHTML, LAYER_NOTES } from './layer-notes.js';
+import { buildRows, sortRows, nextSort, tableHTML as refTableHTML } from './referent-table.js';
+import { scanPunctuation, loadPunctuation, moodAt, containersAt, cuesFromBlankLines, cuesFromLayout } from './punctuation.js';
 import { tokenize } from '../vendor/khora/native/organs/source.js';
+import { loadModel as loadParser, analyse as parseRows, tokenize as parseTokens } from '../vendor/khora/native/adapters/text/english-parser.js';
+import { tuplesOf } from './propositions.js';
 import { classifyForm, lookupForm, documentClassifier } from '../holodeck-surface.js';
 import { namesCorefer, genericTokens, extractSurfaces, discoverReferents, diaNorm } from '../vendor/khora/native/adapters/text/surfaces.js';
 import { sha256 } from '../vendor/khora/native/kernel/sha256.js';
@@ -441,6 +511,7 @@ const LAYERS = [
   { id:'bytes',     label:'Bytes',      color:'--dim',   fixed:true, why:'the material as bytes — one addressable source' },
   { id:'decode',    label:'Decode',     color:'--pink',  fixed:true, why:'utf-8 bytes → characters; the address space stays bytes' },
   { id:'furniture', label:'Furniture',  color:'--mut',   feature:'furniture', why:'markup / CSS / URLs blanked in place — offsets untouched' },
+  { id:'punct',     label:'Punctuation', color:'--amber', fixed:true, why:'every mark kept, with its role: sentence ends and their mood, quotations, brackets, separators' },
   { id:'statement', label:'Statements', color:'--ink2',  fixed:true, why:'the material split into the statements it makes' },
   { id:'token',     label:'Words',      color:'--blue',  fixed:true, why:'each statement split into the forms it is made of' },
   { id:'grammar',   label:'POS',        color:'--acc',   feature:'pos', why:'each form → the classes it is ATTESTED as (Thrax over UD)' },
@@ -533,8 +604,16 @@ async function ready(){
 }
 
 // ── build the trace: run the real organs, recording each transformation ──────
-const WORD_RE = /[\p{L}\p{N}][\p{L}\p{N}'’.\-]*/gu;
-function wordsIn(text, base){ const out = []; WORD_RE.lastIndex = 0; let m; while ((m = WORD_RE.exec(text))) out.push({ w:m[0], s:base + m.index, e:base + m.index + m[0].length }); return out; }
+// punctuation is settled at tokenization (reading/tokenize.js): POS is only ever asked about word forms
+let ABBREV = null;   // the splitter's own abbreviation knowledge for the text being read
+let PUNCT = null;    // the language's punctuation norms (declared) and its abbreviation prior (measured): reading/punctuation.js
+const abbrevOf = text => deriveAbbreviations(String(text ?? '').replace(/\r\n/g, '\n').replace(/\r/g, '\n'));
+// the document's own abbreviations (the splitter's) joined to the language's measured ones: "Dr." is one word, its dot kept, wherever it comes from
+const abbrevAll = () => new Set([...(PUNCT ? PUNCT.abbreviations : []), ...(ABBREV || [])].map(x => String(x).toLowerCase()));
+// the splitter compares case-sensitively ("Dr"), the measured prior is lower case: hand it every case a title takes
+const abbrevForSplitter = () => new Set([...abbrevAll()].flatMap(a => [a, a.charAt(0).toUpperCase() + a.slice(1), a.toUpperCase()]));
+const scanOpts = (extra = {}) => ({ norms: PUNCT && PUNCT.norms, abbreviations: abbrevAll(), ...extra });
+const wordsIn = (text, base) => scanPunctuation(text, scanOpts({ base })).words.map(({ w, s, e }) => ({ w, s, e }));
 const WORDS_ANIMATED = 700;
 
 function buildTrace(doc, clean, claims, features, extraction){
@@ -550,6 +629,7 @@ function buildTrace(doc, clean, claims, features, extraction){
     extraction.readings.forEach((r, i) => push('extract', r.ok ? 'reading' : 'reading-failed', r.ok
       ? `reading ${i + 1}: ${r.extractor} → reads as words ${(r.sniff.reads * 100).toFixed(0)}% · ${r.sniff.verdict}${i === extraction.collapsed ? ' — COLLAPSED as the reading' : ''}`
       : `reading ${i + 1}: ${r.extractor} → not available (${r.why})`, { s:0, e:0, data:{ reading: r, i } }));
+    { const r = extraction.readings[extraction.collapsed]; (r && r.junctions || []).forEach((jx) => push('extract', 'startle', `startle on page ${jx.page}: ${jx.why}. Held: “${jx.spaced}” and “${jx.joined}”. Read as ${jx.decision === 'join' ? '“' + jx.joined + '”' : '“' + jx.spaced + '”'}${jx.flipped ? ' (flipped by you)' : ''} — ${jx.by}`, { s:0, e:0, data:{ junction: jx } })); }
     if (extraction.revisions && extraction.revisions.length) push('extract', 'revision', `the collapse was revised ${extraction.revisions.length}× — append-only: ${extraction.revisions.map(v => v.extractor).join(' → ')}`, { s:0, e:0 });
   }
 
@@ -568,13 +648,24 @@ function buildTrace(doc, clean, claims, features, extraction){
     : blanks.length ? `blanked ${blanks.length.toLocaleString()} characters of markup/CSS/URL furniture to spaces — every offset is unchanged` : `no markup furniture found — this material is already prose, read as it stands`,
     { s:0, e:analysis.length, data:{ runs:blankRuns } });
 
-  const sents = splitSentences(clean);
+  ABBREV = abbrevOf(clean);
+  // the splitter and the punctuation scan share ONE abbreviation knowledge: the language's measured prior joined to this text's own
+  const sents = splitSentences(clean, { abbreviations: abbrevForSplitter() });
   sents.forEach((s, i) => push('statement', 'statement',
     `statement ${i + 1} of ${sents.length} · bytes ${charToByte(analysis, s.offset)}–${charToByte(analysis, s.offset + s.text.length)} · “${clamp(s.text.replace(/\s+/g,' ').trim(), 74)}”`,
     { s:s.offset, e:s.offset + s.text.length, data:{ order:i, len:sents.length } }));
 
   const words = [];
+  const punct = [];   // PUNCT/SYM by Unicode category: their own tokens, never sent to the class prior
+  // the whole text is scanned once for punctuation: every mark kept with its role, the sentences with their mood, the containers a proposition nests in,
+  // and — for a scan, or a text with line structure — the boundaries the page's own layout supplies
+  const SCAN = scanPunctuation(clean, scanOpts({ cues: [...cuesFromBlankLines(clean), ...(doc.layout ? cuesFromLayout(doc.layout, clean) : [])] }));
   for (const s of sents) for (const w of wordsIn(s.text, s.offset)) words.push(w);
+  for (const p of SCAN.punct) punct.push(p);
+  { const P = SCAN.structure, moods = {}; P.sentences.forEach(x => { moods[x.mood] = (moods[x.mood] || 0) + 1; });
+    push('punct', 'scan', `${SCAN.punct.length} marks kept · ${P.sentences.length} sentences (${Object.entries(moods).map(([k, v]) => v + ' ' + k).join(', ') || 'none'}) · ${P.containers.length} container${P.containers.length === 1 ? '' : 's'} · ${P.notes.abbreviations} abbreviation dot${P.notes.abbreviations === 1 ? '' : 's'} attached · norms for “${P.notes.lang || 'default'}” ${P.notes.normsKnown ? 'declared' : 'not declared — default used'}`, { s:0, e:0, data:{ moods } });
+    P.containers.slice(0, 40).forEach(c => push('punct', 'container', `${c.kind} ${c.mark} · depth ${c.depth}${c.mood ? ' · ' + c.mood : ''} · “${clamp(clean.slice(c.s, c.e).replace(/\s+/g, ' '), 56)}”`, { s:c.s, e:c.e, data:{ container:c } }));
+    P.notes.unclosed.forEach(u => push('punct', 'gap', `an opening ${u.w} that never closes — kept as a gap, not guessed at`, { s:u.s, e:u.s + 1, data:u })); }
 
   const shown = words.slice(0, WORDS_ANIMATED);
   const toks = tokenize(clean);
@@ -643,7 +734,7 @@ function buildTrace(doc, clean, claims, features, extraction){
   push('ledger', 'source', `source stored once under its own bytes → ${srcId} · anchor byteRange(0, ${nBytes})`, { s:0, e:0, data:{ srcId } });
   // a scan: every layer of reading it, from the pixels up, goes into the same log (scan-ledger.js); the layers above are recorded by the reader as they settle
   const scanned = doc.layout ? recordOcr(led, srcId, doc.layout) : null;
-  if (extraction) led.event({ stage:'extract', source_id:srcId, ...(scanned ? { parent:scanned.last } : {}), transform:'container→readings', detail:{ readings: extraction.readings.map(r => r.ok ? { extractor:r.extractor, reads:r.sniff.reads, verdict:r.sniff.verdict } : { extractor:r.extractor, skipped:r.why }), collapsed: extraction.collapsed, floor: extraction.floor, revisions: extraction.revisions || [] } });
+  if (extraction) led.event({ stage:'extract', source_id:srcId, ...(scanned ? { parent:scanned.last } : {}), transform:'container→readings', detail:{ readings: extraction.readings.map(r => r.ok ? { extractor:r.extractor, reads:r.sniff.reads, verdict:r.sniff.verdict } : { extractor:r.extractor, skipped:r.why }), collapsed: extraction.collapsed, floor: extraction.floor, revisions: extraction.revisions || [], junctions: ((extraction.readings[extraction.collapsed] || {}).junctions || []).map((jx) => ({ page: jx.page, a: jx.a, b: jx.b, spaced: jx.spaced, joined: jx.joined, scores: jx.scores, decision: jx.decision, by: jx.by, flipped: jx.flipped || 0 })) } });
   const readEvt = led.event({ stage:'read', source_id:srcId, ...(scanned ? { parent:scanned.last } : {}), transform:'bytes→statements' });
   push('ledger', 'event', `${readEvt} · stage read · transform bytes→statements`, { s:0, e:0, data:{ id:readEvt } });
   led.event({ stage:'arrange', source_id:srcId, parent:readEvt, transform:'statements→tokens' });
@@ -664,18 +755,18 @@ function buildTrace(doc, clean, claims, features, extraction){
     const list = occ.get(k) || (occ.set(k, []), occ.get(k));
     list.push({ doc:'source', id:i, s:c.s, e:c.e, t:c.span || analysis.slice(c.s, c.e) }); } });
 
-  return { ev, claims, refs, occ, words, shown, sents, blanks:blankRuns, gaps, ambiguous, toks, nBytes, hash, srcId, led, eot, scanPages:scanned ? scanned.pages : null, scanOcr:scanned ? scanned.last : null, doc, features, extraction, net:{ ...net }, totalMs:performance.now() - t0,
+  return { ev, claims, refs, occ, words, punct, punctuation:SCAN.structure, shown, sents, blanks:blankRuns, gaps, ambiguous, toks, nBytes, hash, srcId, led, eot, scanPages:scanned ? scanned.pages : null, scanOcr:scanned ? scanned.last : null, doc, features, extraction, net:{ ...net }, totalMs:performance.now() - t0,
     stats:{ words:words.length, classified, gaps, ambiguous, acts, morphGaps, positions:stanceClaims.length, blanked:blanks.length } };
 }
 
 // ── the OUTPUT: the reading as text (each sentence diagrammed) and as JSON ────
-const standingOfClaim = (c) => c.verdict === 'bound' ? 'read' : c.verdict === 'beyond-reach' ? 'beyond reach' : c.verdict === 'unbound' ? 'unbound' : c.verdict === 'contradicted' ? 'contradicted' : 'unheard';
+const standingOfClaim = (c) => c.mood === 'interrogative' ? 'asked' : c.mood === 'exclamative' ? 'exclaimed' : c.verdict === 'bound' ? 'read' : c.verdict === 'beyond-reach' ? 'beyond reach' : c.verdict === 'unbound' ? 'unbound' : c.verdict === 'contradicted' ? 'contradicted' : 'unheard';
 const arrowOf = (c) => `${c.end1} ──${c.polarity === '-' ? '¬' : ''}${c.label}──▶ ${c.end2}`;
 const slugOf = (T) => String(T.doc.label || 'reading').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60) || 'reading';
 
 function readingJSON(T){
   const reopened = i => (T.reopened && T.reopened.get(i)) || null;
-  const counts = { read:0, 'beyond reach':0, unbound:0, contradicted:0, unheard:0 };
+  const counts = { read:0, 'beyond reach':0, unbound:0, contradicted:0, unheard:0, asked:0, exclaimed:0 };
   T.claims.forEach(c => counts[standingOfClaim(c)]++);
   const stmtOf = (c) => { if (!c.located) return null; for (let j = 0; j < T.sents.length; j++){ const s = T.sents[j]; if (c.s >= s.offset && c.s < s.offset + s.text.length) return j + 1; } return null; };
   return {
@@ -686,7 +777,10 @@ function readingJSON(T){
     run:{ steps:T.ev.length, ms:Math.round(T.totalMs * 100) / 100, model_calls:T.net.models, network:T.net.requests.slice() },
     summary:{ statements:T.sents.length, propositions:T.claims.length, read:counts.read, unbound:counts.unbound, contradicted:counts.contradicted, beyond_reach:counts['beyond reach'], unheard:counts.unheard, referents:T.refs.size, forms:T.words.length, distinct_forms:new Set(T.toks).size, grammar_gaps:T.gaps, grammar_ambiguous:T.ambiguous },
     statements:T.sents.map((s, i) => ({ n:i + 1, bytes:[charToByte(T.doc.analysis, s.offset), charToByte(T.doc.analysis, s.offset + s.text.length)], text:s.text.replace(/\s+/g, ' ').trim() })),
-    propositions:T.claims.map((c, i) => ({ n:i + 1, located:!!c.located, statement:stmtOf(c), subject:c.end1, act:c.label, object:c.end2, polarity:c.polarity === '-' ? '-' : '+', standing:reopened(i) ? 'reopened' : standingOfClaim(c), confidence:confidenceOf(c).pct, tense:c.tense.v, tense_why:c.tense.why, bytes:c.b0 == null ? null : [c.b0, c.b1], span:c.span || null, grounded:!!c.grounded, revised_by:reopened(i), render:{ en:ORDERS[0].line(c), sov:ORDERS[1].line(c), vso:ORDERS[2].line(c) } })),
+    tuples:(T.tuples || []).map((l, j) => l.map(t => ({ statement:j + 1, id:t.id, parent:t.parent, order:t.order, kind:t.kind, relation:t.relation, subject:t.subject, act:t.act, object:t.object, polarity:t.polarity, modal:t.modal || null, tense:t.tense || null, voice:t.voice || null, mood:t.mood || null, at:t.at, end:t.end }))),
+    propositions:T.claims.map((c, i) => ({ n:i + 1, located:!!c.located, statement:stmtOf(c), mood:c.mood || null, held_in:c.holds || [], subject:c.end1, act:c.label, object:c.end2, polarity:c.polarity === '-' ? '-' : '+', standing:reopened(i) ? 'reopened' : standingOfClaim(c), confidence:confidenceOf(c).pct, tense:c.tense.v, tense_why:c.tense.why, bytes:c.b0 == null ? null : [c.b0, c.b1], span:c.span || null, grounded:!!c.grounded, revised_by:reopened(i), render:{ en:ORDERS[0].line(c), sov:ORDERS[1].line(c), vso:ORDERS[2].line(c) } })),
+    punctuation:(() => { const P = T.punctuation || { sentences:[], containers:[], boundaries:[], notes:{} }, by = (xs, f) => xs.reduce((m, x) => { const k = f(x); m[k] = (m[k] || 0) + 1; return m; }, {});
+      return { norms:{ language:P.notes.lang, declared:P.notes.normsKnown }, marks:T.punct ? T.punct.length : 0, by_role:by(T.punct || [], p => p.role || 'mark'), sentences:by(P.sentences, s => s.mood), containers:by(P.containers, c => c.kind), boundaries_by_source:by(P.boundaries, b => b.source), abbreviations_attached:P.notes.abbreviations, unclosed:P.notes.unclosed || [] }; })(),
     referents:[...T.refs.values()].map(r => ({ name:r.n, relations:r.c, first_byte:r.b0 == null ? null : r.b0 })),
     priors:[
       { name:'part of speech', giver:(PRIORS.lang && PRIORS.posPrior !== PRIORS.posEng && PRIORS.posPrior.provenance ? `${PRIORS.posPrior.provenance.giver} — chosen because the text measures as ${PRIORS.lang.name || PRIORS.lang.lang}` : POS_PRIOR_META.giver), schema:PRIORS.posPrior && PRIORS.posPrior.schema, on:T.features.pos !== false },
@@ -742,17 +836,27 @@ function download(name, text, mime){
 const STEP_SPEEDS = [[1,'1 event/s'],[4,'4 events/s'],[8,'8 events/s'],[30,'30 events/s'],[120,'120 events/s'],[600,'600 events/s']];
 const REAL_SPEEDS = [[1,'1×'],[0.1,'1/10×'],[0.01,'1/100×'],[0.001,'1/1,000×'],[1e-4,'1/10,000×']];
 
-let cur = null, BASELINE = null;
+let cur = null, inst = null, BASELINE = null, LAYERS_SEEN = false;
 let features = { ...DEFAULT_FEATURES };
 let lastRaw = '', lastLabel = '';
 let LAST_TAB = 'source', LAST_INSP = 'reading';
 
 function openTrace(T){ return openReader(T); }
 // the reading, in three panels (reading/reader-view.js): what was read · the selected thing · where it came from
+// the layered instrument (Source · Words · POS · Morphology · Referents · Propositions · Render · EOT · JSON · Graph, the lanes, the inspector and the replay)
+// is a second view of the SAME reading: the reader's "Layers" button opens it, its "Reader" button (or Esc) returns
+function showLayers(){
+  if (!cur) return null; if (inst) inst.close();
+  const rv = $('rv'); if (rv) rv.classList.remove('on');
+  const first = !LAYERS_SEEN; LAYERS_SEEN = true; if (first) LAST_TAB = 'graph';   // the first time, open on the relative solar system
+  inst = mount(cur.T); if (first && inst.setTab) inst.setTab('graph'); return inst;
+}
+document.addEventListener('click', (e) => { if (e.target.closest && e.target.closest('[data-a="to-reader"]') && inst) inst.close(); });
 function openReader(T, keep = null){
+  if (inst) inst.close();
   if (cur){ const old = cur; cur = null; old.close(); }
   const ctx = {
-    hash: sha256, readingJSON, download, features, keep, ledger: () => ({ led:T.led, srcId:T.srcId, pages:T.scanPages, refresh:() => { T.eot = T.led.eot({ root:T.eot && T.eot.root }); return T.eot; } }), known: knownWord, pdfjs: loadPdfjs,
+    showLayers, hash: sha256, readingJSON, download, features, keep, ledger: () => ({ led:T.led, srcId:T.srcId, pages:T.scanPages, refresh:() => { T.eot = T.led.eot({ root:T.eot && T.eot.root }); return T.eot; } }), known: knownWord, pdfjs: loadPdfjs,
     explainWord: w => { try { return classifyForm(w, { posPrior: PRIORS.posPrior, lemmatizer: PRIORS.lemmatizer }); } catch (e) { return null; } },
     actsOf: w => { const lw = lookupForm(w).toLowerCase(); const out = new Set(); try { for (const x of (PRIORS.lemmatizer ? PRIORS.lemmatizer.lemmasOf(lw) : [])) out.add(x); } catch (e) {} try { for (const x of stemsOf(lw)) out.add(x); } catch (e) {} return [...out]; },
     layers: LAYERS.filter(l => l.feature).map(l => ({ feature:l.feature, label:l.label, why:l.why })),
@@ -824,17 +928,19 @@ function mount(T){
       const cur = l.id === active;
       const sw = l.fixed ? ''
         : `<span class="sw" role="switch" tabindex="0" aria-checked="${on}" data-feature="${l.feature}" title="switch ${esc(l.label)} ${on ? 'off' : 'on'} — the reading re-runs"></span>`;
-      return `<div class="ly ${cur ? 'cur' : ''} ${on ? '' : 'off'}"><span class="n">${l.i + 1}</span><span class="lab" style="color:var(${l.color})">${esc(l.label)}</span>${sw}<span class="why">${esc(l.why)}</span><span class="cnt" style="grid-column:2/3">${cnt}</span></div>`;
+      return `<div class="ly ${cur ? 'cur' : ''} ${on ? '' : 'off'}"><span class="n">${l.i + 1}</span><span class="lab" style="color:var(${l.color})">${esc(l.label)}</span>${sw}${layerNoteHTML(l.id, { full:cur })}<span class="cnt" style="grid-column:2/3">${cnt}</span></div>`;
     }).join('');
+    { const n = LAYER_NOTES[active], lab = (L[active] || {}).label, ln = $('p-lnote'); if (ln) ln.innerHTML = n ? `<b>${esc(lab)}</b> ${esc(n.what)} <span class="dim"><b>Rests on</b> ${esc(n.rests)} <b>Cannot decide</b> ${esc(n.cannot)}</span>` : ''; }
     wireSwitches();
     if (wide.matches){ const c = spineEl.querySelector('.ly.cur'); if (c){ const top = c.offsetTop, h = spineEl.clientHeight; if (top < spineEl.scrollTop || top + c.offsetHeight > spineEl.scrollTop + h) spineEl.scrollTop = Math.max(0, top - h / 3); } }
   }
   function layerCount(key, St){
     switch (key){
-      case 'extract': { const X = T.extraction; return X ? `${esc((X.readings[X.collapsed] || {}).extractor || '—')} · ${X.held} reading${X.held === 1 ? '' : 's'} held` : 'text — no container'; }
+      case 'extract': { const X = T.extraction; if (!X) return 'text — no container'; const js = (X.readings[X.collapsed] || {}).junctions || [], nj = js.filter((x) => x.decision === 'join').length; return `${esc((X.readings[X.collapsed] || {}).extractor || '—')} · ${X.held} reading${X.held === 1 ? '' : 's'} held${js.length ? ` · ${js.length} startle${js.length === 1 ? '' : 's'}, ${nj} joined` : ''}`; }
       case 'bytes': return esc(T.doc.label) + ' · ' + T.nBytes.toLocaleString() + ' bytes';
       case 'decode': return T.doc.analysis.length.toLocaleString() + ' chars';
       case 'furniture': return T.features.furniture === false ? 'off' : (T.blanks.length ? T.blanks.length.toLocaleString() + ' chars blanked' : 'nothing to blank');
+      case 'punct': { const P = T.punctuation || { sentences:[], containers:[] }, q = P.sentences.filter(x => x.mood === 'interrogative').length, x2 = P.sentences.filter(x => x.mood === 'exclamative').length; return (T.punct ? T.punct.length : 0) + ' marks · ' + P.sentences.length + ' sentences' + (q ? ' · ' + q + ' ask' : '') + (x2 ? ' · ' + x2 + ' exclaim' : '') + (P.containers.length ? ' · ' + P.containers.length + ' nested' : ''); }
       case 'statement': return T.sents.length + ' statements';
       case 'token': return St.tokens.length.toLocaleString() + ' forms';
       case 'grammar': return T.features.pos === false ? 'off' : (St.grammar.length.toLocaleString() + ' classified · ' + T.gaps + ' gaps · ' + T.ambiguous + ' ambiguous');
@@ -1265,14 +1371,14 @@ function mount(T){
 
   // ── graph ──
   const gh = $('p-graph'); gh.innerHTML = '';
-  const map = mountMap(gh, { padBottom:24, wheelZoom:true, empty:'Referents and relations appear here as the reading reaches them.', sentence:o => o.t || '', onWitness:o => openSourceAt(o.s, o.e) });
+  const map = mountMap(gh, { padBottom:24, wheelZoom:true, bonds:'hot', noun:'referent', empty:'Referents and relations appear here as the reading reaches them.', sentence:o => o.t || '', onWitness:o => openSourceAt(o.s, o.e) });
   function mapData(St, e){
     const nodes = [...St.refs.values()].map(r => ({ n:r.n, c:r.c, mine:true, st:'fold' }));
     const edges = St.rels.map(c => ({ a:String(c.end1), b:String(c.end2), c:1, mine:true, neg:c.polarity === '-' }));
     const hot = new Set([e && e.data && e.data.end1, e && e.data && e.data.end2, e && e.data && e.data.n].filter(Boolean).map(String));
     const hotPairs = (e && e.stage === 'relation' && e.data) ? [[String(e.data.end1), String(e.data.end2)]] : [];
     const cursor = (e && e.data && (e.data.n || e.data.end1)) ? String(e.data.n || e.data.end1) : null;
-    return { nodes, edges, docs:[{ id:'source', title:T.doc.label }], occ:T.occ, odd:new Map(), hot, hotPairs, cursor, sig:`${St.refs.size}:${St.rels.length}` };
+    return { nodes, edges, docs:[{ id:'source', title:T.doc.label }], occ:T.occ, odd:new Map(), hot, hotPairs, cursor, sel:graphSel, sig:`${St.refs.size}:${St.rels.length}:${graphSel || ''}` };
   }
   // a real affordance: the map's "Open in source →" lands on the exact bytes
   function openSourceAt(s, e2){
@@ -1294,23 +1400,28 @@ function mount(T){
   tabBtns.forEach(b => b.setAttribute('aria-selected', String(b.dataset.tab === tab)));
 
   function renderPane(St, e){
+    LAST = [St, e]; if (tab === 'props') ensureTuples();
     const hot = e.stage === 'relation' ? e.data : null;
     const graph = tab === 'graph';
-    $('p-graph').hidden = !graph; pane.hidden = graph;
+    $('p-graph').hidden = !graph; pane.hidden = graph; { const gn = $('p-graph-note'); gn.hidden = !graph; if (graph) gn.innerHTML = tabNoteHTML('graph', { collapsed:true }); }
     if (graph){ map.set(mapData(St, e)); return; }
     if (tab === 'source') pane.innerHTML = sourcePane(St, hot);
-    else if (tab === 'words'){ const sig = 'W' + T.words.length + '|' + wordsSort.key + wordsSort.dir; if (sig !== wordsKey){ wordsKey = sig; pane.innerHTML = wordsPane(); wireSort(); } return; }
+    else if (tab === 'words'){ const sig = 'W' + T.words.length + '|' + wordsSort.key + wordsSort.dir; if (sig !== wordsKey){ wordsKey = sig; pane.innerHTML = tabNoteHTML('words') + wordsPane(); wireSort(); } return; }
     else if (tab === 'pos') pane.innerHTML = posPane(St);
     else if (tab === 'morph') pane.innerHTML = morphPane(St);
     else if (tab === 'refs') pane.innerHTML = refsPane(St);
     else if (tab === 'props') pane.innerHTML = propsPane(St, hot);
     else if (tab === 'render') pane.innerHTML = renderPaneHTML();
     else if (tab === 'eot') pane.innerHTML = eotPane(St);
-    else if (tab === 'json') pane.innerHTML = `<div class="h">the whole reading as JSON</div><div class="fig">The same reading the page draws — propositions with confidence, referents, the render, and the EOT ledger — as one document.</div><pre class="json">${esc(JSON.stringify(readingJSON(T), null, 2))}</pre>`;
+    else if (tab === 'json') pane.innerHTML = `<pre class="json">${esc(JSON.stringify(readingJSON(T), null, 2))}</pre>`;
+    pane.insertAdjacentHTML('afterbegin', tabNoteHTML(tab));
     wireReopen(pane);
   }
   const standingOf = c => standingOfClaim(c);
 
+  // STARTLES: junctions whose geometry contradicted itself; both readings held, the later layers' pick shown with its reason, flippable
+  function junctionsHTML(X){ const r = X.readings[X.collapsed], js = r && r.junctions; if (!js || !js.length) return '';
+    return `<div class="h">startles — junctions the geometry could not settle</div><table class="t"><thead><tr><th>page</th><th>held</th><th>read as</th><th>why</th><th></th></tr></thead><tbody>${js.map((jx, q) => `<tr><td class="mono">${jx.page}</td><td>${jx.spaced ? `“${esc(jx.spaced)}” · “${esc(jx.joined)}”` : `<span class="dim">“${esc(clamp(jx.a.str.slice(-24), 24))}” | “${esc(clamp(jx.b.str, 24))}”</span>`}<div class="mono dim" title="${esc(jx.why)}">${esc(jx.a.str)} ${jx.a.h}pt @${jx.a.y} → ${esc(clamp(jx.b.str, 24))} ${jx.b.h}pt @${jx.b.y}</div></td><td><span class="chip ${jx.decision === 'join' ? 'g' : 'a'}">${esc(jx.decision === 'join' ? jx.joined : jx.spaced || '')}</span>${jx.flipped ? ' <span class="chip">flipped</span>' : ''}</td><td style="font-size:12.5px">${esc(jx.by || '')}</td><td>${jx.spaced && jx.joined ? `<button class="reopen" data-flip="${q}">read the other way</button>` : ''}</td></tr>`).join('')}</tbody></table>`; }
   function sourcePane(St, hot){
     // the ORIGINAL source, whole, byte-addressed, with the reading's own marks
     const a = T.doc.analysis; const marks = St.marks.slice().sort((x, y) => x.s - y.s);
@@ -1327,9 +1438,9 @@ function mount(T){
       <table class="t"><thead><tr><th>reading (extractor)</th><th>reads as words</th><th>verdict</th><th></th></tr></thead><tbody>${X.readings.map((r, i) => r.ok
         ? `<tr${i === X.collapsed ? ' class="cur"' : ''}><td>${esc(r.extractor)}</td><td class="mono">${(r.sniff.reads * 100).toFixed(0)}%</td><td><span class="chip ${r.sniff.verdict === 'confirmed' ? 'g' : 'v'}">${esc(r.sniff.verdict)}</span></td><td>${i === X.collapsed ? '<span class="chip a">collapsed</span>' : `<button class="reopen" data-pick="${i}">read from this one</button>`}</td></tr>`
         : `<tr><td>${esc(r.extractor)}</td><td class="mono">—</td><td><span class="chip">skipped</span></td><td class="mono">${esc(r.why)}</td></tr>`).join('')}</tbody></table>
-      ${(X.revisions && X.revisions.length) ? `<div class="fig">revisions (append-only): ${X.revisions.map(v => `collapsed to <b>${esc(v.extractor)}</b>`).join(' · ')}</div>` : ''}` : '';
-    return `<div class="h">the original source — whole, byte-addressed, with the reading's marks</div>
-      <div class="fig"><b>${esc(T.doc.label)}</b> · ${T.nBytes.toLocaleString()} bytes utf-8 · sha-256 <span class="mono">${hx(T.hash, 44)}</span> · source id <span class="mono">${esc(T.srcId)}</span></div>
+      ${(X.revisions && X.revisions.length) ? `<div class="fig">revisions (append-only): ${X.revisions.map(v => v.junction != null ? `junction ${v.junction + 1} read as <b>${esc(v.to)}</b>` : `collapsed to <b>${esc(v.extractor)}</b>`).join(' · ')}</div>` : ''}
+      ${junctionsHTML(X)}` : '';
+    return `<div class="fig"><b>${esc(T.doc.label)}</b> · ${T.nBytes.toLocaleString()} bytes utf-8 · sha-256 <span class="mono">${hx(T.hash, 44)}</span> · source id <span class="mono">${esc(T.srcId)}</span></div>
       ${xcard}
       <div class="src">${h}</div>
       <div class="h">the first 48 bytes, as bytes</div><pre class="json">${esc(hex)}</pre>`;
@@ -1342,8 +1453,7 @@ function mount(T){
     arr.sort((a, b) => { let d = key === 'w' ? a.w.toLowerCase().localeCompare(b.w.toLowerCase()) : (a[key] - b[key]); if (d === 0) d = a.w.toLowerCase().localeCompare(b.w.toLowerCase()); return d * dir; });
     const arrow = k => key === k ? (dir < 0 ? ' ▼' : ' ▲') : '';
     const rows = arr.slice(0, 2000).map(s => `<tr><td>${esc(s.w)}</td><td class="mono">${s.n.toLocaleString()}</td><td class="mono">${charToByte(T.doc.analysis, s.s).toLocaleString()}</td><td class="mono">${charToByte(T.doc.analysis, s.s)}–${charToByte(T.doc.analysis, s.e)}</td></tr>`).join('');
-    return `<div class="h">words — ${T.words.length.toLocaleString()} form occurrences · ${arr.length.toLocaleString()} distinct</div>
-      <div class="fig">The material split into the forms it is made of. Each carries the byte it was read at. Nothing is stemmed or merged here — identity is decided later, in the referents. <b>Click a column to sort.</b></div>
+    return `<div class="pstat"><span><b>${T.words.length.toLocaleString()}</b> occurrences</span><span><b>${arr.length.toLocaleString()}</b> distinct forms</span><span>nothing stemmed or merged here; identity is decided in the referents</span></div>
       <table class="t"><thead><tr>
         <th data-sort="w">word${arrow('w')}</th>
         <th data-sort="n">occurrences${arrow('n')}</th>
@@ -1367,59 +1477,72 @@ function mount(T){
       const hop = g.via && g.via.length ? `<br><span class="mono" style="opacity:.65">looked up as ${esc(g.form)} · ${esc(g.via.map(v => v.step).join(' + '))}</span>` : '';
       return `<tr><td class="mono">${esc(g.w)}${hop}</td><td>${bar}</td><td>${bits}</td></tr>`;
     }).join('');
-    return `<div class="h">POS — each form → the classes it is ATTESTED as (Thrax over UD)</div>
-      <div class="fig"><b>Ambiguity is preserved, not resolved.</b> A type-level table cannot answer an instance-level question, so no winner is picked. Giver: ${esc(POS_PRIOR_META.giver)} → ${esc(THRAX_META.giver)}. ${[...THRAX_OUT_OF_SCOPE].length} categories are kept out, never forced.</div>
+    return `<div class="fig"><b>Ambiguity is preserved, not resolved.</b> A type-level table cannot answer an instance-level question, so no winner is picked. Giver: ${esc(POS_PRIOR_META.giver)} → ${esc(THRAX_META.giver)}. ${[...THRAX_OUT_OF_SCOPE].length} categories are kept out, never forced.</div>
       <table class="t"><thead><tr><th>form</th><th></th><th>classes attested</th></tr></thead><tbody>${rows}</tbody></table>`;
   }
   function morphPane(St){
     if (T.features.morph === false) return `<div class="h">Morphology — layer OFF</div><div class="fig">The UniMorph lemmatizer is switched off. Same-act is now exact string equality: "underwent" no longer binds a source's "undergoes". Disclosed, not hidden.</div>`;
     const rows = St.morph.filter(Boolean).slice(-400).reverse().map(m => `<tr><td class="mono">${esc(m.w)}</td><td class="mono">${m.lemmas.map(l => esc(l)).join(', ') || '—'}</td><td class="mono">${m.stems.map(esc).join(', ') || '—'}</td></tr>`).join('');
     const prov = (PRIORS.morphRaw && PRIORS.morphRaw.provenance) || {};
-    return `<div class="h">Morphology — each form → the act it belongs to</div>
-      <div class="fig"><b>The prior decides sameness; the material decides presence.</b> Identity lives in the referent, never in a string — the lemma is a SET, never reduced to one. Giver: ${esc(prov.source || 'UniMorph English')} (${esc((PRIORS.morphRaw && PRIORS.morphRaw.schema) || '—')}).</div>
+    return `<div class="fig"><b>The prior decides sameness; the material decides presence.</b> Identity lives in the referent, never in a string — the lemma is a SET, never reduced to one. Giver: ${esc(prov.source || 'UniMorph English')} (${esc((PRIORS.morphRaw && PRIORS.morphRaw.schema) || '—')}).</div>
       <table class="t"><thead><tr><th>form</th><th>lemma candidates (a set)</th><th>rule-recovered stem</th></tr></thead><tbody>${rows}</tbody></table>`;
   }
+  // REFERENTS: the participants this material establishes, as a table (the same table the reader's index uses). A row opens that name in the Graph.
+  let refTabSort = { key:'mentions', dir:'desc' }, graphSel = null;
+  const hueOf = (s) => { let h = 7; for (const ch of String(s)) h = (h * 31 + ch.codePointAt(0)) % 360; return `hsl(${h} 70% 68%)`; };
+  const stmtNoOf = (c) => { if (c == null) return null; const j = T.sents.findIndex(s => c >= s.offset && c < s.offset + s.text.length); return j < 0 ? null : j + 1; };
   function refsPane(St){
-    return `<div class="h">Referents — the participants this material establishes</div>
-      <div>${[...St.refs.values()].map(r => `<span class="chip b">${esc(r.n)} <span style="color:var(--dim)">×${r.c}</span></span>`).join('') || '<span class="noprop">—</span>'}</div>
-      <div class="fig">Each with the byte it was first read at. A participant that never appears in a bound relation is not invented here.</div>`;
+    const rows = buildRows([...St.refs.values()].map(r => ({ id:String(r.n), name:String(r.n), mentions:r.c, born:stmtNoOf(r.s), dot:hueOf(r.n) })), { selectedId:graphSel });
+    const n = rows.length;
+    return `${n ? `<div class="pstat"><span><b>${n}</b> referents</span></div>` : ''}${n ? refTableHTML(sortRows(rows, refTabSort.key, refTabSort.dir), { nSources:1, sort:refTabSort, caption:'Referents of this reading', selectKind: r => ({ kind:'ref', ref:r.id }) }) : '<span class="noprop">No referents yet — the reading has not reached one at this step.</span>'}`;
   }
+
+  // PROPOSITIONS AS TUPLES: the smallest meaningful tuples, nested and in order, read from the English parser's dependency rows (loaded on first need: 16 MB).
+  let PARSER = null, tupBusy = false, LAST = [null, null];
+  async function ensureTuples(){
+    if (T.tuples || tupBusy) return; tupBusy = true;
+    try {
+      PARSER ??= loadParser(await (await fetch('../vendor/khora/native/priors/parser-eng-ewt.json')).json());
+      const mood = (o) => { const x = (T.punctuation && T.punctuation.sentences || []).find(q => o >= q.s && o < q.e); return x ? x.mood : 'declarative'; };
+      T.tuples = T.sents.slice(0, 400).map(sn => { try { const tk = parseTokens(sn.text); if (!tk.length) return []; const rows = parseRows(PARSER, tk.map(t => t.form)); rows.forEach((r, k) => { r.start = tk[k].start; r.end = tk[k].end; }); return tuplesOf(rows, { mood: mood(sn.offset), base: sn.offset }).tuples; } catch (e) { return []; } });
+    } catch (e) { T.tuples = null; T.tuplesErr = String(e && e.message || e); }
+    tupBusy = false; if (tab === 'props') { renderPane(LAST[0], LAST[1]); }
+  }
+  // one tuple as subject —act→ object, indented by how deep it is nested; the number is its place among its siblings
+  const tupNode = (x, cls) => x == null || x === '' ? `<span class="pnode nil">·</span>` : `<span class="pnode ${cls}" title="${esc(x)}">${esc(x)}</span>`;
+  const tuplesHTML = (j) => { const ts = T.tuples && T.tuples[j]; if (!ts || !ts.length) return '';
+    const byId = new Map(ts.map(t => [t.id, t])), depth = t => { let d = 0, p = t.parent; while (p && byId.has(p) && d < 3){ d++; p = byId.get(p).parent; } return d; };
+    return ts.map(t => { const rel = t.kind === 'relation', d = depth(t);
+      const tags = [rel ? 'prep' : t.relation !== 'root' ? t.relation : null, t.modal, t.tense, t.voice === 'passive' ? 'passive' : null].filter(Boolean);
+      return `<div class="tup${rel ? ' rel' : ''}${d ? ' d' + d : ''}"><span class="o">${t.order + 1}</span>${tupNode(t.subject, 's')}<span class="parc${t.polarity === '-' ? ' neg' : ''}"><span class="plabel">${esc(t.act || '·')}</span><span class="pline"></span><span class="phead"></span></span>${tupNode(t.object, 'o')}${tags.map(g => `<span class="tag">${esc(g)}</span>`).join('')}${t.mood && t.mood !== 'declarative' ? `<span class="tag m">${esc(t.mood === 'interrogative' ? 'asked' : t.mood === 'exclamatory' ? 'exclaimed' : t.mood)}</span>` : ''}</div>`; }).join(''); };
+  const tieHTML = (ci) => { const c = T.claims[ci], st = standingOf(c), re = T.reopened && T.reopened.get(ci);
+    return `<div class="tie">${diagram(c, ci)}${confHTML(c)}<span class="chip ${re ? 'a' : st === 'read' ? 'g' : st === 'unbound' || st === 'beyond reach' ? 'a' : 'v'}">${re ? 'reopened' : esc(st)}</span><span class="mono" title="${esc(c.tense.why)}">${esc(c.tense.v)}</span></div>`; };
   function propsPane(St, hot){
     const sents = T.sents, inSent = sents.map(() => []), unlocated = [];
     T.claims.forEach((c, i) => { if (!c.located){ unlocated.push(i); return; }
       for (let j = 0; j < sents.length; j++){ const s = sents[j]; if (c.s >= s.offset && c.s < s.offset + s.text.length){ inSent[j].push(i); return; } } unlocated.push(i); });
     const counts = { read:0, unbound:0, contradicted:0, far:0, unheard:0 };
     T.claims.forEach(c => { const s = standingOfClaim(c); counts[s === 'beyond reach' ? 'far' : s]++; });
-    const CAP = 500;
-    const rows = sents.slice(0, CAP).map((s, j) => {
-      const idxs = inSent[j], isCur = !!hot && idxs.some(i => T.claims[i].s === hot.s && T.claims[i].e === hot.e);
-      if (!idxs.length) return `<tr${isCur ? ' class="cur"' : ''}><td class="n">${j + 1}</td><td class="stmt">${marked(s, [])}</td><td colspan="4"><span class="noprop">— no proposition bound: this statement named no act the reader could bind. A refusal is a result, never an error.</span></td></tr>`;
-      const n = idxs.length;
-      return idxs.map((ci, kk) => {
-        const c = T.claims[ci], st = standingOf(c), re = T.reopened && T.reopened.get(ci);
-        let h = `<tr${isCur ? ' class="cur"' : ''}>`;
-        if (kk === 0) h += `<td class="n" rowspan="${n}">${j + 1}</td><td class="stmt" rowspan="${n}">${marked(s, idxs)}</td>`;
-        h += `<td>${diagram(c, ci)}</td>`;
-        h += `<td>${confHTML(c)}</td>`;
-        h += `<td><span class="chip ${re ? 'a' : st === 'read' ? 'g' : st === 'unbound' || st === 'beyond reach' ? 'a' : 'v'}">${re ? 'reopened' : st}</span></td>`;
-        h += `<td class="mono" title="${esc(c.tense.why)}">${esc(c.tense.v)}</td>`;
-        h += `<td class="mono">${c.b0 == null ? '—' : c.b0 + '–' + c.b1}</td>`;
-        return h + '</tr>';
-      }).join('');
+    const nTup = T.tuples ? T.tuples.reduce((a, l) => a + l.length, 0) : 0;
+    const CAP = 500, a = T.doc.analysis;
+    const cards = sents.slice(0, CAP).map((s, j) => {
+      const idxs = inSent[j], isCur = !!hot && idxs.some(i => T.claims[i].s === hot.s && T.claims[i].e === hot.e), tup = tuplesHTML(j);
+      const bytes = `${charToByte(a, s.offset).toLocaleString()}–${charToByte(a, s.offset + s.text.length).toLocaleString()}`;
+      const struct = tup ? `<div class="pc-sec"><div class="pc-k">Structure <span>— the tuples the parser read, nested and in order</span></div>${tup}</div>`
+        : T.tuples && j < T.tuples.length ? '' : tupBusy ? `<div class="pc-sec"><span class="pc-why">Reading its structure…</span></div>` : '';
+      const ties = idxs.length ? `<div class="pc-sec"><div class="pc-k">Ties <span>— referents this statement binds to each other</span></div>${idxs.map(tieHTML).join('')}</div>` : '';
+      const thin = !struct && !ties;
+      return `<div class="pc${isCur ? ' cur' : ''}${thin ? ' thin' : ''}"><div class="pc-h"><span class="pc-n">${j + 1}</span><div class="pc-s">${marked(s, idxs)}</div><span class="pc-b" title="byte range">${bytes}</span></div>${struct}${ties}${thin && T.tuples ? `<div class="pc-sec"><span class="pc-why">No clause and no tie: a heading, label or fragment. Kept, not read into.</span></div>` : ''}</div>`;
     }).join('');
-    const unloc = unlocated.length ? `<div class="h">unlocated propositions — stated, but no span to place them</div>
-      <table class="t"><thead><tr><th></th><th>the proposition it makes</th><th>confidence</th><th>standing</th><th>tense</th></tr></thead><tbody>${unlocated.map(ci => { const c = T.claims[ci], st = T.reopened && T.reopened.get(ci) ? 'reopened' : standingOf(c);
-        return `<tr><td class="n">—</td><td>${diagram(c, ci)}</td><td>${confHTML(c)}</td><td><span class="chip ${st === 'read' ? 'g' : 'a'}">${st}</span></td><td class="mono">${esc(c.tense.v)}</td></tr>`; }).join('')}</tbody></table>` : '';
-    return `<div class="h">the propositions this reading makes — the source in order, each one drawn, with its confidence</div>
-      <div class="fig"><b>${counts.read}</b> read · <b>${counts.unbound}</b> unbound · <b>${counts.contradicted}</b> contradicted · <b>${counts.far}</b> beyond reach · <b>${counts.unheard}</b> unheard${unlocated.length ? ` · <b>${unlocated.length}</b> unlocated` : ''} over <b>${sents.length.toLocaleString()}</b> statements.
-      Each row shows the <b>original words</b> (the span that carried the proposition underlined), the proposition as <b>subject —act→ object</b>, a <b>confidence</b> derived from the engine's own signals (hover it), the <b>standing</b>, the clause's own <b>tense</b>, and the <b>byte range</b>.</div>
-      <table class="t"><thead><tr><th>#</th><th>the statement</th><th>the proposition it makes</th><th>confidence</th><th>standing</th><th>tense</th><th>bytes</th></tr></thead><tbody>${rows}</tbody></table>${unloc}`;
+    const unloc = unlocated.length ? `<div class="h">ties with no place in the text</div><div class="pc"><div class="pc-sec" style="padding-left:12px">${unlocated.map(tieHTML).join('')}</div></div>` : '';
+    return `<div class="pstat"><span><b>${sents.length.toLocaleString()}</b> statements</span>${T.tuples ? `<span><b>${nTup.toLocaleString()}</b> tuples</span>` : ''}<span><b>${T.claims.length}</b> ties: ${counts.read} read · ${counts.unbound} unbound · ${counts.contradicted} contradicted · ${counts.far} beyond reach${counts.unheard ? ` · ${counts.unheard} unheard` : ''}${unlocated.length ? ` · ${unlocated.length} unplaced` : ''}</span>${sents.length > CAP ? `<span>showing the first ${CAP}</span>` : ''}</div>
+      ${cards}${unloc}`;
   }
   function marked(s, idxs){
     const a0 = s.offset, b0 = s.offset + s.text.length;
     const parts = idxs.map(i => T.claims[i]).sort((x, y) => x.s - y.s);
     let html = '', curp = a0;
-    for (const c of parts){ const a = Math.max(a0, c.s), b = Math.min(b0, c.e); if (b <= a) continue;
+    for (const c of parts){ const a = Math.max(a0, c.s, curp), b = Math.min(b0, c.e); if (b <= a) continue;
       if (a > curp) html += esc(T.doc.analysis.slice(curp, a));
       html += `<span class="mrel">${esc(T.doc.analysis.slice(a, b))}</span>`; if (b > curp) curp = b; }
     if (curp < b0) html += esc(T.doc.analysis.slice(curp, b0));
@@ -1434,14 +1557,12 @@ function mount(T){
       + `</div>`;
   }
   function renderPaneHTML(){
-    return `<div class="h">Render — the same triple in a reader's word order, zero model</div>
-      <div class="fig">A proposition is language-neutral: an <b>end1 · act · end2</b> with its standing. The render lens is a <b>declared scaffold</b> (WALS-style), never a model — the content words are the material's own; only the order and the scaffolding are supplied.</div>
+    return `<div class="fig">A proposition is language-neutral: an <b>end1 · act · end2</b> with its standing. The render lens is a <b>declared scaffold</b> (WALS-style), never a model — the content words are the material's own; only the order and the scaffolding are supplied.</div>
       ${ORDERS.map(o => `<div class="ord"><h3>${esc(o.label)}</h3><div class="giver">${esc(o.giver)}</div>${T.claims.slice(0, 60).map(c => `<div class="line">${esc(o.line(c))}</div>`).join('') || '<div class="line">—</div>'}</div>`).join('')}`;
   }
   function eotPane(St){
     const srcs = T.eot.sources || [], evs = T.eot.events || [];
-    return `<div class="h">EOT — the folded, append-only ledger (Provenance@${T.eot.schema || 2})</div>
-      <div class="fig">Not citations but <b>transformations</b>: read → arrange → classify → bind → eot. Ids are <span class="mono">evt_ + first 20 hex of sha256(JSON.stringify(value))</span> — the same reading always yields the same ids, and a third party can recompute the whole log. Address space: <b>${esc((T.eot.addressSpace && T.eot.addressSpace.artifact) || 'folded-bytes')}</b>, unit byte.</div>
+    return `<div class="fig">Provenance@${T.eot.schema || 2}. Not citations but <b>transformations</b>: read → arrange → classify → bind → eot. Ids are <span class="mono">evt_ + first 20 hex of sha256(JSON.stringify(value))</span> — the same reading always yields the same ids, and a third party can recompute the whole log. Address space: <b>${esc((T.eot.addressSpace && T.eot.addressSpace.artifact) || 'folded-bytes')}</b>, unit byte.</div>
       <div class="h">sources — stored once under their own bytes</div>
       ${srcs.map(s => `<div class="evt"><span class="id">${esc(hx(s.source_id, 18))}</span><span class="st">${esc(s.kind)}</span><span class="rd">${esc(clamp(s.locator, 44))} · anchor ${esc(JSON.stringify(s.anchor || {}))}</span></div>`).join('')}
       <div class="h">events — every step a transformation (${evs.length})</div>
@@ -1465,9 +1586,16 @@ function mount(T){
     E.revisions = (E.revisions || []).concat([{ to: idx, extractor: r.extractor, reads: r.sniff.reads, at: new Date().toISOString() }]);
     read(r.text, T.doc.label + ' — ' + r.extractor, features, { animate: false, extraction: E });
   }
+  function flipJunction(q){
+    const E = T.extraction, r = E && E.readings[E.collapsed]; if (!r || !r.junctions || !r.junctions[q]) return;
+    const jx = r.junctions[q]; jx.decision = jx.decision === 'join' ? 'space' : 'join'; jx.flipped = (jx.flipped || 0) + 1;
+    E.revisions = (E.revisions || []).concat([{ junction: q, to: jx.decision === 'join' ? jx.joined : jx.spaced, extractor: r.extractor, at: new Date().toISOString() }]);
+    r.text = applyJunctions(r.before, r.junctions); read(r.text, T.doc.label, features, { animate: false, extraction: E });
+  }
   function wireReopen(scope){
     scope.querySelectorAll('[data-reopen]').forEach(b => b.addEventListener('click', () => reopen(+b.dataset.reopen)));
     scope.querySelectorAll('[data-pick]').forEach(b => b.addEventListener('click', () => recollapse(+b.dataset.pick)));
+    scope.querySelectorAll('[data-flip]').forEach(b => b.addEventListener('click', () => flipJunction(+b.dataset.flip)));
   }
 
   // ── ribbon ──
@@ -1516,7 +1644,10 @@ function mount(T){
       sw.addEventListener('keydown', e => { if (e.key === ' ' || e.key === 'Enter'){ e.preventDefault(); go(); } });
     });
   }
-  const onClick = e => { const a = e.target.closest('[data-a]'); if (!a) return; const act = a.dataset.a;
+  const onClick = e => {
+    const rs = e.target.closest('[data-rsort]'); if (rs){ refTabSort = nextSort(refTabSort, rs.dataset.rsort); render(false); return; }
+    const rr = e.target.closest('#p-pane .rt tbody tr[data-sel]'); if (rr){ try { graphSel = JSON.parse(rr.dataset.sel).ref; } catch (er) { graphSel = null; } setTab('graph'); return; }
+    const a = e.target.closest('[data-a]'); if (!a) return; const act = a.dataset.a;
     if (act === 'close') close(); else if (act === 'play') setDir(dir === 1 ? 0 : (k >= N - 1 ? (seek(0), 1) : 1));
     else if (act === 'rev') setDir(dir === -1 ? 0 : (k <= 0 ? (seek(N - 1), -1) : -1));
     else if (act === 'start'){ setDir(0); seek(0); } else if (act === 'back'){ setDir(0); seek(k - 1); } else if (act === 'fwd'){ setDir(0); seek(k + 1); }
@@ -1531,7 +1662,7 @@ function mount(T){
     else if (e.key === 'ArrowLeft'){ setDir(0); seek(k - 1); } else if (e.key === 'ArrowRight'){ setDir(0); seek(k + 1); }
     else if (e.key === 'j' || e.key === 'J') setDir(-1); else if (e.key === 'k' || e.key === 'K') setDir(0); else if (e.key === 'l' || e.key === 'L') setDir(1);
     else if (e.key === 'Home'){ setDir(0); seek(0); } else if (e.key === 'End'){ setDir(0); seek(N - 1); } };
-  function close(){ ac.abort(); stopTL(); try { ro.disconnect(); } catch (e) {} cancelAnimationFrame(raf); try { map.destroy && map.destroy(); } catch (e) {} app.classList.remove('on'); cur = null; }
+  function close(){ ac.abort(); stopTL(); try { ro.disconnect(); } catch (e) {} cancelAnimationFrame(raf); try { map.destroy && map.destroy(); } catch (e) {} app.classList.remove('on'); inst = null; const rv = $('rv'); if (rv && cur) rv.classList.add('on'); }
   const ro = new ResizeObserver(() => size());
   bind(app, 'click', onClick);
   bind(document, 'keydown', onKey);
@@ -1602,6 +1733,7 @@ function startTimeline(T){
     try {
       const pos = T.feat.pos === false ? null : PRIORS.posPrior, R = T.R;
       const memo = new Map();   // one classification cache for every prefix of this replay
+      ABBREV = abbrevOf(T.clean);
       T.timeline = buildReadingTimeline(T.clean, {
         hash: sha256, diaNorm, splitSentences, wordsIn, extractSurfaces, discoverReferents, resolvePronouns,
         classifyAt: prefix => pos ? documentClassifier(prefix, { posPrior: pos, lemmatizer: PRIORS.lemmatizer, lookups: LOOKUP.cache, memo }) : (f => classifyForm(f, { posPrior: null })),
@@ -1629,6 +1761,8 @@ async function read(text, label, feat, opt = {}){
   const doc = { label: lastLabel, analysis, truncated, layout: opt.layout || (opt.keep && opt.keep.layout) || null };
   const T = buildTrace(doc, clean, claims, feat, opt.extraction || null);
   T.clean = clean; T.R = R; T.feat = feat;
+  // a proposition is held in the MOOD of its sentence (a question asks; it does not assert) and NESTED in the containers around it (speech, aside), in order
+  T.claims.forEach(c => { if (c.located){ c.mood = moodAt(T.punctuation, c.s); c.holds = containersAt(T.punctuation, c.s).map(k => ({ kind:k.kind, mark:k.mark, mood:k.mood })); } });
   startTimeline(T);
   if (!BASELINE) BASELINE = T;
   $('model').textContent = `model calls: ${T.net.models}`;
@@ -1661,14 +1795,27 @@ function sniff(buf){
 async function pdfText(buf){
   const m = await loadPdfjs();
   const pdf = await m.getDocument({ data: buf.slice() }).promise;
-  const pages = Math.min(pdf.numPages, 40); let raw = '';
+  const pages = Math.min(pdf.numPages, 40); let raw = ''; const startles = [];
   await ready();
   for (let i = 1; i <= pages; i++){
     const c = await (await pdf.getPage(i)).getTextContent();
-    for (const it of c.items) raw += (it.str || '') + (it.hasEOL ? '\n' : ' ');
+    // words are joined by GEOMETRY, not by item (reading/look-joins.js): a space goes between two items only at a real word gap or a new line,
+    // and a junction whose geometry contradicts itself (two baselines on one row) is marked as a STARTLE, for the later layers to settle
+    const j = joinItems(c.items, { base: raw.length }); raw += j.text; startles.push(...j.startles.map((x) => ({ ...x, page: i })));
     raw += '\n\n';
   }
-  return { raw, pages, numPages: pdf.numPages };
+  return { raw, pages, numPages: pdf.numPages, startles };
+}
+// A STARTLE at a junction is settled by what the later layers can use: the lexicon, the document's own forms, and the names the referent
+// layer has established (namesCorefer). Both readings stay on the record (reading.before is the PDF's own text); a decision can be flipped.
+function junctionCtx(text){
+  const counts = new Map(); for (const w of text.toLowerCase().match(/[\p{L}\p{N}'’-]+/gu) || []) counts.set(w, (counts.get(w) || 0) + 1);
+  let names = []; try { names = extractSurfaces(splitSentences(text, { abbreviations: abbrevForSplitter() })).filter((x) => x.sentences >= 2).map((x) => x.surface); } catch (e) {}
+  return { known: (w) => knownWord(w), docCount: (w) => counts.get(w) || 0, names, corefer: (a, b) => { try { return namesCorefer(a, b); } catch (e) { return false; } } };
+}
+function settleJunctions(E, startles, prior){
+  const r = E.readings.find((x) => x.ok && /pdf\.js/.test(x.extractor)); if (!r) return;
+  r.before = r.text; r.junctions = decideJunctions(r.text, startles, junctionCtx(r.text)); r.text = applyJunctions(r.before, r.junctions); r.sniff = sniffExtraction(r.text, { prior, floor: E.floor });
 }
 function refuse(name, kind, extra = {}){
   $('app').classList.remove('on');
@@ -1752,7 +1899,7 @@ async function readFile(file){
   if (kind !== 'pdf' && kind !== 'text' && kind !== 'image') return refuse(file.name, kind);
   await ready();
   const prior = { name: 'English vocabulary', giver: (PRIORS.posPrior && PRIORS.posPrior.provenance && PRIORS.posPrior.provenance.source) || 'UD/Thrax + UniMorph', known: knownWord, longest: LEXICON_LONGEST };
-  let E = null;
+  let E = null, PDF_STARTLES = null;
   OCR_META = null;
   const ocrReading = { name: 'tesseract OCR (this machine)', run: async () => ocr(buf) };
   if (kind === 'image'){
@@ -1762,7 +1909,7 @@ async function readFile(file){
     // parallel readings (eigenvalues): pdf.js (local) and the platform converter; one collapses as the reading.
     // If neither reads as words (a scan: its pages are pixels), the recogniser joins them and the gate chooses.
     const textual = [
-      { name: 'pdf.js text layer (browser)', run: async () => (await pdfText(buf)).raw },
+      { name: 'pdf.js text layer (browser)', run: async () => { const p = await pdfText(buf); PDF_STARTLES = p.startles; return p.raw; } },
       { name: 'pdftotext (poppler)', run: async () => { const c = await convert(buf); return c && c.text; } },
     ];
     E = await extractReadings({ prior, extractors: textual });
@@ -1779,6 +1926,7 @@ async function readFile(file){
     if (/\.(csv|tsv)$/i.test(file.name)) { const c = csvReading(raw, file.name); if (c.statements) return run(c.statements, file.name); }
     return run(raw, file.name);
   }
+  if (PDF_STARTLES && PDF_STARTLES.length) settleJunctions(E, PDF_STARTLES, prior);
   const chosen = E.collapsed != null ? E.readings[E.collapsed] : null;
   if (!chosen || !chosen.text || chosen.text.trim().length < 8) return refuse(file.name, kind === 'pdf' ? 'pdf-no-text' : kind === 'image' ? 'image' : 'binary', {});
   if (chosen.sniff.verdict === 'unconfirmed') return refuse(file.name, 'pdf-unreadable', { reads: chosen.sniff.reads });
@@ -1803,6 +1951,7 @@ const POS_FILE = { en:'eng', fr:'fra', de:'deu', es:'spa', it:'ita', pt:'por', n
 async function priorFor(text){
   await ready(); PRIORS.posEng ??= PRIORS.posPrior; PRIORS.lemEng ??= PRIORS.lemmatizer;
   let d = null; try { d = detectLang(text); } catch (e) {}
+  try { PUNCT = await loadPunctuation(new URL('./', import.meta.url), d && d.confident ? d.lang : 'en'); } catch (e) { PUNCT = null; }
   const f = d && d.confident && d.lang !== 'en' ? POS_FILE[d.lang] : null;
   if (f) { try { const p = await (await fetch(`../vendor/khora/native/priors/pos-${f}.json`)).json(); if (p && p.forms) { PRIORS.posPrior = p; PRIORS.lemmatizer = null; PRIORS.lang = d; PRIORS.langIso3 = f; return d; } } catch (e) {} }
   PRIORS.posPrior = PRIORS.posEng; PRIORS.lemmatizer = PRIORS.lemEng; PRIORS.lang = d; PRIORS.langIso3 = null; return d;

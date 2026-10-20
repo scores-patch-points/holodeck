@@ -257,3 +257,42 @@ named text, attended or not. A test document built from broad sources also canno
 touches every part of the exhibit shares words with every other such source by chance, and the null is right to
 refuse. Plant narrow sources, run the control with the mechanism removed, and read the null's number beside the
 observed one before believing either.
+
+## 32. The reading is stable under presentation: hold the extractions, collapse one, never guess
+
+A PDF's text layer is not words. The page's own tracking is encoded into the character stream, so a
+title arrives as `"F R O M"` and `"L AT E S T"` — five one-letter "words", which no language states —
+and a line breaks inside a word across items (`"Co"` + `"u"` + `"ncil, Flo"`). Read literally, each
+glyph became a form, took a class, and stood as a name. The requirement is a **stable response**: a
+reading that is a function of the material's words, not of how the page was set.
+
+Three wrong turns, kept so they are not retaken. **(a) Do not build the extractor.** Measured
+2026-10-18 on `propublica-memo.pdf`: pdf.js's `getTextContent` returned `"F R O M"`, MuPDF's `mutool`
+kept the tracking, and poppler's `pdftotext` returned `"FROM THE CREATORS OF"` — because poppler
+reconstructs WORDS from the page's glyph advances and pdf.js does not. **(b) Do not read the page with
+information a person does not have.** A human cannot tell a tracking space from a word space; a reader
+that decides boundaries from the glyph advances (space widths, x positions) is CHEATING, and it fails
+the moment the text is copied, reflowed, or OCR'd. **(c) Do not infer a word the prior does not hold.**
+A hand-built geometry normalizer and a word-inference pass were both written and both removed: the
+first used the cheat, the second guessed word boundaries and derived through the guess — refused by
+II.1 and IV.3, and it could not be made constant-free (II.11).
+
+What stands is a **gate**, not a normalizer, and it obeys the constitution (`docs/FOLD-CONSTITUTION.md`):
+
+- **Hold every extraction as a parallel reading (III.4).** The gate runs the local extractor and, when
+  needed, the platform converter (`pdftotext`, `textutil`), and keeps BOTH — plural grounds stay
+  parallel, never averaged. `reading/extract.js`.
+- **Collapse one as the reading, revisable (I.5).** The reading that reads as words the MOST collapses;
+  the others are kept and shown, and a person may re-collapse to any of them, append-only.
+- **Measure by what reads as words, not by a score (II.6).** The measure is the share of TOKENS that
+  are known words of the prior — a mangled extraction shatters a word into many short tokens, so few
+  are known. The vocabulary is RECEIVED and names its giver; no prior is a typed gap (II.1 / IV.3).
+- **The one constant is DECLARED and NAMED (II.11).** `READS_FLOOR` (a reading below it is
+  `unconfirmed`, so the converter is called); giver = the gate, surfaced on every reading.
+- **Falsifiable (II.10).** The tests show a mangled extraction read `unconfirmed` and a clean one
+  `confirmed`.
+
+Falsifying control: a clean PDF must not call the converter; a converter's reading must beat the first
+extractor's by the measure; a missing or broken converter is a held, skipped reading, never fatal; and
+the reading must be identical however the spaces were set. A reading surprised by its material's
+presentation is not yet stable.

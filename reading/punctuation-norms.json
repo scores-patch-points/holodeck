@@ -1,0 +1,39 @@
+{
+  "schema": "PunctuationNorms@1",
+  "giver": "declared by this reader's authors from Unicode (general categories, UAX #29 sentence-boundary behaviour) and each orthography's own conventions; a language not listed here is read with `default`, and the reading says so",
+  "note": "Structure only. Which words are abbreviations is NOT here: it is measured per language (punctuation-priors/<lang>.json, tools/build-punctuation-priors.mjs) and added to from the document being read. What a mark MEANS for a proposition (a question asks, it does not assert) is in punctuation.js.",
+  "default": {
+    "terminators": [".", "!", "?", "…", "‼", "⁇", "。", "！", "？", "؟", "۔", "।", "॥", "։", "።"],
+    "questions": ["?", "？", "؟", "⁇", ";"],
+    "exclamations": ["!", "！", "‼"],
+    "ellipsis": ["…", "‥"],
+    "separators": { "weak": [",", "、", "，", "،", "﹐"], "strong": [";", ":", "；", "：", "؛", "：", "﹕"] },
+    "dashes": ["—", "–", "―", "‒", "−"],
+    "pairs": {
+      "quote": [["“", "”"], ["‘", "’"], ["«", "»"], ["‹", "›"], ["„", "“"], ["‚", "‘"], ["「", "」"], ["『", "』"], ["《", "》"], ["〈", "〉"]],
+      "bracket": [["(", ")"], ["[", "]"], ["{", "}"], ["（", "）"], ["［", "］"], ["【", "】"], ["〔", "〕"]]
+    },
+    "toggle": ["\""],
+    "inverted": { "¿": "?", "¡": "!" },
+    "abbreviationDot": true,
+    "ordinalDot": false,
+    "decimal": ["."],
+    "grouping": [",", "’", "'", " ", " "]
+  },
+  "langs": {
+    "en": { "questions": ["?", "⁇"] },
+    "de": { "ordinalDot": true, "decimal": [","], "grouping": [".", "’", " "], "pairs": { "quote": [["„", "“"], ["‚", "‘"], ["»", "«"], ["›", "‹"]] } },
+    "fr": { "decimal": [","], "grouping": [" ", " ", "."], "pairs": { "quote": [["«", "»"], ["“", "”"], ["‹", "›"]] }, "spaceBefore": ["?", "!", ":", ";", "»"] },
+    "es": { "decimal": [","], "grouping": [".", " "], "pairs": { "quote": [["«", "»"], ["“", "”"]] } },
+    "pt": { "decimal": [","], "grouping": [".", " "], "pairs": { "quote": [["“", "”"], ["«", "»"]] } },
+    "it": { "decimal": [","], "grouping": [".", " "], "pairs": { "quote": [["«", "»"], ["“", "”"]] } },
+    "ru": { "decimal": [","], "grouping": [" ", " "], "pairs": { "quote": [["«", "»"], ["„", "“"]] } },
+    "sv": { "pairs": { "quote": [["”", "”"], ["’", "’"], ["»", "»"]] } },
+    "zh": { "abbreviationDot": false, "questions": ["？", "?"], "separators": { "weak": ["，", "、", ","], "strong": ["；", "：", ";", ":"] }, "pairs": { "quote": [["「", "」"], ["『", "』"], ["“", "”"], ["‘", "’"], ["《", "》"]] } },
+    "ja": { "abbreviationDot": false, "questions": ["？", "?"], "separators": { "weak": ["、", "，", ","], "strong": ["；", "："] }, "pairs": { "quote": [["「", "」"], ["『", "』"], ["“", "”"]] } },
+    "ar": { "abbreviationDot": true, "questions": ["؟", "?"], "separators": { "weak": ["،", ","], "strong": ["؛", ";", ":"] }, "rtl": true },
+    "fa": { "questions": ["؟", "?"], "separators": { "weak": ["،", ","], "strong": ["؛", ";", ":"] }, "rtl": true },
+    "he": { "rtl": true },
+    "hi": { "terminators": ["।", "॥", ".", "!", "?"], "abbreviationDot": true }
+  }
+}
