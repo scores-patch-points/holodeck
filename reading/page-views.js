@@ -9,6 +9,7 @@
 // Pure of the page: they take the reading and return data or HTML. Nothing here reads anything new.
 import '../alhazen.js'; // UMD: sets self.Alhazen
 import { weighField } from './prior-tilt.js';
+import { setPage } from './layout-rules.js';
 import { shapeOf, hasWord, ROW, MARKER, AMOUNT } from './shapes.js';
 import { labelOf as printedBeside, headingOf as headingOver } from './prior-measure.js';
 const A = () => self.Alhazen;
@@ -81,23 +82,20 @@ export function placeHTML(layout, R, { selected, tilt = null } = {}) {
     const T = tilt && tilt.pages.find((p) => p.n === pg.n && p.matched);
     const valueOf = new Map(), labelOf_ = new Map();
     for (const f of R.fields.filter((x) => x.page === pg.n)) { for (const w of f.vwords || []) valueOf.set(w.s, f); for (const w of f.lwords || []) labelOf_.set(w.s, f); }
-    const lineH = pg.lines.map((ln) => med(pg.words.slice(ln.words[0], ln.words[1]).filter((w) => /[\p{L}\p{N}]/u.test(w.t)).map((w) => w.b[3] - w.b[1])));
-    const pageH = med(lineH.filter(Boolean)) || 10;
-    const out = [];
-    pg.lines.forEach((ln, li) => {
-      const h = Math.min(pageH * 1.7, Math.max(pageH * 0.75, lineH[li] || pageH)), size = (h / pg.w) * 100 * 0.86;
-      for (const w of pg.words.slice(ln.words[0], ln.words[1])) {
-        if (!/[\p{L}\p{N}$€£¥%]/u.test(w.t) || w.c < 45) continue; // stray marks, rules and graphics read as glyphs
+    const { rows } = setPage(pg), out = [];
+    for (const r of rows) {
+      const h = r.h, size = (h / pg.w) * 100 * 0.86;
+      for (const { w, x } of r.set) {
         const fv = valueOf.get(w.s), fl = labelOf_.get(w.s), tw = T && T.per.get(w.s);
         // the prior tilts: what the blank form prints here is printed, whatever the cell reading guessed; a word in a box it leaves is filled in
         const k = tw && tw.printed ? 'printed' : fv ? 'filled' : tw && tw.field ? 'filled' : 'printed';
         const field = fv || fl;
         const sel = field ? JSON.stringify({ kind: 'field', id: field.id }) : JSON.stringify({ kind: 'word', w: w.t, s: w.s, e: w.e });
         const on = selected && ((selected.kind === 'field' && field && field.id === selected.id) || (selected.kind === 'word' && selected.s === w.s));
-        const boxW = ((w.b[2] - w.b[0]) / pg.w) * 100, guess = Math.max(1, [...w.t].length) * size * 0.5, sx = Math.max(0.55, Math.min(1.35, boxW / guess));
-        out.push('<span class="pw ' + k + (fv ? ' fv' : '') + (on ? ' on' : '') + '" style="left:' + pct(w.b[0], pg.w) + ';top:' + pct(w.b[3] - h * 0.95, pg.h) + ';font-size:' + size.toFixed(3) + 'cqw;transform:scaleX(' + sx.toFixed(3) + ')" data-sel=\'' + esc(sel) + '\' title="' + esc(k) + (w.c != null ? ' · ' + w.c + '% confidence' : '') + (field ? ' · ' + esc(field.label) : '') + '">' + esc(w.t) + '</span>');
+        const boxW = ((w.b[2] - w.b[0]) / pg.w) * 100, guess = Math.max(1, [...w.t].length) * size * 0.5, sx = Math.max(0.55, Math.min(1.2, boxW / guess));
+        out.push('<span class="pw ' + k + (fv ? ' fv' : '') + (on ? ' on' : '') + '" style="left:' + pct(x, pg.w) + ';top:' + pct(r.base - h * 0.95, pg.h) + ';font-size:' + size.toFixed(3) + 'cqw;transform:scaleX(' + sx.toFixed(3) + ')" data-sel=\'' + esc(sel) + '\' title="' + esc(k) + (w.c != null ? ' · ' + w.c + '% confidence' : '') + (field ? ' · ' + esc(field.label) : '') + '">' + esc(w.t) + '</span>');
       }
-    });
+    }
     return '<div class="pgh">page ' + pg.n + ' — re-set where the page has it · <span style="color:#6b7280">printed</span> · <span style="color:#1d4ed8">filled in</span></div><div class="pg place" style="aspect-ratio:' + pg.w + '/' + pg.h + '">' + out.join('') + '</div>';
   }).join('');
 }
@@ -326,4 +324,24 @@ function tiltFields(fields, tilt, layout, text) {
     }
   }
   return kept.sort((a, b) => a.page - b.page || a.lb[1] - b.lb[1] || a.lb[0] - b.lb[0]);
+}
+
+/** The reading as standalone, semantic HTML — the scan's words set by the layout rules, filled-in values as <data> carrying their field,
+ *  character range and box, so the page's provenance survives outside the reader. Opens anywhere; also readable back as a document. */
+export function htmlExport(layout, R, { title = 'reading', tilt = null, form = null } = {}) {
+  const e = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const secs = layout.pages.map((pg) => {
+    const T = tilt && tilt.pages.find((p) => p.n === pg.n && p.matched), valueOf = new Map();
+    for (const f of R.fields.filter((x) => x.page === pg.n)) for (const w of f.vwords || []) valueOf.set(w.s, f);
+    const { rows } = setPage(pg);
+    const body = rows.map((r) => {
+      const parts = []; let run = null;
+      const flush = () => { if (run) { parts.push(run.f ? `<data value="${e(run.f.value)}" data-field="${e(run.f.id)}" data-label="${e(run.f.label)}" data-format="${e(run.f.format || '')}" data-chars="${run.f.s}-${run.f.e}">${e(run.t.join(' '))}</data>` : e(run.t.join(' '))); run = null; } };
+      for (const { w } of r.set) { const f = valueOf.get(w.s) || ((T && T.per.get(w.s) && T.per.get(w.s).field && !T.per.get(w.s).printed) ? null : null); if (!run || run.f !== f) { flush(); run = { f, t: [] }; } run.t.push(w.t); }
+      flush(); return `<p data-y="${Math.round(r.base)}">${parts.join(' ')}</p>`;
+    }).join('\n');
+    return `<section data-page="${pg.n}" data-width="${pg.w}" data-height="${pg.h}">\n${body}\n</section>`;
+  }).join('\n');
+  const facts = (form && form.claims || []).map((c) => `<tr><th scope="row">${e(c.act)}</th><td><data value="${e(c.object)}" data-type="${e(c.type)}" data-page="${c.page}" data-chars="${c.chars[0]}-${c.chars[1]}">${e(c.object)}</data></td></tr>`).join('\n');
+  return `<!doctype html>\n<html><head><meta charset="utf-8"><title>${e(title)}</title><meta name="generator" content="fold reader — no model">\n<style>body{font:15px/1.5 system-ui;max-width:56rem;margin:2rem auto;padding:0 1rem;color:#1f2430}section{margin:2rem 0;padding-top:1rem;border-top:1px solid #ddd}p{margin:.15rem 0}data{color:#1d4ed8;font-weight:600}th{text-align:left;font-weight:400;color:#555;padding-right:1.5rem}</style></head>\n<body><article>\n<h1>${e(title)}</h1>\n${facts ? `<table aria-label="what the form says">\n${facts}\n</table>\n` : ''}${secs}\n</article></body></html>\n`;
 }
