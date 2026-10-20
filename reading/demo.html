@@ -1618,7 +1618,8 @@ async function read(text, label, feat, opt = {}){
   const analysis = raw.length > LIMIT ? raw.slice(0, LIMIT) : raw;
   const truncated = raw.length > LIMIT;
   const clean = feat.furniture === false ? analysis : blankMarkup(analysis);
-  const R = await makeEngineRelationReader({ features: feat });
+  // a non-English document's relations are read against ITS language's prior (the suite's dispatch reader picks the extractor from it)
+  const foreign = PRIORS.posPrior !== PRIORS.posEng && PRIORS.langIso3 ? { iso3: PRIORS.langIso3, posPrior: PRIORS.posPrior } : null, R = await makeEngineRelationReader({ features: feat, foreign });
   let read0 = { claims: [] };
   try { read0 = R([{ ref:'source', text: clean }]).read(clean); } catch (e) { console.error(e); }
   const claims = mapClaims(read0.claims, analysis);
@@ -1800,8 +1801,8 @@ async function priorFor(text){
   await ready(); PRIORS.posEng ??= PRIORS.posPrior; PRIORS.lemEng ??= PRIORS.lemmatizer;
   let d = null; try { d = detectLang(text); } catch (e) {}
   const f = d && d.confident && d.lang !== 'en' ? POS_FILE[d.lang] : null;
-  if (f) { try { const p = await (await fetch(`../vendor/khora/native/priors/pos-${f}.json`)).json(); if (p && p.forms) { PRIORS.posPrior = p; PRIORS.lemmatizer = null; PRIORS.lang = d; return d; } } catch (e) {} }
-  PRIORS.posPrior = PRIORS.posEng; PRIORS.lemmatizer = PRIORS.lemEng; PRIORS.lang = d; return d;
+  if (f) { try { const p = await (await fetch(`../vendor/khora/native/priors/pos-${f}.json`)).json(); if (p && p.forms) { PRIORS.posPrior = p; PRIORS.lemmatizer = null; PRIORS.lang = d; PRIORS.langIso3 = f; return d; } } catch (e) {} }
+  PRIORS.posPrior = PRIORS.posEng; PRIORS.lemmatizer = PRIORS.lemEng; PRIORS.lang = d; PRIORS.langIso3 = null; return d;
 }
 async function run(text, label, opt = {}){
   try { await priorFor(text); } catch (e) { console.warn('language prior', e); }

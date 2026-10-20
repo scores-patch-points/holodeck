@@ -233,8 +233,15 @@ export async function readCorpus(docs, { reader = null, chunkChars = 60000 } = {
 const cleanText = (s) => String(s == null ? '' : s).replace(/\s+/g, ' ').trim();
 
 export async function makeEngineRelationReader(extra = {}) {
-  const { features = {}, ...rest } = extra;
+  const { features = {}, foreign = null, ...rest } = extra;
   const { posPrior, verbForms, lemmatizer } = await loadPriors();
+  // FOREIGN: a document that measured as another language is read by the suite's own dispatch for THAT language — its POS prior, and its
+  // RoleConfig@1 where one is shipped (positional reader), else the clause-aware GFP reader. Nothing English is applied to it.
+  if (foreign) {
+    let roleConfig = null; try { const r = await fetch(new URL(`./vendor/khora/native/priors/role-config-${foreign.iso3}.json`, import.meta.url)); if (r.ok) roleConfig = await r.json(); } catch (e) {}
+    const d = relationExtractorsFor({ language: foreign.iso3, roleConfig, posPrior: foreign.posPrior, classifyWord, dominantClass });
+    Object.assign(rest, { extractRelations: (t, o) => d.extractRelations(t, d.mode === 'gfp' ? { ...o, clauseAware: true } : o), discoverRelationVocab: (...a) => d.discoverRelationVocab(...a), posPriorFor: () => foreign.posPrior });
+  }
   // hand the composed reader its priors, once — the same received closed class
   // the dispatch reader already uses, plus the measured role config.
   // sameAct is widened by stance class, so "is pro" binds a source's "in
