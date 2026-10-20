@@ -152,7 +152,7 @@ export function mountReader(T, ctx) {
   const L = T.doc.layout || null;
   let fieldsMemo = null; const fields = () => (fieldsMemo ??= fieldsOf(L, text));
   const isForm = () => fields().length >= 5;
-  let formMemo = null, formKey = ''; const form = () => { const f = fold(); const k = foldKey; if (formMemo && formKey === k) return formMemo; formKey = k; return (formMemo = readForm(fields(), { referents: f ? f.order : [], formWord })); };
+  let formMemo = null, formKey = ''; const form = () => { const f = fold(); const k = foldKey; if (formMemo && formKey === k) return formMemo; formKey = k; return (formMemo = readForm(fields(), { referents: f ? f.order : [], formWord, known: ctx.known || null })); };
   const R = () => { const f = fold(), mentions = []; if (f) for (const m of f.mentions.values()) { const r = f.assign.get(m.id), ref = r ? f.resolve(r) : null; if (ref && f.referents.has(ref)) mentions.push({ s: m.s, e: m.e, ref, rc: f.col.get(ref) }); }
     return { fields: fields(), mentions, claims: claims(), unplaced: new Set(tokens().filter((t) => !t.upos && /\p{L}/u.test(t.w)).map((t) => t.s)), tokens: tokens(), title, extracted }; };
   let structMemo = null, structKey = '';
@@ -226,8 +226,8 @@ export function mountReader(T, ctx) {
   }
   function hero() {
     const f = fold(), s = st.sel; crumbGo = []; let h = crumbs();
-    const modes = () => `<div class="modes">${[['pdf', 'PDF + text', !!L], ['text', 'Text', true], ['json', 'JSON', true]].filter((m) => m[2]).map(([m, lab]) => `<button type="button" data-a="mode" data-m="${m}" class="${st.mode === m ? 'on' : ''}">${lab}</button>`).join('')}</div>`;
-    const body = (sel) => st.mode === 'pdf' && L ? pdfHTML(L, R(), { selected: sel }) : st.mode === 'text' && L ? placeHTML(L, R(), { selected: sel }) : st.mode === 'json' ? `<div class="dim" style="margin-bottom:8px">the document's own structure, as tuples all the way down — [key, value, where]. Hover a grey note for its exact provenance.</div>${tupleHTML(structure())}` : docHTML();
+    const modes = () => `<div class="modes">${[['scan', 'PDF', !!L], ['pdf', 'PDF + text', !!L], ['text', 'Text', true], ['json', 'JSON', true]].filter((m) => m[2]).map(([m, lab]) => `<button type="button" data-a="mode" data-m="${m}" class="${st.mode === m ? 'on' : ''}">${lab}</button>`).join('')}</div>`;
+    const body = (sel) => st.mode === 'scan' && L ? L.pages.map((pg) => `<div class="pgh">page ${pg.n} — as scanned</div><div class="pg" style="aspect-ratio:${pg.w}/${pg.h}"><img src="${pg.image}" alt="page ${pg.n} as scanned"></div>`).join('') : st.mode === 'pdf' && L ? pdfHTML(L, R(), { selected: sel }) : st.mode === 'text' && L ? placeHTML(L, R(), { selected: sel }) : st.mode === 'json' ? `<div class="dim" style="margin-bottom:8px">the document's own structure, as tuples all the way down — [key, value, where]. Hover a grey note for its exact provenance.</div>${tupleHTML(structure())}` : docHTML();
     if (s.kind === 'doc' || !f) return h + modes() + body(null);
     if (s.kind === 'fclaim') {
       const c = form().claims.find((y) => y.id === s.id); if (!c) return h + modes() + body(null);
