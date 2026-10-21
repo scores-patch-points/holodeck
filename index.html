@@ -9084,7 +9084,8 @@ class Component extends DCLogic {
   // rendered by the user's own browser, so frame-ancestors and CORS never apply.
   bookmarkletRef = el => { if (el) el.setAttribute('href', bookmarkletHref()); };
   attachHandlers(target) {
-    target.addEventListener('click', e => { const a = e.target.closest('a'); if (a && (e.metaKey || e.ctrlKey)) return; const nm = e.target.closest('[data-name]'); const st = e.target.closest('[data-st]');
+    target.addEventListener('click', e => { const a = e.target.closest('a'); if (a && (e.metaKey || e.ctrlKey)) return; const nm = e.target.closest('[data-name]'); const st = e.target.closest('[data-st]'); const tm = !nm && e.target.closest('[data-term]');
+      if (tm) { e.preventDefault(); e.stopPropagation(); this.openProfile(tm.getAttribute('data-term')); return; }
       if (a && !e.shiftKey && /^https?:/.test(a.href || '')) { e.preventDefault(); e.stopPropagation(); this.navigate(a.href); return; }
       if (nm) { e.preventDefault(); const dd = this._A && this.state.view === 'reader' && this.state.readDoc && this._A.docById[this.state.readDoc]; if (dd && dd.media && dd.media.segN > 0) { this.phJumpFrom(nm, e, dd.id); this.openProfile(nm.getAttribute('data-name')); return; } this.sel('name', nm.getAttribute('data-name')); return; }
       if (st) {
@@ -9376,8 +9377,37 @@ class Component extends DCLogic {
     }
     try { this.repairLoops(d); } catch (e) { /* as it was */ }
     try { this.paintTranscriptSlider(el, d, A); } catch (e) { this._txErr = e; }
+    try { this.paintTermLinks(el, d); } catch (e) { this._tlErr = e; }
     try { this.paintLinkGutter(el, d, A); } catch (e) { this._lkErr = e; }
     const sk = JSON.stringify(S.sel); if (this._selKey !== sk && this._rRoot) { this._selKey = sk; this.applySel(this._rRoot); }
+  }
+  // Every content word of a transcript is a link, the way every term on a Wikipedia page is: it opens that term's page
+  // (where the workspace says it, what it sits next to). Names, figures and dates keep their own marks and clicks; the
+  // little words (the, of, and …) are left as plain text. Done a block at a time so a long transcript never stalls a paint.
+  paintTermLinks(el, d) {
+    if (!el || !d || !((d.media && d.media.segN > 0) || d.type === 'Transcript')) return;
+    const doc = el.ownerDocument; if (doc !== document) return;
+    const STOP = this._tlStop = this._tlStop || new Set(('a about above after again against all also am an and any are as at be because been before being below between both but by can could did do does doing down during each few for from further had has have having he her here hers herself him himself his how i if in into is it its itself just me more most my myself no nor not now of off on once only or other our ours ourselves out over own same she should so some such than that the their theirs them themselves then there these they this those through to too under until up very was we were what when where which while who whom why will with would you your yours yeah yes okay uh um oh well like get got going go one two three said say says right know think mean really thing things much many lot').split(' '));
+    const blocks = [...el.querySelectorAll('p,li,h2,h3,h4,blockquote')].filter(b => !b.hasAttribute('data-tl') && !b.closest('button,a,[data-gen]'));
+    let budget = 2500, did = 0;
+    for (const b of blocks) {
+      if (budget <= 0) break;
+      const w = doc.createTreeWalker(b, NodeFilter.SHOW_TEXT, { acceptNode: n => { const q = n.parentElement; return q && n.nodeValue.trim() && !q.closest('button,a,script,style,[data-gen],[data-name],[data-fig],[data-date],[data-term]') ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT; } });
+      const nodes = []; for (let n; (n = w.nextNode());) nodes.push(n);
+      for (const n of nodes) {
+        const t = n.nodeValue; const parts = t.split(/([\p{L}\p{N}][\p{L}\p{N}'’-]*)/u); if (parts.length < 3) continue;
+        const frag = doc.createDocumentFragment(); let any = false;
+        for (const part of parts) {
+          const k = part.toLowerCase().replace(/['’]s$/, '');
+          if (part && /^[\p{L}\p{N}]/u.test(part) && k.length >= 3 && !/^\d/.test(k) && !STOP.has(k)) { const sp = doc.createElement('span'); sp.setAttribute('data-term', k); sp.textContent = part; sp.title = 'Open “' + k + '”'; sp.style.cssText = 'color:var(--acc2,#4a90d9);cursor:pointer;text-decoration:none'; frag.appendChild(sp); any = true; budget--; }
+          else if (part) frag.appendChild(doc.createTextNode(part));
+        }
+        if (any) n.parentNode.replaceChild(frag, n);
+      }
+      b.setAttribute('data-tl', '1'); did++;
+    }
+    if (blocks.length > did) { clearTimeout(this._tlT); this._tlT = setTimeout(() => { try { this.paintTermLinks(this._rRoot || el, d); } catch (e) {} }, 40); }
+    if (!this._tlCss) { this._tlCss = 1; const st = document.createElement('style'); st.textContent = '[data-term]:hover{text-decoration:underline!important;text-underline-offset:3px}'; document.head.appendChild(st); }
   }
   applySel(el) {
     el.querySelectorAll('[data-selon]').forEach(x => { x.removeAttribute('data-selon'); x.style.background = x.getAttribute('data-bg') || ''; });
