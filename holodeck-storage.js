@@ -1,7 +1,7 @@
 // holodeck-storage.js — a workspace's bytes, wherever the person keeps them, sealed.
 //
 // The holodeck is a client: identity is the person's own Matrix account, and the bytes live in
-// whatever store they bring — their own Drive app folder (holodeck-storage-drive.js), their own
+// whatever store they bring — their own
 // homeserver, or just this browser. This module is the seam.
 //
 // A PROVIDER is anything that can put/get/list/del OPAQUE BYTES under string keys. It never sees a

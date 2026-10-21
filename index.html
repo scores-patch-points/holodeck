@@ -3344,8 +3344,8 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
           <section style="background:var(--s1);border:1px solid var(--line);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:10px">
             <span style="font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mut)">Account &amp; sync</span>
             <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><button onClick="{{ ing.onShareRepo }}" style="background:var(--acc2);border:0;color:#fff;border-radius:8px;padding:7px 16px;cursor:pointer;font:600 14px var(--sans)">Invite people…</button><button onClick="{{ ing.onAllWorkspaces }}" style="background:none;border:1px solid var(--line2);color:var(--ink2);border-radius:8px;padding:7px 14px;cursor:pointer;font:500 14px var(--sans)" style-hover="border-color:var(--acc)">All workspaces &amp; people…</button></div>
-            <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><button onClick="{{ ing.onConnectDrive }}" style="background:none;border:1px solid var(--line2);color:var(--ink2);border-radius:8px;padding:7px 14px;cursor:pointer;font:500 14px var(--sans)" style-hover="border-color:var(--acc)">Connect your Drive…</button></div>
-            <span style="font:400 12px/1.45 var(--sans);color:var(--dim);text-wrap:pretty">Bring your own storage: sign in with Google and this workspace’s bytes live in your own storage, sealed on this device first. Google proves who you are; it is not the key.</span>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><button onClick="{{ ing.onConnectDrive }}" style="background:none;border:1px solid var(--line2);color:var(--ink2);border-radius:8px;padding:7px 14px;cursor:pointer;font:500 14px var(--sans)" style-hover="border-color:var(--acc)">Connect your storage…</button></div>
+            <span style="font:400 12px/1.45 var(--sans);color:var(--dim);text-wrap:pretty">Bring your own storage: this workspace’s bytes live in your own storage, sealed on this device first. Signing in proves who you are; it is not the key.</span>
             <span style="font:400 13px/1.45 var(--sans);color:var(--mut);text-wrap:pretty">Invite people to read or edit this workspace. Their names, your private work and who is viewing what are sealed on your device with a key the server never has. The server can still see who is a member, when they were active, and room names.</span>
             <sc-if value="{{ ing.notSignedIn }}" hint-placeholder-val="{{ true }}">
               <span style="font:400 14px/1.5 var(--sans);color:var(--mut)">Your work stays in this browser until you sign in. Sign in with your own Matrix account to sync it and share it.</span>
@@ -5843,10 +5843,6 @@ let _hdRef = null; try { import(new URL('holodeck-referents.js', location.href).
 // browser cannot read YouTube and Pyodide cannot either — its networking is the browser's fetch.
 let _hdYt = null; const hdYt = () => _hdYt || (_hdYt = import(new URL('holodeck-yt.js', location.href).href));
 let _hdClip = null; const hdClip = () => _hdClip || (_hdClip = import(new URL('holodeck-clip.js', location.href).href));
-// Bring-your-own storage (holodeck-byo.js): sign in with Google, keep the workspace's SEALED bytes in the
-// person's own storage. The module is exposed on window.hdBYO; the UI calls hdBYO.byoStorage(...) or the
-// Supabase facade. See docs/GOOGLE-SIGNIN-AND-BYO-STORAGE.md.
-let _hdByo = null; const hdByo = () => _hdByo || (_hdByo = import(new URL('holodeck-byo.js', location.href).href).then(M => { try { window.hdBYO = M; } catch (e) {} return M; }).catch(() => null));
 // Entity profiles (holodeck-profile.js): kind-induced key parameters per being,
 // built from the workspace's own relations. Loaded like the other modules.
 let _hdProf = null;
@@ -7553,7 +7549,7 @@ class Component extends DCLogic {
     if (code && !emailInvite) { import(new URL('holodeck-share-panel.js', location.href).href).then(M => M.openSharePanel({ ...this.shareCtx(code) })).catch(e => this.ilog('Share panel could not open: ' + ((e && e.message) || e), 'bad')); return; }
     import(new URL('holodeck-people-panel.js', location.href).href).then(M => M.openPeoplePanel({ ...this.shareCtx(null), inviteRaw: emailInvite ? code : null })).catch(e => this.ilog('The people panel could not open: ' + ((e && e.message) || e), 'bad'));
   }
-  // Bring-your-own storage: sign in with Google, keep this workspace's sealed bytes in storage the person chooses.
+  // Bring-your-own storage: keep this workspace's sealed bytes in storage the person chooses.
   openByoPanel() {
     const s = this._net && this._net.s;
     import(new URL('holodeck-byo-panel.js', location.href).href)

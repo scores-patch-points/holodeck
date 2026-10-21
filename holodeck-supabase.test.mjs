@@ -4,7 +4,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { makeKeyring } from './holodeck-vault.js';
-import { supabaseAuth, supabaseStore, passkeySupported, oauthAuthorizeUrl, sessionFromRedirect } from './holodeck-supabase.js';
+import { supabaseAuth, supabaseStore, passkeySupported } from './holodeck-supabase.js';
 
 function fakeProject() {
   const objects = new Map();
@@ -65,35 +65,4 @@ test('the manifest points a second device at the bucket, sealed', async () => {
 test('a facade without a workspace is refused; passkeySupport is a boolean', () => {
   assert.throws(() => supabaseStore({ url: 'https://x.supabase.co', anonKey: 'anon' }), (e) => e.supabase && e.code === 'no-workspace');
   assert.equal(typeof passkeySupported(), 'boolean');
-});
-
-// ---- Sign in with Google, through Supabase
-const jwt = (c) => 'h.' + Buffer.from(JSON.stringify(c)).toString('base64url') + '.s';
-
-test('the Google authorize URL points at the project and carries redirect_to', () => {
-  const u = new URL(oauthAuthorizeUrl({ url: 'https://x.supabase.co', redirectTo: 'https://app.example/' }));
-  assert.equal(u.origin + u.pathname, 'https://x.supabase.co/auth/v1/authorize');
-  assert.equal(u.searchParams.get('provider'), 'google');
-  assert.equal(u.searchParams.get('redirect_to'), 'https://app.example/');
-  assert.throws(() => oauthAuthorizeUrl({ url: 'http://x.supabase.co' }), (e) => e.supabase && e.code === 'insecure-transport');
-});
-
-test('sessionFromRedirect reads the implicit-flow session and the identity from the JWT', () => {
-  const at = jwt({ sub: 'u1', email: 'a@b.c' });
-  const s = sessionFromRedirect('https://app.example/#access_token=' + at + '&refresh_token=r&expires_in=3600&token_type=bearer');
-  assert.equal(s.access_token, at); assert.equal(s.refresh_token, 'r'); assert.equal(s.user.email, 'a@b.c');
-  assert.deepEqual(sessionFromRedirect('https://app.example/?code=abc'), { code: 'abc' });          // PKCE, disclosed
-  assert.deepEqual(sessionFromRedirect('https://app.example/#error=access_denied'), { error: 'access_denied', error_description: '' });
-  assert.equal(sessionFromRedirect('https://app.example/'), null);
-});
-
-test('resume adopts the redirect session and connects the sealed store', async () => {
-  const d = fakeProject();
-  const ring = makeKeyring(memStore(), { account: 'a@b.c' }); await ring.ensure('!ws:x');
-  const supa = supabaseStore({ url: 'https://x.supabase.co', anonKey: 'anon', workspace: '!ws:x', ring, fetch: d.fetchImpl });
-  const at = jwt({ sub: 'u1', email: 'a@b.c' });
-  const r = supa.resume('https://app.example/#access_token=' + at + '&refresh_token=r&expires_in=3600');
-  assert.equal(r.identity.email, 'a@b.c');
-  await r.store.put('k', { hello: 'sealed' });
-  assert.deepEqual(await r.store.get('k'), { hello: 'sealed' });
 });

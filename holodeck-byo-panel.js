@@ -1,20 +1,17 @@
 // holodeck-byo-panel.js — "Your storage": bring your own, sealed.
 //
-// A thin client of holodeck-supabase.js (default) and holodeck-byo.js (Google Drive). It draws, it collects what
+// A thin client of holodeck-supabase.js. It draws, it collects what
 // a person types, and it calls; the decisions (sealing, the provider, the keyring) are in the pure modules. The
 // point it makes on screen, in order:
-//   * sign in — with a Supabase project (email one-time code), or with Google if you prefer;
+//   * sign in — with a Supabase project (email one-time code);
 //   * your bytes go to that store, sealed on this device first — so the store holds ciphertext;
 //   * a write-and-read test proves the round-trip without leaving anything readable in the store.
 //
 // Defaults come from the repo declaration (fold-workspace.json `storage`), which is what lets EVERY holodeck
 // connect with no per-copy configuration: a Supabase project URL and its publishable anon key are public.
-// See docs/GOOGLE-SIGNIN-AND-BYO-STORAGE.md.
 
 import { supabaseStore, passkeySupported } from './holodeck-supabase.js';
-import { byoStorage, DRIVE_APPDATA } from './holodeck-byo.js';
 
-const CID_KEY = 'hd:google-client-id';
 const SUPA_KEY = 'hd:supabase';
 const CSS = `
 #hd-byo{position:fixed;top:0;right:0;height:100%;width:min(480px,100vw);box-sizing:border-box;z-index:57;overflow:auto;
@@ -61,12 +58,10 @@ export function openByoPanel(ctx = {}) {
   document.addEventListener('keydown', onKey);
   const kept = readJson(SUPA_KEY);
   S = { busy: '', error: '', note: '', test: '', store: null, identity: null, providerName: '', sent: false,
-    clientId: ctx.clientId || read(CID_KEY),
     supaUrl: ctx.supaUrl || kept.url || '', supaAnon: ctx.supaAnon || kept.anonKey || '', bucket: ctx.bucket || kept.bucket || 'holodeck',
     email: ctx.email || '', code: '', passkey: passkeySupported() };
   draw();
   loadDeclaration().then((d) => { decl = d; applyDeclaration(); draw(); }).catch(() => {});
-  if (redirectSessionPresent()) resumeFromUrl();
 }
 export function closeByoPanel() {
   document.removeEventListener('keydown', onKey);
@@ -84,29 +79,11 @@ function applyDeclaration() {
   if (!S.supaUrl && su.url) S.supaUrl = su.url;
   if (!S.supaAnon && su.anonKey) S.supaAnon = su.anonKey;
   if (su.bucket) S.bucket = su.bucket;
-  if (!S.clientId && s.google && s.google.clientId) S.clientId = s.google.clientId;
 }
 const workspaceOf = () => ctxRef.workspace || 'holodeck';
 const accountOf = () => ctxRef.account || (S.identity && (S.identity.email || S.identity.id)) || '';
 const loc = () => (typeof location !== 'undefined' ? location : null);
 const makeSupa = () => { S.supa = S.supa || supabaseStore({ url: S.supaUrl, anonKey: S.supaAnon, bucket: S.bucket, workspace: workspaceOf(), account: accountOf(), ring: ctxRef.ring || null }); return S.supa; };
-
-function redirectSessionPresent() { const l = loc(); if (!l) return false; return /access_token=|error=|(^|[?&#])code=/.test(String(l.hash || '') + String(l.search || '')); }
-
-async function googleSignIn() {
-  if (!S.supaUrl || !S.supaAnon) { S.error = 'A project URL and anon key are needed first.'; draw(); return; }
-  try { const l = loc(); write(SUPA_KEY, JSON.stringify({ url: S.supaUrl, anonKey: S.supaAnon, bucket: S.bucket })); l.href = makeSupa().authorizeUrl({ redirectTo: l.href.split('#')[0] }); }
-  catch (e) { S.error = (e && (e.why || e.message)) || String(e); draw(); }
-}
-async function resumeFromUrl() {
-  if (!S.supaUrl || !S.supaAnon) return;
-  S.busy = 'resume'; draw();
-  try {
-    const r = makeSupa().resume(loc().href);
-    if (r && r.store) { S.store = r.store; S.identity = r.identity; S.providerName = 'Supabase Storage'; S.note = 'Signed in with Google.'; try { history.replaceState(null, '', loc().pathname + loc().search); } catch (e) {} }
-  } catch (e) { S.error = (e && (e.why || e.message)) || String(e); }
-  S.busy = ''; draw();
-}
 
 async function sendCode() {
   if (!S.supaUrl || !S.supaAnon || !S.email) { S.error = 'A project URL, anon key and email are needed.'; draw(); return; }
@@ -126,19 +103,6 @@ async function verifyCode() {
     S.store = r.store; S.identity = r.identity; S.providerName = 'Supabase Storage';
     S.note = 'Connected. Your bytes go to your Supabase project, sealed on this device first.';
   } catch (e) { S.error = (e && (e.why || e.message)) || String(e); }
-  S.busy = ''; draw();
-}
-async function connectGoogle() {
-  const clientId = (S.clientId || '').trim();
-  if (!clientId) { S.error = 'A Google OAuth client id is needed first.'; draw(); return; }
-  write(CID_KEY, clientId);
-  S.busy = 'google'; S.error = ''; S.note = 'Asking Google…'; draw();
-  try {
-    const byo = byoStorage({ clientId, scope: DRIVE_APPDATA, workspace: workspaceOf(), account: accountOf(), ring: ctxRef.ring || null });
-    const { identity } = await byo.signIn();
-    S.store = byo.store; S.identity = identity; S.providerName = 'Google Drive (app folder)';
-    S.note = 'Connected. Your bytes go to your own Drive app folder, sealed on this device first.';
-  } catch (e) { S.error = (e && (e.why || e.message)) || String(e); S.note = ''; }
   S.busy = ''; draw();
 }
 async function selfTest() {
@@ -162,15 +126,13 @@ function draw() {
       el('h2', {}, 'Your storage'),
       el('button', { style: 'border:0;color:var(--mut,#9a97ab);font-size:16px', onClick: closeByoPanel }, '✕')),
     el('p', { class: 'byo-mut' }, 'The holodeck keeps no store of its own. Your workspace’s bytes live in storage you choose, sealed on this device before they are sent — so the store holds ciphertext it cannot open. Signing in proves who you are; it is not the key.'),
-    // Supabase (default): Continue with Google, identity-only
+    // Supabase: email one-time code
     el('div', { class: 'byo-card' },
       el('div', { class: 'byo-row', style: 'justify-content:space-between' }, el('h3', {}, 'Sign in'), el('span', { class: 'byo-badge' }, 'recommended')),
-      el('span', { class: 'byo-mut' }, 'One login for every holodeck and for your storage. Google is asked only to prove who you are (your name and email) — no files, no Drive, so no verification and no app review.'),
+      el('span', { class: 'byo-mut' }, 'Sign in with an email one-time code: one login for every holodeck and for your storage.'),
       el('input', { type: 'text', placeholder: 'project URL (https://…supabase.co)', value: S.supaUrl, onChange: (e) => { S.supaUrl = e.target.value; } }),
       el('input', { type: 'text', placeholder: 'publishable (anon) key', value: S.supaAnon, onChange: (e) => { S.supaAnon = e.target.value; } }),
       el('input', { type: 'text', placeholder: 'bucket', value: S.bucket, onChange: (e) => { S.bucket = e.target.value; } }),
-      el('div', { class: 'byo-row' }, el('button', { class: 'byo-go', onClick: googleSignIn }, 'Continue with Google')),
-      el('span', { class: 'byo-mut' }, 'or with an email one-time code:'),
       el('input', { type: 'email', placeholder: 'you@example.com', value: S.email, onChange: (e) => { S.email = e.target.value; } }),
       el('div', { class: 'byo-row' },
         el('button', { disabled: S.busy === 'otp', onClick: sendCode }, S.busy === 'otp' ? 'Sending…' : 'Send one-time code'),
@@ -178,12 +140,6 @@ function draw() {
       S.sent ? el('div', { class: 'byo-row' },
         el('input', { type: 'text', inputmode: 'numeric', placeholder: 'six-digit code', value: S.code, onChange: (e) => { S.code = e.target.value; } }),
         el('button', { disabled: S.busy === 'verify', onClick: verifyCode }, S.busy === 'verify' ? 'Signing in…' : 'Sign in & connect')) : null),
-    // Advanced: the person's own Google Drive (uses a Drive scope, so it re-opens Google's app rules — kept out of the way)
-    el('details', { class: 'byo-card' },
-      el('summary', { style: 'cursor:pointer;color:var(--mut,#9a97ab)' }, 'Advanced: use your own Google Drive instead'),
-      el('span', { class: 'byo-mut' }, 'This asks Google for access to a hidden Drive folder (a storage scope), so the Google app must be verified for anyone but test users. Prefer “Continue with Google” above unless you specifically want your bytes in your own Drive.'),
-      el('input', { type: 'text', placeholder: 'Google OAuth client id', value: S.clientId, onChange: (e) => { S.clientId = e.target.value; } }),
-      el('div', { class: 'byo-row' }, el('button', { disabled: S.busy === 'google', onClick: connectGoogle }, S.busy === 'google' ? 'Connecting…' : 'Connect Google Drive'))),
     // Connected
     S.store ? el('div', { class: 'byo-card' },
       el('h3', {}, 'Signed in'),
