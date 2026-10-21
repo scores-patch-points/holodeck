@@ -58,6 +58,10 @@ const STYLE = `
 #hd-wsh .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
 #hd-wsh .card{all:unset;box-sizing:border-box;cursor:pointer;display:flex;flex-direction:column;gap:12px;padding:16px;border-radius:14px;
   background:var(--s1,#1c1c20);border:1px solid var(--line,#2e2e33);min-height:158px;transition:border-color .12s,transform .12s}
+#hd-wsh .cardwrap{position:relative;display:flex}
+#hd-wsh .cardwrap .card{flex:1;min-width:0}
+#hd-wsh .manage{position:absolute;right:10px;bottom:10px;font:500 11px var(--mono,ui-monospace,monospace);padding:3px 8px;border-radius:7px;cursor:pointer;background:var(--s2,#1c1c20);color:var(--ink2,#c9c9d2);border:1px solid var(--line2,#3f3f46)}
+#hd-wsh .manage:hover{border-color:var(--acc,#8ab4ff)}
 #hd-wsh .card:hover{border-color:var(--line2,#3f3f46);transform:translateY(-1px)}
 #hd-wsh .card:focus-visible{outline:2px solid var(--acc,#8ab4ff);outline-offset:2px}
 #hd-wsh .card[aria-current=true]{border-color:var(--acc,#8ab4ff);box-shadow:0 0 0 1px var(--acc,#8ab4ff) inset}
@@ -348,7 +352,7 @@ function drawGrid() {
   const signed = !!sessionNow();
   const cards = list.map((w) => {
     const rooms = roomsOf(w.id); const s = H.sums[w.id];
-    return el('button', { class: 'card', type: 'button', 'data-ws': w.id, 'aria-current': String(H.sel === w.id), onClick: () => select(H.sel === w.id ? null : w.id) },
+    const card = el('button', { class: 'card', type: 'button', 'data-ws': w.id, 'aria-current': String(H.sel === w.id), title: w.current ? 'Back to this workspace' : 'Open ' + w.name, onClick: () => { closeWorkspacesHero(); if (!w.current) ctx.open(w.id); } },
       el('div', { class: 'row', style: { flexWrap: 'nowrap', alignItems: 'flex-start' } },
         el('span', { class: 'tile', style: { background: tint(w.id) } }, initials(w.name)),
         el('div', { style: { flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: '2px' } },
@@ -359,6 +363,8 @@ function drawGrid() {
         el('span', { class: 'share' }, shareLine({ rooms, summary: s, signedIn: signed })),
         s && s.ready && s.waiting ? el('span', { class: 'badge wait', title: 'Invitations not yet used' }, s.waiting + ' WAITING') : null),
       facesNode(s));
+    return el('div', { class: 'cardwrap' }, card,
+      el('button', { class: 'manage', type: 'button', 'aria-label': 'Manage ' + w.name + ': people, rename, invitations', onClick: () => select(H.sel === w.id ? null : w.id) }, 'Manage'));
   });
   wrap.replaceChildren(
     cards.length ? el('div', { class: 'grid' }, cards) : el('div', { class: 'empty' }, H.q ? `No workspace matches “${H.q}”.` : 'No workspaces yet — name one above.'),

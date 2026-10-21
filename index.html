@@ -7523,7 +7523,7 @@ class Component extends DCLogic {
     const roomsAll = () => { try { return JSON.parse(localStorage.getItem('fold-ws-rooms') || '{}'); } catch (e) { return {}; } };
     const ctx = { ...this.shareCtx(null), select: select || null,
       list: () => { const S = this.state, names = loadWorkspaceNames(), recent = loadWsRecent(), cid = this.corpusId();
-        return [{ id: 'custom', name: 'Your content', fixed: true }].concat(Object.keys(S.added).filter(k => names[k]).map(k => ({ id: k, name: names[k] })))
+        return [{ id: 'custom', name: 'Your content', fixed: true }].concat(Object.keys(S.added).filter(k => names[k] && k !== 'custom').map(k => ({ id: k, name: names[k] })))
           .map(w => ({ ...w, n: (S.added[w.id] || []).length, at: recent[w.id] || 0, current: w.id === cid })); },
       roomsFor: id => roomsAll()[id] || {},
       setRoomsFor: (id, p) => { const all = roomsAll(); all[id] = { ...(all[id] || {}), ...p }; try { localStorage.setItem('fold-ws-rooms', JSON.stringify(all)); } catch (e) {} },
