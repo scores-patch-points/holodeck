@@ -27,6 +27,19 @@ export function parsePlain(raw) {
   return out;
 }
 
+// Markdown -> the words that were said. Headings (the title), rules, front matter, fences and comments are not speech;
+// emphasis, links, quotes and list markers are formatting around speech. "**[0:12]** text" (this app's own .md export)
+// keeps its clock, so a round trip comes back timed.
+export function parseMarkdown(raw) {
+  let t = String(raw || '').replace(/\r/g, '').replace(/^\uFEFF/, '');
+  t = t.replace(/^---\n[\s\S]*?\n---\n/, '').replace(/<!--[\s\S]*?-->/g, '').replace(/```[\s\S]*?```/g, '');
+  t = t.split('\n').filter(l => !/^\s{0,3}#{1,6}\s/.test(l) && !/^\s*([-*_])(\s*\1){2,}\s*$/.test(l)).join('\n');
+  t = t.replace(/!\[[^\]]*\]\([^)]*\)/g, '').replace(/\[([^\]]+)\]\([^)]*\)/g, '$1')
+    .replace(/(\*\*|__)(.+?)\1/g, '$2').replace(/(^|[^\w*])[*_]([^*_\n]+)[*_](?=[^\w*]|$)/g, '$1$2').replace(/`([^`]*)`/g, '$1')
+    .replace(/^\s{0,3}>\s?/gm, '').replace(/^\s*(?:[-*+]|\d+[.)])\s+(?!\d{1,2}:\d{2})/gm, '');
+  return parsePlain(t);
+}
+
 // ---------- the heard side: words with times (spread across each segment by length) ----------
 export function heardWords(segs) {
   const out = [];
@@ -149,6 +162,6 @@ export function merge(given, heard, opts = {}) {
   return { segments: out, summary: { verdict: lines, coverage: +coverage.toFixed(3), heardCoverage: +heardCover.toFixed(3), segments: out.length, ...by, offset: +offset.toFixed(2), retimed: out.filter(s => s.check.retimed).length, unheard, givenWords: total, heardWords: hw.length } };
 }
 
-export const verdictText = s => 'The transcript ' + s.verdict + ' with the recording: ' + Math.round(s.coverage * 100) + '% of its words were heard in the audio (' + s.ok + ' of ' + s.segments + ' passages match, ' + s.weak + ' partly, ' + s.none + ' not found)'
-  + (s.heardCoverage < 0.8 ? '; ' + Math.round((1 - s.heardCoverage) * 100) + '% of what the recognizer heard is not in the transcript' : '')
-  + (Math.abs(s.offset) > 2 ? '; its own timecodes ran ' + Math.abs(s.offset) + 's ' + (s.offset > 0 ? 'late' : 'early') + ' against the audio' : '') + '.';
+export const verdictText = (s, o = {}) => 'The transcript ' + s.verdict + ' with ' + (o.against || 'the recording') + ': ' + Math.round(s.coverage * 100) + '% of its words were ' + (o.found || 'heard in the audio') + ' (' + s.ok + ' of ' + s.segments + ' passages match, ' + s.weak + ' partly, ' + s.none + ' not found)'
+  + (s.heardCoverage < 0.8 ? '; ' + Math.round((1 - s.heardCoverage) * 100) + '% of what ' + (o.who || 'the recognizer heard') + ' is not in the transcript' : '')
+  + (Math.abs(s.offset) > 2 ? '; its own timecodes ran ' + Math.abs(s.offset) + 's ' + (s.offset > 0 ? 'late' : 'early') + ' against ' + (o.clock || 'the audio') : '') + '.';

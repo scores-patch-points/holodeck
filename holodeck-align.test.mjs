@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { merge, parsePlain, tokens, spoken, matchWords, verdictText } from './holodeck-align.js';
+import { merge, parsePlain, parseMarkdown, tokens, spoken, matchWords, verdictText } from './holodeck-align.js';
 
 const LINES = ['Good evening and welcome to the regular meeting of the council', 'The first item on the agenda is the approval of the minutes from last month', 'Is there a motion to approve the minutes as presented', 'So moved says councilmember Alvarez', 'Seconded by councilmember Okafor all those in favor say aye', 'The ayes have it the minutes are approved'];
 const heardOf = (lines, at = 0, per = 6) => lines.map((t, i) => ({ start: at + i * per, end: at + i * per + per - 0.5, text: t }));
@@ -63,4 +63,20 @@ test('times never run backwards and large inputs finish', () => {
   const t0 = Date.now(); const r = merge(g, h); assert.ok(Date.now() - t0 < 8000);
   let last = -1; r.segments.forEach(s => { assert.ok(s.start >= last); last = s.start; });
   assert.ok(r.summary.coverage > 0.9);
+});
+
+test('markdown: formatting and the title are stripped, the app\'s own export keeps its clocks', () => {
+  const md = '---\ntitle: x\n---\n# Council meeting\n\n**[0:05]** Good *evening* and [welcome](http://x) everyone\n\n> **[0:11]** Chair: first item\n\n- [0:20] third point\n\n---\n';
+  const s = parseMarkdown(md);
+  assert.deepEqual(s.map(x => x.start), [5, 11, 20]);
+  assert.equal(s[0].text.replace(/\[0:05\]\s*/, ''), 'Good evening and welcome everyone');
+  assert.ok(!s.some(x => /Council meeting|title|\*|http/.test(x.text)));
+  assert.equal(merge(s, [{ start: 5, end: 10, text: 'Good evening and welcome everyone' }]).segments[0].check.status, 'ok');
+});
+
+test('a transcript can be the reference: timed transcript as heard, plain words get its times', () => {
+  const ref = [{ start: 10, end: 16, text: LINES[0] }, { start: 16, end: 22, text: LINES[1] }];
+  const r = merge(parsePlain(LINES[0] + '\n\n' + LINES[1]), ref);
+  assert.equal(r.summary.verdict, 'lines up'); assert.ok(Math.abs(r.segments[1].start - 16) < 1.5);
+  assert.match(verdictText(r.summary, { against: 'the other transcript', found: 'found in it', who: 'the other transcript says', clock: 'its times' }), /the other transcript: 100% of its words were found in it/);
 });
