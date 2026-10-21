@@ -9614,7 +9614,7 @@ class Component extends DCLogic {
       const extra = {}; docs.forEach(d => { if (this._stage.has(d.id)) extra[d.id] = d; });
       const A = { ...this._A, docs, docById: { ...this._A.docById, ...extra } };
       try { window.__holodeckA = A; } catch (e) {}
-      return attachKeyedFigs(A);
+      return A;
     }
     const key = id + ':' + docs.map(d => d.id).join(',') + ':' + this.state.htmlVer + ':' + this.corrKey(id);
     if (this._key !== key) {
@@ -9632,14 +9632,14 @@ class Component extends DCLogic {
           setTimeout(() => { this._deferNext = false; this._deferOK = key; this.forceUpdate(); }, 0);
         }
         try { window.__holodeckA = this._prov.A; } catch (e) {}
-        return attachKeyedFigs(this._prov.A);
+        return this._prov.A;
       } else {
         this._key = key; this._A = analyze({ docs }, this._html); this.applyCorrections(this._A, id); this._Aid = id; this._deferNext = false; this._prov = null;
         this._ac.set(key, this._A); if (this._ac.size > 4) this._ac.delete(this._ac.keys().next().value);
       }
     }
     try { window.__holodeckA = this._A; } catch (e) {}
-    return attachKeyedFigs(this._A);
+    return this._A;
   }
   // Anything that sets _key to null is saying "the content under this key changed": every kept reading is stale then.
   get _key() { return this.__key; }
