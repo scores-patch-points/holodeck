@@ -5182,6 +5182,7 @@ const CLOCK_L = { happened: 'Happened', published: 'Published', captured: 'Captu
 const monthsBack = (k, n) => { let y = +k.slice(0, 4), m = +k.slice(5, 7) - n; while (m < 1) { m += 12; y--; } return y + '-' + String(m).padStart(2, '0'); };
 const periodLabel = k => /^\d{4}-\d{2}$/.test(k) ? MON_N[+k.slice(5)] + ' ' + k.slice(0, 4) : k;
 const FRAG = st => { const t = clean(st.text); return /^[a-z(,;–—-]/.test(t) || /\b(the|of|to|with|and|or|a|an|for|in|on|by|that|from|at)$/i.test(t) || (!/[.!?”"')]$/.test(t) && t.split(/\s+/).length < 8); };
+const hdTxPref = (k, v) => { try { if (v === undefined) return localStorage.getItem('hd:tx-' + k); localStorage.setItem('hd:tx-' + k, v); } catch (e) {} return null; };
 const plural = (n, a, b) => n + ' ' + (n === 1 ? a : (b || a + 's'));
 const CITE_RE = /\[(?:\d+|[a-z]|[ivx]+|citation needed|note \d+|nb \d+|update)\]/gi;
 const clean = t => (t || '').replace(CITE_RE, '').replace(/\s+([.,;:])/g, '$1').replace(/\s{2,}/g, ' ').trim();
@@ -6423,7 +6424,7 @@ class Component extends DCLogic {
       this._overviewRoot = root; this._overviewMount = M.mountOverview(root, { ...options, docs: this.analysis().docs });
     }).catch(e => { this._overviewLoading = null; root.textContent = 'Overview unavailable: ' + e.message; });
   }
-  state = { corpus: null, added: loadAdded(), view: 'summary', akMode: new URLSearchParams(location.search).get('work') === 'notebook' ? 'notebook' : new URLSearchParams(location.search).get('work') === 'fold' ? 'generate' : 'chat', akFocus: new URLSearchParams(location.search).get('fullscreen') === '1' || new URLSearchParams(location.search).get('work') === 'chat', akConvList: false, akNotes: {}, sel: null, f: {}, q: '', readDoc: null, showPos: false, showAdd: false, showSettings: false, draftText: '', fw: {}, note: '', theme: loadTheme(), railOpen: loadRailOpen(), segOpen: loadSegOpen(), topicsQ: '', topicsPage: 0, dragging: false, busy: '', just: null, readMode: 'original', htmlVer: 0, txAsk: null, txPrior: 'workspace', txLang: 'en', txModel: 'base', txBusy: false, txProg: '', txProgress: null, wsNewName: '', ground: { on: true, names: true, figures: true, dates: true, sentences: true }, wsRenaming: false, wsNameDraft: '', wsDeleting: false, readerRename: false, readerNameDraft: '', stripRead: { mode: 'Relate', domain: 'Interpretation', grain: 'Pattern' }, folder: null, folderDraft: '', folderRename: null, folderNameDraft: '', mxOpen: false, mxErr: '', mxBusy: false, editOpen: null, editDraft: null, findOpen: false, findQ: '', findN: 0, findI: 0 };
+  state = { corpus: null, added: loadAdded(), view: 'summary', akMode: new URLSearchParams(location.search).get('work') === 'notebook' ? 'notebook' : new URLSearchParams(location.search).get('work') === 'fold' ? 'generate' : 'chat', akFocus: new URLSearchParams(location.search).get('fullscreen') === '1' || new URLSearchParams(location.search).get('work') === 'chat', akConvList: false, akNotes: {}, sel: null, f: {}, q: '', readDoc: null, showPos: false, showAdd: false, showSettings: false, draftText: '', fw: {}, note: '', theme: loadTheme(), railOpen: loadRailOpen(), segOpen: loadSegOpen(), topicsQ: '', topicsPage: 0, dragging: false, busy: '', just: null, readMode: 'original', htmlVer: 0, txAsk: null, txPrior: 'workspace', txLang: hdTxPref('lang') || 'en', txModel: hdTxPref('model') || 'base', txBusy: false, txProg: '', txProgress: null, wsNewName: '', ground: { on: true, names: true, figures: true, dates: true, sentences: true }, wsRenaming: false, wsNameDraft: '', wsDeleting: false, readerRename: false, readerNameDraft: '', stripRead: { mode: 'Relate', domain: 'Interpretation', grain: 'Pattern' }, folder: null, folderDraft: '', folderRename: null, folderNameDraft: '', mxOpen: false, mxErr: '', mxBusy: false, editOpen: null, editDraft: null, findOpen: false, findQ: '', findN: 0, findI: 0 };
   _html = {};
 
   // The links a contract's profile shows, from contract-links.json (made by tools/link-contracts.mjs): legislation
@@ -6572,8 +6573,8 @@ class Component extends DCLogic {
     // nothing — the app lands in the person's own (empty) workspace, never on a demo's content.
     setTimeout(() => { try { this.maybeSample(); } catch (e) {} }, 900);
     setTimeout(() => this.measureHdr(), 400);
-    setTimeout(() => { try { this.akAutoLoad(); } catch (e) {} }, 2500);
-    this.applyTheme(); this.restoreReaders(); this._c = 0; import(new URL('holodeck-match.js', location.href).href).then(M => { this._mt = M; this._qc = null; this.forceUpdate(); }).catch(() => {}); import(new URL('holodeck-profile.js', location.href).href).then(M => { _hdProf = M; this._pbA = null; this.forceUpdate(); }).catch(() => {}); import(new URL('holodeck-lang.js', location.href).href).then(M => { _hdLang = M; this._pfLang = null; this.loadLangPriors(); this.forceUpdate(); }).catch(() => {}); import(new URL('holodeck-ambiguity.js', location.href).href).then(M => { this._ambM = M; this.forceUpdate(); }).catch(() => {}); import(new URL('holodeck-contradiction.js', location.href).href).then(M => { this._ctM = M; this.forceUpdate(); }).catch(() => {}); hdSum().then(() => this.forceUpdate()).catch(() => {}); this.loadHtml(); if (typeof location !== 'undefined' && /fx-share=/.test(location.hash)) { this.netInit(); this.setState({ view: 'draft' }); }
+    // The 2B language model is NOT loaded here: it is ~1.5 GB of GPU memory, and loads on the first question instead (and is released when idle).
+    this.applyTheme(); this.restoreReaders(); this._c = 0; import(new URL('holodeck-match.js', location.href).href).then(M => { this._mt = M; this._qc = null; this.forceUpdate(); }).catch(() => {}); import(new URL('holodeck-offices.js', location.href).href).then(M => { window.__hdRoles = M; this._lkBase = null; this._lkSet = null; this.forceUpdate(); }).catch(() => {}); import(new URL('holodeck-disagreements.js', location.href).href).then(M => { this._dgM = M; this.forceUpdate(); }).catch(() => {}); import(new URL('holodeck-profile.js', location.href).href).then(M => { _hdProf = M; this._pbA = null; this.forceUpdate(); }).catch(() => {}); import(new URL('holodeck-lang.js', location.href).href).then(M => { _hdLang = M; this._pfLang = null; this.loadLangPriors(); this.forceUpdate(); }).catch(() => {}); import(new URL('holodeck-ambiguity.js', location.href).href).then(M => { this._ambM = M; this.forceUpdate(); }).catch(() => {}); import(new URL('holodeck-contradiction.js', location.href).href).then(M => { this._ctM = M; this.forceUpdate(); }).catch(() => {}); hdSum().then(() => this.forceUpdate()).catch(() => {}); this.loadHtml(); if (typeof location !== 'undefined' && /fx-share=/.test(location.hash)) { this.netInit(); this.setState({ view: 'draft' }); }
     this._onRz = () => { this.measureHdr(); const stk = window.innerWidth <= 720; if ((window.innerWidth < SIDE_PANEL_MIN_VW) !== this._narrow || stk !== this._stk) { this._stk = stk; this.forceUpdate(); } }; window.addEventListener('resize', this._onRz);
 
     this._onFocusKey = e => { if (e.key === 'Escape' && this.state.akFocus) this.setState({ akFocus: false }); }; window.addEventListener('keydown', this._onFocusKey);
@@ -7845,7 +7846,7 @@ class Component extends DCLogic {
   asrMod() { if (!this._asrP) this._asrP = import(new URL('holodeck-asr.js', location.href).href); return this._asrP; }
   asrUrl() { try { const v = localStorage.getItem('hd:asr'); if (!v || v === 'off') return null; return v; } catch (e) { return null; } }
   async transcribeAny(buf, onProgress, model, opts) {
-    const url = this.asrUrl();
+    const url = opts && opts.resume ? null : this.asrUrl();   // the local service transcribes whole files and keeps no checkpoints, so a resumed run uses the in-browser recognizer
     if (url) {
       try {
         const A = await this.asrMod();
@@ -7934,7 +7935,7 @@ class Component extends DCLogic {
   // closed tab, a failed decode — leaves it there, and the next Transcribe picks up at that second instead of at zero.
   // It is only reused for the same recording bytes, model and language; anything else starts clean.
   async txWipLoad(id, model, lang, size) {
-    try { const w = await idbGet('txwip:' + id); return w && w.v === 1 && w.model === model && w.lang === lang && w.size === size && Array.isArray(w.segs) && w.upTo > 0 ? w : null; } catch (e) { return null; }
+    try { const w = await idbGet('txwip:' + id); return w && w.v === 1 && w.size === size && Array.isArray(w.segs) && w.upTo > 0 ? w : null; } catch (e) { return null; }
   }
   txWipSaver(id, model, lang, size) {
     let last = 0, pending = null;
@@ -8014,9 +8015,10 @@ class Component extends DCLogic {
     }
     // Plain transcription: no vocabulary prior (it broke the decoder, see fold-net.js transcribe).
     const prompt = null, priorNote = 'no vocabulary prior';
-    const lang = this.state.txLang || 'en';
-    const model = this.state.txModel === 'small' ? 'onnx-community/whisper-small' : this.state.txModel === 'smallen' ? 'onnx-community/whisper-small.en' : 'onnx-community/whisper-base';
+    let lang = this.state.txLang || 'en';
+    let model = this.state.txModel === 'small' ? 'onnx-community/whisper-small' : this.state.txModel === 'smallen' ? 'onnx-community/whisper-small.en' : 'onnx-community/whisper-base';
     const wip = await this.txWipLoad(d0.id, model, lang, buf.byteLength || buf.size || 0);
+    if (wip) { model = wip.model || model; lang = wip.lang || lang; }   // carrying on a run means the same recognizer and language it started with
     const save = this.txWipSaver(d0.id, model, lang, buf.byteLength || buf.size || 0);
     this.txReset(d0.id); this.setState({ txAsk: null });
     if (wip) this.ilog('Resuming the transcription at ' + fmtT(wip.upTo) + ' — ' + plural(wip.segs.length, 'segment') + ' already heard are kept.');
@@ -8121,9 +8123,10 @@ class Component extends DCLogic {
     const A = this.analysis(); const prior = this.state.txPrior || 'workspace';
     // Plain transcription: no vocabulary prior (it broke the decoder, see fold-net.js transcribe).
     const prompt = null, priorNote = 'no vocabulary prior';
-    const lang = this.state.txLang || 'en';
-    const model = this.state.txModel === 'small' ? 'onnx-community/whisper-small' : this.state.txModel === 'smallen' ? 'onnx-community/whisper-small.en' : 'onnx-community/whisper-base';
+    let lang = this.state.txLang || 'en';
+    let model = this.state.txModel === 'small' ? 'onnx-community/whisper-small' : this.state.txModel === 'smallen' ? 'onnx-community/whisper-small.en' : 'onnx-community/whisper-base';
     const wip = await this.txWipLoad(d0.id, model, lang, file.size || 0);
+    if (wip) { model = wip.model || model; lang = wip.lang || lang; }
     const save = this.txWipSaver(d0.id, model, lang, file.size || 0);
     this.txReset(d0.id); this.setState({ txAsk: null });
     if (wip) this.ilog('Resuming the transcription at ' + fmtT(wip.upTo) + ' — ' + plural(wip.segs.length, 'segment') + ' already heard are kept.');
@@ -9387,7 +9390,11 @@ class Component extends DCLogic {
     // a name has many occurrences: if one is already on screen (usually the one just clicked), stay on it rather than jumping to the first
     const vi = s.type === 'name' ? [...els].findIndex(onScreen) : -1; const tg = els[vi > 0 ? vi : 0];
     if (vi > 0 && (this.state.pfIdx || 0) !== vi) this.setState({ pfIdx: vi });
-    const scrollTo = () => { if (!tg || !tg.isConnected) return; const [top, h] = topOf(tg); if (top < 90 || top + h > innerHeight - 40) window.scrollTo({ top: scrollY + top - 180, behavior: Math.abs(top) > 3000 ? 'auto' : 'smooth' }); };
+    // the passage may sit in a pane that scrolls on its own (the transcript beside an audio player): bring it into view in that pane first, then in the window
+    const pane = x => { if (x.ownerDocument !== document) return null; for (let p = x.parentElement; p && p !== document.body; p = p.parentElement) { if (/(auto|scroll)/.test(getComputedStyle(p).overflowY) && p.scrollHeight > p.clientHeight + 4) return p; } return null; };
+    const scrollTo = () => { if (!tg || !tg.isConnected) return;
+      const sc = pane(tg); if (sc) { const r = tg.getBoundingClientRect(), b = sc.getBoundingClientRect(); if (r.top < b.top + 30 || r.bottom > b.bottom - 30) sc.scrollTo({ top: sc.scrollTop + (r.top - b.top) - sc.clientHeight / 3, behavior: Math.abs(r.top - b.top) > 3000 ? 'auto' : 'smooth' }); }
+      const [top, h] = topOf(tg); if (top < 90 || top + h > innerHeight - 40) window.scrollTo({ top: scrollY + top - 180, behavior: Math.abs(top) > 3000 ? 'auto' : 'smooth' }); };
     if (tg) { scrollTo(); setTimeout(scrollTo, 450); setTimeout(scrollTo, 1400); }
   }
   // ---- find in this source: the whole open document is searched as it is painted (plain text, a faithful page,
@@ -9971,7 +9978,7 @@ class Component extends DCLogic {
       requestAnimationFrame(() => { try { const b = document.getElementById('hd-opening'); if (b) b.className = ''; document.body.style.cursor = ''; } catch (e) {} });
     }, 0));
   }
-  readNow(docId, stId) { const S0 = this.state; if (S0.view !== 'reader' || docId !== S0.readDoc || (S0.sel && S0.sel.type === 'name')) this.pushHist(); this.markRead(docId); const live = this.isLiveDoc(this.analysis().docById[docId]); if (docId !== this.state.readDoc) { this.state.seekT = 0; this._faithFound = null; } this.setState({ view: 'reader', readDoc: docId, narrowDetail: false, sel: stId ? { type: 'statement', id: stId } : { type: 'doc', id: docId }, ...(live ? { readMode: 'original' } : {}) }); }
+  readNow(docId, stId) { const S0 = this.state; if (S0.view !== 'reader' || docId !== S0.readDoc || (S0.sel && S0.sel.type === 'name')) this.pushHist(); this.markRead(docId); const live = this.isLiveDoc(this.analysis().docById[docId]); if (docId !== this.state.readDoc) { this.state.seekT = 0; this._faithFound = null; } this.setState({ view: 'reader', readDoc: docId, narrowDetail: false, sel: stId ? { type: 'statement', id: stId } : { type: 'doc', id: docId }, ...(live || (stId && ['map', 'summary', 'restated'].includes(this.state.readMode)) ? { readMode: 'original' } : {}) }); }
   saveAdded(added, opts) {
     // The bytes go to IndexedDB as a gzipped binary blob, not localStorage: a big
     // corpus is stored compact, and the page only carries a small pointer. The
@@ -11352,8 +11359,8 @@ class Component extends DCLogic {
             canAsk: !timed && !d0.aboutOnly, ask: S.txAsk === d0.id, noAsk: !timed && !d0.aboutOnly && S.txAsk !== d0.id,
 onAsk: () => { this.setState({ txAsk: d0.id }); this.pickYtFile(d0); }, onCancelAsk: () => this.setState({ txAsk: null }),
             prior: prior, pw: prior === 'workspace', pn: prior === 'none', pm: prior === 'mine', onPriorW: () => this.setState({ txPrior: 'workspace' }), onPriorN: () => this.setState({ txPrior: 'none' }), onPriorM: () => this.setState({ txPrior: 'mine' }),
-            lang: S.txLang || 'en', onLang: e => this.setState({ txLang: e.target.value }), langs: [['en', 'English'], ['es', 'Spanish'], ['fr', 'French'], ['de', 'German'], ['pt', 'Portuguese'], ['it', 'Italian'], ['nl', 'Dutch'], ['pl', 'Polish'], ['ru', 'Russian'], ['uk', 'Ukrainian'], ['ar', 'Arabic'], ['hi', 'Hindi'], ['zh', 'Chinese'], ['ja', 'Japanese'], ['ko', 'Korean']].map(([v, l]) => ({ v, l })),
-            model: S.txModel || 'base', onModel: e => this.setState({ txModel: e.target.value }), models: [['base', 'whisper-base · fast, multilingual'], ['small', 'whisper-small · slower, more accurate, multilingual'], ['smallen', 'whisper-small.en · English only, most accurate for English']].map(([v, l]) => ({ v, l })),
+            lang: S.txLang || 'en', onLang: e => { hdTxPref('lang', e.target.value); this.setState({ txLang: e.target.value }); }, langs: [['en', 'English'], ['es', 'Spanish'], ['fr', 'French'], ['de', 'German'], ['pt', 'Portuguese'], ['it', 'Italian'], ['nl', 'Dutch'], ['pl', 'Polish'], ['ru', 'Russian'], ['uk', 'Ukrainian'], ['ar', 'Arabic'], ['hi', 'Hindi'], ['zh', 'Chinese'], ['ja', 'Japanese'], ['ko', 'Korean']].map(([v, l]) => ({ v, l })),
+            model: S.txModel || 'base', onModel: e => { hdTxPref('model', e.target.value); this.setState({ txModel: e.target.value }); }, models: [['base', 'whisper-base · fast, multilingual'], ['small', 'whisper-small · slower, more accurate, multilingual'], ['smallen', 'whisper-small.en · English only, most accurate for English']].map(([v, l]) => ({ v, l })),
             onTerms: e => { this._txTerms = e.target.value; }, ...this.txProgVals(), onTx: () => this.pickYtFile(d0), priorNote: 'Choose the file you downloaded from YouTube — Whisper reads it locally here, so it never leaves this machine. A transcript is a machine interpretation; the prior changes what it hears, and the choice stays on the record.' }; }
         const timed = m.segN > 0;
         const prior = S.txPrior || 'workspace';
@@ -11398,8 +11405,8 @@ onAsk: () => { this.setState({ txAsk: d0.id }); this.pickYtFile(d0); }, onCancel
           ...(() => { const wi = !timed && !txHere && this._txWipInfo && this._txWipInfo[d0.id]; return wi ? { txLabel: 'Resume', hasWip: true, wipNote: 'Paused at ' + fmtT(wi.upTo) + (wi.total ? ' of ' + fmtT(wi.total) : '') + ' · ' + plural(wi.n, 'segment') + ' kept. Resume carries on from there.' } : { txLabel: 'Transcribe', hasWip: false, wipNote: '' }; })(),
           onMerge: () => this.pickMergeFile(d0), onAsk: () => { this.setState({ txAsk: d0.id }); this.transcribeLocal(d0); }, onCancelAsk: () => this.setState({ txAsk: null }),
           prior: prior, pw: prior === 'workspace', pn: prior === 'none', pm: prior === 'mine', onPriorW: () => this.setState({ txPrior: 'workspace' }), onPriorN: () => this.setState({ txPrior: 'none' }), onPriorM: () => this.setState({ txPrior: 'mine' }),
-          lang: S.txLang || 'en', onLang: e => this.setState({ txLang: e.target.value }), langs: [['en', 'English'], ['es', 'Spanish'], ['fr', 'French'], ['de', 'German'], ['pt', 'Portuguese'], ['it', 'Italian'], ['nl', 'Dutch'], ['pl', 'Polish'], ['ru', 'Russian'], ['uk', 'Ukrainian'], ['ar', 'Arabic'], ['hi', 'Hindi'], ['zh', 'Chinese'], ['ja', 'Japanese'], ['ko', 'Korean']].map(([v, l]) => ({ v, l })),
-          model: S.txModel || 'base', onModel: e => this.setState({ txModel: e.target.value }), models: [['base', 'whisper-base · fast, multilingual'], ['small', 'whisper-small · slower, more accurate, multilingual'], ['smallen', 'whisper-small.en · English only, most accurate for English']].map(([v, l]) => ({ v, l })),
+          lang: S.txLang || 'en', onLang: e => { hdTxPref('lang', e.target.value); this.setState({ txLang: e.target.value }); }, langs: [['en', 'English'], ['es', 'Spanish'], ['fr', 'French'], ['de', 'German'], ['pt', 'Portuguese'], ['it', 'Italian'], ['nl', 'Dutch'], ['pl', 'Polish'], ['ru', 'Russian'], ['uk', 'Ukrainian'], ['ar', 'Arabic'], ['hi', 'Hindi'], ['zh', 'Chinese'], ['ja', 'Japanese'], ['ko', 'Korean']].map(([v, l]) => ({ v, l })),
+          model: S.txModel || 'base', onModel: e => { hdTxPref('model', e.target.value); this.setState({ txModel: e.target.value }); }, models: [['base', 'whisper-base · fast, multilingual'], ['small', 'whisper-small · slower, more accurate, multilingual'], ['smallen', 'whisper-small.en · English only, most accurate for English']].map(([v, l]) => ({ v, l })),
           onTerms: e => { this._txTerms = e.target.value; }, ...this.txProgVals(), onTx: () => this.transcribeLocal(d0), priorNote: 'Whisper runs locally here; the recording never leaves this machine. A transcript is a machine interpretation — the prior changes what it hears, and the choice stays on the record.' }; })(),
       isMapMode: S.readMode === 'map' && !!S.readDoc, rdMapEl: S.readMode === 'map' && S.readDoc ? this.graph(D, null, F, A, S.readDoc) : null,
       modeMp: { bg: S.readMode === 'map' ? 'var(--sel)' : 'transparent', color: S.readMode === 'map' ? 'var(--ink)' : 'var(--mut)' }, modeMap: () => this.setState({ readMode: 'map' }),

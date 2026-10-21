@@ -232,7 +232,14 @@ let _asr = null, _asrModel = null;
 // segments heard so far and the second they run up to; opts.resume = { segs, upTo } feeds that back in, and the
 // windows that end at or before `upTo` are not given to the recognizer again. A long run that dies (tab closed,
 // out of memory, a decoder error) therefore loses at most one window.
+// The recognizer holds hundreds of MB; it is released 3 minutes after the last transcription finishes (the weights stay cached).
+let _asrTimer = null;
 export async function transcribe(fileOrBuf, onProgress, model, opts) {
+  clearTimeout(_asrTimer);
+  try { return await transcribeInner(fileOrBuf, onProgress, model, opts); }
+  finally { clearTimeout(_asrTimer); _asrTimer = setTimeout(() => { try { _asr && _asr.dispose && _asr.dispose(); } catch (e) {} _asr = null; _asrModel = null; }, 180000); }
+}
+async function transcribeInner(fileOrBuf, onProgress, model, opts) {
   opts = opts || {}; model = model || 'onnx-community/whisper-base';
   onProgress && onProgress({ stage: 'loading model' });
   if (!_asr || _asrModel !== model) { _asr = null; _asrModel = model; const T = await import('https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.1.2'); const device = navigator.gpu ? 'webgpu' : 'wasm';

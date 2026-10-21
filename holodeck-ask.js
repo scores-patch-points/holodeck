@@ -64,13 +64,25 @@ export function isThinkingModel(name) { return THINKING_RE.test(String(name || '
 export const DEFAULT_MODEL = 'webllm:gemma-2-2b-it-q4f16_1-MLC';
 export function webgpu() { return typeof navigator !== 'undefined' && !!navigator.gpu; }
 let _wl = null, _wlId = null, _wlP = null, _wlIv = null, _wlGen = 0;
+// The engine holds ~1.5 GB of GPU memory for as long as it is loaded, so it is let go after WL_IDLE_MS without a question
+// (the weights stay cached on disk; the next question loads it again).
+const WL_IDLE_MS = 5 * 60 * 1000; let _wlUsed = 0, _wlBusy = 0, _wlIdle = null;
+function wlWatch() {
+  if (_wlIdle) return;
+  _wlIdle = setInterval(() => {
+    if (!_wl) { clearInterval(_wlIdle); _wlIdle = null; return; }
+    if (_wlBusy > 0 || Date.now() - _wlUsed < WL_IDLE_MS) return;
+    try { _wl.unload && _wl.unload(); } catch (e) {}
+    _wl = null; _wlId = null; _wlP = null; clearInterval(_wlIdle); _wlIdle = null;
+  }, 30000);
+}
 const WL_STALL_MS = 60000; // the weights ship over the network; no init progress for a minute means the download stalled, not that the GPU is warming up
 const WL_SOURCES = ['https://esm.run/@mlc-ai/web-llm', 'https://cdn.jsdelivr.net/npm/@mlc-ai/web-llm/+esm'];
 // The engine downloads the weights once (the browser caches them), then runs them on this machine's GPU. Nothing leaves the tab.
 // A load that makes no progress is broken, not slow: a watchdog fails it so the next call really retries (a fresh
 // engine, and a fallback CDN if the first runtime import did not answer). A late-finishing abandoned engine is unloaded.
 export function loadWebLLM(id, onProgress) {
-  if (_wl && _wlId === id) return Promise.resolve(_wl);
+  if (_wl && _wlId === id) { _wlUsed = Date.now(); return Promise.resolve(_wl); }
   if (_wlP && _wlId === id) return _wlP;
   if (_wl && _wlId !== id) { try { _wl.unload(); } catch (e) {} _wl = null; }
   _wlId = id;
@@ -87,7 +99,7 @@ export function loadWebLLM(id, onProgress) {
     })().then(e => {
       done = true; settle();
       if (gen !== _wlGen) { try { e.unload && e.unload(); } catch (x) {} return; }
-      _wl = e; resolve(e);
+      _wl = e; _wlUsed = Date.now(); wlWatch(); resolve(e);
     }, err => {
       done = true; settle();
       if (gen === _wlGen) { _wlP = null; _wlId = null; reject(err); }
@@ -105,7 +117,11 @@ export function loadWebLLM(id, onProgress) {
   return _wlP;
 }
 export function webllmLoaded(id) { return !!_wl && _wlId === id; }
-async function chatWebLLM(id, messages, { onToken, format, maxTokens, signal } = {}) {
+async function chatWebLLM(id, messages, opts = {}) {
+  _wlBusy++;
+  try { return await chatWebLLMInner(id, messages, opts); } finally { _wlBusy--; _wlUsed = Date.now(); }
+}
+async function chatWebLLMInner(id, messages, { onToken, format, maxTokens, signal } = {}) {
   const eng = await loadWebLLM(id);
   // Gemma's chat template has no system turn: the system block rides at the head of the first user message instead.
   let msgs = messages;
