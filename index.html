@@ -9614,13 +9614,36 @@ class Component extends DCLogic {
       const extra = {}; docs.forEach(d => { if (this._stage.has(d.id)) extra[d.id] = d; });
       const A = { ...this._A, docs, docById: { ...this._A.docById, ...extra } };
       try { window.__holodeckA = A; } catch (e) {}
-      return A;
+      return attachKeyedFigs(A);
     }
     const key = id + ':' + docs.map(d => d.id).join(',') + ':' + this.state.htmlVer + ':' + this.corrKey(id);
-    if (this._key !== key) { this._key = key; this._A = analyze({ docs }, this._html); this.applyCorrections(this._A, id); }
+    if (this._key !== key) {
+      // Reading a workspace is synchronous and takes seconds for a big one. A workspace already read this session is kept
+      // (one per key), so going back to it is instant; a first visit, or a delete, paints the new list of sources at once
+      // and does the read on the next tick instead of inside the click.
+      const hit = (this._ac = this._ac || new Map()).get(key);
+      if (hit) { this._A = hit; this._Aid = id; this._key = key; }
+      else if (docs.length >= 3 && this._A && this._deferOK !== key && (id !== this._Aid || this._deferNext)) {
+        if (!this._prov || this._prov.key !== key) {
+          const byId = {}; docs.forEach(d => { byId[d.id] = d; });
+          const base = id === this._Aid ? this._A : (this._emptyA = this._emptyA || analyze({ docs: [] }, this._html));
+          this._prov = { key, A: { ...base, docs, docById: { ...base.docById, ...byId } } };
+          this._key = key + ':reading';
+          setTimeout(() => { this._deferNext = false; this._deferOK = key; this.forceUpdate(); }, 0);
+        }
+        try { window.__holodeckA = this._prov.A; } catch (e) {}
+        return attachKeyedFigs(this._prov.A);
+      } else {
+        this._key = key; this._A = analyze({ docs }, this._html); this.applyCorrections(this._A, id); this._Aid = id; this._deferNext = false; this._prov = null;
+        this._ac.set(key, this._A); if (this._ac.size > 4) this._ac.delete(this._ac.keys().next().value);
+      }
+    }
     try { window.__holodeckA = this._A; } catch (e) {}
-    return this._A;
+    return attachKeyedFigs(this._A);
   }
+  // Anything that sets _key to null is saying "the content under this key changed": every kept reading is stale then.
+  get _key() { return this.__key; }
+  set _key(v) { this.__key = v; if (v == null && this._ac) this._ac.clear(); }
   // Corrections: filing, revising (retract/restore), and enforcement. Entries are append-only;
   // revising flips status and appends to history, so the log is the audit trail.
   corrections(id) { const all = loadCorrections(); return (all[id || this.corpusId()] || []).slice(); }
@@ -9839,7 +9862,7 @@ class Component extends DCLogic {
     try { const k = 'hd:store-gone:' + cid; const g = new Set(JSON.parse(localStorage.getItem(k) || '[]')); set.forEach(id => g.add(id)); localStorage.setItem(k, JSON.stringify([...g])); } catch (e) {}
     const added = { ...this.state.added, [cid]: have.filter(d => !set.has(d.id)) }; this.saveAdded(added);
     set.forEach(id => { try { this.setDocFolder(id, ''); } catch (e) {} this.purgeDocBytes(id); });
-    this._key = null;
+    this._deferNext = true;
     this.setState({ added, view: 'summary', readDoc: null, sel: null, just: null, delAsk: null, dvSel: {}, dvBulkAsk: false, dvOpen: null, dvRename: null });
     this.toast(set.size === 1 ? 'Deleted \u201c' + (titles[0] || 'Untitled') + '\u201d.' : 'Deleted ' + set.size + ' sources.');
   }
