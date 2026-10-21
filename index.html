@@ -2785,7 +2785,8 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
                     <button onClick="{{ rdMedia.onStopRecord }}" title="Stop — pause, rewind to the start, and clear the marking so you can read the transcript" style="background:none;border:1px solid var(--line2);border-radius:8px;height:30px;padding:0 11px;cursor:pointer;font:500 13px var(--sans);color:var(--ink2)" style-hover="border-color:var(--bad)">■ Stop</button>
                     <span id="fx-tm" style="font:600 12.5px var(--mono);color:var(--ink2);white-space:nowrap">{{ rdMedia.timeLabel }}</span>
                     <span id="fx-st" style="font:500 12px var(--sans);color:var(--mut);white-space:nowrap">{{ rdMedia.statusLabel }}</span>
-                    <sc-if value="{{ rdMedia.canTx }}" hint-placeholder-val="{{ false }}"><button onClick="{{ rdMedia.onTx }}" aria-label="Transcribe this recording here, in this browser" style="margin-left:auto;height:30px;padding:0 14px;border:0;border-radius:8px;background:var(--acc2);color:#fff;cursor:pointer;font:600 13px var(--sans);white-space:nowrap">{{ rdMedia.txLabel }}</button></sc-if>
+                    <sc-if value="{{ rdMedia.isLocal }}" hint-placeholder-val="{{ false }}"><button onClick="{{ rdMedia.onMerge }}" title="Merge a transcript you already have with this recording; the audio is transcribed again to check that they line up" style="margin-left:auto;height:30px;padding:0 11px;border:1px solid var(--line2);border-radius:8px;background:transparent;color:var(--ink2);cursor:pointer;font:500 13px var(--sans);white-space:nowrap">Merge transcript…</button></sc-if>
+                    <sc-if value="{{ rdMedia.canTx }}" hint-placeholder-val="{{ false }}"><button onClick="{{ rdMedia.onTx }}" aria-label="Transcribe this recording here, in this browser" style="margin-left:8px;height:30px;padding:0 14px;border:0;border-radius:8px;background:var(--acc2);color:#fff;cursor:pointer;font:600 13px var(--sans);white-space:nowrap">{{ rdMedia.txLabel }}</button></sc-if>
                   </div>
                 </sc-if>
                 <sc-if value="{{ rdMedia.ytOnly }}" hint-placeholder-val="{{ false }}">
@@ -3723,6 +3724,25 @@ function ohsSegmentsHtml(segs, title) {
   const P = TAG_STYLE.P ? ' style="' + TAG_STYLE.P + '"' : '';
   return '<h1' + (TAG_STYLE.H1 ? ' style="' + TAG_STYLE.H1 + '"' : '') + '>' + esc(title) + '</h1>\n' + paras.map(p => '<p data-t="' + Math.floor(p.t) + '"' + P + '>' + p.txt + '</p>').join('\n');
 }
+// Merging a transcript someone already has with the recording (holodeck-align.js). The supplied words are kept
+// verbatim, timed from a fresh machine pass over the audio; a passage the recording does not bear out says so in the
+// app's voice, in an aria-hidden element the text reader skips, so it is never part of what was said.
+let _hdAlign = null; const hdAlign = () => _hdAlign || (_hdAlign = import(new URL('holodeck-align.js', location.href).href));
+const HD_TX_EXT = /\.(srt|vtt|sbv|txt|md|json|jsonl)$/i, HD_MEDIA_EXT = /\.(mp3|wav|m4a|aac|flac|ogg|oga|opus|mp4|m4v|mov|webm|mkv)$/i;
+const hdIsMediaFile = f => /^(audio|video)\//.test(f.type || '') || HD_MEDIA_EXT.test(f.name || '');
+async function hdSuppliedSegs(name, raw) {
+  const [R, AL] = await Promise.all([hdRead(), hdAlign()]); const ext = ((name || '').match(/\.(\w+)$/) || [])[1] || 'txt';
+  let segs = /^(srt|vtt|sbv)$/i.test(ext) ? R.timedSegments(ext, raw) : /^(json|jsonl)$/i.test(ext) ? R.timedSegments('json', raw) : [];
+  if (!segs.length) segs = AL.parsePlain(raw);
+  return segs.map(g => ({ text: g.text, start: g.start != null ? g.start : null, end: g.end != null ? g.end : null }));
+}
+function mergedSegmentsHtml(segs, title) {
+  const P = TAG_STYLE.P ? ' style="' + TAG_STYLE.P + '"' : '';
+  const mark = c => c.status === 'ok' ? '' : '<span data-gen="1" aria-hidden="true" style="font:500 11px var(--mono);color:var(--bad,#b3261e);margin-left:6px;white-space:nowrap">' + (c.status === 'weak' ? 'only partly heard in the recording (' + Math.round(c.score * 100) + '%)' : 'not found in the recording — time estimated') + '</span>';
+  return '<h1' + (TAG_STYLE.H1 ? ' style="' + TAG_STYLE.H1 + '"' : '') + '>' + esc(title) + '</h1>\n'
+    + segs.filter(s => (s.text || '').trim()).map(s => '<p data-t="' + Math.floor(s.start) + '" data-check="' + s.check.status + '"' + P + '>' + esc(s.text.replace(/\s+/g, ' ').trim()) + mark(s.check) + '</p>').join('\n');
+}
+
 // Downloading the transcript in other forms: the reader's paragraphs carry a data-t
 // start-time each, so the same words can be written back out as plain text, captions
 // (.srt / .vtt), markdown with timecodes, or a segments.json in the shape the surface
@@ -6632,7 +6652,10 @@ class Component extends DCLogic {
     // Instant feedback: a drop is acknowledged the moment it arrives, before the entries are walked — a deep folder can take a moment to enumerate, and the page must not sit silent.
     try { if (dt.items && dt.items.length) this.setState({ busy: 'Reading your files…' }); } catch (e) {}
     const files = await hdFilesFromDataTransfer(dt);
-    if (files.length) { try { HD_KNOWN_NAMES = Object.keys(this.analysis().names || {}); } catch (e) {} hdTraceStart(files.length === 1 ? files[0].name : plural(files.length, 'file')); this.setState({ busy: 'Reading ' + plural(files.length, 'file') + '…', showAdd: false, view: 'summary', folder: null }); this.beginReading(files); try { const list = []; for (const fl of files) list.push(await readAny(fl)); await this.addDocs(list); } finally { this.endReading(); } return; }
+    if (files.length) { try { HD_KNOWN_NAMES = Object.keys(this.analysis().names || {}); } catch (e) {} hdTraceStart(files.length === 1 ? files[0].name : plural(files.length, 'file')); this.setState({ busy: 'Reading ' + plural(files.length, 'file') + '…', showAdd: false, view: 'summary', folder: null }); this.beginReading(files); try { const list = []; const mf = files.filter(hdIsMediaFile), tf = files.filter(f => !hdIsMediaFile(f) && HD_TX_EXT.test(f.name || ''));
+      // one recording dropped with one transcript: they are the same thing, so the transcript is merged with the audio and checked against it
+      const pair = mf.length === 1 && tf.length === 1 ? { m: mf[0], t: tf[0] } : null;
+      for (const fl of files) { if (pair && fl === pair.t) continue; const rd = await readAny(fl); if (pair && fl === pair.m) rd.mergeWith = { name: pair.t.name, raw: await pair.t.text() }; list.push(rd); } await this.addDocs(list); } finally { this.endReading(); } return; }
     let text = (dt.getData('text/plain') || '').trim(); const html = dt.getData('text/html') || '';
     if (!text) text = ((dt.getData('text/uri-list') || '').split('\n').find(l => l && l[0] !== '#') || '').trim();
     const title = dt.getData('application/x-fold-title'); const year = +dt.getData('application/x-fold-year') || null; const fallback = dt.getData('application/x-fold-fallback') || null;
@@ -8009,6 +8032,40 @@ class Component extends DCLogic {
       const bytes = JSON.stringify({ source: r.source, model: r.model, segments: r.segments, priors: r.priors || { prompt: prompt ? priorNote : 'none', language: lang } });
       if (this._net && this._net.s && !this._net.s.guest && this.wsRooms().pub) this.publish({ bytes, meta: { kind: 'transcript', title: d0.title, url: null, mime: 'application/json', filename: d0.title.replace(/[^\w-]+/g, '-').slice(0, 60) + '.segments.json' } }).catch(() => {});
     } catch (e) { await this.txStopped(d0.id, e, save); }
+  }
+  // Merge a transcript with the recording it belongs to, then check the two against each other: the audio is
+  // transcribed afresh, the supplied words are matched to what was heard, and the result keeps the supplied words,
+  // takes its times from the audio, and says where the two disagree. Nothing the recognizer heard is added to it.
+  pickMergeFile(d0) {
+    const inp = document.createElement('input'); inp.type = 'file'; inp.accept = '.srt,.vtt,.sbv,.txt,.md,.json,.jsonl,text/plain';
+    inp.onchange = async () => { const f = inp.files && inp.files[0]; if (!f) return; try { await this.mergeTranscript(d0, { name: f.name, raw: await f.text() }); } catch (e) { this.toast('Could not read ' + f.name + ': ' + ((e && e.message) || e)); } };
+    inp.click();
+  }
+  async mergeTranscript(d0, src, bytes) {
+    const buf = bytes || await mediaBytes(d0.id);
+    if (!buf) { this.toast('The recording’s audio isn’t kept in this browser, so there is nothing to merge the transcript with.'); return; }
+    const given = await hdSuppliedSegs(src.name, src.raw);
+    if (!given.length) { this.toast('No transcript text found in ' + (src.name || 'that file') + '.'); return; }
+    const AL = await hdAlign(); const lang = this.state.txLang || 'en';
+    const model = this.state.txModel === 'small' ? 'onnx-community/whisper-small' : this.state.txModel === 'smallen' ? 'onnx-community/whisper-small.en' : 'onnx-community/whisper-base';
+    this.txReset(d0.id); this.setState({ txAsk: null, view: 'reader', readDoc: d0.id, sel: { type: 'doc', id: d0.id } });
+    this.ilog('Merging ' + plural(given.length, 'passage') + ' from ' + (src.name || 'the transcript') + ' with the recording: listening to the audio again to check where they line up.');
+    try {
+      const r = await this.transcribeAny(buf, p => this.txOnProgress(p), model, { prompt: null, language: lang, signal: this._txAbort.signal });
+      const m = AL.merge(given, r.segments, { duration: d0.media && d0.media.dur });
+      const html = mergedSegmentsHtml(m.segments, d0.title);
+      const media = { ...d0.media, segN: m.segments.length, model: r.model, merged: { from: src.name || null, at: Date.now(), ...m.summary }, priors: { prompt: 'none', language: lang } };
+      this._html[d0.id] = html; idbPut('html:' + d0.id, html).catch(() => {});
+      idbPut('heard:' + d0.id, r.segments).catch(() => {});
+      this.replaceAddedDoc(d0.id, { format: 'html', html, text: htmlToText(html), media, transcribed: true, note: AL.verdictText(m.summary) });
+      this.showMapFor(d0.id);
+      hdEngineRead(d0.title, htmlToText(html)).then(got => { this.replaceAddedDoc(d0.id, got ? { eng: hdEngineCompact(got.host, got.read), engTried: true } : { engTried: true }); }).catch(() => {});
+      const said = AL.verdictText(m.summary); this.ilog(said, m.summary.verdict === 'lines up' ? 'info' : 'bad');
+      this.txDone(); this.setState({ note: said }); this.toast(m.summary.verdict === 'lines up' ? 'Transcript merged — it lines up with the recording.' : 'Transcript merged — ' + m.summary.verdict + '. Passages that were not found are marked.');
+    } catch (e) {
+      this.txDone(); const stopped = !!(this._txAbort && this._txAbort.signal.aborted) || /^stopped$/.test(String(e && e.message || e));
+      this.setState({ note: stopped ? 'Merge stopped before the recording was checked; nothing was changed.' : 'The merge could not check the transcript against the audio: ' + (e && e.message || e) + '. Nothing was changed.' });
+    }
   }
   // A run that did not finish keeps what it heard. Said plainly: paused by the person, or failed — either way resumable.
   async txStopped(id, e, save) {
@@ -10011,7 +10068,7 @@ class Component extends DCLogic {
     // A recording arrives and the work begins on its own, one thing at a time (soundWork): audio is transcribed
     // right away, and only then is its sound mapped. Nothing is transcribed without being kept.
     const recs = [];
-    nd.forEach((d, i) => { const x = list[i]; if (!x.buf) return; if (!(d.media && d.media.kind === 'local')) return; if (!d.medium || d.transcribed) return; recs.push({ d, buf: x.buf }); });
+    nd.forEach((d, i) => { const x = list[i]; if (!x.buf) return; if (!(d.media && d.media.kind === 'local')) return; if (!d.medium || d.transcribed) return; if (x.mergeWith) { const mw = x.mergeWith, buf = x.buf; setTimeout(async () => { for (let k = 0; k < 60 && !this.analysis().docById[d.id]; k++) await new Promise(r => setTimeout(r, 100)); this.mergeTranscript(this.analysis().docById[d.id] || d, mw, buf).catch(e => this.toast('Merge failed: ' + ((e && e.message) || e))); }, 0); return; } recs.push({ d, buf: x.buf }); });
     if (recs.length) setTimeout(() => this.soundWork(recs, !!(aopt && aopt.defer)), 0);
     // Store first, then paint: each source lands in the workspace (and its bytes in IndexedDB) before the read and
     // the fold, so Sources fills in as the files arrive instead of freezing until the whole batch is done.
@@ -10407,7 +10464,7 @@ class Component extends DCLogic {
       const badges = [...(d.medium ? [{ label: d.medium === 'Video' || d.medium === 'Audio' ? d.medium + (d.transcribed ? ' · machine transcript' : ' · not transcribed') : d.medium, color: MEDIUM_C[d.medium] || 'var(--mut)' }] : []), ...(d.standing ? [{ label: d.standing, color: STANDING_C[d.standing] || 'var(--mut)' }] : []), ...((d.recordings || []).map(r => ({ label: 'Video linked · not transcribed', color: 'var(--date)' }))), ...(d.sameAs ? [{ label: 'Same bytes as ' + short(d.sameAsTitle || '', 36), color: 'var(--amber)' }] : []), ...(d.custodyStatus && d.custodyStatus !== 'captured' ? [{ label: d.custody, color: /missing|failed|not-located|no-text/.test(d.custodyStatus) ? 'var(--bad)' : 'var(--amber)' }] : [])];
       const vid = !!(d.media && d.media.kind === 'youtube');
       const tr = this.traceFor(d.id);
-      return { ...c, op: 1, isVid: vid, noVid: !vid, ...(() => { const pt = !d.vm && (d.pdfSrc || d.format === 'pdf' || d.type === 'PDF') ? epavTokenOf(d) : null; const vt = d.vm && d.thumb; return { hasPdfThumb: !!(pt || vt), pdfThumb: vt ? 'url(' + vt + ')' : pt ? 'url(thumbs/' + pt + '.jpg)' : 'none' }; })(), thumbBg: vid ? 'url(https://i.ytimg.com/vi/' + d.media.id + '/hqdefault.jpg)' : 'none', readLabel: 'Open source', ...(vid ? { onSelect: () => this.read(d.id) } : {}), badges, hasBadges: badges.length > 0, hasDistinct: !!dd, distinct: dd ? dd.label + ' · ' + pct(dd.a) + ' of its statements vs ' + pct(dd.b) + ' elsewhere' : '', hasFold: this._fold.length > 0, fold: inF + ' of ' + all.length + ' statements touch the topic', stats: (narrowed ? ((FbyDoc[d.id] || []).length).toLocaleString() + ' of ' + plural(all.length, 'statement') + ' in this selection' : plural(all.length, 'statement')) + ' · ' + plural(nm.size, 'name'), isSeen: m.status === 'seen', isKept: m.status !== 'seen', hasReplay: !!tr, onReplay: () => tr && import(new URL('holodeck-ingest-player.js', location.href).href).then(M => M.open(tr)), canUnkeep: m.status !== 'seen' && !this.baseDocs(this.corpusId()).some(x => x.id === d.id), needsRead: !!d.needsRead, onProcess: () => this.processRead(d.id), canProcess: !!(d.type === 'Image' || d.type === 'PDF' || d.format === 'pdf' || d.pdf || d.hasImg), ...(() => { const ec = (d.type === 'Image' || d.type === 'PDF' || d.format === 'pdf' || d.pdf || d.hasImg) ? this.eyesCard(d) : null; return { hasEyes: !!ec, eyesRows: ec ? ec.rows : [], eyesNote: ec ? ec.note : '' }; })(), canTranscribe: !!((d.medium === 'Audio' || d.medium === 'Video' || d.type === 'Audio' || d.type === 'Video' || (d.media && (d.media.kind === 'local' || d.media.kind === 'youtube'))) && !d.transcribed), onTranscribe: () => this.transcribeCard(d), cardStyle: 'border-color:' + (c.bd || 'var(--line)') + ';opacity:' + ((S.solo && S.solo.length && !S.solo.includes(d.id)) ? '0.28' : '1') + ';transition:opacity .25s ease', soloOn: !!(S.solo && S.solo.includes(d.id)), soloLabel: (S.solo && S.solo.includes(d.id)) ? 'Showing only this source' : 'Only this source', onSolo: () => this.setState(s => { const cur = Array.isArray(s.solo) ? s.solo : []; return { solo: cur.includes(d.id) ? cur.filter(x => x !== d.id) : [...cur, d.id] }; }),
+      return { ...c, op: 1, isVid: vid, noVid: !vid, ...(() => { const pt = !d.vm && (d.pdfSrc || d.format === 'pdf' || d.type === 'PDF') ? epavTokenOf(d) : null; const vt = d.vm && d.thumb; return { hasPdfThumb: !!(pt || vt), pdfThumb: vt ? 'url(' + vt + ')' : pt ? 'url(thumbs/' + pt + '.jpg)' : 'none' }; })(), thumbBg: vid ? 'url(https://i.ytimg.com/vi/' + d.media.id + '/hqdefault.jpg)' : 'none', readLabel: 'Open source', ...(vid ? { onSelect: () => this.read(d.id) } : {}), badges, hasBadges: badges.length > 0, hasDistinct: !!dd, distinct: dd ? dd.label + ' · ' + pct(dd.a) + ' of its statements vs ' + pct(dd.b) + ' elsewhere' : '', hasFold: this._fold.length > 0, fold: inF + ' of ' + all.length + ' statements touch the topic', stats: (narrowed ? ((FbyDoc[d.id] || []).length).toLocaleString() + ' of ' + plural(all.length, 'statement') + ' in this selection' : plural(all.length, 'statement')) + ' · ' + plural(nm.size, 'name'), isSeen: m.status === 'seen', isKept: m.status !== 'seen', hasReplay: !!tr, onReplay: () => tr && import(new URL('holodeck-ingest-player.js', location.href).href).then(M => M.open(tr)), canUnkeep: m.status !== 'seen' && !this.baseDocs(this.corpusId()).some(x => x.id === d.id), needsRead: !!d.needsRead, onProcess: () => this.processRead(d.id), canProcess: !!(d.type === 'Image' || d.type === 'PDF' || d.format === 'pdf' || d.pdf || d.hasImg), ...(() => { const ec = (d.type === 'Image' || d.type === 'PDF' || d.format === 'pdf' || d.pdf || d.hasImg) ? this.eyesCard(d) : null; return { hasEyes: !!ec, eyesRows: ec ? ec.rows : [], eyesNote: ec ? ec.note : '' }; })(), canTranscribe: !!((d.medium === 'Audio' || d.medium === 'Video' || d.type === 'Audio' || d.type === 'Video' || (d.media && (d.media.kind === 'local' || d.media.kind === 'youtube'))) && !d.transcribed), onTranscribe: () => this.transcribeCard(d), canMerge: !!(d.media && d.media.kind === 'local'), onMerge: () => this.pickMergeFile(d), cardStyle: 'border-color:' + (c.bd || 'var(--line)') + ';opacity:' + ((S.solo && S.solo.length && !S.solo.includes(d.id)) ? '0.28' : '1') + ';transition:opacity .25s ease', soloOn: !!(S.solo && S.solo.includes(d.id)), soloLabel: (S.solo && S.solo.includes(d.id)) ? 'Showing only this source' : 'Only this source', onSolo: () => this.setState(s => { const cur = Array.isArray(s.solo) ? s.solo : []; return { solo: cur.includes(d.id) ? cur.filter(x => x !== d.id) : [...cur, d.id] }; }),
         ...(() => { const on = this._inf[d.id] || null;
           return { originText: on ? on.why + ' ' + short(A.docById[on.of].title, 40) : 'Independent · shares no claims or outlet with another source', originDep: !!on, originCol: on ? 'var(--amber)' : 'var(--mut)' }; })(),
         drawsX: 0, drawOptions: drawOpts,
@@ -10548,7 +10605,7 @@ class Component extends DCLogic {
         sub: [dvAgo(r.addedAt), r.date && r.date !== dvAgo(r.addedAt) ? 'source ' + r.date : '', (dv0 => dv0 && dv0.vm && !dv0.readState ? 'not read yet' : plural(r.sts, 'statement'))(A.docById[r.id]), (dd => dd && dd.captionsWhy && !dd.transcribed ? 'no captions — ' + ({ 'helper-unreachable': 'helper not reachable', 'helper-error': 'helper could not read it', 'extension-error': 'extension could not read it', 'no-track': 'no caption track' }[dd.captionsWhy] || 'not read') : '')(A.docById[id]), this.commentsOf(id).total ? '💬 ' + this.commentsOf(id).total + (this.commentsOf(id).unread ? ' ●' : '') : ''].filter(Boolean).join(' · '),
         menu: [{ label: 'Open', onClick: dvClose(it.onRead) }, { label: 'Comment' + (this.commentsOf(id).total ? ' (' + this.commentsOf(id).total + ')' : ''), onClick: dvClose(() => this.commentOn({ kind: 'source', doc: 'src:' + id })) }, ...(own ? [{ label: 'Rename', onClick: dvClose(() => this.setState({ dvRename: id, dvRenameDraft: r.title })) }] : []), { label: 'Details', onClick: dvClose(() => this.setState({ dvOpen: id })) },
           { label: it.soloLabel || 'Only this source', onClick: dvClose(it.onSolo) },
-          ...(it.canTranscribe ? [{ label: 'Transcribe it', onClick: dvClose(it.onTranscribe) }] : []), ...(it.canProcess ? [{ label: 'Read it', onClick: dvClose(it.onProcess) }] : []),
+          ...(it.canTranscribe ? [{ label: 'Transcribe it', onClick: dvClose(it.onTranscribe) }] : []), ...(it.canMerge ? [{ label: 'Merge a transcript…', onClick: dvClose(it.onMerge) }] : []), ...(it.canProcess ? [{ label: 'Read it', onClick: dvClose(it.onProcess) }] : []),
           ...(it.isSeen ? [{ label: 'Keep as a source', onClick: dvClose(it.onKeep) }] : []),
           ...(it.isSeen ? [{ label: 'Discard', col: 'var(--bad)', onClick: dvClose(it.onDiscard) }] : it.canDelete ? [{ label: 'Delete', col: 'var(--bad)', onClick: dvClose(it.onAskDelete) }] : [])] }; })
       // a source that is stored but still being folded keeps the moving bar, and a click on it shows the reading
@@ -11277,10 +11334,10 @@ onAsk: () => { this.setState({ txAsk: d0.id }); this.pickYtFile(d0); }, onCancel
           kindLine: timed ? plural(m.segN, 'timed segment') + ' · ' + (m.model || 'Whisper').split('/').pop() : (m.dur != null ? fmtT(m.dur) : '') + (m.mime ? ' · ' + m.mime.split('/')[0] + (m.size ? ' · ' + Math.max(1, Math.round(m.size / 1e6)) + ' MB' : '') : ''),
           hasCls, clsLine, clsBusy, clsMeta: (d0.clsModel || '').replace('yamnet-', ''), hasClsStrip: clsStrip.length > 0, clsStrip, clsEvents, clsTable, clsN: String(clsTable.length), hasNewNames, newNames,
           txTitle: timed ? 'Transcript · click a timecode to play from there' : txHere ? 'Transcribing — words appear below as they are heard' : 'Transcript',
-          note: timed ? 'Machine transcript (' + (m.model || 'Whisper').split('/').pop() + '), not checked by a person' + (m.priors ? ' · transcribed with the prior: ' + (PRIOR_LABEL[m.priors.prompt] || m.priors.prompt || 'none') + ', language ' + (m.priors.language || 'auto') : '') + '. Quote from the recording, not the transcript.' : 'The recording is kept in this browser; nothing in it has been read until it is transcribed. A transcript is a machine reading of the sound, not checked by a person.',
+          note: timed && m.merged ? 'Transcript merged from ' + (m.merged.from || 'a supplied file') + ' — the words are its own, the times come from the recording, which was transcribed again to check them: it ' + m.merged.verdict + ' (' + Math.round(m.merged.coverage * 100) + '% of its words heard in the audio; ' + m.merged.weak + ' passages partly heard, ' + m.merged.none + ' not found' + (m.merged.unheard && m.merged.unheard.length ? '; ' + plural(m.merged.unheard.length, 'stretch', 'stretches') + ' of speech the transcript leaves out' : '') + '). Quote from the recording.' : timed ? 'Machine transcript (' + (m.model || 'Whisper').split('/').pop() + '), not checked by a person' + (m.priors ? ' · transcribed with the prior: ' + (PRIOR_LABEL[m.priors.prompt] || m.priors.prompt || 'none') + ', language ' + (m.priors.language || 'auto') : '') + '. Quote from the recording, not the transcript.' : 'The recording is kept in this browser; nothing in it has been read until it is transcribed. A transcript is a machine reading of the sound, not checked by a person.',
           canAsk: !timed, ask: S.txAsk === d0.id, noAsk: !timed && S.txAsk !== d0.id, canTx: !timed && !txHere && S.txAsk !== d0.id,
           ...(() => { const wi = !timed && !txHere && this._txWipInfo && this._txWipInfo[d0.id]; return wi ? { txLabel: 'Resume', hasWip: true, wipNote: 'Paused at ' + fmtT(wi.upTo) + (wi.total ? ' of ' + fmtT(wi.total) : '') + ' · ' + plural(wi.n, 'segment') + ' kept. Resume carries on from there.' } : { txLabel: 'Transcribe', hasWip: false, wipNote: '' }; })(),
-          onAsk: () => { this.setState({ txAsk: d0.id }); this.transcribeLocal(d0); }, onCancelAsk: () => this.setState({ txAsk: null }),
+          onMerge: () => this.pickMergeFile(d0), onAsk: () => { this.setState({ txAsk: d0.id }); this.transcribeLocal(d0); }, onCancelAsk: () => this.setState({ txAsk: null }),
           prior: prior, pw: prior === 'workspace', pn: prior === 'none', pm: prior === 'mine', onPriorW: () => this.setState({ txPrior: 'workspace' }), onPriorN: () => this.setState({ txPrior: 'none' }), onPriorM: () => this.setState({ txPrior: 'mine' }),
           lang: S.txLang || 'en', onLang: e => this.setState({ txLang: e.target.value }), langs: [['en', 'English'], ['es', 'Spanish'], ['fr', 'French'], ['de', 'German'], ['pt', 'Portuguese'], ['it', 'Italian'], ['nl', 'Dutch'], ['pl', 'Polish'], ['ru', 'Russian'], ['uk', 'Ukrainian'], ['ar', 'Arabic'], ['hi', 'Hindi'], ['zh', 'Chinese'], ['ja', 'Japanese'], ['ko', 'Korean']].map(([v, l]) => ({ v, l })),
           model: S.txModel || 'base', onModel: e => this.setState({ txModel: e.target.value }), models: [['base', 'whisper-base · fast, multilingual'], ['small', 'whisper-small · slower, more accurate, multilingual'], ['smallen', 'whisper-small.en · English only, most accurate for English']].map(([v, l]) => ({ v, l })),
