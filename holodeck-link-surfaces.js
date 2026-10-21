@@ -13,14 +13,17 @@ import {
   cuesOf, isTimed, fmtClock, onChars, admits, canWriteLinks, wholeSpan, makeLink, patternsOf, tallyByDoc,
 } from './holodeck-relations.js';
 import { mountMap } from './holodeck-map.js';
+import { propositionsOf, sentenceOf, eotOfStatement } from './holodeck-propositions.js';
+import { disagreementsOf } from './holodeck-disagreements.js';
 
 const NS = 'http://www.w3.org/2000/svg';
-export const SURFACES = ['lanes', 'margin', 'seam', 'orbit', 'fields', 'review'];
-export const SURFACE_TITLE = { lanes: 'Lanes', margin: 'Margin', seam: 'Seam', orbit: 'Orbit', fields: 'Fields', review: 'Review' };
+export const SURFACES = ['lanes', 'margin', 'seam', 'disagreements', 'orbit', 'fields', 'review'];
+export const SURFACE_TITLE = { lanes: 'Lanes', margin: 'Margin', seam: 'Seam', disagreements: 'Disagreements', orbit: 'Orbit', fields: 'Fields', review: 'Review' };
 const BLURB = {
   lanes: 'Media sources share one time axis; documents share document order. A line joins two passages and says how.',
   margin: 'Write or paste a draft. Each sentence shows what the sources say about it, and what nothing answers.',
   seam: 'Two sources aligned side by side. Pairs are proposed by wording; the label comes from comparing the figures. Nothing is merged.',
+  disagreements: 'Where sources that mean the same thing give different values, most worth reading first. Identity first: the same measure of the same being, or the same office at the same body.',
   orbit: 'Sources are planets and their linked passages are moons. Click any body to re-center; a ring is the number of link steps from the center.',
   fields: 'Where the sources are tied and where they touch nothing: every passage of every source, linked or void.',
   review: 'Inferred links wait here. Confirming turns a dotted line solid everywhere.',
@@ -447,7 +450,7 @@ export function mountLinks(root, opts) {
     const cell = (st, doc, raw, L, side) => {
       const marks = L && L.finding && L.finding.marks && L.finding.marks[side];
       const body = st && marks && marks.length ? passageNodes(o.A, { doc: doc.id, kind: 'span', axis: 'chars', s: st.s, e: st.e }, marks, markClass(L), 400) : (st ? figSpan(st.text, raw) : null);
-      return st ? h('div', { class: 'lk-cell', style: 'border-left:3px solid ' + H.get(doc.id) }, ...body, h('button', { class: 'src', onclick: () => open(doc.id, st.s) }, 'open in ' + clip(doc.title, 28) + ' →'))
+      return st ? h('div', { class: 'lk-cell', style: 'border-left:3px solid ' + H.get(doc.id) + ';cursor:pointer', title: 'What this statement says', onclick: () => showCard({ statement: st }) }, ...body, h('button', { class: 'src', onclick: ev => { ev.stopPropagation(); open(doc.id, st.s); } }, 'open in ' + clip(doc.title, 28) + ' →'))
         : h('div', { class: 'lk-cell void' }, doc.title + ' is silent');
     };
     // what came to light between exactly these two sources, beyond the row pairs: not named, not on file, defined as
@@ -457,7 +460,11 @@ export function mountLinks(root, opts) {
       meet.slice(0, 6).map((L) => h('div', { class: 'lk-card', style: 'cursor:pointer', onclick: () => showCard({ links: [L] }) }, findingBlock(o.A, L, H)))) : null;
     let body;
     if (mode === 'seam' || mode === 'differences') {
-      const rows = mode === 'differences' ? S.rows.filter(r => ['differs', 'extends'].includes(r.verdict)) : S.rows;
+      // only what the two sources have to say about each other: a statement with no partner in the other source says
+      // nothing about the pair, so it is not a row. Disagreements first, then agreement, then what one adds.
+      const RANK = { differs: 0, same: 1, extends: 2, related: 3 };
+      const rows = (mode === 'differences' ? S.rows.filter(r => ['differs', 'extends'].includes(r.verdict)) : S.rows.filter(r => r.a && r.b))
+        .map((r, i) => [r, i]).sort((x, y) => (RANK[x[0].verdict] ?? 4) - (RANK[y[0].verdict] ?? 4) || x[1] - y[1]).map(x => x[0]);
       body = rows.length ? h('div', { class: 'lk-seam' }, rows.flatMap(r => {
         const q = r.link && r.link.quote;
         const F = r.link && r.link.finding; const said = F && F.kind !== 'terms' ? h('div', { class: 'lk-findrow' }, kindChip(r.link), h('div', { class: 'lk-head', style: 'font-weight:500' }, F.headline)) : null;
@@ -586,6 +593,26 @@ export function mountLinks(root, opts) {
   }
 
   // ── Review ─────────────────────────────────────────────────────────────────────────────────────────────────────
+  function disagreements() {
+    const A = o.A, H = hues();
+    const key = (o.key || '') + '#dg'; let list = memo.get(key); if (!list) { list = disagreementsOf(A); memo.set(key, list); }
+    if (!list.length) return h('div', { class: 'lk-empty' }, 'No two sources give different values for the same thing. Only figures and offices the reading could tie to a being are compared.');
+    const cards = list.map((D, i) => {
+      const pair = [...new Set(D.values.flatMap(v => v.docs.map(x => x.doc)))].slice(0, 2);
+      return h('div', { class: 'lk-card', style: 'display:flex;flex-direction:column;gap:8px' },
+        h('div', { style: 'display:flex;gap:8px;align-items:baseline;flex-wrap:wrap;justify-content:space-between' },
+          h('span', { style: 'font:600 15px var(--sans)' }, (i + 1) + '. ' + (D.anchor ? D.anchor + ' · ' : '') + D.measure),
+          h('span', { class: 'lk-note' }, D.why)),
+        D.values.map(v => h('div', { style: 'display:flex;flex-direction:column;gap:4px' },
+          h('div', { style: 'font:600 13px var(--mono);color:var(--bad)' }, v.raw),
+          v.docs.slice(0, 3).map(x => h('div', { class: 'lk-cell', style: 'border-left:3px solid ' + H.get(x.doc) + ';cursor:pointer', title: 'What this statement says', onclick: () => showCard({ statement: x.st }) },
+            ...passageNodes(A, { doc: x.doc, kind: 'span', axis: 'chars', s: x.st.s, e: x.st.e }, [[x.s, x.e]], 'bad', 320),
+            h('button', { class: 'src', onclick: ev => { ev.stopPropagation(); open(x.doc, x.st.s); } }, 'open in ' + clip(x.title, 36) + ' →'))))),
+        pair.length === 2 ? h('div', {}, h('button', { class: 'lk-btn', style: 'padding:2px 9px;font-size:12px', onclick: () => o.onSeam && o.onSeam(pair) }, 'Compare these two sources in the Seam')) : null);
+    });
+    return h('div', { style: 'display:flex;flex-direction:column;gap:12px' }, h('div', { class: 'lk-note' }, h('b', {}, plural(list.length, 'disagreement')), ', most worth reading first. Identity is established before values are compared; every value is the source\u2019s own words.'), cards, noteTruth());
+  }
+
   function review() {
     const A = o.A, H = hues();
     const inferred = o.links.filter(L => L.provenance === 'inferred');
@@ -643,7 +670,7 @@ export function mountLinks(root, opts) {
     const parts = [];
     let count = null;
     if (orbitMap) { try { orbitMap.destroy(); } catch (e) { /* gone */ } orbitMap = null; }
-    const fn = { lanes, margin, seam, orbit, fields, review }[view];
+    const fn = { lanes, margin, seam, disagreements, orbit, fields, review }[view];
     const body = fn();
     if (view !== 'review') parts.push(...toolbar(view, count));
     parts.push(sourcesBar());
@@ -665,9 +692,10 @@ export function mountLinks(root, opts) {
 }
 
 // ── the Passage card: one span and its links, read-only (a surface with NUL on links) ─────────────────────────────
-export function passageCard({ links = [], title = '', quote = null, A, hues, theme = 'dark', onOpen, onClose }) {
+export function passageCard({ links = [], title = '', quote = null, statement = null, A, hues, theme = 'dark', onOpen, onClose }) {
   ensureStyle(); const bad = DIFFERS[theme] || DIFFERS.dark; void bad;
   const open = (doc, s) => onOpen && onOpen(doc, s);
+  if (statement) return propositionsCard({ st: statement, A, hues, onOpen, onClose });
   return h('aside', { class: 'lk lk-pcard', role: 'dialog', 'aria-label': 'Passage and its links' },
     h('button', { class: 'lk-x', title: 'Close', onclick: () => onClose && onClose() }, '✕'),
     title ? h('div', { class: 'lk-h' }, title) : null,
@@ -682,6 +710,68 @@ export function passageCard({ links = [], title = '', quote = null, A, hues, the
         L.finding ? passageNodes(A, sp, L.finding.marks && L.finding.marks[i ? 'to' : 'from'], markClass(L), 260) : quoteOf(A, sp, 220),
         h('button', { class: 'lk-btn', style: 'margin-top:4px;padding:2px 8px;font-size:12px', onclick: () => open(sp.doc, onChars(sp) ? sp.s : 0) }, onChars(sp) ? 'Open in reader' : 'Open source'))),
       L.finding ? null : h('div', { class: 'lk-note' }, L.why))));
+}
+
+// ── the structured EOT of one statement, drawn: beings as nodes, claims as labelled edges, pattern as colour ─────
+// Ground (the beings the reading admitted) is the ring of nodes; Figure (what is claimed of them) is the edges, with a
+// value node where the claim ends in a figure; Pattern (where the other sources stand) is the colour of the edge.
+function eotGraph(E, { onPick } = {}) {
+  const W = 560, Hh = 290, cx = W / 2;
+  const COL = { disagrees: '#ff6b6b', agrees: '#3fb950', alone: '#8a8a99' };
+  const nodes = new Map(); const put = (name, kind) => { if (!name) return null; let n = nodes.get(name); if (!n) nodes.set(name, n = { name, kind, deg: 0 }); if (kind === 'value') n.kind = 'value'; return n; };
+  E.ground.forEach(g => put(g.name, 'being'));
+  const edges = E.figure.map(f => { const a = put(f.end1, 'being'); const b = put(f.end2, f.kind === 'figure' ? 'value' : 'being'); if (a) a.deg++; if (b) b.deg++; return { f, a, b }; });
+  const beings = [...nodes.values()].filter(n => n.kind === 'being').sort((x, y) => y.deg - x.deg); const values = [...nodes.values()].filter(n => n.kind === 'value');
+  // the beings a claim runs through stand in front, far apart so the claim reads as an arc; the rest are spoken of but
+  // claim nothing here, and sit in a quiet row beneath
+  const live = beings.filter(n => n.deg > 0), quiet = beings.filter(n => !n.deg);
+  live.forEach((n, i) => { n.x = live.length === 1 ? cx : 90 + (W - 180) * i / (live.length - 1); n.y = 96; });
+  values.forEach((n, i) => { const src = edges.find(e => e.b === n); const base = src && src.a && src.a.x != null ? src.a : { x: cx, y: 96 }; n.x = Math.max(70, Math.min(W - 70, base.x + (i - (values.length - 1) / 2) * 120)); n.y = 170; });
+  quiet.forEach((n, i) => { const per = Math.min(4, quiet.length), row = Math.floor(i / per), inRow = Math.min(per, quiet.length - row * per); n.x = 60 + (W - 120) * ((i % per) + 0.5) / inRow; n.y = 232 + row * 34; });
+  const svg = sv('svg', { viewBox: '0 0 ' + W + ' ' + Hh, width: '100%', style: 'display:block;background:radial-gradient(ellipse at center,rgba(138,180,255,.08),transparent 70%);border-radius:10px', role: 'img', 'aria-label': 'Structured EOT of the statement' });
+  edges.forEach(({ f, a, b }, i) => { if (!a || !b) return; const col = COL[f.verdict] || COL.alone; const mx = (a.x + b.x) / 2, my = Math.min(a.y, b.y) - (a.y === b.y ? 78 : 18) - (i % 3) * 10;
+    svg.append(sv('path', { d: 'M' + a.x + ' ' + a.y + ' Q' + mx + ' ' + my + ' ' + b.x + ' ' + b.y, fill: 'none', stroke: col, 'stroke-width': f.verdict === 'alone' ? 1.4 : 2.4, 'stroke-linecap': 'round', opacity: f.verdict === 'alone' ? .65 : .95, style: 'cursor:pointer', onclick: () => onPick && onPick(f) }));
+    const lab = clip(f.label, 28); const lx = (a.x + 2 * mx + b.x) / 4, ly = (a.y + 2 * my + b.y) / 4;
+    svg.append(sv('rect', { x: lx - lab.length * 3.4 - 5, y: ly - 9, width: lab.length * 6.8 + 10, height: 16, rx: 8, fill: 'var(--s1, #1c1c20)', stroke: col, 'stroke-width': 1, style: 'cursor:pointer', onclick: () => onPick && onPick(f) }));
+    svg.append(sv('text', { x: lx, y: ly + 3, 'text-anchor': 'middle', fill: col, 'font-size': 10.5, 'font-family': 'ui-monospace,Menlo,monospace', style: 'cursor:pointer;pointer-events:none' }, lab)); });
+  [...nodes.values()].forEach(n => { const isV = n.kind === 'value'; const t = clip(n.name, 22); const w = Math.max(36, t.length * 6.6 + 16);
+    svg.append(sv('g', { transform: 'translate(' + n.x + ' ' + n.y + ')' },
+      sv('rect', { x: -w / 2, y: -12, width: w, height: 24, rx: isV ? 5 : 12, fill: isV ? 'rgba(240,180,41,.16)' : n.deg ? 'rgba(138,180,255,.2)' : 'rgba(138,138,153,.10)', stroke: isV ? '#f0b429' : n.deg ? '#8ab4ff' : '#4a4a55', 'stroke-width': n.deg ? 1.4 : 1 }),
+      sv('text', { x: 0, y: 4, 'text-anchor': 'middle', fill: 'var(--ink, #f4f4f6)', 'font-size': 11.5, 'font-family': isV ? 'ui-monospace,Menlo,monospace' : 'inherit', opacity: n.deg ? 1 : .6 }, t))); });
+  return svg;
+}
+
+// ── the propositions card: what one statement says, and where every other source stands on each ─────────────────
+export function propositionsCard({ st, A, hues, onOpen, onClose }) {
+  ensureStyle();
+  const open = (doc, s) => onOpen && onOpen(doc, s);
+  const props = propositionsOf(A, st); const d = docOf(A, st.doc);
+  const COL = { disagrees: 'var(--bad)', agrees: '#3fb950', alone: '#9d9da8' };
+  const WORD = { disagrees: 'disagrees', agrees: 'agrees', alone: 'unmatched' };
+  return h('aside', { class: 'lk lk-pcard', role: 'dialog', 'aria-label': 'What this statement says' },
+    h('button', { class: 'lk-x', title: 'Close', onclick: () => onClose && onClose() }, '✕'),
+    h('div', { class: 'lk-h' }, 'What this statement says'),
+    h('div', { class: 'lk-pass', style: '--lk-c:' + (hues.get(st.doc) || 'var(--acc)') }, h('small', {}, clip(d.title, 40)),
+      ...passageNodes(A, { doc: st.doc, kind: 'span', axis: 'chars', s: st.s, e: st.e }, props.map(p => [(st.s || 0) + p.s, (st.s || 0) + p.e]), 'bad', 400)),
+    (() => { const E = eotOfStatement(A, st); if (!E.ground.length && !E.figure.length) return null;
+      return h('div', { class: 'lk-card', style: 'display:flex;flex-direction:column;gap:8px' },
+        h('div', { style: 'display:flex;gap:10px;flex-wrap:wrap;align-items:baseline;justify-content:space-between' },
+          h('b', { style: 'font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--acc)' }, 'Structured EOT'),
+          h('span', { class: 'lk-note' }, 'Ground ' + E.ground.length + ' · Figure ' + E.figure.length + ' · Pattern ', h('span', { style: 'color:#ff6b6b' }, E.pattern.disagrees + ' disagree'), ' · ', h('span', { style: 'color:#3fb950' }, E.pattern.agrees + ' agree'), ' · ', E.pattern.alone + ' unmatched')),
+        eotGraph(E),
+        h('details', {}, h('summary', { class: 'lk-note', style: 'cursor:pointer' }, 'The record: ground, figure, pattern'),
+          h('pre', { style: 'margin:6px 0 0;white-space:pre-wrap;font:11.5px/1.5 var(--mono);color:var(--ink2,#c9c9d2)' },
+            'GROUND\n' + E.ground.map(g => '  ' + g.name + (g.type ? '  [' + g.type + ']' : '') + '  @' + g.s + '–' + g.e).join('\n') +
+            '\n\nFIGURE\n' + (E.figure.map(f => '  ' + f.cell + '\n    ' + f.end1 + ' —' + f.label + '→ ' + (f.end2 || '∅') + '  (' + f.polarity + ')' + (f.kind === 'relation' ? '' : '  @' + f.s + '–' + f.e)).join('\n') || '  (none read)') +
+            '\n\nPATTERN\n' + (E.figure.filter(f => f.kind !== 'relation').map(f => '  ' + f.end1 + ' · ' + f.label + ': ' + f.verdict + (f.others.length ? ' — ' + f.others.map(o => o.title.slice(0, 24) + ' says ' + o.raw).join('; ') : '')).join('\n') || '  (nothing to hold against)')))); })(),
+    props.length ? null : h('div', { class: 'lk-note' }, 'No figure or office in this statement could be tied to a being, so there is nothing here to hold against other sources.'),
+    props.map(p => h('div', { class: 'lk-card', style: 'border-left:3px solid ' + COL[p.verdict] },
+      h('div', { style: 'display:flex;gap:8px;align-items:baseline;flex-wrap:wrap;justify-content:space-between' },
+        h('b', { style: 'font:600 13px var(--sans)' }, sentenceOf(p)),
+        h('span', { style: 'font:600 11px var(--mono);color:' + COL[p.verdict] }, WORD[p.verdict])),
+      p.others.length ? p.others.slice(0, 6).map(x => h('div', { class: 'lk-pass', style: '--lk-c:' + (hues.get(x.doc) || 'var(--acc)') },
+        h('small', {}, clip(x.title, 36) + ' · ' + (x.agrees ? 'same' : 'says')), h('b', { style: x.agrees ? '' : 'color:var(--bad)' }, x.raw),
+        h('button', { class: 'lk-btn', style: 'margin-left:8px;padding:1px 8px;font-size:12px', onclick: () => open(x.doc, x.st.s) }, 'Open'))) : h('div', { class: 'lk-note' }, 'No other source states this.'))));
 }
 
 // ── the Reader's link gutter ────────────────────────────────────────────────────────────────────────────────────

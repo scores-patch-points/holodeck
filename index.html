@@ -3551,7 +3551,7 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
 function digammaH(x) { let r = 0; while (x < 6) { r -= 1 / x; x += 1; } const f = 1 / (x * x); return r + Math.log(x) - 0.5 / x - f * (1 / 12 - f * (1 / 120 - f * (1 / 252 - f * (1 / 240 - f / 132)))); }
 const klAdmitH = (bv, B) => Math.max(0, Math.log(B) - Math.log(bv) + digammaH(bv + 1) - digammaH(B + 1));
 const holoTokens = t => [...new Set((clean(t).toLowerCase().replace(/[\u2019']/g, '').match(/[a-z][a-z-]{2,}/g) || []).filter(w => !STOP.has(w) && !/^-|-$/.test(w)))];
-const VIEW_LABEL = { inbox: 'Inbox', overview: 'Evidence overview', summary: 'Sources', search: 'Search', names: 'Names', types: 'Types', figures: 'Figures', statements: 'Statements', connections: 'Connections', framing: 'Framing', views: 'Views', patterns: 'Patterns', surprise: 'Surprise', reader: 'Sources', profile: 'Names', draft: 'Draft', records: 'Records', ingest: 'Add & publish', lanes: 'Lanes', margin: 'Margin', seam: 'Seam', orbit: 'Orbit', fields: 'Fields', review: 'Review' };
+const VIEW_LABEL = { inbox: 'Inbox', overview: 'Evidence overview', summary: 'Sources', search: 'Search', names: 'Names', types: 'Types', figures: 'Figures', statements: 'Statements', connections: 'Connections', framing: 'Framing', views: 'Views', patterns: 'Patterns', surprise: 'Surprise', reader: 'Sources', profile: 'Names', draft: 'Draft', records: 'Records', ingest: 'Add & publish', lanes: 'Lanes', margin: 'Margin', seam: 'Seam', disagreements: 'Disagreements', orbit: 'Orbit', fields: 'Fields', review: 'Review' };
 const SU_CURSORS = [
   { id: 'loo', label: 'Everything else', desc: 'Each statement against normal text plus everything the other sources in this view say, regardless of date: what this source says that nothing else in view, and nothing normal, prepares you for.' },
   { id: 'pub', label: 'When published', desc: 'Sources in the order they were published: what a reader following the story would have learned, and when.' },
@@ -4969,6 +4969,36 @@ function figureRelation(win, at, pos = (typeof hdPos === 'function' ? hdPos : nu
   return cand[0] ? cand[0].w : '';
 }
 
+// The holograph's reading of a statement's figures, for the Seam: each figure keyed by what it measures and of whom
+// (holoKit.figsOf), so two sources are compared by meaning and not by the unit word beside the number. Lazy: the kit
+// is only built when a link surface asks.
+const MEASURE_CANON = { saved: 'saved', rescued: 'saved', survived: 'saved', lost: 'lost', drowned: 'lost', perished: 'lost', sacrificed: 'lost', aboard: 'aboard', 'on board': 'aboard' };
+const QUALIFY = {
+  ton: [[/\bdisplace(?:d|ment)?\b|\bloaded\b/i, 'displacement'], [/\bgross\b|\bregister|\bmeasured\b|\btonnage\b/i, 'registered tonnage']],
+  passenger: [[/\bcapacity\b|\baccommodat|\bcapable of carrying\b|\bdesigned to carry\b|\bcould carry\b/i, 'capacity']],
+  person: [[/\bcapacity\b|\baccommodat|\bcapable of carrying\b|\bdesigned to carry\b/i, 'capacity']],
+};
+function attachKeyedFigs(A) {
+  if (A && !A.rolesOf && typeof window !== 'undefined' && window.__hdRoles) A.rolesOf = st => window.__hdRoles.rolesOf(st);
+  // The statement's structured EOT: EOGfpClaim@1 triples (end1 —label→ end2, with the cell, grain and polarity the
+  // reading gave them), read by the language's own front leg. Read on demand for the statement a reader opens.
+  if (A && !A.eotOf && HD_ROLE) { let front = null;
+    A.eotOf = st => { try { if (!front) front = HD_ROLE.relationExtractorsFor({ language: 'eng', roleConfig: HD_ROLE.roleConfig, posPrior: { forms: HD_POS, language: 'en', lexicon: HD_ROLE.lexicon }, classifyWord: HD_ROLE.classifyWord, dominantClass: HD_ROLE.dominantClass });
+      return front.extractRelations(st.text, {}) || []; } catch (e) { return []; } }; }
+  if (A && !A.keyedFigs) { let K = null;
+    A.keyedFigs = st => { if (!K) K = holoKit(A, { cur: 'pub', srcShort: () => '' });
+      // Two words that name one measure ("saved"/"rescued") are one measure: the relation is read to its canonical
+      // form before the key is made, so the same thing said two ways is held together and two different things
+      // (saved, lost) never are. A figure with no earned being stays unkeyed: it is never compared.
+      return K.infoOf(st).fs.map(f => { const m = MEASURE_CANON[String(f.rel || f.label || '').toLowerCase().replace(/\s+altogether$/, '')];
+        if (m && f.anchor) return { ...f, measure: m, key: 'count|' + m + '|' + f.anchor };
+        // The same unit can state different quantities: a tonnage is registered, or a displacement, or a loaded weight;
+        // a count of passengers is a capacity or who was aboard. The statement says which; two figures compare only
+        // within one. (Closed prior of qualifier words, read from the statement itself, never from a neighbour.)
+        const q = f.key && QUALIFY[f.u] && QUALIFY[f.u].find(([re]) => re.test(st.text));
+        return q ? { ...f, measure: q[1], key: f.u + '|' + q[1] + '|' + f.anchor } : f; }); }; }
+  return A;
+}
 function holoTopics(A) {
   const none = { groups: [], entities: [], strayN: A.docs.length, basis: 'holograph' };
   if (!A || A.docs.length < 2) return none;
@@ -6361,7 +6391,7 @@ class Component extends DCLogic {
       pair: S.lkPair || null, seamMode: S.lkSeamMode || 'seam', centre: S.lkCentre || null, level: S.lkLevel || 'roots', reviewTab: S.lkReviewTab || 'all',
       off: S.offDocs || {}, onSources: off => this.setState({ offDocs: off }),
       draft: (() => { try { return localStorage.getItem(dkey) || ''; } catch (e) { return ''; } })(),
-      onGrain: g => this.setLinkPref('grain', g), onFilter: f => this.setLinkPref('filter', f), onPair: p => this.setState({ lkPair: p }), onSeamMode: m => this.setState({ lkSeamMode: m }),
+      onGrain: g => this.setLinkPref('grain', g), onFilter: f => this.setLinkPref('filter', f), onPair: p => this.setState({ lkPair: p }), onSeam: p => this.setState({ view: 'seam', lkPair: p, readDoc: null, sel: null }), onSeamMode: m => this.setState({ lkSeamMode: m }),
       onCentre: c => this.setState({ lkCentre: c }), onLevel: l => this.setState({ lkLevel: l }), onDraft: t => { try { localStorage.setItem(dkey, t); } catch (e) {} },
       onOpen: (doc, s) => this.openLinked(doc, s), write: S.view === 'review' && LM.R.canWriteLinks('Review') ? ev => this.linkDecide(ev) : null };
     if (this._lkRoot === root && this._lkMount) { this._lkMount.update(o); return; }
@@ -6570,7 +6600,7 @@ class Component extends DCLogic {
     setTimeout(() => { try { this.maybeSample(); } catch (e) {} }, 900);
     setTimeout(() => this.measureHdr(), 400);
     setTimeout(() => { try { this.akAutoLoad(); } catch (e) {} }, 2500);
-    this.applyTheme(); this.restoreReaders(); this._c = 0; import(new URL('holodeck-match.js', location.href).href).then(M => { this._mt = M; this._qc = null; this.forceUpdate(); }).catch(() => {}); import(new URL('holodeck-profile.js', location.href).href).then(M => { _hdProf = M; this._pbA = null; this.forceUpdate(); }).catch(() => {}); import(new URL('holodeck-lang.js', location.href).href).then(M => { _hdLang = M; this._pfLang = null; this.loadLangPriors(); this.forceUpdate(); }).catch(() => {}); import(new URL('holodeck-ambiguity.js', location.href).href).then(M => { this._ambM = M; this.forceUpdate(); }).catch(() => {}); import(new URL('holodeck-contradiction.js', location.href).href).then(M => { this._ctM = M; this.forceUpdate(); }).catch(() => {}); hdSum().then(() => this.forceUpdate()).catch(() => {}); this.loadHtml(); if (typeof location !== 'undefined' && /fx-share=/.test(location.hash)) { this.netInit(); this.setState({ view: 'draft' }); }
+    this.applyTheme(); this.restoreReaders(); this._c = 0; import(new URL('holodeck-match.js', location.href).href).then(M => { this._mt = M; this._qc = null; this.forceUpdate(); }).catch(() => {}); import(new URL('holodeck-offices.js', location.href).href).then(M => { window.__hdRoles = M; this._lkBase = null; this._lkSet = null; this.forceUpdate(); }).catch(() => {}); import(new URL('holodeck-disagreements.js', location.href).href).then(M => { this._dgM = M; this.forceUpdate(); }).catch(() => {}); import(new URL('holodeck-profile.js', location.href).href).then(M => { _hdProf = M; this._pbA = null; this.forceUpdate(); }).catch(() => {}); import(new URL('holodeck-lang.js', location.href).href).then(M => { _hdLang = M; this._pfLang = null; this.loadLangPriors(); this.forceUpdate(); }).catch(() => {}); import(new URL('holodeck-ambiguity.js', location.href).href).then(M => { this._ambM = M; this.forceUpdate(); }).catch(() => {}); import(new URL('holodeck-contradiction.js', location.href).href).then(M => { this._ctM = M; this.forceUpdate(); }).catch(() => {}); hdSum().then(() => this.forceUpdate()).catch(() => {}); this.loadHtml(); if (typeof location !== 'undefined' && /fx-share=/.test(location.hash)) { this.netInit(); this.setState({ view: 'draft' }); }
     this._onRz = () => { this.measureHdr(); const stk = window.innerWidth <= 720; if ((window.innerWidth < SIDE_PANEL_MIN_VW) !== this._narrow || stk !== this._stk) { this._stk = stk; this.forceUpdate(); } }; window.addEventListener('resize', this._onRz);
 
     this._onFocusKey = e => { if (e.key === 'Escape' && this.state.akFocus) this.setState({ akFocus: false }); }; window.addEventListener('keydown', this._onFocusKey);
@@ -10859,7 +10889,7 @@ class Component extends DCLogic {
       : view === 'overview' ? { eyebrow: 'Situated reading', title: 'Evidence and negative spaces', sub: 'Compose a view, reopen its ground, and pursue what remains unknown.', color: 'var(--acc)' }
       : view === 'records' ? { eyebrow: 'Assertions', title: 'The workspace as tables', sub: 'Every source, statement, name, figure and date, linked back to where it came from.', color: 'var(--acc)' }
       : view === 'ask' ? { eyebrow: 'Ask the Fold', title: 'Ask the sources', sub: 'Answered by a small model running in this tab, from material found by the question\'s own words. Afterwards every sentence is checked: a numbered address where it matches something in the sources, a dotted line where it is the model\'s own, a wavy line where a figure or name is not in the material.', color: 'var(--acc)' }
-      : ['lanes', 'margin', 'seam', 'orbit', 'fields', 'review'].includes(view) ? { eyebrow: 'Links', title: VIEW_LABEL[view], sub: 'Sources read together by relation, not by type.', color: 'var(--acc)' }
+      : ['lanes', 'margin', 'seam', 'disagreements', 'orbit', 'fields', 'review'].includes(view) ? { eyebrow: 'Links', title: VIEW_LABEL[view], sub: 'Sources read together by relation, not by type.', color: 'var(--acc)' }
       : view === 'draft' ? { eyebrow: 'Draft', title: 'Claims and the excerpts behind them', sub: 'Private to this browser — pinned passages keep their source.', color: 'var(--acc)' }
       : c ? { eyebrow: c.row + (this.props.showTerrainNames ? ' · ' + c.terrain : ''), title: c.label, sub: c.question, color: c.color }
       : { eyebrow: 'Sources', title: this.corpusName(), sub: plural(docsIn.length, 'document') + ' · ' + plural(F.length, 'statement') + ' · ' + plural(D.nameList.length, 'name') + ' · ' + plural(figCount, 'figure') + '.' + (A.docs.length && !docsIn.length ? ' ' + plural(A.docs.length, 'link') + ' saved; none could be read yet.' : ''), color: 'var(--acc)' };
@@ -11071,13 +11101,13 @@ class Component extends DCLogic {
       hasBrowseYears: yearCounts.size > 1, browseYears,
     };
     const V = {}; ['overview', 'draft', 'inbox', 'summary', 'search', 'surprise', 'names', 'types', 'figures', 'statements', 'connections', 'framing', 'views', 'patterns', 'reader', 'profile', 'ingest', 'reading'].forEach(k => { V[k] = !isEmpty && view === k; });
-    V.linkSurface = !isEmpty && ['lanes', 'margin', 'seam', 'orbit', 'fields', 'review'].includes(view);
+    V.linkSurface = !isEmpty && ['lanes', 'margin', 'seam', 'disagreements', 'orbit', 'fields', 'review'].includes(view);
 
     const SU = isEmpty ? null : this.surprise(A); const Fid = new Set(F.map(st => st.id));
     const suF = SU ? SU.list.filter(x => Fid.has(x.st.id)) : [];
     const juncMode = S.suMode !== 'belief'; const JN = isEmpty ? [] : this.junctions(A, Fid);
     const gHi = on => ({ bg: on ? 'var(--sel)' : 'transparent', bd: on ? 'var(--acc2)' : 'transparent', weight: on ? 600 : 500 });
-    const NAVG = [['', [['summary', 'Sources'], ['draft', 'Draft']]], ['Read closely', [['names', 'Names'], ['fixnames', 'Fix names'], ['records', 'Assertions']]], ['Explore', [['connections', 'Connections'], ['overview', 'Evidence overview']]], ['Manage', [['ingest', 'Add & publish'], ['hero:workspaces', 'Workspaces & people']]], ['Links', [['lanes', 'Lanes'], ['margin', 'Margin'], ['seam', 'Seam'], ['orbit', 'Orbit'], ['fields', 'Fields'], ['review', 'Review']]]];
+    const NAVG = [['', [['summary', 'Sources'], ['draft', 'Draft']]], ['Read closely', [['names', 'Names'], ['fixnames', 'Fix names'], ['records', 'Assertions']]], ['Explore', [['connections', 'Connections'], ['overview', 'Evidence overview']]], ['Manage', [['ingest', 'Add & publish'], ['hero:workspaces', 'Workspaces & people']]], ['Links', [['lanes', 'Lanes'], ['margin', 'Margin'], ['seam', 'Seam'], ['disagreements', 'Disagreements'], ['orbit', 'Orbit'], ['fields', 'Fields'], ['review', 'Review']]]];
     // extra screens from screens.json (see componentDidMount): beside Sources and Draft at the top of the
     // sidebar, where they are seen, not inside the collapsed "Explore & manage" group
     const SCREENS = this._screens || [];

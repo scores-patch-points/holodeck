@@ -430,3 +430,23 @@ test('definitions: a lone generic word in a definition is not an example', () =>
   const W = world([D, S, ...filler()]);
   assert.equal(R.definedLinks(W, R.buildIndex(W)).length, 0);
 });
+
+// Identity before value: a split is a contradiction only when both figures are keyed to the same measure and being.
+test('keyed figures: same measure and being, two values → differs; unkeyed or other-being figures are not compared', () => {
+  const a = mkDoc('a', 'Report', ['The ship registered 46,328 tons in her certificate of survey.']);
+  const b = mkDoc('b', 'Summary', ['She measured 45,328 tons by the same survey, the largest afloat.']);
+  const c = mkDoc('c', 'Other ship', ['The earlier vessel cost $900,000 to complete in her yard at last.']);
+  const d = mkDoc('d', 'Titanic cost', ['The leviathan was completed in February at a cost of $10,000,000 in the yard.']);
+  const W = world([a, b, c, d]);
+  const key = { a: ['n', 'tons', 'Titanic', 46328], b: ['n', 'tons', 'Titanic', 45328] };
+  W.keyedFigs = st => { const k = key[st.doc]; if (k) { const raw = k[3].toLocaleString('en-US') + ' tons'; const s = st.text.indexOf(raw); return [{ key: 'ton|tons|' + k[2], measure: 'tons', anchor: k[2], v: k[3], raw, s, e: s + raw.length }]; }
+    return [{ key: null, measure: 'cost', anchor: '', v: st.doc === 'c' ? 900000 : 10000000, raw: '$x', s: 0, e: 2 }]; };
+  const ix = R.buildIndex(W);
+  assert.equal(ix.keyed, true);
+  const v = R.verdictOf(ix, 'a:0', 'b:0');
+  assert.equal(v.verdict, 'differs');
+  assert.equal(v.via[0].anchor, 'Titanic');
+  assert.notEqual(R.verdictOf(ix, 'c:0', 'd:0').verdict, 'differs');
+  const S = R.seamOf(W, 'a', 'b', ix);
+  assert.equal(S.counts.differs, 1);
+});
