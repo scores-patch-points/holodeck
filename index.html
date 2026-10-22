@@ -5199,6 +5199,8 @@ const CLOCK_L = { happened: 'Happened', published: 'Published', captured: 'Captu
 const monthsBack = (k, n) => { let y = +k.slice(0, 4), m = +k.slice(5, 7) - n; while (m < 1) { m += 12; y--; } return y + '-' + String(m).padStart(2, '0'); };
 const periodLabel = k => /^\d{4}-\d{2}$/.test(k) ? MON_N[+k.slice(5)] + ' ' + k.slice(0, 4) : k;
 const FRAG = st => { const t = clean(st.text); return /^[a-z(,;–—-]/.test(t) || /\b(the|of|to|with|and|or|a|an|for|in|on|by|that|from|at)$/i.test(t) || (!/[.!?”"')]$/.test(t) && t.split(/\s+/).length < 8); };
+// every piece of "where we are" that lives in the address: w workspace, p page, s search text, sel selection, f/fw filters, tab/layout/sort/dq/folder on Sources, pair for the Seam
+const HD_URL_KEYS = ['w', 'p', 's', 'sel', 'f', 'fw', 'tab', 'layout', 'sort', 'dq', 'folder', 'pair'];
 const hdTxPref = (k, v) => { try { if (v === undefined) return localStorage.getItem('hd:tx-' + k); localStorage.setItem('hd:tx-' + k, v); } catch (e) {} return null; };
 const plural = (n, a, b) => n + ' ' + (n === 1 ? a : (b || a + 's'));
 const CITE_RE = /\[(?:\d+|[a-z]|[ivx]+|citation needed|note \d+|nb \d+|update)\]/gi;
@@ -6593,7 +6595,7 @@ class Component extends DCLogic {
     // an address that names a source (?doc=) can only open once the source is loaded — the demo sample installs
     // and stored sources hydrate from IndexedDB a moment after mount, so the wanted address is captured here and
     // reopened in componentDidUpdate as the sources land.
-    try { const q0 = new URL(location.href).searchParams; this._wantDoc = q0.get('doc'); this._wantView = q0.get('view'); this._wantLevel = q0.get('level'); this._wantLayout = q0.get('layout'); } catch (e) {}
+    try { const q0 = new URL(location.href).searchParams; this._wantDoc = q0.get('doc'); this._wantView = q0.get('view'); this._wantLevel = q0.get('level'); this._wantLayout = q0.get('layout'); this._wantSel = q0.get('sel'); const W = {}; for (const k of HD_URL_KEYS) { const v = q0.get(k); if (v != null && v !== '') W[k] = v; } this._urlWant = Object.keys(W).length ? W : null; } catch (e) {}
     setTimeout(() => { this.openFromUrl(); this._urlReady = true; this.urlSync(); }, 0);
     this.installColDrag();
     // optional extra screens: a deployment lists whole pages in screens.json and they join the sidebar; absent or
@@ -6661,7 +6663,7 @@ class Component extends DCLogic {
     window.addEventListener('resize', go);
     window.addEventListener('scroll', go, { passive: true });
   }
-  componentDidUpdate() { try { this.urlSync(); } catch (e) {} if (this._wantDoc) { try { this.openFromUrl(); } catch (e) {} } try { this.paintExtracted(); } catch (e) {} try { const c = this.corpusId(); if (c !== this._wsSeen) { this._wsSeen = c; touchWs(c); } } catch (e) {} this.installFill(); this.fitFill(); this.syncOverview(); this.syncInbox(); this.syncLinks(); this.ensureLinks(); this.applyTheme(); this.measureHdr(); try { const ff = document.getElementById('fold-folder-input'); if (ff && !ff.multiple) { ff.webkitdirectory = true; ff.setAttribute('webkitdirectory', ''); ff.multiple = true; ff.setAttribute('multiple', ''); } } catch (e) {} if (this._prevCorpus !== this.state.corpus || this._prevAdded !== this.state.added) { this._prevCorpus = this.state.corpus; this._prevAdded = this.state.added; this.loadHtml(); /* the ask model preload (this.akAutoLoad()) is off with the Ask door — restore both together */ } const rd0 = this.state.readDoc && this.analysis().docById[this.state.readDoc]; if (rd0 && rd0.media && rd0.media.kind === 'local') { this.ensureMediaUrl(rd0);
+  componentDidUpdate() { try { this.urlSync(); } catch (e) {} if (this._wantDoc) { try { this.openFromUrl(); } catch (e) {} } if (this._urlWant) { try { this.applyUrlState(); } catch (e) { this._urlWant = null; } } try { this.paintExtracted(); } catch (e) {} try { const c = this.corpusId(); if (c !== this._wsSeen) { this._wsSeen = c; touchWs(c); } } catch (e) {} this.installFill(); this.fitFill(); this.syncOverview(); this.syncInbox(); this.syncLinks(); this.ensureLinks(); this.applyTheme(); this.measureHdr(); try { const ff = document.getElementById('fold-folder-input'); if (ff && !ff.multiple) { ff.webkitdirectory = true; ff.setAttribute('webkitdirectory', ''); ff.multiple = true; ff.setAttribute('multiple', ''); } } catch (e) {} if (this._prevCorpus !== this.state.corpus || this._prevAdded !== this.state.added) { this._prevCorpus = this.state.corpus; this._prevAdded = this.state.added; this.loadHtml(); /* the ask model preload (this.akAutoLoad()) is off with the Ask door — restore both together */ } const rd0 = this.state.readDoc && this.analysis().docById[this.state.readDoc]; if (rd0 && rd0.media && rd0.media.kind === 'local') { this.ensureMediaUrl(rd0);
       // A recording opened but never classified gets its sound map on first sight (an
       // older stored recording, or one added before the classifier existed); the work
       // is the same in-browser rung, guarded so it happens once until it lands.
@@ -12141,6 +12143,48 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
   //   ?doc=<contract id>&view=original|map|extracted[&level=0..100]    the reader, its tab, and the Extracted fold level
   //   ?layout=table                                                    the sources table (grid is the default)
   // A URL opens straight to that contract and view; the bar follows the page with replaceState, so Back keeps its own meaning.
+  // The address mirrors the state that says where we are, so a refresh, a shared link and the Back button's neighbour tab all
+  // land on the same page. Only what differs from the default is written.
+  urlModel() {
+    const S = this.state, cid = this.corpusId(), reader = S.view === 'reader' && S.readDoc;
+    const json = o => { const e = {}; for (const k in (o || {})) { const v = o[k]; if (v != null && v !== '' && !(Array.isArray(v) && !v.length)) e[k] = v; } const t = JSON.stringify(e); return t === '{}' || t.length > 1800 ? null : t; };
+    const sel = S.sel && S.sel.type === 'name' ? 'name:' + S.sel.id : S.sel && S.sel.type === 'statement' ? 'st:' + S.sel.id : null;
+    const svMode = S.svMode && S.svMode !== 'list' && S.svMode !== 'cards' ? S.svMode : null;
+    return { w: cid !== 'custom' && cid !== 'metro-vm' ? cid : null,
+      p: !reader && S.view && S.view !== 'summary' && S.view !== 'reader' ? S.view : null,
+      s: S.q && S.q.trim() ? S.q.trim() : null, sel, f: json(S.f), fw: json(S.fw),
+      tab: !reader && S.svTab && S.svTab !== '__all' ? S.svTab : null, layout: !reader && svMode && svMode !== 'grid' ? svMode : null,
+      sort: S.dvSort && S.dvSort !== 'added' ? S.dvSort : null, dq: S.dvQ && S.dvQ.trim() ? S.dvQ.trim() : null, folder: S.folder || null,
+      pair: S.view === 'seam' && Array.isArray(S.lkPair) && S.lkPair.length === 2 ? S.lkPair.join(',') : null };
+  }
+  // Put the state the address names back. The workspace comes first (its sources may still be hydrating, so this is
+  // retried from componentDidUpdate); then everything else is applied in one go. A source named in ?doc= wins the page.
+  applyUrlState() {
+    const W = this._urlWant; if (!W) return true;
+    if (W.w && W.w !== this.corpusId()) {
+      const known = SAMPLES[W.w] || Object.prototype.hasOwnProperty.call(this.state.added || {}, W.w);
+      if (known) { this.setState({ corpus: W.w, view: 'summary', sel: null, f: {}, readDoc: null, folder: null }); return false; }
+      if ((W._n = (W._n || 0) + 1) > 80) { this._urlWant = null; return true; }
+      return false;
+    }
+    if (this._wantDoc) return false;                       // the source opens first, then the rest
+    const st = {}; const parse = v => { try { const o = JSON.parse(v); return o && typeof o === 'object' ? o : null; } catch (e) { return null; } };
+    if (W.p) st.view = W.p;
+    if (W.s != null) st.q = W.s;
+    if (W.f) { const o = parse(W.f); if (o) st.f = o; }
+    if (W.fw) { const o = parse(W.fw); if (o) st.fw = o; }
+    if (W.tab) st.svTab = W.tab;
+    if (W.layout) st.svMode = W.layout;
+    if (W.dq) st.dvQ = W.dq;
+    if (W.folder) st.folder = W.folder;
+    if (W.pair) st.lkPair = W.pair.split(',').slice(0, 2);
+    if (W.sort) { const v = W.sort, asc = /:asc$/.test(v) || v === 'dateAsc', base = v.replace(/:asc$/, '').replace(/^dateAsc$/, 'date'); st.dvSort = v; if (v !== 'added') { st.svSort = base; st.svDir = asc ? 1 : -1; } }
+    if (W.sel) {
+      if (/^name:/.test(W.sel)) st.sel = { type: 'name', id: W.sel.slice(5) };
+      else if (/^st:/.test(W.sel)) { const A = this.analysis(); const id = W.sel.slice(3); if (A && A.byId && A.byId[id]) st.sel = { type: 'statement', id }; else if ((W._m = (W._m || 0) + 1) < 40) return false; }
+    }
+    this._urlWant = null; this.setState(st); return true;
+  }
   urlSync() {
     if (!this._urlReady) return;
     try {
@@ -12148,9 +12192,10 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
       const VM = { original: 'original', map: 'map', restated: 'extracted', reading: 'reading', figures: 'figures', summary: 'summary', plain: 'plain' };
       const want = { doc: reader ? S.readDoc : this._wantDoc ? undefined : null, view: reader ? (VM[S.readMode] || 'original') : this._wantDoc ? undefined : null,
         level: reader && S.readMode === 'restated' && this._foldP != null && Math.round(this._foldP) !== 100 ? String(Math.round(this._foldP)) : null,
-        layout: !reader && S.svMode === 'table' ? 'table' : null,
+        ...this.urlModel(),
         // undefined = leave it alone: until the VM workspace is up, ?ws= / ?dept= / ?q= are not ours to strip
         ws: !this._vm ? undefined : this.corpusId() === 'metro-vm' ? 'metro' : null, dept: !this._vm ? undefined : this.corpusId() === 'metro-vm' && this._vm.dept ? this._vm.dept : null, q: !this._vm ? undefined : this.corpusId() === 'metro-vm' && this._vm.q ? this._vm.q : null };
+      if (this._urlWant) for (const k of HD_URL_KEYS) want[k] = undefined;   // not applied yet: not ours to strip
       let changed = false;
       for (const [k, v] of Object.entries(want)) { const cur = q.get(k); if (v === undefined) continue;
         if (v == null) { if (cur != null) { q.delete(k); changed = true; } } else if (cur !== v) { q.set(k, v); changed = true; } }
@@ -12167,7 +12212,8 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
       const A = this.analysis(); if (!A || !A.docById || !A.docById[id]) return false;
       const MV = { original: 'original', map: 'map', extracted: 'restated', reading: 'reading', figures: 'figures', summary: 'summary', plain: 'plain' };
       const lv = this._wantLevel; if (lv != null && lv !== '' && isFinite(+lv)) this._foldP = Math.max(0, Math.min(100, +lv));
-      this.read(id);
+      const sid = /^st:/.test(this._wantSel || '') ? this._wantSel.slice(3) : undefined; this._wantSel = null;
+      this.readNow(id, sid && A.byId && A.byId[sid] ? sid : undefined);   // straight in: a restore at load needs no 'opening' animation frame
       const m = MV[this._wantView]; if (m) this.setState({ readMode: m });
       this._wantDoc = null; this._wantView = null; this._wantLevel = null;
       return true;
