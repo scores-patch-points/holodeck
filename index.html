@@ -86,6 +86,43 @@ button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visi
 .hd-crumbline button:hover{text-decoration:underline}
 .hd-crumb-here{color:var(--ink2);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
 .hd-crumb-sep{color:var(--dim)}
+/* the rail (handoff): one picker, Sources/Draft, Topics, Explore, a footer. Items are plain buttons; the current page is aria-current. */
+.hd-item{display:flex;justify-content:space-between;align-items:center;gap:8px;width:100%;box-sizing:border-box;background:none;border:1px solid transparent;border-radius:9px;padding:7px 12px;font:500 14px var(--sans);color:var(--ink);text-align:left;cursor:pointer}
+.hd-item:hover{background:var(--s2)}
+.hd-item[aria-current=page]{background:var(--sel);border-color:var(--acc2)}
+.hd-item.row{border-radius:7px;padding:6px 8px;font-weight:400;font-size:13.5px}
+.hd-item.row[aria-current=page]{border-color:transparent}
+.hd-item>span:first-child{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hd-n{flex:none;font:400 12px var(--mono);color:var(--mut)}
+.hd-tag{flex:none;font:700 10px var(--mono);letter-spacing:.08em;text-transform:uppercase}
+.hd-label{display:flex;justify-content:space-between;align-items:baseline;padding:0 2px;font:700 11px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--acc)}
+.hd-label .hd-n{letter-spacing:0;font-weight:400}
+.hd-rsec{display:flex;flex-direction:column;gap:6px;padding-top:12px;border-top:1px solid var(--line)}
+.hd-more{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:2px 8px;font:400 13px var(--sans);color:var(--mut)}
+.hd-more button{all:unset;cursor:pointer;color:var(--acc);font:500 13px var(--sans)}
+.hd-more button:hover{text-decoration:underline}
+.hd-rail input.hd-filter{border:1px solid var(--line2);border-radius:8px;padding:7px 10px;font:400 14px var(--sans);color:var(--ink);background:var(--s1);outline:none;width:100%;box-sizing:border-box}
+.hd-rail input.hd-filter:focus{border-color:var(--acc)}
+.hd-item:focus-visible,.hd-rail input.hd-filter:focus-visible,.hd-footbtn:focus-visible,.hd-crumb-back:focus-visible,.hd-more button:focus-visible{outline:2px solid var(--acc);outline-offset:1px}
+.hd-crumbline .hd-crumb-back{flex:none;display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;margin-right:2px;border:1px solid var(--line2);border-radius:6px;color:var(--ink2);font:500 15px/1 var(--sans)}
+.hd-crumbline .hd-crumb-back:hover{border-color:var(--acc);text-decoration:none}
+.hd-crumbline .hd-crumb-back[disabled]{opacity:.35;cursor:default}
+.hd-railfoot{margin-top:auto;position:relative;border-top:1px solid var(--line);padding:10px 2px 0;display:flex;justify-content:space-between;align-items:center;gap:8px;font:400 13px var(--sans);color:var(--mut)}
+.hd-footbtn{all:unset;cursor:pointer;font:500 13px var(--sans);color:var(--ink2);padding:2px 4px;border-radius:5px}
+.hd-footbtn:hover{color:var(--ink);background:var(--s2)}
+.hd-tools{position:absolute;left:0;right:0;bottom:calc(100% + 6px);z-index:41;background:var(--s1);border:1px solid var(--line2);border-radius:10px;padding:6px;box-shadow:0 12px 32px rgba(0,0,0,.35);display:flex;flex-direction:column;gap:1px;max-height:70vh;overflow:auto}
+.hd-tools .hd-label{padding:8px 8px 3px}
+.hd-shell:not(.rail-closed) .hd-railcollapse{display:none}
+/* tighter vertical rhythm so the whole rail fits 720px of height without scrolling */
+.hd-rail>nav{gap:10px!important}
+.hd-rail .hd-rsec{gap:4px;padding-top:9px}
+.hd-rail .hd-item{padding-top:6px;padding-bottom:6px}
+.hd-rail .hd-item.row{padding-top:4px;padding-bottom:4px}
+.hd-rail .hd-primary{padding-top:2px!important}
+.hd-rail .hd-navbar{padding:6px 2px 0;border-top:0}
+.hd-rail .hd-workspace{padding-top:4px!important}
+.hd-rail input.hd-filter{padding-top:6px;padding-bottom:6px}
+@media(max-width:720px){.hd-rail .hd-railfoot{display:none!important}.hd-rail.menu-open .hd-railfoot{display:flex!important;order:5}}
 .hd-drive-bar{display:flex;flex-direction:column;gap:12px}
 .hd-drive-top{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .hd-drive-crumb{display:flex;align-items:center;gap:6px;font:500 20px var(--sans);color:var(--ink);min-width:0}
@@ -231,22 +268,16 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
     </div>
     <sc-if value="{{ railOpen }}" hint-placeholder-val="{{ true }}">
     <div class="hd-navbar">
-      <div class="hd-navrow">
-        <button onClick="{{ navCtl.onBack }}" disabled="{{ navCtl.backDisabled }}" title="{{ navCtl.backTitle }}" aria-label="{{ navCtl.backTitle }}">← <span>{{ navCtl.backLabel }}</span></button>
-        <button class="hd-navhome {{ navCtl.homeCls }}" onClick="{{ navCtl.onHome }}" title="All sources" aria-current="{{ navCtl.homeAria }}" style="flex:0 1 auto">▤ Sources</button>
-      </div>
-      <sc-if value="{{ navCtl.hasLoc }}" hint-placeholder-val="{{ false }}">
       <div class="hd-crumbline" title="{{ navCtl.locTitle }}">
+        <button class="hd-crumb-back" onClick="{{ navCtl.onBack }}" disabled="{{ navCtl.backDisabled }}" title="{{ navCtl.backTitle }}" aria-label="{{ navCtl.backTitle }}">‹</button>
         <sc-for list="{{ navCtl.loc }}" as="p" hint-placeholder-count="3">
           <sc-if value="{{ p.on }}" hint-placeholder-val="{{ false }}"><button onClick="{{ p.onClick }}" title="{{ p.label }}">{{ p.label }}</button></sc-if>
-          <sc-if value="{{ p.here }}" hint-placeholder-val="{{ true }}"><span class="hd-crumb-here">{{ p.label }}</span></sc-if>
+          <sc-if value="{{ p.here }}" hint-placeholder-val="{{ true }}"><span class="hd-crumb-here" aria-current="page">{{ p.label }}</span></sc-if>
           <sc-if value="{{ p.sep }}" hint-placeholder-val="{{ true }}"><span class="hd-crumb-sep">›</span></sc-if>
         </sc-for>
       </div>
-      </sc-if>
     </div>
     <div class="hd-workspace" style="display:flex;flex-direction:column;gap:6px;padding:8px 2px 2px;border-top:1px solid var(--line)">
-      <span style="font:600 12px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--acc);padding:0 10px">Workspace</span>
       <sc-if value="{{ wsRenaming }}" hint-placeholder-val="{{ false }}">
         <div style="display:flex;gap:4px;align-items:center">
           <input value="{{ wsNameDraft }}" onChange="{{ onWsNameDraft }}" onKeyDown="{{ onWsRenameKey }}" aria-label="Name for this workspace" autofocus="{{ true }}" style="flex:1;min-width:0;background:var(--s2);border:1px solid var(--acc2);border-radius:8px;color:var(--ink);font:500 14px var(--sans);padding:6px 9px;outline:none">
@@ -288,159 +319,89 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
       <button class="hd-railadd" onClick="{{ openAdd }}" title="Add a source: a file, a folder, a link or pasted text" style="width:100%;box-sizing:border-box;background:var(--acc2);border:0;color:#fff;border-radius:8px;padding:6px 10px;cursor:pointer;font:600 14px var(--sans)" style-hover="background:var(--acc3)">Add source</button>
       </sc-if>
     </div>
-    <nav aria-label="Workspace navigation" style="display:flex;flex-direction:column;gap:2px">
-      <div class="hd-primary" style="display:flex;flex-direction:column;gap:4px;padding:10px 0 12px">
+    <nav aria-label="Workspace navigation" style="display:flex;flex-direction:column;gap:14px">
+      <div class="hd-primary" style="display:flex;flex-direction:column;gap:2px;padding:6px 0 0">
         <sc-for list="{{ navTop }}" as="g" hint-placeholder-count="2">
-          <button onClick="{{ g.onClick }}" style="white-space:normal;text-align:left;cursor:pointer;padding:5px 12px 5px 20px;border-radius:8px;background:{{ g.bg }};border:1px solid {{ g.bd }};display:flex;justify-content:space-between;align-items:baseline;gap:10px" style-hover="background:var(--s2)">
-            <span style="font:{{ g.weight }} 14px var(--sans);color:var(--ink2)">{{ g.label }}</span>
-            <span class="hd-count" style="font:500 12px var(--mono);color:var(--mut);white-space:nowrap">{{ g.count }}</span>
-          </button>
+          <button class="hd-item" aria-current="{{ g.aria }}" onClick="{{ g.onClick }}"><span>{{ g.label }}</span><span class="hd-n hd-count">{{ g.count }}</span></button>
         </sc-for>
       </div>
-      <sc-if value="{{ hasContent }}" hint-placeholder-val="{{ false }}">
-      <details class="hd-disclosure hd-topics" open="{{ topicsOpen }}">
-      <summary>{{ topicsLabel }}</summary>
-      <div style="display:flex;flex-direction:column;gap:5px;padding:0 0 6px">
-        <div style="display:flex;gap:4px;padding:0 12px">
-          <sc-for list="{{ topicsLens }}" as="m">
-            <button onClick="{{ m.onClick }}" style="cursor:pointer;border:1px solid {{ m.bd }};background:{{ m.bg }};color:{{ m.col }};border-radius:999px;padding:1px 9px;font:600 10px/1.5 var(--mono);letter-spacing:.06em;text-transform:uppercase" style-hover="border-color:var(--acc)">{{ m.label }} <span style="color:var(--mut)">{{ m.n }}</span></button>
+      <sc-if value="{{ railTopicsShow }}" hint-placeholder-val="{{ false }}">
+      <div class="hd-rsec">
+        <div class="hd-label"><span>Topics</span><span class="hd-n">{{ topicsCountLabel }}</span></div>
+        <sc-if value="{{ topicsHasSearch }}" hint-placeholder-val="{{ false }}"><input class="hd-filter" value="{{ topicsSearchVal }}" onChange="{{ onTopicsSearch }}" placeholder="Filter topics…" aria-label="Filter topics"></sc-if>
+        <div style="display:flex;flex-direction:column;gap:1px">
+          <sc-for list="{{ topicsRail }}" as="t" hint-placeholder-count="5">
+            <button class="hd-item row" aria-current="{{ t.aria }}" onClick="{{ t.onJump }}" title="{{ t.title }}"><span>{{ t.label }}</span><span class="hd-tag" style="color:{{ t.tagCol }}">{{ t.tag }}</span></button>
           </sc-for>
         </div>
-        <sc-if value="{{ hasTopics }}" hint-placeholder-val="{{ false }}">
-          <sc-if value="{{ topicsHasTypes }}" hint-placeholder-val="{{ false }}">
-            <div style="display:flex;gap:4px;flex-wrap:wrap;padding:0 12px">
-              <sc-for list="{{ topicsTypes }}" as="ty">
-                <button onClick="{{ ty.onClick }}" title="{{ ty.title }}" style="cursor:pointer;border:1px solid {{ ty.bd }};background:{{ ty.bg }};color:{{ ty.col }};border-radius:999px;padding:2px 9px;font:600 10px/1.4 var(--mono);letter-spacing:.06em;text-transform:uppercase" style-hover="border-color:var(--acc)">{{ ty.label }} <span style="color:var(--mut)">{{ ty.n }}</span></button>
-              </sc-for>
-            </div>
-          </sc-if>
-          <sc-if value="{{ topicsHasSearch }}" hint-placeholder-val="{{ false }}">
-            <div style="padding:0 12px">
-              <input value="{{ topicsSearchVal }}" onChange="{{ onTopicsSearch }}" placeholder="{{ topicsSearchPh }}" style="width:100%;box-sizing:border-box;background:var(--bg);border:1px solid var(--line2);border-radius:8px;color:var(--ink);font:400 12px var(--sans);padding:5px 9px;outline:none">
-            </div>
-          </sc-if>
-          <div style="display:flex;flex-direction:column;gap:3px;padding:0 8px">
-            <sc-for list="{{ topicsList }}" as="t" hint-placeholder-count="3">
-              <button onClick="{{ t.onJump }}" title="{{ t.title }}" style="white-space:nowrap;text-align:left;cursor:pointer;padding:3px 9px;border-radius:7px;background:{{ t.bg }};border:1px solid {{ t.bd }};display:flex;align-items:baseline;gap:8px" style-hover="background:var(--s2);border-color:var(--line2)">
-                <span style="font:500 13.5px/1.4 var(--sans);color:var(--ink);min-width:0;overflow:hidden;text-overflow:ellipsis;flex:1">{{ t.label }}</span>
-                <span style="font:600 9px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:{{ t.tagCol }};white-space:nowrap">{{ t.tag }}</span>
-                <span style="font:500 10px var(--mono);color:var(--mut);white-space:nowrap">{{ t.n }}</span>
-              </button>
-            </sc-for>
-          </div>
-          <sc-if value="{{ topicsHasEmpty }}" hint-placeholder-val="{{ false }}"><span style="padding:0 12px;font:400 12px var(--sans);color:var(--mut)">{{ topicsEmptyText }}</span></sc-if>
-          <sc-if value="{{ topicsHasPager }}" hint-placeholder-val="{{ false }}">
-            <div style="display:flex;align-items:center;gap:4px;padding:0 12px 0 14px">
-              <button data-keep="1" onClick="{{ onTopicsPrev }}" style="all:unset;cursor:pointer;font:500 13px var(--sans);color:{{ topicsHasPrev ? 'var(--ink2)' : 'var(--dim)' }};padding:1px 6px" style-hover="color:var(--ink)">‹</button>
-              <span style="font:500 11px var(--mono);color:var(--mut);flex:1;text-align:center;white-space:nowrap">{{ topicsPageN }}</span>
-              <button data-keep="1" onClick="{{ onTopicsNext }}" style="all:unset;cursor:pointer;font:500 13px var(--sans);color:{{ topicsHasNext ? 'var(--ink2)' : 'var(--dim)' }};padding:1px 6px" style-hover="color:var(--ink)">›</button>
-            </div>
-          </sc-if>
-        </sc-if>
-        <sc-if value="{{ showTopicsStray }}" hint-placeholder-val="{{ false }}">
-          <button onClick="{{ onTopicsStray }}" title="Segment to the sources that belong to no topic" style="white-space:normal;text-align:left;cursor:pointer;margin:0 8px;padding:8px 11px;border-radius:10px;background:transparent;border:1px solid var(--line2);display:flex;justify-content:space-between;align-items:baseline;gap:10px" style-hover="background:var(--s2)">
-            <span style="font:500 14px var(--sans);color:var(--mut)">Not in any topic</span>
-            <span style="font:500 12px var(--mono);color:var(--mut);white-space:nowrap">{{ topicsStrayN }}</span>
-          </button>
-        </sc-if>
+        <div class="hd-more">
+          <sc-if value="{{ hasTopicsRail }}" hint-placeholder-val="{{ false }}"><button onClick="{{ onAllTopics }}">{{ allTopicsLabel }}</button></sc-if>
+          <sc-if value="{{ showTopicsStray }}" hint-placeholder-val="{{ false }}"><button onClick="{{ onTopicsStray }}" title="Show the sources that belong to no topic" style="color:var(--mut)">{{ topicsStrayLine }}</button></sc-if>
+        </div>
       </div>
-      </details>
-      <details class="hd-disclosure hd-browse" open="{{ browseOpen }}">
-        <summary>{{ browseLabel }}</summary>
-        <div style="display:flex;flex-direction:column;gap:1px;padding:0 0 4px">
-          <button onClick="{{ browseMap.onClick }}" title="{{ browseMap.title }}" style="white-space:normal;text-align:left;cursor:pointer;padding:5px 12px 5px 20px;border-radius:8px;background:{{ browseMap.bg }};border:1px solid {{ browseMap.bd }};display:flex;justify-content:space-between;align-items:baseline;gap:10px" style-hover="background:var(--s2)">
-            <span style="font:{{ browseMap.weight }} 14px var(--sans);color:var(--ink2)">{{ browseMap.label }}</span>
-            <span style="font:500 12px var(--mono);color:var(--mut);white-space:nowrap">{{ browseMap.n }}</span>
-          </button>
+      </sc-if>
+      <sc-if value="{{ hasContent }}" hint-placeholder-val="{{ false }}">
+      <div class="hd-rsec">
+        <div class="hd-label"><span>Explore</span></div>
+        <div style="display:flex;flex-direction:column;gap:1px">
+          <sc-for list="{{ navExploreFlat }}" as="g" hint-placeholder-count="5">
+            <button class="hd-item row" aria-current="{{ g.aria }}" onClick="{{ g.onClick }}" title="{{ g.title }}"><span>{{ g.label }}</span><span class="hd-n">{{ g.count }}</span></button>
+          </sc-for>
+        </div>
+      </div>
+      </sc-if>
+      <sc-if value="{{ hasBrowseExtras }}" hint-placeholder-val="{{ false }}">
+      <div class="hd-rsec">
+        <div class="hd-label"><span>Browse</span></div>
+        <div style="display:flex;flex-direction:column;gap:1px">
           <sc-for list="{{ browseMore }}" as="b" hint-placeholder-count="0">
-            <button onClick="{{ b.onClick }}" style="white-space:normal;text-align:left;cursor:pointer;padding:5px 12px 5px 20px;border-radius:8px;background:{{ b.bg }};border:1px solid {{ b.bd }};display:flex;justify-content:space-between;align-items:baseline;gap:10px" style-hover="background:var(--s2)">
-              <span style="font:{{ b.weight }} 14px var(--sans);color:var(--ink2)">{{ b.label }}</span>
-              <span style="font:500 12px var(--mono);color:var(--mut);white-space:nowrap">{{ b.n }}</span>
-            </button>
+            <button class="hd-item row" onClick="{{ b.onClick }}"><span>{{ b.label }}</span><span class="hd-n">{{ b.n }}</span></button>
           </sc-for>
           <sc-if value="{{ hasBrowseDepts }}" hint-placeholder-val="{{ false }}">
-            <span style="font:600 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--dim);padding:8px 12px 4px">Departments</span>
-            <sc-if value="{{ browseDeptSearch }}" hint-placeholder-val="{{ false }}">
-              <div style="padding:0 12px 4px"><input value="{{ browseDeptQ }}" onChange="{{ browseDeptOnQ }}" placeholder="Filter departments…" style="width:100%;box-sizing:border-box;background:var(--bg);border:1px solid var(--line2);border-radius:6px;color:var(--ink);font:400 12px var(--sans);padding:4px 8px;outline:none"></div>
-            </sc-if>
+            <span style="font:600 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--dim);padding:8px 8px 4px">Departments</span>
+            <sc-if value="{{ browseDeptSearch }}" hint-placeholder-val="{{ false }}"><div style="padding:0 0 4px"><input class="hd-filter" value="{{ browseDeptQ }}" onChange="{{ browseDeptOnQ }}" placeholder="Filter departments…" aria-label="Filter departments"></div></sc-if>
             <div style="max-height:230px;overflow:auto;display:flex;flex-direction:column;gap:1px">
               <sc-for list="{{ browseDepts }}" as="d" hint-placeholder-count="4">
-                <button onClick="{{ d.onClick }}" title="Show only this department" style="white-space:normal;text-align:left;cursor:pointer;padding:4px 12px 4px 20px;border-radius:8px;background:{{ d.bg }};border:1px solid {{ d.bd }};display:flex;justify-content:space-between;align-items:baseline;gap:10px" style-hover="background:var(--s2)">
-                  <span style="font:{{ d.weight }} 13px var(--sans);color:var(--ink2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ d.label }}</span>
-                  <span style="font:500 12px var(--mono);color:var(--mut);white-space:nowrap">{{ d.n }}</span>
-                </button>
+                <button class="hd-item row" onClick="{{ d.onClick }}" title="Show only this department"><span>{{ d.label }}</span><span class="hd-n">{{ d.n }}</span></button>
               </sc-for>
             </div>
           </sc-if>
           <sc-if value="{{ hasBrowseYears }}" hint-placeholder-val="{{ false }}">
-            <span style="font:600 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--dim);padding:8px 12px 4px">Dates</span>
+            <span style="font:600 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--dim);padding:8px 8px 4px">Dates</span>
             <div style="max-height:180px;overflow:auto;display:flex;flex-direction:column;gap:1px">
               <sc-for list="{{ browseYears }}" as="y" hint-placeholder-count="4">
-                <button onClick="{{ y.onClick }}" title="Show only this year" style="white-space:normal;text-align:left;cursor:pointer;padding:4px 12px 4px 20px;border-radius:8px;background:{{ y.bg }};border:1px solid {{ y.bd }};display:flex;justify-content:space-between;align-items:baseline;gap:10px" style-hover="background:var(--s2)">
-                  <span style="font:{{ y.weight }} 13px var(--sans);color:var(--ink2)">{{ y.label }}</span>
-                  <span style="font:500 12px var(--mono);color:var(--mut);white-space:nowrap">{{ y.n }}</span>
-                </button>
+                <button class="hd-item row" onClick="{{ y.onClick }}" title="Show only this year"><span>{{ y.label }}</span><span class="hd-n">{{ y.n }}</span></button>
               </sc-for>
             </div>
           </sc-if>
         </div>
-      </details>
-      <details class="hd-disclosure" data-nav="explore" open="{{ toolsOpen }}">
-        <summary>Explore &amp; manage</summary>
-      <div style="display:flex;flex-direction:column;gap:1px;padding:10px 0 12px;border-top:1px solid var(--line)">
-        <span style="font:600 12px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--acc);padding:2px 12px 6px">{{ navRead.label }}</span>
-        <sc-for list="{{ navRead.items }}" as="g" hint-placeholder-count="3">
-          <button onClick="{{ g.onClick }}" style="white-space:normal;text-align:left;cursor:pointer;padding:5px 12px 5px 20px;border-radius:8px;background:{{ g.bg }};border:1px solid {{ g.bd }};display:flex;justify-content:space-between;align-items:baseline;gap:10px" style-hover="background:var(--s2)">
-            <span style="font:{{ g.weight }} 14px var(--sans);color:var(--ink2)">{{ g.label }}</span>
-            <span style="font:500 12px var(--mono);color:var(--mut);white-space:nowrap">{{ g.count }}</span>
-          </button>
-        </sc-for>
       </div>
-      <div style="display:flex;flex-direction:column;gap:1px;padding:10px 0 12px;border-top:1px solid var(--line)">
-        <span style="font:600 12px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--acc);padding:2px 12px 6px">{{ navExplore.label }}</span>
-        <sc-for list="{{ navExplore.items }}" as="g" hint-placeholder-count="3">
-          <button onClick="{{ g.onClick }}" style="white-space:normal;text-align:left;cursor:pointer;padding:5px 12px 5px 20px;border-radius:8px;background:{{ g.bg }};border:1px solid {{ g.bd }};display:flex;justify-content:space-between;align-items:baseline;gap:10px" style-hover="background:var(--s2)">
-            <span style="font:{{ g.weight }} 14px var(--sans);color:var(--ink2)">{{ g.label }}</span>
-            <span style="font:500 12px var(--mono);color:var(--mut);white-space:nowrap">{{ g.count }}</span>
-          </button>
-        </sc-for>
-        <button onClick="{{ toggleSegOpen }}" style="white-space:normal;text-align:left;cursor:pointer;padding:5px 12px 5px 20px;border-radius:8px;background:transparent;border:0;display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-top:4px" style-hover="background:var(--s2)">
-          <span style="font:500 14px var(--sans);color:var(--ink2)">{{ segToggleLabel }}</span>
-          <span style="font:500 12px var(--mono);color:var(--mut);white-space:nowrap">{{ segCount }}</span>
-        </button>
-        <sc-if value="{{ segOpen }}" hint-placeholder-val="{{ false }}">
-          <div style="display:flex;flex-direction:column;gap:6px;padding:2px 12px 2px 20px">
-            <sc-for list="{{ segList }}" as="s" hint-placeholder-count="2">
-              <button onClick="{{ s.onJump }}" style="all:unset;box-sizing:border-box;width:100%;cursor:pointer;display:flex;flex-direction:column;gap:3px;border-radius:8px;background:{{ s.bg }};border:1px solid {{ s.bd }};padding:6px 10px" style-hover="background:var(--s2)">
-                <div style="display:flex;align-items:center;gap:8px;width:100%">
-                  <span style="font:500 13px var(--sans);color:var(--ink2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0">{{ s.label }}</span>
-                  <span style="font:500 12px var(--mono);color:var(--mut);white-space:nowrap;flex:none">{{ s.n }}</span>
-                  <sc-if value="{{ s.hasRemove }}" hint-placeholder-val="{{ false }}"><span onClick="{{ s.onRemove }}" title="Remove" style="cursor:pointer;flex:none;color:var(--mut);font-size:12px;padding:2px">✕</span></sc-if>
-                </div>
-                <span style="font:400 12px var(--sans);color:var(--mut);text-wrap:pretty;text-align:left">{{ s.desc }}</span>
-              </button>
-            </sc-for>
-          </div>
-        </sc-if>
-      </div>
-      <sc-for list="{{ navRest }}" as="G" hint-placeholder-count="3">
-        <div style="display:flex;flex-direction:column;gap:1px;padding:10px 0 12px;border-top:1px solid var(--line)">
-          <sc-if value="{{ G.hasLabel }}" hint-placeholder-val="{{ true }}"><span style="font:600 12px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--acc);padding:2px 12px 6px">{{ G.label }}</span></sc-if>
-          <sc-for list="{{ G.items }}" as="g" hint-placeholder-count="3">
-            <button onClick="{{ g.onClick }}" style="white-space:normal;text-align:left;cursor:pointer;padding:5px 12px 5px 20px;border-radius:8px;background:{{ g.bg }};border:1px solid {{ g.bd }};display:flex;justify-content:space-between;align-items:baseline;gap:10px" style-hover="background:var(--s2)">
-              <span style="font:{{ g.weight }} 14px var(--sans);color:var(--ink2)">{{ g.label }}</span>
-              <span style="font:500 12px var(--mono);color:{{ g.countColor }};white-space:nowrap">{{ g.count }}</span>
-            </button>
-          </sc-for>
-        </div>
-      </sc-for>
-      </details>
       </sc-if>
     </nav>
-    <div style="margin:8px 8px 4px;padding:9px 10px;border:1px dashed var(--line2);border-radius:8px;font:400 11.5px/1.5 var(--sans);color:var(--mut)">Beta — the Holodeck is in progress. Found a bug or have an idea? <a href="mailto:scores.patch.points@proton.me?subject=Holodeck%20beta%20feedback" style="color:var(--acc);text-decoration:none;font-weight:600">Send feedback</a>.</div>
-    <div style="margin:2px 8px 4px;padding:0 10px;font:400 11.5px/1.5 var(--sans);color:var(--mut)"><a href="reading/index.html" style="color:var(--acc);text-decoration:none;font-weight:600">How it reads →</a> the same reading, layer by layer, audited byte by byte, with no model.</div>
-    <div style="margin:2px 8px 4px;padding:0 10px;font:400 11.5px/1.5 var(--sans);color:var(--mut)"><a href="power-map.html" style="color:var(--acc);text-decoration:none;font-weight:600">Power map →</a> a directed map of who holds what — entities and typed relations, drawn as a DAG and exported as SVG.</div>
-    <div style="margin:2px 8px 4px;padding:0 10px;font:400 11.5px/1.5 var(--sans);color:var(--mut)"><a href="reading/parse.html" style="color:var(--acc);text-decoration:none;font-weight:600">Parsing without an LLM →</a> the reading page as a worked example: bytes to referents, every step measured, no model.</div>
+    <div class="hd-railfoot">
+      <sc-if value="{{ railTools.open }}" hint-placeholder-val="{{ false }}">
+        <div onClick="{{ railTools.close }}" style="position:fixed;inset:0;z-index:40"></div>
+        <div class="hd-tools" role="menu" aria-label="More tools">
+          <sc-for list="{{ railTools.groups }}" as="G" hint-placeholder-count="3">
+            <div class="hd-label"><span>{{ G.label }}</span></div>
+            <sc-for list="{{ G.items }}" as="g" hint-placeholder-count="3">
+              <button class="hd-item row" role="menuitem" aria-current="{{ g.aria }}" onClick="{{ g.onClick }}"><span>{{ g.label }}</span><span class="hd-n" style="color:{{ g.countColor }}">{{ g.count }}</span></button>
+            </sc-for>
+          </sc-for>
+          <sc-if value="{{ hasSegments }}" hint-placeholder-val="{{ false }}">
+            <div class="hd-label"><span>Saved folds</span><span class="hd-n">{{ segCount }}</span></div>
+            <sc-for list="{{ segList }}" as="s" hint-placeholder-count="2">
+              <div style="display:flex;align-items:center;gap:6px"><button class="hd-item row" role="menuitem" onClick="{{ s.onJump }}" title="{{ s.desc }}" style="flex:1;min-width:0"><span>{{ s.label }}</span><span class="hd-n">{{ s.n }}</span></button><sc-if value="{{ s.hasRemove }}" hint-placeholder-val="{{ false }}"><button class="hd-footbtn" onClick="{{ s.onRemove }}" title="Remove this saved fold" aria-label="Remove this saved fold">✕</button></sc-if></div>
+            </sc-for>
+          </sc-if>
+          <div style="margin:8px 6px 4px;padding:8px 9px;border:1px dashed var(--line2);border-radius:8px;font:400 11.5px/1.5 var(--sans);color:var(--mut)">Beta — the Holodeck is in progress. Found a bug or have an idea? <a href="mailto:scores.patch.points@proton.me?subject=Holodeck%20beta%20feedback" style="color:var(--acc);text-decoration:none;font-weight:600">Send feedback</a>.</div>
+          <div style="padding:2px 8px;font:400 11.5px/1.5 var(--sans);color:var(--mut)"><a href="reading/index.html" style="color:var(--acc);text-decoration:none;font-weight:600">How it reads →</a> · <a href="power-map.html" style="color:var(--acc);text-decoration:none;font-weight:600">Power map →</a> · <a href="reading/parse.html" style="color:var(--acc);text-decoration:none;font-weight:600">Parsing without an LLM →</a></div>
+        </div>
+      </sc-if>
+      <button class="hd-footbtn" onClick="{{ openSettings }}" title="{{ acctTitle }}">Settings</button>
+      <button class="hd-footbtn" onClick="{{ railTools.toggle }}" aria-haspopup="menu" aria-expanded="{{ railTools.open }}">Tools ▴</button>
+      <span class="hd-n">{{ acctLabel }}</span>
+    </div>
     </sc-if>
   </div>
   <div class="hd-column" style="flex:1 1 0;min-width:0;box-sizing:border-box;{{ colPad }}">
@@ -633,6 +594,17 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
         </div>
       </sc-if>
 
+      <sc-if value="{{ crumbStrip }}" hint-placeholder-val="{{ false }}">
+        <nav aria-label="Breadcrumb" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;font:500 12px var(--mono);color:var(--dim);padding:6px 0 4px">
+          <sc-for list="{{ crumbsAll }}" as="c" hint-placeholder-count="3">
+            <span style="display:flex;align-items:center;gap:6px;min-width:0">
+              <sc-if value="{{ c.hasOn }}" hint-placeholder-val="{{ false }}"><button onClick="{{ c.onClick }}" title="{{ c.title }}" style="all:unset;cursor:pointer;color:var(--acc);max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" style-hover="text-decoration:underline">{{ c.label }}</button></sc-if>
+              <sc-if value="{{ c.noOn }}" hint-placeholder-val="{{ true }}"><span aria-current="page" style="color:var(--ink2);font-weight:600;max-width:320px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ c.label }}</span></sc-if>
+              <sc-if value="{{ c.hasSep }}" hint-placeholder-val="{{ false }}"><span style="color:var(--dim)">›</span></sc-if>
+            </span>
+          </sc-for>
+        </nav>
+      </sc-if>
       <sc-if value="{{ hdrShow }}" hint-placeholder-val="{{ true }}">
         <div style="position:sticky;top:var(--hdr-h,61px);z-index:12;background:var(--bg);padding:8px 0 10px;display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap">
           <div style="flex:1 1 320px;min-width:0;display:flex;flex-direction:column;gap:4px">
@@ -649,6 +621,7 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
             </sc-if>
             <sc-if value="{{ !v.summary }}" hint-placeholder-val="{{ true }}"><h1 style="margin:0;font:500 30px/1.2 var(--serif);color:var(--ink);text-wrap:pretty">{{ crumbLast.label }}</h1></sc-if>
             <p style="margin:0;color:var(--mut);font-size:15px;text-wrap:pretty;max-width:760px">{{ hdrSubShown }}{{ sr.sub }}</p>
+            <sc-if value="{{ v.names }}" hint-placeholder-val="{{ false }}"><div><button onClick="{{ onFixNames }}" title="Merge spellings, split two people, say what a name is not" style="cursor:pointer;border:1px solid var(--line2);background:none;color:var(--ink2);border-radius:8px;padding:5px 12px;font:500 13px var(--sans)" style-hover="border-color:var(--acc)">Fix names{{ fixNamesN }}</button></div></sc-if>
             <sc-if value="{{ sr.hasOthers }}" hint-placeholder-val="{{ false }}">
               <div style="display:flex;align-items:center;gap:6px 8px;flex-wrap:wrap;margin-top:4px">
                 <span style="font:400 14px var(--sans);color:var(--mut)">Also narrowed to</span>
@@ -672,6 +645,32 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
         </sc-if>
       </sc-if>
 
+      <sc-if value="{{ v.topics }}" hint-placeholder-val="{{ false }}">
+        <div style="max-width:860px;display:flex;flex-direction:column;gap:12px">
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+            <sc-for list="{{ topicsLens }}" as="m" hint-placeholder-count="2"><button onClick="{{ m.onClick }}" style="cursor:pointer;border:1px solid {{ m.bd }};background:{{ m.bg }};color:{{ m.col }};border-radius:999px;padding:4px 12px;font:500 13px var(--sans)">{{ m.label }} <span style="font:500 11px var(--mono);color:var(--mut)">{{ m.n }}</span></button></sc-for>
+            <input value="{{ topicsSearchVal }}" onChange="{{ onTopicsSearch }}" placeholder="{{ topicsSearchPh }}" aria-label="{{ topicsSearchPh }}" style="flex:1 1 220px;min-width:0;border:1px solid var(--line2);border-radius:8px;padding:7px 10px;font:400 14px var(--sans);color:var(--ink);background:var(--s1);outline:none">
+          </div>
+          <sc-if value="{{ topicsHasTypes }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;gap:6px;flex-wrap:wrap">
+              <sc-for list="{{ topicsTypes }}" as="ty" hint-placeholder-count="3"><button onClick="{{ ty.onClick }}" title="{{ ty.title }}" style="cursor:pointer;border:1px solid {{ ty.bd }};background:{{ ty.bg }};color:{{ ty.col }};border-radius:999px;padding:3px 10px;font:500 12.5px var(--sans)">{{ ty.label }} <span style="font:500 11px var(--mono);color:var(--mut)">{{ ty.n }}</span></button></sc-for>
+            </div>
+          </sc-if>
+          <div style="display:flex;flex-direction:column;gap:1px">
+            <sc-for list="{{ topicsFull }}" as="t" hint-placeholder-count="8">
+              <button class="hd-item row" onClick="{{ t.onJump }}" title="{{ t.title }}" style="font-size:15px;padding:8px 10px"><span>{{ t.label }}</span><span style="display:flex;gap:12px;align-items:baseline"><span class="hd-tag" style="color:{{ t.tagCol }}">{{ t.tag }}</span><span class="hd-n">{{ t.n }}</span></span></button>
+            </sc-for>
+          </div>
+          <sc-if value="{{ topicsFullEmpty }}" hint-placeholder-val="{{ false }}"><span style="font:400 14px var(--sans);color:var(--mut)">{{ topicsEmptyText }}</span></sc-if>
+          <sc-if value="{{ topicsFullHasPager }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;align-items:center;gap:10px;font:500 13px var(--sans);color:var(--mut)">
+              <button onClick="{{ onTopicsFullPrev }}" disabled="{{ !topicsFullHasPrev }}" style="cursor:pointer;border:1px solid var(--line2);background:none;color:var(--ink2);border-radius:8px;padding:4px 12px;font:500 13px var(--sans)">‹ Previous</button>
+              <span>{{ topicsFullPageN }}</span>
+              <button onClick="{{ onTopicsFullNext }}" disabled="{{ !topicsFullHasNext }}" style="cursor:pointer;border:1px solid var(--line2);background:none;color:var(--ink2);border-radius:8px;padding:4px 12px;font:500 13px var(--sans)">Next ›</button>
+            </div>
+          </sc-if>
+        </div>
+      </sc-if>
       <sc-if value="{{ v.overview }}" hint-placeholder-val="{{ false }}"><div id="overview-surface"></div></sc-if>
       <sc-if value="{{ v.linkSurface }}" hint-placeholder-val="{{ false }}"><div id="links-surface" style="min-width:0"></div></sc-if>
       <sc-if value="{{ v.inbox }}" hint-placeholder-val="{{ false }}"><div id="inbox-surface" style="max-width:1100px"></div></sc-if>
@@ -3569,7 +3568,7 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
 function digammaH(x) { let r = 0; while (x < 6) { r -= 1 / x; x += 1; } const f = 1 / (x * x); return r + Math.log(x) - 0.5 / x - f * (1 / 12 - f * (1 / 120 - f * (1 / 252 - f * (1 / 240 - f / 132)))); }
 const klAdmitH = (bv, B) => Math.max(0, Math.log(B) - Math.log(bv) + digammaH(bv + 1) - digammaH(B + 1));
 const holoTokens = t => [...new Set((clean(t).toLowerCase().replace(/[\u2019']/g, '').match(/[a-z][a-z-]{2,}/g) || []).filter(w => !STOP.has(w) && !/^-|-$/.test(w)))];
-const VIEW_LABEL = { inbox: 'Inbox', overview: 'Evidence overview', summary: 'Sources', search: 'Search', names: 'Names', types: 'Types', figures: 'Figures', statements: 'Statements', connections: 'Connections', framing: 'Framing', views: 'Views', patterns: 'Patterns', surprise: 'Surprise', reader: 'Sources', profile: 'Names', draft: 'Draft', records: 'Records', ingest: 'Add & publish', lanes: 'Lanes', margin: 'Margin', seam: 'Seam', orbit: 'Orbit', fields: 'Fields', review: 'Review' };
+const VIEW_LABEL = { ask: 'Ask', fixnames: 'Fix names', topics: 'Topics', inbox: 'Inbox', overview: 'Evidence overview', summary: 'Sources', search: 'Search', names: 'Names', types: 'Types', figures: 'Figures', statements: 'Statements', connections: 'Connections', framing: 'Framing', views: 'Views', patterns: 'Patterns', surprise: 'Surprise', reader: 'Sources', profile: 'Names', draft: 'Draft', records: 'Assertions', ingest: 'Add & publish', lanes: 'Lanes', margin: 'Margin', seam: 'Seam', orbit: 'Orbit', fields: 'Fields', review: 'Review' };
 const SU_CURSORS = [
   { id: 'loo', label: 'Everything else', desc: 'Each statement against normal text plus everything the other sources in this view say, regardless of date: what this source says that nothing else in view, and nothing normal, prepares you for.' },
   { id: 'pub', label: 'When published', desc: 'Sources in the order they were published: what a reader following the story would have learned, and when.' },
@@ -6627,6 +6626,8 @@ class Component extends DCLogic {
     this._onRz = () => { this.measureHdr(); const stk = window.innerWidth <= 720; if ((window.innerWidth < SIDE_PANEL_MIN_VW) !== this._narrow || stk !== this._stk) { this._stk = stk; this.forceUpdate(); } }; window.addEventListener('resize', this._onRz);
 
     this._onFocusKey = e => { if (e.key === 'Escape' && this.state.akFocus) this.setState({ akFocus: false }); }; window.addEventListener('keydown', this._onFocusKey);
+    // the rail's collapse button moved out of the way: [ folds and unfolds it (not while typing)
+    this._onRailKey = e => { if (e.key !== '[' || e.metaKey || e.ctrlKey || e.altKey) return; const t = e.target; if (t && (/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName) || t.isContentEditable)) return; e.preventDefault(); const open = !this.state.railOpen; try { localStorage.setItem('fold-explorer-rail', open ? '1' : '0'); } catch (x) {} this.setState({ railOpen: open }); }; window.addEventListener('keydown', this._onRailKey);
     // in a source, Ctrl/⌘ + F opens find-in-document (the reader's own search) instead of the browser's
     this._onFindKey = e => { if (!(e.metaKey || e.ctrlKey)) return; if (e.key !== 'f' && e.key !== 'F') return; const S = this.state; if (S.view !== 'reader' || !S.readDoc) return; e.preventDefault(); if (S.findOpen) { const el = this._findInp; if (el && el.focus) { el.focus(); if (el.select) el.select(); } } else this.findOpenUp(); }; window.addEventListener('keydown', this._onFindKey);
     this._onSelCh = () => { cancelAnimationFrame(this._selRaf); this._selRaf = requestAnimationFrame(() => this.updatePinPop()); };
@@ -10980,6 +10981,7 @@ class Component extends DCLogic {
       : view === 'reader' && S.readDoc ? { eyebrow: 'Reading · ' + docMeta(A.docById[S.readDoc]), title: A.docById[S.readDoc].title, sub: plural((A.stsByDoc[S.readDoc] || []).length, 'statement') + ' · names, figures and dates are marked', color: 'var(--acc)' }
       : view === 'reading' ? { eyebrow: 'The constitutional reading', title: 'Every name, found automatically', sub: 'A mechanical pass over every source (no AI) — every name it found, which spellings it merged into the same person or org as evidence came in, and who keeps turning up together.' }
       : view === 'ingest' ? { eyebrow: 'Ingest and publish', title: 'Bring in more, and make it public', sub: 'Find new material, transcribe it here, and publish what you keep.' }
+      : view === 'topics' ? { eyebrow: 'Topics', title: 'All topics', sub: 'What the sources share. Filter, then open one to read it.', color: 'var(--acc)' }
       : view === 'overview' ? { eyebrow: 'Situated reading', title: 'Evidence and negative spaces', sub: 'Compose a view, reopen its ground, and pursue what remains unknown.', color: 'var(--acc)' }
       : view === 'records' ? { eyebrow: 'Assertions', title: 'The workspace as tables', sub: 'Every source, statement, name, figure and date, linked back to where it came from.', color: 'var(--acc)' }
       : view === 'ask' ? { eyebrow: 'Ask the Fold', title: 'Ask the sources', sub: 'Answered by a small model running in this tab, from material found by the question\'s own words. Afterwards every sentence is checked: a numbered address where it matches something in the sources, a dotted line where it is the model\'s own, a wavy line where a figure or name is not in the material.', color: 'var(--acc)' }
@@ -11016,9 +11018,17 @@ class Component extends DCLogic {
     const crumbs = (() => {
       const out = [];
       const push = (label, onClick) => out.push({ label, onClick });
-      if (view === 'summary') {
+      if (view === 'summary' && S.svMode === 'map') {
+        // the Map layout of Sources is a place of its own: the workspace crumb leads back to the plain list
+        push(this.corpusName(), () => { this.pushHist(); this.setState({ view: 'summary', svMode: 'grid', readDoc: null, sel: null }); });
+        push('Map', null);
+      } else if (view === 'summary') {
         if (this._topicStr) push('Topic: ' + this._topicStr, () => this.setMeta('__topic', ''));
         push(this.corpusName(), () => this.go('summary'));
+      } else if (view === 'reader') {
+        // the reading has no page of its own above it, so its crumb steps back to whatever you came from (or Sources)
+        out.push({ label: this.corpusName(), onClick: () => this.go('summary') });
+        push('Reading', () => { if (this.backTarget()) this.goBack(); else this.go('summary'); });
       } else {
         out.push({ label: this.corpusName(), onClick: () => this.go('summary') });
         push(VIEW_LABEL[view] || 'Sources', () => this.go(view));
@@ -11095,8 +11105,7 @@ class Component extends DCLogic {
     // the row's tag is the topic's KIND (Measure/Bond/Statement) — every topic is Link, so a
     // terrain tag was the same word on every row; a uniform kind shows no tag at all.
     const topicsMixed = new Set((P.groups || []).map(p => p.kind)).size > 1;
-    const topicsList = topicsLensMode === 'referents'
-      ? topicsShown.map(r => { const on = !!(S.sel && S.sel.type === 'name' && S.sel.id === r.name);
+    const refRow = r => { const on = !!(S.sel && S.sel.type === 'name' && S.sel.id === r.name);
           // the tag is the EARNED kind once the Wikipedia lead has answered ("Liner", not "People");
           // amber when the anchor overturned the reading's own type — the falsification, made visible.
           const rk = this._realityKinds && this._realityKinds.get(r.name);
@@ -11105,9 +11114,15 @@ class Component extends DCLogic {
           return { label: r.name, title: plural(r.n, 'source') + ' name it · open its profile', n: String(r.n),
             tag: earned ? (earned + (rk.ambiguous ? '?' : '')) : (r.type !== 'other' ? ((typeof TYPE_L !== 'undefined' && TYPE_L[r.type]) ? TYPE_L[r.type].replace(/s$/, '') : '') : ''),
             tagCol: earned ? (rk.corrected ? 'var(--amber)' : 'var(--ink2)') : ((typeof TYPE_C !== 'undefined' && TYPE_C[r.type]) || 'var(--mut)'),
-            on, bg: on ? 'var(--sel)' : 'transparent', bd: on ? 'var(--acc2)' : 'transparent', onJump: () => this.openProfile(r.name) }; })
-      : topicsShown.map(p => { const on = activeTopicGroup === p.label && !f.topicGroup.invert;
-          return { label: p.label, title: plural(p.n, 'source') + ' share this topic · open its profile', n: String(p.n), tag: topicsMixed ? (TOPIC_KIND_LABEL[p.kind] || '') : '', tagCol: TOPIC_KIND_COLOR[p.kind] || 'var(--mut)', on, bg: on ? 'var(--sel)' : 'transparent', bd: on ? 'var(--acc2)' : 'transparent', onJump: () => this.openTopic(p.label) }; });
+            on, bg: on ? 'var(--sel)' : 'transparent', bd: on ? 'var(--acc2)' : 'transparent', onJump: () => this.openProfile(r.name) }; };
+    const topRow = p => { const on = activeTopicGroup === p.label && !f.topicGroup.invert;
+          return { label: p.label, title: plural(p.n, 'source') + ' share this topic · open its profile', n: String(p.n), tag: topicsMixed ? (TOPIC_KIND_LABEL[p.kind] || '') : '', tagCol: TOPIC_KIND_COLOR[p.kind] || 'var(--mut)', on, bg: on ? 'var(--sel)' : 'transparent', bd: on ? 'var(--acc2)' : 'transparent', onJump: () => { this.openTopic(p.label); if (this.state.view === 'topics') this.setState({ view: 'summary' }); } }; };
+    const rowFor = topicsLensMode === 'referents' ? refRow : topRow;
+    const topicsList = topicsShown.map(rowFor);
+    // the rail shows five topics (filtered by the same box); the full list is its own page, forty to a page
+    const topicsRail = P.groups.filter(p => !topicsQ || p.label.toLowerCase().includes(topicsQ)).slice(0, 5).map(p => { const r = topRow(p); return { ...r, aria: r.on ? 'page' : undefined }; });
+    const FULL_PER = 40, topicsFullPages = Math.max(1, Math.ceil(topicsAll.length / FULL_PER)), topicsFullPage = Math.min(S.topicsPage || 0, topicsFullPages - 1);
+    const topicsFull = topicsAll.slice(topicsFullPage * FULL_PER, (topicsFullPage + 1) * FULL_PER).map(rowFor);
     // the lens toggle: Topics | Referents, with their counts
     // showing a referent is the explicit ask: check the shown rows' kinds against Wikipedia
     // (one lookup per row, memoized; anchors checked before are kept and never re-fetched).
@@ -11194,7 +11209,7 @@ class Component extends DCLogic {
       hasBrowseDepts: deptAll.length > 1, browseDepts, browseDeptSearch: deptAll.length > 10, browseDeptQ: S.browseQ || '', browseDeptOnQ: e => this.setState({ browseQ: e.target.value }),
       hasBrowseYears: yearCounts.size > 1, browseYears,
     };
-    const V = {}; ['overview', 'draft', 'inbox', 'summary', 'search', 'surprise', 'names', 'types', 'figures', 'statements', 'connections', 'framing', 'views', 'patterns', 'reader', 'profile', 'ingest', 'reading'].forEach(k => { V[k] = !isEmpty && view === k; });
+    const V = {}; ['topics', 'overview', 'draft', 'inbox', 'summary', 'search', 'surprise', 'names', 'types', 'figures', 'statements', 'connections', 'framing', 'views', 'patterns', 'reader', 'profile', 'ingest', 'reading'].forEach(k => { V[k] = !isEmpty && view === k; });
     V.linkSurface = !isEmpty && ['lanes', 'margin', 'seam', 'orbit', 'fields', 'review'].includes(view);
 
     const SU = isEmpty ? null : this.surprise(A); const Fid = new Set(F.map(st => st.id));
@@ -11207,7 +11222,7 @@ class Component extends DCLogic {
     const SCREENS = this._screens || [];
     NAVG[0][1].push(...SCREENS.map(sc => ['screen:' + sc.id, sc.label]));
     const countFor = id => ({
-      names: String(D.nameList.length), records: String(F.length),
+      summary: String(docsIn.length), names: String(D.nameList.length), records: String(F.length),
       connections: String(D.edgeList.length),
       draft: this.activePins().length ? String(this.activePins().length) : '',
       ingest: (this._net && this._net.chain && this._net.chain.length) ? String(this._net.chain.length) : '',
@@ -11215,11 +11230,19 @@ class Component extends DCLogic {
       review: this.linkWaiting(),
       'hero:workspaces': this._wsTotals && this._wsTotals.waiting ? String(this._wsTotals.waiting) : '',
     }[id] || '');
-    const navGroups = NAVG.map(([label, items]) => ({ label, hasLabel: !!label, items: items.map(([id, lab]) => { const isScr = id.startsWith('screen:');
-      return { label: lab, count: id === 'fixnames' ? (this.refEdits().length ? String(this.refEdits().length) : '') : countFor(id), countColor: id === 'review' || id === 'hero:workspaces' ? 'var(--amber)' : 'var(--mut)', ...gHi(isScr ? S.screenId === id.slice(7) : view === id), onClick: id === 'hero:workspaces' ? () => this.openWorkspacesHero() : id === 'fixnames' ? () => this.openFixNames() : isScr ? () => { if (this.state.screenId !== id.slice(7)) this.pushHist(); this.setState({ screenId: id.slice(7) }); } : () => { if (view !== id || S.readDoc) this.pushHist(); this.setState({ view: id, readDoc: null, sel: null }); } }; }) }));
+    const navGroups = NAVG.map(([label, items]) => ({ label, hasLabel: !!label, items: items.map(([id, lab]) => { const isScr = id.startsWith('screen:'); const on = isScr ? S.screenId === id.slice(7) : id === 'summary' ? (view === 'summary' && S.svMode !== 'map') : view === id;
+      return { id, aria: on ? 'page' : undefined, label: lab, count: id === 'fixnames' ? (this.refEdits().length ? String(this.refEdits().length) : '') : countFor(id), countColor: id === 'review' || id === 'hero:workspaces' ? 'var(--amber)' : 'var(--mut)', ...gHi(on), onClick: id === 'hero:workspaces' ? () => this.openWorkspacesHero() : id === 'fixnames' ? () => this.openFixNames() : isScr ? () => { if (this.state.screenId !== id.slice(7)) this.pushHist(); this.setState({ screenId: id.slice(7) }); } : () => { const leaveMap = id === 'summary' && S.svMode === 'map'; if (view !== id || S.readDoc || leaveMap) this.pushHist(); this.setState({ view: id, readDoc: null, sel: null, ...(leaveMap ? { svMode: 'grid' } : {}) }); } }; }) }));
     // split so Folds can sit right under The reading / Connections, inside Explore
     // the Metro contracts address is for searching: its rail offers Sources only (no Ask, no Draft)
     const navTop = HD_METRO ? navGroups[0].items.filter(g => /^sources$/i.test(String(g.label))) : navGroups[0].items; const navRead = navGroups[1]; const navExplore = navGroups[2]; const navRest = navGroups.slice(3);
+    // the rail's Explore list is one flat list (handoff): Names, Assertions, Connections, Evidence overview, Map
+    const allNavItems = navGroups.flatMap(g => g.items);
+    const navExploreFlat = ['names', 'records', 'connections', 'overview'].map(id => allNavItems.find(i => i.id === id)).filter(Boolean);
+    navExploreFlat.push({ id: 'map', label: 'Map', count: '', title: 'Every name placed by how much it appears with the one you pick', aria: (view === 'summary' && !S.readDoc && S.svMode === 'map') ? 'page' : undefined, onClick: () => { this.pushHist(); this.setState({ view: 'summary', svMode: 'map', readDoc: null, sel: null }); } });
+    // everything the rail used to list that the handoff takes out of it stays one click away, in the footer's Tools menu
+    const toolPick = g => ({ ...g, onClick: () => { this.setState({ railToolsOpen: false }); g.onClick(); } });
+    const railTools = { open: !!S.railToolsOpen, toggle: () => this.setState(st => ({ railToolsOpen: !st.railToolsOpen })), close: () => this.setState({ railToolsOpen: false }),
+      groups: [{ label: 'Names', items: allNavItems.filter(i => i.id === 'fixnames').map(toolPick) }, ...navRest.map(G => ({ label: G.label, items: G.items.map(toolPick) }))].filter(G => G.items.length) };
     const qv = (S.q || '').trim();
     const dv = (S.qDraft !== undefined ? S.qDraft : S.q || '').trim();
     const isOmniUrl = v => /^(https?:\/\/|www\.)\S+$|^[\w-]+(\.[\w-]+)*\.[a-z]{2,}(\/\S*)?$/i.test(v);
@@ -11368,12 +11391,18 @@ class Component extends DCLogic {
         const titleCase = s => s ? s.charAt(0).toUpperCase() + s.slice(1) : s;
         // the reader's surface crumb reads "Sources" in the shared breadcrumb; here it says what it is, and is not a link
         // (there is no "reader root" to go up to), so the trail reads: workspace › Reading › what you have open.
-        const loc = crumbs.map((c, i) => { const last = i === crumbs.length - 1; const isSurf = i === 1;
-          const canGo = !!c.onClick && !last && !(isSurf && view === 'reader');
-          return { label: (isSurf && view === 'reader') ? 'Reading' : c.label, on: canGo, here: !canGo, sep: !last, onClick: c.onClick }; });
+        const loc = crumbs.map((c, i) => { const last = i === crumbs.length - 1; const canGo = !!c.onClick && !last;
+          return { label: c.label, on: canGo, here: !canGo, sep: !last, onClick: c.onClick }; });
         return { backLabel: bt ? short(titleCase(String(bt)), 24) : 'Back', backDisabled: !this.backTarget(), backTitle: bt ? 'Back to ' + bt : 'Back',
           onBack: () => this.goBack(), onHome: () => this.setState({ view: 'summary', readDoc: null, sel: null }),
-          homeCls: onSummary ? 'on' : '', homeAria: onSummary ? 'page' : undefined, hasLoc: loc.length > 1, locTitle: loc.map(c => c.label).join(' › '), loc }; })(),
+          homeCls: onSummary ? 'on' : '', homeAria: onSummary ? 'page' : undefined, hasLoc: loc.length >= 1, locTitle: loc.map(c => c.label).join(' › '), loc }; })(),
+      onFixNames: () => this.openFixNames(), fixNamesN: this.refEdits().length ? ' · ' + this.refEdits().length : '',
+      railTopicsShow: !isEmpty && (P.groups.length > 0 || showTopicsStray), topicsRail, hasTopicsRail: P.groups.length > 0, topicsCountLabel: String(P.groups.length), allTopicsLabel: 'All ' + P.groups.length + ' topics →', topicsStrayLine: (P.strayN || 0) + ' unfiled',
+      onAllTopics: () => { this.pushHist(); this.setState({ view: 'topics', readDoc: null, sel: null, topicsPage: 0 }); },
+      topicsFull, topicsFullEmpty: topicsFull.length === 0, topicsFullHasPager: topicsFullPages > 1, topicsFullPageN: 'Page ' + (topicsFullPage + 1) + ' of ' + topicsFullPages + ' · ' + plural(topicsAll.length, topicsLensMode === 'referents' ? 'referent' : 'topic'),
+      topicsFullHasPrev: topicsFullPage > 0, topicsFullHasNext: topicsFullPage < topicsFullPages - 1,
+      onTopicsFullPrev: () => this.setState({ topicsPage: Math.max(0, topicsFullPage - 1) }), onTopicsFullNext: () => this.setState({ topicsPage: Math.min(topicsFullPages - 1, topicsFullPage + 1) }),
+      hasBrowseExtras: browseMore.length > 0 || deptAll.length > 1 || yearCounts.size > 1, railTools, navExploreFlat,
       topicsList, hasTopics, topicsOpen: hasTopics || entAll.length > 0 || !!activeTopicGroup || !!topicsQ, topicsLabel: topicsLensMode === 'referents' ? 'Referents · ' + entAll.length : (P.groups.length ? 'Topics · ' + P.groups.length : 'Topics'), topicsNote, hasTopicsNote, topicsStrayN, showTopicsStray, onTopicsStray,
       topicsTypes, topicsHasTypes, topicsHasEmpty, topicsEmptyText, topicsLens, topicsSearchPh, topicsType: S.topicsType || '', scope,
       topicsHasSearch, topicsSearchVal, onTopicsSearch, topicsHasPager, topicsPagerLine, onTopicsPrev, onTopicsNext, topicsHasPrev, topicsHasNext, topicsPageN: (topicsPage + 1) + ' of ' + topicsPages,
@@ -11409,6 +11438,7 @@ class Component extends DCLogic {
       showOmni: view !== 'summary' || isEmpty, bodyPad: view === 'summary' && !isEmpty ? '8px 20px 16px' : '20px',
       showFilterLayers: FILTER_LAYERS, hdrSubShown: view === 'summary' ? '' : (hdr.sub || ''),
       hdrShow: !isEmpty && view !== 'summary' && !(view === 'connections' && S.foldBand) && view !== 'reader' && view !== 'profile' && view !== 'ask' && view !== 'draft' && view !== 'inbox',
+      crumbsAll: crumbs, crumbStrip: !isEmpty && crumbs.length > 1 && !(!isEmpty && view !== 'summary' && !(view === 'connections' && S.foldBand) && view !== 'reader' && view !== 'profile' && view !== 'ask' && view !== 'draft' && view !== 'inbox') && !(view === 'summary' && S.svMode !== 'map'),
       crumbLast, crumbAnc, hasAnc, yearOn: !isEmpty && (view === 'views' || view === 'surprise'),
       ...(() => { const d0 = S.readDoc && A.docById[S.readDoc]; if (!d0) return { rd: { eyebrow: '', title: '', meta: '' } }; const dsts = A.stsByDoc[d0.id] || []; const nm = new Set(dsts.flatMap(s => s.names)); const host = d0.url ? (/wikipedia\.org/.test(d0.url) ? 'Wikipedia' : d0.url.replace(/^https?:\/\/(www\.)?/, '').split('/')[0]) : 'Your content'; return { rd: { eyebrow: [host, d0.type, d0.year].filter(Boolean).join(' · '), title: d0.title, meta: [d0.authors && d0.authors.length ? 'By ' + d0.authors.join(', ') : '', d0.pubLabel ? 'Published ' + d0.pubLabel : ''].filter(Boolean).map(x => x + ' · ').join('') + plural(dsts.length, 'statement') + ' · ' + plural(nm.size, 'name') + ' · ' + plural(dsts.reduce((a, s) => a + s.figs.length, 0), 'figure') } }; })(),
       gsw: { track: S.ground.on ? 'var(--acc2)' : 'var(--line2)', left: S.ground.on ? '16px' : '2px' },
