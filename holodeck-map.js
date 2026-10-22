@@ -15,6 +15,15 @@
 // scroll still scrolls the page.
 import { nestByTies, repOf, visibleHolons, rollUp, placeLabels, sourceGraph, statementsOf, levelsOf, openAtLevel } from './holodeck-holons.js';
 
+// The rings of the orbit layout: shared-statement counts in halving steps from the strongest tie, at most three, the last
+// reaching down to 1. ringBins(14) = 8–14, 4–7, 1–3: the first ring holds the names that appear with the reference name most,
+// the next about half as often.
+export function ringBins(smax) {
+  const bins = []; let hi = Math.max(1, Math.floor(smax));
+  for (let k = 0; k < 3 && hi >= 1; k++) { const lo = k === 2 || Math.floor(hi / 2) < 1 ? 1 : Math.floor(hi / 2) + 1; bins.push({ lo, hi }); if (lo <= 1) break; hi = lo - 1; }
+  return bins;
+}
+
 export function mapOrigin(vis, adj, sel, noun = 'name') {
   if (sel && vis.includes(sel)) return { name: sel, reason: 'you selected it' };
   let name = null, degree = -1; for (const n of vis) { const d = (adj.get(n) || new Set()).size; if (d > degree) { name = n; degree = d; } }
@@ -72,7 +81,7 @@ export function mountMap(host, opts = {}) {
     `<span class="hm-tg" title="Move between levels of nesting"><button type="button" data-lv="up" title="Up a level: fewer, larger groups">↑</button><span class="hm-lv"></span><button type="button" data-lv="down" title="Down a level: open the groups">↓</button></span>` +
     `<span class="hm-tg" title="Orbit speed"><button type="button" data-spd="slow" title="Slower orbit">🐢</button><span class="hm-spd"></span><button type="button" data-spd="fast" title="Faster orbit">🐇</button></span></div><div class="hm-position" aria-label="Map viewpoint"></div></div>${opts.legend ? legend : ''}</div><div class="hm-card" hidden></div>`;
   host.appendChild(root);
-  const gc = root.querySelector('canvas'), cardEl = root.querySelector('.hm-card'), layersEl = root.querySelector('.hm-layers'), topEl = root.querySelector('.hm-top'), stageEl = root.querySelector('.hm-stage'), lvEl = root.querySelector('.hm-lv'); { const s = root.querySelector('.hm-spd'); if (s) s.textContent = '0.25×'; }
+  const gc = root.querySelector('canvas'), cardEl = root.querySelector('.hm-card'), layersEl = root.querySelector('.hm-layers'), topEl = root.querySelector('.hm-top'), stageEl = root.querySelector('.hm-stage'), lvEl = root.querySelector('.hm-lv'); { const s = root.querySelector('.hm-spd'); if (s) s.textContent = 'still'; }
   const padBottom = opts.padBottom ?? 30, css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim() || '#888';
   let col = {}, W = 0, H = 0, dpr = 1, topPad = 54, alive = true, raf = 0, frame = 0;
   const readCols = () => { col = { acc: css('--acc'), blue: css('--blue'), dim: css('--dim'), ink: css('--ink'), ink2: css('--ink2'), bad: css('--bad'), amber: css('--amber'), edge: css('--edge'), line2: css('--line2'), bg: css('--bg') }; };
@@ -108,7 +117,7 @@ export function mountMap(host, opts = {}) {
     N.edges.forEach(E => { const a = rep.get(E.a), b = rep.get(E.b); if (a == null || b == null || a === b) return; const x = agg.get(eKey(a, b)); if (x) { if (E.mine) x.mine = true; if (E.neg) x.neg = true; } });
     model = { nk, vk, nest: N.nest, open, rep, agg, vis: visibleHolons(N.nest, open), virtNode: N.virtNode, max: N.lv.max }; return model;
   }
-  const holonR = (M, n) => Math.min(26, 4.5 + Math.sqrt(M.nest.weight.get(n)) * 1.7);
+  const holonR = (M, n) => Math.min(19, 4.5 + Math.sqrt(M.nest.weight.get(n)) * 1.4);
 
   function nearOf(n) { let sx = 0, sy = 0, c = 0; (adj.get(n) || []).forEach(o => { const q = P.get(o); if (q) { sx += q.x; sy += q.y; c++; } }); return c ? { x: sx / c, y: sy / c } : null; }
   function posOf(x) {
@@ -130,41 +139,57 @@ export function mountMap(host, opts = {}) {
       const vis = M.vis.slice();
       const visSet = new Set(vis);
       const adj = new Map(), wadj = new Map();
-      const addE = (a, b, w) => { if (a == null || b == null || a === b || !visSet.has(a) || !visSet.has(b)) return;
+      const addE = (a, b, w) => { if (a == null || b == null || a === b || !visSet.has(a) || !visSet.has(b) || a === VIRT || b === VIRT) return;   // the "no strong ties" bucket is a drawing device, not a tie
         if (!adj.has(a)) adj.set(a, new Set()); if (!adj.has(b)) adj.set(b, new Set()); adj.get(a).add(b); adj.get(b).add(a);
         const ww = Math.max(1, w || 1);
         if (!wadj.has(a)) wadj.set(a, new Map()); if (!wadj.has(b)) wadj.set(b, new Map());
         const ma = wadj.get(a), mb = wadj.get(b); ma.set(b, Math.max(ma.get(b) || 0, ww)); mb.set(a, Math.max(mb.get(a) || 0, ww)); };
       (D.edges || []).forEach(E => addE(E.a, E.b, E.c || (E.sts && E.sts.length)));
       if (M.agg) M.agg.forEach(E => addE(E.a, E.b, E.c));
-      const center = mapOrigin(vis, adj, sel, NOUN), origin = center.name;
-      root.querySelector('.hm-position').textContent = origin ? 'Centered on ' + origin + ' because ' + center.reason + ' · ' + docMap.size + ' sources · distance follows shared-statement counts, not ownership or control' : 'No origin: no ' + NOUNS + ' have been read here.';
+      // the reference point is the selected name, or the group it sits in when it is folded inside one; never the "no strong ties" bucket
+      const selRep = sel && sel !== VIRT ? (visSet.has(sel) ? sel : M.rep.get(sel)) : null;
+      const center = mapOrigin(vis.filter(n => n !== VIRT), adj, selRep && visSet.has(selRep) ? selRep : null, NOUN), origin = center.name;
+      if (selRep && selRep !== sel && origin === selRep) center.reason = 'you selected ' + sel + ', which sits in this group';
+      root.querySelector('.hm-position').textContent = origin ? 'Reference point: ' + origin + ' (' + center.reason + '). Rings show how many statements each ' + NOUN + ' shares with it, nearest first; the angle groups the kind of ' + NOUN + '. Nothing orbits ' + origin + ': it is only where the distances are measured from · ' + docMap.size + ' sources' : 'No origin: no ' + NOUNS + ' have been read here.';
       topPad = topEl.offsetHeight + 16;
       // GRAVITY: orbit radius ∝ 1/bond. Edge length is the bond's inverse
       // (scaled so the strongest bond is length 1), so a strongly-bound name
       // sits close and a weakly-bound one drifts out; Dijkstra gives the
       // cumulative relational distance that becomes the orbit ring.
-      let WMAX = 1; wadj.forEach(mm => mm.forEach(w => { if (w > WMAX) WMAX = w; }));
-      const dist = new Map(); vis.forEach(n => dist.set(n, Infinity)); if (origin) dist.set(origin, 0);
-      const done = new Set();
-      while (true) { let u = null, bd = Infinity; vis.forEach(n => { if (!done.has(n) && dist.get(n) < bd) { bd = dist.get(n); u = n; } }); if (u == null) break; done.add(u);
-        (wadj.get(u) || new Map()).forEach((w, m) => { if (!done.has(m)) { const nd = dist.get(u) + WMAX / w; if (nd < dist.get(m)) dist.set(m, nd); } }); }
-      const rings = new Map();
-      vis.forEach(n => { const r = isFinite(dist.get(n)) ? Math.min(40, Math.max(0, Math.round(dist.get(n)))) : 99; if (!rings.has(r)) rings.set(r, []); rings.get(r).push(n); });
-      const step = Math.min(W, H) * 0.12;
-      const lay = new Map();
-      const radii = new Set();
-      rings.forEach((list, r) => {
-        const radius = r === 0 ? 0 : Math.min(Math.min(W, H) * 0.46, step * r + step * 0.5);
-        if (radius > 0) radii.add(Math.round(radius));
-        const speed = r === 0 ? 0 : (0.22 / (1 + r * 0.45));
-        list.forEach((n, i) => lay.set(n, { radius, speed, base: -Math.PI / 2 + i * 6.283 / Math.max(1, list.length) + (r % 2 ? 0.35 : 0), r: holonR(M, n) + ((M.nest.kids.get(n) || []).length ? 4 : 0) }));
+      // RADIUS = how many statements a name shares with the reference name (its tie to it), in halving steps from the
+      // strongest: the first ring holds the names that appear with it most, the next about half as often, and so on.
+      // Names that reach it only through other names sit on a ring of their own, and names with no path to it on the rim.
+      // ANGLE = the kind of name (person, organisation, place, other), so a kind reads as an arc, the same on every ring.
+      const direct = n => (origin && wadj.get(origin) && wadj.get(origin).get(n)) || 0;
+      const reach = new Set(origin ? [origin] : []); { const q = origin ? [origin] : []; while (q.length) { const u = q.shift(); (adj.get(u) || []).forEach(m => { if (!reach.has(m)) { reach.add(m); q.push(m); } }); } }
+      let SMAX = 1; vis.forEach(n => { if (n !== origin) SMAX = Math.max(SMAX, direct(n)); });
+      const bins = ringBins(SMAX);
+      const shellOf = n => { if (n === origin) return -1; const d = direct(n); if (d > 0) { const k = bins.findIndex(b => d >= b.lo); return k < 0 ? bins.length - 1 : k; } return reach.has(n) ? bins.length : bins.length + 1; };
+      const kindOf = n => { const x = nodeOf(n), t = x && (x.type || ({ 'var(--pink)': 'person', 'var(--blue)': 'organisation', 'var(--green)': 'place' })[x.color]); return n === VIRT ? 'other' : (t === 'person' || t === 'organisation' || t === 'place' ? t : 'other'); };
+      const KINDS = ['person', 'organisation', 'place', 'other'], KLAB = { person: 'People', organisation: 'Organisations', place: 'Places', other: 'Other' };
+      const members = new Map(); vis.forEach(n => { if (n === origin) return; const sh = shellOf(n); if (!members.has(sh)) members.set(sh, []); members.get(sh).push(n); });
+      const used = [...members.keys()].sort((a, b) => a - b), S = used.length;
+      const kindN = new Map(KINDS.map(k => [k, 0])); vis.forEach(n => { if (n !== origin) kindN.set(kindOf(n), kindN.get(kindOf(n)) + 1); });
+      const kinds = KINDS.filter(k => kindN.get(k) > 0), totalN = Math.max(1, kinds.reduce((a, k) => a + kindN.get(k), 0)), GAP = kinds.length > 1 ? 0.12 : 0;
+      const sector = new Map(); { let a0 = -Math.PI / 2; kinds.forEach(k => { const w = (6.283 - GAP * kinds.length) * kindN.get(k) / totalN; sector.set(k, [a0 + GAP / 2, a0 + GAP / 2 + w]); a0 += w + GAP; }); }
+      const rmin = Math.min(W, H) * 0.15, rmax = Math.min(W, H) * 0.43, rStep = S > 1 ? (rmax - rmin) / (S - 1) : 0;
+      const lay = new Map(), shells = [];
+      used.forEach((sh, si) => {
+        const radius = S === 1 ? (rmin + rmax) / 2 : rmin + rStep * si, list = members.get(sh);
+        const b = sh < bins.length ? bins[sh] : null;
+        shells.push({ radius, label: b ? (b.lo === b.hi ? plural(b.lo, 'statement') : b.hi >= SMAX && b.hi !== b.lo ? b.lo + '+ statements' : b.lo + '–' + b.hi + ' statements') + ' with ' + (origin.length > 22 ? origin.slice(0, 21) + '…' : origin) : sh === bins.length ? 'only through other ' + NOUNS : 'no path to ' + (origin.length > 22 ? origin.slice(0, 21) + '…' : origin) });
+        kinds.forEach(k => { const ks = list.filter(n => kindOf(n) === k).sort((x, y) => String(M.nest.parent.get(x)).localeCompare(String(M.nest.parent.get(y))) || (M.nest.weight.get(y) || 0) - (M.nest.weight.get(x) || 0) || (x < y ? -1 : 1));
+          const [a0, a1] = sector.get(k); const band = (S > 1 ? rStep : Math.min(W, H) * 0.1) * 0.2;
+          ks.forEach((n, i) => lay.set(n, { radius: radius + ((i % 3) - 1) * band * (ks.length > 3 ? 1 : 0), speed: 0.22, base: a0 + (i + 0.5) / ks.length * (a1 - a0), r: holonR(M, n) + ((M.nest.kids.get(n) || []).length ? 4 : 0) })); });
       });
+      if (origin) lay.set(origin, { radius: 0, speed: 0, base: 0, r: holonR(M, origin) + 2 });
+      simulate._origin = origin; simulate._shells = shells; simulate._sectors = kinds.map(k => ({ k, label: KLAB[k], a0: sector.get(k)[0], a1: sector.get(k)[1] })); simulate._rmax = rmax;
+      const radii = new Set(shells.map(x => Math.round(x.radius)));
       simulate._lay = lay; simulate._k = key; simulate._rings = [...radii].sort((a, b) => a - b);
     }
     const cx = W / 2, cy = (H - padBottom + topPad) / 2;
     simulate._t = (simulate._t || 0) + 1;
-    simulate._lay.forEach((L, n) => { const ang = L.base + simulate._t * L.speed * 0.02 * (simulate._spd || 0.25);
+    simulate._lay.forEach((L, n) => { const ang = L.base + simulate._t * L.speed * 0.02 * (simulate._spd == null ? 0 : simulate._spd);
       const x = cx + Math.cos(ang) * L.radius, y = cy + Math.sin(ang) * L.radius;
       P.set(n, { x: Math.max(30, Math.min(W - 30, x)), y: Math.max(topPad + 14, Math.min(H - padBottom - 20, y)), vx: 0, vy: 0, ang, r: L.r }); });
   }
@@ -193,10 +218,19 @@ export function mountMap(host, opts = {}) {
     hitsAt.length = 0; edgeHits.length = 0;
     // OHS: draw the orbit rings so the relational-distance shells read as a
     // solar system (faint concentric circles around the origin).
-    if (simulate._rings) { const ocx = W / 2, ocy = (H - padBottom + topPad) / 2, ox = X(ocx), oy = Y(ocy); g.save(); g.setLineDash([3, 6]); g.strokeStyle = col.line2; g.globalAlpha = 0.5; g.lineWidth = 1;
-      simulate._rings.forEach(rad => { g.beginPath(); g.arc(ox, oy, Rz(rad), 0, 6.283); g.stroke(); }); g.restore(); }
+    if (simulate._shells) { const ocx = W / 2, ocy = (H - padBottom + topPad) / 2, ox = X(ocx), oy = Y(ocy); g.save();
+      // the kinds of name are arcs: faint spokes between them, and the kind named on the rim
+      const rmax = Rz(simulate._rmax || 0);
+      (simulate._sectors || []).forEach(sc => { g.setLineDash([]); g.strokeStyle = col.line2; g.globalAlpha = 0.35; g.lineWidth = 1; g.beginPath(); g.moveTo(ox + Math.cos(sc.a0 - 0.06) * Rz(simulate._shells[0].radius * 0.55), oy + Math.sin(sc.a0 - 0.06) * Rz(simulate._shells[0].radius * 0.55)); g.lineTo(ox + Math.cos(sc.a0 - 0.06) * (rmax + Rz(18)), oy + Math.sin(sc.a0 - 0.06) * (rmax + Rz(18))); g.stroke();
+        const am = (sc.a0 + sc.a1) / 2, lx = ox + Math.cos(am) * (rmax + Rz(30)), ly = oy + Math.sin(am) * (rmax + Rz(30)); g.globalAlpha = 0.9; g.fillStyle = col.dim; g.font = "600 11px 'Hanken Grotesk', sans-serif"; g.textAlign = Math.cos(am) > 0.3 ? 'left' : Math.cos(am) < -0.3 ? 'right' : 'center'; g.fillText(sc.label.toUpperCase(), lx, ly + 4); });
+      // the rings are the tie to the reference name; each says what it holds
+      g.textAlign = 'left'; g.font = "500 11px 'Hanken Grotesk', sans-serif";
+      simulate._shells.forEach((sh, i) => { g.setLineDash([3, 6]); g.strokeStyle = col.line2; g.globalAlpha = 0.6; g.lineWidth = 1; g.beginPath(); g.arc(ox, oy, Rz(sh.radius), 0, 6.283); g.stroke(); g.setLineDash([]);
+        const tx = ox + Rz(sh.radius) * Math.cos(-0.5 + i * 0.07) + 4, ty = oy + Rz(sh.radius) * Math.sin(-0.5 + i * 0.07), w = g.measureText(sh.label).width + 8;
+        g.globalAlpha = 0.92; g.fillStyle = col.bg; g.fillRect(tx - 3, ty - 11, w, 15); g.globalAlpha = 1; g.fillStyle = col.dim; g.fillText(sh.label, tx + 1, ty); });
+      g.restore(); }
     // opts.bonds: 'all' (default) draws every bond; 'hot' draws only the relation the reading is on and the selected name's — on an orbiting layout the ring already says how near two names are, so a line between spinning bodies is only noise
-    M.agg.forEach((E, key) => { const a = P.get(E.a), b = P.get(E.b); if (!a || !b) return; if (opts.bonds === 'hot' && !hotE.has(key) && !(sel && (E.a === sel || E.b === sel))) return; g.beginPath(); g.moveTo(X(a.x), Y(a.y)); g.lineTo(X(b.x), Y(b.y));
+    M.agg.forEach((E, key) => { const a = P.get(E.a), b = P.get(E.b); if (!a || !b) return; if (opts.bonds === 'hot' && !hotE.has(key) && !((sel || simulate._origin) && (E.a === (sel || simulate._origin) || E.b === (sel || simulate._origin)))) return; g.beginPath(); g.moveTo(X(a.x), Y(a.y)); g.lineTo(X(b.x), Y(b.y));
       g.strokeStyle = E.neg ? col.bad : E.mine ? col.acc : col.edge; g.globalAlpha = hotE.has(key) ? 1 : E.mine ? 0.7 : 0.35; g.lineWidth = Math.min(5, 0.8 + Math.log2(1 + E.c)) + (hotE.has(key) ? 1.5 : 0); g.setLineDash(E.neg ? [5, 4] : []); g.stroke(); edgeHits.push({ a:E.a, b:E.b, x1:X(a.x), y1:Y(a.y), x2:X(b.x), y2:Y(b.y) }); });
     g.setLineDash([]); g.globalAlpha = 1;
     const items = [];
@@ -212,9 +246,9 @@ export function mountMap(host, opts = {}) {
       g.beginPath(); g.arc(sx, sy, r + (h ? 2 : 0), 0, 6.283); g.fillStyle = dark ? '#05070a' : fill(x); g.fill(); if (dark) { g.strokeStyle = col.dim; g.lineWidth = 1.5; g.stroke(); } else if (h || sel === n) { g.strokeStyle = col.ink; g.lineWidth = 2; g.stroke(); }
       hitsAt.push({ id: n, x: sx, y: sy, r: Math.max(13, r + (nk ? 4 : 0)) });
       items.push({ id: n, x: sx, y: sy, r: r + (nk ? 5 : 1), text: (n.length > 24 ? n.slice(0, 23) + '…' : n) + (nk && !isOpen ? '  +' + (M.nest.size.get(n) - 1) : ''), pri: M.nest.weight.get(n), force: h || sel === n }); });
-    g.font = "12px 'Hanken Grotesk', sans-serif";
+    g.font = "500 13px 'Hanken Grotesk', sans-serif";
     const meas = t => { let w = wcache.get(t); if (w == null) { w = g.measureText(t).width; wcache.set(t, w); } return w; };
-    placeLabels(items, W, H - padBottom + 10, meas, 13, topPad - 6).forEach(L => { hitsAt.push({ id: L.id, x: L.x, y: L.y - 4, r: 11 }); g.textAlign = L.align; g.fillStyle = hot.has(L.id) || sel === L.id ? col.ink : col.ink2; g.fillText(L.text, L.x, L.y); });
+    placeLabels(items, W, H - padBottom + 10, meas, 13, topPad - 6).forEach(L => { hitsAt.push({ id: L.id, x: L.x, y: L.y - 4, r: 11 }); g.textAlign = L.align; g.lineJoin = 'round'; g.lineWidth = 3.5; g.strokeStyle = col.bg; g.globalAlpha = 0.9; g.strokeText(L.text, L.x, L.y); g.globalAlpha = 1; g.fillStyle = hot.has(L.id) || sel === L.id ? col.ink : col.ink2; g.fillText(L.text, L.x, L.y); });
     if (D.cursor) { const cr = M.rep.get(D.cursor) || (M.nest.has(D.cursor) ? D.cursor : null), cp = cr && P.get(cr); if (cp) drawCursor(g, X(cp.x), Y(cp.y), 'reading'); }
     g.textAlign = 'center';
     if (!D.nodes.length) { g.fillStyle = col.dim; g.font = "13px 'Hanken Grotesk', sans-serif"; g.fillText(opts.empty || '' + Cap(NOUNS) + ' appear here as they are found.', W / 2, H / 2); }
@@ -307,7 +341,7 @@ export function mountMap(host, opts = {}) {
   gc.addEventListener('dblclick', e => { if (!pick(e)) fit(); });
   gc.addEventListener('wheel', e => { if (!(opts.wheelZoom || e.ctrlKey || e.metaKey)) return; e.preventDefault(); const r = gc.getBoundingClientRect(); zoomAt(e.clientX - r.left, e.clientY - r.top, Math.exp(-e.deltaY * (e.ctrlKey ? 0.01 : 0.0015))); }, { passive: false });
   root.querySelector('.hm-tools').addEventListener('click', e => { const b = e.target.closest('[data-z],[data-lv],[data-spd]'); if (!b || b.disabled) return;
-    if (b.dataset.spd) { simulate._spd = Math.min(8, Math.max(0.1, (simulate._spd || 0.5) * (b.dataset.spd === 'fast' ? 1.6 : 1 / 1.6))); const el = root.querySelector('.hm-spd'); if (el) el.textContent = (simulate._spd).toFixed(1) + '×'; return; }
+    if (b.dataset.spd) { { const v = (simulate._spd || 0) * (b.dataset.spd === 'fast' ? 1.6 : 1 / 1.6) || (b.dataset.spd === 'fast' ? 0.4 : 0); simulate._spd = v < 0.15 ? 0 : Math.min(8, v); } const el = root.querySelector('.hm-spd'); if (el) el.textContent = simulate._spd ? simulate._spd.toFixed(1) + '×' : 'still'; return; }
     if (b.dataset.z === 'fit') fit(); else if (b.dataset.z) zoomAt(W / 2, H / 2, b.dataset.z === 'in' ? 1.35 : 1 / 1.35); else if (b.dataset.lv === 'up') levelUp(); else levelDown(); });
   layersEl.addEventListener('click', e => { const b = e.target.closest('[data-layer]'); if (b) setLayer(b.dataset.layer); });
   cardEl.addEventListener('click', e => { const x = e.target.closest('[data-close]'); if (x) { sel = null; selectedEdge = null; heat = 1; dirty = true; renderCard(); return; } const w = e.target.closest('[data-witness]'); if (w) { const o = [...occ.values()].flat().find(o => String(o.doc) + ':' + o.id === w.dataset.witness); if (o && opts.onWitness) opts.onWitness(o); return; } const b = e.target.closest('[data-name],[data-layer],[data-profile]'); if (!b) return;
@@ -346,5 +380,7 @@ export function mountMap(host, opts = {}) {
   function destroy() { alive = false; cancelAnimationFrame(raf); ro.disconnect(); root.remove(); }
 
   readCols(); size(); renderCard(); raf = requestAnimationFrame(loop);
-  return { set, destroy, el: root };
+  const api = { set, destroy, el: root, layout: () => ({ origin: simulate._origin || null, sel: sel || null, shells: (simulate._shells || []).map(x => x.label), kinds: (simulate._sectors || []).map(x => x.label) }) };
+  root._map = api;
+  return api;
 }
