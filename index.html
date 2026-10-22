@@ -774,6 +774,7 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
                 <button class="hd-chip" onClick="{{ drv.onCompare }}" title="Line the two sources up, statement by statement, in the Seam">Compare</button>
                 <button class="hd-chip" onClick="{{ drv.onLinkForm }}" title="Declare how these two sources relate">Link these…</button>
               </sc-if>
+              <sc-if value="{{ drv.canMerge }}" hint-placeholder-val="{{ false }}"><button class="hd-chip" onClick="{{ drv.onMergeForm }}" title="Merge these two into one: a recording with its transcript, or one transcript into another">Merge…</button></sc-if>
               <sc-if value="{{ drv.hasFoldersOpts }}" hint-placeholder-val="{{ false }}"><select value="" onChange="{{ drv.onMove }}" style="background:var(--s1);border:1px solid var(--line2);border-radius:8px;color:var(--ink);font:500 13px var(--sans);padding:4px 8px;outline:none"><option value="__">Move to…</option><sc-for list="{{ drv.moveOpts }}" as="o" hint-placeholder-count="3"><option value="{{ o.v }}">{{ o.l }}</option></sc-for></select></sc-if>
               <sc-if value="{{ drv.canBulkDelete }}" hint-placeholder-val="{{ false }}">
                 <sc-if value="{{ drv.noBulkAsk }}" hint-placeholder-val="{{ true }}"><button class="hd-chip" onClick="{{ drv.onBulkAsk }}" style="color:var(--bad)">Delete</button></sc-if>
@@ -796,6 +797,22 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
               <sc-if value="{{ drv.lk.err }}" hint-placeholder-val="{{ false }}"><span style="font:400 13px var(--sans);color:var(--bad)">{{ drv.lk.err }}</span></sc-if>
               <div style="display:flex;gap:8px"><button class="hd-drive-add" onClick="{{ drv.lk.onSave }}" style="padding:6px 16px">Save link</button><button class="hd-chip" onClick="{{ drv.lk.onCancel }}">Cancel</button></div>
               <span style="font:400 12px/1.4 var(--sans);color:var(--dim)">A link you declare is recorded as confirmed, with who made it and when. It stays in this browser, and can be revised under Review.</span>
+            </div>
+          </sc-if>
+          <sc-if value="{{ drv.mg.open }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;gap:10px;background:var(--s1);border:1px solid var(--line2);border-radius:12px;padding:12px 14px">
+              <span style="font:600 14px var(--sans);color:var(--ink)">Merge these two sources</span>
+              <span style="font:400 13px/1.45 var(--sans);color:var(--mut)">{{ drv.mg.from }} &nbsp;→&nbsp; {{ drv.mg.into }}</span>
+              <sc-if value="{{ drv.mg.canFlip }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+                  <span style="font:500 12px var(--mono);color:var(--mut)">Merge into</span>
+                  <select value="{{ drv.mg.base }}" onChange="{{ drv.mg.onBase }}" style="background:var(--s2);border:1px solid var(--line2);border-radius:8px;color:var(--ink);font:500 13px var(--sans);padding:4px 8px;outline:none"><sc-for list="{{ drv.mg.bases }}" as="r" hint-placeholder-count="2"><option value="{{ r.v }}">{{ r.l }}</option></sc-for></select>
+                </div>
+              </sc-if>
+              <span style="font:400 13px/1.45 var(--ink2)">{{ drv.mg.how }}</span>
+              <label style="display:flex;gap:8px;align-items:center;font:400 13px var(--sans);color:var(--ink2)"><input type="checkbox" checked="{{ drv.mg.del }}" onChange="{{ drv.mg.onDel }}"> Delete “{{ drv.mg.from }}” afterwards</label>
+              <div style="display:flex;gap:8px"><button class="hd-drive-add" onClick="{{ drv.mg.onGo }}" style="padding:6px 16px">{{ drv.mg.goLabel }}</button><button class="hd-chip" onClick="{{ drv.mg.onCancel }}">Cancel</button></div>
+              <span style="font:400 12px/1.4 var(--sans);color:var(--dim)">Passages one source says that the other doesn’t bear out are marked, not dropped. The earlier version of what is merged into is kept in this browser.</span>
             </div>
           </sc-if>
           <sc-if value="{{ drv.scoped }}" hint-placeholder-val="{{ false }}">
@@ -6329,6 +6346,36 @@ class Component extends DCLogic {
     const t = this._lkTally.get(id); if (!t) return { hasLinks: false, linkN: '', hasDiffers: false, diffN: '', linkTitle: '' };
     return { hasLinks: true, linkN: plural(t.links, 'link'), hasDiffers: t.differs > 0, diffN: t.differs + ' differ', linkTitle: 'Links to other sources in this workspace, not counting proposals that wait for a reader' };
   }
+  // ---- Merge… on two selected sources: a recording with its transcript, or one transcript into another ----
+  mergePlan(ids, A) {
+    if (!ids || ids.length !== 2) return null; const [a, b] = ids.map(id => A.docById[id]); if (!a || !b) return null;
+    const rec = d => !!(d.media && d.media.kind === 'local' && /^(Audio|Video)$/.test(d.medium || d.type || ''));
+    if (rec(a) && rec(b)) return null;
+    if (rec(a) && hdCanMergeTx(b)) return { kind: 'audio', into: a, from: b };
+    if (rec(b) && hdCanMergeTx(a)) return { kind: 'audio', into: b, from: a };
+    if (hdCanMergeTx(a) && hdCanMergeTx(b)) { const keepB = this.state.mgForm && this.state.mgForm.base === b.id; return keepB ? { kind: 'transcript', into: b, from: a, pair: [a, b] } : { kind: 'transcript', into: a, from: b, pair: [a, b] }; }
+    return null;
+  }
+  // a source's words as a transcript file the merger can read: its timed paragraphs as [m:ss] lines, else its plain text
+  docAsTranscript(d) {
+    const LZ = (this._lazy || {})[d.id]; const html = this._html[d.id] || (d.lazy && LZ && LZ.html) || d.html || ''; const paras = timedParasOf(html);
+    return { name: (d.title || 'transcript') + '.txt', raw: paras.length ? paras.map(p => '[' + fmtT(p.t) + '] ' + p.text).join('\n\n') : (d.text || htmlToText(html) || '') };
+  }
+  mergeForm(ids, A) {
+    const f = this.state.mgForm; const plan = f && this.mergePlan(ids, A);
+    if (!plan) return { open: false, bases: [] };
+    const audio = plan.kind === 'audio';
+    return { open: true, from: plan.from.title, into: plan.into.title, canFlip: !audio, base: plan.into.id, bases: audio ? [] : plan.pair.map(d => ({ v: d.id, l: d.title })), del: !!f.del,
+      how: audio ? '“' + plan.from.title + '” becomes the transcript of the recording: its words are kept as they are, the recording is transcribed again here to check them, each passage is timed from the audio, and any passage the audio does not bear out is marked.'
+        : 'Whichever of the two has times is the clock; the words of “' + plan.from.title + '” are laid onto it and the two are compared word by word.',
+      goLabel: audio ? 'Merge and check against the audio' : 'Merge',
+      onBase: e => this.setState(s => ({ mgForm: { ...s.mgForm, base: e.target.value } })), onDel: e => this.setState(s => ({ mgForm: { ...s.mgForm, del: !!e.target.checked } })),
+      onCancel: () => this.setState({ mgForm: null }),
+      onGo: async () => { const live = this.state.mgForm || f, ids2 = Object.keys(this.state.dvSel || {}).filter(k => this.state.dvSel[k]); const pl = (this.state.mgForm && this.mergePlan(ids2, this.analysis())) || plan; const from = pl.from, into = pl.into, del = !!live.del; this.setState({ mgForm: null, dvSel: {} });
+        const src = this.docAsTranscript(from);
+        const ok = pl.kind === 'audio' ? await this.mergeTranscript(into, src) : await this.mergeIntoTranscript(into, src);
+        if (ok && del) this.deleteSources([from.id]); } };
+  }
   linkForm(selIds, A) {
     const f = this.state.lkForm; const LM = this._LM;
     if (!f || !LM || selIds.length !== 2) return { open: false, rels: [] };
@@ -8048,9 +8095,9 @@ class Component extends DCLogic {
   }
   async mergeTranscript(d0, src, bytes) {
     const buf = bytes || await mediaBytes(d0.id);
-    if (!buf) { this.toast('The recording’s audio isn’t kept in this browser, so there is nothing to merge the transcript with.'); return; }
+    if (!buf) { this.toast('The recording’s audio isn’t kept in this browser, so there is nothing to merge the transcript with.'); return false; }
     const given = await hdSuppliedSegs(src.name, src.raw);
-    if (!given.length) { this.toast('No transcript text found in ' + (src.name || 'that file') + '.'); return; }
+    if (!given.length) { this.toast('No transcript text found in ' + (src.name || 'that file') + '.'); return false; }
     const AL = await hdAlign(); const lang = this.state.txLang || 'en';
     const model = this.state.txModel === 'small' ? 'onnx-community/whisper-small' : this.state.txModel === 'smallen' ? 'onnx-community/whisper-small.en' : 'onnx-community/whisper-base';
     this.txReset(d0.id); this.setState({ txAsk: null, view: 'reader', readDoc: d0.id, sel: { type: 'doc', id: d0.id } });
@@ -8066,10 +8113,10 @@ class Component extends DCLogic {
       this.showMapFor(d0.id);
       hdEngineRead(d0.title, htmlToText(html)).then(got => { this.replaceAddedDoc(d0.id, got ? { eng: hdEngineCompact(got.host, got.read), engTried: true } : { engTried: true }); }).catch(() => {});
       const said = AL.verdictText(m.summary); this.ilog(said, m.summary.verdict === 'lines up' ? 'info' : 'bad');
-      this.txDone(); this.setState({ note: said }); this.toast(m.summary.verdict === 'lines up' ? 'Transcript merged — it lines up with the recording.' : 'Transcript merged — ' + m.summary.verdict + '. Passages that were not found are marked.');
+      this.txDone(); this.setState({ note: said }); this.toast(m.summary.verdict === 'lines up' ? 'Transcript merged — it lines up with the recording.' : 'Transcript merged — ' + m.summary.verdict + '. Passages that were not found are marked.'); return true;
     } catch (e) {
       this.txDone(); const stopped = !!(this._txAbort && this._txAbort.signal.aborted) || /^stopped$/.test(String(e && e.message || e));
-      this.setState({ note: stopped ? 'Merge stopped before the recording was checked; nothing was changed.' : 'The merge could not check the transcript against the audio: ' + (e && e.message || e) + '. Nothing was changed.' });
+      this.setState({ note: stopped ? 'Merge stopped before the recording was checked; nothing was changed.' : 'The merge could not check the transcript against the audio: ' + (e && e.message || e) + '. Nothing was changed.' }); return false;
     }
   }
   // Merge a transcript INTO a transcript already in the workspace (an uploaded .srt/.vtt/.txt/.md/.json, or a machine one),
@@ -8083,7 +8130,7 @@ class Component extends DCLogic {
   }
   async mergeIntoTranscript(d0, src) {
     const AL = await hdAlign(); const incoming = await hdSuppliedSegs(src.name, src.raw);
-    if (!incoming.length) { this.toast('No transcript text found in ' + (src.name || 'that file') + '.'); return; }
+    if (!incoming.length) { this.toast('No transcript text found in ' + (src.name || 'that file') + '.'); return false; }
     const LZ = (this._lazy || {})[d0.id]; const html0 = this._html[d0.id] || (d0.lazy && LZ && LZ.html) || d0.html || '';
     const paras = timedParasOf(html0);
     // a paragraph ends where the next begins; the last has no end of its own, so it gets one from the speaking rate (~2.5 words a second), no later than the recording's length
@@ -8092,8 +8139,8 @@ class Component extends DCLogic {
     let words, ref;
     if (paras.length) { ref = toRef(paras.map(p => ({ start: p.t, end: null, text: p.text }))); words = incoming; }
     else if (incoming.some(g => g.start != null)) { ref = toRef(incoming.filter(g => g.start != null)); words = AL.parsePlain(htmlToText(html0) || d0.text || ''); }
-    else { this.toast('Neither transcript has times, so there is nothing to line them up on. Merge one that does (.srt, .vtt, .json, or a .md/.txt with [0:12] clocks).'); return; }
-    if (!words.length) { this.toast('The existing transcript has no text to merge.'); return; }
+    else { this.toast('Neither transcript has times, so there is nothing to line them up on. Merge one that does (.srt, .vtt, .json, or a .md/.txt with [0:12] clocks).'); return false; }
+    if (!words.length) { this.toast('The existing transcript has no text to merge.'); return false; }
     const m = AL.merge(words, ref, { duration: ref.length ? ref[ref.length - 1].end : 0 });
     const html = mergedSegmentsHtml(m.segments, d0.title, 'the other transcript');
     idbPut('premerge:' + d0.id, html0).catch(() => {});
@@ -8103,7 +8150,7 @@ class Component extends DCLogic {
     this.replaceAddedDoc(d0.id, { format: 'html', html, text: htmlToText(html), media, transcribed: true, note: said });
     hdEngineRead(d0.title, htmlToText(html)).then(got => { this.replaceAddedDoc(d0.id, got ? { eng: hdEngineCompact(got.host, got.read), engTried: true } : { engTried: true }); }).catch(() => {});
     this.ilog(said, m.summary.verdict === 'lines up' ? 'info' : 'bad'); this.setState({ note: said, htmlVer: (this.state.htmlVer || 0) + 1 });
-    this.toast(m.summary.verdict === 'lines up' ? 'Transcripts merged — they line up.' : 'Transcripts merged — ' + m.summary.verdict + '. Passages not found in the other one are marked. The earlier version is kept.');
+    this.toast(m.summary.verdict === 'lines up' ? 'Transcripts merged — they line up.' : 'Transcripts merged — ' + m.summary.verdict + '. Passages not found in the other one are marked. The earlier version is kept.'); return true;
   }
   // A run that did not finish keeps what it heard. Said plainly: paused by the person, or failed — either way resumable.
   async txStopped(id, e, save) {
@@ -10730,6 +10777,8 @@ class Component extends DCLogic {
       onCompare: () => this.setState({ view: 'seam', lkPair: dvSelIds.slice(0, 2), readDoc: null, sel: null, dvSel: {}, lkForm: null }),
       onLinkForm: () => this.setState({ lkForm: { rel: 'cites', qa: '', qb: '', err: '' } }),
       lk: this.linkForm(dvSelIds, A),
+      canMerge: !!this.mergePlan(dvSelIds, A), onMergeForm: () => this.setState({ mgForm: { base: null, del: false }, lkForm: null }),
+      mg: this.mergeForm(dvSelIds, A),
       hasSel: dvSelIds.length > 0, selLabel: plural(dvSelIds.length, 'source') + ' selected', onClearSel: () => this.setState({ dvSel: {}, dvBulkAsk: false }),
       hasFoldersOpts: dvFl.length > 0, moveOpts: [{ v: '', l: 'No folder' }, ...dvFl.map(f => ({ v: f.id, l: f.name }))],
       onMove: e => { const v = e.target.value; if (v === '__') return; dvSelIds.forEach(id => this.setDocFolder(id, v)); this.setState({ dvSel: {} }); this.toast('Moved ' + plural(dvSelIds.length, 'source') + (v ? ' into the folder.' : ' out of its folder.')); },
