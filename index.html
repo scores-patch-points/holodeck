@@ -6067,7 +6067,7 @@ async function readText(file, M) {
 function MapView(p) {
   const R = React, host = R.useRef(null), ctl = R.useRef(null), cur = R.useRef(p); cur.current = p;
   R.useEffect(() => { let dead = false;
-    import(new URL('holodeck-map.js', location.href).href).then(M => { if (dead || !host.current) return; ctl.current = M.mountMap(host.current, { legend: true, padBottom: 44, onProfile: n => cur.current.onProfile(n), onWitness: o => cur.current.onWitness && cur.current.onWitness(o) }); ctl.current.set(cur.current.data); }).catch(e => console.warn('holodeck map', e));
+    import(new URL('holodeck-map.js', location.href).href).then(M => { if (dead || !host.current) return; ctl.current = M.mountMap(host.current, { legend: true, padBottom: 44, bonds: 'hot', onProfile: n => cur.current.onProfile(n), onWitness: o => cur.current.onWitness && cur.current.onWitness(o) }); ctl.current.set(cur.current.data); }).catch(e => console.warn('holodeck map', e));
     return () => { dead = true; if (ctl.current) ctl.current.destroy(); ctl.current = null; }; }, []);
   R.useEffect(() => { if (ctl.current) ctl.current.set(p.data); });
   return R.createElement('div', { ref: host, style: { position: 'relative', height: p.height || '560px' } });
@@ -11771,9 +11771,9 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
       // a tie is two names sharing more statements than chance would give (dmdCo); the map nests names by those ties
       const S = pool.map(n => new Set(n.sts.map(x => x.id))), edges = [];
       for (let i = 0; i < pool.length; i++) for (let j = i + 1; j < pool.length; j++) { const a = S[i], b = S[j]; let k = 0; const [sm, lg] = a.size < b.size ? [a, b] : [b, a]; sm.forEach(v => { if (lg.has(v)) k++; }); if (k && dmdCo(k, a.size, b.size, F.length)) edges.push({ a: pool[i].name, b: pool[j].name, c: k }); }
-      M = this._mapMemo = { key, nodes: pool.map(n => ({ n: n.name, c: n.sts.length, color: TYPE_C[n.type] })), edges, occ: new Map(pool.map(n => [n.name, n.sts.map(x => ({ doc: x.doc, id: x.id, t: short(x.text, 240) }))])) };
+      M = this._mapMemo = { key, nodes: pool.map(n => ({ n: n.name, c: n.sts.length, color: TYPE_C[n.type], type: n.type })), edges, occ: new Map(pool.map(n => [n.name, n.sts.map(x => ({ doc: x.doc, id: x.id, t: short(x.text, 240) }))])) };
     }
-    return h(MapView, { height: onlyDoc ? '460px' : this.state.foldBand && this.state.view === 'connections' ? 'max(520px, 74vh)' : undefined, onWitness: o => this.read(o.doc, o.id), data: { sig: M.key, nodes: M.nodes, edges: M.edges, docs, occ: M.occ, sel: selName || null }, onProfile: id => this.setState({ sel: { type: 'name', id }, selAll: false, pfIdx: 0, pfAll: false, view: 'profile', readDoc: null }) });
+    return h(MapView, { height: onlyDoc ? '460px' : 'max(560px, calc(100vh - 170px))', onWitness: o => this.read(o.doc, o.id), data: { sig: M.key, nodes: M.nodes, edges: M.edges, docs, occ: M.occ, sel: selName || null }, onProfile: id => this.setState({ sel: { type: 'name', id }, selAll: false, pfIdx: 0, pfAll: false, view: 'profile', readDoc: null }) });
   }
 
   orbitUi(A, selName) {
