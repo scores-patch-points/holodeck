@@ -6,6 +6,8 @@
   "scripts": {
     "serve": "node tools/serve.mjs 8813",
     "asr": "../.whisper-venv/bin/python tools/asr-server.py",
+    "ocr": "node tools/ocr-server/server.mjs",
+    "test:ocr": "node --test tools/ocr-server/ocr-server.test.mjs",
     "vendor:chat": "node vendor-chat.mjs",
     "vendor:chat:check": "node vendor-chat.mjs --check",
     "vendor:check": "node vendor-sync.mjs --check && node vendor-chat.mjs --check",
