@@ -1938,7 +1938,7 @@ async function ocr(buf){
   try { r = await fetch('/ocr', { method: 'POST', body: buf }); } catch (e) { r = null; }
   if (!r || !r.ok || !r.body) return await ocrInBrowser(buf, show);
   const rd = r.body.getReader(), dec = new TextDecoder();
-  let pending = '', text = '', pages = 0, total = 0, words = 0, confSum = 0;
+  let pending = '', text = '', pages = 0, total = 0, words = 0, confSum = 0, engine = 'tesseract';
   for (;;){
     const { done, value } = await rd.read(); if (done) break;
     pending += dec.decode(value, { stream: true });
@@ -1947,12 +1947,12 @@ async function ocr(buf){
       const l = pending.slice(0, nl); pending = pending.slice(nl + 1);
       if (!l.trim()) continue;
       let m; try { m = JSON.parse(l); } catch (e) { continue; }
-      if (m.event === 'start'){ total = m.total; show(`<b>Reading pixels</b> — tesseract (OCR, no model) · page 0 of ${total}${m.pages > m.total ? ` (first ${m.total} of ${m.pages})` : ''}`); }
+      if (m.event === 'start'){ total = m.total; engine = m.engine ? m.engine.replace(/\+/g, ' + ') : engine; show(`<b>Reading pixels</b> — ${engine} (OCR, no model) · page 0 of ${total}${m.pages > m.total ? ` (first ${m.total} of ${m.pages})` : ''}`); }
       else if (m.event === 'page'){
         pages++;
         if (m.text){ text += (text ? '\n\n' : '') + m.text; ta.value = text; }
         if (m.conf != null){ words += m.words; confSum += m.conf * m.words; }
-        show(`<b>Reading pixels</b> — tesseract (OCR, no model) · page ${pages} of ${total}${m.conf != null ? ` · ${m.conf}% mean word confidence` : ''}${m.error ? ` · <span class="mono">${esc(m.error)}</span>` : ''}`);
+        show(`<b>Reading pixels</b> — ${engine} (OCR, no model) · page ${pages} of ${total}${m.conf != null ? ` · ${m.conf}% mean word confidence` : ''}${m.error ? ` · <span class="mono">${esc(m.error)}</span>` : ''}`);
       }
     }
   }

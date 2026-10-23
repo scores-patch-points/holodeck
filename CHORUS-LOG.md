@@ -1,3 +1,16 @@
+## 2026-10-23 — local OCR service: Apple Vision + tesseract folded with the document's own words as the prior, mounted at POST /ocr; a PDF → EOT runner (ocr-server-local-eyes, tools/ocr-server)
+fast: 17 files · 140 affected tests pass (28 in tools/ocr-server, 2 added after the first pass) · law: ok (0 citations)
+| lens | citation | file:line | verdict | one line |
+| Greenberg | a language parameter silently defaulting to English | tools/ocr-server/adapters/vision-macos.mjs:read | fixed | an unmapped `lang` used to read English under the other eye's language; it is now a typed gap on the page and tesseract reads alone (test added) |
+| Feynman | a claim stated without its limits | tools/ocr-server/fuse.mjs header, README | fixed | the header table showed fusion's gain but not that the fused reading fell below the better single eye on two held-out PDFs (0.963 vs 0.984; 0.978 vs 0.999); both files now say so |
+| Simon/Chekhov | a mechanism shipped unwired | tools/serve.mjs | fixed | the two-line mount of the reader had no committed test; one now spawns serve.mjs and POSTs a PDF |
+| Simon/Chekhov | new source no test imports | bench.mjs, check.mjs, to-eot.mjs | deferred | CLIs run by hand on the real 674-page PDF (bench: three samples; check --offline: both eyes identical with the network denied; to-eot: valid, deterministic log); no committed test drives them yet |
+| Feynman | a constant tuned against its own golden | reader.mjs dpi 220 | noted | chosen on 24 scan pages by the two eyes' agreement (no ground truth for a scan); the comment says so; the pre-registered held-out run is not done |
+| Dijkstra | script/locale scope | bench.mjs:21, fuse.mjs `parts` | noted | letter-digit runs are \p{L}\p{N}, not a Latin range |
+| Kondo | what the diff left dead | adapters/vision.swift | noted | the `fast` level is accepted and never called (measured 0.686 vs 0.919 for `accurate`); kept as a documented interface option; the sweep found no dead module |
+| Lévi-Strauss | the stash against the diff's open problems | STASH.md | noted | the two reclaim candidates concern relations-gfp and capacities.js, not OCR |
+clean: Ostrom, Alexander
+
 ## 2026-10-23 — Names: a name keeps one register, a shouted ordinary word is still ordinary, a source's names are ranked by mentions — each decided by the measured regional null, never a list (main, surface)
 fast: 1 files · 0 affected tests (no test imports index.html; full suite 617/618 before and after, the E5 timing test is the standing failure) · law: ok
 | lens | citation | file:line | verdict | one line |
