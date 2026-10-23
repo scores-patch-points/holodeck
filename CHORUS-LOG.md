@@ -1,3 +1,11 @@
+## 2026-10-23 — Names: a name keeps one register, a shouted ordinary word is still ordinary, a source's names are ranked by mentions — each decided by the measured regional null, never a list (main, surface)
+fast: 1 files · 0 affected tests (no test imports index.html; full suite 617/618 before and after, the E5 timing test is the standing failure) · law: ok
+| lens | citation | file:line | verdict | one line |
+| Feynman | a numeric constant in a comparison | index.html:4311 | false-positive-on-review | `< 0.5` is the under-half rule ordinaryOpener already used; the diff only routes it through capNormal, and the REGION that sets the rate is chosen by HDRegion's 199 draws, not the constant. A null rate is kept as a gap (nothing cut, nothing dropped). Disclosed cost: the every-word test drops GOVERNMENT PRINTING OFFICE on the speech's title page (OFFICE is capitalised mid-sentence 45% of the time in General English) |
+| Dijkstra | locale / script logic | index.html:4286 | false-positive-on-review | the register tally is \p{Lu}/\p{Ll} over any cased script, never A–Z; toLowerCase is only the treebank key hdPos already uses, read here for one class (NUM), never as identity |
+| Greenberg | a capitalisation gate | index.html:4311 | noted | the register rule is a case convention and says so: hdRegister returns null for a caseless script (nothing is cut) and the change rate is measured per document, so a convention that mixes registers measures high and never cuts. Two English priors are consulted, each named in the trace note — General English (live_priors) for shouted ordinary words, the English treebank for the numeral exemption (II, XVI) — so in a non-English source a numeral after a name reads as ALL-CAPS; the scope is disclosed, not widened |
+clean: —
+
 ## 2026-10-18 — make "Continue with Google" the primary sign-in; Drive tucked behind Advanced (topics-holograph-profile, byo-storage)
 fast: 3 files · 43 tests pass · law: ok
 | lens | citation | file:line | verdict | one line |

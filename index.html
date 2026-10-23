@@ -4274,14 +4274,23 @@ function hdHygiene(docs) {
   const kindOf = d => d.kind || d.type || d.medium || 'Source';
   const per = new Map(), kind = new Map(), ws = new Map(), midPairs = new Set(); // midPairs: capitalised word pairs written mid-sentence (name-level evidence)
   const bump = (M, k, cap) => { let e = M.get(k); if (!e) M.set(k, e = [0, 0]); e[1]++; if (cap) e[0]++; };
+  // REGISTER tallies: of the adjacent capitalised words that open in a register (Capitalised / ALL-CAPS), how many are followed by the
+  // other one. Read per document, per kind and across the workspace, so "do names here change register?" is answered by the material.
+  const SW0 = () => ({ T: [0, 0], A: [0, 0] }), swD = new Map(), swK = new Map(), swW = SW0();
   docs.forEach(d => { const t = d.text || '', re = /[A-Za-z][A-Za-z'’]*/g, P = new Map(); let K = kind.get(kindOf(d)); if (!K) kind.set(kindOf(d), K = new Map()); let m;
     while ((m = re.exec(t))) { if (!m.index || /[.!?:\n"“(•]\s*$/.test(t.slice(Math.max(0, m.index - 3), m.index))) continue; const w = m[0]; if (/^[A-Z]+$/.test(w) && w.length > 1) continue; // all-caps says nothing about casing
       const k = w.toLowerCase(), cap = w !== k; bump(P, k, cap); bump(K, k, cap); bump(ws, k, cap);
       if (cap) { const nx = t.slice(m.index + w.length).match(/^ +([A-Z][A-Za-z'\u2019]*)/); if (nx) midPairs.add(w + ' ' + nx[1]); } }
-    per.set(d.id, P); });
+    per.set(d.id, P);
+    const S = SW0(); swD.set(d.id, S); let SK = swK.get(kindOf(d)); if (!SK) swK.set(kindOf(d), SK = SW0());
+    { const rt = /(?<![\p{L}\p{M}])\p{Lu}[\p{L}\p{M}'’]*/gu; let tm, pv = null;
+      while ((tm = rt.exec(t))) { const g = hdRegister(tm[0]);
+        if (pv && g && pv.g && /^[ \t]+$/.test(t.slice(pv.e, tm.index))) [S, SK, swW].forEach(X => { X[pv.g][1]++; if (g !== pv.g) X[pv.g][0]++; });
+        pv = g ? { g, e: tm.index + tm[0].length } : null; } } });
   const kindRes = new Map();
   return { forDoc(d, note) {
     const P = per.get(d.id) || new Map(), K = kind.get(kindOf(d)) || new Map(), mine = new Map(), kn = kindOf(d);
+    const SD = swD.get(d.id) || SW0(), SKd = swK.get(kn) || SW0(), regMemo = new Map();
     const hy = { note: note || (() => {}), lastWhy: '',
       nonNominal: w => { const c = hdPos(w); if (!c || Object.keys(c).some(x => HD_NOM.includes(x))) return false; return !(/(ed|en|ing)$/i.test(w) && Object.keys(c).every(x => x === 'VERB' || x === 'AUX')); }, // a participle (Written Standards) modifies; a bare imperative (Provide Guest House) does not
       functionOnly: w => { const c = hdPos(w); return !!c && Object.keys(c).every(x => ['ADP', 'CCONJ', 'SCONJ', 'DET', 'AUX', 'PART', 'PRON'].includes(x)); },
@@ -4289,7 +4298,8 @@ function hdHygiene(docs) {
       clause: w => { if (/(ing|ed)$/i.test(w)) return false; const c = hdPos(w); if (!c) return false; const es = Object.entries(c); if (!es.length || es.some(([x]) => HD_NOM.includes(x))) return false; const top = es.sort((a, b) => b[1] - a[1])[0][0]; return ['AUX', 'PRON', 'ADV', 'SCONJ', 'PART', 'VERB', 'INTJ'].includes(top); },
       commonOnly: w => { const c = hdPos(w); if (!c) return false; const es = Object.entries(c); if (!es.length) return false; return es.sort((a, b) => b[1] - a[1])[0][0] !== 'PROPN'; },
       namePair: (a, b) => midPairs.has(a + ' ' + b),
-      ordinaryOpener: w => { if (/^[A-Z]+$/.test(w)) return false; const k = w.toLowerCase(); let r = mine.get(k);
+      // how often a word is written capitalised mid-sentence, in the smallest region that differs (the walk is disclosed in hy.lastWhy)
+      capNormal: w => { const k = w.toLowerCase(); let r = mine.get(k);
         if (!r) { const e = P.get(k) || [0, 0], ek = K.get(k) || [0, 0], ew = ws.get(k) || [0, 0], c = HD_POS[k]; const pr = c ? [c.PROPN || 0, Object.values(c).reduce((a, b) => a + b, 0)] : [0, 0]; const rf = (HD_REF && HD_REF.casing.get(k)) || [0, 0];
           const L = [{ name: 'this document', k: e[0], n: e[1] }, { name: kn + ' documents', k: ek[0], n: ek[1] }, { name: 'the workspace', k: ew[0], n: ew[1] }, { name: 'General English (live_priors)', k: rf[0], n: rf[1] }, { name: 'the treebank prior', k: pr[0], n: pr[1] }];
           // the outer walk (kind -> workspace -> prior) is the same for every document of this kind: computed once
@@ -4297,10 +4307,29 @@ function hdHygiene(docs) {
           const inner = e[1] ? HDRegion.normalRate([L[0], L.find((x, i) => i > 0 && x.n > e[1]) || L[0]], { key: d.id + '|' + k }) : null;
           r = inner && inner.hop === 'this document' && inner.walk[0].verdict.startsWith('its own') ? inner : outer; mine.set(k, r); }
         hy.lastWhy = r.rate == null ? 'no region has seen ' + qW(w) + ' mid-sentence' : 'normal for ' + qW(w) + ' is set by ' + r.hop + ', where it is capitalised mid-sentence ' + Math.round(r.rate * 100) + '% of the time';
+        return r; },
+      ordinaryOpener: w => { if (/^[A-Z]+$/.test(w)) return false; const r = hy.capNormal(w); return r.rate != null && r.rate < 0.5; },
+      // an ALL-CAPS word whose lowercase form is the normal way to write it (THIS, SCRIPT, PURPOSES): shouted, not named
+      shoutedOrdinary: w => { if (!/^\p{Lu}[\p{Lu}'’]+$/u.test(w)) return false; const r = hy.capNormal(w); return r.rate != null && r.rate < 0.5; },
+      // REGISTER: a name is written in one register (Capitalised or ALL-CAPS). Whether a change of register inside a capitalised run
+      // ends the name is MEASURED like every other normal here: of the adjacent capitalised pairs that open in this register, how many
+      // change to the other one, in the smallest region that differs. Under half means a change is where one name stops and the next starts.
+      registerBreak: (a, b) => { const ga = hdRegister(a.replace(/[.,;:]+$/, '')), gb = hdRegister(b.replace(/[.,;:]+$/, '')); if (!ga || !gb || ga === gb) return false;
+        const key = d.id + '|register|' + ga; let r = regMemo.get(key);
+        if (!r) { const L = [{ name: 'this document', k: SD[ga][0], n: SD[ga][1] }, { name: kn + ' documents', k: SKd[ga][0], n: SKd[ga][1] }, { name: 'the workspace', k: swW[ga][0], n: swW[ga][1] }];
+          r = HDRegion.normalRate(L, { key }); r.n = (L.find(x => x.name === r.hop) || {}).n; regMemo.set(key, r); }
+        hy.lastWhy = r.rate == null ? 'no region has seen a ' + HD_REGISTER[ga] + ' word followed by another capitalised one' : 'after a ' + HD_REGISTER[ga] + ' word the next one is in the other register ' + Math.round(r.rate * 100) + '% of the time in ' + r.hop + ' (' + r.n + ' pairs)';
         return r.rate != null && r.rate < 0.5; } };
     return hy; } };
 }
 const qW = w => '“' + w + '”';
+// The REGISTER a written word is in: ALL-CAPS or Capitalised. It is read off the word's BODY — its last letter — because a prefix may be
+// set apart from the body (McGOUGH is ALL-CAPS, DeWitt is Capitalised). A lone capital letter says nothing, a numeral (II, XVI — the
+// treebank's main reading is NUM) says nothing, and a caseless script has neither.
+const HD_REGISTER = { T: 'Capitalised', A: 'ALL-CAPS' };
+const hdRegister = w => { const m = /^\p{Lu}[\p{L}\p{M}'’]*(\p{L})$/u.exec(w); if (!m) return null;
+  const es = Object.entries((HD_POS && HD_POS[w.toLowerCase()]) || {}); if (es.length && es.sort((a, b) => b[1] - a[1])[0][0] === 'NUM') return null;
+  return /\p{Ll}/u.test(m[1]) ? 'T' : 'A'; };
 function findNames(t, hy) {
   const out = [];
   // a hyphen only continues the same capitalized word when what follows it is ALSO capitalized
@@ -4328,6 +4357,11 @@ function findNames(t, hy) {
     if (words.length === 1 && /^(I|We|You|They|He|She|It|That|There|What|Let|Don|Won|Can|Isn|Didn|Doesn)['\u2019](ve|m|re|ll|d|s|t)$/i.test(words[0])) return;
     if (!words[words.length - 1]) return;
     if (hy) { const cw = words.find(w => hy.clause(w)); if (cw) { hy.note('drop', words.join(' '), 'not a name: ' + qW(cw) + ' has no noun or name reading, so this is a clause or headline'); return; } }
+    // A SHOUTED run (every word ALL-CAPS) is a name only where its words are not ordinary lowercase words. That is MEASURED, never
+    // listed: hy.capNormal asks the smallest region that differs how often each word is written capitalised mid-sentence. A lone
+    // all-caps word amid mixed case is read as an acronym, so the test applies to a run of two or more, or to a line with no lowercase
+    // at all (there the capitals say nothing about the word). A word no region has seen proves nothing, so a run holding one stays.
+    if (hy && words.every(w => /^\p{Lu}[\p{Lu}'’]+[.,;:]*$/u.test(w)) && (words.length > 1 || !/\p{Ll}/u.test(t)) && words.every(w => hy.shoutedOrdinary(w.replace(/[.,;:]+$/, '')))) { hy.note('drop', words.join(' '), 'not a name: an ALL-CAPS run of ordinary words — ' + hy.lastWhy); return; }
     const atStart = /(^|[;:]\s*)[\s"'(]*$/.test(t.slice(0, idx));
     if (hy && atStart && /^\s*:/.test(after) && words.every(w => hy.commonOnly(w))) { hy.note('label', words.join(' '), 'not a name: a line-opening run of common words followed by a colon is a form label'); return; }
     const acr = /^[A-Z]{2,}$/.test(words[0]);
@@ -4342,8 +4376,7 @@ function findNames(t, hy) {
     out.push({ name, s: idx, e: idx + name.length, title, alias: am ? am[1] : null, saidAfter, acr: acr && words.length === 1 });
   };
   const next = (idx, w) => { const rest = t.slice(idx + w.length); return idx + w.length + (rest.match(/^\s+/) || [''])[0].length; };
-  while ((m = re.exec(t))) {
-    const words = m[0].split(/\s+/); const after = t.slice(m.index + m[0].length);
+  const runOf = (words, at, after) => {
     // split at a title word — or a leading PROFESSION ("Actress Susan Sarandon" ->
     // (Actress) "Susan Sarandon"): a capitalised human role opens a name the way a
     // title does, and the role is not part of the name. TITLE_ROLES is the narrow,
@@ -4351,12 +4384,23 @@ function findNames(t, hy) {
     // must stay one surface) and never title-ish words TITLES already owns.
     let ti = words.findIndex(w => TITLES.has(w.replace(/\.$/, '')) || TITLE_ROLES.has(w.toLowerCase().replace(/[.,;:]+$/, '')));
     if (ti >= 0) {
-      let idx = m.index; for (let i = 0; i < ti; i++) idx = next(idx, words[i]);
-      if (ti > 0) push(words.slice(0, ti), m.index, null, m, ' ' + words[ti]);
+      let idx = at; for (let i = 0; i < ti; i++) idx = next(idx, words[i]);
+      if (ti > 0) push(words.slice(0, ti), at, null, m, ' ' + words[ti]);
       let j = ti + 1; idx = next(idx, words[ti]);
       if (words[j] === 'of' && words[j + 1]) { idx = next(next(idx, words[j]), words[j + 1]); j += 2; while (/^(and|&)$/.test(words[j] || '') && words[j + 1]) { idx = next(next(idx, words[j]), words[j + 1]); j += 2; } }
       push(words.slice(j), idx, words[ti], m, after);
-    } else push(words, m.index, null, m, after);
+    } else push(words, at, null, m, after);
+  };
+  while ((m = re.exec(t))) {
+    const words = m[0].split(/\s+/); const cuts = [];
+    // REGISTER: where the next word is in the other register and the material says names here do not change register, one name
+    // stops and the next starts ("Rose DeWitt Bukater | LEONARDO DICAPRIO"). Measured by hy.registerBreak; without the prior, never cut.
+    if (hy) for (let i = 1; i < words.length; i++) if (hy.registerBreak(words[i - 1], words[i])) cuts.push({ i, why: hy.lastWhy });
+    if (!cuts.length) { runOf(words, m.index, t.slice(m.index + m[0].length)); continue; }
+    let p = m.index; const starts = words.map(w => { const s = p; p = next(p, w); return s; });
+    const bounds = [0, ...cuts.map(c => c.i), words.length];
+    hy.note('register', bounds.slice(0, -1).map((a, k) => words.slice(a, bounds[k + 1]).join(' ')).join(' | '), 'split where the register changes: ' + cuts.map(c => c.why).join('; '));
+    for (let k = 0; k + 1 < bounds.length; k++) { const a = bounds[k], b = bounds[k + 1]; runOf(words.slice(a, b), starts[a], t.slice(starts[b - 1] + words[b - 1].length)); }
   }
   return out;
 }
@@ -13409,7 +13453,9 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
           d.atomsNote = ['holon', 'name', 'fig', 'term'].filter(k => n[k]).map(k => n[k] + ' ' + k).join(' · ') + ' · the fold of the ground at “' + WA.address + '”'; }
       }
     } else if (sel.type === 'doc' && A.docById[sel.id]) {
-      const doc = A.docById[sel.id]; const sts = A.stsByDoc[doc.id] || []; const nm = [...new Set(sts.flatMap(s => s.names))];
+      const doc = A.docById[sel.id]; const sts = A.stsByDoc[doc.id] || [];
+      // the names a source is about are the ones it keeps saying, not the ones it opens with: ranked by how many of its statements mention them (ties keep reading order)
+      const nmN = new Map(); sts.forEach(s => s.names.forEach(n => nmN.set(n, (nmN.get(n) || 0) + 1))); const nm = [...nmN.keys()].sort((a, b) => nmN.get(b) - nmN.get(a));
       const AM = this._ambM; let amb = { has: false }, amount = null;
       if (AM && doc.text) {
         const r = AM.amountReadings(doc.text); const v = this.verdictOf(doc.id, 'amount');
