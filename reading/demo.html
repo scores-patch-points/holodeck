@@ -52,14 +52,15 @@
   .left{border-right:1px solid var(--line);display:grid;grid-template-rows:minmax(0,44%) minmax(0,1fr);min-height:0}
   .spine{overflow-y:auto;border-bottom:1px solid var(--line);padding:8px 10px 10px}
   .spine .h{font:600 12.5px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--dim);padding:6px 4px 8px}
-  .ly{display:grid;grid-template-columns:26px 1fr auto;gap:8px;align-items:center;border:1px solid var(--line);border-radius:9px;margin:5px 0;padding:6px 9px;background:var(--s1);cursor:default}
+  .ly{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:8px;align-items:center;border:1px solid var(--line);border-radius:9px;margin:3px 0;padding:5px 9px;background:var(--s1);cursor:pointer}
+  .ly:hover{border-color:var(--line2)}.ly:focus-visible{outline:2px solid var(--acc3);outline-offset:1px}
   .ly .n{font:600 12.5px var(--mono);color:var(--bg);background:var(--dim);border-radius:5px;padding:1px 6px;text-align:center}
   .ly.on{border-color:var(--acc3);background:#1a1f2b}
   .ly.on .n{background:var(--acc);color:#0b0d12}
   .ly.off{opacity:.55}
   .ly .lab{font-weight:600;font-size:13px}
   .ly .why{color:var(--dim);font-size:12.5px;grid-column:2 / 4;margin-top:-2px}
-  .ly .cnt{font:12.5px var(--mono);color:var(--dim)}
+  .ly .cnt{font:12.5px var(--mono);color:var(--dim);text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
   .sw{position:relative;width:36px;height:20px;border-radius:20px;background:#33333a;border:1px solid var(--line2);cursor:pointer;flex:none}
   .sw::after{content:'';position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:var(--dim);transition:.14s}
   .sw[aria-checked=true]{background:#1e3a2b;border-color:#2f6b4b}
@@ -68,13 +69,13 @@
   .ly.cur .lab{color:var(--ink)}
   .ly.cur{box-shadow:inset 3px 0 0 var(--acc)}
   /* ── the floors in the rail: a header per floor whose verdict fills in as the replay reaches it; under each, the layers that make its operand ── */
-  .fh{display:grid;grid-template-columns:auto auto minmax(0,1fr);gap:5px 8px;align-items:center;margin:14px 0 4px;padding:3px 2px 5px;border-bottom:1px solid var(--line);cursor:pointer}
+  .fh{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:5px 8px;align-items:center;margin:14px 0 4px;padding:3px 2px 5px;border-bottom:1px solid var(--line);cursor:pointer}
   .spine .h + .fh{margin-top:2px}
   .fh .f{font:600 12px var(--mono);color:var(--bg);background:var(--fc);border-radius:5px;padding:1px 7px}
-  .fh .nm{font:600 12px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--ink2)}
-  .fh .vd{font:12px var(--mono);color:var(--dim);justify-self:end;text-align:right;min-width:0;overflow-wrap:break-word;line-height:1.3}
+  .fh .t{min-width:0;line-height:1.3}.fh .nm{font:600 12px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--ink2);overflow-wrap:anywhere}
+  .fh .vd{font:12px var(--mono);color:var(--dim);justify-self:end;text-align:right;white-space:nowrap;line-height:1.3}
   .fh .vd.ok{color:var(--green)}.fh .vd.bad{color:var(--amber)}.fh .vd.fail{color:var(--bad)}
-  .fh .no{grid-column:1 / 4;font-size:12px;color:var(--dim);line-height:1.4}
+  .fh .no{font:11.5px var(--mono);color:var(--dim);margin-left:6px}
   .fh.ahead .f{opacity:.55}
   .fh.stage .nm::after{content:" · stage";color:var(--green);text-transform:none;letter-spacing:0}
   .fh.cur{box-shadow:inset 3px 0 0 var(--fc)}
@@ -315,7 +316,6 @@
     #app .spine{display:flex;flex-direction:row;gap:6px;overflow-x:auto;overflow-y:hidden;max-height:none;padding:8px 12px;-webkit-overflow-scrolling:touch}
     #app .spine .ly{flex:0 0 auto;margin:0;padding:8px 14px;white-space:nowrap;min-height:40px}
     #app .spine .fh{flex:0 0 auto;display:flex;align-items:center;gap:6px;margin:0;padding:8px 12px;white-space:nowrap;min-height:40px;border:1px solid var(--line);border-left:3px solid var(--fc);border-radius:9px;background:var(--s1)}
-    #app .spine .fh .no{display:none}
     #app .right{grid-template-rows:auto auto minmax(46vh,1fr);overflow:auto}
     #app .lens{max-height:22vh;overflow:auto;font-size:15px;line-height:1.7}
     #app .lanes{max-height:16vh;overflow:auto}
@@ -342,7 +342,7 @@
   .ly .how{display:none;grid-column:2 / 4;font-size:12px;line-height:1.45;color:var(--dim);margin-top:2px}.ly.cur .how{display:block}.ly .how b{color:var(--ink2);font-weight:600}
   .pnote{border:1px solid var(--line);border-radius:9px;padding:9px 12px;margin:0 0 12px;font-size:13.5px;line-height:1.55;background:var(--s1)}.pnote b{color:var(--ink2)}
   #p-graph-note{align-self:start;z-index:3;margin:6px 10px 0;font-size:13px;line-height:1.5}#p-graph-note .pnote{margin:0;background:var(--s1);opacity:.96}#p-graph-note summary{cursor:pointer}
-  .lnote{display:none}
+  .lnote{display:block;padding:8px 14px 9px;font-size:12.5px;line-height:1.45;color:var(--mut);border-bottom:1px solid var(--line)}.lnote b{color:var(--ink2)}#app .lnote .dim{display:none}
   @media (max-width:900px){
     #app .lnote{display:block;padding:8px 14px;font-size:13px;line-height:1.5;border-bottom:1px solid var(--line);max-height:30vh;overflow:auto}#app .lnote b{color:var(--ink2)}
     #app .spine .why,#app .spine .how,#app .spine .cnt{display:none}
@@ -353,8 +353,9 @@
   #app .insp .rh2{margin-top:18px;letter-spacing:.06em}
   #app button{font-size:13px}
   #app .left{grid-template-rows:minmax(0,1fr)}
+  @media (min-width:901px){ #app .left{grid-template-rows:auto minmax(0,1fr)} #app .lnote{order:-1} }
   #app .spine{border-bottom:0;padding:14px 14px}
-  #app .ly{grid-template-columns:1fr auto;padding:9px 12px;margin:6px 0}
+  #app .ly{padding:6px 11px;margin:3px 0}
   #app .ly .n{display:none}
   @media (max-width:1199px){ #app .spine{max-height:26vh} #app .ly{margin:4px 0;padding:7px 12px} }
 
@@ -373,8 +374,8 @@
 .flr .chg{border-left:2px solid var(--line2);padding:4px 10px;margin:6px 0;font-size:13.5px;line-height:1.5;overflow-wrap:anywhere}.flr .chg .k{font:600 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--dim);margin-bottom:2px}
 .flr .ex{font:12.5px/1.6 var(--mono);color:var(--ink2);margin-top:4px;overflow-wrap:anywhere}.flr .ex .dim,.flr .dim{color:var(--dim)}
 .flr .lys{margin:6px 0}.flr .lys.none{font-size:12.5px;color:var(--dim);line-height:1.4}
-.flr .det{font-size:12.5px;color:var(--dim);margin:6px 0;line-height:1.45;overflow-wrap:anywhere}
-.flr details.task{margin:6px 0;font-size:13px}.flr details.task summary{cursor:pointer;color:var(--mut)}
+.flr .det{font-size:12.5px;color:var(--dim);margin:6px 0;line-height:1.45;overflow-wrap:anywhere}.flr .det b{color:var(--ink2);font-weight:600}
+.flr details.fold{margin:6px 0;font-size:13px}.flr details.fold summary{cursor:pointer;color:var(--mut)}.flr details.fold summary:hover{color:var(--ink)}
 .flr dl.defs{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;margin:6px 0 0}.flr dl.defs dt{color:var(--dim);font:12px var(--mono)}.flr dl.defs dd{margin:0;overflow-wrap:anywhere;line-height:1.45}
 .flr table.arms{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:8px}.flr .arms th{font:600 11px var(--mono);color:var(--dim);text-align:left;padding:4px 6px;border-bottom:1px solid var(--line)}
 .flr .arms td{padding:5px 6px;vertical-align:top;border-bottom:1px solid var(--line);line-height:1.4;overflow-wrap:anywhere}.flr .arms .giver{color:var(--dim);font-size:11px}.flr .arms .skip{color:var(--dim)}
@@ -570,7 +571,7 @@ import { mountMap } from '../holodeck-map.js';
 import { classifyWord, THRAX_MAP, THRAX_OUT_OF_SCOPE, THRAX_META, POS_PRIOR_META } from '../vendor/khora/native/adapters/text/wordclass.js';
 import { morphologyFromPrior, createLemmatizer, stemsOf } from '../vendor/khora/native/adapters/text/morphology.js';
 import { splitSentences, deriveAbbreviations } from '../vendor/khora/native/adapters/text/spans.js';
-import { layerNoteHTML, tabNoteHTML, LAYER_NOTES } from './layer-notes.js';
+import { tabNoteHTML, LAYER_NOTES } from './layer-notes.js';
 import { buildRows, sortRows, nextSort, tableHTML as refTableHTML } from './referent-table.js';
 import { scanPunctuation, loadPunctuation, moodAt, containersAt, cuesFromBlankLines, cuesFromLayout } from './punctuation.js';
 import { tokenize } from '../vendor/khora/native/organs/source.js';
@@ -652,6 +653,9 @@ const FLOOR_NOTE = {   // what the rail says where a floor has no layer of its o
   'F6': 'no layer on this page — nothing here composes from premises',
 };
 const floorIdx = h => FLOORS.findIndex(f => f.floor === h);
+// click a layer in the rail: the replay jumps to its first event and the drawer opens on the tab that shows its work
+const TAB_OF_LAYER = { extract:'source', bytes:'source', decode:'source', furniture:'source', punct:'source', statement:'source', token:'words', grammar:'pos', morph:'morph', stance:'props', referent:'refs', relation:'props', np:'props', phrasal:'props', render:'render', ledger:'eot' };
+const shortVerdict = w => String(w || '').split(' — ')[0];
 const floorId = h => 'fl-' + String(h).replace(/^F/, '').replace('½', 'h');
 
 // the stance class, re-declared here (same shape as the organ) so the page can
@@ -1106,25 +1110,25 @@ function mount(T){
       const cur = l.id === active;
       const sw = l.fixed ? ''
         : `<span class="sw" role="switch" tabindex="0" aria-checked="${on}" data-feature="${l.feature}" title="switch ${esc(l.label)} ${on ? 'off' : 'on'} — the reading re-runs"></span>`;
-      return `<div class="ly ${cur ? 'cur' : ''} ${on ? '' : 'off'}"><span class="n">${CK[l.id] + 1}</span><span class="lab" style="color:var(${l.color})">${esc(l.label)}</span>${sw}${layerNoteHTML(l.id, { full:cur })}<span class="cnt" style="grid-column:2/3">${cnt}</span></div>`;
+      const note = LAYER_NOTES[l.id] || {};
+      return `<div class="ly ${cur ? 'cur' : ''} ${on ? '' : 'off'}" data-layer="${l.id}" role="button" tabindex="0" title="${esc(note.what || l.why)}"><span class="lab" style="color:var(${l.color})">${esc(l.label)}</span><span class="cnt" title="${esc(String(cnt).replace(/<[^>]+>/g, ''))}">${cnt}</span>${sw}</div>`;
     };
     const head = (f, fi) => {
       const reached = k >= reachAt[fi], v = reached ? floorVerdict(f.floor) : null, layers = byFloor.get(f.floor);
-      return `<div class="fh ${curFloor === f.floor ? 'cur' : ''} ${stage === f.floor ? 'stage' : ''} ${reached ? '' : 'ahead'}" data-floor="${esc(f.floor)}" style="--fc:var(${FLOOR_COLOR[f.floor]})" role="button" tabindex="0" title="${esc(f.operand)} — open in the Floors tab">`
-        + `<span class="f">${esc(f.floor)}</span><span class="nm">${esc(f.name)}</span><span class="vd ${v ? v.cls : ''}">${v ? esc(v.word) : ''}</span>`
-        + (layers.length ? '' : `<span class="no">${esc(FLOOR_NOTE[f.floor] || 'no layer on this page')}</span>`) + `</div>`;
+      return `<div class="fh ${curFloor === f.floor ? 'cur' : ''} ${stage === f.floor ? 'stage' : ''} ${reached ? '' : 'ahead'}" data-floor="${esc(f.floor)}" style="--fc:var(${FLOOR_COLOR[f.floor]})" role="button" tabindex="0" title="${esc(f.operand)}${v ? ' — ' + esc(v.word) : ''}${layers.length ? '' : ' — ' + esc(FLOOR_NOTE[f.floor] || 'no layer on this page')} — open in the Floors tab">`
+        + `<span class="f">${esc(f.floor)}</span><span class="t"><span class="nm">${esc(f.name)}</span>${layers.length ? '' : '<span class="no">no layer</span>'}</span><span class="vd ${v ? v.cls : ''}">${v ? esc(shortVerdict(v.word)) : ''}</span></div>`;
     };
     spineEl.innerHTML = `<div class="h">the floors, and the layers that make each — switch a layer off and the reading re-runs</div>`
       + FLOORS.map((f, fi) => head(f, fi) + byFloor.get(f.floor).map(row).join('')).join('')
       + `<div class="fh rec" style="--fc:var(--dim)" title="the record every floor appends to"><span class="f">∀</span><span class="nm">the record</span><span class="vd">every floor appends</span></div>` + record.map(row).join('');
-    { const n = LAYER_NOTES[active], lab = (L[active] || {}).label, ln = $('p-lnote'); if (ln) ln.innerHTML = n ? `<b>${esc(lab)}</b> ${esc(n.what)} <span class="dim"><b>Rests on</b> ${esc(n.rests)} <b>Cannot decide</b> ${esc(n.cannot)}</span>` : ''; }
+    { const n = LAYER_NOTES[active], lab = (L[active] || {}).label, ln = $('p-lnote'); if (ln){ ln.innerHTML = n ? `<b>${esc(lab)}</b> ${esc(n.what)} <span class="dim"><b>Rests on</b> ${esc(n.rests)} <b>Cannot decide</b> ${esc(n.cannot)}</span>` : ''; ln.title = n ? `Rests on: ${n.rests}\nCannot decide: ${n.cannot}` : ''; } }
     wireSwitches();
     if (wide.matches){ const c = spineEl.querySelector('.ly.cur'); if (c){ const top = c.offsetTop, h = spineEl.clientHeight; if (top < spineEl.scrollTop || top + c.offsetHeight > spineEl.scrollTop + h) spineEl.scrollTop = Math.max(0, top - h / 3); } }
   }
   function layerCount(key, St){
     switch (key){
       case 'extract': { const X = T.extraction; if (!X) return 'text — no container'; const js = (X.readings[X.collapsed] || {}).junctions || [], nj = js.filter((x) => x.decision === 'join').length; return `${esc((X.readings[X.collapsed] || {}).extractor || '—')} · ${X.held} reading${X.held === 1 ? '' : 's'} held${js.length ? ` · ${js.length} startle${js.length === 1 ? '' : 's'}, ${nj} joined` : ''}`; }
-      case 'bytes': return esc(T.doc.label) + ' · ' + T.nBytes.toLocaleString() + ' bytes';
+      case 'bytes': return T.nBytes.toLocaleString() + ' bytes';
       case 'decode': return T.doc.analysis.length.toLocaleString() + ' chars';
       case 'furniture': return T.features.furniture === false ? 'off' : (T.blanks.length ? T.blanks.length.toLocaleString() + ' chars blanked' : 'nothing to blank');
       case 'punct': { const P = T.punctuation || { sentences:[], containers:[] }, q = P.sentences.filter(x => x.mood === 'interrogative').length, x2 = P.sentences.filter(x => x.mood === 'exclamative').length; return (T.punct ? T.punct.length : 0) + ' marks · ' + P.sentences.length + ' sentences' + (q ? ' · ' + q + ' ask' : '') + (x2 ? ' · ' + x2 + ' exclaim' : '') + (P.containers.length ? ' · ' + P.containers.length + ' nested' : ''); }
@@ -1602,7 +1606,7 @@ function mount(T){
     else if (tab === 'render') pane.innerHTML = renderPaneHTML();
     else if (tab === 'eot') pane.innerHTML = eotPane(St);
     else if (tab === 'json') pane.innerHTML = `<pre class="json">${esc(JSON.stringify(readingJSON(T), null, 2))}</pre>`;
-    pane.insertAdjacentHTML('afterbegin', tabNoteHTML(tab));
+    pane.insertAdjacentHTML('afterbegin', tabNoteHTML(tab, tab === 'floors' ? { collapsed:true } : undefined));
     wireReopen(pane);
   }
 
@@ -1612,8 +1616,9 @@ function mount(T){
     if (!Ld || Ld.state === 'running') return `<div class="h">the floors</div><p class="stage-line dim">scoring this reading on the floor ladder — every rung's declared task with its three control arms, run by the same reader as the replay over the text cut into addressed passages…</p>`;
     if (Ld.state === 'failed') return `<div class="h">the floors</div><p class="stage-line">the ladder did not run: <span class="mono">${esc(Ld.error)}</span></p>`;
     const Lr = Ld.L, S = Lr.floors.stage, curFloor = FLOOR_OF_LAYER[e.stage] || null, chars = Lr.material.text.length;
+    const capF = S.cappedBy ? Lr.floors.floors.find(x => x.floor === S.cappedBy.floor) : null, capIt = capF && capF.items[0];
     return `<div class="h">the floors — this reader's ceiling on this material, not a property of the text</div>
-      <div class="stage-line">${S.stage ? `stage <b style="color:var(${FLOOR_COLOR[S.stage]})">${esc(S.stage)} · ${esc(S.stageName)}</b>` : '<b>no floor passed</b>'}${S.cappedBy ? ` — stops at ${esc(S.cappedBy.floor)}: ${esc(S.cappedBy.detail)}` : ' — every floor passed'}${S.isolated.length ? `. Passed above the gap, not counted: ${S.isolated.map(x => esc(x.floor)).join(', ')}` : ''}</div>
+      <div class="stage-line">${S.stage ? `stage <b style="color:var(${FLOOR_COLOR[S.stage]})">${esc(S.stage)} · ${esc(S.stageName)}</b>` : '<b>no floor passed</b>'}${capF ? ` — stops at <b>${esc(capF.floor)} · ${esc(capF.name)}</b>: ${esc(statusWord(capIt))}` : ' — every floor passed'}${S.isolated.length ? `. Passed above the gap, not counted: ${S.isolated.map(x => esc(x.floor)).join(', ')}` : ''}</div>
       <div class="pstat"><span>scored in <b>${Lr.ms.toLocaleString()}</b> ms, no model</span><span>control <b>${esc(Lr.controlKey)}</b></span><span>${Lr.cut ? `the first <b>${chars.toLocaleString()}</b> of ${(chars + Lr.cut).toLocaleString()} chars` : `<b>${chars.toLocaleString()}</b> chars`}</span><span>axiom 1 <b>${Lr.floors.axiom1.held ? 'held' : 'broken'}</b></span></div>`
       + FLOORS.map((f, fi) => floorBlock(f, fi, Lr, curFloor)).join('');
   }
@@ -1622,14 +1627,16 @@ function mount(T){
     const layers = LAYERS.filter(l => FLOOR_OF_LAYER[l.id] === f.floor);
     const below = fi === 0 ? 'the byte stream (S0), not itself a floor' : `${FLOORS[fi - 1].floor} · ${FLOORS[fi - 1].name}`;
     const xref = f.commons != null ? `≈ Commons ${f.commons} · ${orderOf(f.commons).name}` : 'no Commons order';
+    const word = statusWord(it), phrase = word.includes(' — ') ? word.slice(word.indexOf(' — ') + 3) : '';
+    const capped = Lr.floors.stage.cappedBy && Lr.floors.stage.cappedBy.floor === f.floor;
     return `<section class="flr ${curFloor === f.floor ? 'cur' : ''} ${Lr.floors.stage.stage === f.floor ? 'stage' : ''}" id="${floorId(f.floor)}" style="--fc:var(${FLOOR_COLOR[f.floor]})">
-      <div class="fhd"><span class="f">${esc(f.floor)}</span><b>${esc(f.name)}</b><span class="vd ${verdictClass(it)}">${esc(statusWord(it))}</span><span class="xr">${esc(xref)}</span></div>
+      <div class="fhd"><span class="f">${esc(f.floor)}</span><b>${esc(f.name)}</b><span class="vd ${verdictClass(it)}">${esc(shortVerdict(word))}</span><span class="xr">${esc(xref)}</span></div>
       <div class="op">${esc(f.operand)}</div>
       <div class="chg"><div class="k">what this floor made of ${esc(below)}</div>${floorChange(f.floor, Lr)}</div>
       ${layers.length ? `<div class="lys">${layers.map(l => `<span class="chip" style="color:var(${l.color})">${CK[l.id] + 1} · ${esc(l.label)}</span>`).join('')}</div>` : `<div class="lys none">${esc(FLOOR_NOTE[f.floor] || 'no layer on this page')}</div>`}
-      ${it && it.detail && it.status !== 'passed' ? `<div class="det">${esc(cleanDetail(it.detail))}</div>` : ''}
-      ${dec ? `<details class="task"><summary>the task — declared before it ran</summary><dl class="defs"><dt>task</dt><dd>${esc(dec.name)}</dd><dt>organizes</dt><dd>${esc(dec.organizes)}</dd><dt>organ</dt><dd class="mono">${esc(dec.organ)}</dd><dt>stages used</dt><dd>${esc(dec.stages.join(' · '))}</dd></dl></details>` : ''}
-      ${it ? armsTable(it, fi) : ''}
+      ${it && it.status !== 'passed' ? `<div class="det">${phrase ? `<b>${esc(phrase)}.</b> ` : ''}${esc(cleanDetail(it.detail || ''))}</div>` : ''}
+      ${dec ? `<details class="fold"><summary>the task — declared before it ran</summary><dl class="defs"><dt>task</dt><dd>${esc(dec.name)}</dd><dt>organizes</dt><dd>${esc(dec.organizes)}</dd><dt>organ</dt><dd class="mono">${esc(dec.organ)}</dd><dt>stages used</dt><dd>${esc(dec.stages.join(' · '))}</dd></dl></details>` : ''}
+      ${it ? `<details class="fold"${capped ? ' open' : ''}><summary>the three control arms — each must fail${it.arms ? '' : ' (not run)'}</summary>${armsTable(it, fi)}</details>` : ''}
     </section>`;
   }
   // the three control arms, each as what it skipped (⊘): the floor below withheld, the parts re-coordinated at random, the control text — and what the reader did without it
@@ -1637,7 +1644,7 @@ function mount(T){
     const below = fi === 0 ? 'the cut rule withheld — S0 alone' : `${FLOORS[fi - 1].floor} withheld — the floor below, alone`;
     const rows = ARM_ROWS.map(([key, what, giver]) => { const a = it.arms && it.arms[key], o = armOutcome(a);
       return `<tr class="${o.cls}"><td><span class="skip">⊘</span> ${esc(key === 'lowerOrder' ? below : what)}<br><span class="giver">${esc(giver)}</span></td><td class="res">${esc(o.res)}${esc(o.draws)}</td><td class="dim">${esc(a && a.detail || '')}</td></tr>`; }).join('');
-    return `<table class="arms"><thead><tr><th>control arm — each must fail</th><th>result</th><th>what it did</th></tr></thead><tbody>${rows}</tbody></table>`;
+    return `<table class="arms"><thead><tr><th>skipped</th><th>result</th><th>what it did</th></tr></thead><tbody>${rows}</tbody></table>`;
   }
   // what each floor made, on this text — counted from the same reader, index and specimens the rungs ran on (mhc-ladder.js::viewsOf), never restated
   function floorChange(h, Lr){
@@ -1897,7 +1904,8 @@ function mount(T){
     });
   }
   const onClick = e => {
-    const fh = e.target.closest('.fh[data-floor]'); if (fh){ setTab('floors'); const el = pane.querySelector('#' + floorId(fh.dataset.floor)); if (el) el.scrollIntoView({ block:'start', behavior:'smooth' }); return; }
+    const fh = e.target.closest('.fh[data-floor]'); if (fh){ setTab('floors'); const el = pane.querySelector('#' + floorId(fh.dataset.floor)); if (el) pane.scrollTop += el.getBoundingClientRect().top - pane.getBoundingClientRect().top - 8; return; }
+    const ly = e.target.closest('.ly[data-layer]'); if (ly && !e.target.closest('.sw')){ const id = ly.dataset.layer, j = ev.findIndex(x => x.stage === id); setDir(0); if (j >= 0) seek(j); setTab(TAB_OF_LAYER[id] || 'source'); return; }
     const rs = e.target.closest('[data-rsort]'); if (rs){ refTabSort = nextSort(refTabSort, rs.dataset.rsort); render(false); return; }
     const rr = e.target.closest('#p-pane .rt tbody tr[data-sel]'); if (rr){ try { graphSel = JSON.parse(rr.dataset.sel).ref; } catch (er) { graphSel = null; } setTab('graph'); return; }
     const a = e.target.closest('[data-a]'); if (!a) return; const act = a.dataset.a;
@@ -1911,7 +1919,7 @@ function mount(T){
     else if (act === 'dl-json'){ download(`${slugOf(T)}-reading.json`, JSON.stringify(readingJSON(T), null, 2), 'application/json'); a.textContent = 'Saved'; setTimeout(() => { a.textContent = '⤓ Reading (JSON)'; }, 1400); } };
   const onKey = e => { if (e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') return;
     if (!app.classList.contains('on')) return;
-    if (e.key === 'Enter' && e.target && e.target.closest && e.target.closest('.fh[data-floor]')){ e.preventDefault(); e.target.click(); return; }
+    if (e.key === 'Enter' && e.target && e.target.closest && e.target.closest('.fh[data-floor], .ly[data-layer]')){ e.preventDefault(); e.target.click(); return; }
     if (e.key === 'Escape') close(); else if (e.key === ' '){ e.preventDefault(); setDir(dir ? 0 : 1); }
     else if (e.key === 'ArrowLeft'){ setDir(0); seek(k - 1); } else if (e.key === 'ArrowRight'){ setDir(0); seek(k + 1); }
     else if (e.key === 'j' || e.key === 'J') setDir(-1); else if (e.key === 'k' || e.key === 'K') setDir(0); else if (e.key === 'l' || e.key === 'L') setDir(1);
