@@ -50,15 +50,15 @@ const ARBITRARY_ALPHA = 0.05; // network-standing.js's LINK_SPEC precedent, cite
 // ── THE FLOORS — our own ladder, the one the stage is read on ──────────────
 //
 // Canon's operand ladder (khora native/docs/LEVELS.md; WHERE-WE-ARE.md):
-// "F0 units → F1 referents → F2 arrangements → F3 claims → F4½ nesting →
+// "F0 units → F1 referents → F2 arrangements → F3 claims → F4 nesting →
 // F5 corroborated notes → F6 premises", and "every floor promotes the
 // previous floor's FINDING into an OPERAND" (organs/derivation.js). That is
 // Commons's axioms 1 and 2 in our own terms, so the MHC discipline carries
 // over whole: each rung is a task declared before it runs, defined in terms
 // of the rung one floor down, run through mhc.js's own `runItem` (three
 // control arms that must fail, then the task, quantal), and the stage is the
-// highest floor passed with no gap below it. Canon names no F4; F4½ sits
-// between F3 and F5 and is treated as the next floor down from F5.
+// highest floor passed with no gap below it. Canon's LEVELS.md names no F4
+// and calls this rung F4½; here it is F4, the next floor down from F5.
 //
 // What mhc.js cannot do here is score the ladder itself: `declareItem`,
 // `checkAxiom1` and `stageFrom` are bound to Commons's sixteen orders. The
@@ -74,7 +74,7 @@ export const FLOORS = Object.freeze([
   Object.freeze({ floor: 'F1', name: 'referents', operand: 'Beings — a name admitted as one being the material establishes', commons: 5, probes: [] }),
   Object.freeze({ floor: 'F2', name: 'arrangements', operand: 'referents arranged around a connector: who did what to whom', commons: 6, probes: [7] }),
   Object.freeze({ floor: 'F3', name: 'claims', operand: 'an arrangement as a claim a judge can check against the material', commons: 8, probes: [10, 12] }),
-  Object.freeze({ floor: 'F4½', name: 'nesting', operand: 'a claim in an end slot: who says what, apart from what is so', commons: null, probes: [] }),
+  Object.freeze({ floor: 'F4', name: 'nesting', operand: 'a claim in an end slot: who says what, apart from what is so', commons: null, probes: [] }),
   Object.freeze({ floor: 'F5', name: 'corroborated notes', operand: 'a claim become a note — a variable over its own restatements', commons: 9, probes: [11, 13] }),
   Object.freeze({ floor: 'F6', name: 'premises', operand: 'notes that survived corroboration, standing as premises for composition', commons: null, probes: [] }),
 ]);
@@ -449,7 +449,7 @@ function floorOnlyItems({ material, spec }) {
       },
     },
     {
-      id: 'f4h-nesting', floor: 'F4½',
+      id: 'f4-nesting', floor: 'F4',
       name: 'a claim in an end slot: who says what, kept apart from what is so',
       organ: 'organs/nesting.js (corroborationOf · leakCheck); in canon only organs/ranke.js writes nested notes',
       assembly: ASSEMBLY, stages: ['typed, directional relation'], definedInTermsOf: ['f3-claims'],
@@ -476,7 +476,7 @@ const FLOOR_WRAP = [
   ['f1-referents', 'F1', 'o5-nominal', ['f0-units']],
   ['f2-arrangements', 'F2', 'o6-sentential', ['f1-referents']],
   ['f3-claims', 'F3', 'o8-primary', ['f2-arrangements']],
-  ['f5-notes', 'F5', 'o9-concrete', ['f4h-nesting']],
+  ['f5-notes', 'F5', 'o9-concrete', ['f4-nesting']],
 ];
 function floorItemsOf(commonsItems, own) {
   const byId = new Map(commonsItems.map((i) => [i.id, i]));
@@ -1012,6 +1012,89 @@ function viewsOf({ material, reader, index, spec }) {
     pronouns: { bindings: (pron.bindings ?? []).map((b) => ({ ...b, name: nameOfRef.get(b.referentId) ?? b.referentId })), gaps: pron.gaps ?? [], regime: pron.regime ?? null },
     edges, slots, grid, systems: spec.sourceReaders.map((s) => s.ref), bySource: spec.bySource, merges,
   };
+}
+
+// ── the priors each floor consumes, and the arm that withholds them ───────
+// A floor is defined in terms of the floor below AND the priors its organ is
+// handed. The three MHC arms never touch a prior; this arm does: the floor's
+// task is run again with one prior withheld, and the prior is said to have
+// EARNED ITS KEEP at that floor when the task no longer completes without it,
+// or to have ADDED NOTHING on this material when it still does. It changes no
+// floor's verdict — it is a finding about the prior, not about the floor.
+//
+// What each floor's organ is handed on this page (the ASSEMBLY above):
+//   F0  spans.js::splitSentences derives the material's own abbreviations, so
+//       "Mr." stays whole — a prior measured from the material, withholdable
+//       by cutting with none
+//   F1  cast.js::makeReferentIndex reads the script's capitalisation and the
+//       material's own recurrence; no shipped prior is threaded into it here
+//   F2, F3, F5  the relation reader (holodeck-reader.js) is built over the
+//       part-of-speech prior, the morphology prior (same-act widened by the
+//       lemmatizer) and the stance class; each has a switch, so the page can
+//       hand this arm a reader built without one (`withhold(key)`)
+//   F4, F6  no organ on this page, nothing consumed
+export const PRIORS_OF = Object.freeze({
+  F0: [{ key: 'abbreviations', what: 'abbreviations derived from the material itself (spans.js::deriveAbbreviations)' }],
+  F1: [],
+  F2: [{ key: 'posPrior', what: 'part of speech' }, { key: 'morphology', what: 'morphology — same-act widened by the lemmatizer' }, { key: 'stance', what: 'stance class — same-act widened by stance' }],
+  F3: [{ key: 'posPrior', what: 'part of speech' }, { key: 'morphology', what: 'morphology — same-act widened by the lemmatizer' }, { key: 'stance', what: 'stance class — same-act widened by stance' }],
+  F4: [],
+  F5: [{ key: 'posPrior', what: 'part of speech' }, { key: 'morphology', what: 'morphology — same-act widened by the lemmatizer' }, { key: 'stance', what: 'stance class — same-act widened by stance' }],
+  F6: [],
+});
+export const PRIOR_NOTE = Object.freeze({
+  F1: 'no shipped prior: the name rule reads the script’s capitalisation and the material’s own recurrence',
+  F4: 'no organ on this page, nothing consumed',
+  F6: 'no organ on this page, nothing consumed',
+});
+const priorWord = (a) => (!a.withheld ? 'could not withhold' : a.completed ? 'added nothing here — the floor completed without it' : 'needed — the floor did not complete without it');
+
+/** Run the prior-withheld arm on a ladder already scored (`L` from runLadder),
+ * for every floor whose task ran. `withhold(key)` is the page's: it returns a
+ * READER built without that prior (async), or null where it has no switch.
+ * Writes `L.priorArms[floor] = [{ key, what, withheld, completed, detail, word }]`. */
+export async function runPriorArms(L, { material, withhold = null } = {}) {
+  const out = {};
+  const spec = L.spec, text = material.text;
+  const variants = new Map();
+  const readerWithout = async (key) => {
+    if (variants.has(key)) return variants.get(key);
+    let r = null;
+    try { const RV = withhold ? await withhold(key) : null; r = RV ? RV(material.passages) : null; } catch { r = null; }
+    variants.set(key, r);
+    return r;
+  };
+  for (const f of L.floors.floors) {
+    const declared = PRIORS_OF[f.floor] ?? [];
+    const item = f.items[0];
+    const ran = item && item.status === 'passed';   // runItem runs the task only when the arms hold
+    const rows = [];
+    for (const pr of declared) {
+      if (!ran) { rows.push({ ...pr, withheld: false, completed: null, detail: `the floor’s task did not run (${item?.status ?? 'no item'}), so nothing can be withheld from it` }); continue; }
+      if (f.floor === 'F0') {
+        const a = auditUnits(text, splitSentences(text, { abbreviations: [] }).map((u) => (typeof u === 'string' ? { text: u, offset: text.indexOf(u) } : u)));
+        rows.push({ ...pr, withheld: true, completed: a.ok, detail: `cut with no abbreviation knowledge: ${a.n} units, ${a.reopen} re-open by byte address, ${a.inWord} cuts inside a word — the F0 task cannot tell a sentence from a fragment, only an address from a guess` });
+        continue;
+      }
+      if (f.floor === 'F5') { rows.push({ ...pr, withheld: false, completed: null, detail: 'F5 reads across source systems; this arm does not re-run that read here' }); continue; }
+      const rv = await readerWithout(pr.key);
+      if (!rv) { rows.push({ ...pr, withheld: false, completed: null, detail: 'the page handed no reader built without it' }); continue; }
+      const e = spec.specimen;
+      if (!e) { rows.push({ ...pr, withheld: false, completed: null, detail: 'no specimen edge to re-run' }); continue; }
+      if (f.floor === 'F2') {
+        const ev = edgesOf(rv);
+        const fwd = queryEdges(ev, { subject: e.subject, verb: e.verb, object: e.object }) ?? [], rev = queryEdges(ev, { subject: e.object, verb: e.verb, object: e.subject }) ?? [];
+        rows.push({ ...pr, withheld: true, completed: fwd.length > 0 && rev.length === 0, detail: `without it: "${e.subject} —${e.verb}→ ${e.object}" stated ${fwd.length}, its reverse ${rev.length}; ${ev.length} edges read (${spec.edges.length} with it)` });
+      } else if (f.floor === 'F3') {
+        const st = rv.read(`${e.subject} ${e.verb} ${e.object}.`), rs = rv.read(`${e.object} ${e.verb} ${e.subject}.`);
+        const b1 = (st.claims ?? []).some((c) => c.verdict === 'bound'), b2 = (rs.claims ?? []).some((c) => c.verdict === 'bound');
+        rows.push({ ...pr, withheld: true, completed: b1 && !b2, detail: `without it: stated → ${(st.claims ?? []).map((c) => c.verdict).join(',') || 'no claim'}; reversed → ${(rs.claims ?? []).map((c) => c.verdict).join(',') || 'no claim'}` });
+      }
+    }
+    out[f.floor] = rows.map((r) => ({ ...r, word: priorWord(r) }));
+  }
+  L.priorArms = out;
+  return out;
 }
 
 /** Check one claim against the material's own edges (order 8's judge), for the

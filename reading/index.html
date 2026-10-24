@@ -135,7 +135,7 @@
   <h1>the reading microscope</h1>
   <div class="sub">
     Drop any text in. This page reads it <b>the way the fold reads it</b> and lays the reading out on the fold's own
-    <b>floors</b> — F0 units, F1 referents, F2 arrangements, F3 claims, F4½ nesting, F5 corroborated notes, F6 premises —
+    <b>floors</b> — F0 units, F1 referents, F2 arrangements, F3 claims, F4 nesting, F5 corroborated notes, F6 premises —
     with the discipline of the <b>Model of Hierarchical Complexity</b>: every rung is a task declared before it runs, tried
     on your text with three control arms by khora's own MHC module, and the stage is the highest floor reached with no gap
     below it. Commons's orders are kept beside each floor as a cross-reference.
@@ -335,7 +335,7 @@ function ladderSection(doc, R, L){
       <div>
         <p class="note" style="margin-top:0">The floors are canon’s operand ladder: <i>“every floor promotes the previous floor’s finding into an operand”</i> (khora <span class="mono">organs/derivation.js</span>). That is the MHC’s own discipline in our terms, so each rung is a <b>task declared before it runs</b>, defined in terms of the floor directly below it, and its order is fixed by what it is built from — never read off your text.</p>
         <p class="note">Three control arms run first, and <b>each must fail</b>: the floor below, alone (axiom 3); the same parts re-coordinated arbitrarily (axiom 3); and material that does not support the task (this battery’s own control). Only then is the task tried, and it passes or fails <b>whole</b>.</p>
-        <p class="note">A rung whose arms do not hold is <b>refused</b> — not a genuine task at that floor on this material, so the reader is unmeasured there, not failing. A rung your material offers no specimen for, or that no organ on this page can perform, is a <b>typed gap</b>. Neither is read as a pass, and no stage is read across either. Canon names no F4: F4½ is the floor between F3 and F5.</p>
+        <p class="note">A rung whose arms do not hold is <b>refused</b> — not a genuine task at that floor on this material, so the reader is unmeasured there, not failing. A rung your material offers no specimen for, or that no organ on this page can perform, is a <b>typed gap</b>. Neither is read as a pass, and no stage is read across either. Canon names no F4: F4 is the floor between F3 and F5.</p>
         ${card('this run', [
           ['scorer', 'khora the-fold/mhc.js runItem — vendored byte-identical'],
           ['floor table, axiom 1, stage walk', 'this page, by mhc.js’s own rules — until they move to khora'],
@@ -531,9 +531,9 @@ const FLOOR_VIEWS = {
   F1: (doc, R, L) => VIEWS[5](doc, R, L),
   F2: (doc, R, L) => VIEWS[6](doc, R, L),
   F3: (doc, R, L) => VIEWS[8](doc, R, L),
-  'F4½': () => `
+  'F4': () => `
       <p class="note" style="margin-top:0">Canon’s nesting floor holds a claim in an end slot — <span class="mono">Tolstoy —states→ claim:…</span> — as an ordinary note, and its wall is why it exists: <b>witnesses of an outer note never corroborate the inner claim</b>, so “papers report he said it” never becomes “sources confirm it” (<span class="mono">organs/nesting.js</span>).</p>
-      <p class="note">No organ on this page nests. The reader binds surfaces into its end slots, never <span class="mono">claim:&lt;id&gt;</span>, and canon’s one producer of nested notes, <span class="mono">organs/ranke.js</span>, follows a page’s citations, which this page does not fetch. So F4½ is a typed gap here and no stage is read across it. Detecting reported speech with a list of saying-verbs would get past the gap, and is exactly what this page does not do.</p>`,
+      <p class="note">No organ on this page nests. The reader binds surfaces into its end slots, never <span class="mono">claim:&lt;id&gt;</span>, and canon’s one producer of nested notes, <span class="mono">organs/ranke.js</span>, follows a page’s citations, which this page does not fetch. So F4 is a typed gap here and no stage is read across it. Detecting reported speech with a list of saying-verbs would get past the gap, and is exactly what this page does not do.</p>`,
   F5: (doc, R, L) => VIEWS[9](doc, R, L),
   F6: (doc, R, L) => {
     const p = L.views.premises, fl = L.views.premiseFloor;

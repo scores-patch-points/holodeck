@@ -5,13 +5,13 @@
 // "Name verb Name." is one edge, and read(claim) binds a claim the edges
 // state. The organs the items drive (surfaces, pronouns, cast, verification,
 // testimony) are the vendored khora ones. What is pinned is the ladder, not
-// the reader: the canon floor table, axiom 1 one floor down, F4½ typed as an
+// the reader: the canon floor table, axiom 1 one floor down, F4 typed as an
 // absent organ, the stage walk, a floor reusing its Commons run, and F0's
 // byte re-open.
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { materialOf, runLadder, FLOORS } from './mhc-ladder.js';
+import { materialOf, runLadder, runPriorArms, FLOORS, PRIORS_OF, PRIOR_NOTE } from './mhc-ladder.js';
 
 const SENT = /([A-Z][a-z]+) (praised|opposed|met|joined) ([A-Z][a-z]+)\./g;
 function stubReader(passages) {
@@ -62,8 +62,8 @@ test('materialOf: passages tile each source, refs are source#start-end, keys sta
 
 test('the ladder is canon’s floor table, in order, with axiom 1 held one floor down', async () => {
   const L = await run([{ key: 'one', text: prose(40) }, { key: 'two', text: prose(40, 2) }]);
-  assert.deepEqual(L.floors.floors.map((f) => f.floor), ['F0', 'F1', 'F2', 'F3', 'F4½', 'F5', 'F6']);
-  assert.deepEqual(FLOORS.map((f) => f.floor), ['F0', 'F1', 'F2', 'F3', 'F4½', 'F5', 'F6']);
+  assert.deepEqual(L.floors.floors.map((f) => f.floor), ['F0', 'F1', 'F2', 'F3', 'F4', 'F5', 'F6']);
+  assert.deepEqual(FLOORS.map((f) => f.floor), ['F0', 'F1', 'F2', 'F3', 'F4', 'F5', 'F6']);
   assert.equal(L.floors.axiom1.held, true, JSON.stringify(L.floors.axiom1.findings));
   const at = new Map(L.floors.declared.map((d) => [d.id, d.floor]));
   for (const d of L.floors.declared) {
@@ -73,14 +73,14 @@ test('the ladder is canon’s floor table, in order, with axiom 1 held one floor
   }
 });
 
-test('F4½ is a typed gap — no organ on this page — and no stage is read across it', async () => {
+test('F4 is a typed gap — no organ on this page — and no stage is read across it', async () => {
   const L = await run([{ key: 'one', text: prose(40) }, { key: 'two', text: prose(40, 2) }]);
-  const f4h = L.floors.floors.find((f) => f.floor === 'F4½');
-  assert.equal(f4h.status, 'unmeasured');
-  assert.equal(f4h.items[0].reason, 'organ_unreachable');
-  assert.match(f4h.items[0].detail, /no organ on this page nests a claim/);
+  const f4 = L.floors.floors.find((f) => f.floor === 'F4');
+  assert.equal(f4.status, 'unmeasured');
+  assert.equal(f4.items[0].reason, 'organ_unreachable');
+  assert.match(f4.items[0].detail, /no organ on this page nests a claim/);
   const order = FLOORS.map((f) => f.floor);
-  if (L.floors.stage.stage) assert.ok(order.indexOf(L.floors.stage.stage) < order.indexOf('F4½'));
+  if (L.floors.stage.stage) assert.ok(order.indexOf(L.floors.stage.stage) < order.indexOf('F4'));
 });
 
 test('the stage walk: every floor up to the stage passed, the cap is the first that did not, isolated passes sit above it', async () => {
@@ -89,7 +89,7 @@ test('the stage walk: every floor up to the stage passed, the cap is the first t
   const { stage, cappedBy, isolated } = L.floors.stage;
   const upTo = stage ? order.indexOf(stage) : -1;
   L.floors.floors.slice(0, upTo + 1).forEach((f) => assert.equal(f.status, 'passed', f.floor));
-  assert.ok(cappedBy, 'F4½ guarantees a cap on this page');
+  assert.ok(cappedBy, 'F4 guarantees a cap on this page');
   assert.equal(order.indexOf(cappedBy.floor), upTo + 1);
   assert.notEqual(L.floors.floors[upTo + 1].status, 'passed');
   for (const f of isolated) {
@@ -126,4 +126,30 @@ test('one sentence offers F0 no second unit: a gap about the material, never a f
   assert.equal(f0.status, 'unmeasured');
   assert.match(f0.detail, /this material offers no second unit/);
   assert.equal(L.floors.stage.stage, null);
+});
+
+test('every floor declares the priors its organ consumes; a floor with none says why', () => {
+  for (const f of FLOORS) {
+    assert.ok(Array.isArray(PRIORS_OF[f.floor]), `${f.floor} declares its priors`);
+    if (!PRIORS_OF[f.floor].length) assert.ok(PRIOR_NOTE[f.floor], `${f.floor} consumes nothing and says why`);
+  }
+  assert.deepEqual(PRIORS_OF.F2.map((p) => p.key), ['posPrior', 'morphology', 'stance']);
+});
+
+test('the prior-withheld arm: a reader that reads nothing without the prior makes it needed; the same reader makes it add nothing; no switch, no measure', async () => {
+  const L = await run([{ key: 'a', text: prose(60) }]);
+  const passed = L.floors.floors.filter((f) => f.items[0] && f.items[0].status === 'passed' && ['F2', 'F3'].includes(f.floor)).map((f) => f.floor);
+  assert.ok(passed.length >= 1, 'the stub reaches F2 or F3 on this material');
+  const blind = () => ({ edges: [], read: () => ({ claims: [], edges: [], vocabulary: {} }) });
+  await runPriorArms(L, { material: L.material ?? materialOf([{ key: 'a', text: prose(60) }]), withhold: async () => blind });
+  for (const h of passed) for (const a of L.priorArms[h]) { assert.equal(a.withheld, true); assert.equal(a.completed, false); assert.match(a.word, /^needed/); }
+  await runPriorArms(L, { material: materialOf([{ key: 'a', text: prose(60) }]), withhold: async () => stubReader });
+  for (const h of passed) for (const a of L.priorArms[h]) { assert.equal(a.completed, true); assert.match(a.word, /^added nothing/); }
+  await runPriorArms(L, { material: materialOf([{ key: 'a', text: prose(60) }]), withhold: null });
+  for (const h of passed) for (const a of L.priorArms[h]) { assert.equal(a.withheld, false); assert.match(a.word, /^could not withhold/); }
+  // F0 withholds the material's own abbreviations; this prose has none, so the cut is the same and the prior added nothing here
+  const f0 = L.priorArms.F0;
+  assert.equal(f0.length, 1); assert.equal(f0[0].withheld, true); assert.equal(f0[0].completed, true);
+  // a floor whose task never ran has nothing to withhold from
+  for (const a of L.priorArms.F5) assert.equal(a.withheld, false);
 });

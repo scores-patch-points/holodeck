@@ -6,7 +6,7 @@
 <title>How to read without a model — the pipeline, layer by layer</title>
 <style>
   :root{--bg:#17171a;--s1:#1c1c20;--s2:#29292e;--sel:#26272c;--sel2:#30333b;--line:#2e2e33;--line2:#3f3f46;--ink:#f4f4f6;--ink2:#c9c9d2;--mut:#9d9da8;--dim:#9494a0;--acc:#8ab4ff;--acc2:#8ab4ff;--acc3:#6d9dff;--amber:#f0b429;--blue:#8ab4ff;--green:#56d364;--pink:#e0a0c0;--date:#8ab4ff;--ok:#56d364;--bad:#f87171;--edge:#3f3f46;--hdr:rgba(23,23,26,.95);--sans:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;--mono:ui-monospace,SFMono-Regular,Menlo,monospace;--serif:Georgia,"Times New Roman",serif;color-scheme:dark}
-  :root{--f0:#9494a0;--f1:#c68bff;--f2:#56d364;--f3:#8ab4ff;--f4h:#e0a0c0;--f5:#f0b429;--f6:#ff9d6e}  /* the floors, F0 units … F6 premises (reading/mhc-ladder.js) */
+  :root{--f0:#9494a0;--f1:#c68bff;--f2:#56d364;--f3:#8ab4ff;--f4:#e0a0c0;--f5:#f0b429;--f6:#ff9d6e}  /* the floors, F0 units … F6 premises (reading/mhc-ladder.js) */
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 var(--sans);-webkit-font-smoothing:antialiased}
   a{color:var(--acc)}
@@ -67,13 +67,16 @@
   .ly.cur .lab{color:var(--ink)}
   .ly.cur{box-shadow:inset 3px 0 0 var(--acc)}
   /* ── the floors in the rail: a header per floor whose verdict fills in as the replay reaches it; under each, the layers that make its operand ── */
-  .fh{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:5px 8px;align-items:center;margin:14px 0 4px;padding:3px 2px 5px;border-bottom:1px solid var(--line);cursor:pointer}
+  .fh{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;gap:5px 6px;align-items:center;margin:14px 0 4px;padding:3px 2px 5px;border-bottom:1px solid var(--line);cursor:pointer}
   .spine .h + .fh{margin-top:2px}
   .fh .f{font:600 12px var(--mono);color:var(--bg);background:var(--fc);border-radius:5px;padding:1px 7px}
   .fh .t{min-width:0;line-height:1.3}.fh .nm{font:600 12px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--ink2);overflow-wrap:anywhere}
   .fh .vd{font:12px var(--mono);color:var(--dim);justify-self:end;text-align:right;white-space:nowrap;line-height:1.3}
   .fh .vd.ok{color:var(--green)}.fh .vd.bad{color:var(--amber)}.fh .vd.fail{color:var(--bad)}
   .fh .no{font:11.5px var(--mono);color:var(--dim);margin-left:6px}
+  .fh .rv{font:11px var(--mono);color:var(--pink);margin-left:6px}
+  .fh .car{background:none;border:0;color:var(--dim);cursor:pointer;font-size:12px;padding:0 2px;min-width:22px;min-height:22px;border-radius:4px}.fh .car:hover{color:var(--ink);background:var(--s1)}
+  .fh.closed{margin-bottom:2px}
   .fh.ahead .f{opacity:.55}
   .fh.stage .nm::after{content:" · stage";color:var(--green);text-transform:none;letter-spacing:0}
   .fh.cur{box-shadow:inset 3px 0 0 var(--fc)}
@@ -395,6 +398,7 @@
     #app{grid-template-columns:1fr;grid-template-rows:auto auto minmax(0,1fr) 190px auto}
     #app .index{grid-column:1;grid-row:2;border-right:0;border-bottom:1px solid var(--line);overflow:visible}
     #app .index .spine{padding:8px 12px;overflow-x:auto;overflow-y:hidden}
+    #app .spine .fg{display:contents}#app .spine .fg[hidden]{display:none}#app .spine .fh .car{display:none}
     #app .viewer{grid-column:1;grid-row:3}
     #app .viewer .lens{padding:8px 16px 14px}
     #app .timeline{grid-column:1;grid-row:4}
@@ -542,7 +546,7 @@ import { makeSameBeing } from '../vendor/khora/native/adapters/text/corpus-ident
 import { browserOcr, loadPdfjs } from '../holodeck-ocr.js';
 import { recordOcr } from './scan-ledger.js';
 import { sha256Hex, stableProvenanceId, byteRange, EotLedger } from '../vendor/fold-chat/fold-chat-eot.js';
-import { runLadder, materialOf, FLOORS } from './mhc-ladder.js';
+import { runLadder, runPriorArms, materialOf, FLOORS, PRIORS_OF, PRIOR_NOTE } from './mhc-ladder.js';
 import { statusWord, cleanDetail, ARM_ROWS, armOutcome } from './floor-words.js';
 import { orderOf } from '../vendor/khora/native/the-fold/mhc.js';
 import { isClaimRef } from '../vendor/khora/native/organs/nesting.js';
@@ -594,13 +598,13 @@ const DEFAULT_FEATURES = { furniture:true, pos:true, morph:true, stance:true, np
 // Each layer sits at the floor whose operand it makes. The layers that classify forms by a received prior (POS,
 // morphology, stance) sit with F0: they say what a unit's forms carry and arrange nothing. Render re-orders an F2
 // arrangement and makes no new operand. F3's judge is the verdict each relation carries, read in the Relations
-// layer — no layer of its own. F4½, F5 and F6 have no layer on this page, and the rail shows those rungs empty:
+// layer — no layer of its own. F4, F5 and F6 have no layer on this page, and the rail shows those rungs empty:
 // that is the finding about this pipeline, not a gap in the drawing.
 const FLOOR_OF_LAYER = { extract:'F0', bytes:'F0', decode:'F0', furniture:'F0', punct:'F0', statement:'F0', token:'F0', grammar:'F0', morph:'F0', stance:'F0', referent:'F1', relation:'F2', np:'F2', phrasal:'F2', render:'F2', ledger:null };
-const FLOOR_COLOR = { 'F0':'--f0', 'F1':'--f1', 'F2':'--f2', 'F3':'--f3', 'F4½':'--f4h', 'F5':'--f5', 'F6':'--f6' };
+const FLOOR_COLOR = { 'F0':'--f0', 'F1':'--f1', 'F2':'--f2', 'F3':'--f3', 'F4':'--f4', 'F5':'--f5', 'F6':'--f6' };
 const FLOOR_NOTE = {   // what the rail says where a floor has no layer of its own
   'F3': 'no layer of its own — the verdict each relation carries (bound · contradicted · unbound), read back against the material',
-  'F4½': 'no layer on this page — nothing here puts a claim in an end slot',
+  'F4': 'no layer on this page — nothing here puts a claim in an end slot',
   'F5': 'no layer on this page — the ladder reads notes across sources; this view reads one',
   'F6': 'no layer on this page — nothing here composes from premises',
 };
@@ -707,18 +711,28 @@ function controlFor(analysis){
 // the Floors tab says when a cap cut.
 // The verdicts are the READER's ceiling on this material, not a property of the text: the same text under another reader scores otherwise.
 const LADDER_CHARS = 80000;
-function startLadder(T, R, clean){
+function startLadder(T, R, clean, { readerFeatures = {}, foreign = null } = {}){
   T.ladder = { state:'running' };
   setTimeout(async () => {
     const t0 = performance.now();
+    let Lr = null, material = null;
     try {
       const text = clean.length > LADDER_CHARS ? clean.slice(0, LADDER_CHARS) : clean;
-      const material = materialOf([{ key:'text', label:T.doc.label, text }]);
+      material = materialOf([{ key:'text', label:T.doc.label, text }]);
       const ctl = controlFor(text);
-      const Lr = await runLadder({ material, control: ctl.material, READER: R, priors: priorsDeclared(), reader: R(material.passages) });
+      Lr = await runLadder({ material, control: ctl.material, READER: R, priors: priorsDeclared(), reader: R(material.passages) });
       Lr.ms = Math.round(performance.now() - t0); Lr.controlKey = ctl.key; Lr.material = material; Lr.cut = clean.length - text.length;
-      T.ladder = { state:'done', L: Lr };
+      T.ladder = { state:'done', L: Lr, priors:'running' };
     } catch (err) { console.error(err); T.ladder = { state:'failed', error: String(err && err.message || err) }; }
+    if (T.onLadder) T.onLadder();
+    if (!Lr) return;
+    // the prior-withheld arm: the same reader built without one prior at a time (the rail's own switches), the floor's task run again.
+    // A finding about each prior — earned its keep here, or added nothing — never a change to a floor's verdict.
+    const t1 = performance.now();
+    try {
+      await runPriorArms(Lr, { material, withhold: async key => makeEngineRelationReader({ features: { ...readerFeatures, [key]: false }, foreign }) });
+      Lr.priorMs = Math.round(performance.now() - t1); T.ladder.priors = 'done';
+    } catch (err) { console.error(err); T.ladder.priors = 'failed'; T.ladder.priorError = String(err && err.message || err); }
     if (T.onLadder) T.onLadder();
   }, 80);
 }
@@ -828,21 +842,30 @@ function buildTrace(doc, clean, claims, features, extraction){
     { s:0, e:0, data:{ n:stanceClaims.length } });
 
   // ── referents ──
+  // The replay's referents are the ends of the relations read, so F1 here is read off F2. Which of them the name rule (F1's own
+  // route, cast.js: capitalised runs the text repeats) would have admitted is measured, and every other one is recorded as a
+  // REVISION: F2 added a referent F1 never had. The record is appended (the ledger's revise event), never written over.
+  // if the name rule itself cannot run, no revision is claimed: a failure of the route is not a finding about F2
+  let nameRule = null;
+  try { nameRule = [...new Set(discoverReferents(extractSurfaces(splitSentences(clean), {}), {}).events.map(x => x.surface))]; } catch (e) { console.warn('the name rule did not run; no F2→F1 revision is recorded', e); }
+  const byRule = k => !nameRule || nameRule.includes(k) || nameRule.some(sf => { try { return namesCorefer(k, sf); } catch (e) { return false; } });
   const refs = new Map();
   for (const c of claims) for (const nm of [c.end1, c.end2]) {
     if (!nm) continue; const k = String(nm);
-    const r = refs.get(k) || { n:k, c:0, s:c.s, e:c.e, b0:c.b0 };
+    const r = refs.get(k) || { n:k, c:0, s:c.s, e:c.e, b0:c.b0, byRule: byRule(k) };
     r.c++; if (c.s < r.s) { r.s = c.s; r.e = c.e; r.b0 = c.b0; }
     refs.set(k, r);
   }
-  [...refs.values()].sort((a,b) => a.s - b.s).forEach(r => push('referent', 'name',
-    `referent “${r.n}” — first read at byte ${r.b0 == null ? '—' : r.b0} · stands in ${r.c} relation${r.c>1?'s':''}`, { s:r.s, e:r.e, data:r }));
+  [...refs.values()].sort((a,b) => a.s - b.s).forEach(r => { r.ev = push('referent', 'name',
+    `referent “${r.n}” — first read at byte ${r.b0 == null ? '—' : r.b0} · stands in ${r.c} relation${r.c>1?'s':''} · ${r.byRule ? 'admitted by the name rule' : 'NOT a name the rule admits: it will come from a relation’s end (F2 revising F1)'}`, { s:r.s, e:r.e, data:r }); });
 
   // ── relations ──
   claims.forEach(c => {
-    const v = c.verdict;
+    const v = c.verdict, ri = ev.length;
     push('relation', v, `${c.end1} —${c.label}→ ${c.end2} · standing: ${v === 'bound' ? 'read' : v === 'beyond-reach' ? 'beyond reach' : v === 'unbound' ? 'unbound' : v === 'contradicted' ? 'contradicted' : 'unheard'} · polarity ${c.polarity} · byte ${c.b0 == null ? '—' : c.b0}–${c.b1} · tense ${c.tense.v}`,
       { s:c.s, e:c.e, data:c });
+    for (const nm of [c.end1, c.end2]){ const r = refs.get(String(nm)); if (!r || r.byRule || r.revised) continue; r.revised = true;
+      push('relation', 'revision', `↺ “${r.n}” — a referent the name rule had not admitted, added from this relation’s end: F2 revises F1`, { s:c.s, e:c.e, data:{ revises:r.ev, by:ri, from:'F2', to:'F1', n:r.n } }); }
   });
 
   // ── render ──
@@ -864,6 +887,10 @@ function buildTrace(doc, clean, claims, features, extraction){
       range:byteRange(c.b0 ?? 0, (c.b0 ?? 0) + (c.span ? utf8Len(c.span) : 0)),
       transform:'clause→relation', detail:{ end1:c.end1, label:c.label, end2:c.end2, polarity:c.polarity, verdict:c.verdict, confidence:confidenceOf(c).pct } });
     push('ledger', 'bind', `${id} · bind clause→relation · byte ${c.b0 ?? 0}–${(c.b0 ?? 0) + (c.span ? utf8Len(c.span) : 0)} · “${c.end1}—${c.label}→${c.end2}”`, { s:c.s, e:c.e, data:{ id } });
+  });
+  [...refs.values()].filter(r => r.revised).forEach(r => {
+    const id = led.event({ stage:'revise', source_id:srcId, parent:readEvt, transform:'relation→referent', detail:{ of:r.n, from:'F2', to:'F1', note:'an end slot held a surface the name rule had not admitted; the relation layer added it as a referent' } });
+    push('ledger', 'revise', `${id} · revise relation→referent · “${r.n}” — F2 revised F1, appended`, { s:r.s, e:r.e, data:{ id, of:r.n } });
   });
   const eot = led.eot({ root:readEvt });
   push('ledger', 'eot', `append-only Provenance@${eot.schema || 2} emitted · ${led.events.length} events · ids recomputable by anyone (evt_ + first 20 hex of sha256(value))`, { s:0, e:0 });
@@ -1033,7 +1060,8 @@ function mount(T){
     else if (e.stage === 'morph'){ S.morph.push(e.data); mk('m'); }
     else if (e.stage === 'stance'){ S.stance = (e.data && e.data.n) || 0; }
     else if (e.stage === 'referent'){ S.refs.set(e.data.n, e.data); mk('nm'); }
-    else if (e.stage === 'relation'){ S.rels.push(e.data); mk('r'); }
+    else if (e.stage === 'relation' && e.kind !== 'revision'){ S.rels.push(e.data); mk('r'); }
+    else if (e.stage === 'relation'){ /* a revision record on the relation lane: counted on the floor it revised, not as an arrangement */ }
     else if (e.stage === 'ledger'){ S.led.push(e); }
     if (e.stage === 'furniture' && e.data && e.data.runs) e.data.runs.forEach(r => S.marks.push({ s:r.s, e:r.e, cls:'fu', stage:'furniture' }));
   }
@@ -1047,6 +1075,11 @@ function mount(T){
   const firstLedger = ev.findIndex(e => e.stage === 'ledger');
   const reachAt = FLOORS.map((f, fi) => { const j = ev.findIndex((e, i) => floorOfEv(i) && floorIdx(floorOfEv(i)) >= fi); return j >= 0 ? j : firstLedger >= 0 ? firstLedger : N - 1; });
   const ladderOf = () => (T.ladder && T.ladder.state === 'done' ? T.ladder.L : null);
+  // revisions received per floor: every event whose data.revises points at an operand on that floor (the record counts as a floor of its own)
+  let revN = -1, revCount = {}, revMsgs = {};
+  function revisions(){ if (revN === N) return revCount; revCount = {}; revMsgs = {};
+    for (let i = 0; i < N; i++){ const d = ev[i].data; if (!d || d.revises == null || !ev[d.revises]) continue; const fl = FLOOR_OF_LAYER[ev[d.revises].stage] || 'record'; revCount[fl] = (revCount[fl] || 0) + 1; (revMsgs[fl] = revMsgs[fl] || []).push(ev[i].msg); }
+    revN = N; return revCount; }
   const verdictClass = it => (!it ? '' : it.status === 'passed' ? 'ok' : it.status === 'failed' ? 'fail' : 'bad');
   function floorVerdict(h){
     const Ld = T.ladder;
@@ -1064,10 +1097,10 @@ function mount(T){
       const sw = l.fixed ? '' : `<span class="sw" role="switch" tabindex="0" aria-checked="${on}" data-feature="${l.feature}" title="switch ${esc(l.label)} ${on ? 'off' : 'on'} — the reading re-runs"></span>`;
       return `<div class="ly ${on ? '' : 'off'}" data-layer="${l.id}" role="button" tabindex="0" title="${esc(noteOf(l.id))}"><span class="lab" style="color:var(${l.color})">${esc(l.label)}</span><span class="cnt"></span>${sw}</div>`;
     };
-    const head = f => { const layers = byFloor.get(f.floor);
-      return `<div class="fh" data-floor="${esc(f.floor)}" style="--fc:var(${FLOOR_COLOR[f.floor]})" role="button" tabindex="0" title="${esc(f.operand)} — open in the Floors tab"><span class="f">${esc(f.floor)}</span><span class="t"><span class="nm">${esc(f.name)}</span>${layers.length ? '' : '<span class="no">no layer</span>'}</span><span class="vd"></span></div>`; };
+    const head = f => { const layers = byFloor.get(f.floor), closed = idxClosed.has(f.floor);
+      return `<div class="fh ${closed ? 'closed' : ''}" data-floor="${esc(f.floor)}" style="--fc:var(${FLOOR_COLOR[f.floor]})" role="button" tabindex="0" title="${esc(f.operand)} — open in the Floors tab"><span class="f">${esc(f.floor)}</span><span class="t"><span class="nm">${esc(f.name)}</span><span class="rv" hidden></span>${layers.length ? '' : '<span class="no">no layer</span>'}</span><span class="vd"></span>${layers.length ? `<button type="button" class="car" data-fold="${esc(f.floor)}" aria-expanded="${!closed}" aria-label="${closed ? 'show' : 'hide'} the layers of ${esc(f.floor)}">${closed ? '▸' : '▾'}</button>` : ''}</div>`; };
     spineEl.innerHTML = `<div class="h">the floors, and the layers that make each — switch a layer off and the reading re-runs</div>`
-      + FLOORS.map(f => head(f) + byFloor.get(f.floor).map(row).join('')).join('')
+      + FLOORS.map(f => head(f) + `<div class="fg" data-fg="${esc(f.floor)}"${idxClosed.has(f.floor) ? ' hidden' : ''}>${byFloor.get(f.floor).map(row).join('')}</div>`).join('')
       + `<div class="fh rec" style="--fc:var(--dim)" title="the record every floor appends to"><span class="f">∀</span><span class="t"><span class="nm">the record</span></span><span class="vd">every floor appends</span></div>` + record.map(row).join('');
     wireSwitches();
   }
@@ -1084,6 +1117,7 @@ function mount(T){
       const v = reached ? floorVerdict(f.floor) : null, vd = el.querySelector('.vd'), word = v ? shortVerdict(v.word) : '', cls = 'vd ' + (v ? v.cls : '');
       if (vd.textContent !== word) vd.textContent = word; if (vd.className !== cls) vd.className = cls;
       if (v) el.title = `${f.operand} — ${v.word} — open in the Floors tab`;
+      const rv = el.querySelector('.rv'), n = revisions()[f.floor] || 0, txt = '↺ ' + n; rv.hidden = !n; if (rv.textContent !== txt){ rv.textContent = txt; rv.title = `${n} revision${n === 1 ? '' : 's'} from a higher floor — drawn as arrows on the timeline`; }
     });
   }
   function layerCount(key, St){
@@ -1541,7 +1575,7 @@ function mount(T){
     const nodes = [...St.refs.values()].map(r => ({ n:r.n, c:r.c, mine:true, st:'fold' }));
     const edges = St.rels.map(c => ({ a:String(c.end1), b:String(c.end2), c:1, mine:true, neg:c.polarity === '-' }));
     const hot = new Set([e && e.data && e.data.end1, e && e.data && e.data.end2, e && e.data && e.data.n].filter(Boolean).map(String));
-    const hotPairs = (e && e.stage === 'relation' && e.data) ? [[String(e.data.end1), String(e.data.end2)]] : [];
+    const hotPairs = (e && e.stage === 'relation' && e.kind !== 'revision' && e.data) ? [[String(e.data.end1), String(e.data.end2)]] : [];
     const cursor = (e && e.data && (e.data.n || e.data.end1)) ? String(e.data.n || e.data.end1) : null;
     return { nodes, edges, docs:[{ id:'source', title:T.doc.label }], occ:T.occ, odd:new Map(), hot, hotPairs, cursor, sel:graphSel, sig:`${St.refs.size}:${St.rels.length}:${graphSel || ''}` };
   }
@@ -1568,7 +1602,7 @@ function mount(T){
     LAST = [St, e]; if (tab === 'props') ensureTuples();
     const textTab = tab === 'text'; $('b-read').hidden = !textTab; $('p-drawer').hidden = textTab;
     if (textTab) return;   // the viewer shows the text at the playhead, and the current sentence lane by lane
-    const hot = e.stage === 'relation' ? e.data : null;
+    const hot = e.stage === 'relation' && e.kind !== 'revision' ? e.data : null;
     const graph = tab === 'graph';
     $('p-graph').hidden = !graph; pane.hidden = graph; { const gn = $('p-graph-note'); gn.hidden = !graph; if (graph) gn.innerHTML = tabNoteHTML('graph', { collapsed:true }); }
     if (graph){ map.set(mapData(St, e)); return; }
@@ -1614,6 +1648,8 @@ function mount(T){
       ${it && it.status !== 'passed' ? `<div class="det">${phrase ? `<b>${esc(phrase)}.</b> ` : ''}${esc(cleanDetail(it.detail || ''))}</div>` : ''}
       ${dec ? `<details class="fold"><summary>the task — declared before it ran</summary><dl class="defs"><dt>task</dt><dd>${esc(dec.name)}</dd><dt>organizes</dt><dd>${esc(dec.organizes)}</dd><dt>organ</dt><dd class="mono">${esc(dec.organ)}</dd><dt>stages used</dt><dd>${esc(dec.stages.join(' · '))}</dd></dl></details>` : ''}
       ${it ? `<details class="fold"${capped ? ' open' : ''}><summary>the three control arms — each must fail${it.arms ? '' : ' (not run)'}</summary>${armsTable(it, fi)}</details>` : ''}
+      ${priorsFold(f, Lr)}
+      ${revisionsLine(f.floor)}
     </section>`;
   }
   // the three control arms, each as what it skipped (⊘): the floor below withheld, the parts re-coordinated at random, the control text — and what the reader did without it
@@ -1622,6 +1658,20 @@ function mount(T){
     const rows = ARM_ROWS.map(([key, what, giver]) => { const a = it.arms && it.arms[key], o = armOutcome(a);
       return `<tr class="${o.cls}"><td><span class="skip">⊘</span> ${esc(key === 'lowerOrder' ? below : what)}<br><span class="giver">${esc(giver)}</span></td><td class="res">${esc(o.res)}${esc(o.draws)}</td><td class="dim">${esc(a && a.detail || '')}</td></tr>`; }).join('');
     return `<table class="arms"><thead><tr><th>skipped</th><th>result</th><th>what it did</th></tr></thead><tbody>${rows}</tbody></table>`;
+  }
+  // the priors this floor consumes, each withheld once and the task run again (mhc-ladder.js::runPriorArms) — a finding about the prior, not the floor
+  function priorsFold(f, Lr){
+    const declared = PRIORS_OF[f.floor] || [], st = T.ladder && T.ladder.priors, rows = Lr.priorArms && Lr.priorArms[f.floor];
+    if (!declared.length) return `<div class="det">priors consumed: ${esc(PRIOR_NOTE[f.floor] || 'none')}</div>`;
+    const body = rows
+      ? `<table class="arms"><thead><tr><th>prior withheld</th><th>result</th><th>what happened</th></tr></thead><tbody>${rows.map(a => `<tr class="${a.withheld ? (a.completed ? 'warn' : 'ok') : ''}"><td><span class="skip">⊘</span> ${esc(a.what)}</td><td class="res">${esc(a.word)}</td><td class="dim">${esc(a.detail || '')}</td></tr>`).join('')}</tbody></table>`
+      : `<p class="dim">${st === 'running' ? 'withholding each prior and running the task again…' : st === 'failed' ? `the arm did not run: ${esc(T.ladder.priorError || '')}` : 'not run'}</p>`;
+    return `<details class="fold" open><summary>the priors this floor consumes — each withheld (${declared.length})${Lr.priorMs != null && f.floor === 'F0' ? ` · ${Lr.priorMs.toLocaleString()} ms for the ladder` : ''}</summary>${body}</details>`;
+  }
+  function revisionsLine(h){
+    const n = revisions()[h] || 0; if (!n) return '';
+    const msgs = (revMsgs[h] || []).slice(0, 3);
+    return `<div class="det">↺ <b>revised from above, ${n} time${n === 1 ? '' : 's'}</b> — appended to the record, drawn as arrows on the timeline:<br>${msgs.map(m => esc(m.replace(/^↺ /, ''))).join('<br>')}${n > 3 ? `<br>… ${n - 3} more` : ''}</div>`;
   }
   // what each floor made, on this text — counted from the same reader, index and specimens the rungs ran on (mhc-ladder.js::viewsOf), never restated
   function floorChange(h, Lr){
@@ -1638,7 +1688,7 @@ function mount(T){
       case 'F3': { const C = T.claims, vs = C.reduce((m, c) => (m[c.verdict] = (m[c.verdict] || 0) + 1, m), {});
         return (C.length ? `the replay's <b>${pl(C.length, 'relation')}</b>, each read back against the material by the same reader: ${Object.entries(vs).map(([kk, v]) => `${n(v)} ${esc(kk)}`).join(' · ')}.` : '<b>nothing to judge</b> — no relation was read.')
           + (V.grid ? `<div class="ex">specimen ${q(V.grid.claim)} · the same claim with a subject nobody is: ${q(V.grid.absentClaim)}</div>` : ''); }
-      case 'F4½': { const E = V.edges, nested = E.filter(x => isClaimRef(x.end1) || isClaimRef(x.end2)).length; return `<b>${n(nested)}</b> of ${pl(E.length, 'edge')} hold a claim in an end slot — the reader puts surfaces there, so who-says-what is never kept apart from what is so.`; }
+      case 'F4': { const E = V.edges, nested = E.filter(x => isClaimRef(x.end1) || isClaimRef(x.end2)).length; return `<b>${n(nested)}</b> of ${pl(E.length, 'edge')} hold a claim in an end slot — the reader puts surfaces there, so who-says-what is never kept apart from what is so.`; }
       case 'F5': { const M = V.merges || []; return `<b>${pl((V.systems || []).length, 'source reader')}</b>; a note is corroborated at ${n(V.premiseFloor.sources)} distinct sources${M.length ? `; ${pl(M.length, 'merge')} measured` : ''}.` + ex(M, m => `${esc(m.edge.subject)} —${esc(m.edge.verb)}→ ${esc(m.edge.object)}: ${pl(m.readings.length, 'reading')}, held by ${n(m.holds)}`); }
       case 'F6': { const P = (V.premises && V.premises.premises) || []; return `<b>${pl(P.length, 'premise')}</b> at a floor of ${n(V.premiseFloor.sources)} sources (instrument independence not required: ${n(V.premiseFloor.instruments)}); composition needs a declarations register this page does not hold.`; }
     }
@@ -1801,7 +1851,7 @@ function mount(T){
   function reopen(i){
     const c = T.claims[i]; if (!c) return;
     const id = T.led.event({ stage:'revisit', source_id:T.srcId, transform:'assertion→revision', detail:{ of:`${c.end1}—${c.label}→${c.end2}`, act:'reopened', note:'standing held open for re-reading' } });
-    ev.push({ i:ev.length, t:performance.now() - (T.ev._t0 || 0), stage:'ledger', kind:'revisit', msg:`${id} · revisit assertion→revision · “${c.end1}—${c.label}→${c.end2}” reopened — the standing is held open`, s:c.s, e:c.e, data:{ id, revisits:i } });
+    ev.push({ i:ev.length, t:performance.now() - (T.ev._t0 || 0), stage:'ledger', kind:'revisit', msg:`${id} · revisit assertion→revision · “${c.end1}—${c.label}→${c.end2}” reopened — the standing is held open`, s:c.s, e:c.e, data:{ id, revisits:i, revises: ev.findIndex(x => x.stage === 'relation' && x.data === c), from:'record', to:'F2' } });
     if (!T.reopened) T.reopened = new Map(); T.reopened.set(i, id);
     N = ev.length; render(true);
   }
@@ -1830,6 +1880,7 @@ function mount(T){
   let dpr = 1, tlCache = null, lanes = [];
   const LANE_H = 20, AX_H = 18, tlh = $('p-tlh');
   const collapsed = new Set(FLOORS.filter(f => LAYERS.filter(l => FLOOR_OF_LAYER[l.id] === f.floor).length > 4).map(f => f.floor));
+  const idxClosed = new Set();   // floors folded in the index — the user's, kept for this mount
   function laneModel(){
     lanes = [];
     for (const f of FLOORS){
@@ -1871,6 +1922,17 @@ function mount(T){
         for (const st of ln.stages) for (const i of (byStage.get(st) || [])){ const x0 = clockOf(i) / mp * w, x1 = i + 1 < N ? clockOf(i + 1) / mp * w : w; q.fillRect(x0, y0 + 4 * dpr, Math.max(dpr, x1 - x0), (LANE_H - 8) * dpr); }
         q.globalAlpha = 1;
       });
+      // revisions: an arrow from the event that revised back to the operand it revised, on whatever lane each sits in
+      const laneOf = st => { if (st === 'ledger') return lanes.length - 1; let li = lanes.findIndex(l => l.kind === 'layer' && l.stages[0] === st); if (li < 0) li = lanes.findIndex(l => l.kind === 'floor' && l.floor === FLOOR_OF_LAYER[st]); return li; };
+      q.strokeStyle = cssVar('--pink'); q.fillStyle = cssVar('--pink'); q.lineWidth = 1.5 * dpr; q.globalAlpha = 0.9;
+      for (let i = 0; i < N; i++){ const d = ev[i].data; if (!d || d.revises == null || d.revises < 0 || d.revises >= N) continue;
+        const a = laneOf(ev[i].stage), b = laneOf(ev[d.revises].stage); if (a < 0 || b < 0) continue;
+        const x0 = clockOf(i) / mp * w, y0 = (AX_H + a * LANE_H + LANE_H / 2) * dpr, x1 = clockOf(d.revises) / mp * w, y1 = (AX_H + b * LANE_H + LANE_H / 2) * dpr;
+        const cx = (x0 + x1) / 2, cy = Math.min(y0, y1) - LANE_H * dpr * 0.8;
+        q.beginPath(); q.moveTo(x0, y0); q.quadraticCurveTo(cx, cy, x1, y1); q.stroke();
+        const ang = Math.atan2(y1 - cy, x1 - cx), L6 = 6 * dpr;
+        q.beginPath(); q.moveTo(x1, y1); q.lineTo(x1 - L6 * Math.cos(ang - 0.45), y1 - L6 * Math.sin(ang - 0.45)); q.lineTo(x1 - L6 * Math.cos(ang + 0.45), y1 - L6 * Math.sin(ang + 0.45)); q.closePath(); q.fill(); }
+      q.globalAlpha = 1;
       tlCache = { key, c };
     }
     g.clearRect(0, 0, w, h); g.drawImage(tlCache.c, 0, 0);
@@ -1918,6 +1980,7 @@ function mount(T){
     });
   }
   const onClick = e => {
+    const fold = e.target.closest('.fh .car[data-fold]'); if (fold){ const f = fold.dataset.fold; if (idxClosed.has(f)) idxClosed.delete(f); else idxClosed.add(f); const closed = idxClosed.has(f), g = spineEl.querySelector(`.fg[data-fg="${CSS.escape(f)}"]`); if (g) g.hidden = closed; fold.textContent = closed ? '▸' : '▾'; fold.setAttribute('aria-expanded', String(!closed)); fold.setAttribute('aria-label', `${closed ? 'show' : 'hide'} the layers of ${f}`); fold.closest('.fh').classList.toggle('closed', closed); return; }
     const tf = e.target.closest('[data-tlf]'); if (tf){ const f = tf.dataset.tlf; if (LAYERS.some(l => FLOOR_OF_LAYER[l.id] === f)){ if (collapsed.has(f)) collapsed.delete(f); else collapsed.add(f); renderLaneHeads(); } return; }
     const tm = e.target.closest('.tl-mode [data-tl]'); if (tm){ const list = tm.dataset.tl === 'list'; $('p-tl').hidden = list; $('p-log').hidden = !list; app.querySelectorAll('.tl-mode [data-tl]').forEach(x => x.setAttribute('aria-pressed', String(x === tm))); if (list) renderLog(true); else size(); return; }
     const fh = e.target.closest('.fh[data-floor]'); if (fh){ setTab('floors'); const el = pane.querySelector('#' + floorId(fh.dataset.floor)); if (el) pane.scrollTop += el.getBoundingClientRect().top - pane.getBoundingClientRect().top - 8; return; }
@@ -2045,7 +2108,7 @@ async function read(text, label, feat, opt = {}){
   // a proposition is held in the MOOD of its sentence (a question asks; it does not assert) and NESTED in the containers around it (speech, aside), in order
   T.claims.forEach(c => { if (c.located){ c.mood = moodAt(T.punctuation, c.s); c.holds = containersAt(T.punctuation, c.s).map(k => ({ kind:k.kind, mark:k.mark, mood:k.mood })); } });
   startTimeline(T);
-  startLadder(T, R, clean);
+  startLadder(T, R, clean, { readerFeatures, foreign });
   if (!BASELINE) BASELINE = T;
   $('model').textContent = `model calls: ${T.net.models}`;
   if (opt.animate !== false){ openTrace(T); }
