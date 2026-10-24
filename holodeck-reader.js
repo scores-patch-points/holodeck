@@ -233,7 +233,11 @@ export async function readCorpus(docs, { reader = null, chunkChars = 60000 } = {
 const cleanText = (s) => String(s == null ? '' : s).replace(/\s+/g, ' ').trim();
 
 export async function makeEngineRelationReader(extra = {}) {
-  const { features = {}, foreign = null, ...rest } = extra;
+  const { features = {}, foreign = null, abbreviations = null, ...rest } = extra;
+  // ABBREVIATIONS (2026-10-24): the page's own knowledge of which dotted tokens are words — the language's measured prior, the
+  // document's own, and the aliases the hyperlexicon resolved ("Messrs." is a form of "Mr."). Every sentence cut the reader makes
+  // goes through it, so a relation is never read across a cut inside a word. Omitted, the splitter derives its own per passage.
+  const split = abbreviations ? (t, o = {}) => splitSentences(t, { ...o, abbreviations: o.abbreviations ?? abbreviations }) : splitSentences;
   const { posPrior, verbForms, lemmatizer } = await loadPriors();
   // FOREIGN: a document that measured as another language is read by the suite's own dispatch for THAT language — its POS prior, and its
   // RoleConfig@1 where one is shipped (positional reader), else the clause-aware GFP reader. Nothing English is applied to it.
@@ -261,7 +265,7 @@ export async function makeEngineRelationReader(extra = {}) {
     return useMorph ? lemmatizer.sameAct(a, b) : String(a).toLowerCase() === String(b).toLowerCase();
   };
   return makeRelationReader({
-    splitSentences, extractSurfaces, discoverReferents, namesCorefer, diaNorm,
+    splitSentences: split, extractSurfaces, discoverReferents, namesCorefer, diaNorm,
     discoverRelationVocab: (...a) => dispatch().discoverRelationVocab(...a),
     extractRelations: useStance ? extractRelations : makeExtractRelations({ stance: false }),
     extractorsMode: 'dispatch', tokenize, posPriorFor: () => (usePos ? posPrior : null), verbForms, oovLexicon: verbForms, attestedVerbs: true,

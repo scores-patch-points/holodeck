@@ -528,6 +528,7 @@ import { classifyWord, THRAX_MAP, THRAX_OUT_OF_SCOPE, THRAX_META, POS_PRIOR_META
 import { morphologyFromPrior, createLemmatizer, stemsOf } from '../vendor/khora/native/adapters/text/morphology.js';
 import { splitSentences, deriveAbbreviations } from '../vendor/khora/native/adapters/text/spans.js';
 import { tabNoteHTML, LAYER_NOTES } from './layer-notes.js';
+import { makeLexicon, aliasJunctions, resolveAliases } from './lexicon.js';
 import { buildRows, sortRows, nextSort, tableHTML as refTableHTML } from './referent-table.js';
 import { scanPunctuation, loadPunctuation, moodAt, containersAt, cuesFromBlankLines, cuesFromLayout } from './punctuation.js';
 import { tokenize } from '../vendor/khora/native/organs/source.js';
@@ -576,6 +577,7 @@ const LAYERS = [
   { id:'decode',    label:'Decode',     color:'--pink',  fixed:true, why:'utf-8 bytes → characters; the address space stays bytes' },
   { id:'furniture', label:'Furniture',  color:'--mut',   feature:'furniture', why:'markup / CSS / URLs blanked in place — offsets untouched' },
   { id:'punct',     label:'Punctuation', color:'--amber', fixed:true, why:'every mark kept, with its role: sentence ends and their mood, quotations, brackets, separators' },
+  { id:'lexicon',   label:'Hyperlexicon', color:'--acc2', feature:'lexicon', why:'forms the priors cannot settle, asked of the hyperlexicon (its local giver, English Wiktionary): an alias keeps its period, a missing class is filled' },
   { id:'statement', label:'Statements', color:'--ink2',  fixed:true, why:'the material split into the statements it makes' },
   { id:'token',     label:'Words',      color:'--blue',  fixed:true, why:'each statement split into the forms it is made of' },
   { id:'grammar',   label:'POS',        color:'--acc',   feature:'pos', why:'each form → the classes it is ATTESTED as (Thrax over UD)' },
@@ -592,7 +594,7 @@ const L = {}; LAYERS.forEach((l, i) => L[l.id] = { i, ...l });
 const CK = {}; LAYERS.forEach((l, i) => CK[l.id] = i);
 const FEATURE_OF = {}; LAYERS.forEach(l => { if (l.feature) FEATURE_OF[l.feature] = l.id; });
 const OPTIONAL = LAYERS.filter(l => l.feature).map(l => l.feature);
-const DEFAULT_FEATURES = { furniture:true, pos:true, morph:true, stance:true, npSubj:true, phrasal:true };
+const DEFAULT_FEATURES = { furniture:true, lexicon:true, pos:true, morph:true, stance:true, npSubj:true, phrasal:true };
 
 // ── THE FLOORS over the pipeline: the fold's own ladder (reading/mhc-ladder.js), scored with the MHC's discipline. ──
 // Each layer sits at the floor whose operand it makes. The layers that classify forms by a received prior (POS,
@@ -600,7 +602,7 @@ const DEFAULT_FEATURES = { furniture:true, pos:true, morph:true, stance:true, np
 // arrangement and makes no new operand. F3's judge is the verdict each relation carries, read in the Relations
 // layer — no layer of its own. F4, F5 and F6 have no layer on this page, and the rail shows those rungs empty:
 // that is the finding about this pipeline, not a gap in the drawing.
-const FLOOR_OF_LAYER = { extract:'F0', bytes:'F0', decode:'F0', furniture:'F0', punct:'F0', statement:'F0', token:'F0', grammar:'F0', morph:'F0', stance:'F0', referent:'F1', relation:'F2', np:'F2', phrasal:'F2', render:'F2', ledger:null };
+const FLOOR_OF_LAYER = { extract:'F0', bytes:'F0', decode:'F0', furniture:'F0', punct:'F0', lexicon:'F0', statement:'F0', token:'F0', grammar:'F0', morph:'F0', stance:'F0', referent:'F1', relation:'F2', np:'F2', phrasal:'F2', render:'F2', ledger:null };
 const FLOOR_COLOR = { 'F0':'--f0', 'F1':'--f1', 'F2':'--f2', 'F3':'--f3', 'F4':'--f4', 'F5':'--f5', 'F6':'--f6' };
 const FLOOR_NOTE = {   // what the rail says where a floor has no layer of its own
   'F3': 'no layer of its own — the verdict each relation carries (bound · contradicted · unbound), read back against the material',
@@ -610,7 +612,7 @@ const FLOOR_NOTE = {   // what the rail says where a floor has no layer of its o
 };
 const floorIdx = h => FLOORS.findIndex(f => f.floor === h);
 // click a layer in the rail: the replay jumps to its first event and the drawer opens on the tab that shows its work
-const TAB_OF_LAYER = { extract:'text', bytes:'text', decode:'text', furniture:'text', punct:'text', statement:'text', token:'words', grammar:'pos', morph:'morph', stance:'props', referent:'refs', relation:'props', np:'props', phrasal:'props', render:'render', ledger:'eot' };
+const TAB_OF_LAYER = { extract:'text', bytes:'text', decode:'text', furniture:'text', punct:'text', lexicon:'words', statement:'text', token:'words', grammar:'pos', morph:'morph', stance:'props', referent:'refs', relation:'props', np:'props', phrasal:'props', render:'render', ledger:'eot' };
 const shortVerdict = w => String(w || '').split(' — ')[0];
 const floorId = h => 'fl-' + String(h).replace(/^F/, '').replace('½', 'h');
 
@@ -674,7 +676,13 @@ const ORDERS = [
 
 let PRIORS = null, READER = null, LEXICON = null, LEXICON_LONGEST = 0;
 // dictionary · Wikipedia · Wikidata: a crossing the page makes only when asked — see holodeck-lookup.js. Starts OFF.
-const LOOKUP = makeLookup();
+// THE HYPERLEXICON, open to every organ (reading/lexicon.js): its local giver is the English Wiktionary pack on this machine, read by the
+// Holodeck's own server (POST /lexicon). An organ asks only about a form the language's priors cannot settle; nothing leaves the machine.
+// one client per language the documents measure as: the giver's entries are filtered to that language's own words
+const askLexicon = async (forms, lang) => { const r = await fetch('/lexicon', { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ forms, lang }) }); return r.ok ? r.json() : null; };
+const HLEXS = new Map(), hlexFor = (lang) => { if (!HLEXS.has(lang)) HLEXS.set(lang, makeLexicon({ ask: askLexicon, lang })); return HLEXS.get(lang); };
+const HLEX = hlexFor('en');
+const LOOKUP = makeLookup({ local: HLEX });   // the page's dictionary parser reads English entries, so the class fill below is English only
 let LOOKUPS_ON = false;
 const knownWord = w => !!(LEXICON && LEXICON.has(String(w).toLowerCase()));
 async function ready(){
@@ -711,7 +719,7 @@ function controlFor(analysis){
 // the Floors tab says when a cap cut.
 // The verdicts are the READER's ceiling on this material, not a property of the text: the same text under another reader scores otherwise.
 const LADDER_CHARS = 80000;
-function startLadder(T, R, clean, { readerFeatures = {}, foreign = null } = {}){
+function startLadder(T, R, clean, { readerFeatures = {}, foreign = null, abbreviations = null } = {}){
   T.ladder = { state:'running' };
   setTimeout(async () => {
     const t0 = performance.now();
@@ -730,7 +738,7 @@ function startLadder(T, R, clean, { readerFeatures = {}, foreign = null } = {}){
     // A finding about each prior — earned its keep here, or added nothing — never a change to a floor's verdict.
     const t1 = performance.now();
     try {
-      await runPriorArms(Lr, { material, withhold: async key => makeEngineRelationReader({ features: { ...readerFeatures, [key]: false }, foreign }) });
+      await runPriorArms(Lr, { material, withhold: async key => makeEngineRelationReader({ features: { ...readerFeatures, [key]: false }, foreign, abbreviations }) });
       Lr.priorMs = Math.round(performance.now() - t1); T.ladder.priors = 'done';
     } catch (err) { console.error(err); T.ladder.priors = 'failed'; T.ladder.priorError = String(err && err.message || err); }
     if (T.onLadder) T.onLadder();
@@ -740,10 +748,11 @@ function startLadder(T, R, clean, { readerFeatures = {}, foreign = null } = {}){
 // ── build the trace: run the real organs, recording each transformation ──────
 // punctuation is settled at tokenization (reading/tokenize.js): POS is only ever asked about word forms
 let ABBREV = null;   // the splitter's own abbreviation knowledge for the text being read
+let ALIASES = new Map(), LEXSTEP = null;   // dotted forms the hyperlexicon resolved as aliases of other words, and what the consult did
 let PUNCT = null;    // the language's punctuation norms (declared) and its abbreviation prior (measured): reading/punctuation.js
 const abbrevOf = text => deriveAbbreviations(String(text ?? '').replace(/\r\n/g, '\n').replace(/\r/g, '\n'));
 // the document's own abbreviations (the splitter's) joined to the language's measured ones: "Dr." is one word, its dot kept, wherever it comes from
-const abbrevAll = () => new Set([...(PUNCT ? PUNCT.abbreviations : []), ...(ABBREV || [])].map(x => String(x).toLowerCase()));
+const abbrevAll = () => new Set([...(PUNCT ? PUNCT.abbreviations : []), ...(ABBREV || []), ...ALIASES.keys()].map(x => String(x).toLowerCase()));
 // the splitter compares case-sensitively ("Dr"), the measured prior is lower case: hand it every case a title takes
 const abbrevForSplitter = () => new Set([...abbrevAll()].flatMap(a => [a, a.charAt(0).toUpperCase() + a.slice(1), a.toUpperCase()]));
 const scanOpts = (extra = {}) => ({ norms: PUNCT && PUNCT.norms, abbreviations: abbrevAll(), ...extra });
@@ -783,6 +792,18 @@ function buildTrace(doc, clean, claims, features, extraction){
     { s:0, e:analysis.length, data:{ runs:blankRuns } });
 
   ABBREV = abbrevOf(clean);
+  // ── the hyperlexicon: what the priors could not settle, and what its local giver said ──
+  { const X = LEXSTEP;
+    if (!X || !X.on) push('lexicon', 'off', `hyperlexicon layer OFF — nothing is looked up; a dotted form the priors do not know may end a sentence, and a form the class prior lacks stays a gap`, { s:0, e:0, data:{ off:true } });
+    else if (X.gap) push('lexicon', 'gap', `the hyperlexicon was not reached — ${X.gap}; the reading carries on with the priors alone`, { s:0, e:0, data:X });
+    else {
+      push('lexicon', 'ask', `asked the hyperlexicon about ${X.asked.toLocaleString()} form${X.asked === 1 ? '' : 's'} the priors could not settle — ${X.junctions} possible sentence end${X.junctions === 1 ? '' : 's'} after a dotted form, ${X.posAsked} form${X.posAsked === 1 ? '' : 's'} with no class — ${X.giver.name}, the ${X.giver.snapshot} dump, on this machine · ${Math.round(X.ms)} ms`, { s:0, e:0, data:{ asked:X.asked, giver:X.giver } });
+      for (const a of X.aliases){ const at = clean.indexOf(a.form); push('lexicon', a.kept ? 'alias' : 'alias-refused', a.kept
+        ? `“${a.form}” is one word: the hyperlexicon lists it as a form of ${a.of.map(o => `“${o}”`).join(' and ')} — the period belongs to the word, so no sentence ends inside it (${a.n} place${a.n === 1 ? '' : 's'})`
+        : `“${a.form}” is listed as a form of ${a.of.map(o => `“${o}”`).join(' and ')}, but ${a.why} — so its period may still end a sentence`, { s:at, e:at >= 0 ? at + a.form.length : 0, data:a }); }
+      for (const f of X.posFound){ const at = clean.indexOf(f.form); push('lexicon', 'class', `“${f.form}” → ${f.upos.length ? f.upos.join(' / ') : 'listed, with no class the reader maps'} — attested by ${X.giver.name}, a witness for the class layer`, { s:at, e:at >= 0 ? at + f.form.length : 0, data:f }); }
+    }
+  }
   // the splitter and the punctuation scan share ONE abbreviation knowledge: the language's measured prior joined to this text's own
   const sents = splitSentences(clean, { abbreviations: abbrevForSplitter() });
   sents.forEach((s, i) => push('statement', 'statement',
@@ -809,7 +830,7 @@ function buildTrace(doc, clean, claims, features, extraction){
 
   const pos = features.pos === false ? null : PRIORS.posPrior;
   // the document's own definitions and typography settle capitalised forms the priors cannot place (candidates, with ranges)
-  const DOCC = pos ? documentClassifier(clean, { posPrior: pos, lemmatizer: PRIORS.lemmatizer, lookups: LOOKUP.cache }) : null;
+  const DOCC = pos ? documentClassifier(clean, { posPrior: pos, lemmatizer: PRIORS.lemmatizer, lookups: features.lexicon === false ? null : LOOKUP.cache }) : null;
   let gaps = 0, ambiguous = 0, classified = 0;
   shown.forEach(w => {
     if (!pos){ push('grammar', 'off', `“${w.w}” → POS layer OFF — no class prior is read; the form is carried as a bare string`, { s:w.s, e:w.e, data:{ w:w.w, found:false, off:true } }); return; }
@@ -847,7 +868,7 @@ function buildTrace(doc, clean, claims, features, extraction){
   // REVISION: F2 added a referent F1 never had. The record is appended (the ledger's revise event), never written over.
   // if the name rule itself cannot run, no revision is claimed: a failure of the route is not a finding about F2
   let nameRule = null;
-  try { nameRule = [...new Set(discoverReferents(extractSurfaces(splitSentences(clean), {}), {}).events.map(x => x.surface))]; } catch (e) { console.warn('the name rule did not run; no F2→F1 revision is recorded', e); }
+  try { nameRule = [...new Set(discoverReferents(extractSurfaces(splitSentences(clean, { abbreviations: abbrevForSplitter() }), {}), {}).events.map(x => x.surface))]; } catch (e) { console.warn('the name rule did not run; no F2→F1 revision is recorded', e); }
   const byRule = k => !nameRule || nameRule.includes(k) || nameRule.some(sf => { try { return namesCorefer(k, sf); } catch (e) { return false; } });
   const refs = new Map();
   for (const c of claims) for (const nm of [c.end1, c.end2]) {
@@ -881,6 +902,7 @@ function buildTrace(doc, clean, claims, features, extraction){
   const readEvt = led.event({ stage:'read', source_id:srcId, ...(scanned ? { parent:scanned.last } : {}), transform:'bytes→statements' });
   push('ledger', 'event', `${readEvt} · stage read · transform bytes→statements`, { s:0, e:0, data:{ id:readEvt } });
   led.event({ stage:'arrange', source_id:srcId, parent:readEvt, transform:'statements→tokens' });
+  if (LEXSTEP && LEXSTEP.on && !LEXSTEP.gap) LEXSTEP.aliases.filter(a => a.kept).forEach(a => led.event({ stage:'lexicon', source_id:srcId, parent:readEvt, transform:'form→alias', detail:{ form:a.form, of:a.of, places:a.n, giver:LEXSTEP.giver } }));
   led.event({ stage:'classify', source_id:srcId, parent:readEvt, transform:'tokens→classes', detail:{ giver:features.pos === false ? null : POS_PRIOR_META.giver, ...(LOOKUP.count() ? { witnesses:`hyperlexicon — ${LOOKUP.count()} forms looked up, candidates not givers` } : {}) } });
   claims.forEach(c => {
     const id = led.event({ stage:'bind', source_id:srcId, parent:readEvt, unit:'relation',
@@ -1126,6 +1148,7 @@ function mount(T){
       case 'bytes': return T.nBytes.toLocaleString() + ' bytes';
       case 'decode': return T.doc.analysis.length.toLocaleString() + ' chars';
       case 'furniture': return T.features.furniture === false ? 'off' : (T.blanks.length ? T.blanks.length.toLocaleString() + ' chars blanked' : 'nothing to blank');
+      case 'lexicon': { const X = T.lexicon; if (!X || !X.on) return 'off'; if (X.gap) return 'not reached'; const k = X.aliases.filter(a => a.kept).length; return `${X.asked.toLocaleString()} asked · ${k} alias${k === 1 ? '' : 'es'} · ${X.posFound.length} classes`; }
       case 'punct': { const P = T.punctuation || { sentences:[], containers:[] }, q = P.sentences.filter(x => x.mood === 'interrogative').length, x2 = P.sentences.filter(x => x.mood === 'exclamative').length; return (T.punct ? T.punct.length : 0) + ' marks · ' + P.sentences.length + ' sentences' + (q ? ' · ' + q + ' ask' : '') + (x2 ? ' · ' + x2 + ' exclaim' : '') + (P.containers.length ? ' · ' + P.containers.length + ' nested' : ''); }
       case 'statement': return T.sents.length + ' statements';
       case 'token': return St.tokens.length.toLocaleString() + (T.words.length > WORDS_ANIMATED ? ' of ' + T.words.length.toLocaleString() : '') + ' forms';
@@ -1961,7 +1984,7 @@ function mount(T){
       `<span>ledger <b>${St.led.length.toLocaleString()}</b></span>` +
       `<span class="g">layer <b>${(L[e.stage] || {}).i + 1}</b>/${LAYERS.length} · <b>${esc((L[e.stage] || { label:e.stage }).label)}</b></span>` +
       `<span class="g">real run <b>${ms(T.totalMs)}</b> ms · model calls <b>${T.net.models}</b></span>`;
-    metaEl.textContent = `${N.toLocaleString()} steps · read in ${ms(T.totalMs)} ms · ${T.net.requests.length} network request${T.net.requests.length === 1 ? '' : 's'} (no model — static priors + any format library)` + (LOOKUP.log.length ? ` · + ${LOOKUP.log.length} lookup request${LOOKUP.log.length === 1 ? '' : 's'} you asked for (dictionary · Wikipedia · Wikidata)` : '');
+    metaEl.textContent = `${N.toLocaleString()} steps · read in ${ms(T.totalMs)} ms · ${T.net.requests.length} network request${T.net.requests.length === 1 ? '' : 's'} (no model — static priors + any format library)` + (() => { const netN = LOOKUP.log.filter(x => !/local/.test(x.source)).length, X = T.lexicon, locN = X && X.on && !X.gap ? X.asked : 0; return (locN ? ` · ${locN.toLocaleString()} form${locN === 1 ? '' : 's'} asked of the local hyperlexicon` : '') + (netN ? ` · + ${netN} lookup request${netN === 1 ? '' : 's'} you asked for over the network (dictionary · Wikipedia · Wikidata)` : ''); })();
   }
 
   // ── loop ──
@@ -2076,13 +2099,48 @@ function startTimeline(T){
       const memo = new Map();   // one classification cache for every prefix of this replay
       ABBREV = abbrevOf(T.clean);
       T.timeline = buildReadingTimeline(T.clean, {
-        hash: sha256, diaNorm, splitSentences, wordsIn, extractSurfaces, discoverReferents, resolvePronouns,
-        classifyAt: prefix => pos ? documentClassifier(prefix, { posPrior: pos, lemmatizer: PRIORS.lemmatizer, lookups: LOOKUP.cache, memo }) : (f => classifyForm(f, { posPrior: null })),
+        hash: sha256, diaNorm, splitSentences: (t, o = {}) => splitSentences(t, { ...o, abbreviations: o.abbreviations ?? abbrevForSplitter() }), wordsIn, extractSurfaces, discoverReferents, resolvePronouns,
+        classifyAt: prefix => pos ? documentClassifier(prefix, { posPrior: pos, lemmatizer: PRIORS.lemmatizer, lookups: T.feat.lexicon === false ? null : LOOKUP.cache, memo }) : (f => classifyForm(f, { posPrior: null })),
         readClaims: prefix => mapClaims(R([{ ref:'source', text:prefix }]).read(prefix).claims, prefix),
       }, { maxSnapshots: 40 });
     } catch (err) { console.error(err); T.timeline = { schema:'EOReadingTimeline@1', sentences:[], words:[], snapshots:[], revisions:[], error:String(err && err.message || err) }; }
     if (T.onTimeline) T.onTimeline();
   }, 40);
+}
+
+// Ask the hyperlexicon about what the priors cannot settle: the dotted forms standing at a possible sentence end that neither the
+// language's prior nor this text's own evidence knows, and the word forms the class prior cannot place. One batch, local only.
+async function consultLexicon(clean, feat){
+  // the language the document measured as (fold-chat-lang, confident only); the class fill uses the English parser, so it runs for English only
+  const lang = PRIORS.lang && PRIORS.lang.confident && PRIORS.lang.lang ? PRIORS.lang.lang : 'en', LEX = hlexFor(lang);
+  const step = { on: feat.lexicon !== false, lang, junctions: 0, asked: 0, aliases: [], posAsked: 0, posFound: [], ms: 0, gap: null, giver: null };
+  if (!step.on) return step;
+  const t0 = performance.now();
+  const junc = aliasJunctions(clean, abbrevAll());
+  step.junctions = [...junc.values()].reduce((a, b) => a + b, 0);
+  const pos = PRIORS.posPrior, gapForms = new Set();
+  if (pos && lang === 'en') for (const w of new Set(clean.match(/\p{L}[\p{L}'’-]*\p{L}/gu) || [])){
+    if (w.length < 3) continue;
+    let c = null; try { c = classifyForm(w, { posPrior: pos, lemmatizer: PRIORS.lemmatizer }); } catch (e) {}
+    if (!c || !c.found) gapForms.add(w);
+  }
+  const ask = new Set([...junc.keys(), ...gapForms, ...[...gapForms].map(w => w.toLowerCase())]);
+  step.asked = ask.size;
+  await LEX.want(ask);
+  step.giver = LEX.giver;
+  if (!step.giver){ step.gap = 'no local lexicon answered (the Holodeck server reads the Wiktionary pack in ~/.cache/live_priors/wiktionary)'; step.ms = performance.now() - t0; return step; }
+  // an ALIAS: the giver lists the dotted form as a form of another word, and this text never writes the token without its period
+  step.aliases = resolveAliases(LEX, junc, clean);
+  for (const a of step.aliases) if (a.kept) ALIASES.set(a.form.slice(0, -1).toLowerCase(), a.of);
+  // a missing class: what the dictionary lists, nominated to the hyperlexicon as a witness (the local giver only, no network)
+  step.posAsked = gapForms.size;
+  for (const w of gapForms){
+    if (!LEX.get(w) && !LEX.get(w.toLowerCase())) continue;
+    const rec = await LOOKUP.look(w, { only:['dictionary'], network:false });
+    if (rec && rec.dictionary && rec.dictionary.found) step.posFound.push({ form: w, upos: rec.dictionary.upos || [] });
+  }
+  step.ms = performance.now() - t0;
+  return step;
 }
 
 async function read(text, label, feat, opt = {}){
@@ -2098,17 +2156,19 @@ async function read(text, label, feat, opt = {}){
   // the rail's switches, under the names the reader takes (holodeck-reader.js reads posPrior · morphology · stance · nounPhraseSubjects · phrasalPredicates):
   // until now only `stance` reached it, so switching POS, morphology, noun-phrase subjects or phrasal predicates off re-ran the display and not the relations
   const readerFeatures = { posPrior: feat.pos !== false, morphology: feat.morph !== false, stance: feat.stance !== false, nounPhraseSubjects: feat.npSubj !== false, phrasalPredicates: feat.phrasal !== false };
-  const foreign = PRIORS.posPrior !== PRIORS.posEng && PRIORS.langIso3 ? { iso3: PRIORS.langIso3, posPrior: PRIORS.posPrior } : null, R = await makeEngineRelationReader({ features: readerFeatures, foreign });
+  ABBREV = abbrevOf(clean); ALIASES = new Map(); LEXSTEP = await consultLexicon(clean, feat);
+  const abbreviations = abbrevForSplitter();
+  const foreign = PRIORS.posPrior !== PRIORS.posEng && PRIORS.langIso3 ? { iso3: PRIORS.langIso3, posPrior: PRIORS.posPrior } : null, R = await makeEngineRelationReader({ features: readerFeatures, foreign, abbreviations });
   let read0 = { claims: [] };
   try { read0 = R([{ ref:'source', text: clean }]).read(clean); } catch (e) { console.error(e); }
   const claims = mapClaims(read0.claims, analysis);
   const doc = { label: lastLabel, analysis, truncated, layout: opt.layout || (opt.keep && opt.keep.layout) || null };
   const T = buildTrace(doc, clean, claims, feat, opt.extraction || null);
-  T.clean = clean; T.R = R; T.feat = feat;
+  T.clean = clean; T.R = R; T.feat = feat; T.lexicon = LEXSTEP;
   // a proposition is held in the MOOD of its sentence (a question asks; it does not assert) and NESTED in the containers around it (speech, aside), in order
   T.claims.forEach(c => { if (c.located){ c.mood = moodAt(T.punctuation, c.s); c.holds = containersAt(T.punctuation, c.s).map(k => ({ kind:k.kind, mark:k.mark, mood:k.mood })); } });
   startTimeline(T);
-  startLadder(T, R, clean, { readerFeatures, foreign });
+  startLadder(T, R, clean, { readerFeatures, foreign, abbreviations });
   if (!BASELINE) BASELINE = T;
   $('model').textContent = `model calls: ${T.net.models}`;
   if (opt.animate !== false){ openTrace(T); }
