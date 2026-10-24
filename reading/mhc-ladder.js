@@ -1006,7 +1006,10 @@ function viewsOf({ material, reader, index, spec }) {
   return {
     units: auditUnits(material.text, spec.units), premiseFloor: PREMISE_FLOOR, premises: spec.premises,
     absentName: ABSENT_NAME, referents, corefAgreement: spec.corefAgreement,
-    pronouns: { bindings: (pron.bindings ?? []).map((b) => ({ ...b, name: nameOfRef.get(b.referentId) ?? b.referentId })), gaps: pron.gaps ?? [] },
+    // `regime` is the organ's own denominator: in the refused regime a frame that
+    // carries a name is skipped without adjudication and files no gap, so the
+    // page can say how many pronouns were never read rather than imply none.
+    pronouns: { bindings: (pron.bindings ?? []).map((b) => ({ ...b, name: nameOfRef.get(b.referentId) ?? b.referentId })), gaps: pron.gaps ?? [], regime: pron.regime ?? null },
     edges, slots, grid, systems: spec.sourceReaders.map((s) => s.ref), bySource: spec.bySource, merges,
   };
 }

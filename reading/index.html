@@ -184,6 +184,7 @@ import { splitSentences } from '../vendor/khora/native/adapters/text/spans.js';
 import { tokenize } from '../vendor/khora/native/organs/source.js';
 import { sha256Hex, stableProvenanceId, byteRange, EotLedger } from '../vendor/fold-chat/fold-chat-eot.js';
 import { materialOf, runLadder, judge, FLOORS, floorOf, ORDERS, orderOf, SYMBOLIC_FLOOR, AXIOMS, WITNESS_FLOOR } from './mhc-ladder.js';
+import { statusWord, cleanDetail, ARM_ROWS, armOutcome } from './floor-words.js';
 
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]));
@@ -307,26 +308,7 @@ function render(doc, R, L){
 }
 
 // ── verdict words ───────────────────────────────────────────────────────────
-const REFUSAL_WORD = {
-  organ_unreachable: 'unmeasured — could not run',
-  unlicensed_perturbation: 'unmeasured — a control arm tested nothing',
-  lower_order_suffices: 'refused — the floor below did it alone',
-  arbitrary_coordination: 'refused — an arbitrary re-coordination did it too',
-  indiscriminate: 'refused — it also succeeded on the control',
-  constituent_missing: 'refused — axiom 1: constituent missing',
-};
-function statusWord(item){
-  if (!item) return 'no item declared';
-  if (item.status === 'passed') return 'passed';
-  if (item.status === 'failed') return 'failed — a real ceiling';
-  const d = String(item.detail || '');
-  if (item.reason === 'organ_unreachable' && /this material offers no/.test(d)) return 'unmeasured — no specimen in this material';
-  if (item.reason === 'organ_unreachable' && /no organ on this page/.test(d)) return 'unmeasured — no organ on this page';
-  return REFUSAL_WORD[item.reason] || item.status;
-}
 const chipFor = (s) => s === 'passed' ? 'g' : s === 'failed' ? 'v' : 'a';
-// the scorer names the first arm it gated; what the reader needs is the gap itself
-const cleanDetail = (d) => String(d || '').replace(/^\w+ arm could not run: /, '');
 const floorId = (h) => 'f' + String(h).replace(/^F/, '').replace('½', 'h');
 const xrefOf = (f) => [f.commons != null ? `≈ Commons ${f.commons} · ${orderOf(f.commons).name}` : 'no Commons order', ...(f.probes.length ? [`${f.probes.length > 1 ? 'probes' : 'probe'} ${f.probes.join(', ')}`] : [])].join(' · ');
 
@@ -387,22 +369,10 @@ function commonsTable(L){
 }
 
 // ── one floor ───────────────────────────────────────────────────────────────
-const ARM_ROWS = [
-  ['lowerOrder', 'the floor below, alone', 'axiom 3 — Commons'],
-  ['arbitrary', 'the same parts, arbitrarily re-coordinated', 'axiom 3 — Commons'],
-  ['discrimination', 'material that does not support it', 'this battery’s control, not Commons'],
-];
 function armsCard(item, below = 'the floor below, alone'){
   const rows = ARM_ROWS.map(([k, what, giver]) => {
     if (k === 'lowerOrder') what = below;
-    const a = item.arms?.[k];
-    let res, cls;
-    if (!a){ res = 'not run — stopped at an earlier arm'; cls = ''; }
-    else if (a.unreachable){ res = 'could not run'; cls = 'warn'; }
-    else if (!a.perturbed){ res = 'tested nothing (A10)'; cls = 'warn'; }
-    else if (a.completed){ res = 'accomplished it — the axiom fails'; cls = 'bad'; }
-    else { res = 'did not — holds'; cls = 'ok'; }
-    const draws = a && a.draws > 1 ? ` · ${a.fired} of ${a.draws} draws` : '';
+    const a = item.arms?.[k], { res, cls, draws } = armOutcome(a);
     return `<tr><td>${esc(what)}<br><span style="color:var(--faint);font-size:11px">${esc(giver)}</span></td><td class="${cls}">${esc(res)}${draws}</td><td style="color:var(--dim)">${esc(a?.detail || '')}</td></tr>`;
   }).join('');
   return `<div class="card"><h3>the three control arms — each must fail</h3><table><thead><tr><th>arm</th><th>result</th><th>what it did</th></tr></thead><tbody>${rows}</tbody></table></div>`;
