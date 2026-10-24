@@ -389,3 +389,15 @@ fast: 3 files · no affected tests · law: ok
 | Simon/Chekhov | untested source | m3-build.mjs · m25-build.mjs | noted | one-off builders run as commands; what they built is pinned by the hashes in the plan's appendix, which is the check that matters for a pre-registration |
 | Pearl · Ostrom · Alexander · Kondo · Lévi-Strauss | routed by the plan's wording | PLAN.md | false-positive-on-review | the plan names corroboration, the helix, composition and level-profile as things it will measure; nothing here makes those claims |
 clean: Marshall — no law edited or cited
+
+## 2026-10-24 — the unit-tree finder, its tests, and the B1–B4 runner (reading-mhc-ladder, staged)
+fast: 3 files · 6 affected tests pass · law: ok
+| lens | citation | file:line | verdict | one line |
+| Diaconis | a null | reading/unit-tree.js:admitTypes | noted | the null draws k cuts from the finer level's own boundaries inside the candidate's extent (level-preserving), 1,000 seeded draws, p = (1 + #≥)/(1 + draws); one seed per type, and Holm is valid under any dependence between the tests |
+| Feynman | constants | run-units.mjs:B1–B4 | noted | the bars' numbers are the frozen plan's, copied, not chosen here |
+| Greenberg | language scope | run-units.mjs:depthFor | noted | the harness loads the English punctuation norms and abbreviation prior: right for M1–M3 and M5, which are English; M4 (other scripts) will need the language measured per document before it runs |
+| Dijkstra | case | run-units.mjs:46 | false-positive-on-review | the same case variants the page's splitter set uses (abbrevForSplitter) |
+| Holmes | identity | run-units.mjs:6 | false-positive-on-review | aliases keep a period with its word; no beings merged |
+| Ostrom | — | unit-tree.js:247 | false-positive-on-review | a shuffled pool of boundary indices |
+| Simon/Chekhov | untested source | reading/unit-tree.js · run-units.mjs | fixed / noted | unit-tree.test.mjs pins the types, a block comment, the trees, the addresses, (b) admitting topic paragraphs and refusing fixed-width wraps; the runner is a command, smoke-tested on a throwaway set (it caught two plumbing faults: a summary crash and the Wiktionary reader's path) |
+Found by the tests before any frozen run, fixed: a trailing ";" made code lines a one-column table (a delimiter now needs two non-empty fields); statements were read across the whole text when a brace appeared anywhere (now only in blocks that hold braces); types with few units that cover little of the text (two quotations) claimed the first tree before the sentences (types covering ≥ 90% of the material now join first).
