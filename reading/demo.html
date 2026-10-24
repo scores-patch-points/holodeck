@@ -47,9 +47,7 @@
   .top .exit{border:1px solid var(--line2)!important;border-radius:6px;padding:5px 11px!important;color:var(--ink)!important;font-weight:600}
   .top .stats{flex-basis:100%;font:12.5px var(--mono);color:var(--ink2);display:flex;gap:10px 16px;flex-wrap:wrap;padding-top:6px}
   .top .stats b{color:var(--ink);font-weight:600}.top .stats .g{color:var(--dim)}
-  .body{display:grid;grid-template-columns:minmax(300px,32%) 1fr;min-height:0}
   /* ── spine: the pipeline, with layer switches ──────────────────────────── */
-  .left{border-right:1px solid var(--line);display:grid;grid-template-rows:minmax(0,44%) minmax(0,1fr);min-height:0}
   .spine{overflow-y:auto;border-bottom:1px solid var(--line);padding:8px 10px 10px}
   .spine .h{font:600 12.5px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--dim);padding:6px 4px 8px}
   .ly{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:8px;align-items:center;border:1px solid var(--line);border-radius:9px;margin:3px 0;padding:5px 9px;background:var(--s1);cursor:pointer}
@@ -94,7 +92,6 @@
   .now .k{font:600 12.5px var(--mono);letter-spacing:.1em;text-transform:uppercase}
   .now p{margin:4px 0 0;font-size:14px;color:var(--ink);max-width:74ch}
   /* ── right: lens + tabs ────────────────────────────────────────────────── */
-  .right{display:grid;grid-template-rows:auto auto 1fr;min-height:0}
   .lens{border-bottom:1px solid var(--line);padding:4px 18px 12px;max-height:24vh;overflow:auto}
   .lens .doc{font:12.5px var(--mono);color:var(--dim);margin-bottom:4px;padding-top:8px}
   .lens .txt{font:15px/1.7 var(--serif);color:var(--mut);white-space:pre-wrap;max-width:92ch;word-break:break-word}
@@ -162,9 +159,6 @@
   .evt{display:grid;grid-template-columns:auto auto 1fr;gap:3px 10px;padding:4px 0;border-bottom:1px solid var(--line);font:12.5px var(--mono)}
   .evt .id{color:var(--pink)}.evt .st{color:var(--amber)}.evt .rd{color:var(--dim)}
   /* transport */
-  .bar2{border-top:1px solid var(--line);padding:6px 18px calc(12px + env(safe-area-inset-bottom,0px));display:grid;gap:8px}
-  .rib{position:relative;height:30px;cursor:pointer;touch-action:none}
-  .rib canvas{width:100%;height:100%;display:block}
   .ctl{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
   .ctl button{background:none;border:0;color:var(--mut);font:500 13px var(--sans);cursor:pointer;padding:4px 6px;border-radius:4px}
   .ctl button:hover{color:var(--ink)}.ctl .pl{color:var(--acc);font-weight:600;min-width:64px}
@@ -178,7 +172,7 @@
   .delta{margin:8px 0;border:1px solid #5c4d1d;border-radius:9px;background:#221d10;color:#f0d9a0;padding:8px 11px;font-size:13px}
   .delta b{color:#fff}
 
-  /* ── wide screens: rail | document + lanes | inspector, with the detail tabs in a drawer ── */
+  /* ── wide screens: the lanes of the current sentence ── */
   .drawer,.dh{display:contents}
   .dt,.lanes,.insp{display:none}
   .lanes .col{display:inline-grid;justify-items:center;gap:2px;padding:4px 7px 5px;border-radius:7px;cursor:pointer;min-width:38px;border:1px solid transparent}
@@ -265,65 +259,32 @@
   .insp .you{font:12.5px/1.8 var(--sans);color:var(--ink2)}.insp .you button{all:unset;cursor:pointer;color:var(--blue);text-decoration:underline;margin-left:6px;font:12.5px var(--sans)}.insp .small{font-size:12.5px;color:var(--dim)}
   .lens .txt .mn{box-shadow:inset 0 -3px 0 var(--rc);cursor:pointer}.lens .txt .mn.sel{background:color-mix(in srgb, var(--rc) 22%, transparent)}.lens .txt .pick{outline:2px dashed var(--acc);outline-offset:1px;border-radius:2px}
   /* the lens never paints outside its own box, and the tabs sit on an opaque ground, so a long line can never run under the drawer */
-  .lens{contain:paint}.drawer,.dh,#p-tabs{background:var(--bg)}.dh,#p-tabs{position:relative;z-index:2}
+  .lens{contain:paint}#p-tabs{background:var(--bg);position:relative;z-index:2}
   @media (min-width:1200px){
-    .body{grid-template-columns:300px minmax(0,1fr) minmax(340px,400px)}
-    .right{grid-template-rows:auto minmax(0,1fr) auto;min-width:0}
     .lens{max-height:46vh;padding:6px 32px 18px;overflow:auto}
     .lens .txt{font-size:19px;line-height:1.9;max-width:78ch}
     .lanes{display:block;border-top:1px solid var(--line);padding:10px 22px 12px;overflow:auto;min-height:0}
     .lanes .sent{padding:6px 0 10px;border-bottom:1px dashed var(--line)}.lanes .sent.cur{padding-top:8px}.lanes .sent:not(.cur) .col{opacity:.55}
     .lanes .w{font-size:17px}
-    .drawer{display:grid;grid-template-rows:auto 0fr;border-top:1px solid var(--line);min-height:0}
-    .drawer.open{grid-template-rows:auto minmax(0,1fr);height:42vh}
-    .dh{display:flex;align-items:stretch;min-width:0}
-    .dt{display:block;all:unset;cursor:pointer;font:600 12.5px var(--sans);color:var(--ink);padding:8px 14px;white-space:nowrap;border-right:1px solid var(--line)}
-    .dh .tabs{flex:1;border-bottom:0}
-    .drawer .pane-wrap{overflow:hidden;min-height:0}
     .insp{display:block;border-left:1px solid var(--line);overflow:auto;min-height:0}
   }
-  /* ── swappable hero panels: the reading, the details and the inspector each sit in the centre or the right slot (or are hidden) ── */
-  .lay,.slot{display:none}
-  @media (min-width:1200px){
-    .lay{display:inline-flex;align-items:baseline;gap:10px;position:relative}
-    .lay summary{cursor:pointer;color:var(--mut);font:500 13px var(--sans);padding:4px 6px;list-style:none}.lay summary:hover,.lay details[open] summary{color:var(--ink)}
-    .lay-pop{position:absolute;right:0;top:100%;z-index:60;background:var(--panel,var(--bg));border:1px solid var(--line2);border-radius:8px;padding:10px 12px;display:grid;gap:8px;min-width:220px;box-shadow:0 8px 24px rgba(0,0,0,.35)}
-    .lay-pop label{display:flex;justify-content:space-between;align-items:center;gap:12px;font:13px var(--sans);color:var(--ink2)}
-    .lay-pop select{background:var(--panel,var(--bg));color:var(--ink);border:1px solid var(--line2);border-radius:5px;padding:3px 5px;font:12.5px var(--sans)}
-    .slot{display:flex;flex-direction:column;min-height:0;min-width:0}
-    .right{display:flex;flex-direction:column;min-height:0;min-width:0}
-    .blk{display:contents}
-    .right .lens,.slot .lens{flex:0 0 auto}.right .lanes,.slot .lanes{flex:1 1 0}
-    .right .drawer,.slot .drawer{flex:0 0 auto}
-    .right .insp,.slot .insp{flex:1 1 0}
-    .slot .lens{padding:6px 16px 12px}.slot .lens .txt{font-size:16px;line-height:1.8}.slot .lanes{padding:10px 14px}
-    .right>.insp{border-left:0}.slot>.insp{border-left:0}.slot{border-left:1px solid var(--line)}
-    .only-detail>.drawer,.only-detail>.drawer.open{flex:1 1 0;height:auto;grid-template-rows:auto minmax(0,1fr)}
-    .empty-slot::after{content:"nothing here — pick a panel from \201Clayout\201D";color:var(--dim);font:13px var(--sans);padding:24px;display:block}
-  }
-  @media (max-width:900px){.body{grid-template-columns:1fr;grid-template-rows:44% 56%}.left{border-right:0;border-bottom:1px solid var(--line)}}
   header .claim{color:var(--dim);font-size:13px;margin-top:6px}
   /* ── calm: one thing at a time. What is hidden is still there for the code; the page just stops shouting it. ── */
   #app .top .stats, #app .top [data-a="toggle-all"], #app .top [data-a="reset"], #app .top [data-a="copy"]{display:none}
-  #app .left .log, #app .bar2 .key, #app .bar2 .seg, #app .bar2 label, #app .bar2 [data-a="rev"], #app .bar2 .rd{display:none}
   #app .lanes .h, #app .lanes .lg, #app .lens .doc, #app .insp .legend, #app .insp .lg{display:none}
-  /* ── on a phone the Layers view is the drawer: the layers become a swipeable row, the sentence and its lanes stay short, and the graph gets the screen ── */
+  /* ── on a phone the layers become a swipeable row, the sentence and its lanes stay short, and the graph gets the screen ── */
   @media (max-width:900px){
     #app .top{padding:8px 12px;gap:6px}#app .top .meta{display:none}#app .top h2{font-size:16px;flex-basis:100%}
     #app .top button{min-height:40px;padding:6px 12px}#app .top [data-a="dl-json"]{display:none}
-    #app .body{grid-template-columns:1fr;grid-template-rows:auto minmax(0,1fr)}
-    #app .left{border:0;border-bottom:1px solid var(--line);max-height:none}
     #app .spine{display:flex;flex-direction:row;gap:6px;overflow-x:auto;overflow-y:hidden;max-height:none;padding:8px 12px;-webkit-overflow-scrolling:touch}
     #app .spine .ly{flex:0 0 auto;margin:0;padding:8px 14px;white-space:nowrap;min-height:40px}
     #app .spine .fh{flex:0 0 auto;display:flex;align-items:center;gap:6px;margin:0;padding:8px 12px;white-space:nowrap;min-height:40px;border:1px solid var(--line);border-left:3px solid var(--fc);border-radius:9px;background:var(--s1)}
-    #app .right{grid-template-rows:auto auto minmax(46vh,1fr);overflow:auto}
     #app .lens{max-height:22vh;overflow:auto;font-size:15px;line-height:1.7}
     #app .lanes{max-height:16vh;overflow:auto}
-    #app #p-drawer{min-height:46vh}
     #app #p-tabs{overflow-x:auto;white-space:nowrap}#app #p-tabs button{min-height:42px;flex:0 0 auto}
     #p-graph .hm-tg,#p-graph .hm-position{display:none}
     #p-graph .hm-top{left:8px;right:8px}
-    #app .bar2 button{min-height:40px;min-width:40px}
+    #app .transport button{min-height:40px;min-width:40px}
   }
   /* referents as a table — the same module as the reader's index (referent-table.js) */
   #app .rt{width:100%;border-collapse:collapse;font-size:13px}#app .rt th,#app .rt td{padding:6px 8px;text-align:left;font-weight:400;line-height:1.35;border-bottom:1px solid var(--line)}
@@ -334,7 +295,6 @@
   #app .rt .sm{display:inline-block;width:8px;height:8px;border-radius:2px;margin-left:2px}#app .rt .c-reality{text-align:center;cursor:help}
   #app .rt .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
   @media (max-width:900px){#app .rt tbody th,#app .rt tbody td,#app .rt thead th{height:40px}#app .rt .c-first{display:none}}
-  /* the Layers view keeps its drawer: Source · Words · POS · Morphology · Referents · Propositions · Render · EOT · JSON · Graph (the solar system) */
   #app .lens{overflow:auto;min-height:0}
   #app .spine .h{display:none}
   /* every section says what it is doing: the rail's notes, the tab notes, the phone's note line */
@@ -342,29 +302,23 @@
   .ly .how{display:none;grid-column:2 / 4;font-size:12px;line-height:1.45;color:var(--dim);margin-top:2px}.ly.cur .how{display:block}.ly .how b{color:var(--ink2);font-weight:600}
   .pnote{border:1px solid var(--line);border-radius:9px;padding:9px 12px;margin:0 0 12px;font-size:13.5px;line-height:1.55;background:var(--s1)}.pnote b{color:var(--ink2)}
   #p-graph-note{align-self:start;z-index:3;margin:6px 10px 0;font-size:13px;line-height:1.5}#p-graph-note .pnote{margin:0;background:var(--s1);opacity:.96}#p-graph-note summary{cursor:pointer}
-  .lnote{display:block;padding:8px 14px 9px;font-size:12.5px;line-height:1.45;color:var(--mut);border-bottom:1px solid var(--line)}.lnote b{color:var(--ink2)}#app .lnote .dim{display:none}
-  @media (max-width:900px){
-    #app .lnote{display:block;padding:8px 14px;font-size:13px;line-height:1.5;border-bottom:1px solid var(--line);max-height:30vh;overflow:auto}#app .lnote b{color:var(--ink2)}
-    #app .spine .why,#app .spine .how,#app .spine .cnt{display:none}
-  }
+  @media (max-width:900px){ #app .spine .why,#app .spine .how,#app .spine .cnt{display:none} }
   #app .top h2{font-size:17px;font-weight:600}
   #app .lens{line-height:1.9;font-size:16px}
   #app .insp{line-height:1.55}
   #app .insp .rh2{margin-top:18px;letter-spacing:.06em}
   #app button{font-size:13px}
-  #app .left{grid-template-rows:minmax(0,1fr)}
-  @media (min-width:901px){ #app .left{grid-template-rows:auto minmax(0,1fr)} #app .lnote{order:-1} }
-  #app .spine{border-bottom:0;padding:14px 14px}
   #app .ly{padding:6px 11px;margin:3px 0}
   #app .ly .n{display:none}
-  @media (max-width:1199px){ #app .spine{max-height:26vh} #app .ly{margin:4px 0;padding:7px 12px} }
+  @media (max-width:1199px){ #app .ly{margin:4px 0;padding:7px 12px} }
 
 /* ── panels that read in one direction: the header is one line of title, then one line of controls; the rail fills its column; every tab is visible ── */
 #app .top h2{flex-basis:100%}
 #app .top .meta{flex:1 1 0;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}#app .top .sp{display:none}
-@media (min-width:901px) and (max-width:1199px){ #app .spine{max-height:none} #app .tabs{flex-wrap:wrap;overflow:visible} }
+@media (min-width:901px) and (max-width:1199px){ #app .tabs{flex-wrap:wrap;overflow:visible} }
 .pstat{display:flex;flex-wrap:wrap;gap:6px 14px;font:12.5px var(--mono);color:var(--dim);margin:0 0 12px}.pstat b{color:var(--ink);font-weight:600}
 .stage-line{font-size:14px;line-height:1.5;margin:4px 0 8px}.stage-line.dim{color:var(--dim)}
+.fold-top{margin:2px 0 10px;font-size:13px}.fold-top summary{cursor:pointer;color:var(--mut)}.fold-top summary:hover{color:var(--ink)}.fold-top ul{margin:6px 0 0 18px;padding:0;color:var(--ink2);font-size:12.5px;line-height:1.5}.fold-top li{margin:2px 0;overflow-wrap:anywhere}
 .flr{border:1px solid var(--line);border-left:3px solid var(--fc);border-radius:9px;padding:10px 12px;margin:10px 0;background:var(--s1);min-width:0}
 .flr.cur{background:#1a1f2b}.flr.stage .fhd b::after{content:" · stage";color:var(--green)}
 .flr .fhd{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline}.flr .fhd .f{font:600 12.5px var(--mono);color:var(--bg);background:var(--fc);border-radius:5px;padding:1px 7px}
@@ -401,6 +355,54 @@
 .tie{display:grid;grid-template-columns:minmax(0,1fr) auto auto auto;gap:6px 14px;align-items:center;padding:2px 0}
 .tie .mono{color:var(--mut)}
 @media (max-width:700px){.pc-sec{padding-left:12px}.tie{grid-template-columns:1fr;gap:4px}}
+
+  /* ── the editor's layout: index | viewer + timeline | inspector, the transport across the bottom. Only the playhead and the viewer's marks move while it plays. ── */
+  #app{grid-template-columns:280px minmax(0,1fr);grid-template-rows:auto minmax(0,1fr) 300px auto}
+  @media (min-width:1200px){ #app{grid-template-columns:280px minmax(0,1fr) minmax(340px,400px)} }
+  @media (max-width:1199px){ #app .insp{display:none} }
+  #app .top{grid-column:1/-1;grid-row:1}
+  #app .index{grid-column:1;grid-row:2/4;border-right:1px solid var(--line);overflow:auto;min-height:0;min-width:0}
+  #app .index .spine{padding:10px 12px 14px;overflow:visible;border:0;max-height:none}
+  #app .viewer{grid-column:2;grid-row:2;display:flex;flex-direction:column;min-height:0;min-width:0}
+  #app .viewer .tabs{flex:0 0 auto}
+  #app .viewer .now{flex:0 0 auto;border-top:0;border-bottom:1px solid var(--line);min-height:0;padding:6px 18px 7px}
+  #app .viewer .now .k{font-size:11px;letter-spacing:.1em}#app .viewer .now p{margin:2px 0 0;font-size:13px;color:var(--ink2);max-width:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  #app .vbody{flex:1 1 0;min-height:0;display:flex;flex-direction:column}
+  #app #b-read{display:flex;flex-direction:column;flex:1 1 0;min-height:0}#app #b-read[hidden]{display:none}
+  #app .viewer .lens{flex:1 1 0;min-height:0;max-height:none;overflow:auto;border-bottom:0;padding:8px 26px 18px}
+  #app .viewer .lanes{display:block;flex:0 0 auto;max-height:32%;overflow:auto;border-top:1px solid var(--line);padding:8px 18px 10px}
+  #app #p-drawer{flex:1 1 0;min-height:0;display:grid;position:relative}#app #p-drawer[hidden]{display:none}#app #p-drawer>*{grid-area:1/1}
+  @media (min-width:1200px){ #app .insp{grid-column:3;grid-row:2/4;display:block;border-left:1px solid var(--line);overflow:auto;min-height:0;min-width:0} }
+  #app .timeline{grid-column:2;grid-row:3;border-top:1px solid var(--line);display:flex;flex-direction:column;min-height:0;min-width:0;background:#141417}
+  #app .tl-head{flex:0 0 auto;display:flex;align-items:center;gap:10px;padding:3px 10px;border-bottom:1px solid var(--line);font:11px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--dim)}
+  #app .tl-head .seg{margin-left:auto}
+  #app .tl-body{flex:1 1 0;min-height:0;overflow:auto;position:relative}
+  #app .tl-lanes{display:grid;grid-template-columns:168px minmax(0,1fr)}#app .tl-lanes[hidden]{display:none}
+  #app .tl-h div{height:20px;box-sizing:border-box;display:flex;align-items:center;gap:6px;padding:0 8px 0 10px;font:11.5px var(--mono);color:var(--ink2);border-bottom:1px solid #222227;white-space:nowrap;overflow:hidden;cursor:default}
+  #app .tl-h div.ax{height:18px;color:var(--dim);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase}
+  #app .tl-h div.fl{cursor:pointer}#app .tl-h div.fl.empty{cursor:default;color:var(--dim)}#app .tl-h div.fl:focus-visible{outline:2px solid var(--acc3);outline-offset:-2px}
+  #app .tl-h div.sub{padding-left:30px;color:var(--mut)}
+  #app .tl-h .dot{width:8px;height:8px;border-radius:2px;flex:none}#app .tl-h .car{width:10px;flex:none;color:var(--dim)}
+  #app .rib{position:relative;cursor:pointer;touch-action:none;height:60px}#app .rib canvas{width:100%;height:100%;display:block}
+  #app .log{display:grid;grid-template-rows:minmax(0,1fr);height:100%;min-height:0}#app .log[hidden]{display:none}
+  #app .transport{grid-column:1/-1;grid-row:4;display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:6px 14px calc(8px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--line)}
+  #app .transport .seg,#app .tl-head .seg{display:inline-flex;gap:0;margin-left:6px;border:1px solid var(--line2);border-radius:6px;overflow:hidden}
+  #app .seg button{border-radius:0;font-size:12px;padding:4px 9px;min-height:30px;background:none;border:0;color:var(--mut);cursor:pointer}
+  #app .seg button[aria-pressed=true]{background:var(--sel);color:var(--ink)}
+  #app .transport .rd{margin-left:auto}
+  #app .lnote,#app .key{display:none}
+  @media (max-width:900px){
+    #app{grid-template-columns:1fr;grid-template-rows:auto auto minmax(0,1fr) 190px auto}
+    #app .index{grid-column:1;grid-row:2;border-right:0;border-bottom:1px solid var(--line);overflow:visible}
+    #app .index .spine{padding:8px 12px;overflow-x:auto;overflow-y:hidden}
+    #app .viewer{grid-column:1;grid-row:3}
+    #app .viewer .lens{padding:8px 16px 14px}
+    #app .timeline{grid-column:1;grid-row:4}
+    #app .tl-lanes{grid-template-columns:118px minmax(0,1fr)}
+    #app .transport{grid-column:1;grid-row:5}
+    #app .insp{display:none}
+    #app .top h2{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  }
 </style>
 </head>
 <body>
@@ -423,6 +425,7 @@
       <button data-s="dossier">sample 2</button>
       <button data-s="history">sample 3</button>
       <button id="exsrc" title="Three sources on one ship">ship</button>
+      <button data-doc="Report" title="A whole document, read end to end: the Board of Trade’s 1912 report on the loss of the Titanic (about 64,000 characters), from the Holodeck’s own published sample set">whole document</button>
     </span>
     <span id="model" class="badge live" hidden>model calls: 0</span>
   </div>
@@ -435,17 +438,6 @@
   <div class="top">
     <h2 id="p-title">how it was read</h2>
     <span class="meta" id="p-meta"></span><span class="sp"></span>
-    <span class="lay" id="lay">
-      <button type="button" data-lay="swap" title="Swap the centre and right panels">⇄ swap</button>
-      <details><summary title="Choose what each panel shows">layout</summary>
-        <div class="lay-pop">
-          <label>Reading <select data-blk="read"></select></label>
-          <label>Details <select data-blk="detail"></select></label>
-          <label>Inspector <select data-blk="insp"></select></label>
-          <button type="button" data-lay="reset">reset layout</button>
-        </div>
-      </details>
-    </span>
     <button type="button" class="f" data-a="toggle-all" title="Switch every optional layer off or on">all layers</button>
     <button type="button" data-a="reset" title="Back to every layer on">reset</button>
     <button type="button" data-a="copy">Copy trace (JSON)</button>
@@ -455,103 +447,63 @@
     <span class="stats" id="p-stats"></span>
     <div class="delta" id="p-delta" hidden></div>
   </div>
-  <div class="body">
-    <div class="left">
-      <div class="spine" id="spine"></div>
-      <div class="lnote" id="p-lnote" aria-live="polite"></div>
-      <div class="log">
-        <div class="rows" tabindex="0"><div class="sz"></div></div>
-        <div class="now" id="p-now"></div>
-      </div>
+  <!-- the editor's four panes: the index of floors and layers (fixed), the viewer (the text at the playhead), the timeline (one lane per layer), the inspector (the selection) — and the transport -->
+  <aside class="index" id="p-index" aria-label="Index — the floors, and the layers that make each">
+    <div class="spine" id="spine"></div>
+  </aside>
+  <main class="viewer" id="p-viewer" aria-label="Viewer">
+    <div class="tabs" id="p-tabs" role="tablist" aria-label="View">
+      <button type="button" data-tab="text" role="tab" aria-selected="true">Text</button>
+      <button type="button" data-tab="source" role="tab" aria-selected="false">Source</button>
+      <button type="button" data-tab="floors" role="tab" aria-selected="false">Floors</button>
+      <button type="button" data-tab="words" role="tab" aria-selected="false">Words</button>
+      <button type="button" data-tab="pos" role="tab" aria-selected="false">POS</button>
+      <button type="button" data-tab="morph" role="tab" aria-selected="false">Morphology</button>
+      <button type="button" data-tab="refs" role="tab" aria-selected="false">Referents</button>
+      <button type="button" data-tab="props" role="tab" aria-selected="false">Propositions</button>
+      <button type="button" data-tab="render" role="tab" aria-selected="false">Render</button>
+      <button type="button" data-tab="eot" role="tab" aria-selected="false">EOT</button>
+      <button type="button" data-tab="json" role="tab" aria-selected="false">JSON</button>
+      <button type="button" data-tab="graph" role="tab" aria-selected="false">Graph</button>
     </div>
-    <div class="right">
-      <div class="blk" id="b-read" data-blk="read">
+    <div class="now" id="p-now"></div>
+    <div class="vbody">
+      <div class="blk" id="b-read">
         <div class="lens" id="p-lens"></div>
         <div class="lanes" id="p-lanes" aria-label="The current sentence, lane by lane"></div>
       </div>
-      <div class="drawer" id="p-drawer" data-blk="detail">
-        <div class="dh">
-          <button type="button" class="dt" id="p-dt" aria-expanded="false" title="Show or hide the detail views">▸ Details</button>
-          <div class="tabs" id="p-tabs" role="tablist" aria-label="View">
-            <button type="button" data-tab="source" role="tab" aria-selected="true">Source</button>
-            <button type="button" data-tab="floors" role="tab" aria-selected="false">Floors</button>
-            <button type="button" data-tab="words" role="tab" aria-selected="false">Words</button>
-            <button type="button" data-tab="pos" role="tab" aria-selected="false">POS</button>
-            <button type="button" data-tab="morph" role="tab" aria-selected="false">Morphology</button>
-            <button type="button" data-tab="refs" role="tab" aria-selected="false">Referents</button>
-            <button type="button" data-tab="props" role="tab" aria-selected="false">Propositions</button>
-            <button type="button" data-tab="render" role="tab" aria-selected="false">Render</button>
-            <button type="button" data-tab="eot" role="tab" aria-selected="false">EOT</button>
-            <button type="button" data-tab="json" role="tab" aria-selected="false">JSON</button>
-            <button type="button" data-tab="graph" role="tab" aria-selected="false">Graph</button>
-          </div>
-        </div>
-        <div class="pane-wrap">
-          <div class="pane" id="p-pane"></div>
-          <div id="p-graph-note" hidden></div>
-          <div class="pane graph-host" id="p-graph" hidden></div>
-        </div>
+      <div class="pane-wrap" id="p-drawer" hidden>
+        <div class="pane" id="p-pane"></div>
+        <div id="p-graph-note" hidden></div>
+        <div class="pane graph-host" id="p-graph" hidden></div>
       </div>
     </div>
-    <div class="slot" id="slot-b"><aside class="insp" id="p-insp" data-blk="insp" aria-label="Inspector — why this step"></aside></div>
-  </div>
-  <div id="park" hidden></div>
-  <div class="bar2">
-    <div class="rib" title="Drag to scrub"><canvas></canvas></div>
-    <div class="ctl">
-      <button type="button" data-a="start" title="First event (Home)">|◀</button>
-      <button type="button" data-a="back" title="One event back (←)">◀|</button>
-      <button type="button" data-a="rev" title="Rewind (J)">◀◀</button>
-      <button type="button" data-a="play" class="pl" title="Play / pause (Space)">▶ Play</button>
-      <button type="button" data-a="fwd" title="One event forward (→)">|▶</button>
-      <span class="seg" role="group" aria-label="Clock">
-        <button type="button" data-a="steps" aria-pressed="true">Steps</button>
-        <button type="button" data-a="real" aria-pressed="false">Real time</button>
-      </span>
-      <label style="display:flex;align-items:center" title="Speed"><select id="p-speed"></select></label>
-      <span class="rd" id="p-rd"></span>
+  </main>
+  <aside class="insp" id="p-insp" aria-label="Inspector — the selected step"></aside>
+  <section class="timeline" id="p-timeline" aria-label="Timeline — one lane per layer">
+    <div class="tl-head"><span>lanes · <span id="p-clockname">steps</span></span>
+      <span class="seg tl-mode" role="group" aria-label="Timeline view"><button type="button" data-tl="lanes" aria-pressed="true">Lanes</button><button type="button" data-tl="list" aria-pressed="false">List</button></span></div>
+    <div class="tl-body">
+      <div class="tl-lanes" id="p-tl"><div class="tl-h" id="p-tlh"></div><div class="rib" title="Drag to scrub"><canvas></canvas></div></div>
+      <div class="log" id="p-log" hidden><div class="rows" tabindex="0"><div class="sz"></div></div></div>
     </div>
-    <div class="key" id="p-key"></div>
+  </section>
+  <div class="transport ctl">
+    <button type="button" data-a="start" title="First event (Home)">|◀</button>
+    <button type="button" data-a="back" title="One event back (←)">◀|</button>
+    <button type="button" data-a="rev" title="Rewind (J)">◀◀</button>
+    <button type="button" data-a="play" class="pl" title="Play / pause (Space)">▶ Play</button>
+    <button type="button" data-a="fwd" title="One event forward (→)">|▶</button>
+    <span class="seg" role="group" aria-label="Clock">
+      <button type="button" data-a="steps" aria-pressed="true">Steps</button>
+      <button type="button" data-a="real" aria-pressed="false">Real time</button>
+    </span>
+    <label style="display:flex;align-items:center" title="Speed"><select id="p-speed"></select></label>
+    <span class="rd" id="p-rd"></span>
   </div>
+  <div class="key" id="p-key" hidden></div>
+  <div class="lnote" id="p-lnote" hidden></div>
 </div>
-
-<script>
-// Swappable panels (wide screens): each of the reading, the details and the inspector sits in the centre slot, the
-// right slot, or is hidden. Blocks are moved, never rebuilt, so every renderer keeps its element and its listeners.
-(() => {
-  const KEY = 'holodeck-demo-layout', DEF = { read:'a', detail:'a', insp:'b' }, ORDER = ['read', 'detail', 'insp'];
-  const NAME = { a:'Centre', b:'Right', h:'Hidden' };
-  const app = document.getElementById('app'), lay = document.getElementById('lay'); if (!app || !lay) return;
-  const slots = { a: app.querySelector('.right'), b: document.getElementById('slot-b'), h: document.getElementById('park') };
-  const blk = { read: document.getElementById('b-read'), detail: document.getElementById('p-drawer'), insp: document.getElementById('p-insp') };
-  const wide = matchMedia('(min-width:1200px)');
-  let L = { ...DEF };
-  try { const v = JSON.parse(localStorage.getItem(KEY) || 'null'); if (v && ORDER.every(k => 'abh'.includes(v[k]))) L = v; } catch (e) {}
-  const save = () => { try { localStorage.setItem(KEY, JSON.stringify(L)); } catch (e) {} };
-  const sels = [...lay.querySelectorAll('select')];
-  sels.forEach(sel => { sel.innerHTML = ['a', 'b', 'h'].map(v => `<option value="${v}">${NAME[v]}</option>`).join(''); });
-  function place(){
-    const use = wide.matches ? L : DEF;
-    ORDER.forEach(k => slots[use[k]].appendChild(blk[k]));
-    for (const id of ['a', 'b']){
-      const here = ORDER.filter(k => use[k] === id);
-      slots[id].classList.toggle('only-detail', here.length === 1 && here[0] === 'detail');
-      slots[id].classList.toggle('empty-slot', !here.length);
-    }
-    sels.forEach(sel => { sel.value = L[sel.dataset.blk]; });
-    window.dispatchEvent(new Event('resize'));
-  }
-  lay.addEventListener('change', e => { const sel = e.target.closest('select'); if (!sel) return; L[sel.dataset.blk] = sel.value; save(); place(); });
-  lay.addEventListener('click', e => {
-    const b = e.target.closest('[data-lay]'); if (!b) return;
-    if (b.dataset.lay === 'swap') ORDER.forEach(k => { if (L[k] !== 'h') L[k] = L[k] === 'a' ? 'b' : 'a'; });
-    else L = { ...DEF };
-    save(); place();
-  });
-  wide.addEventListener('change', place);
-  place();
-})();
-</script>
 <script type="module">
 // ─────────────────────────────────────────────────────────────────────────────
 // "No model was called" is MEASURED: every network request this page makes is
@@ -654,7 +606,7 @@ const FLOOR_NOTE = {   // what the rail says where a floor has no layer of its o
 };
 const floorIdx = h => FLOORS.findIndex(f => f.floor === h);
 // click a layer in the rail: the replay jumps to its first event and the drawer opens on the tab that shows its work
-const TAB_OF_LAYER = { extract:'source', bytes:'source', decode:'source', furniture:'source', punct:'source', statement:'source', token:'words', grammar:'pos', morph:'morph', stance:'props', referent:'refs', relation:'props', np:'props', phrasal:'props', render:'render', ledger:'eot' };
+const TAB_OF_LAYER = { extract:'text', bytes:'text', decode:'text', furniture:'text', punct:'text', statement:'text', token:'words', grammar:'pos', morph:'morph', stance:'props', referent:'refs', relation:'props', np:'props', phrasal:'props', render:'render', ledger:'eot' };
 const shortVerdict = w => String(w || '').split(' — ')[0];
 const floorId = h => 'fl-' + String(h).replace(/^F/, '').replace('½', 'h');
 
@@ -741,6 +693,8 @@ function priorsDeclared(){
     `morphology — ${PRIORS.morphRaw?.provenance?.source || 'UniMorph English'} (priors/morphology-eng.json): the lemmatizer that widens same-act, and the verb-form set${PRIORS.langIso3 ? ' — English; not applied to this document' : ''}`,
     'stance class — holodeck-reader.js (same-act widened by stance)',
     'English closed classes — determiners, negation, first person (adapters/text/priors.js)',
+    `punctuation — the language's declared norms and its measured abbreviation prior (reading/punctuation.js, punctuation-priors/${PUNCT && PUNCT.lang ? PUNCT.lang : 'en'}.json), joined to the document's own abbreviations (spans.js::deriveAbbreviations)`,
+    ...(LOOKUP.count() ? [`hyperlexicon — ${LOOKUP.count()} forms looked up on request (holodeck-lookup.js → kernel/hyperlexicon.js): each witness nominated as a candidate with its giver, licence and address, none licensed; they fill class gaps in the document classifier — the relation reader does not read them`] : []),
   ];
 }
 // The discrimination arms need material that does NOT support the task: a built-in sample of different content, never the material itself.
@@ -749,9 +703,10 @@ function controlFor(analysis){
   return { key, material: materialOf([{ key, label: 'sample · ' + key, text: SAMPLES[key] }]) };
 }
 // The blanked text, cut into addressed passages, with the control beside it; every rung's declared task with its three arms.
-// It starts after the reading is on screen and is capped at LADDER_CHARS so the arms stay in seconds — the Floors tab says when the cap cut.
+// It starts after the reading is on screen. LADDER_CHARS is the view's own reading cap (LIMIT), so a whole document is scored whole;
+// the Floors tab says when a cap cut.
 // The verdicts are the READER's ceiling on this material, not a property of the text: the same text under another reader scores otherwise.
-const LADDER_CHARS = 14000;
+const LADDER_CHARS = 80000;
 function startLadder(T, R, clean){
   T.ladder = { state:'running' };
   setTimeout(async () => {
@@ -903,7 +858,7 @@ function buildTrace(doc, clean, claims, features, extraction){
   const readEvt = led.event({ stage:'read', source_id:srcId, ...(scanned ? { parent:scanned.last } : {}), transform:'bytes→statements' });
   push('ledger', 'event', `${readEvt} · stage read · transform bytes→statements`, { s:0, e:0, data:{ id:readEvt } });
   led.event({ stage:'arrange', source_id:srcId, parent:readEvt, transform:'statements→tokens' });
-  led.event({ stage:'classify', source_id:srcId, parent:readEvt, transform:'tokens→classes', detail:{ giver:features.pos === false ? null : POS_PRIOR_META.giver } });
+  led.event({ stage:'classify', source_id:srcId, parent:readEvt, transform:'tokens→classes', detail:{ giver:features.pos === false ? null : POS_PRIOR_META.giver, ...(LOOKUP.count() ? { witnesses:`hyperlexicon — ${LOOKUP.count()} forms looked up, candidates not givers` } : {}) } });
   claims.forEach(c => {
     const id = led.event({ stage:'bind', source_id:srcId, parent:readEvt, unit:'relation',
       range:byteRange(c.b0 ?? 0, (c.b0 ?? 0) + (c.span ? utf8Len(c.span) : 0)),
@@ -1004,7 +959,7 @@ const REAL_SPEEDS = [[1,'1×'],[0.1,'1/10×'],[0.01,'1/100×'],[0.001,'1/1,000×
 let cur = null, inst = null, BASELINE = null, LAYERS_SEEN = false;
 let features = { ...DEFAULT_FEATURES };
 let lastRaw = '', lastLabel = '';
-let LAST_TAB = 'source', LAST_INSP = 'reading';
+let LAST_TAB = 'text', LAST_INSP = 'why';
 
 function openTrace(T){ return openReader(T); }
 // the reading, in three panels (reading/reader-view.js): what was read · the selected thing · where it came from
@@ -1013,8 +968,8 @@ function openTrace(T){ return openReader(T); }
 function showLayers(){
   if (!cur) return null; if (inst) inst.close();
   const rv = $('rv'); if (rv) rv.classList.remove('on');
-  const first = !LAYERS_SEEN; LAYERS_SEEN = true; if (first) LAST_TAB = 'graph';   // the first time, open on the relative solar system
-  inst = mount(cur.T); if (first && inst.setTab) inst.setTab('graph'); return inst;
+  LAYERS_SEEN = true;
+  inst = mount(cur.T); return inst;
 }
 document.addEventListener('click', (e) => { if (e.target.closest && e.target.closest('[data-a="to-reader"]') && inst) inst.close(); });
 function openReader(T, keep = null){
@@ -1051,7 +1006,7 @@ function mount(T){
   const statsEl = $('p-stats'), metaEl = $('p-meta'), rc = app.querySelector('.rib canvas'), rdEl = $('p-rd'), speedSel = $('p-speed'), keyEl = $('p-key'), spineEl = $('spine');
   $('p-title').textContent = T.doc.label;
   keyEl.innerHTML = LAYERS.map(l => `<span><i style="background:var(${l.color})"></i>${esc(l.label)}</span>`).join('');
-  let closed = false; T.onLadder = () => { if (!closed) render(false); };
+  let closed = false; T.onLadder = () => { if (!closed){ tlCache = null; render(false); } };
 
   // ── clock ──
   let real = false, dir = 0, pos = 0, k = 0, speed = 8, last = performance.now(), raf = 0;
@@ -1063,7 +1018,7 @@ function mount(T){
     speedSel.value = String(speed);
     app.querySelector('[data-a=steps]').setAttribute('aria-pressed', String(!real));
     app.querySelector('[data-a=real]').setAttribute('aria-pressed', String(real)); }
-  const setClock = r => { real = r; pos = clockOf(k); fillSpeeds(); drawRibbon(); };
+  const setClock = r => { real = r; pos = clockOf(k); fillSpeeds(); const cn = $('p-clockname'); if (cn) cn.textContent = r ? 'real time' : 'steps'; tlCache = null; drawRibbon(); };
   const seek = i => { k = Math.max(0, Math.min(N - 1, i)); pos = clockOf(k); render(true); };
   const setDir = d => { dir = d; app.querySelector('[data-a=play]').textContent = dir === 1 ? '❚❚ Pause' : '▶ Play'; app.querySelector('[data-a=rev]').textContent = dir === -1 ? '❚❚' : '◀◀'; last = performance.now(); };
 
@@ -1100,30 +1055,36 @@ function mount(T){
     const f = Ld.L.floors.floors.find(x => x.floor === h), it = f && f.items[0];
     return { word: statusWord(it), cls: verdictClass(it) };
   }
-  function renderSpine(St, e){
-    const active = e.stage, curFloor = FLOOR_OF_LAYER[active] || null, Ld = ladderOf(), stage = Ld ? Ld.floors.stage.stage : null;
+  const noteOf = id => (LAYER_NOTES[id] || {}).what || (L[id] || {}).why || '';
+  function buildIndex(){
     const byFloor = new Map(FLOORS.map(f => [f.floor, []])), record = [];
     LAYERS.forEach(l => { const h = FLOOR_OF_LAYER[l.id]; (h ? byFloor.get(h) : record).push(l); });
     const row = l => {
       const on = l.fixed || T.features[l.feature] !== false;
-      const cnt = layerCount(l.id, St);
-      const cur = l.id === active;
-      const sw = l.fixed ? ''
-        : `<span class="sw" role="switch" tabindex="0" aria-checked="${on}" data-feature="${l.feature}" title="switch ${esc(l.label)} ${on ? 'off' : 'on'} — the reading re-runs"></span>`;
-      const note = LAYER_NOTES[l.id] || {};
-      return `<div class="ly ${cur ? 'cur' : ''} ${on ? '' : 'off'}" data-layer="${l.id}" role="button" tabindex="0" title="${esc(note.what || l.why)}"><span class="lab" style="color:var(${l.color})">${esc(l.label)}</span><span class="cnt" title="${esc(String(cnt).replace(/<[^>]+>/g, ''))}">${cnt}</span>${sw}</div>`;
+      const sw = l.fixed ? '' : `<span class="sw" role="switch" tabindex="0" aria-checked="${on}" data-feature="${l.feature}" title="switch ${esc(l.label)} ${on ? 'off' : 'on'} — the reading re-runs"></span>`;
+      return `<div class="ly ${on ? '' : 'off'}" data-layer="${l.id}" role="button" tabindex="0" title="${esc(noteOf(l.id))}"><span class="lab" style="color:var(${l.color})">${esc(l.label)}</span><span class="cnt"></span>${sw}</div>`;
     };
-    const head = (f, fi) => {
-      const reached = k >= reachAt[fi], v = reached ? floorVerdict(f.floor) : null, layers = byFloor.get(f.floor);
-      return `<div class="fh ${curFloor === f.floor ? 'cur' : ''} ${stage === f.floor ? 'stage' : ''} ${reached ? '' : 'ahead'}" data-floor="${esc(f.floor)}" style="--fc:var(${FLOOR_COLOR[f.floor]})" role="button" tabindex="0" title="${esc(f.operand)}${v ? ' — ' + esc(v.word) : ''}${layers.length ? '' : ' — ' + esc(FLOOR_NOTE[f.floor] || 'no layer on this page')} — open in the Floors tab">`
-        + `<span class="f">${esc(f.floor)}</span><span class="t"><span class="nm">${esc(f.name)}</span>${layers.length ? '' : '<span class="no">no layer</span>'}</span><span class="vd ${v ? v.cls : ''}">${v ? esc(shortVerdict(v.word)) : ''}</span></div>`;
-    };
+    const head = f => { const layers = byFloor.get(f.floor);
+      return `<div class="fh" data-floor="${esc(f.floor)}" style="--fc:var(${FLOOR_COLOR[f.floor]})" role="button" tabindex="0" title="${esc(f.operand)} — open in the Floors tab"><span class="f">${esc(f.floor)}</span><span class="t"><span class="nm">${esc(f.name)}</span>${layers.length ? '' : '<span class="no">no layer</span>'}</span><span class="vd"></span></div>`; };
     spineEl.innerHTML = `<div class="h">the floors, and the layers that make each — switch a layer off and the reading re-runs</div>`
-      + FLOORS.map((f, fi) => head(f, fi) + byFloor.get(f.floor).map(row).join('')).join('')
-      + `<div class="fh rec" style="--fc:var(--dim)" title="the record every floor appends to"><span class="f">∀</span><span class="nm">the record</span><span class="vd">every floor appends</span></div>` + record.map(row).join('');
-    { const n = LAYER_NOTES[active], lab = (L[active] || {}).label, ln = $('p-lnote'); if (ln){ ln.innerHTML = n ? `<b>${esc(lab)}</b> ${esc(n.what)} <span class="dim"><b>Rests on</b> ${esc(n.rests)} <b>Cannot decide</b> ${esc(n.cannot)}</span>` : ''; ln.title = n ? `Rests on: ${n.rests}\nCannot decide: ${n.cannot}` : ''; } }
+      + FLOORS.map(f => head(f) + byFloor.get(f.floor).map(row).join('')).join('')
+      + `<div class="fh rec" style="--fc:var(--dim)" title="the record every floor appends to"><span class="f">∀</span><span class="t"><span class="nm">the record</span></span><span class="vd">every floor appends</span></div>` + record.map(row).join('');
     wireSwitches();
-    if (wide.matches){ const c = spineEl.querySelector('.ly.cur'); if (c){ const top = c.offsetTop, h = spineEl.clientHeight; if (top < spineEl.scrollTop || top + c.offsetHeight > spineEl.scrollTop + h) spineEl.scrollTop = Math.max(0, top - h / 3); } }
+  }
+  function updateIndex(St, e){
+    const active = e.stage, curFloor = FLOOR_OF_LAYER[active] || null, Ld = ladderOf(), stage = Ld ? Ld.floors.stage.stage : null;
+    spineEl.querySelectorAll('.ly[data-layer]').forEach(el => {
+      const id = el.dataset.layer; el.classList.toggle('cur', id === active);
+      const c = el.querySelector('.cnt'), html = layerCount(id, St); if (c.innerHTML !== html) c.innerHTML = html;
+    });
+    FLOORS.forEach((f, fi) => {
+      const el = spineEl.querySelector(`.fh[data-floor="${CSS.escape(f.floor)}"]`); if (!el) return;
+      el.classList.toggle('cur', curFloor === f.floor); el.classList.toggle('stage', stage === f.floor);
+      const reached = k >= reachAt[fi]; el.classList.toggle('ahead', !reached);
+      const v = reached ? floorVerdict(f.floor) : null, vd = el.querySelector('.vd'), word = v ? shortVerdict(v.word) : '', cls = 'vd ' + (v ? v.cls : '');
+      if (vd.textContent !== word) vd.textContent = word; if (vd.className !== cls) vd.className = cls;
+      if (v) el.title = `${f.operand} — ${v.word} — open in the Floors tab`;
+    });
   }
   function layerCount(key, St){
     switch (key){
@@ -1133,7 +1094,7 @@ function mount(T){
       case 'furniture': return T.features.furniture === false ? 'off' : (T.blanks.length ? T.blanks.length.toLocaleString() + ' chars blanked' : 'nothing to blank');
       case 'punct': { const P = T.punctuation || { sentences:[], containers:[] }, q = P.sentences.filter(x => x.mood === 'interrogative').length, x2 = P.sentences.filter(x => x.mood === 'exclamative').length; return (T.punct ? T.punct.length : 0) + ' marks · ' + P.sentences.length + ' sentences' + (q ? ' · ' + q + ' ask' : '') + (x2 ? ' · ' + x2 + ' exclaim' : '') + (P.containers.length ? ' · ' + P.containers.length + ' nested' : ''); }
       case 'statement': return T.sents.length + ' statements';
-      case 'token': return St.tokens.length.toLocaleString() + ' forms';
+      case 'token': return St.tokens.length.toLocaleString() + (T.words.length > WORDS_ANIMATED ? ' of ' + T.words.length.toLocaleString() : '') + ' forms';
       case 'grammar': return T.features.pos === false ? 'off' : (St.grammar.length.toLocaleString() + ' classified · ' + T.gaps + ' gaps · ' + T.ambiguous + ' ambiguous');
       case 'morph': return T.features.morph === false ? 'off' : St.morph.length.toLocaleString() + ' acts';
       case 'stance': return T.features.stance === false ? 'off' : St.stance + ' positions';
@@ -1157,7 +1118,7 @@ function mount(T){
       h += `<div class="row-ev${i === k ? ' cur' : i > k ? ' fut' : ''}" data-i="${i}" style="top:${i*RH}px" title="${esc(e.msg)}"><span class="t">${ms(e.t)}</span><span class="st" style="color:var(${S0.color})">${esc(S0.label)}</span><span>${esc(e.msg)}</span></div>`; }
     sz.innerHTML = h;
     const e = ev[k], S0 = L[e.stage] || { label:e.stage, color:'--dim' }, dt = k ? e.t - ev[k-1].t : e.t;
-    nowEl.innerHTML = `<div class="k" style="color:var(${S0.color})">layer ${S0.i + 1} of ${LAYERS.length} · ${esc(S0.label)} · ${esc(e.kind)} · +${ms(dt)} ms</div><p>${esc(e.msg)}</p>`;
+    nowEl.innerHTML = `<div class="k" style="color:var(${S0.color})">layer ${S0.i + 1} of ${LAYERS.length} · ${esc(S0.label)} · ${FLOOR_OF_LAYER[e.stage] || 'the record'} · ${esc(e.kind)} · +${ms(dt)} ms</div><p>${esc(e.msg)}</p>`;
   }
   bind(rowsEl, 'scroll', () => { if (!dir) renderLog(false); });
   bind(rowsEl, 'click', e => { const r = e.target.closest('.row-ev'); if (r){ setDir(0); seek(+r.dataset.i); } });
@@ -1205,7 +1166,7 @@ function mount(T){
   bind(lens, 'click', e2 => { const sel = getSelection(); if (sel && !sel.isCollapsed) return; const m = e2.target.closest('[data-ref]'); if (m) pivotTo(m.dataset.ref, m.dataset.mid); });
 
   // ── wide screens: the sentence lane by lane, and the inspector for the selected step ──
-  const lanesEl = $('p-lanes'), inspEl = $('p-insp'), drawer = $('p-drawer'), dtBtn = $('p-dt');
+  const lanesEl = $('p-lanes'), inspEl = $('p-insp');
   const wide = matchMedia('(min-width:1200px)');
   const TOK = [], tokAt = new Map(), lookupIdx = [];
   ev.forEach((e, i) => {
@@ -1213,8 +1174,6 @@ function mount(T){
     else if (e.stage === 'grammar' && e.s != null && tokAt.get(e.s)){ const t = tokAt.get(e.s); t.g = e.data; t.ig = i; lookupIdx.push(i); }
     else if (e.stage === 'morph' && e.s != null && tokAt.get(e.s)){ const t = tokAt.get(e.s); t.m = e.data; t.im = i; lookupIdx.push(i); }
   });
-  const setDrawer = on => { drawer.classList.toggle('open', on); dtBtn.setAttribute('aria-expanded', String(on)); dtBtn.textContent = (on ? '▾' : '▸') + ' Details'; };
-  bind(dtBtn, 'click', () => setDrawer(!drawer.classList.contains('open')));
   const classLabel = g => { if (!g || !g.found) return null; const c = g.candidates[0]; return c ? c.upos : null; };
   function renderLanes(e){
     const at = e.s != null ? e.s : (T.sents[0] ? T.sents[0].offset : 0);
@@ -1281,11 +1240,11 @@ function mount(T){
     // the last few lookups, each a way back
     let j = lookupIdx.length; { let lo = 0, hi = lookupIdx.length; while (lo < hi){ const m = (lo + hi) >> 1; if (lookupIdx[m] <= k) lo = m + 1; else hi = m; } j = lo; }
     const recent = lookupIdx.slice(Math.max(0, j - 7), j).reverse().map(i => { const x = ev[i]; const g = x.data || {}; const out = x.stage === 'grammar' ? (g.found ? classLabel(g) + (g.via && g.via.length ? ' ·' + (g.via.find(v => ['lexicon','shape','lemma','document-evidence'].includes(v.step)) || g.via[0]).step.replace('document-evidence','doc') : '') : 'gap') : ((g.lemmas && g.lemmas[0]) || (g.stems && g.stems[0]) || '—'); return `<div class="r" data-i="${i}"><span>${x.stage === 'grammar' ? 'class' : 'act'}</span><b>${esc(g.w)}</b><span>→ ${esc(out)}</span></div>`; }).join('');
-    return `<div class="ih"><div class="k" style="color:var(${S0.color})">layer ${S0.i + 1} of ${LAYERS.length} · ${esc(S0.label)} · ${esc(e.kind)} · +${ms(dt)} ms</div><div class="ttl">${ttl}</div><div class="sub">${e.s != null && e.e != null && e.e > e.s ? 'characters ' + e.s.toLocaleString() + '–' + e.e.toLocaleString() + ' · ' : ''}step ${(k + 1).toLocaleString()} of ${N.toLocaleString()}</div></div>${body}${recent ? `<div class="rec"><div class="n" style="font:600 12.5px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--dim);padding-bottom:4px">recent lookups</div>${recent}</div>` : ''}`;
+    return `<div class="ih"><div class="k" style="color:var(${S0.color})">layer ${S0.i + 1} of ${LAYERS.length} · ${esc(S0.label)} · ${FLOOR_OF_LAYER[e.stage] || 'the record'} · ${esc(e.kind)} · +${ms(dt)} ms</div><div class="ttl">${ttl}</div><div class="sub">${e.s != null && e.e != null && e.e > e.s ? 'characters ' + e.s.toLocaleString() + '–' + e.e.toLocaleString() + ' · ' : ''}step ${(k + 1).toLocaleString()} of ${N.toLocaleString()}</div></div>${body}${recent ? `<div class="rec"><div class="n" style="font:600 12.5px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--dim);padding-bottom:4px">recent lookups</div>${recent}</div>` : ''}`;
   }
   bind(inspEl, 'click', ev2 => { const r = ev2.target.closest('.r'); if (r){ setDir(0); seek(+r.dataset.i); } });
   // ── the reading over time: the WHOLE text is always on screen; what changes is the READING of it ──
-  const INSP_TABS = [['reading', 'Reading'], ['referents', 'Referents'], ['plain', 'Plain'], ['diagram', 'Diagrammed'], ['json', 'JSON'], ['why', 'Why this step']];
+  const INSP_TABS = [['why', 'Why this step'], ['floor', 'Floor'], ['reading', 'Reading'], ['referents', 'Referents'], ['plain', 'Plain'], ['diagram', 'Diagrammed'], ['json', 'JSON'], ['lookup', 'Look up']];
   let inspTab = LAST_INSP, tf = -1, tfTimer = 0, lastViewKey = '';
   // ── referents: ids, the fold at the frontier, and what the person has appended on top of it ──
   const overlay = T.overlay || (T.overlay = []);   // a person's own INS / CON / SYN events — the reader's log is never edited
@@ -1382,6 +1341,8 @@ function mount(T){
   function renderInsp(e){
     const tabs = `<div class="itabs" role="tablist" aria-label="Right panel">${INSP_TABS.map(([id, lab]) => `<button type="button" role="tab" data-itab="${id}" aria-selected="${id === inspTab}">${lab}</button>`).join('')}</div>`;
     if (inspTab === 'why'){ lastViewKey = ''; inspEl.innerHTML = tabs + whyHTML(e); return; }
+    if (inspTab === 'floor'){ lastViewKey = ''; const Lr = ladderOf(), h = FLOOR_OF_LAYER[e.stage] || (Lr && Lr.floors.stage.stage) || 'F0', fi = Math.max(0, floorIdx(h));
+      inspEl.innerHTML = tabs + `<div class="rd">${!T.ladder || T.ladder.state === 'running' ? '<p class="dim">scoring the floors on this reading…</p>' : T.ladder.state === 'failed' ? `<p>the ladder did not run: <span class="mono">${esc(T.ladder.error)}</span></p>` : floorBlock(FLOORS[fi], fi, Lr, h)}</div>`; return; }
     if (inspTab === 'referents'){ const key = `refs|${T.timeline ? tfIdx() : 'x'}|${overlay.length}|${selRef}|${selMention}|${selSpan ? selSpan.s + '-' + selSpan.e : ''}|${refSort.key}${refSort.dir}|${LOOKUP.count()}`; if (key === lastViewKey && inspEl.querySelector('.rtw')) return; lastViewKey = key; const keep = inspEl.scrollTop; inspEl.innerHTML = tabs + `<div class="rd refv">${refsHTML()}</div>`; inspEl.scrollTop = keep; return; }
     if (inspTab === 'lookup'){ lastViewKey = ''; const keep = inspEl.scrollTop, had = (inspEl.querySelector('#lk-in') || {}).value; inspEl.innerHTML = tabs + `<div class="rd lkv">${lookupHTML(e)}</div>`; inspEl.scrollTop = keep; return; }
     const key = `${inspTab}|${T.timeline ? tfIdx() : 'x'}|${tfTimer ? 'p' : ''}`;
@@ -1410,7 +1371,8 @@ function mount(T){
     let h = `<div class="lkt"><label class="lksw"><input type="checkbox" data-lkon ${on ? 'checked' : ''}> Allow lookups over the network</label>
       <div class="why">Sends only the word to <span class="mono">en.wiktionary.org</span>, <span class="mono">en.wikipedia.org</span> and <span class="mono">www.wikidata.org</span>. It is off until you switch it on; each request is listed below and counted in the page’s network total.</div>
       <div class="lkq"><input type="text" id="lk-in" value="${esc(w)}" placeholder="a word or a name" spellcheck="false"><button type="button" data-lk="look" ${on ? '' : 'disabled'}>Look up</button></div>
-      <div class="lkq"><button type="button" data-lk="batch" ${on && un.length ? '' : 'disabled'}>Look up the ${un.length} form${un.length === 1 ? '' : 's'} this reading could not place</button></div>
+      <div class="lkq"><button type="button" data-lk="batch" ${on && un.length ? '' : 'disabled'}>Look up ${un.length > 12 ? 'the first 12 of ' : ''}the ${un.length} form${un.length === 1 ? '' : 's'} this reading could not place</button>${un.length > 12 ? `<button type="button" data-lk="all" ${on ? '' : 'disabled'} title="dictionary and Wikipedia only; one form at a time, every request listed">Look up all ${un.length}</button>` : ''}</div>
+      ${LOOKUP.count() ? `<div class="lkq"><button type="button" data-lk="reread" title="the same text read again, the class gaps now filled where a witness answered — the reading re-runs in this browser">Re-read with the ${LOOKUP.count()} looked up</button></div>` : ''}
       ${lkBusy ? `<div class="why mono">${esc(lkBusy)}</div>` : ''}</div>`;
     if (w && !r) h += `<div class="rd0">Nothing looked up for “${esc(w)}” yet.</div>`;
     if (r){
@@ -1425,10 +1387,12 @@ function mount(T){
     return h;
   }
   const rebuildTL = () => { T.timeline = null; lastViewKey = ''; renderInsp(ev[k]); startTimeline(T); };
-  async function doLook(words){
+  // the batch asks the dictionary and Wikipedia only: Wikidata is identity, settled by consequence, never fetched unasked
+  const BATCH_SOURCES = ['dictionary', 'wikipedia'];
+  async function doLook(words, only = null){
     if (!LOOKUPS_ON) return;
     let i = 0;
-    for (const w of words){ i++; lkBusy = `looking up “${w}” (${i} of ${words.length})…`; lastViewKey = ''; renderInsp(ev[k]); try { await LOOKUP.look(w); } catch (err) { console.error(err); } }
+    for (const w of words){ i++; lkBusy = `looking up “${w}” (${i} of ${words.length})…`; lastViewKey = ''; renderInsp(ev[k]); try { await LOOKUP.look(w, only ? { only } : undefined); } catch (err) { console.error(err); } }
     lkBusy = `${words.length} looked up — re-reading with what came back…`; lastViewKey = ''; renderInsp(ev[k]);
     rebuildTL(); lkBusy = '';
   }
@@ -1436,8 +1400,18 @@ function mount(T){
   bind(inspEl, 'click', ev2 => {
     const b = ev2.target.closest('[data-lk]'); if (!b || b.disabled) return;
     if (b.dataset.lk === 'look'){ const w = bareWord((inspEl.querySelector('#lk-in') || {}).value); if (w){ selWord = w; doLook([w]); } }
-    else if (b.dataset.lk === 'batch') doLook(unplacedForms().slice(0, 12));
+    else if (b.dataset.lk === 'batch') doLook(unplacedForms().slice(0, 12), BATCH_SOURCES);
+    else if (b.dataset.lk === 'all') doLook(unplacedForms(), BATCH_SOURCES);
+    else if (b.dataset.lk === 'reread') rereadWithLookups();
   });
+  // the same text read again with the witnesses in the classifier's cache: the POS layer's gaps close where a witness answered,
+  // the ledger's classify event names the hyperlexicon beside the prior, and the reader view states the delta
+  async function rereadWithLookups(){
+    const prev = T, n = LOOKUP.count(), found = [...LOOKUP.cache.values()].filter(r => r.dictionary && r.dictionary.found).length;
+    lkBusy = `re-reading with the ${n} looked up…`; lastViewKey = ''; renderInsp(ev[k]);
+    const T2 = await read(lastRaw, lastLabel, features, { animate:false, layout: prev.doc.layout, keep:{ layout: prev.doc.layout } });
+    if (T2 && cur){ cur.state.delta = `${n} form${n === 1 ? '' : 's'} looked up (dictionary · Wikipedia), ${found} answered by the dictionary — class gaps on the animated forms ${prev.gaps} → ${T2.gaps}, names ${prev.refs.size} → ${T2.refs.size}, claims ${prev.claims.length} → ${T2.claims.length}. The reading re-ran in this browser; the witnesses are nominated to the hyperlexicon, none licensed.`; cur.render(); }
+  }
 
 
   // ── Referents: a TABLE of beings (hash ids) — each a row; a row opens its profile; its spans are CON'd to it, never what it is ──
@@ -1586,12 +1560,14 @@ function mount(T){
   let tab = LAST_TAB;
   let wordsKey = '', wordsSort = { key: 'n', dir: -1 };
   const tabBtns = [...app.querySelectorAll('#p-tabs [data-tab]')];
-  function setTab(t){ LAST_TAB = t; tab = t; if (wide.matches) setDrawer(true); tabBtns.forEach(b => b.setAttribute('aria-selected', String(b.dataset.tab === t))); render(false); }
+  function setTab(t){ LAST_TAB = t; tab = t; tabBtns.forEach(b => b.setAttribute('aria-selected', String(b.dataset.tab === t))); render(false); }
   tabBtns.forEach(b => bind(b, 'click', () => setTab(b.dataset.tab)));
   tabBtns.forEach(b => b.setAttribute('aria-selected', String(b.dataset.tab === tab)));
 
   function renderPane(St, e){
     LAST = [St, e]; if (tab === 'props') ensureTuples();
+    const textTab = tab === 'text'; $('b-read').hidden = !textTab; $('p-drawer').hidden = textTab;
+    if (textTab) return;   // the viewer shows the text at the playhead, and the current sentence lane by lane
     const hot = e.stage === 'relation' ? e.data : null;
     const graph = tab === 'graph';
     $('p-graph').hidden = !graph; pane.hidden = graph; { const gn = $('p-graph-note'); gn.hidden = !graph; if (graph) gn.innerHTML = tabNoteHTML('graph', { collapsed:true }); }
@@ -1619,6 +1595,7 @@ function mount(T){
     const capF = S.cappedBy ? Lr.floors.floors.find(x => x.floor === S.cappedBy.floor) : null, capIt = capF && capF.items[0];
     return `<div class="h">the floors — this reader's ceiling on this material, not a property of the text</div>
       <div class="stage-line">${S.stage ? `stage <b style="color:var(${FLOOR_COLOR[S.stage]})">${esc(S.stage)} · ${esc(S.stageName)}</b>` : '<b>no floor passed</b>'}${capF ? ` — stops at <b>${esc(capF.floor)} · ${esc(capF.name)}</b>: ${esc(statusWord(capIt))}` : ' — every floor passed'}${S.isolated.length ? `. Passed above the gap, not counted: ${S.isolated.map(x => esc(x.floor)).join(', ')}` : ''}</div>
+      ${Lr.report && Lr.report.priors && Lr.report.priors.injected ? `<details class="fold-top"><summary>the priors the reader was handed (${Lr.report.priors.injected.length}) — declared before the run</summary><ul>${Lr.report.priors.injected.map(x => `<li>${esc(x)}</li>`).join('')}</ul></details>` : ''}
       <div class="pstat"><span>scored in <b>${Lr.ms.toLocaleString()}</b> ms, no model</span><span>control <b>${esc(Lr.controlKey)}</b></span><span>${Lr.cut ? `the first <b>${chars.toLocaleString()}</b> of ${(chars + Lr.cut).toLocaleString()} chars` : `<b>${chars.toLocaleString()}</b> chars`}</span><span>axiom 1 <b>${Lr.floors.axiom1.held ? 'held' : 'broken'}</b></span></div>`
       + FLOORS.map((f, fi) => floorBlock(f, fi, Lr, curFloor)).join('');
   }
@@ -1848,21 +1825,58 @@ function mount(T){
     scope.querySelectorAll('[data-flip]').forEach(b => b.addEventListener('click', () => flipJunction(+b.dataset.flip)));
   }
 
-  // ── ribbon ──
-  let dpr = 1;
-  function size(){ dpr = window.devicePixelRatio || 1; const q = rc.getBoundingClientRect(); rc.width = Math.max(1, q.width * dpr); rc.height = Math.max(1, q.height * dpr); drawRibbon(); }
-  // the floor track rides above the layer band: the floor each event's layer makes, solid where the ladder passed that floor,
-  // faint where it did not or has not scored yet; a run wide enough carries its floor's name
-  function drawRibbon(){ const g = rc.getContext('2d'), w = rc.width, h = rc.height; if (!w) return; g.clearRect(0, 0, w, h); const mp = maxPos(), Ld = ladderOf();
-    const passed = new Set(Ld ? Ld.floors.floors.filter(f => f.status === 'passed').map(f => f.floor) : []);
-    const runs = []; let run = null;
-    for (let i = 0; i < N; i++){ const x0 = clockOf(i) / mp * w, x1 = i + 1 < N ? clockOf(i + 1) / mp * w : w, fl = FLOOR_OF_LAYER[ev[i].stage] || null;
-      if (fl){ g.fillStyle = cssVar(FLOOR_COLOR[fl]); g.globalAlpha = passed.has(fl) ? 0.95 : 0.4; g.fillRect(x0, 0, Math.max(1, x1 - x0), h * 0.30); }
-      if (run && run.fl === fl) run.x1 = x1; else { run = { fl, x0, x1 }; runs.push(run); }
-      g.fillStyle = cssVar((L[ev[i].stage] || { color:'--dim' }).color); g.globalAlpha = 0.85; g.fillRect(x0, h * 0.44, Math.max(1, x1 - x0), h * 0.54); }
-    g.globalAlpha = 1; g.font = `600 ${Math.round(9 * dpr)}px ${cssVar('--mono')}`; g.textBaseline = 'middle'; g.fillStyle = cssVar('--bg');
-    for (const r of runs) if (r.fl && r.x1 - r.x0 > 26 * dpr) g.fillText(r.fl, r.x0 + 4 * dpr, h * 0.15);
-    const x = pos / mp * w; g.fillStyle = cssVar('--ink'); g.fillRect(x - dpr, 0, 2 * dpr, h); }
+  // ── timeline: one lane per layer under its floor (a floor collapses to a summary lane; a floor with no layer is a dashed empty lane),
+  // the record last. The lanes are drawn once into a cache; each frame blits it and draws the playhead. Scrub by pointer, as before.
+  let dpr = 1, tlCache = null, lanes = [];
+  const LANE_H = 20, AX_H = 18, tlh = $('p-tlh');
+  const collapsed = new Set(FLOORS.filter(f => LAYERS.filter(l => FLOOR_OF_LAYER[l.id] === f.floor).length > 4).map(f => f.floor));
+  function laneModel(){
+    lanes = [];
+    for (const f of FLOORS){
+      const ls = LAYERS.filter(l => FLOOR_OF_LAYER[l.id] === f.floor), open = ls.length > 0 && !collapsed.has(f.floor);
+      lanes.push({ kind:'floor', floor:f.floor, label:`${f.floor} ${f.name}`, color:FLOOR_COLOR[f.floor], stages:ls.map(l => l.id), empty:!ls.length, open });
+      if (open) for (const l of ls) lanes.push({ kind:'layer', floor:f.floor, label:l.label, color:l.color, stages:[l.id] });
+    }
+    lanes.push({ kind:'record', floor:null, label:'the record · EOT', color:'--green', stages:['ledger'] });
+  }
+  function renderLaneHeads(){
+    laneModel();
+    tlh.innerHTML = `<div class="ax">lanes</div>` + lanes.map(ln => ln.kind === 'floor'
+      ? `<div class="fl ${ln.empty ? 'empty' : ''}" data-tlf="${esc(ln.floor)}" ${ln.empty ? '' : 'role="button" tabindex="0"'} title="${ln.empty ? esc(FLOOR_NOTE[ln.floor] || 'no layer on this page') : (ln.open ? 'collapse' : 'expand')}"><span class="car">${ln.empty ? '' : ln.open ? '▾' : '▸'}</span><span class="dot" style="background:var(${ln.color})"></span>${esc(ln.label)}</div>`
+      : `<div class="${ln.kind === 'layer' ? 'sub' : ''}"><span class="dot" style="background:var(${ln.color})"></span>${esc(ln.label)}</div>`).join('');
+    rib.style.height = (AX_H + lanes.length * LANE_H) + 'px'; tlCache = null; size();
+  }
+  function size(){ dpr = window.devicePixelRatio || 1; const q = rc.getBoundingClientRect(); rc.width = Math.max(1, q.width * dpr); rc.height = Math.max(1, q.height * dpr); tlCache = null; drawRibbon(); }
+  function drawRibbon(){
+    const g = rc.getContext('2d'), w = rc.width, h = rc.height; if (!w || !lanes.length) return; const mp = maxPos();
+    const key = [w, h, real, N, lanes.map(l => l.label).join(','), !!ladderOf()].join('|');
+    if (!tlCache || tlCache.key !== key){
+      const c = document.createElement('canvas'); c.width = w; c.height = h; const q = c.getContext('2d');
+      const byStage = new Map(); ev.forEach((e, i) => { const arr = byStage.get(e.stage) || []; arr.push(i); byStage.set(e.stage, arr); });
+      const Ld = ladderOf(), passed = new Set(Ld ? Ld.floors.floors.filter(f => f.status === 'passed').map(f => f.floor) : []);
+      const line = cssVar('--line'), dim = cssVar('--dim');
+      q.font = `${Math.round(10 * dpr)}px ${cssVar('--mono')}`; q.textBaseline = 'middle';
+      const ticks = 6;
+      for (let t = 0; t <= ticks; t++){
+        const p = mp * t / ticks, x = p / mp * w, lab = real ? ms(p) + ' ms' : (t === ticks ? N : Math.round(p)).toLocaleString();
+        q.textAlign = t === 0 ? 'left' : t === ticks ? 'right' : 'center'; q.fillStyle = dim; q.fillText(lab, x + (t === 0 ? 3 * dpr : t === ticks ? -3 * dpr : 0), AX_H * dpr / 2);
+        q.fillStyle = line; q.fillRect(Math.min(x, w - dpr), AX_H * dpr - 4 * dpr, dpr, 4 * dpr);
+      }
+      q.fillStyle = line; q.fillRect(0, AX_H * dpr - dpr, w, dpr);
+      lanes.forEach((ln, li) => {
+        const y0 = (AX_H + li * LANE_H) * dpr;
+        q.globalAlpha = 0.5; q.fillStyle = line; q.fillRect(0, y0 + LANE_H * dpr - dpr, w, dpr); q.globalAlpha = 1;
+        if (ln.empty){ q.strokeStyle = cssVar('--line2'); q.lineWidth = dpr; q.setLineDash([4 * dpr, 6 * dpr]); q.beginPath(); q.moveTo(0, y0 + LANE_H * dpr / 2); q.lineTo(w, y0 + LANE_H * dpr / 2); q.stroke(); q.setLineDash([]); return; }
+        q.fillStyle = cssVar(ln.color); q.globalAlpha = ln.kind === 'floor' ? (passed.has(ln.floor) ? 0.95 : 0.45) : 0.8;
+        for (const st of ln.stages) for (const i of (byStage.get(st) || [])){ const x0 = clockOf(i) / mp * w, x1 = i + 1 < N ? clockOf(i + 1) / mp * w : w; q.fillRect(x0, y0 + 4 * dpr, Math.max(dpr, x1 - x0), (LANE_H - 8) * dpr); }
+        q.globalAlpha = 1;
+      });
+      tlCache = { key, c };
+    }
+    g.clearRect(0, 0, w, h); g.drawImage(tlCache.c, 0, 0);
+    const x = pos / mp * w; g.fillStyle = cssVar('--ink'); g.fillRect(x - dpr, 0, 2 * dpr, h);
+    g.beginPath(); g.moveTo(x - 6 * dpr, 0); g.lineTo(x + 6 * dpr, 0); g.lineTo(x, 8 * dpr); g.closePath(); g.fill();
+  }
   const scrub = e => { const r = rc.getBoundingClientRect(); const f = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)); setDir(0); pos = f * maxPos(); k = idxAt(pos); render(true); };
   let dragging = false; const rib = app.querySelector('.rib');
   bind(rib, 'pointerdown', e => { dragging = true; e.target.setPointerCapture && e.target.setPointerCapture(e.pointerId); scrub(e); });
@@ -1872,7 +1886,7 @@ function mount(T){
   // ── render ──
   function render(follow){
     const St = stateAt(k), e = ev[k];
-    renderSpine(St, e); renderLog(follow); renderLens(St); if (wide.matches){ renderLanes(e); renderInsp(e); } renderPane(St, e); map.set(mapData(St, e)); drawRibbon(); updateStats(St, e);
+    updateIndex(St, e); renderLog(follow); renderLens(St); if (wide.matches){ renderLanes(e); renderInsp(e); } renderPane(St, e); map.set(mapData(St, e)); drawRibbon(); updateStats(St, e);
     rdEl.textContent = (real ? 't = ' + ms(pos) + ' of ' + ms(ev[N-1].t) + ' ms' : 'step ' + (k + 1).toLocaleString() + ' of ' + N.toLocaleString())
       + ' · layer ' + ((L[e.stage] || {}).i + 1) + '/' + LAYERS.length + ' · ' + (FLOOR_OF_LAYER[e.stage] || 'the record') + ' · real ' + ms(e.t) + ' ms';
   }
@@ -1904,6 +1918,8 @@ function mount(T){
     });
   }
   const onClick = e => {
+    const tf = e.target.closest('[data-tlf]'); if (tf){ const f = tf.dataset.tlf; if (LAYERS.some(l => FLOOR_OF_LAYER[l.id] === f)){ if (collapsed.has(f)) collapsed.delete(f); else collapsed.add(f); renderLaneHeads(); } return; }
+    const tm = e.target.closest('.tl-mode [data-tl]'); if (tm){ const list = tm.dataset.tl === 'list'; $('p-tl').hidden = list; $('p-log').hidden = !list; app.querySelectorAll('.tl-mode [data-tl]').forEach(x => x.setAttribute('aria-pressed', String(x === tm))); if (list) renderLog(true); else size(); return; }
     const fh = e.target.closest('.fh[data-floor]'); if (fh){ setTab('floors'); const el = pane.querySelector('#' + floorId(fh.dataset.floor)); if (el) pane.scrollTop += el.getBoundingClientRect().top - pane.getBoundingClientRect().top - 8; return; }
     const ly = e.target.closest('.ly[data-layer]'); if (ly && !e.target.closest('.sw')){ const id = ly.dataset.layer, j = ev.findIndex(x => x.stage === id); setDir(0); if (j >= 0) seek(j); setTab(TAB_OF_LAYER[id] || 'source'); return; }
     const rs = e.target.closest('[data-rsort]'); if (rs){ refTabSort = nextSort(refTabSort, rs.dataset.rsort); render(false); return; }
@@ -1919,7 +1935,7 @@ function mount(T){
     else if (act === 'dl-json'){ download(`${slugOf(T)}-reading.json`, JSON.stringify(readingJSON(T), null, 2), 'application/json'); a.textContent = 'Saved'; setTimeout(() => { a.textContent = '⤓ Reading (JSON)'; }, 1400); } };
   const onKey = e => { if (e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') return;
     if (!app.classList.contains('on')) return;
-    if (e.key === 'Enter' && e.target && e.target.closest && e.target.closest('.fh[data-floor], .ly[data-layer]')){ e.preventDefault(); e.target.click(); return; }
+    if (e.key === 'Enter' && e.target && e.target.closest && e.target.closest('.fh[data-floor], .ly[data-layer], [data-tlf]')){ e.preventDefault(); e.target.click(); return; }
     if (e.key === 'Escape') close(); else if (e.key === ' '){ e.preventDefault(); setDir(dir ? 0 : 1); }
     else if (e.key === 'ArrowLeft'){ setDir(0); seek(k - 1); } else if (e.key === 'ArrowRight'){ setDir(0); seek(k + 1); }
     else if (e.key === 'j' || e.key === 'J') setDir(-1); else if (e.key === 'k' || e.key === 'K') setDir(0); else if (e.key === 'l' || e.key === 'L') setDir(1);
@@ -1931,7 +1947,7 @@ function mount(T){
   bind(speedSel, 'change', () => { speed = +speedSel.value; });
 
   T.ev._t0 = performance.now();
-  fillSpeeds(); ro.observe(app.querySelector('.right')); size();
+  buildIndex(); renderLaneHeads(); fillSpeeds(); ro.observe(app.querySelector('.timeline')); size();
   seek(0);
   if (!matchMedia('(prefers-reduced-motion: reduce)').matches) setDir(1);
   raf = requestAnimationFrame(loop);
@@ -2016,7 +2032,10 @@ async function read(text, label, feat, opt = {}){
   const truncated = raw.length > LIMIT;
   const clean = feat.furniture === false ? analysis : blankMarkup(analysis);
   // a non-English document's relations are read against ITS language's prior (the suite's dispatch reader picks the extractor from it)
-  const foreign = PRIORS.posPrior !== PRIORS.posEng && PRIORS.langIso3 ? { iso3: PRIORS.langIso3, posPrior: PRIORS.posPrior } : null, R = await makeEngineRelationReader({ features: feat, foreign });
+  // the rail's switches, under the names the reader takes (holodeck-reader.js reads posPrior · morphology · stance · nounPhraseSubjects · phrasalPredicates):
+  // until now only `stance` reached it, so switching POS, morphology, noun-phrase subjects or phrasal predicates off re-ran the display and not the relations
+  const readerFeatures = { posPrior: feat.pos !== false, morphology: feat.morph !== false, stance: feat.stance !== false, nounPhraseSubjects: feat.npSubj !== false, phrasalPredicates: feat.phrasal !== false };
+  const foreign = PRIORS.posPrior !== PRIORS.posEng && PRIORS.langIso3 ? { iso3: PRIORS.langIso3, posPrior: PRIORS.posPrior } : null, R = await makeEngineRelationReader({ features: readerFeatures, foreign });
   let read0 = { claims: [] };
   try { read0 = R([{ ref:'source', text: clean }]).read(clean); } catch (e) { console.error(e); }
   const claims = mapClaims(read0.claims, analysis);
@@ -2207,6 +2226,23 @@ drop.addEventListener('drop', async ev => { const f = ev.dataTransfer.files && e
 $('read').addEventListener('click', () => run(ta.value, 'pasted text'));
 $('clear').addEventListener('click', () => { ta.value = ''; });
 $('samples').addEventListener('click', e => { const s = e.target.dataset.s; if (s){ ta.value = SAMPLES[s]; run(SAMPLES[s], 'Sample extraction'); } });
+// a WHOLE document: the Holodeck's own published sample set (holodeck-samples), one account read end to end — nothing cut, every prior loaded
+const WHOLE_URL = 'https://scores-patch-points.github.io/holodeck-samples/titanic-1912/readings.json';
+let WHOLE = null;
+async function wholeDocument(type){
+  if (!WHOLE){ const r = await fetch(WHOLE_URL); if (!r.ok) throw new Error(`HTTP ${r.status} from the sample set`); WHOLE = (await r.json()).readings || []; }
+  const d = WHOLE.find(x => x.type === type) || WHOLE[0]; if (!d) return null;
+  // DOMParser documents are inert: no script runs and no image loads
+  const text = new DOMParser().parseFromString(String(d.html || ''), 'text/html').body.textContent.replace(/[ \t]+/g, ' ').replace(/\n{3,}/g, '\n\n').trim();
+  return { label: d.title, text };
+}
+$('samples').addEventListener('click', async e => {
+  const b = e.target.closest('[data-doc]'); if (!b) return;
+  b.disabled = true; const was = b.textContent; b.textContent = 'fetching…';
+  try { const d = await wholeDocument(b.dataset.doc); if (d){ ta.value = d.text; await run(d.text, d.label); } }
+  catch (err) { alert('The whole document could not be fetched: ' + (err && err.message || err)); }
+  finally { b.disabled = false; b.textContent = was; }
+});
 
 // The document's language is MEASURED (the suite's own detector: script, then words and character n-grams; it abstains rather than guess),
 // and its part-of-speech prior is that language's, from the same shipped priors. English stays the default and the fallback.
@@ -2222,7 +2258,7 @@ async function priorFor(text){
 async function run(text, label, opt = {}){
   try { await priorFor(text); } catch (e) { console.warn('language prior', e); }
   const btn = $('read'); const was = btn.textContent; btn.textContent = 'reading…'; btn.disabled = true;
-  features = { ...DEFAULT_FEATURES }; BASELINE = null; LAST_TAB = 'source';
+  features = { ...DEFAULT_FEATURES }; BASELINE = null; LAST_TAB = 'text';
   const d = $('p-delta'); if (d) d.hidden = true; const r = $('refuse'); if (r) r.hidden = true;
   try { await read(text, label, features, { animate:true, extraction: opt.extraction || null, layout: opt.layout || null }); }
   catch (err){ alert('The reading failed: ' + (err && err.message || err)); console.error(err); }
@@ -2241,7 +2277,7 @@ const SOURCES = mountSources($('sources'), { makeDeps: corpusDeps, openInReader:
 $('addsrc').addEventListener('click', () => SOURCES.addCurrent());
 $('exsrc').addEventListener('click', () => SOURCES.example());
 const OFFLINE = startOffline();   // silent: it only makes the files local; nothing on the page announces it
-window.__demo = { offline: OFFLINE, sources: SOURCES, view: () => cur, read, run, json:() => (cur ? readingJSON(cur.T) : null), text:() => (cur ? diagrammedText(cur.T) : null), current:() => (cur ? cur.T : null), features:() => features, net };
+window.__demo = { offline: OFFLINE, sources: SOURCES, view: () => cur, read, run, wholeDocument, lookup: LOOKUP, json:() => (cur ? readingJSON(cur.T) : null), text:() => (cur ? diagrammedText(cur.T) : null), current:() => (cur ? cur.T : null), features:() => features, net };
 </script>
 </body>
 </html>
