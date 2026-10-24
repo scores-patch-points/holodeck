@@ -6,6 +6,7 @@
 <title>How to read without a model — the pipeline, layer by layer</title>
 <style>
   :root{--bg:#17171a;--s1:#1c1c20;--s2:#29292e;--sel:#26272c;--sel2:#30333b;--line:#2e2e33;--line2:#3f3f46;--ink:#f4f4f6;--ink2:#c9c9d2;--mut:#9d9da8;--dim:#9494a0;--acc:#8ab4ff;--acc2:#8ab4ff;--acc3:#6d9dff;--amber:#f0b429;--blue:#8ab4ff;--green:#56d364;--pink:#e0a0c0;--date:#8ab4ff;--ok:#56d364;--bad:#f87171;--edge:#3f3f46;--hdr:rgba(23,23,26,.95);--sans:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;--mono:ui-monospace,SFMono-Regular,Menlo,monospace;--serif:Georgia,"Times New Roman",serif;color-scheme:dark}
+  :root{--f0:#9494a0;--f1:#c68bff;--f2:#56d364;--f3:#8ab4ff;--f4h:#e0a0c0;--f5:#f0b429;--f6:#ff9d6e}  /* the floors, F0 units … F6 premises (reading/mhc-ladder.js) */
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 var(--sans);-webkit-font-smoothing:antialiased}
   a{color:var(--acc)}
@@ -51,14 +52,15 @@
   .left{border-right:1px solid var(--line);display:grid;grid-template-rows:minmax(0,44%) minmax(0,1fr);min-height:0}
   .spine{overflow-y:auto;border-bottom:1px solid var(--line);padding:8px 10px 10px}
   .spine .h{font:600 12.5px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--dim);padding:6px 4px 8px}
-  .ly{display:grid;grid-template-columns:26px 1fr auto;gap:8px;align-items:center;border:1px solid var(--line);border-radius:9px;margin:5px 0;padding:6px 9px;background:var(--s1);cursor:default}
+  .ly{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:8px;align-items:center;border:1px solid var(--line);border-radius:9px;margin:3px 0;padding:5px 9px;background:var(--s1);cursor:pointer}
+  .ly:hover{border-color:var(--line2)}.ly:focus-visible{outline:2px solid var(--acc3);outline-offset:1px}
   .ly .n{font:600 12.5px var(--mono);color:var(--bg);background:var(--dim);border-radius:5px;padding:1px 6px;text-align:center}
   .ly.on{border-color:var(--acc3);background:#1a1f2b}
   .ly.on .n{background:var(--acc);color:#0b0d12}
   .ly.off{opacity:.55}
   .ly .lab{font-weight:600;font-size:13px}
   .ly .why{color:var(--dim);font-size:12.5px;grid-column:2 / 4;margin-top:-2px}
-  .ly .cnt{font:12.5px var(--mono);color:var(--dim)}
+  .ly .cnt{font:12.5px var(--mono);color:var(--dim);text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
   .sw{position:relative;width:36px;height:20px;border-radius:20px;background:#33333a;border:1px solid var(--line2);cursor:pointer;flex:none}
   .sw::after{content:'';position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:var(--dim);transition:.14s}
   .sw[aria-checked=true]{background:#1e3a2b;border-color:#2f6b4b}
@@ -66,6 +68,18 @@
   .sw[aria-disabled=true]{opacity:.4;cursor:not-allowed}
   .ly.cur .lab{color:var(--ink)}
   .ly.cur{box-shadow:inset 3px 0 0 var(--acc)}
+  /* ── the floors in the rail: a header per floor whose verdict fills in as the replay reaches it; under each, the layers that make its operand ── */
+  .fh{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:5px 8px;align-items:center;margin:14px 0 4px;padding:3px 2px 5px;border-bottom:1px solid var(--line);cursor:pointer}
+  .spine .h + .fh{margin-top:2px}
+  .fh .f{font:600 12px var(--mono);color:var(--bg);background:var(--fc);border-radius:5px;padding:1px 7px}
+  .fh .t{min-width:0;line-height:1.3}.fh .nm{font:600 12px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--ink2);overflow-wrap:anywhere}
+  .fh .vd{font:12px var(--mono);color:var(--dim);justify-self:end;text-align:right;white-space:nowrap;line-height:1.3}
+  .fh .vd.ok{color:var(--green)}.fh .vd.bad{color:var(--amber)}.fh .vd.fail{color:var(--bad)}
+  .fh .no{font:11.5px var(--mono);color:var(--dim);margin-left:6px}
+  .fh.ahead .f{opacity:.55}
+  .fh.stage .nm::after{content:" · stage";color:var(--green);text-transform:none;letter-spacing:0}
+  .fh.cur{box-shadow:inset 3px 0 0 var(--fc)}
+  .fh:hover .nm,.fh:focus-visible .nm{color:var(--ink)}
   /* ── event log ─────────────────────────────────────────────────────────── */
   .log{display:grid;grid-template-rows:1fr auto;min-height:0}
   .rows{overflow-y:auto;position:relative;font:12.5px/24px var(--mono);min-height:0}
@@ -149,7 +163,7 @@
   .evt .id{color:var(--pink)}.evt .st{color:var(--amber)}.evt .rd{color:var(--dim)}
   /* transport */
   .bar2{border-top:1px solid var(--line);padding:6px 18px calc(12px + env(safe-area-inset-bottom,0px));display:grid;gap:8px}
-  .rib{position:relative;height:18px;cursor:pointer;touch-action:none}
+  .rib{position:relative;height:30px;cursor:pointer;touch-action:none}
   .rib canvas{width:100%;height:100%;display:block}
   .ctl{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
   .ctl button{background:none;border:0;color:var(--mut);font:500 13px var(--sans);cursor:pointer;padding:4px 6px;border-radius:4px}
@@ -301,6 +315,7 @@
     #app .left{border:0;border-bottom:1px solid var(--line);max-height:none}
     #app .spine{display:flex;flex-direction:row;gap:6px;overflow-x:auto;overflow-y:hidden;max-height:none;padding:8px 12px;-webkit-overflow-scrolling:touch}
     #app .spine .ly{flex:0 0 auto;margin:0;padding:8px 14px;white-space:nowrap;min-height:40px}
+    #app .spine .fh{flex:0 0 auto;display:flex;align-items:center;gap:6px;margin:0;padding:8px 12px;white-space:nowrap;min-height:40px;border:1px solid var(--line);border-left:3px solid var(--fc);border-radius:9px;background:var(--s1)}
     #app .right{grid-template-rows:auto auto minmax(46vh,1fr);overflow:auto}
     #app .lens{max-height:22vh;overflow:auto;font-size:15px;line-height:1.7}
     #app .lanes{max-height:16vh;overflow:auto}
@@ -327,7 +342,7 @@
   .ly .how{display:none;grid-column:2 / 4;font-size:12px;line-height:1.45;color:var(--dim);margin-top:2px}.ly.cur .how{display:block}.ly .how b{color:var(--ink2);font-weight:600}
   .pnote{border:1px solid var(--line);border-radius:9px;padding:9px 12px;margin:0 0 12px;font-size:13.5px;line-height:1.55;background:var(--s1)}.pnote b{color:var(--ink2)}
   #p-graph-note{align-self:start;z-index:3;margin:6px 10px 0;font-size:13px;line-height:1.5}#p-graph-note .pnote{margin:0;background:var(--s1);opacity:.96}#p-graph-note summary{cursor:pointer}
-  .lnote{display:none}
+  .lnote{display:block;padding:8px 14px 9px;font-size:12.5px;line-height:1.45;color:var(--mut);border-bottom:1px solid var(--line)}.lnote b{color:var(--ink2)}#app .lnote .dim{display:none}
   @media (max-width:900px){
     #app .lnote{display:block;padding:8px 14px;font-size:13px;line-height:1.5;border-bottom:1px solid var(--line);max-height:30vh;overflow:auto}#app .lnote b{color:var(--ink2)}
     #app .spine .why,#app .spine .how,#app .spine .cnt{display:none}
@@ -338,8 +353,9 @@
   #app .insp .rh2{margin-top:18px;letter-spacing:.06em}
   #app button{font-size:13px}
   #app .left{grid-template-rows:minmax(0,1fr)}
+  @media (min-width:901px){ #app .left{grid-template-rows:auto minmax(0,1fr)} #app .lnote{order:-1} }
   #app .spine{border-bottom:0;padding:14px 14px}
-  #app .ly{grid-template-columns:1fr auto;padding:9px 12px;margin:6px 0}
+  #app .ly{padding:6px 11px;margin:3px 0}
   #app .ly .n{display:none}
   @media (max-width:1199px){ #app .spine{max-height:26vh} #app .ly{margin:4px 0;padding:7px 12px} }
 
@@ -348,6 +364,23 @@
 #app .top .meta{flex:1 1 0;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}#app .top .sp{display:none}
 @media (min-width:901px) and (max-width:1199px){ #app .spine{max-height:none} #app .tabs{flex-wrap:wrap;overflow:visible} }
 .pstat{display:flex;flex-wrap:wrap;gap:6px 14px;font:12.5px var(--mono);color:var(--dim);margin:0 0 12px}.pstat b{color:var(--ink);font-weight:600}
+.stage-line{font-size:14px;line-height:1.5;margin:4px 0 8px}.stage-line.dim{color:var(--dim)}
+.flr{border:1px solid var(--line);border-left:3px solid var(--fc);border-radius:9px;padding:10px 12px;margin:10px 0;background:var(--s1);min-width:0}
+.flr.cur{background:#1a1f2b}.flr.stage .fhd b::after{content:" · stage";color:var(--green)}
+.flr .fhd{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline}.flr .fhd .f{font:600 12.5px var(--mono);color:var(--bg);background:var(--fc);border-radius:5px;padding:1px 7px}
+.flr .fhd b{font-size:14px}.flr .fhd .xr{font:12px var(--mono);color:var(--dim);margin-left:auto}
+.flr .vd{font:12.5px var(--mono);color:var(--dim)}.flr .vd.ok{color:var(--green)}.flr .vd.bad{color:var(--amber)}.flr .vd.fail{color:var(--bad)}
+.flr .op{color:var(--mut);font-size:13px;margin:4px 0 8px;line-height:1.45}
+.flr .chg{border-left:2px solid var(--line2);padding:4px 10px;margin:6px 0;font-size:13.5px;line-height:1.5;overflow-wrap:anywhere}.flr .chg .k{font:600 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--dim);margin-bottom:2px}
+.flr .ex{font:12.5px/1.6 var(--mono);color:var(--ink2);margin-top:4px;overflow-wrap:anywhere}.flr .ex .dim,.flr .dim{color:var(--dim)}
+.flr .lys{margin:6px 0}.flr .lys.none{font-size:12.5px;color:var(--dim);line-height:1.4}
+.flr .det{font-size:12.5px;color:var(--dim);margin:6px 0;line-height:1.45;overflow-wrap:anywhere}.flr .det b{color:var(--ink2);font-weight:600}
+.flr details.fold{margin:6px 0;font-size:13px}.flr details.fold summary{cursor:pointer;color:var(--mut)}.flr details.fold summary:hover{color:var(--ink)}
+.flr dl.defs{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;margin:6px 0 0}.flr dl.defs dt{color:var(--dim);font:12px var(--mono)}.flr dl.defs dd{margin:0;overflow-wrap:anywhere;line-height:1.45}
+.flr table.arms{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:8px}.flr .arms th{font:600 11px var(--mono);color:var(--dim);text-align:left;padding:4px 6px;border-bottom:1px solid var(--line)}
+.flr .arms td{padding:5px 6px;vertical-align:top;border-bottom:1px solid var(--line);line-height:1.4;overflow-wrap:anywhere}.flr .arms .giver{color:var(--dim);font-size:11px}.flr .arms .skip{color:var(--dim)}
+.flr .arms tr.ok .res{color:var(--green)}.flr .arms tr.bad .res{color:var(--bad)}.flr .arms tr.warn .res{color:var(--amber)}
+@media (max-width:900px){.flr .arms thead{display:none}.flr .arms tr{display:grid;grid-template-columns:1fr;gap:2px;padding:6px 0;border-bottom:1px solid var(--line)}.flr .arms td{border:0;padding:0 2px}.flr .fhd .xr{margin-left:0;flex-basis:100%}}
 /* propositions: one card per statement — the words, then what the parser made of them, then what the reading tied */
 .pc{border:1px solid var(--line);border-radius:10px;background:var(--s1);margin:0 0 10px;overflow:hidden}
 .pc.cur{border-color:var(--acc3);box-shadow:inset 3px 0 0 var(--acc)}
@@ -441,6 +474,7 @@
           <button type="button" class="dt" id="p-dt" aria-expanded="false" title="Show or hide the detail views">▸ Details</button>
           <div class="tabs" id="p-tabs" role="tablist" aria-label="View">
             <button type="button" data-tab="source" role="tab" aria-selected="true">Source</button>
+            <button type="button" data-tab="floors" role="tab" aria-selected="false">Floors</button>
             <button type="button" data-tab="words" role="tab" aria-selected="false">Words</button>
             <button type="button" data-tab="pos" role="tab" aria-selected="false">POS</button>
             <button type="button" data-tab="morph" role="tab" aria-selected="false">Morphology</button>
@@ -537,7 +571,7 @@ import { mountMap } from '../holodeck-map.js';
 import { classifyWord, THRAX_MAP, THRAX_OUT_OF_SCOPE, THRAX_META, POS_PRIOR_META } from '../vendor/khora/native/adapters/text/wordclass.js';
 import { morphologyFromPrior, createLemmatizer, stemsOf } from '../vendor/khora/native/adapters/text/morphology.js';
 import { splitSentences, deriveAbbreviations } from '../vendor/khora/native/adapters/text/spans.js';
-import { layerNoteHTML, tabNoteHTML, LAYER_NOTES } from './layer-notes.js';
+import { tabNoteHTML, LAYER_NOTES } from './layer-notes.js';
 import { buildRows, sortRows, nextSort, tableHTML as refTableHTML } from './referent-table.js';
 import { scanPunctuation, loadPunctuation, moodAt, containersAt, cuesFromBlankLines, cuesFromLayout } from './punctuation.js';
 import { tokenize } from '../vendor/khora/native/organs/source.js';
@@ -556,6 +590,10 @@ import { makeSameBeing } from '../vendor/khora/native/adapters/text/corpus-ident
 import { browserOcr, loadPdfjs } from '../holodeck-ocr.js';
 import { recordOcr } from './scan-ledger.js';
 import { sha256Hex, stableProvenanceId, byteRange, EotLedger } from '../vendor/fold-chat/fold-chat-eot.js';
+import { runLadder, materialOf, FLOORS } from './mhc-ladder.js';
+import { statusWord, cleanDetail, ARM_ROWS, armOutcome } from './floor-words.js';
+import { orderOf } from '../vendor/khora/native/the-fold/mhc.js';
+import { isClaimRef } from '../vendor/khora/native/organs/nesting.js';
 
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]));
@@ -599,6 +637,26 @@ const CK = {}; LAYERS.forEach((l, i) => CK[l.id] = i);
 const FEATURE_OF = {}; LAYERS.forEach(l => { if (l.feature) FEATURE_OF[l.feature] = l.id; });
 const OPTIONAL = LAYERS.filter(l => l.feature).map(l => l.feature);
 const DEFAULT_FEATURES = { furniture:true, pos:true, morph:true, stance:true, npSubj:true, phrasal:true };
+
+// ── THE FLOORS over the pipeline: the fold's own ladder (reading/mhc-ladder.js), scored with the MHC's discipline. ──
+// Each layer sits at the floor whose operand it makes. The layers that classify forms by a received prior (POS,
+// morphology, stance) sit with F0: they say what a unit's forms carry and arrange nothing. Render re-orders an F2
+// arrangement and makes no new operand. F3's judge is the verdict each relation carries, read in the Relations
+// layer — no layer of its own. F4½, F5 and F6 have no layer on this page, and the rail shows those rungs empty:
+// that is the finding about this pipeline, not a gap in the drawing.
+const FLOOR_OF_LAYER = { extract:'F0', bytes:'F0', decode:'F0', furniture:'F0', punct:'F0', statement:'F0', token:'F0', grammar:'F0', morph:'F0', stance:'F0', referent:'F1', relation:'F2', np:'F2', phrasal:'F2', render:'F2', ledger:null };
+const FLOOR_COLOR = { 'F0':'--f0', 'F1':'--f1', 'F2':'--f2', 'F3':'--f3', 'F4½':'--f4h', 'F5':'--f5', 'F6':'--f6' };
+const FLOOR_NOTE = {   // what the rail says where a floor has no layer of its own
+  'F3': 'no layer of its own — the verdict each relation carries (bound · contradicted · unbound), read back against the material',
+  'F4½': 'no layer on this page — nothing here puts a claim in an end slot',
+  'F5': 'no layer on this page — the ladder reads notes across sources; this view reads one',
+  'F6': 'no layer on this page — nothing here composes from premises',
+};
+const floorIdx = h => FLOORS.findIndex(f => f.floor === h);
+// click a layer in the rail: the replay jumps to its first event and the drawer opens on the tab that shows its work
+const TAB_OF_LAYER = { extract:'source', bytes:'source', decode:'source', furniture:'source', punct:'source', statement:'source', token:'words', grammar:'pos', morph:'morph', stance:'props', referent:'refs', relation:'props', np:'props', phrasal:'props', render:'render', ledger:'eot' };
+const shortVerdict = w => String(w || '').split(' — ')[0];
+const floorId = h => 'fl-' + String(h).replace(/^F/, '').replace('½', 'h');
 
 // the stance class, re-declared here (same shape as the organ) so the page can
 // COUNT and LABEL the positions the stance layer carried, never to change them.
@@ -671,6 +729,43 @@ async function ready(){
   try { Object.keys((PRIORS.posPrior && PRIORS.posPrior.forms) || {}).forEach(w => { LEXICON.add(w.toLowerCase()); if (w.length > LEXICON_LONGEST) LEXICON_LONGEST = w.length; }); } catch (e) {}
   try { Object.keys((PRIORS.morphRaw && PRIORS.morphRaw.forms) || {}).forEach(w => { LEXICON.add(w.toLowerCase()); if (w.length > LEXICON_LONGEST) LEXICON_LONGEST = w.length; }); } catch (e) {}
   READER = await makeEngineRelationReader();
+}
+
+// ── THE LADDER on this reading: reading/mhc-ladder.js::runLadder, on the SAME reader the replay ran ─────────────
+// READING-POLICY P3: the run states which priors the reader was handed — as loadPriors and makeEngineRelationReader hand them over.
+function priorsDeclared(){
+  return [
+    PRIORS.langIso3
+      ? `part of speech — priors/pos-${PRIORS.langIso3}.json, the document's measured language (${PRIORS.lang && PRIORS.lang.lang}); no lemmatizer for it`
+      : `part of speech — ${POS_PRIOR_META.giver} (priors/pos-eng.json), with its lexicon consulted where the treebank has no entry (priors/pos-eng-lexicon.json)`,
+    `morphology — ${PRIORS.morphRaw?.provenance?.source || 'UniMorph English'} (priors/morphology-eng.json): the lemmatizer that widens same-act, and the verb-form set${PRIORS.langIso3 ? ' — English; not applied to this document' : ''}`,
+    'stance class — holodeck-reader.js (same-act widened by stance)',
+    'English closed classes — determiners, negation, first person (adapters/text/priors.js)',
+  ];
+}
+// The discrimination arms need material that does NOT support the task: a built-in sample of different content, never the material itself.
+function controlFor(analysis){
+  const key = analysis.includes(SAMPLES.history.slice(0, 40)) ? 'positions' : 'history';
+  return { key, material: materialOf([{ key, label: 'sample · ' + key, text: SAMPLES[key] }]) };
+}
+// The blanked text, cut into addressed passages, with the control beside it; every rung's declared task with its three arms.
+// It starts after the reading is on screen and is capped at LADDER_CHARS so the arms stay in seconds — the Floors tab says when the cap cut.
+// The verdicts are the READER's ceiling on this material, not a property of the text: the same text under another reader scores otherwise.
+const LADDER_CHARS = 14000;
+function startLadder(T, R, clean){
+  T.ladder = { state:'running' };
+  setTimeout(async () => {
+    const t0 = performance.now();
+    try {
+      const text = clean.length > LADDER_CHARS ? clean.slice(0, LADDER_CHARS) : clean;
+      const material = materialOf([{ key:'text', label:T.doc.label, text }]);
+      const ctl = controlFor(text);
+      const Lr = await runLadder({ material, control: ctl.material, READER: R, priors: priorsDeclared(), reader: R(material.passages) });
+      Lr.ms = Math.round(performance.now() - t0); Lr.controlKey = ctl.key; Lr.material = material; Lr.cut = clean.length - text.length;
+      T.ladder = { state:'done', L: Lr };
+    } catch (err) { console.error(err); T.ladder = { state:'failed', error: String(err && err.message || err) }; }
+    if (T.onLadder) T.onLadder();
+  }, 80);
 }
 
 // ── build the trace: run the real organs, recording each transformation ──────
@@ -956,6 +1051,7 @@ function mount(T){
   const statsEl = $('p-stats'), metaEl = $('p-meta'), rc = app.querySelector('.rib canvas'), rdEl = $('p-rd'), speedSel = $('p-speed'), keyEl = $('p-key'), spineEl = $('spine');
   $('p-title').textContent = T.doc.label;
   keyEl.innerHTML = LAYERS.map(l => `<span><i style="background:var(${l.color})"></i>${esc(l.label)}</span>`).join('');
+  let closed = false; T.onLadder = () => { if (!closed) render(false); };
 
   // ── clock ──
   let real = false, dir = 0, pos = 0, k = 0, speed = 8, last = performance.now(), raf = 0;
@@ -989,25 +1085,50 @@ function mount(T){
   let S = null, sk = -1;
   function stateAt(i){ if (!S || i < sk){ S = fresh(); sk = -1; } while (sk < i) apply(S, ev[++sk]); return S; }
 
-  // ── spine (layers + switches) ──
+  // ── spine: the floors, each with the layers that make its operand, and the switches ──
+  // a floor's verdict fills in once the replay has reached it — the first event of a layer at that floor or above; a floor
+  // no layer makes (F3 up) fills at the first ledger event, since the record is written after the reading
+  const floorOfEv = i => FLOOR_OF_LAYER[ev[i].stage] || null;
+  const firstLedger = ev.findIndex(e => e.stage === 'ledger');
+  const reachAt = FLOORS.map((f, fi) => { const j = ev.findIndex((e, i) => floorOfEv(i) && floorIdx(floorOfEv(i)) >= fi); return j >= 0 ? j : firstLedger >= 0 ? firstLedger : N - 1; });
+  const ladderOf = () => (T.ladder && T.ladder.state === 'done' ? T.ladder.L : null);
+  const verdictClass = it => (!it ? '' : it.status === 'passed' ? 'ok' : it.status === 'failed' ? 'fail' : 'bad');
+  function floorVerdict(h){
+    const Ld = T.ladder;
+    if (!Ld || Ld.state === 'running') return { word:'scoring…', cls:'' };
+    if (Ld.state === 'failed') return { word:'the ladder did not run', cls:'fail' };
+    const f = Ld.L.floors.floors.find(x => x.floor === h), it = f && f.items[0];
+    return { word: statusWord(it), cls: verdictClass(it) };
+  }
   function renderSpine(St, e){
-    const active = e.stage;
-    spineEl.innerHTML = `<div class="h">the pipeline — switch a layer off and the reading re-runs</div>` + LAYERS.map(l => {
+    const active = e.stage, curFloor = FLOOR_OF_LAYER[active] || null, Ld = ladderOf(), stage = Ld ? Ld.floors.stage.stage : null;
+    const byFloor = new Map(FLOORS.map(f => [f.floor, []])), record = [];
+    LAYERS.forEach(l => { const h = FLOOR_OF_LAYER[l.id]; (h ? byFloor.get(h) : record).push(l); });
+    const row = l => {
       const on = l.fixed || T.features[l.feature] !== false;
       const cnt = layerCount(l.id, St);
       const cur = l.id === active;
       const sw = l.fixed ? ''
         : `<span class="sw" role="switch" tabindex="0" aria-checked="${on}" data-feature="${l.feature}" title="switch ${esc(l.label)} ${on ? 'off' : 'on'} — the reading re-runs"></span>`;
-      return `<div class="ly ${cur ? 'cur' : ''} ${on ? '' : 'off'}"><span class="n">${l.i + 1}</span><span class="lab" style="color:var(${l.color})">${esc(l.label)}</span>${sw}${layerNoteHTML(l.id, { full:cur })}<span class="cnt" style="grid-column:2/3">${cnt}</span></div>`;
-    }).join('');
-    { const n = LAYER_NOTES[active], lab = (L[active] || {}).label, ln = $('p-lnote'); if (ln) ln.innerHTML = n ? `<b>${esc(lab)}</b> ${esc(n.what)} <span class="dim"><b>Rests on</b> ${esc(n.rests)} <b>Cannot decide</b> ${esc(n.cannot)}</span>` : ''; }
+      const note = LAYER_NOTES[l.id] || {};
+      return `<div class="ly ${cur ? 'cur' : ''} ${on ? '' : 'off'}" data-layer="${l.id}" role="button" tabindex="0" title="${esc(note.what || l.why)}"><span class="lab" style="color:var(${l.color})">${esc(l.label)}</span><span class="cnt" title="${esc(String(cnt).replace(/<[^>]+>/g, ''))}">${cnt}</span>${sw}</div>`;
+    };
+    const head = (f, fi) => {
+      const reached = k >= reachAt[fi], v = reached ? floorVerdict(f.floor) : null, layers = byFloor.get(f.floor);
+      return `<div class="fh ${curFloor === f.floor ? 'cur' : ''} ${stage === f.floor ? 'stage' : ''} ${reached ? '' : 'ahead'}" data-floor="${esc(f.floor)}" style="--fc:var(${FLOOR_COLOR[f.floor]})" role="button" tabindex="0" title="${esc(f.operand)}${v ? ' — ' + esc(v.word) : ''}${layers.length ? '' : ' — ' + esc(FLOOR_NOTE[f.floor] || 'no layer on this page')} — open in the Floors tab">`
+        + `<span class="f">${esc(f.floor)}</span><span class="t"><span class="nm">${esc(f.name)}</span>${layers.length ? '' : '<span class="no">no layer</span>'}</span><span class="vd ${v ? v.cls : ''}">${v ? esc(shortVerdict(v.word)) : ''}</span></div>`;
+    };
+    spineEl.innerHTML = `<div class="h">the floors, and the layers that make each — switch a layer off and the reading re-runs</div>`
+      + FLOORS.map((f, fi) => head(f, fi) + byFloor.get(f.floor).map(row).join('')).join('')
+      + `<div class="fh rec" style="--fc:var(--dim)" title="the record every floor appends to"><span class="f">∀</span><span class="nm">the record</span><span class="vd">every floor appends</span></div>` + record.map(row).join('');
+    { const n = LAYER_NOTES[active], lab = (L[active] || {}).label, ln = $('p-lnote'); if (ln){ ln.innerHTML = n ? `<b>${esc(lab)}</b> ${esc(n.what)} <span class="dim"><b>Rests on</b> ${esc(n.rests)} <b>Cannot decide</b> ${esc(n.cannot)}</span>` : ''; ln.title = n ? `Rests on: ${n.rests}\nCannot decide: ${n.cannot}` : ''; } }
     wireSwitches();
     if (wide.matches){ const c = spineEl.querySelector('.ly.cur'); if (c){ const top = c.offsetTop, h = spineEl.clientHeight; if (top < spineEl.scrollTop || top + c.offsetHeight > spineEl.scrollTop + h) spineEl.scrollTop = Math.max(0, top - h / 3); } }
   }
   function layerCount(key, St){
     switch (key){
       case 'extract': { const X = T.extraction; if (!X) return 'text — no container'; const js = (X.readings[X.collapsed] || {}).junctions || [], nj = js.filter((x) => x.decision === 'join').length; return `${esc((X.readings[X.collapsed] || {}).extractor || '—')} · ${X.held} reading${X.held === 1 ? '' : 's'} held${js.length ? ` · ${js.length} startle${js.length === 1 ? '' : 's'}, ${nj} joined` : ''}`; }
-      case 'bytes': return esc(T.doc.label) + ' · ' + T.nBytes.toLocaleString() + ' bytes';
+      case 'bytes': return T.nBytes.toLocaleString() + ' bytes';
       case 'decode': return T.doc.analysis.length.toLocaleString() + ' chars';
       case 'furniture': return T.features.furniture === false ? 'off' : (T.blanks.length ? T.blanks.length.toLocaleString() + ' chars blanked' : 'nothing to blank');
       case 'punct': { const P = T.punctuation || { sentences:[], containers:[] }, q = P.sentences.filter(x => x.mood === 'interrogative').length, x2 = P.sentences.filter(x => x.mood === 'exclamative').length; return (T.punct ? T.punct.length : 0) + ' marks · ' + P.sentences.length + ' sentences' + (q ? ' · ' + q + ' ask' : '') + (x2 ? ' · ' + x2 + ' exclaim' : '') + (P.containers.length ? ' · ' + P.containers.length + ' nested' : ''); }
@@ -1476,6 +1597,7 @@ function mount(T){
     $('p-graph').hidden = !graph; pane.hidden = graph; { const gn = $('p-graph-note'); gn.hidden = !graph; if (graph) gn.innerHTML = tabNoteHTML('graph', { collapsed:true }); }
     if (graph){ map.set(mapData(St, e)); return; }
     if (tab === 'source') pane.innerHTML = sourcePane(St, hot);
+    else if (tab === 'floors') pane.innerHTML = floorsPane(St, e);
     else if (tab === 'words'){ const sig = 'W' + T.words.length + '|' + wordsSort.key + wordsSort.dir; if (sig !== wordsKey){ wordsKey = sig; pane.innerHTML = tabNoteHTML('words') + wordsPane(); wireSort(); } return; }
     else if (tab === 'pos') pane.innerHTML = posPane(St);
     else if (tab === 'morph') pane.innerHTML = morphPane(St);
@@ -1484,8 +1606,66 @@ function mount(T){
     else if (tab === 'render') pane.innerHTML = renderPaneHTML();
     else if (tab === 'eot') pane.innerHTML = eotPane(St);
     else if (tab === 'json') pane.innerHTML = `<pre class="json">${esc(JSON.stringify(readingJSON(T), null, 2))}</pre>`;
-    pane.insertAdjacentHTML('afterbegin', tabNoteHTML(tab));
+    pane.insertAdjacentHTML('afterbegin', tabNoteHTML(tab, tab === 'floors' ? { collapsed:true } : undefined));
     wireReopen(pane);
+  }
+
+  // ── the Floors tab: the stage and where it stops, then each floor as the change it made of the floor below, with its three arms ──
+  function floorsPane(St, e){
+    const Ld = T.ladder;
+    if (!Ld || Ld.state === 'running') return `<div class="h">the floors</div><p class="stage-line dim">scoring this reading on the floor ladder — every rung's declared task with its three control arms, run by the same reader as the replay over the text cut into addressed passages…</p>`;
+    if (Ld.state === 'failed') return `<div class="h">the floors</div><p class="stage-line">the ladder did not run: <span class="mono">${esc(Ld.error)}</span></p>`;
+    const Lr = Ld.L, S = Lr.floors.stage, curFloor = FLOOR_OF_LAYER[e.stage] || null, chars = Lr.material.text.length;
+    const capF = S.cappedBy ? Lr.floors.floors.find(x => x.floor === S.cappedBy.floor) : null, capIt = capF && capF.items[0];
+    return `<div class="h">the floors — this reader's ceiling on this material, not a property of the text</div>
+      <div class="stage-line">${S.stage ? `stage <b style="color:var(${FLOOR_COLOR[S.stage]})">${esc(S.stage)} · ${esc(S.stageName)}</b>` : '<b>no floor passed</b>'}${capF ? ` — stops at <b>${esc(capF.floor)} · ${esc(capF.name)}</b>: ${esc(statusWord(capIt))}` : ' — every floor passed'}${S.isolated.length ? `. Passed above the gap, not counted: ${S.isolated.map(x => esc(x.floor)).join(', ')}` : ''}</div>
+      <div class="pstat"><span>scored in <b>${Lr.ms.toLocaleString()}</b> ms, no model</span><span>control <b>${esc(Lr.controlKey)}</b></span><span>${Lr.cut ? `the first <b>${chars.toLocaleString()}</b> of ${(chars + Lr.cut).toLocaleString()} chars` : `<b>${chars.toLocaleString()}</b> chars`}</span><span>axiom 1 <b>${Lr.floors.axiom1.held ? 'held' : 'broken'}</b></span></div>`
+      + FLOORS.map((f, fi) => floorBlock(f, fi, Lr, curFloor)).join('');
+  }
+  function floorBlock(f, fi, Lr, curFloor){
+    const fl = Lr.floors.floors[fi], it = fl.items[0], dec = Lr.floors.declared.find(d => d.floor === f.floor);
+    const layers = LAYERS.filter(l => FLOOR_OF_LAYER[l.id] === f.floor);
+    const below = fi === 0 ? 'the byte stream (S0), not itself a floor' : `${FLOORS[fi - 1].floor} · ${FLOORS[fi - 1].name}`;
+    const xref = f.commons != null ? `≈ Commons ${f.commons} · ${orderOf(f.commons).name}` : 'no Commons order';
+    const word = statusWord(it), phrase = word.includes(' — ') ? word.slice(word.indexOf(' — ') + 3) : '';
+    const capped = Lr.floors.stage.cappedBy && Lr.floors.stage.cappedBy.floor === f.floor;
+    return `<section class="flr ${curFloor === f.floor ? 'cur' : ''} ${Lr.floors.stage.stage === f.floor ? 'stage' : ''}" id="${floorId(f.floor)}" style="--fc:var(${FLOOR_COLOR[f.floor]})">
+      <div class="fhd"><span class="f">${esc(f.floor)}</span><b>${esc(f.name)}</b><span class="vd ${verdictClass(it)}">${esc(shortVerdict(word))}</span><span class="xr">${esc(xref)}</span></div>
+      <div class="op">${esc(f.operand)}</div>
+      <div class="chg"><div class="k">what this floor made of ${esc(below)}</div>${floorChange(f.floor, Lr)}</div>
+      ${layers.length ? `<div class="lys">${layers.map(l => `<span class="chip" style="color:var(${l.color})">${CK[l.id] + 1} · ${esc(l.label)}</span>`).join('')}</div>` : `<div class="lys none">${esc(FLOOR_NOTE[f.floor] || 'no layer on this page')}</div>`}
+      ${it && it.status !== 'passed' ? `<div class="det">${phrase ? `<b>${esc(phrase)}.</b> ` : ''}${esc(cleanDetail(it.detail || ''))}</div>` : ''}
+      ${dec ? `<details class="fold"><summary>the task — declared before it ran</summary><dl class="defs"><dt>task</dt><dd>${esc(dec.name)}</dd><dt>organizes</dt><dd>${esc(dec.organizes)}</dd><dt>organ</dt><dd class="mono">${esc(dec.organ)}</dd><dt>stages used</dt><dd>${esc(dec.stages.join(' · '))}</dd></dl></details>` : ''}
+      ${it ? `<details class="fold"${capped ? ' open' : ''}><summary>the three control arms — each must fail${it.arms ? '' : ' (not run)'}</summary>${armsTable(it, fi)}</details>` : ''}
+    </section>`;
+  }
+  // the three control arms, each as what it skipped (⊘): the floor below withheld, the parts re-coordinated at random, the control text — and what the reader did without it
+  function armsTable(it, fi){
+    const below = fi === 0 ? 'the cut rule withheld — S0 alone' : `${FLOORS[fi - 1].floor} withheld — the floor below, alone`;
+    const rows = ARM_ROWS.map(([key, what, giver]) => { const a = it.arms && it.arms[key], o = armOutcome(a);
+      return `<tr class="${o.cls}"><td><span class="skip">⊘</span> ${esc(key === 'lowerOrder' ? below : what)}<br><span class="giver">${esc(giver)}</span></td><td class="res">${esc(o.res)}${esc(o.draws)}</td><td class="dim">${esc(a && a.detail || '')}</td></tr>`; }).join('');
+    return `<table class="arms"><thead><tr><th>skipped</th><th>result</th><th>what it did</th></tr></thead><tbody>${rows}</tbody></table>`;
+  }
+  // what each floor made, on this text — counted from the same reader, index and specimens the rungs ran on (mhc-ladder.js::viewsOf), never restated
+  function floorChange(h, Lr){
+    const V = Lr.views, n = x => Number(x || 0).toLocaleString(), pl = (x, w) => `${n(x)} ${w}${Number(x) === 1 ? '' : 's'}`;
+    const ex = (xs, f, cap = 3) => xs.length ? `<div class="ex">${xs.slice(0, cap).map(f).join('<br>')}${xs.length > cap ? `<br><span class="dim">… ${n(xs.length - cap)} more</span>` : ''}</div>` : '';
+    const q = x => { const t = String(x); return `“${esc(t.length > 90 ? t.slice(0, 88) + '…' : t)}”`; };
+    switch (h){
+      case 'F0': { const u = V.units; return `<b>${pl(u.n, 'unit')}</b>, cut where the text breaks; ${n(u.reopen)} of ${n(u.n)} re-open by byte address to exactly their own text${u.inWord ? `; ${pl(u.inWord, 'cut')} inside a word` : ''}${u.overlap ? `; ${n(u.overlap)} overlap` : ''}.` + ex(u.rows || [], r => `bytes ${n(r.b0)}–${n(r.b1)} ${q(r.text)}`, 2); }
+      case 'F1': { const R = V.referents, forms = R.reduce((t, g) => t + g.surfaces.length, 0), A = V.corefAgreement || {};
+        return (R.length ? `<b>${pl(R.length, 'being')}</b> from ${pl(forms, 'name form')} — a word is a being only where the text writes it as a name.` : '<b>no beings</b> — no name form in this text was admitted as one.')
+          + (A.shouldMerge || A.shouldWithhold ? ` Variant pairs merged ${n(A.didMerge)} of ${n(A.shouldMerge)}; near-miss pairs held apart ${n((A.shouldWithhold || 0) - (A.wronglyMerged || []).length)} of ${n(A.shouldWithhold)}.` : '')
+          + ex(R.filter(g => g.surfaces.length >= 2), g => `${esc(g.name)} ← ${g.surfaces.map(q).join(', ')}`); }
+      case 'F2': { const E = V.edges; return (E.length ? `<b>${pl(E.length, 'arrangement')}</b> — who did what to whom — over the beings${V.slots.length ? `; ${pl(V.slots.length, 'open slot')}, the widest holding ${n(V.slots[0].fillers.length)}` : ''}.` : '<b>no arrangements</b> — no sentence gave a who-did-what-to-whom tied to beings.') + ex(E, x => `${esc(x.subject)} —${esc(x.verb)}→ ${esc(x.object)}`); }
+      case 'F3': { const C = T.claims, vs = C.reduce((m, c) => (m[c.verdict] = (m[c.verdict] || 0) + 1, m), {});
+        return (C.length ? `the replay's <b>${pl(C.length, 'relation')}</b>, each read back against the material by the same reader: ${Object.entries(vs).map(([kk, v]) => `${n(v)} ${esc(kk)}`).join(' · ')}.` : '<b>nothing to judge</b> — no relation was read.')
+          + (V.grid ? `<div class="ex">specimen ${q(V.grid.claim)} · the same claim with a subject nobody is: ${q(V.grid.absentClaim)}</div>` : ''); }
+      case 'F4½': { const E = V.edges, nested = E.filter(x => isClaimRef(x.end1) || isClaimRef(x.end2)).length; return `<b>${n(nested)}</b> of ${pl(E.length, 'edge')} hold a claim in an end slot — the reader puts surfaces there, so who-says-what is never kept apart from what is so.`; }
+      case 'F5': { const M = V.merges || []; return `<b>${pl((V.systems || []).length, 'source reader')}</b>; a note is corroborated at ${n(V.premiseFloor.sources)} distinct sources${M.length ? `; ${pl(M.length, 'merge')} measured` : ''}.` + ex(M, m => `${esc(m.edge.subject)} —${esc(m.edge.verb)}→ ${esc(m.edge.object)}: ${pl(m.readings.length, 'reading')}, held by ${n(m.holds)}`); }
+      case 'F6': { const P = (V.premises && V.premises.premises) || []; return `<b>${pl(P.length, 'premise')}</b> at a floor of ${n(V.premiseFloor.sources)} sources (instrument independence not required: ${n(V.premiseFloor.instruments)}); composition needs a declarations register this page does not hold.`; }
+    }
+    return '';
   }
   const standingOf = c => standingOfClaim(c);
 
@@ -1671,9 +1851,18 @@ function mount(T){
   // ── ribbon ──
   let dpr = 1;
   function size(){ dpr = window.devicePixelRatio || 1; const q = rc.getBoundingClientRect(); rc.width = Math.max(1, q.width * dpr); rc.height = Math.max(1, q.height * dpr); drawRibbon(); }
-  function drawRibbon(){ const g = rc.getContext('2d'), w = rc.width, h = rc.height; if (!w) return; g.clearRect(0, 0, w, h); const mp = maxPos();
-    for (let i = 0; i < N; i++){ const x0 = clockOf(i) / mp * w, x1 = i + 1 < N ? clockOf(i + 1) / mp * w : w; g.fillStyle = cssVar((L[ev[i].stage] || { color:'--dim' }).color); g.globalAlpha = 0.85; g.fillRect(x0, h * 0.22, Math.max(1, x1 - x0), h * 0.56); }
-    g.globalAlpha = 1; const x = pos / mp * w; g.fillStyle = cssVar('--ink'); g.fillRect(x - dpr, 0, 2 * dpr, h); }
+  // the floor track rides above the layer band: the floor each event's layer makes, solid where the ladder passed that floor,
+  // faint where it did not or has not scored yet; a run wide enough carries its floor's name
+  function drawRibbon(){ const g = rc.getContext('2d'), w = rc.width, h = rc.height; if (!w) return; g.clearRect(0, 0, w, h); const mp = maxPos(), Ld = ladderOf();
+    const passed = new Set(Ld ? Ld.floors.floors.filter(f => f.status === 'passed').map(f => f.floor) : []);
+    const runs = []; let run = null;
+    for (let i = 0; i < N; i++){ const x0 = clockOf(i) / mp * w, x1 = i + 1 < N ? clockOf(i + 1) / mp * w : w, fl = FLOOR_OF_LAYER[ev[i].stage] || null;
+      if (fl){ g.fillStyle = cssVar(FLOOR_COLOR[fl]); g.globalAlpha = passed.has(fl) ? 0.95 : 0.4; g.fillRect(x0, 0, Math.max(1, x1 - x0), h * 0.30); }
+      if (run && run.fl === fl) run.x1 = x1; else { run = { fl, x0, x1 }; runs.push(run); }
+      g.fillStyle = cssVar((L[ev[i].stage] || { color:'--dim' }).color); g.globalAlpha = 0.85; g.fillRect(x0, h * 0.44, Math.max(1, x1 - x0), h * 0.54); }
+    g.globalAlpha = 1; g.font = `600 ${Math.round(9 * dpr)}px ${cssVar('--mono')}`; g.textBaseline = 'middle'; g.fillStyle = cssVar('--bg');
+    for (const r of runs) if (r.fl && r.x1 - r.x0 > 26 * dpr) g.fillText(r.fl, r.x0 + 4 * dpr, h * 0.15);
+    const x = pos / mp * w; g.fillStyle = cssVar('--ink'); g.fillRect(x - dpr, 0, 2 * dpr, h); }
   const scrub = e => { const r = rc.getBoundingClientRect(); const f = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)); setDir(0); pos = f * maxPos(); k = idxAt(pos); render(true); };
   let dragging = false; const rib = app.querySelector('.rib');
   bind(rib, 'pointerdown', e => { dragging = true; e.target.setPointerCapture && e.target.setPointerCapture(e.pointerId); scrub(e); });
@@ -1685,7 +1874,7 @@ function mount(T){
     const St = stateAt(k), e = ev[k];
     renderSpine(St, e); renderLog(follow); renderLens(St); if (wide.matches){ renderLanes(e); renderInsp(e); } renderPane(St, e); map.set(mapData(St, e)); drawRibbon(); updateStats(St, e);
     rdEl.textContent = (real ? 't = ' + ms(pos) + ' of ' + ms(ev[N-1].t) + ' ms' : 'step ' + (k + 1).toLocaleString() + ' of ' + N.toLocaleString())
-      + ' · layer ' + ((L[e.stage] || {}).i + 1) + '/' + LAYERS.length + ' · real ' + ms(e.t) + ' ms';
+      + ' · layer ' + ((L[e.stage] || {}).i + 1) + '/' + LAYERS.length + ' · ' + (FLOOR_OF_LAYER[e.stage] || 'the record') + ' · real ' + ms(e.t) + ' ms';
   }
   function updateStats(St, e){
     statsEl.innerHTML =
@@ -1715,6 +1904,8 @@ function mount(T){
     });
   }
   const onClick = e => {
+    const fh = e.target.closest('.fh[data-floor]'); if (fh){ setTab('floors'); const el = pane.querySelector('#' + floorId(fh.dataset.floor)); if (el) pane.scrollTop += el.getBoundingClientRect().top - pane.getBoundingClientRect().top - 8; return; }
+    const ly = e.target.closest('.ly[data-layer]'); if (ly && !e.target.closest('.sw')){ const id = ly.dataset.layer, j = ev.findIndex(x => x.stage === id); setDir(0); if (j >= 0) seek(j); setTab(TAB_OF_LAYER[id] || 'source'); return; }
     const rs = e.target.closest('[data-rsort]'); if (rs){ refTabSort = nextSort(refTabSort, rs.dataset.rsort); render(false); return; }
     const rr = e.target.closest('#p-pane .rt tbody tr[data-sel]'); if (rr){ try { graphSel = JSON.parse(rr.dataset.sel).ref; } catch (er) { graphSel = null; } setTab('graph'); return; }
     const a = e.target.closest('[data-a]'); if (!a) return; const act = a.dataset.a;
@@ -1728,11 +1919,12 @@ function mount(T){
     else if (act === 'dl-json'){ download(`${slugOf(T)}-reading.json`, JSON.stringify(readingJSON(T), null, 2), 'application/json'); a.textContent = 'Saved'; setTimeout(() => { a.textContent = '⤓ Reading (JSON)'; }, 1400); } };
   const onKey = e => { if (e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') return;
     if (!app.classList.contains('on')) return;
+    if (e.key === 'Enter' && e.target && e.target.closest && e.target.closest('.fh[data-floor], .ly[data-layer]')){ e.preventDefault(); e.target.click(); return; }
     if (e.key === 'Escape') close(); else if (e.key === ' '){ e.preventDefault(); setDir(dir ? 0 : 1); }
     else if (e.key === 'ArrowLeft'){ setDir(0); seek(k - 1); } else if (e.key === 'ArrowRight'){ setDir(0); seek(k + 1); }
     else if (e.key === 'j' || e.key === 'J') setDir(-1); else if (e.key === 'k' || e.key === 'K') setDir(0); else if (e.key === 'l' || e.key === 'L') setDir(1);
     else if (e.key === 'Home'){ setDir(0); seek(0); } else if (e.key === 'End'){ setDir(0); seek(N - 1); } };
-  function close(){ ac.abort(); stopTL(); try { ro.disconnect(); } catch (e) {} cancelAnimationFrame(raf); try { map.destroy && map.destroy(); } catch (e) {} app.classList.remove('on'); inst = null; const rv = $('rv'); if (rv && cur) rv.classList.add('on'); }
+  function close(){ closed = true; T.onLadder = null; ac.abort(); stopTL(); try { ro.disconnect(); } catch (e) {} cancelAnimationFrame(raf); try { map.destroy && map.destroy(); } catch (e) {} app.classList.remove('on'); inst = null; const rv = $('rv'); if (rv && cur) rv.classList.add('on'); }
   const ro = new ResizeObserver(() => size());
   bind(app, 'click', onClick);
   bind(document, 'keydown', onKey);
@@ -1834,6 +2026,7 @@ async function read(text, label, feat, opt = {}){
   // a proposition is held in the MOOD of its sentence (a question asks; it does not assert) and NESTED in the containers around it (speech, aside), in order
   T.claims.forEach(c => { if (c.located){ c.mood = moodAt(T.punctuation, c.s); c.holds = containersAt(T.punctuation, c.s).map(k => ({ kind:k.kind, mark:k.mark, mood:k.mood })); } });
   startTimeline(T);
+  startLadder(T, R, clean);
   if (!BASELINE) BASELINE = T;
   $('model').textContent = `model calls: ${T.net.models}`;
   if (opt.animate !== false){ openTrace(T); }

@@ -87,14 +87,58 @@
   .badge{font:11px var(--mono);padding:1px 7px;border-radius:6px;background:#1a2130;color:var(--dim);border:1px solid var(--line)}
   .badge.live{color:var(--ground);border-color:#245a41}
   .spin{color:var(--dim);font-size:13px}
+  /* the MHC ladder */
+  html{scroll-behavior:smooth}
+  .ladder{display:flex;flex-direction:column;gap:3px}
+  .rung{display:grid;grid-template-columns:30px 1fr auto;gap:0 10px;align-items:baseline;padding:6px 10px;border:1px solid var(--line);
+        border-radius:8px;background:var(--panel2);color:var(--ink);text-decoration:none;font-size:13px}
+  .rung .on{font:600 12px var(--mono);color:var(--dim);grid-row:1 / span 2}
+  .rung .pg{color:var(--faint);font-size:11px;grid-column:2}
+  .rung .st{grid-column:3;grid-row:1 / span 2;font:11.5px var(--mono);text-align:right;align-self:center;max-width:250px}
+  .rung.passed{border-left:3px solid var(--ground)} .rung.passed .st{color:var(--ground)}
+  .rung.failed{border-left:3px solid var(--void)} .rung.failed .st{color:var(--void)}
+  .rung.unmeasured{border-left:3px solid var(--assert)} .rung.unmeasured .st{color:var(--assert)}
+  .rung.floor,.rung.none{opacity:.5;border-style:dashed}
+  .rung.in{background:#11231b}
+  a.rung[href]:hover{border-color:var(--blue)}
+  .stage{padding:12px 14px;border:1px solid var(--line);border-left:3px solid var(--assert);border-radius:10px;background:var(--panel2);
+         margin-bottom:12px;display:flex;flex-direction:column;gap:4px}
+  .stage.ok{border-left-color:var(--ground)}
+  .stage > b{font-size:16px} .stage span{color:var(--dim);font-size:12.5px} .stage span b{color:var(--ink)}
+  .verdict{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;padding:10px 12px;border-radius:10px;background:var(--panel2);
+           border:1px solid var(--line);margin-bottom:14px;font-size:13px}
+  .verdict.passed{border-left:3px solid var(--ground)} .verdict.failed{border-left:3px solid var(--void)}
+  .verdict.unmeasured,.verdict.refused{border-left:3px solid var(--assert)}
+  dl.defs{margin:0;display:grid;grid-template-columns:auto 1fr;gap:6px 12px;font-size:12.5px}
+  dl.defs dt{color:var(--dim)} dl.defs dd{margin:0}
+  .lh{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--dim);margin:18px 0 8px;font-weight:600}
+  details.fold{border:1px solid var(--line);border-radius:10px;margin:10px 0;background:var(--panel2)}
+  details.fold > summary{cursor:pointer;padding:10px 14px;font-weight:600;font-size:13.5px}
+  details.fold > .fb{padding:4px 14px 14px}
+  .why-line{color:var(--faint);font-size:12.5px;margin:0 0 8px}
+  .claimbox{display:flex;gap:8px;flex-wrap:wrap}
+  .claimbox input{flex:1 1 320px;background:var(--panel2);color:var(--ink);border:1px solid var(--line);border-radius:9px;padding:8px 11px;font:13px var(--mono)}
+  td.ok{color:var(--ground)} td.bad{color:var(--void)} td.warn{color:var(--assert)}
+  .lb{color:var(--violet)}
+  .grid > *{min-width:0}
+  dl.defs dd{overflow-wrap:anywhere}
+  .card{overflow-x:auto}
+  @media(max-width:820px){
+    section > .h{flex-wrap:wrap} section > .h .why{max-width:100%;text-align:left;margin-left:0}
+    .rung .st{max-width:150px}
+    header{padding:24px 16px 16px} .wrap{padding:0 16px 70px} section > .b{padding:14px 12px} section > .h{padding:13px 12px}
+  }
 </style>
 </head>
 <body>
 <header>
   <h1>the reading microscope</h1>
   <div class="sub">
-    Drop any text in. This page reads it <b>the way the fold reads it</b> — grammar, then morphology,
-    then a hypergraph of relations — and shows you every step, byte by byte.
+    Drop any text in. This page reads it <b>the way the fold reads it</b> and lays the reading out on the fold's own
+    <b>floors</b> — F0 units, F1 referents, F2 arrangements, F3 claims, F4½ nesting, F5 corroborated notes, F6 premises —
+    with the discipline of the <b>Model of Hierarchical Complexity</b>: every rung is a task declared before it runs, tried
+    on your text with three control arms by khora's own MHC module, and the stage is the highest floor reached with no gap
+    below it. Commons's orders are kept beside each floor as a cross-reference.
     <b>No language model is called at any point.</b> Every organ below is the fold's own vendored code,
     running here in your browser; every name in the reading is the giver that supplied it.
   </div>
@@ -103,9 +147,9 @@
 <div class="wrap">
   <div id="drop" class="drop">
     <div class="big">drop a document here, or click to choose a file</div>
-    <div class="small">.txt · .md · .html · .json · .csv · source code — anything that is text, up to a few MB</div>
+    <div class="small">.txt · .md · .html · .json · .csv · source code — anything that is text, up to a few MB · drop several files and each is read as its own source</div>
   </div>
-  <input id="file" type="file" hidden>
+  <input id="file" type="file" multiple hidden>
   <textarea id="ta" placeholder="…or paste text here, then press Read."></textarea>
   <div class="row">
     <button id="read" class="primary">Read it</button>
@@ -114,6 +158,7 @@
       <button data-s="positions">sample · positions</button>
       <button data-s="dossier">sample · dossier</button>
       <button data-s="history">sample · history</button>
+      <button data-s="titanic" title="four public-domain 1912 accounts of the same night, from the Holodeck's own sample set — each read as its own source">sample · titanic 1912, four accounts</button>
     </span>
     <span id="model" class="badge live" style="margin-left:auto">model calls: 0</span>
   </div>
@@ -138,6 +183,8 @@ import { morphologyFromPrior, createLemmatizer, stemsOf } from '../vendor/khora/
 import { splitSentences } from '../vendor/khora/native/adapters/text/spans.js';
 import { tokenize } from '../vendor/khora/native/organs/source.js';
 import { sha256Hex, stableProvenanceId, byteRange, EotLedger } from '../vendor/fold-chat/fold-chat-eot.js';
+import { materialOf, runLadder, judge, FLOORS, floorOf, ORDERS, orderOf, SYMBOLIC_FLOOR, AXIOMS, WITNESS_FLOOR } from './mhc-ladder.js';
+import { statusWord, cleanDetail, ARM_ROWS, armOutcome } from './floor-words.js';
 
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]));
@@ -154,6 +201,11 @@ const SAMPLES = {
 
 let PRIORS = null;      // { posPrior, morphRaw, morph, lemmatizer, verbForms }
 let READER = null;      // the assembled engine relation reader
+let TITANIC = null;     // the sample's public-domain accounts, fetched once when asked for
+
+// The Holodeck's own sample set (holodeck/samples.json points here). Only the
+// public-domain report and books are read; the screenplay is not.
+const TITANIC_URL = 'https://scores-patch-points.github.io/holodeck-samples/titanic-1912/readings.json';
 
 // ── 0 · INPUT ───────────────────────────────────────────────────────────────
 function show(){}
@@ -168,10 +220,42 @@ async function ready(){
   READER = await makeEngineRelationReader();
 }
 
+async function titanicSources(){
+  if (!TITANIC){
+    const d = await (await fetch(TITANIC_URL)).json();
+    // DOMParser documents are inert: no script runs and no image loads.
+    const text = (h) => new DOMParser().parseFromString(String(h || ''), 'text/html').body.textContent.replace(/\s+/g, ' ').trim();
+    TITANIC = (d.readings || []).filter(r => r.type === 'Report' || r.type === 'Book')
+      .map((r, i) => ({ key: `account-${i + 1}`, label: r.title, text: text(r.html) }));
+  }
+  return TITANIC;
+}
+
+// READING-POLICY P3: a run states which priors the reader was handed.
+function priorsDeclared(){
+  // as holodeck-reader.js::loadPriors and makeEngineRelationReader hand them over
+  return [
+    `part of speech — ${POS_PRIOR_META.giver} (priors/pos-eng.json), with its lexicon consulted where the treebank has no entry (priors/pos-eng-lexicon.json)`,
+    `morphology — ${PRIORS.morphRaw?.provenance?.source || 'UniMorph English'} (priors/morphology-eng.json): the lemmatizer that widens same-act, and the verb-form set`,
+    'stance class — holodeck-reader.js (same-act widened by stance)',
+    'English closed classes — determiners, negation, first person (adapters/text/priors.js)',
+  ];
+}
+
+// The discrimination arms need material that does NOT support the task: a
+// built-in sample of different content, never the material itself.
+function controlFor(analysis){
+  const key = analysis.includes(SAMPLES.history.slice(0, 40)) ? 'positions' : 'history';
+  return { key, material: materialOf([{ key, label: 'sample · ' + key, text: SAMPLES[key] }]) };
+}
+
 // ── MAIN ────────────────────────────────────────────────────────────────────
-async function read(text, label){
+// `input` is a string (one source) or [{ key, label, text }] (each its own source).
+async function read(input, label){
   reset();
-  const raw = String(text || '');
+  const sources = (Array.isArray(input) ? input : [{ key: 'text', label: label || 'pasted text', text: String(input || '') }])
+    .filter(s => String(s.text || '').trim());
+  const raw = sources.map(s => s.text).join('\n\n');
   if (raw.trim().length < 8) { $('out').innerHTML = `<section><div class="b"><span class="empty">Nothing to read yet — drop a document or paste text.</span></div></section>`; return; }
   await ready();
 
@@ -179,11 +263,15 @@ async function read(text, label){
   const fullBytes = utf8Len(raw);
   const fullHash = sha256Hex(raw);
   const LIMIT = 14000;
-  const analysis = raw.length > LIMIT ? raw.slice(0, LIMIT) : raw;
-  const truncated = raw.length > LIMIT;
-  const clean = blankMarkup(analysis);                // length-preserving: markup blanked, offsets intact
+  const per = Math.floor(LIMIT / sources.length);
+  const truncated = sources.some(s => s.text.length > per);
+  const cut = sources.map(s => ({ ...s, text: s.text.length > per ? s.text.slice(0, per) : s.text }));
+  const analysis = cut.map(s => s.text).join('\n\n');
+  // length-preserving: markup blanked, offsets intact — so material.text lines up byte for byte with `analysis`
+  const material = materialOf(cut.map(s => ({ key: s.key, label: s.label || s.key, text: blankMarkup(s.text) })));
+  const clean = material.text;
 
-  const report = READER([{ ref: label || 'source', text: clean }]);
+  const report = READER(material.passages);
   const read0 = report.read(clean);
   const claims = read0.claims || [];
   const vocab = read0.vocabulary || report.vocabulary || {};
@@ -191,37 +279,300 @@ async function read(text, label){
   const toks = tokenize(clean);
   const readMs = Math.round(performance.now() - tRead0);
 
-  const doc = { label: label || 'pasted text', bytes: fullBytes, hash: fullHash, chars: raw.length, truncated, analysis };
+  const doc = { label: sources.length > 1 ? `${sources.length} sources` : sources[0].label, sources: material.sources, passages: material.passages.length,
+    bytes: fullBytes, hash: fullHash, chars: raw.length, truncated, per, analysis };
+  const R = { clean, sentences, toks, claims, vocab, report, readMs, material };
 
-  render(doc, { clean, sentences, toks, claims, vocab, report, readMs });
-  $('model').textContent = `model calls: ${net.models}`;
+  render(doc, R, null);                                  // the floor first; the ladder runs next
+  const ctl = controlFor(analysis);
+  const t1 = performance.now();
+  const L = await runLadder({ material, control: ctl.material, READER, priors: priorsDeclared(), reader: report });
+  L.ms = Math.round(performance.now() - t1);
+  L.controlKey = ctl.key;
+  L.material = material;
+  render(doc, R, L);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-function render(doc, R){
-  const out = $('out');
+function render(doc, R, L){
   const H = [];
-  H.push(inputCard(doc, R));
-  H.push(bytesCard(doc, R));
-  H.push(grammarCard(doc, R));
-  H.push(morphCard(doc, R));
-  H.push(stanceCard(doc, R));
-  H.push(atomsCard(doc, R));
-  H.push(logCard(doc, R));
-  H.push(priorsCard(doc, R));
-  H.push(timeCard(doc, R));
-  out.innerHTML = H.join('');
-  wireAtoms(doc, R);
+  if (!L) H.push(section('·', 'what came in', 'the floors are read next', `${inputCard(doc, R)}<p class="spin" style="margin-top:12px">running the floor ladder — each floor's task with its three control arms…</p>`));
+  else {
+    H.push(ladderSection(doc, R, L));
+    L.floors.floors.forEach((f, i) => H.push(floorSection(i, doc, R, L)));
+    H.push(logCard(doc, R, L));
+  }
+  $('out').innerHTML = H.join('');
+  if (L){ wireAtoms(doc, R); wireClaimBox(L); }
   $('model').textContent = `model calls: ${net.models}`;
+}
+
+// ── verdict words ───────────────────────────────────────────────────────────
+const chipFor = (s) => s === 'passed' ? 'g' : s === 'failed' ? 'v' : 'a';
+const floorId = (h) => 'f' + String(h).replace(/^F/, '').replace('½', 'h');
+const xrefOf = (f) => [f.commons != null ? `≈ Commons ${f.commons} · ${orderOf(f.commons).name}` : 'no Commons order', ...(f.probes.length ? [`${f.probes.length > 1 ? 'probes' : 'probe'} ${f.probes.join(', ')}`] : [])].join(' · ');
+
+// ── the ladder ──────────────────────────────────────────────────────────────
+function ladderSection(doc, R, L){
+  const F = L.floors, st = F.stage;
+  const at = (h) => FLOORS.findIndex(x => x.floor === h);
+  const rows = [...F.floors].reverse().map(f => {
+    const it = f.items[0];
+    const cls = !it ? 'none' : it.status === 'refused' ? 'unmeasured' : it.status;
+    const inStage = st.stage != null && at(f.floor) <= at(st.stage);
+    return `<a class="rung ${cls}${inStage ? ' in' : ''}" href="#${floorId(f.floor)}"><span class="on">${esc(f.floor)}</span><span class="nm">${esc(f.name)}</span><span class="pg">${esc(xrefOf(f))}</span><span class="st">${esc(statusWord(it))}</span></a>`;
+  }).join('');
+  const pri = L.report.priors.declared ? L.report.priors.injected : [];
+  const axiomRows = AXIOMS.map(a => `<tr><td class="mono">${a.axiom ?? '—'}</td><td>${esc(a.statement)}</td><td>${esc(a.checkedBy)}</td><td>${esc(a.giver)}</td></tr>`).join('');
+  return section('F', 'the ladder — the fold’s own floors', 'the stage is the highest floor passed with no gap beneath it', `
+    <div class="stage ${st.stage != null ? 'ok' : ''}">
+      <b>${st.stage != null ? `stage ${esc(st.stage)} · ${esc(st.stageName)}` : 'no stage readable'}</b>
+      ${st.cappedBy ? `<span>${esc(st.cappedBy.detail)}</span>` : ''}
+      ${st.isolated.length ? `<span>passes above the cap, carried as observations and <b>not</b> folded into the stage: ${st.isolated.map(f => `<a href="#${floorId(f.floor)}">${esc(f.floor)} · ${esc(f.name)}</a>`).join(', ')}</span>` : ''}
+    </div>
+    <div class="grid g2">
+      <div class="ladder">${rows}</div>
+      <div>
+        <p class="note" style="margin-top:0">The floors are canon’s operand ladder: <i>“every floor promotes the previous floor’s finding into an operand”</i> (khora <span class="mono">organs/derivation.js</span>). That is the MHC’s own discipline in our terms, so each rung is a <b>task declared before it runs</b>, defined in terms of the floor directly below it, and its order is fixed by what it is built from — never read off your text.</p>
+        <p class="note">Three control arms run first, and <b>each must fail</b>: the floor below, alone (axiom 3); the same parts re-coordinated arbitrarily (axiom 3); and material that does not support the task (this battery’s own control). Only then is the task tried, and it passes or fails <b>whole</b>.</p>
+        <p class="note">A rung whose arms do not hold is <b>refused</b> — not a genuine task at that floor on this material, so the reader is unmeasured there, not failing. A rung your material offers no specimen for, or that no organ on this page can perform, is a <b>typed gap</b>. Neither is read as a pass, and no stage is read across either. Canon names no F4: F4½ is the floor between F3 and F5.</p>
+        ${card('this run', [
+          ['scorer', 'khora the-fold/mhc.js runItem — vendored byte-identical'],
+          ['floor table, axiom 1, stage walk', 'this page, by mhc.js’s own rules — until they move to khora'],
+          ['material', esc(doc.sources.map(s => s.label).join(' + '))],
+          ['control material', 'sample · ' + esc(L.controlKey) + ' — different content'],
+          ['on Commons’s scale', L.stage.stage != null ? `stage ${L.stage.stage} · ${esc(L.stage.stageName)}` : 'no stage readable'],
+          ['priors injected (P3)', String(pri.length)],
+          ['ladder ran in', L.ms + ' ms'],
+        ])}
+      </div>
+    </div>
+    ${fold('Commons’s sixteen orders — the cross-reference', commonsTable(L))}
+    ${fold('the axioms each rung is held to', `<table><thead><tr><th>axiom</th><th>statement</th><th>checked by</th><th>giver</th></tr></thead><tbody>${axiomRows}</tbody></table>`)}
+    ${fold('the assembly and its priors (READING-POLICY P0, P3)', `<p class="note" style="margin-top:0">${esc(typeof L.report.assembly === 'string' ? L.report.assembly : L.report.assembly.detail)}</p><ul class="note">${pri.map(p => `<li>${esc(p)}</li>`).join('')}</ul>`)}
+  `, 'ladder');
+}
+
+function commonsTable(L){
+  const items = new Map(L.report.items.map(i => [i.order, i]));
+  const home = new Map();
+  for (const f of FLOORS){ if (f.commons != null) home.set(f.commons, `the task of ${f.floor} · ${f.name}`); for (const p of f.probes) home.set(p, `a probe on ${f.floor} · ${f.name}`); }
+  const rows = ORDERS.map(o => {
+    const it = items.get(o.order);
+    const where = o.order < SYMBOLIC_FLOOR ? 'below Commons’s symbolic floor — out of scope by construction' : home.get(o.order) || 'no item declared';
+    const cls = !it ? '' : it.status === 'passed' ? 'ok' : it.status === 'failed' ? 'bad' : 'warn';
+    return `<tr><td class="mono">${o.order}</td><td>${esc(o.name)}<br><span style="color:var(--faint);font-size:11px">${esc(o.piaget)}</span></td><td>${esc(where)}</td><td class="${cls}">${it ? esc(statusWord(it)) : '—'}</td></tr>`;
+  }).join('');
+  const cst = L.stage;
+  return `<p class="note" style="margin-top:0">The same runs, read on Commons’s scale by mhc.js’s own <span class="mono">stageFrom</span>: <b>${cst.stage != null ? `stage ${cst.stage} · ${esc(cst.stageName)}` : 'no stage readable'}</b>${cst.cappedBy ? ` — ${esc(cst.cappedBy.detail)}` : ''}. The eo-wiki’s own reading warns that MHC orders and EO’s structure are different objects; this table is a cross-reference, not a mapping the stage rests on.</p>
+    <table><thead><tr><th>order</th><th>Commons’s name</th><th>where it sits on the floors</th><th>verdict here</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+// ── one floor ───────────────────────────────────────────────────────────────
+function armsCard(item, below = 'the floor below, alone'){
+  const rows = ARM_ROWS.map(([k, what, giver]) => {
+    if (k === 'lowerOrder') what = below;
+    const a = item.arms?.[k], { res, cls, draws } = armOutcome(a);
+    return `<tr><td>${esc(what)}<br><span style="color:var(--faint);font-size:11px">${esc(giver)}</span></td><td class="${cls}">${esc(res)}${draws}</td><td style="color:var(--dim)">${esc(a?.detail || '')}</td></tr>`;
+  }).join('');
+  return `<div class="card"><h3>the three control arms — each must fail</h3><table><thead><tr><th>arm</th><th>result</th><th>what it did</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+}
+
+function floorSection(i, doc, R, L){
+  const f = L.floors.floors[i];
+  const item = f.items[0];
+  const dec = L.floors.declared.find(d => d.floor === f.floor);
+  if (!item || !dec) return '';
+  const below = i === 0
+    ? 'the byte stream (S0) — the address space every floor cites, not itself a floor'
+    : dec.definedInTermsOf.map(id => { const d = L.floors.declared.find(x => x.id === id); return d ? `<a href="#${floorId(d.floor)}">${esc(d.floor)} · ${esc(floorOf(d.floor).name)}</a>` : esc(id); }).join(', ');
+  const xref = f.commons != null
+    ? `order ${f.commons} · ${esc(orderOf(f.commons).name)} (${esc(orderOf(f.commons).piaget)}) — this floor’s task is that order’s declared task`
+    : 'none — Commons’s battery declares no task at this floor';
+  const status = item.status === 'refused' ? 'refused' : item.status;
+  const view = FLOOR_VIEWS[f.floor] ? FLOOR_VIEWS[f.floor](doc, R, L) : '';
+  const probes = f.probes.map(p => probeFold(p, doc, R, L)).join('');
+  return section(f.floor, f.name, f.operand, `
+    <div class="verdict ${status}"><span class="chip ${chipFor(item.status)}">${esc(statusWord(item))}</span><span>${esc(cleanDetail(item.detail))}</span></div>
+    <div class="grid g2">
+      <div class="card"><h3>the task — declared before it is run</h3><dl class="defs">
+        <dt>task</dt><dd>${esc(dec.name)}</dd>
+        <dt>defined in terms of</dt><dd>${below}</dd>
+        <dt>organizes</dt><dd>${esc(dec.organizes)}</dd>
+        <dt>organ</dt><dd class="mono">${esc(dec.organ)}</dd>
+        <dt>stages used</dt><dd>${esc(dec.stages.join(' · '))}</dd>
+        <dt>Commons</dt><dd>${xref}</dd>
+      </dl></div>
+      ${armsCard(item)}
+    </div>
+    ${view ? `<h3 class="lh">what this floor read in your material</h3>${view}` : ''}
+    ${probes ? `<h3 class="lh">Commons probes that read this floor’s operand — run, not folded into the stage</h3>${probes}` : ''}
+  `, floorId(f.floor));
+}
+
+function probeFold(n, doc, R, L){
+  const it = L.report.items.find(i => i.order === n);
+  const dec = L.declared.find(d => d.order === n);
+  if (!it || !dec) return '';
+  return fold(`order ${n} · ${orderOf(n).name} — ${statusWord(it)}`, `
+    <div class="verdict ${it.status}"><span class="chip ${chipFor(it.status)}">${esc(statusWord(it))}</span><span>${esc(cleanDetail(it.detail))}</span></div>
+    <div class="grid g2">
+      <div class="card"><h3>the probe — Commons’s order ${n}, declared before it is run</h3><dl class="defs">
+        <dt>task</dt><dd>${esc(dec.name)}</dd>
+        <dt>organizes</dt><dd>${esc(dec.organizes)}</dd>
+        <dt>organ</dt><dd class="mono">${esc(dec.organ)}</dd>
+      </dl></div>
+      ${armsCard(it, 'the order below, alone')}
+    </div>
+    ${VIEWS[n] ? `<h3 class="lh">what it read</h3>${VIEWS[n](doc, R, L)}` : ''}`);
+}
+
+// ── what each rung read ─────────────────────────────────────────────────────
+const edgeText = (e) => `${esc(e.subject)} <span class="lb">—${esc(e.verb)}→</span> ${esc(e.object)}`;
+const sourcesOf = (refs) => new Set((refs || []).map(r => String(r).split('#')[0]));
+const labelOfKey = (L, k) => { const s = (L.material?.sources || []).find(x => x.key === k); return s ? s.label : k; };
+const VIEWS = {
+  5: (doc, R, L) => {
+    const v = L.views, c = v.corefAgreement;
+    const rows = v.referents.map(r => `<tr><td class="mono">${esc(r.name)}</td><td>${r.surfaces.map(s => `<span class="chip b">${esc(s)}</span>`).join('')}</td></tr>`).join('');
+    const pairs = (list, want) => list.map(p => `<tr><td class="mono">${esc(p.a)}</td><td class="mono">${esc(p.b)}</td><td class="${p.merged === want ? 'ok' : 'bad'}">${p.merged ? 'gathered as one being' : 'kept apart'}</td></tr>`).join('');
+    const head = '<thead><tr><th>surface</th><th>surface</th><th>the reading</th></tr></thead>';
+    return `
+      <p class="note" style="margin-top:0">A capitalised run is only a symbol. This rung folds runs into <b>beings the material establishes</b>, by the fold's own individuation rule: generic tokens (titles, family names, demonyms) are stripped from both sides and the remainders compared. The control name <span class="mono">${esc(v.absentName)}</span> must resolve to nobody.</p>
+      <div class="row"><span class="badge live">${v.referents.length} referents</span><span class="badge">${c.didMerge}/${c.shouldMerge} gathered that the rule calls one</span><span class="badge">${c.shouldWithhold - c.wronglyMerged.length}/${c.shouldWithhold} kept apart that it withholds on</span><span class="badge">${c.abstained} abstained — one side bare</span></div>
+      ${rows ? `<table><thead><tr><th>referent</th><th>surfaces it gathered</th></tr></thead><tbody>${rows}</tbody></table>` : '<span class="empty">No referent admitted.</span>'}
+      ${c.regime1.length ? `<h3 class="lh">pairs the rule calls one being</h3><table>${head}<tbody>${pairs(c.regime1, true)}</tbody></table>` : ''}
+      ${c.regime2.length ? `<h3 class="lh">near misses the rule keeps apart</h3><table>${head}<tbody>${pairs(c.regime2, false)}</tbody></table>` : ''}`;
+  },
+  6: (doc, R, L) => `
+    ${fold(`the reading — EOT atoms (${R.claims.length})`, atomsCard(doc, R), R.claims.length <= 12)}
+    ${fold('the stance class — position read, label untouched', stanceCard(doc, R))}
+    ${fold('polytemporality — time is local, never a global clock', timeCard(doc, R))}`,
+  7: (doc, R, L) => {
+    const p = L.views.pronouns;
+    const b = p.bindings.map(x => `<tr><td class="mono">${esc(x.pronoun)}</td><td class="mono">${x.offset ?? '—'}</td><td class="ok">${esc(x.name)}</td></tr>`).join('');
+    const g = p.gaps.slice(0, 30).map(x => `<tr><td class="mono">${esc(x.pronoun ?? '')}</td><td class="mono">${x.offset ?? '—'}</td><td class="warn">${esc(x.reason)}</td><td style="color:var(--dim)">${esc(x.detail || '')}</td></tr>`).join('');
+    return `
+      <p class="note" style="margin-top:0">Earlier sentences leave an activation trace; a later pronoun binds only to an admitted referent that clears the margin over its runner-up. A pronoun with no clear antecedent is <b>refused</b> — a correct result, never a guess. The resolver runs on its default register, <b>English third person</b>; another language’s pronouns are not looked for here.</p>
+      <div class="row"><span class="badge live">${p.bindings.length} bound</span><span class="badge">${p.gaps.length} refused</span></div>
+      ${b ? `<table><thead><tr><th>pronoun</th><th>offset</th><th>bound to</th></tr></thead><tbody>${b}</tbody></table>` : ''}
+      ${g ? `<h3 class="lh">refused</h3><table><thead><tr><th>pronoun</th><th>offset</th><th>reason</th><th>why</th></tr></thead><tbody>${g}</tbody></table>` : ''}
+      ${!b && !g ? '<span class="empty">The resolver found no he / she / they here to bind or to refuse.</span>' : ''}`;
+  },
+  8: (doc, R, L) => {
+    const e = L.spec.specimen;
+    const pre = e ? `${e.subject} ${e.verb} ${e.object}.` : '';
+    const rev = e ? `${e.object} ${e.verb} ${e.subject}.` : '';
+    return `
+      <p class="note" style="margin-top:0">The material's whole edge set becomes the rule a claim is measured against. Type any claim — one the text never states, or states backwards — and the judge gives it a verdict, with the passages it read. <b>bound</b> means the material states it; anything else is a refusal, never an implied falsehood.</p>
+      <div class="claimbox"><input id="claim" value="${esc(pre)}" placeholder="Someone did something to someone."><button id="judge">check against the material</button>${rev ? `<button id="judge-rev" data-c="${esc(rev)}">the same, reversed</button>` : ''}</div>
+      <div id="judged" style="margin-top:10px"></div>`;
+  },
+  9: (doc, R, L) => {
+    const rows = [...L.views.edges].sort((a, b) => (b.refs?.length ?? 0) - (a.refs?.length ?? 0)).slice(0, 14)
+      .map(e => `<tr><td class="mono">${edgeText(e)}</td><td class="mono">${e.refs?.length ?? 0}</td><td class="mono">${sourcesOf(e.refs).size}</td></tr>`).join('');
+    return `
+      <p class="note" style="margin-top:0">Two passages of one source are one perspective twice; two sources are two. A passage's ref is <span class="mono">source#start-end</span> and a source is the part before <span class="mono">#</span>, so the two counts stay apart. Witness floor: ${WITNESS_FLOOR}. Sources are counted as you brought them: shared verbatim text is <b>not measured</b> here (canon’s <span class="mono">sharedTextGroups</span> needs thresholds a caller declares, and this page declares none), so two copies of one text would count as two sources.</p>
+      ${rows ? `<table><thead><tr><th>edge</th><th>passages</th><th>sources</th></tr></thead><tbody>${rows}</tbody></table>` : '<span class="empty">No edges.</span>'}`;
+  },
+  10: (doc, R, L) => {
+    const rows = L.views.slots.slice(0, 14).map(s => `<tr><td class="mono">${esc(s.subject)} <span class="lb">—${esc(s.verb)}→</span> __</td><td class="mono ${s.fillers.length >= 2 ? 'ok' : ''}">${s.fillers.length}</td><td>${s.fillers.map(f => `<span class="chip g">${esc(f)}</span>`).join('')}</td></tr>`).join('');
+    return `
+      <p class="note" style="margin-top:0">An instance says <i>X did Y to Z</i>. A slot asks <i>X did Y to whom — all of them</i>: a variable with a range. The task needs a slot the material fills at least twice, and a subject nobody is must range over nothing.</p>
+      ${rows ? `<table><thead><tr><th>open slot</th><th>range</th><th>fillers</th></tr></thead><tbody>${rows}</tbody></table>` : '<span class="empty">No slots.</span>'}`;
+  },
+  11: (doc, R, L) => {
+    const edges = L.views.edges.filter(e => e.assertion);
+    const corr = edges.filter(e => e.assertion.standing === 'corroborated');
+    const single = edges.filter(e => e.assertion.standing === 'single-witness');
+    const rows = [...corr, ...single.slice(0, 6)].map(e => `<tr><td class="mono">${edgeText(e)}</td><td class="mono">${e.assertion.statements ?? '—'}</td><td class="${e.assertion.standing === 'corroborated' ? 'ok' : ''}">${esc(e.assertion.standing)}</td></tr>`).join('');
+    return `
+      <p class="note" style="margin-top:0">An edge stops being taken as recovered fact and becomes a <b>hypothesis</b>: is its connector asserted, or an artefact of word order? Each edge carries a standing from the statements behind it — <b>corroborated</b> at the witness floor (${WITNESS_FLOOR}), else <b>single-witness</b> — and the arms ask whether that labelling could have come from chance or from word salad.</p>
+      <div class="row"><span class="badge live">${corr.length} corroborated</span><span class="badge">${single.length} single-witness</span><span class="badge">${L.views.edges.length - edges.length} with no standing</span></div>
+      ${rows ? `<table><thead><tr><th>edge</th><th>statements</th><th>standing</th></tr></thead><tbody>${rows}</tbody></table>` : ''}`;
+  },
+  12: (doc, R, L) => {
+    const g = L.views.grid;
+    if (!g) return '<span class="empty">No specimen claim to build the grid from.</span>';
+    const verdictCls = (v) => v === 'holds' ? 'ok' : v === 'fails' ? 'bad' : 'warn';
+    const rows = g.tasks.map((t, i) => { const a = g.absentTasks[i] || {}; return `<tr><td>${esc(t.terrain)}</td><td class="${verdictCls(t.verdict)}">${esc(t.verdict)}</td><td class="${verdictCls(a.verdict)}">${esc(a.verdict || '—')}</td></tr>`; }).join('');
+    return `
+      <p class="note" style="margin-top:0">Nine checks, ordered by presupposition: <b>Existence gates Structure gates Interpretation</b>. When the subject does not exist, every check downstream becomes a typed gap (<span class="mono">not_yet_executable</span>), never a false — something no single check can produce.</p>
+      <table><thead><tr><th>cell</th><th class="mono">${esc(g.claim)}</th><th class="mono">${esc(g.absentClaim)}</th></tr></thead><tbody>${rows}</tbody></table>`;
+  },
+  13: (doc, R, L) => {
+    const v = L.views;
+    const sys = v.systems.map(k => `<span class="chip b" title="${esc(labelOfKey(L, k))}">${esc(v.bySource ? labelOfKey(L, k) : k)}</span>`).join('');
+    const merges = v.merges.map(m => `
+      <div class="card" style="margin-top:10px"><h3>${edgeText(m.edge)} — ${esc(m.merged.case)} / ${esc(m.merged.standing)}</h3>
+        <table><thead><tr><th>system</th><th>its own verdict</th></tr></thead><tbody>${m.readings.map(r => `<tr><td>${esc(v.bySource ? labelOfKey(L, r.who) : r.who)}</td><td class="${r.verdict === 'holds' ? 'ok' : ''}">${esc(r.verdict)}</td></tr>`).join('')}</tbody></table></div>`).join('');
+    return `
+      <p class="note" style="margin-top:0">Each ${v.bySource ? 'source' : 'passage'} is read as its own whole system, and a claim's <b>standing across them</b> — corroborated, or a lone voice — is the finding. Below the merge, a system that states the claim just says <i>holds</i>; no member carries the standing.${v.bySource ? '' : ' <b>Here the systems are passages of one source</b>, as the lineage battery read one article — not independent witnesses. Drop several files, or load the titanic sample, to compare sources.'}</p>
+      <div class="row">${sys || '<span class="empty">One system only.</span>'}</div>
+      ${merges || '<span class="empty">No claim was found that two or more systems bind, beside one that exactly one binds.</span>'}`;
+  },
+};
+
+// ── what each floor read: the floors whose task is a Commons item show that item's view ──
+const FLOOR_VIEWS = {
+  F0: (doc, R, L) => {
+    const u = L.views.units;
+    const rows = u.rows.slice(0, 12).map(r => `<tr><td class="mono">byte ${r.b0}–${r.b1}</td><td class="${r.back ? 'ok' : 'bad'}">${r.back ? 're-opens' : 'does not re-open'}</td><td class="${r.splits ? 'bad' : ''}">${r.splits ? 'cut inside a word' : 'at a break'}</td><td style="color:var(--dim)">${esc(clamp(r.text.trim(), 140))}</td></tr>`).join('');
+    return `
+      <p class="note" style="margin-top:0">Every floor above cites a unit by its byte range, so the range must re-open to exactly the unit’s text and the cut must sit where the material itself breaks. What the reader <b>receives</b> rather than reads — the word-class and morphology priors — sits here too, unscored: every floor reads with it.</p>
+      <div class="row"><span class="badge live">${u.n} units</span><span class="badge">${u.reopen} of ${u.n} re-open</span><span class="badge">${u.inWord} cuts inside a word</span><span class="badge">${u.overlap} overlaps</span></div>
+      ${rows ? `<table><thead><tr><th>address</th><th>re-open</th><th>cut</th><th>unit</th></tr></thead><tbody>${rows}</tbody></table>${u.n > 12 ? `<p class="note">first 12 of ${u.n} units shown</p>` : ''}` : ''}
+      ${fold('what came in', inputCard(doc, R))}
+      ${fold('everything is byte-addressed & auditable', bytesCard(doc, R))}
+      ${fold('word classes — received, not scored', grammarCard(doc, R))}
+      ${fold('morphology — received, not scored (UniMorph)', morphCard(doc, R))}
+      ${fold('priors — received, named, never derived', priorsCard(doc, R))}`;
+  },
+  F1: (doc, R, L) => VIEWS[5](doc, R, L),
+  F2: (doc, R, L) => VIEWS[6](doc, R, L),
+  F3: (doc, R, L) => VIEWS[8](doc, R, L),
+  'F4½': () => `
+      <p class="note" style="margin-top:0">Canon’s nesting floor holds a claim in an end slot — <span class="mono">Tolstoy —states→ claim:…</span> — as an ordinary note, and its wall is why it exists: <b>witnesses of an outer note never corroborate the inner claim</b>, so “papers report he said it” never becomes “sources confirm it” (<span class="mono">organs/nesting.js</span>).</p>
+      <p class="note">No organ on this page nests. The reader binds surfaces into its end slots, never <span class="mono">claim:&lt;id&gt;</span>, and canon’s one producer of nested notes, <span class="mono">organs/ranke.js</span>, follows a page’s citations, which this page does not fetch. So F4½ is a typed gap here and no stage is read across it. Detecting reported speech with a list of saying-verbs would get past the gap, and is exactly what this page does not do.</p>`,
+  F5: (doc, R, L) => VIEWS[9](doc, R, L),
+  F6: (doc, R, L) => {
+    const p = L.views.premises, fl = L.views.premiseFloor;
+    const ends = (n) => `${esc(n.subject)} <span class="lb">—${esc(n.verb)}→</span> ${esc(n.object)}`;
+    const prem = p.premises.slice(0, 12).map(n => `<tr><td class="mono">${ends(n)}</td><td class="mono ok">${sourcesOf(n.witnesses).size}</td></tr>`).join('');
+    const stop = [...p.stopped].sort((a, b) => b.sources - a.sources).slice(0, 12).map(n => `<tr><td class="mono">${ends(n)}</td><td class="mono">${n.sources}</td><td class="mono">${n.instruments}</td></tr>`).join('');
+    return `
+      <p class="note" style="margin-top:0">A note stands as a premise only at the declared floor — <b>${fl.sources} distinct sources</b>, with instrument independence not required here (<span class="mono">instruments: ${fl.instruments}</span>, declared). A note below the floor is <b>stopped</b> with the counts it had, never dropped (<span class="mono">organs/derivation.js::premisesOf</span>). Sources are counted as brought; shared verbatim text is not measured here. Composing premises needs chemistry a giver declared in the declarations register; this page holds none, so nothing is derived here.</p>
+      <div class="row"><span class="badge live">${p.premises.length} premises</span><span class="badge">${p.stopped.length} stopped below the floor</span></div>
+      ${prem ? `<table><thead><tr><th>premise</th><th>sources</th></tr></thead><tbody>${prem}</tbody></table>` : ''}
+      ${stop ? `<h3 class="lh">stopped — the counts each had</h3><table><thead><tr><th>note</th><th>sources</th><th>instruments</th></tr></thead><tbody>${stop}</tbody></table>${p.stopped.length > 12 ? `<p class="note">12 of ${p.stopped.length} shown, most-sourced first</p>` : ''}` : ''}`;
+  },
+};
+
+function wireClaimBox(L){
+  const box = $('claim'); if (!box) return;
+  const out = $('judged');
+  const run = (claim) => {
+    const got = judge(L.reader, claim);
+    out.innerHTML = got.length ? got.map(c => `<div class="atom ${c.verdict === 'bound' ? '' : 'asserted'}"><div class="tri"><span class="e1">${esc(c.end1)}</span> <span class="lb">—${esc(c.label)}→</span> <span class="e2">${esc(c.end2)}</span></div>
+      <div class="meta"><span><b>verdict</b> ${esc(c.verdict)}</span><span><b>polarity</b> ${esc(c.polarity || '+')}</span><span><b>read in</b> ${c.refs.length ? c.refs.map(esc).join(', ') : '—'}</span>${c.corroboration ? `<span><b>corroboration</b> ${c.corroboration.passages} passage(s), ${c.corroboration.sources} source(s)</span>` : ''}</div></div>`).join('')
+      : '<span class="empty">The judge found no claim in that sentence to check — it needs someone doing something to someone.</span>';
+  };
+  $('judge').addEventListener('click', () => run(box.value));
+  box.addEventListener('keydown', (e) => { if (e.key === 'Enter') run(box.value); });
+  const rev = $('judge-rev');
+  if (rev) rev.addEventListener('click', () => { box.value = rev.dataset.c; run(box.value); });
+  if (box.value) run(box.value);
 }
 
 // ── 0 · what came in ────────────────────────────────────────────────────────
 function inputCard(doc, R){
   const distinct = new Set(R.toks).size;
-  return section(0, 'what came in', 'the material, its shape, and what the page read it as', `
+  return sub('the material, its shape, and what the page read it as', `
     <div class="grid g3">
       ${card('shape', [
         ['label', esc(doc.label)],
+        ['sources', doc.sources.length + (doc.sources.length > 1 ? ' — each read as its own source' : '')],
+        ['passages', doc.passages + ' — cut at sentence boundaries, ≤ 1,200 chars'],
         ['characters', doc.chars.toLocaleString()],
         ['bytes (utf-8)', doc.bytes.toLocaleString()],
         ['sentences', R.sentences.length.toLocaleString()],
@@ -242,7 +593,8 @@ function inputCard(doc, R){
         ['determinism', 'same bytes → same reading, ids included'],
       ])}
     </div>
-    ${doc.truncated ? `<p class="note">The file is longer than 14,000 characters; the <b>whole file</b> is hashed and addressed (above), but the live reading, below, is shown over its first 14,000 characters so the page stays responsive. The fold's own corpus path (<span class="mono">readCorpus</span>) chunks a whole book the same honest way.</p>` : ''}
+    ${doc.sources.length > 1 ? `<table style="margin-top:12px"><thead><tr><th>source key</th><th>what it is</th><th>characters read</th></tr></thead><tbody>${doc.sources.map(s => `<tr><td class="mono">${esc(s.key)}</td><td>${esc(s.label)}</td><td class="mono">${s.text.length.toLocaleString()}</td></tr>`).join('')}</tbody></table>` : ''}
+    ${doc.truncated ? `<p class="note">The material is longer than 14,000 characters; the <b>whole of it</b> is hashed (above), but the live reading is shown over the first ${doc.per.toLocaleString()} characters of each source so the page stays responsive. The fold's own corpus path (<span class="mono">readCorpus</span>) chunks a whole book the same honest way.</p>` : ''}
   `);
 }
 
@@ -251,7 +603,7 @@ function bytesCard(doc, R){
   const led = new EotLedger({ artifact: 'reading-microscope', encoding: 'utf8' });
   const srcId = led.source({ kind: 'document', locator: sha256Hex(doc.analysis).slice(0, 20), anchor: byteRange(0, utf8Len(doc.analysis)), meta: { label: doc.label } });
   const hex = [...enc.encode(doc.analysis.slice(0, 48))].map(b => b.toString(16).padStart(2,'0')).join(' ');
-  return section(1, 'everything is byte-addressed & auditable', 'an id you can recompute; an address you can re-open', `
+  return sub('an id you can recompute; an address you can re-open', `
     <p class="note">There is no floating claim here. The document becomes a <b>source</b>, stored once under a stable key derived from its own bytes, and every reading below points back into it by <b>byte range</b>. Anyone can recompute the id and re-open the exact bytes — that is the whole of the audit.</p>
     <div class="grid g2">
       ${card('the address', [
@@ -298,7 +650,7 @@ function grammarCard(doc, R){
     }
     rows += `<div style="margin:10px 0 14px"><div class="evt-rd" style="color:var(--faint);font:11.5px var(--mono);margin-bottom:4px">sentence ${s.order} · ${utf8Len(s.text)} bytes · offset ${s.offset}</div><div>${cells}</div></div>`;
   }
-  return section(2, 'grammar first', 'Dionysius Thrax over Universal Dependencies — an occurrence, never collapsed', `
+  return sub('Dionysius Thrax over Universal Dependencies — an occurrence, never collapsed', `
     <p class="note">Before any meaning, the page asks of each word <b>only what class its form is attested as</b> — a translation from the Universal Dependencies treebank (a real, human-annotated count) into Dionysius Thrax's eight ancient categories. The counts are the giver's; the reading is declared, never inherited.</p>
     <div class="row" style="margin:6px 0 2px">
       <span class="badge">${tagged} forms tagged</span>
@@ -343,7 +695,7 @@ function morphCard(doc, R){
     const cand = [...lem.lemmasOf(w)].sort((a,b)=>a.length-b.length);
     return `<tr><td class="mono">${esc(w)}</td><td class="mono">${cand.map(esc).join(', ')}</td><td class="mono">${stem.map(esc).join(', ') || '—'}</td></tr>`;
   }).join('');
-  return section(3, 'morphology — the act closure (UniMorph)', 'prior decides sameness; the material decides presence', `
+  return sub('prior decides sameness; the material decides presence', `
     <p class="note">A reader who has learned "<i>trudged</i>" hears "<i>trudges</i>" and "<i>trudging</i>" for free. The engine does the same, on <b>two walls</b>:</p>
     <div class="grid g2">
       ${card('wall 1 — the prior decides sameness', [
@@ -372,7 +724,7 @@ function morphCard(doc, R){
 // ── 3b · STANCE (the one construction worth calling out) ────────────────────
 function stanceCard(doc, R){
   const withStance = R.claims.filter(c => /support|oppos|against|pro|criticiz|condemn|endors|prais|backed|favou|advocat|denounc|boycott|resist|protest/i.test(c.label || ''));
-  return section("3b", 'the stance class — position read, label untouched', '“is pro” binds a source’s “in support of”, without rewriting either', `
+  return sub('“is pro” binds a source’s “in support of”, without rewriting either', `
     <p class="note">A position — X supports Y — is read when it takes the plain verb form. The construction the base reader cannot hear is the <b>copula + adjective</b> ("is pro", "is opposed to"). On this page the stance class is read as a relation, and a stance is equated with its own paraphrases at the <b>class</b> level — the label a source was read from is carried through verbatim, never rewritten.</p>
     <div class="row">${withStance.length ? withStance.map(c => `<span class="chip b">${esc(c.label)}</span>`).join('') : '<span class="empty">No stance relation bound in this material.</span>'}</div>
     <p class="note">Falsifiable: this reader was measured against its own shuffle-null, and a swap that did <b>not</b> beat its null was reverted rather than kept. The negative result stays in the code.</p>
@@ -414,7 +766,7 @@ function atomsCard(doc, R){
     </div>`).join('') : `<span class="empty">The reader bound no relation here. That is a real, honest result — it refuses to guess rather than invent one. Try a sample with clear actors and verbs, or a longer passage.</span>`;
   const counts = { read: 0, 'beyond reach': 0, unheard: 0 };
   atoms.forEach(a => { counts[a.standing] = (counts[a.standing] || 0) + 1; });
-  return section(4, 'the reading — EOT atoms', 'what the reader actually heard: subject —act→ object, with its verdict', `
+  return sub('what the reader actually heard: subject —act→ object, with its verdict', `
     <p class="note">This is the reading itself. The hypergraph reads a clause as <b>(subject, act, object)</b> and attaches a <b>verdict</b> to every atom — including the ones it cannot read. A refusal is a result, not a failure: <b>nothing here is ever implied false</b>.</p>
     ${card('the three tiers — the ways it reads, and the ways it declines', [
       ['read', 'both endpoints resolve to a referent this material establishes'],
@@ -432,7 +784,7 @@ function atomsCard(doc, R){
 }
 
 // ── 5 · THE LOG ─────────────────────────────────────────────────────────────
-function logCard(doc, R){
+function logCard(doc, R, L){
   const led = new EotLedger({ artifact: 'reading-microscope', encoding: 'utf8' });
   const srcId = led.source({ kind: 'document', locator: sha256Hex(doc.analysis).slice(0, 20), anchor: byteRange(0, utf8Len(doc.analysis)), meta: { label: doc.label } });
   const readEvt = led.event({ stage: 'read', source_id: srcId, transform: 'bytes→sentences' });
@@ -445,20 +797,27 @@ function logCard(doc, R){
     led.event({ stage: 'bind', source_id: srcId, parent: readEvt, unit: 'relation', range: byteRange(b0, b1),
       transform: 'clause→relation', detail: { end1: c.end1, label: c.label, end2: c.end2, polarity: c.polarity || '+' } });
   });
+  // every rung's verdict is appended too: a stage is a reading of the log, never a number beside it
+  if (L){
+    for (const it of L.report.items) led.event({ stage: 'measure', source_id: srcId, parent: readEvt, transform: `mhc order ${it.order} · ${it.name}`,
+      detail: { item: it.id, status: it.status, ...(it.reason ? { reason: it.reason } : {}) } });
+    led.event({ stage: 'stage', source_id: srcId, parent: readEvt, transform: 'orders→stage (mhc.js stageFrom)',
+      detail: { stage: L.stage.stage, cappedBy: L.stage.cappedBy?.order ?? null, isolated: L.stage.isolated.map(o => o.order) } });
+  }
   const eot = led.eot({ root: readEvt });
   const evRows = led.events.map(ev => `<div class="evt">
       <span class="id">${esc(ev.event_id.slice(0, 14))}</span>
       <span><span class="st">${esc(ev.stage)}</span> <span class="rd">${esc(ev.transform || '')}</span>${ev.range ? ` <span class="rd">· byte ${ev.range.start}–${ev.range.end}</span>` : ''}${ev.detail ? ` <span class="rd">· ${esc(clamp(JSON.stringify(ev.detail), 90))}</span>` : ''}${ev.parent ? ` <span class="rd">· parent ${esc(ev.parent.slice(0,10))}</span>` : ''}</span>
     </div>`).join('');
   window.__LED = { led, srcId, readEvt };
-  return section(5, 'the log — Provenance@2, append-only', 'transformations, not citations; ids you can recompute', `
+  return section('log', 'the log — Provenance@2, append-only', 'transformations, not citations; ids you can recompute', `
     <p class="note">The reading is not thrown away; it is <b>appended to a provenance ledger</b>. A source is stored once under its stable key; every event points to a source and to a parent. The stage names the <b>transformation</b> — read, arrange, bind — never a bare citation. The id derivation is penelope's own: <span class="mono">evt_ + first 20 hex of sha256(JSON.stringify(value))</span> — so the same reading always yields the <b>same ids</b>, and a third party can recompute the whole log.</p>
     <div class="grid g2">
       <div class="card"><h3>events (${led.events.length})</h3>${evRows}</div>
       <div class="card"><h3>the document, as emitted</h3><pre>${esc(JSON.stringify(swapSources(eot), null, 1)).slice(0, 3400)}</pre></div>
     </div>
-    <p class="note">Read the events as a chain of transforms on the material's own bytes: <span class="mono">bytes→sentences→tokens→…→relation</span>, each anchored to the range it came from. Nothing is asserted without the address it was read at.</p>
-  `);
+    <p class="note">Read the events as a chain of transforms on the material's own bytes: <span class="mono">bytes→sentences→tokens→…→relation→measure→stage</span>, each anchored to the range it came from. Nothing is asserted without the address it was read at.</p>
+  `, 'log');
 }
 function swapSources(eot){ // keep the JSON readable: sources keyed once
   return { schema: eot.schema, artifact: eot.artifact, addressSpace: eot.addressSpace, sources: eot.sources, events: eot.events.map(e => ({ event_id: e.event_id, stage: e.stage, parent: e.parent || undefined, transform: e.transform || undefined, range: e.range || undefined, detail: e.detail || undefined })) };
@@ -467,7 +826,7 @@ function swapSources(eot){ // keep the JSON readable: sources keyed once
 // ── 6 · PRIORS ──────────────────────────────────────────────────────────────
 function priorsCard(doc, R){
   const pos = PRIORS.posPrior, mr = PRIORS.morphRaw;
-  return section(6, 'priors — received, named, never derived', 'a missing prior is a typed gap, never a silent guess', `
+  return sub('a missing prior is a typed gap, never a silent guess', `
     <p class="note">Everything above was read without a model. What it <i>did</i> receive are <b>priors</b>: knowledge injected from outside, each naming its giver. The engine derives none of it. Where a prior is absent, the reading widens its gap loudly rather than quietly changing its answer.</p>
     <table><thead><tr><th>prior</th><th>schema</th><th>giver</th><th>the wall it holds</th></tr></thead><tbody>
       <tr><td>part of speech</td><td class="mono">${esc(pos.schema)}</td><td>${esc(pos.provenance.giver)}</td><td>attests classes per form; code picks no winner</td></tr>
@@ -499,7 +858,7 @@ function timeCard(doc, R){
     const T = hasSpan ? localTense(sp.text) : { v: 'unlocated', why: 'the claim carried no span — nothing to place in the material' };
     return `<tr><td class="mono">${b0 == null ? '<span class="gap">—</span>' : 'byte ' + b0}</td><td class="mono">${esc(c.label)}</td><td><span class="chip ${T.v==='undeclared'||T.v==='unlocated'?'':'b'}">${T.v}</span></td><td>${esc(T.why)}</td></tr>`;
   }).join('');
-  return section(7, 'polytemporality — time is local, never a global clock', 'each atom carries its own time read from its own clause', `
+  return sub('each atom carries its own time read from its own clause', `
     <p class="note">There is <b>no universal clock</b> in this reading. Each atom is anchored in its own <b>byte range</b> — its own coordinate in the material — and its time is read from its <b>own clause</b>, not from a shared counter or an arrival order. Two atoms about the same referent ("the council opposed…" / "…the governor supported it") are not ordered by a clock; each stands at its own address with its own tense.</p>
     <p class="note">The engine's own tense organ (<span class="mono">adapters/text/clause-tense.js</span>, giver: UD_English-EWT through the Chomsky parser) reads <span class="mono">Pqp</span> as <i>"a past before a past"</i> off the had+participle construction, <span class="mono">Fut</span> off a modal, and <span class="mono">undeclared</span> where no finite verb exists — counted, never guessed. The column below shows the <b>same shape</b> read by this page's own declared rule, so the mechanism is visible; swap in the engine's organ for the full inverse (<span class="mono">go → went</span>, <span class="mono">lay → lie</span>) it would read.</p>
     <table><thead><tr><th>local coordinate</th><th>act</th><th>local tense signal</th><th>how it was read</th></tr></thead><tbody>${rows || '<tr><td colspan="4" class="empty">No atoms to place.</td></tr>'}</tbody></table>
@@ -509,7 +868,7 @@ function timeCard(doc, R){
 
 // ── REVISABLE ASSERTIONS (wired after render) ───────────────────────────────
 function wireAtoms(doc, R){
-  const host = document.querySelector('section[data-n="4"]');
+  const host = document.querySelector('section[data-n="F2"]');
   if (!host) return;
   const led = window.__LED.led;
   host.querySelectorAll('.atom').forEach(el => {
@@ -530,7 +889,7 @@ function wireAtoms(doc, R){
       const badge = document.createElement('span');
       badge.className = 'chip a'; badge.textContent = 'revised · ' + evt.slice(0, 12);
       meta.appendChild(badge);
-      const logHost = document.querySelector('section[data-n="5"] .card');
+      const logHost = document.querySelector('section[data-n="log"] .card');
       if (logHost){
         const row = document.createElement('div');
         row.className = 'evt';
@@ -542,10 +901,15 @@ function wireAtoms(doc, R){
   });
 }
 
-function section(n, title, why, body){
-  return `<section data-n="${n}">
+function section(n, title, why, body, id){
+  return `<section data-n="${n}"${id ? ` id="${id}"` : ''}>
     <div class="h"><span class="n">${n}</span><h2>${esc(title)}</h2><span class="why">${esc(why)}</span></div>
     <div class="b">${body}</div></section>`;
+}
+// a layer's own body, under its one-line why (the layers now nest inside a rung or the floor)
+function sub(why, body){ return `<p class="why-line">${esc(why)}</p>${body}`; }
+function fold(title, body, open = false){
+  return `<details class="fold"${open ? ' open' : ''}><summary>${esc(title)}</summary><div class="fb">${body}</div></details>`;
 }
 function card(title, kvs){
   return `<div class="card"><h3>${esc(title)}</h3>${kvs.map(([k,v]) => `<div class="kv"><span class="k">${esc(k)}</span><span class="v">${v}</span></div>`).join('')}</div>`;
@@ -554,18 +918,36 @@ function card(title, kvs){
 // ── INPUT WIRING ────────────────────────────────────────────────────────────
 const drop = $('drop'), file = $('file'), ta = $('ta');
 drop.addEventListener('click', () => file.click());
-file.addEventListener('change', async () => { const f = file.files[0]; if (f) read(await f.text(), f.name); });
+// several files → several sources, each its own `source#…` in every ref
+async function readFiles(files){
+  const list = [...(files || [])];
+  if (!list.length) return false;
+  read(await Promise.all(list.map(async (f, i) => ({ key: list.length > 1 ? `file-${i + 1}` : 'file', label: f.name, text: await f.text() }))));
+  return true;
+}
+file.addEventListener('change', () => readFiles(file.files));
 ['dragenter','dragover'].forEach(e => drop.addEventListener(e, ev => { ev.preventDefault(); drop.classList.add('hot'); }));
 ['dragleave','drop'].forEach(e => drop.addEventListener(e, ev => { ev.preventDefault(); drop.classList.remove('hot'); }));
 drop.addEventListener('drop', async ev => {
-  const f = ev.dataTransfer.files && ev.dataTransfer.files[0];
-  if (f) return read(await f.text(), f.name);
+  if (await readFiles(ev.dataTransfer.files)) return;
   const t = ev.dataTransfer.getData('text');
   if (t) read(t, 'dropped text');
 });
 $('read').addEventListener('click', () => read(ta.value, 'pasted text'));
 $('clear').addEventListener('click', () => { ta.value = ''; reset(); });
-$('samples').addEventListener('click', e => { const s = e.target.dataset.s; if (s){ ta.value = SAMPLES[s]; read(SAMPLES[s], 'sample · ' + s); } });
+$('samples').addEventListener('click', async e => {
+  const s = e.target.dataset.s;
+  if (!s) return;
+  if (s === 'titanic'){
+    ta.value = '';
+    $('out').innerHTML = `<section><div class="b"><span class="spin">fetching the four 1912 accounts from the Holodeck's sample set…</span></div></section>`;
+    try { read(await titanicSources()); }
+    catch (err) { $('out').innerHTML = `<section><div class="b"><span class="gap">The sample set could not be fetched (${esc(err.message || err)}). Every other part of this page is local; this one sample is not.</span></div></section>`; }
+    return;
+  }
+  ta.value = SAMPLES[s];
+  read([{ key: s, label: 'sample · ' + s, text: SAMPLES[s] }]);
+});
 window.__read = read; window.__SAMPLES = SAMPLES; window.__net = net;
 </script>
 </body>
