@@ -42,7 +42,7 @@ import { relationExtractorsFor } from "../adapters/text/relations-language.js";
 import { classifyWord, dominantClass } from "../adapters/text/wordclass.js";
 import { createLemmatizer, morphologyFromPrior } from "../adapters/text/morphology.js";
 import * as P from "../adapters/text/priors.js";
-import { aliasJunctions, resolveAliases } from "../organs/lexicon.js";
+import { aliasJunctions, resolveAliases, dottedIn } from "../organs/lexicon.js";
 import { extractSurfacesHeard, languageContextFor } from "./language-context.js";
 import { stemOf } from "./language-grammar.js";
 import { tokenEvents, surpriseCut } from "./surprise-gate.mjs";
@@ -53,14 +53,14 @@ export const READ_CORE = Object.freeze({
   schema: "ReadCore@1",
   module: "native/the-fold/read-core.mjs",
   priors: "by name through prior-source.mjs: pos-<stem>, pos-<stem>-lexicon, morphology-<stem>, punctuation-<stem> (janus/priors)",
-  abbreviations: "the measured punctuation prior + the text's own + the hyperlexicon's aliases; never a hand list",
+  abbreviations: "the measured punctuation prior + the text's own + the hyperlexicon's dotted words (read ahead, dotted-<stem>.json) and its live aliases; never a hand list",
   emits: "WeftEntry@4 + sentences, pronouns, language, abbreviations, gaps",
 });
 
 // ── priors ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 
 /** The received priors, from data handed in. Data-gated: an absent piece leaves that leg bare (exact match), never a guess. */
-export function buildPriors({ pos = null, posLexicon = null, morphology = null, unimorph = null, punctuation = null, stem = null } = {}) {
+export function buildPriors({ pos = null, posLexicon = null, morphology = null, unimorph = null, punctuation = null, dotted = null, stem = null } = {}) {
   // a copy, so the class lexicon rides this reader's prior and never the shared one other organs read
   const posPrior = pos ? (posLexicon ? { ...pos, lexicon: posLexicon } : pos) : null;
   const morph = morphology ? morphologyFromPrior(morphology) : null;
@@ -87,7 +87,8 @@ export function buildPriors({ pos = null, posLexicon = null, morphology = null, 
   if (!posPrior) gaps.push({ gap: "no_pos_prior", stem, detail: `pos-${stem ?? "?"}.json absent: the vocabulary gate reads bare` });
   if (!lemmatizer) gaps.push({ gap: "no_morphology", stem, detail: `no morphology prior for ${stem ?? "?"}: verbs match exactly` });
   if (!punctuation) gaps.push({ gap: "no_punctuation_prior", stem, detail: `punctuation-${stem ?? "?"}.json absent: abbreviations come from the text and the hyperlexicon only` });
-  return { stem, posPrior, verbForms: forms.size ? forms : null, lemmatizer, punctuation: punctuation ?? null, gaps };
+  if (!dotted) gaps.push({ gap: "no_dotted_prior", stem, detail: `dotted-${stem ?? "?"}.json absent: only the live hyperlexicon knows the words written with their period` });
+  return { stem, posPrior, verbForms: forms.size ? forms : null, lemmatizer, punctuation: punctuation ?? null, dotted: dotted ? new Set(dotted.words || []) : null, dottedGiver: dotted?.giver ?? null, gaps };
 }
 
 const priorCache = new Map();
@@ -102,6 +103,7 @@ export function priorsFor(language = "eng") {
     posLexicon: priorJson(`pos-${stem}-lexicon.json`),
     morphology: priorJson(`morphology-${stem}.json`),
     punctuation: priorJson(`punctuation-${stem}.json`),
+    dotted: priorJson(`dotted-${stem}.json`),
   });
   if (priorCache.size > 16) priorCache.clear();
   priorCache.set(key, built);
@@ -114,23 +116,40 @@ const variants = (t) => { const s = String(t); return [s, s.toLowerCase(), s.cha
 
 /** The tokens that keep their period, for one text. `abbreviations` (a caller's own set) is added, not substituted. */
 export function abbreviationsFor(text, { priors = null, aliases = [], abbreviations = null } = {}) {
+  const src = String(text ?? "").replace(/\r\n?/g, "\n");
   const fromPrior = priors?.punctuation?.abbreviations ?? [];
-  const derived = [...deriveAbbreviations(String(text ?? "").replace(/\r\n?/g, "\n"))];
+  const derived = [...deriveAbbreviations(src)];
+  // the hyperlexicon read ahead: the dotted words its giver lists (janus dotted-<stem>.json) that this text uses as words
+  const known = new Set([...fromPrior, ...derived].map((a) => String(a).toLowerCase()));
+  const fromDotted = priors?.dotted ? dottedIn(src, priors.dotted, known) : [];
   // the splitter tests the letter run before a period, so a dotted initialism ("U.S.") is kept by its last run ("S")
-  const fromAliases = [...aliases].map((a) => String(a).replace(/\.$/, "").split(".").pop()).filter(Boolean);
+  const lastRun = (a) => String(a).replace(/\.$/, "").split(".").pop();
+  const fromAliases = [...aliases, ...fromDotted].map(lastRun).filter(Boolean);
   const set = new Set();
   for (const t of [...fromPrior, ...derived, ...fromAliases, ...(abbreviations ?? [])]) for (const v of variants(t)) set.add(v);
-  return { set, n: set.size, prior: fromPrior.length, derived: derived.length, aliases: fromAliases.length, giver: priors?.punctuation?.giver ?? null };
+  return { set, n: set.size, prior: fromPrior.length, derived: derived.length, aliases: aliases.length, dotted: fromDotted.length, giver: priors?.punctuation?.giver ?? null };
 }
 
 /** Ask the hyperlexicon about the dotted forms the priors and the text cannot settle; keep each one the text's own use allows. */
 export async function consultAliases(text, lexicon, { priors = null } = {}) {
   if (!lexicon) return { aliases: [], rows: [], giver: null, gap: "no hyperlexicon was handed to this read" };
   const known = new Set([...(priors?.punctuation?.abbreviations ?? []), ...deriveAbbreviations(String(text ?? ""))].map((a) => String(a).toLowerCase()));
+  // what the dotted prior already settles is not asked again
+  for (const f of priors?.dotted ? dottedIn(String(text ?? ""), priors.dotted, known) : []) known.add(f.slice(0, -1).toLowerCase());
   const junctions = aliasJunctions(text, known);
   if (!junctions.size) return { aliases: [], rows: [], giver: lexicon.giver ?? null, gap: null };
   await lexicon.want(junctions.keys());
   const rows = resolveAliases(lexicon, junctions, text);
+  // the treebank's own evidence, the rule janus's dotted prior is built by (scripts/build-dotted-priors.mjs): a giver lists "ports."
+  // (portraits) and "Apr." beside the words "ports" and "APR", and a text that writes the word only at a stop cannot refuse them by
+  // its own use. A single-dot form whose base the class prior attests as a word is kept only where the class prior also attests the
+  // dotted token ("Inc.", "Dr.", "etc."). With no class prior the rule cannot be read, and the text's own use decides alone.
+  const attested = (f) => Object.values(priors?.posPrior?.forms?.[String(f).toLowerCase()] ?? {}).some((n) => n > 0);
+  if (priors?.posPrior?.forms) for (const r of rows) {
+    if (!r.kept || r.form.split(".").length !== 2) continue;
+    const base = r.form.slice(0, -1);
+    if (attested(base) && !attested(r.form)) Object.assign(r, { kept: false, why: `the treebank writes “${base}” as a word and never “${r.form}”` });
+  }
   const last = lexicon.log?.[lexicon.log.length - 1];
   return { aliases: rows.filter((r) => r.kept).map((r) => r.form), rows, giver: lexicon.giver ?? null, gap: last?.gap ?? null };
 }
@@ -270,7 +289,7 @@ export function readWith(text, { address = null, category = null, language = nul
   const pr = priors ?? priorsFor(stem);
   for (const g of pr.gaps ?? []) gaps.push(g);
   const abbr = abbreviationsFor(str, { priors: pr, aliases, abbreviations });
-  const empty = { schema: "WeftEntry@4", address, category, bytes, readCharacters: 0, vocabulary: null, cast: [], heard: [], edges: [], clauses: null, quality: null, surprise: null, sentences: [], pronouns: [], language: languageRead, abbreviations: { n: abbr.n, prior: abbr.prior, derived: abbr.derived, aliases: abbr.aliases }, aliasReport: aliasReport ?? null, gaps, error: null, ms: 0 };
+  const empty = { schema: "WeftEntry@4", address, category, bytes, readCharacters: 0, vocabulary: null, cast: [], heard: [], edges: [], clauses: null, quality: null, surprise: null, sentences: [], pronouns: [], language: languageRead, abbreviations: { n: abbr.n, prior: abbr.prior, derived: abbr.derived, aliases: abbr.aliases, dotted: abbr.dotted }, aliasReport: aliasReport ?? null, gaps, error: null, ms: 0 };
   if (str.trim().length < minCharacters) {
     // too short to read for relations, but its sentences are still cut the one way
     const raw0 = toRawOffsets(str);

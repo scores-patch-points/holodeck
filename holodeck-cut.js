@@ -1,18 +1,28 @@
 // holodeck-cut.js — the one statement cut for text the page holds no master reading of (a draft, an answer, a register sniff, a
 // layout fallback): khora's spans.js::splitSentences inside each line, told which dotted tokens are words by English's MEASURED
-// punctuation prior (janus priors/punctuation-eng.json, vendored as data), the text's own (spans.js::deriveAbbreviations) and any
-// abbreviations a caller hands in (a page's hyperlexicon aliases). A line is the outer unit: a statement never crosses a line
+// punctuation prior (janus priors/punctuation-eng.json, vendored as data), the hyperlexicon's dotted words read ahead (janus
+// priors/dotted-eng.json, kept where this text never writes the token without its period — organs/lexicon.js::dottedIn), the
+// text's own (spans.js::deriveAbbreviations) and any abbreviations a caller hands in (a page's hyperlexicon aliases). A line is the outer unit: a statement never crosses a line
 // break. A document the page reads goes through the master pipeline instead (holodeck-reader.js::readDocument), which cuts the
 // same way. SCOPE: the default prior is English's.
 //   cutLines(text, { abbreviations }) → [{ s, e, text }]   offsets into the text given; text.slice(s, e) === text
 import { splitSentences, deriveAbbreviations } from './vendor/khora/native/adapters/text/spans.js';
+import { dottedIn } from './vendor/khora/native/organs/lexicon.js';
 import PUNCT_ENG from './vendor/khora/native/priors/punctuation-eng.json' with { type: 'json' };
+import DOTTED_ENG from './vendor/khora/native/priors/dotted-eng.json' with { type: 'json' };
 
-const PRIOR = (PUNCT_ENG.abbreviations || []).flatMap((t) => [t, t.charAt(0).toUpperCase() + t.slice(1), t.toUpperCase()]);
+const variants = (t) => [t, t.charAt(0).toUpperCase() + t.slice(1), t.toUpperCase()];
+const PRIOR = (PUNCT_ENG.abbreviations || []).flatMap(variants);
+const DOTTED = new Set(DOTTED_ENG.words || []);
+// the splitter tests the letter run before a period, so a dotted initialism ("U.S.") is kept by its last run ("S")
+const lastRun = (form) => String(form).replace(/\.$/, '').split('.').pop();
 
 export function cutLines(text, { abbreviations = null } = {}) {
   const src = String(text ?? '');
-  const known = new Set([...PRIOR, ...(abbreviations || []), ...deriveAbbreviations(src)]);
+  const derived = [...deriveAbbreviations(src)];
+  const settled = new Set([...(PUNCT_ENG.abbreviations || []), ...derived].map((a) => String(a).toLowerCase()));
+  const dotted = dottedIn(src, DOTTED, settled).map(lastRun).flatMap(variants);
+  const known = new Set([...PRIOR, ...(abbreviations || []), ...derived, ...dotted]);
   const out = []; const lineRe = /[^\n]+/g; let m;
   while ((m = lineRe.exec(src))) {
     const line = m[0].replace(/\r/g, ' ');

@@ -416,3 +416,12 @@ fast: 5 affected tests pass · suite 692/693 (the same one failure as the base) 
 | lens | citation | file:line | verdict | one line |
 | Greenberg | — | index.html splitSentences | fixed (disclosed) | the page's analysis reads English (prior, lexicon, Latin lower-case join); written in the code; the reading page reads other languages with their own priors |
 | Dijkstra | — | index.html hdClosedWord | clean | the hard-wrap join's closed-class test now reads the POS prior's dominant class instead of a typed word list |
+
+## 2026-10-25 — vendor khora 2d63e331 + janus 7b185180: the dotted-words prior, and live aliases meet the treebank (vendor-khora-main, staged)
+fast: 9 files · 50 affected tests pass · full suite 694 tests, the one failure main has (holodeck-byo-panel) · vendor --check 92/92 identical
+| lens | citation | file:line | verdict | one line |
+|---|---|---|---|---|
+| Simon/Chekhov | untested source | holodeck-cut.js | noted | reached through holodeck-research.test.mjs (splitStatements), whose falsifier now names a form no prior holds ("Gebr.") and asserts the dotted prior keeps "Messrs." |
+| Greenberg | language scope | holodeck-cut.js | noted | the header already declares SCOPE: English's priors; the dotted prior is English's too |
+| Holmes | alias identity | vendor/khora/native/the-fold/read-core.mjs | noted | khora#53 refuses an alias merge ("ports." as a form of "portraits") on the treebank's evidence, never on surface overlap |
+clean: Dijkstra, Pearl, Ostrom, Alexander, Kondo (vendored khora prose); page check: the master reading cuts "…northern ports. The fleet…" in two, no gaps, no missed priors
