@@ -117,8 +117,6 @@ const CSS = `
 #rv .bar{display:flex;align-items:center;gap:10px;padding:8px 14px calc(8px + env(safe-area-inset-bottom));border-top:1px solid var(--line);min-width:0;position:relative}
 #rv .bar input[type=range]{flex:1 1 auto;min-width:60px;accent-color:var(--acc)}
 #rv .bar .at{font:12.5px var(--mono);color:var(--dim);white-space:nowrap}
-#rv .lyr{position:relative;font-size:13px}#rv .lyr summary{cursor:pointer;color:var(--ink2);white-space:nowrap;list-style:none}#rv .lyrm{position:absolute;bottom:calc(100% + 8px);right:0;background:var(--s1);border:1px solid var(--line2);border-radius:8px;padding:10px 12px;display:grid;gap:6px;min-width:200px;z-index:2}
-#rv .lyr label{display:flex;gap:6px;align-items:center;font-size:13px;color:var(--ink2);cursor:pointer}
 #rv .delta{position:absolute;left:14px;bottom:100%;font-size:12.5px;color:var(--amber);background:var(--bg);padding:4px 8px;border:1px solid var(--line);border-radius:6px}
 #rv .dim{color:var(--dim)}
 #rv .seg,#rv .mob{display:none}
@@ -145,7 +143,7 @@ export function mountReader(T, ctx) {
   if (!document.getElementById('rv-css')) { const s = document.createElement('style'); s.id = 'rv-css'; s.textContent = CSS; document.head.appendChild(s); }
   let root = document.getElementById('rv');
   if (!root) { root = document.createElement('div'); root.id = 'rv'; document.body.appendChild(root); }
-  root.innerHTML = `<div class="top"><h2></h2><span class="proof"></span><span class="sp"></span><button type="button" data-a="layers" title="The layered instrument: every layer, the replay, and the relative solar system">▦ Layers</button><button type="button" data-a="more" class="mob" aria-label="More" title="Downloads">⋯</button><span class="dl"><button type="button" data-a="json">⤓ the reading as JSON</button><button type="button" data-a="scanlog" title="Every layer of reading the scan, from the pixels to the statements, as one append-only log (Provenance@2)">⤓ scan log</button><button type="button" data-a="html" title="The scan's words as standalone semantic HTML, filled-in values carrying their provenance">⤓ as HTML</button></span><button type="button" data-a="close" title="Esc">✕ Close</button></div>
+  root.innerHTML = `<div class="top"><h2></h2><span class="proof"></span><span class="sp"></span><button type="button" data-a="more" class="mob" aria-label="More" title="Downloads">⋯</button><span class="dl"><button type="button" data-a="json">⤓ the reading as JSON</button><button type="button" data-a="scanlog" title="Every layer of reading the scan, from the pixels to the statements, as one append-only log (Provenance@2)">⤓ scan log</button><button type="button" data-a="html" title="The scan's words as standalone semantic HTML, filled-in values carrying their provenance">⤓ as HTML</button></span><button type="button" data-a="close" title="Esc">✕ Close</button></div>
     <div class="seg" role="tablist" aria-label="Panel"><button type="button" data-a="mt" data-m="hero">Reading</button><button type="button" data-a="mt" data-m="idx">What was read</button><button type="button" data-a="mt" data-m="prov">Where from</button></div>
     <div class="body"><div class="col idx"></div><div class="col hero"></div><div class="col prov"></div></div>
     <div class="bar"></div>`;
@@ -422,11 +420,11 @@ export function mountReader(T, ctx) {
     return '';
   }
 
-  // ── bottom: replay + layers ──
+  // ── bottom: replay ──
   function bar() {
-    const n = nStmts(), f = st.frontier == null ? n : st.frontier, off = ctx.layers.filter((l) => st.features[l.feature] === false).length;
+    const n = nStmts(), f = st.frontier == null ? n : st.frontier;
     return `<button type="button" data-a="play" title="replay the reading statement by statement">${st.playing ? '❚❚' : '▶'}</button><input type="range" min="1" max="${Math.max(1, n)}" value="${f}" data-a="scrub" aria-label="statement"><span class="at">${f} / ${n}</span>
-      <details class="lyr"><summary>layers${off ? ` · ${off} off` : ''}</summary><div class="lyrm">${ctx.layers.map((l) => `<label title="${esc(l.why)}"><input type="checkbox" data-a="layer" data-f="${l.feature}"${st.features[l.feature] !== false ? ' checked' : ''}>${esc(l.label)}</label>`).join('')}<div class="dim">switch one off and the reading re-runs</div></div></details>${st.delta ? `<span class="delta">${esc(st.delta)}</span>` : ''}`;
+${st.delta ? `<span class="delta">${esc(st.delta)}</span>` : ''}`;
   }
 
   function render() {
@@ -470,7 +468,6 @@ export function mountReader(T, ctx) {
     if (a === 'mode') { st.mode = b.dataset.m; return render(); } if (a === 'showclaims') { st.showClaims = true; return render(); }
     if (a === 'mt') { root.dataset.m = b.dataset.m; root.querySelectorAll('.seg button').forEach((x) => x.classList.toggle('on', x === b)); root.querySelector('.body').scrollTop = 0; return; }
     if (a === 'more') { root.querySelector('.dl').classList.toggle('open'); return; }
-    if (a === 'layers') { ctx.showLayers && ctx.showLayers(); return; }
     if (a === 'scanlog' && L) { const g = recordLayers(); if (g) ctx.download(`${(T.doc.label || 'reading').replace(/[^\w]+/g, '-').slice(0, 40)}-scan-log.json`, JSON.stringify(g.led.eot({ root: T.eot && T.eot.root }), null, 1), 'application/json'); } else if (a === 'html' && L) ctx.download(`${(T.doc.label || 'reading').replace(/[^\w]+/g, '-').slice(0, 40)}-reading.html`, htmlExport(L, R(), { title: T.doc.label || 'reading', tilt: st.tilt }), 'text/html;charset=utf-8'); else if (a === 'close') close(); else if (a === 'json') ctx.download(`${(T.doc.label || 'reading').replace(/[^\w]+/g, '-').slice(0, 40)}-reading.json`, JSON.stringify({ reading: structure(), run: ctx.readingJSON(T).run, corrections: st.overlay }, null, 2), 'application/json');
     else if (a === 'play') play(); else if (a === 'sever') act('sever', { mid: b.dataset.mid }); else if (a === 'undo') act('undo', { act: b.dataset.act });
   });
@@ -478,7 +475,6 @@ export function mountReader(T, ctx) {
     const el = e.target, a = el.dataset.a;
     if (a === 'reassign' && el.value) act('reassign', { mid: el.dataset.mid, to: el.value });
     else if (a === 'merge' && el.value) act('merge', { ref: el.dataset.ref, to: el.value });
-    else if (a === 'layer') { st.features = { ...st.features, [el.dataset.f]: el.checked }; stop(); await ctx.rerun(st.features, { sel: st.sel, overlay: st.overlay }); }
   });
   root.addEventListener('toggle', (e) => { const d = e.target; if (!d.classList || !d.classList.contains('jt') || !d.open || d.querySelector(':scope > .jc')) return; const node = d.dataset.path === ROOT_PATH ? structure() : tupleAt(structure(), d.dataset.path); if (node && Array.isArray(node[1])) d.insertAdjacentHTML('beforeend', tupleChildren(node[1], d.dataset.path, 9)); }, { capture: true, signal: ac.signal });
   on(root, 'input', (e) => { if (e.target.dataset.a === 'scrub') { stop(); const v = +e.target.value; st.frontier = v >= nStmts() ? null : v; render(); } });
