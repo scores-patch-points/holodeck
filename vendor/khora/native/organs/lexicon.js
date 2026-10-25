@@ -15,6 +15,9 @@
 //                                 already known: the forms the splitter is unsure of, written with their period
 //   aliasTokens(lexicon, forms)   of those, the tokens (without the period) the giver lists as a form of another word, or lists
 //                                 as a headword with its period ("U.S.", "e.g.") — an ALIAS
+//   dottedIn(text, words, known)  the hyperlexicon's dotted words READ AHEAD (a DottedWords@1 prior, janus priors/dotted-<stem>.json,
+//                                 built from the giver): the listed forms this text uses at a place the splitter cuts and never
+//                                 writes without the period — synchronous, so a cut with no giver in reach still knows "etc."
 //   resolveAliases(lexicon, junctions, text)
 //                                 the decision per listed form: kept when the text never writes the token without its period
 //
@@ -80,6 +83,21 @@ export function aliasTokens(lexicon, forms) {
     if (of.length || dotted) out.set(form.slice(0, -1), of.length ? of : [form]);
   }
   return out; // token → the forms it is an alias of
+}
+
+/** The dotted words a prior lists that this text uses as words: the forms at a junction that the prior lists (as written, or
+ *  lower-cased) and that the text never writes without their period (the same bare-use test resolveAliases applies). */
+export function dottedIn(text, words, known = new Set()) {
+  const set = words instanceof Set ? words : new Set(words || []);
+  if (!set.size) return [];
+  const t = String(text ?? "");
+  const out = [];
+  for (const form of aliasJunctions(t, known).keys()) {
+    if (!set.has(form) && !set.has(form.toLowerCase())) continue;
+    const tok = form.slice(0, -1);
+    if (!new RegExp(`(?<![\\p{L}\\p{N}])${escapeRe(tok)}(?![\\p{L}\\p{N}.])`, "u").test(t)) out.push(form);
+  }
+  return out;
 }
 
 /** The alias decision for one text. A dotted form is kept as one word when the giver lists it as a form of another word AND the

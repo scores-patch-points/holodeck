@@ -26,7 +26,7 @@ const JANUS_COMMIT = arg('--janus-commit');
 const OLD = resolve(ROOT, 'vendor/khora');
 const RECORD = resolve(OLD, 'KHORA-VENDOR.json');
 // priors are DATA the page fetches by name through the prior door (native/the-fold/prior-source.mjs); their home is janus/priors
-const PRIORS = ['pos-eng.json', 'pos-eng-lexicon.json', 'morphology-eng.json', 'reading-rules.json', 'punctuation-eng.json', 'frame-eng.json', 'role-config-eng.json', 'contractions-eng.json', 'morph-cues-en.json', 'parser-eng-ewt.json',
+const PRIORS = ['pos-eng.json', 'pos-eng-lexicon.json', 'morphology-eng.json', 'reading-rules.json', 'punctuation-eng.json', 'dotted-eng.json', 'frame-eng.json', 'role-config-eng.json', 'contractions-eng.json', 'morph-cues-en.json', 'parser-eng-ewt.json',
   'punctuation-index.json', ...['fra', 'deu', 'spa', 'por', 'ita', 'rus'].map((s) => `punctuation-${s}.json`)];
 const ENTRIES = ['reading/demo.html', 'reading/how-it-reads.html', 'holodeck-reader.js'];
 const IMPORT = /(?:from\s*|import\s*\(\s*|import\s+)['"]([^'"]+)['"]/g;

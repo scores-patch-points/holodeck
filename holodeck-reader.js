@@ -11,8 +11,9 @@ import { classifyForm as classifyWord } from './holodeck-surface.js'; // wraps t
 import { stanceWords } from './vendor/khora/native/organs/stance.js';
 
 // the priors an English read takes through the door: the class prior and its lexicon, morphology, the measured punctuation
-// prior, and the ear's grammar (frame, role config, contractions). A foreign read adds its own (priorNamesFor).
-export const priorNamesFor = (stem) => [`pos-${stem}.json`, `pos-${stem}-lexicon.json`, `morphology-${stem}.json`, `punctuation-${stem}.json`, `frame-${stem}.json`, `role-config-${stem}.json`, `contractions-${stem}.json`, `proclitics-${stem}.json`, `enclitics-${stem}.json`];
+// prior, the hyperlexicon's dotted words read ahead, and the ear's grammar (frame, role config, contractions). A foreign read adds
+// its own (priorNamesFor).
+export const priorNamesFor = (stem) => [`pos-${stem}.json`, `pos-${stem}-lexicon.json`, `morphology-${stem}.json`, `punctuation-${stem}.json`, `dotted-${stem}.json`, `frame-${stem}.json`, `role-config-${stem}.json`, `contractions-${stem}.json`, `proclitics-${stem}.json`, `enclitics-${stem}.json`];
 const loaded = new Map();
 // the vendored priors' own list (tools/vendor-khora.mjs writes it), so a name with no file (English has no proclitics) is never fetched
 let _names = null;
