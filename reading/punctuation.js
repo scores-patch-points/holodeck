@@ -18,7 +18,7 @@
 //     reorders anything: the first proposition in the text is first in its sibling list, and a nested one comes where it sits.
 //
 // Norms are DECLARED per language (punctuation-norms.json: terminators, pairs, decimal and grouping marks, whether a dot can be an ordinal or an
-// abbreviation). Which words are abbreviations is MEASURED per language (punctuation-priors/<lang>.json) and added to from the document itself (the
+// abbreviation). Which words are abbreviations is MEASURED per language (janus priors/punctuation-<stem>.json, vendored with khora; its index names each language's file) and added to from the document itself (the
 // sentence splitter's deriveAbbreviations). A language with no norms is read with the default and says so.
 //
 // Not only text: other modalities carry the same information by other means. `cues` are boundaries a modality supplies — an OCR page's line breaks
@@ -45,7 +45,11 @@ export async function loadPunctuation(base, lang, fetchImpl = (...a) => fetch(..
   const key = `${base}|${lang}`; if (CACHE.has(key)) return CACHE.get(key);
   const p = (async () => {
     const get = async (u) => { try { const r = await fetchImpl(new URL(u, base)); return r.ok ? await r.json() : null; } catch (e) { return null; } };
-    const [all, prior] = await Promise.all([get('punctuation-norms.json'), lang ? get(`punctuation-priors/${String(lang).split('-')[0]}.json`) : null]);
+    // the measured prior's one home is janus (priors/punctuation-<stem>.json); the page reads the copy vendored with khora, through its index
+    const PRIORS = '../vendor/khora/native/priors/';
+    const [all, index] = await Promise.all([get('punctuation-norms.json'), lang ? get(PRIORS + 'punctuation-index.json') : null]);
+    const entry = index && index.langs ? index.langs[String(lang).split('-')[0]] : null;
+    const prior = entry ? await get(PRIORS + entry.file) : null;
     const norms = normsFor(all || { default: { terminators: ['.', '!', '?'], pairs: { quote: [['“', '”']], bracket: [['(', ')']] }, separators: { weak: [','], strong: [';', ':'] }, toggle: ['"'], dashes: ['—'], abbreviationDot: true } }, lang);
     return { norms, abbreviations: new Set((prior && prior.abbreviations) || []), prior: prior ? { giver: prior.giver, thin: !!prior.thin, n: (prior.abbreviations || []).length } : null };
   })();

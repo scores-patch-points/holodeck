@@ -340,23 +340,10 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
         </div>
       </div>
       </sc-if>
-      <sc-if value="{{ hasContent }}" hint-placeholder-val="{{ false }}">
-      <div class="hd-rsec">
-        <div class="hd-label"><span>Explore</span></div>
-        <div style="display:flex;flex-direction:column;gap:1px">
-          <sc-for list="{{ navExploreFlat }}" as="g" hint-placeholder-count="5">
-            <button class="hd-item row" aria-current="{{ g.aria }}" onClick="{{ g.onClick }}" title="{{ g.title }}"><span>{{ g.label }}</span><span class="hd-n">{{ g.count }}</span></button>
-          </sc-for>
-        </div>
-      </div>
-      </sc-if>
       <sc-if value="{{ hasBrowseExtras }}" hint-placeholder-val="{{ false }}">
       <div class="hd-rsec">
         <div class="hd-label"><span>Browse</span></div>
         <div style="display:flex;flex-direction:column;gap:1px">
-          <sc-for list="{{ browseMore }}" as="b" hint-placeholder-count="0">
-            <button class="hd-item row" onClick="{{ b.onClick }}"><span>{{ b.label }}</span><span class="hd-n">{{ b.n }}</span></button>
-          </sc-for>
           <sc-if value="{{ hasBrowseDepts }}" hint-placeholder-val="{{ false }}">
             <span style="font:600 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--dim);padding:8px 8px 4px">Departments</span>
             <sc-if value="{{ browseDeptSearch }}" hint-placeholder-val="{{ false }}"><div style="padding:0 0 4px"><input class="hd-filter" value="{{ browseDeptQ }}" onChange="{{ browseDeptOnQ }}" placeholder="Filter departments…" aria-label="Filter departments"></div></sc-if>
@@ -621,7 +608,6 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
             </sc-if>
             <sc-if value="{{ !v.summary }}" hint-placeholder-val="{{ true }}"><h1 style="margin:0;font:500 30px/1.2 var(--serif);color:var(--ink);text-wrap:pretty">{{ crumbLast.label }}</h1></sc-if>
             <p style="margin:0;color:var(--mut);font-size:15px;text-wrap:pretty;max-width:760px">{{ hdrSubShown }}{{ sr.sub }}</p>
-            <sc-if value="{{ v.names }}" hint-placeholder-val="{{ false }}"><div><button onClick="{{ onFixNames }}" title="Merge spellings, split two people, say what a name is not" style="cursor:pointer;border:1px solid var(--line2);background:none;color:var(--ink2);border-radius:8px;padding:5px 12px;font:500 13px var(--sans)" style-hover="border-color:var(--acc)">Fix names{{ fixNamesN }}</button></div></sc-if>
             <sc-if value="{{ sr.hasOthers }}" hint-placeholder-val="{{ false }}">
               <div style="display:flex;align-items:center;gap:6px 8px;flex-wrap:wrap;margin-top:4px">
                 <span style="font:400 14px var(--sans);color:var(--mut)">Also narrowed to</span>
@@ -671,7 +657,6 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
           </sc-if>
         </div>
       </sc-if>
-      <sc-if value="{{ v.overview }}" hint-placeholder-val="{{ false }}"><div id="overview-surface"></div></sc-if>
       <sc-if value="{{ v.linkSurface }}" hint-placeholder-val="{{ false }}"><div id="links-surface" style="min-width:0"></div></sc-if>
       <sc-if value="{{ v.inbox }}" hint-placeholder-val="{{ false }}"><div id="inbox-surface" style="max-width:1100px"></div></sc-if>
       <sc-if value="{{ v.summary }}" hint-placeholder-val="{{ true }}">
@@ -842,9 +827,6 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
             </section>
           </sc-for>
         </sc-if>
-        <sc-if value="{{ svMap }}" hint-placeholder-val="{{ false }}">
-          <div style="margin-top:8px;border-radius:12px;background:var(--bg);border:1px solid var(--line)">{{ graphEl }}</div>
-        </sc-if>
         <sc-if value="{{ svRefs }}" hint-placeholder-val="{{ false }}">
           <div style="margin-top:8px">{{ refEl }}</div>
         </sc-if>
@@ -987,149 +969,6 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
         <sc-if value="{{ rx.notReady }}" hint-placeholder-val="{{ false }}"><div style="border:1px dashed var(--line2);border-radius:12px;padding:18px 20px;display:flex;flex-direction:column;gap:6px"><span style="font:500 16px var(--sans);color:var(--ink)">{{ rx.wait }}</span><span style="font:400 14px/1.5 var(--sans);color:var(--mut)">{{ rx.note }}</span></div></sc-if>
       </sc-if>
 
-      <sc-if value="{{ db.on }}" hint-placeholder-val="{{ false }}">
-        <sc-if value="{{ db.notReady }}" hint-placeholder-val="{{ false }}"><div style="border:1px dashed var(--line2);border-radius:12px;padding:18px 20px;display:flex;flex-direction:column;gap:6px"><span style="font:500 16px var(--sans);color:var(--ink)">{{ db.wait }}</span><span style="font:400 14px/1.5 var(--sans);color:var(--mut)">{{ db.note }}</span></div></sc-if>
-        <sc-if value="{{ db.ready }}" hint-placeholder-val="{{ false }}">
-          <div style="display:flex;flex-direction:column;gap:14px">
-            <div style="display:flex;align-items:center;border:1px solid var(--line2);border-radius:8px;background:var(--s1)">
-              <input value="{{ db.askVal }}" onChange="{{ db.onAsk }}" onKeyDown="{{ db.onAskKey }}" placeholder="Query the records: “how many statements by frame”, “sources where kind is Audit”, “names sorted by type”" style="flex:1;min-width:0;background:transparent;border:0;color:var(--ink);font:400 14px var(--sans);padding:9px 12px;outline:none">
-              <button onClick="{{ db.runAsk }}" style="margin:3px;border:0;background:var(--acc2);color:#fff;border-radius:6px;padding:5px 14px;cursor:pointer;font:600 13px var(--sans);white-space:nowrap">Run ↵</button>
-            </div>
-            <sc-if value="{{ db.res.has }}" hint-placeholder-val="{{ false }}">
-              <section style="background:var(--s1);border:1px solid var(--line);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:10px">
-                <div style="display:flex;gap:12px;align-items:baseline;flex-wrap:wrap">
-                  <span style="font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--acc)">Query</span>
-                  <span style="font:400 14px var(--sans);color:var(--ink2);flex:1 1 240px;min-width:0">{{ db.res.said }}</span>
-                  <button onClick="{{ db.res.clear }}" style="all:unset;cursor:pointer;font:500 13px var(--sans);color:var(--mut)" style-hover="color:var(--ink)">Clear</button>
-                </div>
-                <sc-if value="{{ db.res.busy }}" hint-placeholder-val="{{ false }}"><span style="font:400 14px var(--sans);color:var(--mut)">Planning the query on this machine…</span></sc-if>
-                <sc-if value="{{ db.res.hasErr }}" hint-placeholder-val="{{ false }}"><span style="font:400 14px var(--sans);color:var(--bad)">{{ db.res.err }}</span></sc-if>
-                <sc-if value="{{ db.res.isValue }}" hint-placeholder-val="{{ false }}">
-                  <div style="display:flex;gap:14px;align-items:baseline;flex-wrap:wrap"><span style="font:600 34px var(--mono);color:var(--ink)">{{ db.res.value }}</span><span style="font:500 15px var(--sans);color:var(--mut)">{{ db.res.label }}</span></div>
-                  <sc-if value="{{ db.res.hasNote }}" hint-placeholder-val="{{ false }}"><span style="font:400 13px var(--mono);color:var(--dim)">{{ db.res.note }}</span></sc-if>
-                </sc-if>
-                <sc-if value="{{ db.res.isAgg }}" hint-placeholder-val="{{ false }}">
-                  <div style="display:flex;flex-direction:column">
-                    <span style="font:600 12px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--mut);padding-bottom:4px">{{ db.res.aggHead }}</span>
-                    <sc-for list="{{ db.res.agg }}" as="x" hint-placeholder-count="4"><div style="display:flex;justify-content:space-between;gap:12px;border-top:1px solid var(--line);padding:5px 0"><span style="font:500 14px var(--sans);color:var(--ink);min-width:0">{{ x.k }}</span><span style="font:600 13px var(--mono);color:var(--ink2);white-space:nowrap">{{ x.v }}</span></div></sc-for>
-                  </div>
-                </sc-if>
-                <sc-if value="{{ db.res.isRows }}" hint-placeholder-val="{{ false }}"><span style="font:400 14px var(--sans);color:var(--mut)">{{ db.res.rowsLine }} — shown in the table below.</span></sc-if>
-                <sc-if value="{{ db.res.isMsg }}" hint-placeholder-val="{{ false }}"><span style="font:400 14px var(--sans);color:var(--mut)">{{ db.res.msg }}</span></sc-if>
-                <span style="font:400 12px var(--mono);color:var(--dim)">{{ db.res.via }}</span>
-              </section>
-            </sc-if>
-            <div style="display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap">
-              <nav style="flex:0 0 200px;display:flex;flex-direction:column;gap:14px">
-                <sc-for list="{{ db.groups }}" as="g" hint-placeholder-count="2">
-                  <div style="display:flex;flex-direction:column;gap:2px">
-                    <span style="font:600 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mut);padding:0 10px 4px">{{ g.label }}</span>
-                    <sc-for list="{{ g.tabs }}" as="t" hint-placeholder-count="4">
-                      <button onClick="{{ t.onClick }}" style="white-space:normal;text-align:left;cursor:pointer;padding:6px 10px;border-radius:8px;background:{{ t.bg }};border:1px solid {{ t.bd }};display:flex;justify-content:space-between;align-items:baseline;gap:8px" style-hover="background:var(--s2)">
-                        <span style="font:{{ t.fw }} 14px var(--sans);color:var(--ink);min-width:0;overflow-wrap:anywhere">{{ t.name }}</span>
-                        <span style="font:500 12px var(--mono);color:var(--mut);white-space:nowrap">{{ t.n }}</span>
-                      </button>
-                    </sc-for>
-                  </div>
-                </sc-for>
-              </nav>
-              <div style="flex:1 1 460px;min-width:0;display:flex;flex-direction:column;gap:10px">
-                <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-                  <h2 style="margin:0;font:500 22px var(--serif);color:var(--ink)">{{ db.T }}</h2>
-                  <span style="font:500 12px var(--mono);color:var(--mut)">{{ db.tLine }}</span>
-                  <div style="margin-left:auto;display:flex;gap:6px">
-                    <button onClick="{{ db.onRows }}" style="cursor:pointer;padding:4px 12px;border-radius:999px;background:{{ db.rowsBtn.bg }};border:1px solid {{ db.rowsBtn.bd }};font:{{ db.rowsBtn.fw }} 13px var(--sans);color:var(--ink)">Rows</button>
-                    <button onClick="{{ db.onSchema }}" style="cursor:pointer;padding:4px 12px;border-radius:999px;background:{{ db.schemaBtn.bg }};border:1px solid {{ db.schemaBtn.bd }};font:{{ db.schemaBtn.fw }} 13px var(--sans);color:var(--ink)">How the schema was read</button>
-                  </div>
-                </div>
-                <sc-if value="{{ db.hasFound }}" hint-placeholder-val="{{ false }}"><span style="font:400 13px var(--sans);color:var(--mut)">{{ db.foundLine }}</span></sc-if>
-                <sc-if value="{{ db.showRows }}" hint-placeholder-val="{{ true }}">
-                  <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><input value="{{ db.q }}" onChange="{{ db.onQ }}" placeholder="Filter rows · words, /pattern/, or a near spelling" style="background:var(--s1);border:1px solid var(--line2);border-radius:8px;color:var(--ink);font:400 14px var(--sans);padding:7px 12px;outline:none;flex:0 1 340px;min-width:200px"><sc-if value="{{ db.hasM }}" hint-placeholder-val="{{ false }}"><span style="font:500 12px var(--mono);color:var(--acc)">{{ db.mLine }}</span></sc-if></div>
-                  <div style="overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--s1)">
-                    <div style="min-width:640px;display:flex;flex-direction:column">
-                      <div style="display:grid;grid-template-columns:{{ db.gridCols }};gap:12px;padding:9px 14px;border-bottom:1px solid var(--line2);position:sticky;top:0;background:var(--s1)">
-                        <sc-for list="{{ db.heads }}" as="h" hint-placeholder-count="5"><button onClick="{{ h.onClick }}" title="{{ h.type }}" style="all:unset;cursor:pointer;font:600 12px var(--mono);letter-spacing:.04em;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis" style-hover="color:var(--ink)">{{ h.t }}{{ h.arrow }}</button></sc-for>
-                      </div>
-                      <sc-for list="{{ db.grid }}" as="r" hint-placeholder-count="8">
-                        <button onClick="{{ r.onClick }}" style="all:unset;cursor:pointer;display:grid;grid-template-columns:{{ db.gridCols }};gap:12px;padding:8px 14px;border-top:1px solid var(--line);background:{{ r.bg }};align-items:baseline" style-hover="background:var(--s2)">
-                          <sc-for list="{{ r.cells }}" as="c" hint-placeholder-count="5">
-                            <span style="min-width:0;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">
-                              <sc-if value="{{ c.plain }}" hint-placeholder-val="{{ true }}"><span style="font:400 14px/1.4 var(--sans);color:{{ c.color }}">{{ c.t }}</span></sc-if>
-                              <sc-if value="{{ c.pill }}" hint-placeholder-val="{{ false }}"><span style="font:500 12px var(--sans);color:var(--ink2);border:1px solid var(--line2);border-radius:999px;padding:1px 8px;white-space:nowrap">{{ c.t }}</span></sc-if>
-                            </span>
-                          </sc-for>
-                        </button>
-                      </sc-for>
-                      <sc-if value="{{ db.empty }}" hint-placeholder-val="{{ false }}"><span style="padding:16px;font:400 14px var(--sans);color:var(--mut)">No rows match.</span></sc-if>
-                    </div>
-                  </div>
-                  <sc-if value="{{ db.hasMore }}" hint-placeholder-val="{{ false }}"><button onClick="{{ db.onMore }}" style="all:unset;cursor:pointer;font:500 14px var(--sans);color:var(--acc)" style-hover="text-decoration:underline">{{ db.more }}</button></sc-if>
-                </sc-if>
-                <sc-if value="{{ db.showSchema }}" hint-placeholder-val="{{ false }}">
-                  <section style="background:var(--s1);border:1px solid var(--line);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:2px">
-                    <span style="font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mut);padding-bottom:6px">Fields, and what each type was read from</span>
-                    <sc-for list="{{ db.schemaRows }}" as="f" hint-placeholder-count="5">
-                      <div style="display:grid;grid-template-columns:minmax(0,1.2fr) 90px minmax(0,2fr) auto;gap:4px 14px;align-items:baseline;border-top:1px solid var(--line);padding:7px 0">
-                        <span style="font:600 14px var(--sans);color:var(--ink);overflow-wrap:anywhere">{{ f.name }}</span>
-                        <span style="font:500 12px var(--mono);color:var(--acc)">{{ f.type }}</span>
-                        <span style="font:400 13px var(--sans);color:var(--mut)">{{ f.basis }}</span>
-                        <span style="font:400 12px var(--mono);color:var(--dim);white-space:nowrap">{{ f.cover }}</span>
-                        <sc-if value="{{ f.hasOpts }}" hint-placeholder-val="{{ false }}"><span style="grid-column:2 / -1;font:400 12px var(--mono);color:var(--dim)">{{ f.opts }}</span></sc-if>
-                      </div>
-                    </sc-for>
-                  </section>
-                  <sc-if value="{{ db.hasLinks }}" hint-placeholder-val="{{ false }}">
-                    <section style="background:var(--s1);border:1px solid var(--line);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:2px">
-                      <span style="font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mut);padding-bottom:6px">Relations, read off the links between records</span>
-                      <sc-for list="{{ db.linkRows }}" as="l" hint-placeholder-count="3"><div style="display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:14px;align-items:baseline;border-top:1px solid var(--line);padding:6px 0"><span style="font:500 14px var(--sans);color:var(--ink)">{{ l.line }}</span><span style="font:500 12px var(--mono);color:var(--acc);white-space:nowrap">{{ l.card }}</span><span style="font:400 12px var(--mono);color:var(--dim);white-space:nowrap">{{ l.n }}</span></div></sc-for>
-                    </section>
-                  </sc-if>
-                  <section style="background:var(--s1);border:1px solid var(--line);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:2px">
-                    <span style="font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mut);padding-bottom:2px">The log</span>
-                    <span style="font:400 13px/1.45 var(--sans);color:var(--mut);padding-bottom:6px">State is folded from one append-only log: a record is created, its values set, its links made. The schema readings below were appended to the same log after the data, each with the count it came from.</span>
-                    <span style="font:500 12px var(--mono);color:var(--ink2);padding-bottom:6px">{{ db.opsLine }} · {{ db.built }}</span>
-                    <sc-for list="{{ db.schemaLog }}" as="e" hint-placeholder-count="4"><div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:14px;border-top:1px solid var(--line);padding:5px 0"><span style="font:500 12px var(--mono);color:var(--ink);overflow-wrap:anywhere">DEF {{ e.path }}</span><span style="font:400 13px var(--sans);color:var(--mut)">{{ e.basis }}</span></div></sc-for>
-                  </section>
-                </sc-if>
-              </div>
-            </div>
-          </div>
-          <sc-if value="{{ db.rec.has }}" hint-placeholder-val="{{ false }}">
-            <div onClick="{{ db.rec.closeBg }}" style="position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.35);display:flex;justify-content:flex-end">
-              <aside style="width:min(440px,100%);height:100%;overflow:auto;box-sizing:border-box;background:var(--s1);border-left:1px solid var(--line2);padding:20px 22px;display:flex;flex-direction:column;gap:16px">
-                <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start">
-                  <div style="display:flex;flex-direction:column;gap:4px;min-width:0">
-                    <span style="font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--acc)">{{ db.rec.type }}</span>
-                    <span style="font:500 21px/1.3 var(--serif);color:var(--ink);text-wrap:pretty;overflow-wrap:anywhere">{{ db.rec.title }}</span>
-                  </div>
-                  <button onClick="{{ db.rec.close }}" title="Close" style="background:none;border:0;color:var(--mut);cursor:pointer;font-size:16px">✕</button>
-                </div>
-                <div style="display:flex;gap:8px;flex-wrap:wrap">
-                  <sc-if value="{{ db.rec.canOpen }}" hint-placeholder-val="{{ false }}"><button onClick="{{ db.rec.onOpen }}" style="background:var(--acc2);border:0;color:#fff;border-radius:8px;padding:6px 14px;cursor:pointer;font:600 14px var(--sans)" style-hover="background:var(--acc3)">{{ db.rec.openLabel }}</button></sc-if>
-                </div>
-                <div style="display:flex;flex-direction:column">
-                  <sc-for list="{{ db.rec.fields }}" as="f" hint-placeholder-count="4"><div style="display:grid;grid-template-columns:110px minmax(0,1fr);gap:12px;border-top:1px solid var(--line);padding:7px 0;align-items:baseline"><span style="font:500 12px var(--mono);color:var(--mut);overflow-wrap:anywhere">{{ f.k }}</span><span style="font:400 14px/1.45 var(--sans);color:var(--ink);overflow-wrap:anywhere">{{ f.v }}</span></div></sc-for>
-                </div>
-                <sc-if value="{{ db.rec.hasRel }}" hint-placeholder-val="{{ false }}">
-                  <sc-for list="{{ db.rec.rel }}" as="g" hint-placeholder-count="2">
-                    <div style="display:flex;flex-direction:column;gap:2px">
-                      <div style="display:flex;justify-content:space-between;gap:10px"><span style="font:600 12px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--mut)">{{ g.title }}</span><span style="font:500 12px var(--mono);color:var(--dim)">{{ g.n }}</span></div>
-                      <sc-for list="{{ g.items }}" as="it" hint-placeholder-count="3">
-                        <div style="display:flex;align-items:center;gap:8px;border-top:1px solid var(--line);padding:6px 0">
-                          <button onClick="{{ it.onClick }}" style="all:unset;cursor:pointer;flex:1;min-width:0;font:400 14px/1.4 var(--sans);color:var(--ink2);overflow-wrap:anywhere" style-hover="color:var(--acc)">{{ it.label }}</button>
-                          <sc-if value="{{ it.hasJump }}" hint-placeholder-val="{{ false }}"><button onClick="{{ it.onJump }}" title="Read in context" style="all:unset;cursor:pointer;flex:none;font:600 13px var(--sans);color:var(--acc)" style-hover="text-decoration:underline">↗</button></sc-if>
-                        </div>
-                      </sc-for>
-                      <sc-if value="{{ g.hasMore }}" hint-placeholder-val="{{ false }}"><span style="font:400 13px var(--sans);color:var(--dim);padding-top:2px">{{ g.more }}</span></sc-if>
-                    </div>
-                  </sc-for>
-                </sc-if>
-                <span style="font:400 12px var(--mono);color:var(--dim);overflow-wrap:anywhere">{{ db.rec.anchor }}</span>
-              </aside>
-            </div>
-          </sc-if>
-        </sc-if>
-      </sc-if>
 
       <sc-if value="{{ ak.on }}" hint-placeholder-val="{{ false }}">
         <div class="hd-workbar" data-workbar>
@@ -1982,47 +1821,6 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
         </sc-if>
       </sc-if>
 
-      <sc-if value="{{ v.names }}" hint-placeholder-val="{{ false }}">
-        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-          <sc-for list="{{ nameTable.tabs }}" as="t" hint-placeholder-count="4">
-            <button onClick="{{ t.onClick }}" style="display:flex;align-items:baseline;gap:6px;background:{{ t.bg }};border:1px solid {{ t.bd }};border-radius:999px;padding:4px 12px;cursor:pointer;font:500 14px var(--sans);color:var(--ink)" style-hover="border-color:var(--acc)">{{ t.label }}<span style="font:400 12px var(--mono);color:var(--mut)">{{ t.n }}</span></button>
-          </sc-for>
-          <input value="{{ nameTable.q }}" onChange="{{ nameTable.onQ }}" placeholder="Filter names · try Calvn, /^Metro/, or Off*" style="margin-left:auto;flex:0 1 220px;min-width:140px;background:var(--s1);border:1px solid var(--line2);border-radius:8px;color:var(--ink);font:400 14px var(--sans);padding:6px 10px;outline:none">
-          <button onClick="{{ nameTable.onFix }}" title="Rename misspelled names in bulk; merge (SYN), split (SEG) or connect (CON) names by hand" style="background:none;border:1px solid var(--line2);border-radius:8px;color:var(--ink2);cursor:pointer;font:500 13px var(--sans);padding:6px 11px;white-space:nowrap" style-hover="border-color:var(--acc)">Fix names{{ nameTable.fixN }}</button>
-        </div>
-        <sc-if value="{{ nameTable.hasM }}" hint-placeholder-val="{{ false }}"><span style="font:500 12px var(--mono);color:var(--acc)">{{ nameTable.mLine }}</span></sc-if>
-        <div style="background:var(--s1);border:1px solid var(--line);border-radius:12px;overflow:auto">
-          <table style="width:100%;border-collapse:collapse;font:400 14px var(--sans);color:var(--ink)">
-            <thead>
-              <tr style="background:var(--s2)">
-                <sc-for list="{{ nameTable.head }}" as="h" hint-placeholder-count="6">
-                  <th style="text-align:{{ h.al }};padding:0;border-bottom:1px solid var(--line2);white-space:nowrap"><button onClick="{{ h.onClick }}" style="all:unset;cursor:pointer;display:block;padding:9px 12px;font:600 12px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:{{ h.color }}" style-hover="color:var(--ink)">{{ h.label }}</button></th>
-                </sc-for>
-                <th style="text-align:left;padding:9px 12px;border-bottom:1px solid var(--line2);font:600 12px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--mut);white-space:nowrap">Most often with</th>
-                <th style="border-bottom:1px solid var(--line2)"></th>
-              </tr>
-            </thead>
-            <tbody>
-              <sc-for list="{{ nameTable.rows }}" as="r" hint-placeholder-count="8">
-                <tr onClick="{{ r.onClick }}" style="cursor:pointer;background:{{ r.bg }};border-bottom:1px solid var(--line)" style-hover="background:var(--s2)">
-                  <td style="padding:8px 12px;min-width:180px"><div style="font:600 14px var(--sans);color:var(--ink)">{{ r.name }}</div><sc-if value="{{ r.hasAka }}" hint-placeholder-val="{{ false }}"><div style="font:400 12px var(--sans);color:var(--mut)">{{ r.aka }}</div></sc-if></td>
-                  <td style="padding:8px 12px;white-space:nowrap"><span style="display:inline-flex;align-items:center;gap:6px;font:500 13px var(--sans);color:var(--ink2)"><span style="width:8px;height:8px;border-radius:50%;background:{{ r.color }}"></span>{{ r.type }}</span></td>
-                  <td style="padding:8px 12px;text-align:right;white-space:nowrap"><span style="display:inline-flex;align-items:center;gap:8px"><span style="width:70px;height:5px;border-radius:3px;background:var(--line);display:inline-block;overflow:hidden"><span style="display:block;height:5px;width:{{ r.pct }};background:{{ r.color }}"></span></span><span style="font:500 13px var(--mono);min-width:32px;display:inline-block">{{ r.mentions }}</span></span></td>
-                  <td style="padding:8px 12px;text-align:right;font:500 13px var(--mono)">{{ r.sources }}</td>
-                  <td style="padding:8px 12px;text-align:right;font:500 13px var(--mono);color:var(--ink2)">{{ r.first }}</td>
-                  <td style="padding:8px 12px;text-align:right;font:500 13px var(--mono);color:var(--ink2)">{{ r.last }}</td>
-                  <td style="padding:8px 12px;font:400 13px var(--sans);color:var(--ink2);max-width:220px">{{ r.tie }}</td>
-                  <td style="padding:8px 12px;text-align:right;white-space:nowrap"><button onClick="{{ r.onNarrow }}" style="background:none;border:1px solid var(--line2);border-radius:6px;padding:2px 9px;cursor:pointer;font:500 12px var(--sans);color:var(--ink2)" style-hover="border-color:var(--acc)">{{ r.narrowLabel }}</button> <button onClick="{{ r.onIncorrect }}" title="That's incorrect — strike this as a name" style="background:none;border:0;padding:2px 6px;cursor:pointer;font:500 12px var(--sans);color:var(--dim)" style-hover="color:var(--bad)">✕</button></td>
-                </tr>
-              </sc-for>
-            </tbody>
-          </table>
-        </div>
-        <div style="display:flex;align-items:center;gap:12px;font:400 13px var(--sans);color:var(--mut)">
-          <span>{{ nameTable.count }}</span>
-          <sc-if value="{{ nameTable.hasMore }}" hint-placeholder-val="{{ false }}"><button onClick="{{ nameTable.onMore }}" style="background:none;border:1px solid var(--line2);border-radius:8px;padding:4px 12px;cursor:pointer;font:500 13px var(--sans);color:var(--ink)" style-hover="border-color:var(--acc)">{{ nameTable.more }}</button></sc-if>
-        </div>
-      </sc-if>
 
       <sc-if value="{{ v.types }}" hint-placeholder-val="{{ false }}">
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px">
@@ -2086,105 +1884,6 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
         <sc-if value="{{ stgMore.hasMore }}" hint-placeholder-val="{{ false }}"><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><button onClick="{{ stgMore.onMore }}" style="background:none;border:1px solid var(--line2);border-radius:8px;padding:6px 12px;cursor:pointer;font:500 14px var(--sans);color:var(--ink2)" style-hover="border-color:var(--acc)">{{ stgMore.moreLabel }}</button><span style="font:400 13px var(--sans);color:var(--dim)">{{ stgMore.shown }}</span></div></sc-if><sc-if value="{{ stgMore.canLess }}" hint-placeholder-val="{{ false }}"><button onClick="{{ stgMore.onLess }}" style="all:unset;cursor:pointer;font:500 13px var(--sans);color:var(--mut)" style-hover="color:var(--ink)">Show fewer</button></sc-if>
       </sc-if>
 
-      <sc-if value="{{ v.connections }}" hint-placeholder-val="{{ false }}">
-        <sc-if value="{{ cfold.on }}" hint-placeholder-val="{{ false }}">
-          <section style="display:flex;flex-direction:column;gap:10px;background:var(--sel);border:1px solid var(--acc2);border-radius:12px;padding:14px 16px">
-            <div style="display:flex;gap:12px;align-items:baseline;flex-wrap:wrap">
-              <span style="font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--acc)">The Fold · read together</span>
-              <span style="font:500 16px var(--sans);color:var(--ink)">{{ cfold.title }}</span>
-            </div>
-            <div style="display:flex;gap:6px;flex-wrap:wrap">
-              <sc-for list="{{ cfold.sources }}" as="x" hint-placeholder-count="3"><span style="display:inline-flex;align-items:center;gap:6px;background:var(--s1);border:1px solid var(--line2);border-radius:999px;padding:2px 10px;font:500 13px var(--sans);color:var(--ink2);max-width:100%"><span class="hd-drive-ic" style="background:{{ x.color }};width:15px;height:15px;font-size:9px">{{ x.glyph }}</span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ x.title }}</span></span></sc-for>
-            </div>
-            <span style="font:400 13px/1.45 var(--sans);color:var(--mut);text-wrap:pretty">The map below is the combined content: the names these sources share, nested under the names they are tied to most. Step the Names level up or down to open or fold the groups; click a name to see every statement it sits in.</span>
-            <div style="display:flex;gap:8px;flex-wrap:wrap">
-              <button onClick="{{ cfold.onAll }}" style="background:none;border:0;padding:6px 8px;cursor:pointer;font:500 13px var(--sans);color:var(--acc)">Back to all sources</button>
-            </div>
-          </section>
-        </sc-if>
-        <sc-if value="{{ cfold.on }}" hint-placeholder-val="{{ false }}"><div style="border-radius:12px;background:var(--bg);border:1px solid var(--line)">{{ graphEl }}</div></sc-if>
-        <sc-if value="{{ !cfold.on }}" hint-placeholder-val="{{ true }}">
-        <section style="display:flex;flex-direction:column;gap:8px;background:var(--s1);border:1px solid var(--line2);border-radius:12px;padding:12px 14px">
-          <div style="display:flex;gap:10px;align-items:baseline;flex-wrap:wrap">
-            <span style="font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--acc)">Showing</span>
-            <span style="font:400 13px var(--sans);color:var(--mut);flex:1 1 200px">{{ scope.line }}</span>
-            <sc-if value="{{ scope.any }}" hint-placeholder-val="{{ false }}"><button onClick="{{ scope.reset }}" style="all:unset;cursor:pointer;font:600 13px var(--sans);color:var(--acc)" style-hover="text-decoration:underline">Clear all</button></sc-if>
-          </div>
-          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-            <input value="{{ scope.centreOn.q }}" onChange="{{ scope.centreOn.onQ }}" onKeyDown="{{ scope.centreOn.onKey }}" placeholder="Centre on a name · a near spelling or /pattern/ works" style="flex:0 1 320px;min-width:200px;background:var(--bg);border:1px solid var(--line2);border-radius:8px;color:var(--ink);padding:6px 10px;outline:none;font:400 14px var(--sans)">
-            <sc-if value="{{ scope.centreOn.hasLine }}" hint-placeholder-val="{{ false }}"><span style="flex:1 1 220px;min-width:0;font:500 12px var(--mono);color:{{ scope.centreOn.lineCol }}">{{ scope.centreOn.line }}</span></sc-if>
-            <sc-if value="{{ scope.centreOn.hasPicks }}" hint-placeholder-val="{{ false }}"><sc-for list="{{ scope.centreOn.picks }}" as="p" hint-placeholder-count="0"><button onClick="{{ p.onClick }}" style="background:var(--s2);border:1px solid var(--line2);border-radius:999px;padding:2px 10px;cursor:pointer;font:500 13px var(--sans);color:var(--ink)" style-hover="border-color:var(--acc)">{{ p.n }}</button></sc-for></sc-if>
-          </div>
-          <div style="display:flex;gap:8px;flex-wrap:wrap">
-            <sc-for list="{{ scope.rows }}" as="r" hint-placeholder-count="3">
-              <div style="display:flex;align-items:baseline;gap:8px;padding:5px 10px;border-radius:8px;border:1px solid {{ r.bd }};background:{{ r.bg }};min-width:0">
-                <span style="font:600 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--dim);white-space:nowrap">{{ r.k }}</span>
-                <span style="font:500 14px var(--sans);color:{{ r.vc }};min-width:0">{{ r.v }}</span>
-                <sc-if value="{{ r.canClear }}" hint-placeholder-val="{{ false }}"><button onClick="{{ r.onClear }}" title="Remove this filter" style="all:unset;cursor:pointer;font-size:13px;color:var(--mut);padding-left:2px" style-hover="color:var(--ink)">✕</button></sc-if>
-              </div>
-            </sc-for>
-          </div>
-        </section>
-        <div style="display:flex;flex-direction:column;gap:12px;background:var(--s1);border:1px solid var(--line);border-radius:12px;padding:16px">
-          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap">
-            <div style="display:flex;flex-direction:column;gap:4px;min-width:0;flex:1 1 320px">
-              <div style="font:600 17px var(--sans);color:var(--ink)">{{ orb.title }}</div>
-              <div style="font:400 13px/1.45 var(--sans);color:var(--mut);text-wrap:pretty">{{ orb.note }}</div>
-            </div>
-            <div style="display:flex;gap:6px;flex-wrap:wrap">
-              <sc-if value="{{ orb.canBack }}" hint-placeholder-val="{{ false }}"><button onClick="{{ orb.back }}" style="display:flex;align-items:center;gap:6px;padding:6px 11px;border-radius:8px;border:1px solid var(--line);background:var(--s1);color:var(--ink);font:500 13px var(--sans);cursor:pointer" style-hover="border-color:var(--acc2)">Back to topic</button></sc-if>
-            </div>
-          </div>
-          <div style="border-radius:10px;background:var(--bg);border:1px solid var(--line)">{{ graphEl }}</div>
-          <sc-if value="{{ tl.has }}" hint-placeholder-val="{{ true }}">
-            <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
-              <button onClick="{{ tl.play }}" style="display:flex;align-items:center;gap:6px;padding:6px 11px;border-radius:8px;border:1px solid var(--line);background:var(--s1);color:var(--ink);font:500 13px var(--sans);cursor:pointer;min-width:64px;justify-content:center" style-hover="border-color:var(--acc2)">{{ tl.playLabel }}</button>
-              <span style="font:500 12px var(--mono);color:var(--mut)">{{ tl.start }}</span>
-              <input type="range" min="{{ tl.min }}" max="{{ tl.max }}" step="1" value="{{ tl.val }}" onChange="{{ tl.onChange }}" style="flex:1 1 200px;accent-color:var(--acc2);min-width:120px"></input>
-              <span style="font:500 12px var(--mono);color:var(--mut)">{{ tl.end }}</span>
-              <span style="font:600 13px var(--sans);color:var(--ink);min-width:150px">{{ tl.label }}</span>
-            </div>
-          </sc-if>
-          <div style="display:flex;flex-direction:column;gap:8px;padding-top:12px;border-top:1px solid var(--line)">
-            <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-              <span style="font:600 13px var(--sans);color:var(--ink)">Sources <span style="font-weight:400;color:var(--mut)">· {{ srcNote }}</span></span>
-              <span style="flex:1"></span>
-              <button onClick="{{ allOn }}" style="padding:5px 11px;border-radius:8px;border:1px solid var(--line);background:var(--s1);color:var(--ink);font:500 13px var(--sans);cursor:pointer" style-hover="border-color:var(--acc2)">All on</button>
-              <button onClick="{{ srcPick.none }}" style="padding:5px 11px;border-radius:8px;border:1px solid var(--line);background:var(--s1);color:var(--ink);font:500 13px var(--sans);cursor:pointer" style-hover="border-color:var(--acc2)">None</button>
-              <button onClick="{{ srcPick.toggle }}" style="padding:5px 11px;border-radius:8px;border:1px solid var(--line2);background:var(--s1);color:var(--ink);font:500 13px var(--sans);cursor:pointer" style-hover="border-color:var(--acc2)">{{ srcPick.label }}</button>
-            </div>
-            <sc-if value="{{ srcPick.open }}" hint-placeholder-val="{{ false }}">
-              <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-                <input value="{{ srcPick.q }}" onChange="{{ srcPick.onQ }}" placeholder="Filter sources" style="flex:1 1 220px;min-width:0;background:var(--bg);border:1px solid var(--line2);border-radius:8px;color:var(--ink);padding:6px 10px;outline:none;font:400 14px var(--sans)"></input>
-                <span style="font:400 13px var(--sans);color:var(--dim)">{{ srcPick.count }} · click to switch off, double-click for only that one</span>
-              </div>
-              <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:2px 12px;max-height:280px;overflow:auto;border:1px solid var(--line);border-radius:8px;padding:6px">
-                <sc-for list="{{ srcT }}" as="s" hint-placeholder-count="5">
-                  <button onClick="{{ s.onClick }}" onDoubleClick="{{ s.onOnly }}" style="all:unset;cursor:pointer;display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:6px;color:{{ s.col }};font:500 13px var(--sans);min-width:0" style-hover="background:var(--s2)"><span style="flex:none;width:12px;height:12px;border-radius:3px;border:1.5px solid var(--acc2);background:{{ s.box }}"></span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ s.tip }}</span></button>
-                </sc-for>
-              </div>
-            </sc-if>
-          </div>
-        </div>
-        <div style="display:flex;gap:14px;flex-wrap:wrap;font:400 14px var(--sans);color:var(--mut)">
-          <span style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:50%;background:var(--pink)"></span>person</span>
-          <span style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:50%;background:var(--blue)"></span>organisation</span>
-          <span style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:50%;background:var(--green)"></span>place</span>
-          <span style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:50%;background:var(--mut)"></span>other</span>
-          <span>Lines only where two names appear together more than chance would give. Hover a name to see its ties.</span>
-        </div>
-        <h2 style="margin:4px 0 0;font:600 16px var(--sans)">Appear together</h2>
-        <sc-for list="{{ pairs }}" as="p" hint-placeholder-count="3">
-          <button onClick="{{ p.onClick }}" style="white-space:normal;text-align:left;cursor:pointer;display:flex;justify-content:space-between;gap:12px;padding:10px 14px;border-radius:10px;background:{{ p.bg }};border:1px solid {{ p.bd }}" style-hover="border-color:var(--acc2)">
-            <span style="font:600 14px var(--sans);color:var(--ink)">{{ p.a }} <span style="color:var(--dim);font-weight:400">and</span> {{ p.b }}</span>
-            <span style="font:500 13px var(--mono);color:var(--ink2)">{{ p.n }}</span>
-          </button>
-        </sc-for>
-        <sc-if value="{{ pairsMore.hasMore }}" hint-placeholder-val="{{ false }}"><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><button onClick="{{ pairsMore.onMore }}" style="background:none;border:1px solid var(--line2);border-radius:8px;padding:6px 12px;cursor:pointer;font:500 14px var(--sans);color:var(--ink2)" style-hover="border-color:var(--acc)">{{ pairsMore.moreLabel }}</button><span style="font:400 13px var(--sans);color:var(--dim)">{{ pairsMore.shown }}</span></div></sc-if><sc-if value="{{ pairsMore.canLess }}" hint-placeholder-val="{{ false }}"><button onClick="{{ pairsMore.onLess }}" style="all:unset;cursor:pointer;font:500 13px var(--sans);color:var(--mut)" style-hover="color:var(--ink)">Show fewer</button></sc-if>
-        <sc-if value="{{ noPairs }}" hint-placeholder-val="{{ false }}"><p style="color:var(--mut);margin:0">No two names appear together more often than chance would give.</p></sc-if>
-        <sc-if value="{{ hasPairsHidden }}" hint-placeholder-val="{{ false }}"><p style="color:var(--mut);margin:0;font-size:14px">{{ pairsHidden }}</p></sc-if>
-        </sc-if>
-      </sc-if>
 
       <sc-if value="{{ v.framing }}" hint-placeholder-val="{{ false }}">
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px">
@@ -3568,6 +3267,7 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
 function digammaH(x) { let r = 0; while (x < 6) { r -= 1 / x; x += 1; } const f = 1 / (x * x); return r + Math.log(x) - 0.5 / x - f * (1 / 12 - f * (1 / 120 - f * (1 / 252 - f * (1 / 240 - f / 132)))); }
 const klAdmitH = (bv, B) => Math.max(0, Math.log(B) - Math.log(bv) + digammaH(bv + 1) - digammaH(B + 1));
 const holoTokens = t => [...new Set((clean(t).toLowerCase().replace(/[\u2019']/g, '').match(/[a-z][a-z-]{2,}/g) || []).filter(w => !STOP.has(w) && !/^-|-$/.test(w)))];
+const HD_GONE_VIEWS = new Set(['names', 'records', 'connections', 'overview']);
 const VIEW_LABEL = { ask: 'Ask', fixnames: 'Fix names', topics: 'Topics', inbox: 'Inbox', overview: 'Evidence overview', summary: 'Sources', search: 'Search', names: 'Names', types: 'Types', figures: 'Figures', statements: 'Statements', connections: 'Connections', framing: 'Framing', views: 'Views', patterns: 'Patterns', surprise: 'Surprise', reader: 'Sources', profile: 'Names', draft: 'Draft', records: 'Assertions', ingest: 'Add & publish', lanes: 'Lanes', margin: 'Margin', seam: 'Seam', orbit: 'Orbit', fields: 'Fields', review: 'Review' };
 const SU_CURSORS = [
   { id: 'loo', label: 'Everything else', desc: 'Each statement against normal text plus everything the other sources in this view say, regardless of date: what this source says that nothing else in view, and nothing normal, prepares you for.' },
@@ -3844,21 +3544,12 @@ async function loadReadingIndex(force) {
 const SAMPLES = {};
 const W = s => new Set(s.split(' '));
 const STOP = W('the a an and or of to in on for with at by from as is are was were be been being will would should could may might can this that these those it its their his her they them we our you your i not no new every per than then also into over under about after before during each which who whom what when where while there here has have had do does did said says last first next more most some any all other such only just very since until because through across between within without upon a day week daily');
-const ART = W('The A An This That These Those Our Their Its His Her');
-const TITLES = W('Mayor Chef Dr Mr Mrs Ms Prof Professor Minister Director President Senator Judge Councillor Councilor Officer Captain Nurse Sir Dame Chair Chairman Chairwoman Governor Secretary Representative Commissioner Chief Gov Sen Rep Lieutenant General Admiral Sergeant Detective Inspector Superintendent Principal Coach');
-const NOT_NAMES = W('U.S U.K US UK EU EDT EST UTC GMT TEU AM PM OK TV IT Top Watch Listen Share Subscribe Transcript Download Sponsor Message Menu Search Sign Log More Read Skip Close Open Getty Images Stockphoto iStock Courtesy Photo Video Audio Advertisement Related Loading He She It They We You');
-const LEAD_WORDS = W('But And Or So Yet On In At For From To By With After Before Since When While If As Then Now Here There Why How What Who Where Also Still Even Only Just Last Next Every Some Many Most Other Such Both Each More Than');
 const PLACE_FIRST = W('Port Mount Lake Fort Cape Point Isle Gulf');
 const MONTHS = W('Jan Feb Mar Apr Jun Jul Aug Sep Sept Oct Nov Dec January February March April May June July August September October November December Monday Tuesday Wednesday Thursday Friday Saturday Sunday');
 const ORG = W('Council Authority Farms Dairy Inc Ltd LLC Company Co Department Division Agency Office Group Board Committee University Hospital School Structural Associates Partners Foundation Institute Ministry Commission Services Corporation Corp Bureau Trust Union Party Press News Times Club Team Clinic Lab Labs Industries Court Caucus Congress Administration Guard Navy Army Engineers Association Society Center Service Police Senate House Assembly Bradstreet Line Lines Marine Shipping Holdings Bank Centre Coalition Alliance Network Ministries Initiative Collaborative Partnership');
-const ORG_LOWER = new Set([...ORG].map(w => w.toLowerCase()).concat(['inc.', 'ltd.', 'corp.', 'co.', 'plc', 'gmbh', 'llp', 'lp', 'pa', 'pllc', 'inc', 'corp']));
 const PLACE = W('Bridge Avenue Street Road River Park Square City County District Station Corridor Lane Way Valley Hill Harbor Harbour Island Bay Lake Coast Airport Market Centre Plaza Quarter North South East West Point Terminal Channel Tunnel Ocean Sea States Kingdom Chile Maryland Virginia Baltimore Singapore Asia America Europe Africa Dundalk York');
 const TYPE_C = { person: 'var(--pink)', organisation: 'var(--blue)', place: 'var(--green)', other: 'var(--mut)' };
 const TYPE_L = { person: 'People', organisation: 'Organisations', place: 'Places', other: 'Other names' };
-// The narrow, safe subset of PERSON_ROLE used to SPLIT a leading profession off a
-// name ("Actress Susan Sarandon"): professions that never begin a common title, and
-// never a noble title ("Princess Bride" stays one surface) or a word TITLES already owns.
-const TITLE_ROLES = new Set(('actress actor singer songwriter musician composer pianist violinist filmmaker screenwriter playwright novelist poet essayist journalist reporter columnist editor publisher illustrator painter sculptor photographer architect designer inventor engineer scientist physicist chemist astronomer biologist historian archaeologist anthropologist sociologist psychologist economist linguist philosopher theologian lawyer attorney surgeon nurse activist feminist humanitarian revolutionary entrepreneur industrialist businessman businesswoman executive philanthropist comedian performer entertainer').split(' '));
 // EMERGENT TYPING — the relation sets kind induction types against. Small and
 // structural: a referent's own relations, with position (subject vs object) doing
 // the disambiguation ("studied" as subject -> a person; "studied at X" -> X is an
@@ -3918,7 +3609,7 @@ function hdMostLikely(text, known) {
   text = String(text || '').replace(/[ \t]+/g, ' ').replace(/\n{3,}/g, '\n\n').trim();
   if (!text) return { text: '', known: [], proposals: [] };
   const K = (known || []).filter(n => n && n.length >= 3); const Kset = new Map(); K.forEach(n => Kset.set(n.toLowerCase(), n));
-  let names = []; try { names = [...new Set(splitSentences(text).flatMap(se => findNames(se.t).map(n => n.name)))].filter(n => n.length >= 3); } catch (e) {}
+  let names = []; try { names = [...new Set(hdSurfaceList(text).map(x => x.surface))].filter(n => n.length >= 3); } catch (e) {}
   const hits = [], props = []; let out = text;
   for (const nm of names) {
     const key = nm.toLowerCase(); if (Kset.has(key)) { hits.push(Kset.get(key)); continue; }
@@ -4028,22 +3719,62 @@ async function hdPdfFigures(pdf, pageCap) {
   return out;
 }
 
-// The engine: eoreader7's POST /v1/read reads each added document through the session reader (model-free). The Holodeck
-// draws what comes back and treats its surfaces as a witness beside its own finder; it never lets them replace it.
+// THE MASTER PIPELINE reads every document on this page (2026-10-24): khora's read-core.mjs::readDocument, in a module worker
+// (master-reading-worker.js), the same call every tool makes. Its cast is the page's names — each being with the place of every
+// mention — and its relations and sentences ride with it. Nothing on the page finds a name by a rule of its own. The engine's
+// HTTP door is the same pipeline on a server; the page no longer needs it to read.
 const HD_ENG = { url: null, downAt: 0 };
 function hdEngineHosts() { let u = null; try { u = localStorage.getItem('hd:engine'); } catch (e) {} return [u, 'http://127.0.0.1:11436', 'http://127.0.0.1:11476'].filter((x, i, a) => x && a.indexOf(x) === i); }
-async function hdEngineRead(name, text) {
-  if (!HD_ENG.url && Date.now() - HD_ENG.downAt < 60000) return null;
-  for (const host of HD_ENG.url ? [HD_ENG.url] : hdEngineHosts()) {
-    hdT('engine', 'ask', 'Asking the eoreader7 engine (' + host.replace(/^https?:\/\//, '') + ') to read “' + hdCut(name, 50) + '”…');
-    const ctl = new AbortController(), timer = setTimeout(() => ctl.abort(), 20000);
+const HD_MASTER_CAP = 200000;   // the most characters one read takes; a longer text is cut and the cut is said
+let HD_MW = null, HD_MW_READY = null; const HD_MW_WAIT = new Map(); let HD_MW_SEQ = 0;
+function hdMasterWorker() {
+  if (HD_MW_READY) return HD_MW_READY;
+  HD_MW_READY = new Promise((resolve) => {
     try {
-      const r = await fetch(host + '/v1/read', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ name, text: text.slice(0, 60000) }), signal: ctl.signal });
-      const j = await r.json(); if (!r.ok || j.schema !== 'EORead@1') { if (HD_ENG.url === host) HD_ENG.url = null; continue; }
-      HD_ENG.url = host; return { host, read: j };
-    } catch (e) { if (HD_ENG.url === host) HD_ENG.url = null; } finally { clearTimeout(timer); }
+      HD_MW = new Worker(new URL('master-reading-worker.js', location.href), { type: 'module' });
+      HD_MW.onmessage = (e) => { const m = e.data || {}; if (m.ready) return resolve(HD_MW); const w = HD_MW_WAIT.get(m.id); if (w) { HD_MW_WAIT.delete(m.id); w(m); } };
+      HD_MW.onerror = () => resolve(null);
+    } catch (e) { resolve(null); }
+  });
+  return HD_MW_READY;
+}
+async function hdMasterReadText(name, text) {
+  const W = await hdMasterWorker(); if (!W) return null;
+  const id = 'm' + (++HD_MW_SEQ);
+  const t0 = performance.now();
+  const m = await new Promise((resolve) => { HD_MW_WAIT.set(id, resolve); W.postMessage({ id, text: String(text || ''), cap: HD_MASTER_CAP }); });
+  if (!m || m.err || !m.entry) return null;
+  const E = m.entry;
+  // the door's EORead@1 shape, so every caller of the engine reading reads it unchanged; spans are the master's mentions
+  return { host: 'this page · khora read-core.mjs::readDocument', read: { schema: 'EORead@1', ms: performance.now() - t0, basis: 'khora master pipeline (read-core.mjs::readDocument), in this page' + (m.cut ? ` · read the first ${m.cut.read} of ${m.cut.total} characters` : ''),
+    sentences: E.sentences || [], relations: (E.edges || []).map(e => ({ participants: [{ surface: e.end1Face || e.end1 }, { surface: e.end2Face || e.end2 }], relation: e.label, polarity: e.polarity })),
+    referents: (E.cast || []).map(c => ({ surfaces: c.allSurfaces && c.allSurfaces.length ? c.allSurfaces : [c.surface], surface: c.surface, routes: ['referent'], grain: null, spans: c.mentionSpans || [] })),
+    descriptorBeings: [], language: E.language || null, gaps: E.gaps || [] } };
+}
+async function hdEngineRead(name, text) {
+  hdT('engine', 'ask', 'Reading “' + hdCut(name, 50) + '” through khora\'s master pipeline in this page…');
+  return hdMasterReadText(name, text);
+}
+// a document with no master reading on it yet (a sample, a source added before this page read through the master) is read once,
+// after the first paint; when the read lands the page reads again (hd-cut)
+const HD_MASTER = new Map(), HD_MASTER_PENDING = new Set();
+function hdMasterFor(d) {
+  if (d.eng && d.eng.referents && d.eng.referents.every(r => Array.isArray(r.spans))) return d.eng;
+  const key = d.id + '|' + (d.text || '').length + '|' + (d.text || '').slice(0, 120) + '|' + (d.text || '').slice(-120);
+  if (HD_MASTER.has(key)) return HD_MASTER.get(key);
+  if (!HD_MASTER_PENDING.has(key) && (d.text || '').trim()) {
+    HD_MASTER_PENDING.add(key);
+    setTimeout(async () => { let got = null; try { got = await hdMasterReadText(d.title || d.id, d.text); } catch (e) { got = null; }
+      HD_MASTER.set(key, got ? hdEngineCompact(got.host, got.read) : null); HD_MASTER_PENDING.delete(key); if (typeof hdCutChanged === 'function') hdCutChanged(); }, 0);
   }
-  HD_ENG.downAt = Date.now(); return null;
+  return null;
+}
+// the names a sentence holds, as the master read them: every mention of every being in the master's cast that falls inside it
+function hdMasterNames(d, se) {
+  const eng = hdMasterFor(d); if (!eng) return [];
+  const out = [];
+  for (const r of eng.referents) for (const [a, b] of (r.spans || [])) if (a >= se.s && b <= se.e) out.push({ name: r.surface || r.surfaces[0], s: a - se.s, e: b - se.s, engine: 'khora' });
+  return out.sort((x, y) => x.s - y.s);
 }
 // THE SOURCES READ TOGETHER. The engine's own reading across a workspace (POST /v1/read-across): which source names
 // which, what the named text holds that the naming source never writes, what is spoken of and held by no source.
@@ -4101,45 +3832,46 @@ const POS_L = { NOUN: 'noun', PROPN: 'proper noun', VERB: 'verb', ADJ: 'adjectiv
 const HD_KIND_PLAIN = { differs: 'Different figures', polarity: 'Denied', scope: 'Not named', absent: 'Spoken of, not held', defined: 'Defined as', names: 'Refers to', same: 'Both state', terms: 'Same subject', cite: 'Cites' };
 const HD_KIND_RANK = { differs: 0, polarity: 1, scope: 2, absent: 3, defined: 4, names: 5, same: 6, cite: 7, terms: 8 };
 const HD_STANDING_PLAIN = { fixed: 'always the same', 'one at a time': 'one at a time', 'many-valued': 'many values' };
-const hdEngineCompact = (host, r) => ({ host, ms: Math.round(r.ms), basis: r.basis || null, sentences: r.sentences.length, relations: r.relations.length, referents: r.referents.map(x => ({ surfaces: x.surfaces, routes: x.routes, grain: x.grain || null })).concat(r.descriptorBeings.map(b => ({ surfaces: b.surfaces, routes: ['descriptor'], grain: null }))) });
-const HD_ENGM = new WeakMap();
-function hdEngineMap(eng) { let m = HD_ENGM.get(eng); if (m) return m; m = new Map(); eng.referents.forEach(r => r.surfaces.forEach(sf => { const k = sf.toLowerCase(); if (!m.has(k)) m.set(k, { surface: sf, routes: r.routes, grain: r.grain }); })); HD_ENGM.set(eng, m); return m; }
-function hdEngineMerge(t, ns, eng, hy) {
-  if (!eng || !hy) return ns;
-  const m = hdEngineMap(eng), have = new Set(ns.map(n => n.name.toLowerCase())), out = ns.slice();
-  ns.forEach(n => { const r = m.get(n.name.toLowerCase()); if (r) n.engine = r.routes.join('+'); });
-  m.forEach((r, k) => {
-    if (have.has(k)) return;
-    const words = k.split(/\s+/), desc = r.routes.includes('descriptor'), body = desc ? words.slice(1) : words;
-    if (!body.length || body.some(w => MONTHS.has(w[0].toUpperCase() + w.slice(1)))) return;
-    if (body.length === 1 && typeof ORG_LOWER !== 'undefined' && ORG_LOWER.has(body[0].replace(/[.,]+$/, ''))) return;
-    if (hy.functionOnly(body[0]) || hy.functionOnly(body[body.length - 1])) return;
-    if (!desc && body.length === 1 && hy.commonOnly(body[0])) return;
-    const re = new RegExp('(?<![\\p{L}\\p{N}])' + k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\s+/g, '\\s+') + '(?![\\p{L}\\p{N}])', 'giu'); let x;
-    while ((x = re.exec(t))) { const s0 = x.index, e0 = s0 + x[0].length; if (out.some(n => s0 < n.e && n.s < e0)) continue; out.push({ name: r.surface, s: s0, e: e0, engine: r.routes.join('+') + (r.grain ? ' · ' + r.grain : ''), engineAdded: true }); }
-  });
-  return out.sort((a, b) => a.s - b.s);
-}
+const hdEngineCompact = (host, r) => ({ host, ms: Math.round(r.ms), basis: r.basis || null, sentences: r.sentences.length, relations: r.relations.length, referents: r.referents.map(x => ({ surfaces: x.surfaces, surface: x.surface || null, routes: x.routes, grain: x.grain || null, spans: x.spans || null })).concat(r.descriptorBeings.map(b => ({ surfaces: b.surfaces, routes: ['descriptor'], grain: null }))) });
 // read-only handle for tests: the real functions, so a harness can recompute what a trace claims happened
-setTimeout(() => { try { window.__holodeck = Object.freeze({ analyze, holoKit, holoName, paradigms, holoTopics, fieldTopics, fieldCatalog, splitSentences, findNames, isJunk, readAny, hdHygiene, hdPos: w => hdPos(w), hdPosForms: () => HD_POS, hdDeclReady: () => !!HD_DECL, hdEngineReady: () => !!HD_ENGINE, hdReaderReady: () => hdReaderReady(), hdAttrReady: () => hdAttrReady(), hdHoldReady: () => hdHoldReady(), summarizeHolders: (sts, names) => (HD_ATTR ? HD_ATTR.summarizeHolders(sts, names) : null) }); } catch (e) {} }, 0);
+setTimeout(() => { try { window.__holodeck = Object.freeze({ analyze, holoKit, holoName, paradigms, holoTopics, fieldTopics, fieldCatalog, splitSentences, isJunk, readAny, hdHygiene, hdPos: w => hdPos(w), hdPosForms: () => HD_POS, hdDeclReady: () => !!HD_DECL, hdEngineReady: () => !!HD_ENGINE, hdReaderReady: () => hdReaderReady(), hdAttrReady: () => hdAttrReady(), hdHoldReady: () => hdHoldReady(), summarizeHolders: (sts, names) => (HD_ATTR ? HD_ATTR.summarizeHolders(sts, names) : null) }); } catch (e) {} }, 0);
 const hdCut = (t, n) => { t = String(t || '').replace(/\s+/g, ' ').trim(); return t.length > n ? t.slice(0, n - 1) + '…' : t; };
+// THE CUT IS KHORA'S (2026-10-24). Which dotted tokens are words is khora's knowledge, never a list on this page: the language's
+// measured punctuation prior and the text's own (read-core.mjs::abbreviationsFor), plus the aliases the hyperlexicon resolves for
+// this text (organs/lexicon.js over the local Wiktionary, asked once per new dotted form; the page re-reads when an answer lands).
+// Inside a run of lines the sentences are spans.js::splitSentences'. What stays this page's is the page itself: furniture lines
+// (a short line repeated 3+ times, a bare page number) and the hard-wrap join, whose closed-class test reads the POS prior.
+// Until khora's modules have loaded (a moment after the page opens) a run of lines is one unit, uncut, and the page reads again
+// once they arrive (hd-cut); no second splitter stands in for khora's.
+// SCOPE (Greenberg): this page's analysis reads English — the abbreviation prior and the lexicon asked are English's, and the
+// hard-wrap join's lower-case opener is a Latin-script test. A document in another language is cut with the English knowledge
+// here; the reading page (reading/demo.html) and holodeck-reader.js read it with its own language's priors.
+const HD_CLOSED = new Set(['DET', 'ADP', 'CCONJ', 'SCONJ', 'AUX', 'PART', 'PRON']);
+const hdClosedWord = w => { const c = hdPos(w); if (!c) return false; let best = null, n = -1; for (const [k, v] of Object.entries(c)) if (v > n) { n = v; best = k; } return HD_CLOSED.has(best); };
 function splitSentences(text, tr) {
-  const out = []; const re = /[^\n]+?(?:[.!?]+(?=\s|$)|(?=\n)|$)/g; let m;
-  const ABBR = /(?:\b(?:a\.m|p\.m|U\.S|U\.K|Mr|Mrs|Ms|Dr|St|Pte|Ltd|Inc|Co|No|vs|Jr|Sr|Gov|Sen|Rep|Mt|Ft|approx|etc|e\.g|i\.e)|\b[A-Z])\.$/;
+  const out = []; const lineRe = /[^\n]+/g; let m;
   // page furniture: short lines repeated 3+ times (running heads/feet) and bare page numbers
   const lc = new Map(); text.split('\n').forEach(l => { const k = l.trim(); if (k.length >= 4 && k.length <= 120) lc.set(k, (lc.get(k) || 0) + 1); });
   const FURN = k => (lc.get(k) || 0) >= 3 && !/[.!?]$/.test(k) || /^(page\s*)?\d{1,3}(\s*(of|\/)\s*\d{1,3})?$/i.test(k); let skipped = false;
-  while ((m = re.exec(text))) {
+  const blocks = [];
+  while ((m = lineRe.exec(text))) {
     const raw = m[0]; const lead = raw.length - raw.replace(/^\s+/, '').length; const tt = raw.trim();
     if (!tt) continue;
-    const s = m.index + lead, e = s + tt.length; const prev = out[out.length - 1];
-    const whole = /(^|\n)[ \t]*$/.test(text.slice(Math.max(0, s - 40), s)) && /^[ \t]*(\n|$)/.test(text.slice(e, e + 40));
-    if (whole && FURN(tt)) { skipped = true; tr && tr('sentences', 'furniture', 'Skipped page furniture “' + hdCut(tt, 60) + '” (' + (/^(page\s*)?\d/i.test(tt) ? 'a page number' : 'repeats ' + lc.get(tt) + ' times with no end punctuation') + ')', { s, e }); continue; }
-    const gapOK = /^[ \t]*\n[ \t]*$/.test(text.slice(prev ? prev.e : 0, s)) || (skipped && !!prev); skipped = false;
-    if (prev && ABBR.test(prev.t) && !/\n/.test(text.slice(prev.e, s))) { tr && tr('sentences', 'join', 'Kept going past “' + hdCut(prev.t.slice(-14), 16) + '”: an abbreviation, not a sentence end', { s: prev.s, e }); prev.e = e; prev.t = text.slice(prev.s, e); continue; }
-    // hard-wrapped line (PDF, minutes, transcripts): join when the previous line is unfinished and there's no blank line between
-    if (prev && gapOK && !/[.!?:;"”’)\]]$/.test(prev.t) && (/^[a-z(,;–—-]/.test(tt) || /\b(the|of|to|with|and|or|a|an|for|in|on|by|that|from|at|as|is|are|was|were|be|this|its|their|our)$/i.test(prev.t)) && prev.t.length + tt.length < 900) { tr && tr('sentences', 'join', 'Joined a hard-wrapped line: “' + hdCut(prev.t.slice(-24), 26) + '” continues', { s: prev.s, e }); prev.e = e; prev.t = prev.t + ' ' + tt; continue; }
-    out.push({ s, e, t: tt });
+    const s = m.index + lead, e = s + tt.length; const prev = blocks[blocks.length - 1];
+    if (FURN(tt)) { skipped = true; tr && tr('sentences', 'furniture', 'Skipped page furniture “' + hdCut(tt, 60) + '” (' + (/^(page\s*)?\d/i.test(tt) ? 'a page number' : 'repeats ' + lc.get(tt) + ' times with no end punctuation') + ')', { s, e }); continue; }
+    const gapOK = /^[ \t\r]*\n[ \t\r]*$/.test(text.slice(prev ? prev.e : 0, s)) || (skipped && !!prev); skipped = false;
+    // hard-wrapped line (PDF, minutes, transcripts): join when the previous line is unfinished and there's no blank line between —
+    // unfinished: no closing mark, and the next line opens lower-case or the previous ends on a closed-class word (the POS prior's)
+    const lastWord = prev ? (prev.text.match(/([\p{L}'’]+)\W*$/u) || [])[1] : null;
+    if (prev && gapOK && !/[.!?:;"”’)\]]$/.test(prev.text) && (/^[a-z(,;–—-]/.test(tt) || (lastWord && hdClosedWord(lastWord))) && prev.text.length + tt.length < 900) { tr && tr('sentences', 'join', 'Joined a hard-wrapped line: “' + hdCut(prev.text.slice(-24), 26) + '” continues', { s: prev.s, e }); prev.e = e; prev.text = text.slice(prev.s, e); continue; }
+    blocks.push({ s, e, text: tt });
+  }
+  const abbr = hdAbbreviations(text);
+  if (abbr && tr) tr('sentences', 'abbreviations', abbr.n + ' dotted forms kept as words (khora: the measured prior ' + abbr.prior + ', this text ' + abbr.derived + ', the hyperlexicon ' + abbr.aliases + ')', { s: 0, e: 0 });
+  for (const b of blocks) {
+    const body = b.text.replace(/\r/g, ' ');
+    const cut = HD_CORE ? HD_CORE.split(body, abbr ? { abbreviations: abbr.set } : {}) : [{ text: body, offset: 0 }];
+    for (const x of cut) { const s = b.s + x.offset, e = s + x.text.length; out.push({ s, e, t: x.text.replace(/\s*\n\s*/g, ' ') }); }
   }
   return out.filter(x => x.t.length >= 3);
 }
@@ -4189,6 +3921,45 @@ Promise.all([
   import(new URL('holodeck-reader.js', location.href)).then(M => M.makeEngineRelationReader()),
 ]).then(([P, Q, R]) => { HD_PROF = P; HD_ASK = Q; HD_READER = R; }).catch(() => {});
 const hdReaderReady = () => !!(HD_PROF && HD_ASK && HD_READER);
+// khora's sentence cut and the hyperlexicon (splitSentences): the core's abbreviation knowledge, spans.js's splitter, and the lexicon
+// organ over the local server's Wiktionary (POST /lexicon). A page without that server reads with the prior and the text's own.
+let HD_CORE = null, HD_LEX = null, HD_LEX_GAP = null, HD_CUT_VER = 0;
+const hdCutChanged = () => { HD_CUT_VER++; HD_ABBR.clear(); try { window.dispatchEvent(new Event('hd-cut')); } catch (e) {} };
+const HD_ABBR = new Map();
+Promise.all([
+  import(new URL('vendor/khora/native/the-fold/read-core.mjs', location.href)),
+  import(new URL('vendor/khora/native/adapters/text/spans.js', location.href)),
+  import(new URL('vendor/khora/native/organs/lexicon.js', location.href)),
+  import(new URL('vendor/khora/native/the-fold/language-context.js', location.href)),
+  import(new URL('holodeck-reader.js', location.href)).then(M => M.loadLanguage('eng')),
+]).then(([C, S, L, LC]) => {
+  HD_CORE = { abbreviationsFor: C.abbreviationsFor, priorsFor: C.priorsFor, split: S.splitSentences, derive: S.deriveAbbreviations, L, surfaces: LC.extractSurfacesHeard };
+  HD_LEX = L.makeLexicon({ lang: 'en', ask: async (forms, lang) => { try { const r = await fetch(new URL('lexicon', location.href), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ forms, lang }) }); return r.ok ? await r.json() : null; } catch (e) { return null; } } });
+  hdCutChanged();
+}).catch(() => {});
+// khora's surface organ over khora's cut: the names a text the page holds no reading of (a typed question, a shuffled null) shows,
+// each with how many sentences it stands in. Empty until khora's modules have loaded.
+function hdSurfaceList(text) {
+  if (!HD_CORE) return [];
+  try { const a = hdAbbreviations(text); return HD_CORE.surfaces(HD_CORE.split(String(text || ''), a ? { abbreviations: a.set } : {})); } catch (e) { return []; }
+}
+// the abbreviations for one text: what khora knows, plus the aliases the hyperlexicon has answered; unanswered dotted forms are asked
+// once, and an answer that keeps one re-reads the page. A giver that does not answer is a gap (HD_LEX_GAP), asked no further.
+function hdAbbreviations(text) {
+  if (!HD_CORE) return null;
+  const key = text.length + '|' + text.slice(0, 200) + '|' + text.slice(-200);
+  if (HD_ABBR.has(key)) return HD_ABBR.get(key);
+  const priors = HD_CORE.priorsFor('eng');
+  const known = new Set([...((priors.punctuation && priors.punctuation.abbreviations) || []), ...HD_CORE.derive(text)].map(a => String(a).toLowerCase()));
+  const junc = HD_CORE.L.aliasJunctions(text, known);
+  const unasked = [...junc.keys()].filter(f => HD_LEX.get(f) === undefined);
+  if (unasked.length && !HD_LEX_GAP) HD_LEX.want(unasked).then(() => { const last = HD_LEX.log[HD_LEX.log.length - 1]; if (last && last.gap) HD_LEX_GAP = last.gap; else if (unasked.some(f => HD_LEX.get(f))) hdCutChanged(); });
+  const answered = new Map([...junc].filter(([f]) => HD_LEX.get(f) !== undefined));
+  const aliases = HD_CORE.L.resolveAliases(HD_LEX, answered, text).filter(r => r.kept).map(r => r.form);
+  const a = HD_CORE.abbreviationsFor(text, { priors, aliases });
+  HD_ABBR.set(key, a); if (HD_ABBR.size > 64) HD_ABBR.delete(HD_ABBR.keys().next().value);
+  return a;
+}
 // THE HOLDER-INDEXED READING (holodeck-holders.js): the vendored attribution
 // adapter, wired read-only. `hdPos` supplies the treebank verb prior; the
 // folded referent table (built at the end of analyze) supplies the admitted
@@ -4330,80 +4101,6 @@ const HD_REGISTER = { T: 'Capitalised', A: 'ALL-CAPS' };
 const hdRegister = w => { const m = /^\p{Lu}[\p{L}\p{M}'’]*(\p{L})$/u.exec(w); if (!m) return null;
   const es = Object.entries((HD_POS && HD_POS[w.toLowerCase()]) || {}); if (es.length && es.sort((a, b) => b[1] - a[1])[0][0] === 'NUM') return null;
   return /\p{Ll}/u.test(m[1]) ? 'T' : 'A'; };
-function findNames(t, hy) {
-  const out = [];
-  // a hyphen only continues the same capitalized word when what follows it is ALSO capitalized
-  // (Winston-Salem, Coca-Cola) -- a lowercase continuation (Atlanta-based) is a modifier, not part of the name
-  // CHOMSKY: the arrangement (a name is a run of name-letters; a referent is the fold
-  // of its surfaces) is universal — the CASE convention that opens a name is the
-  // language's, declared here (\p{Lu}, any cased script), never ASCII A-Z assumed as
-  // universal. The ASCII class silently truncated "García" to "Garc" and "Márquez" to
-  // "M", fragments that then collided and merged unrelated people.
-  const WORD = "[\\p{Lu}][\\p{L}\\p{M}'\\u2019&.]*(?:-[\\p{Lu}][\\p{L}\\p{M}'\\u2019&.]*)*";
-  const re = new RegExp(WORD + '(?:\\s+(?:of\\s+|and\\s+|&\\s+)?' + WORD + ')*', 'gu'); let m;
-  const push = (words, idx, title, m, after) => {
-    const oi = words.findIndex((w, i) => i > 0 && i < words.length - 1 && ORG.has(w.replace(/[.,]$/, '')) && (() => { const r = words.slice(i + 1); return r.length >= 1 && r.length <= 3 && r.every(x => /^[A-Z][a-z'\u2019.-]+$/.test(x) && !ORG.has(x) && !PLACE.has(x) && !TITLES.has(x.replace(/\.$/, '')) && !/^(of|and)$/.test(x)); })());
-    if (oi > 0) { let j2 = idx; for (let i = 0; i <= oi; i++) j2 = next(j2, words[i]); push(words.slice(0, oi + 1), idx, title, m, ' ' + words[oi + 1]); push(words.slice(oi + 1), j2, null, m, after); return; }
-    const ji = words.findIndex((w, i) => i > 0 && i < words.length - 1 && /^(and|&)$/.test(w) && (/^[A-Z]{2,}['\u2019]?s?$/.test(words[i - 1]) || /^[A-Z]{2,}$/.test(words[i + 1])));
-    if (ji > 0) { let j2 = idx; for (let i = 0; i <= ji; i++) j2 = next(j2, words[i]); push(words.slice(0, ji), idx, title, m, ' ' + words[ji]); push(words.slice(ji + 1), j2, null, m, after); return; }
-    for (;;) { if (!words.length) break; const w0 = words[0]; let why = null;
-      if (ART.has(w0) || LEAD_WORDS.has(w0) || /^(of|and|&)$/.test(w0)) why = '';
-      else if (hy && words.length > 1) { if (hy.nonNominal(w0)) why = qW(w0) + ' has no noun or name reading'; else if (words.length > 2 && /(^|[;:]\s*)[\s"'(]*$/.test(t.slice(0, idx)) && (() => { const cw = (after.match(/\b[A-Za-z]{4,}\b/g) || []); return cw.filter(x => x === x.toLowerCase()).length > cw.filter(x => x !== x.toLowerCase()).length; })() && !hy.namePair(w0, words[1]) && hy.ordinaryOpener(w0)) why = hy.lastWhy + ', this sentence is prose, not a title line, and ' + qW(w0 + ' ' + words[1]) + ' is never written capitalised mid-sentence'; }
-      if (why === null) break; if (why) hy.note('lead', words.join(' '), 'dropped the opening ' + qW(w0) + ': ' + why); idx = next(idx, w0); words.shift(); }
-    if (words.some(w => /^(Getty|Stockphoto|iStock|Courtesy|Transcript|Sponsor|Shutterstock|Images)$/.test(w))) return;
-    while (words.length && (/^(of|and|&)$/.test(words[words.length - 1]) || (hy && words.length > 1 && hy.functionOnly(words[words.length - 1])))) { const wl = words.pop(); if (hy && !/^(of|and|&)$/.test(wl)) hy.note('tail', words.join(' ') + ' ' + wl, 'dropped the dangling ' + qW(wl) + ': it is only ever a function word'); }
-    if (!words.length) return;
-    words[words.length - 1] = words[words.length - 1].replace(/[.,]+$/, '').replace(/['\u2019]s?$/, '');
-    if (words.length === 1 && /^(I|We|You|They|He|She|It|That|There|What|Let|Don|Won|Can|Isn|Didn|Doesn)['\u2019](ve|m|re|ll|d|s|t)$/i.test(words[0])) return;
-    if (!words[words.length - 1]) return;
-    if (hy) { const cw = words.find(w => hy.clause(w)); if (cw) { hy.note('drop', words.join(' '), 'not a name: ' + qW(cw) + ' has no noun or name reading, so this is a clause or headline'); return; } }
-    // A SHOUTED run (every word ALL-CAPS) is a name only where its words are not ordinary lowercase words. That is MEASURED, never
-    // listed: hy.capNormal asks the smallest region that differs how often each word is written capitalised mid-sentence. A lone
-    // all-caps word amid mixed case is read as an acronym, so the test applies to a run of two or more, or to a line with no lowercase
-    // at all (there the capitals say nothing about the word). A word no region has seen proves nothing, so a run holding one stays.
-    if (hy && words.every(w => /^\p{Lu}[\p{Lu}'’]+[.,;:]*$/u.test(w)) && (words.length > 1 || !/\p{Ll}/u.test(t)) && words.every(w => hy.shoutedOrdinary(w.replace(/[.,;:]+$/, '')))) { hy.note('drop', words.join(' '), 'not a name: an ALL-CAPS run of ordinary words — ' + hy.lastWhy); return; }
-    const atStart = /(^|[;:]\s*)[\s"'(]*$/.test(t.slice(0, idx));
-    if (hy && atStart && /^\s*:/.test(after) && words.every(w => hy.commonOnly(w))) { hy.note('label', words.join(' '), 'not a name: a line-opening run of common words followed by a colon is a form label'); return; }
-    const acr = /^[A-Z]{2,}$/.test(words[0]);
-    if (atStart && words.length === 1 && !title && !acr) return;
-    if (words.every(w => MONTHS.has(w) || NOT_NAMES.has(w) || TITLES.has(w.replace(/\.$/, '')) || /^(Vice|Deputy|Assistant|Acting|Interim|Senior|Chief)$/.test(w))) return;
-    if (words[0].length < 2) return;
-    // a bare company suffix is never a name on its own ("INC", "LLC", "Corp") -- it only counts inside a longer name
-    if (words.length === 1 && ORG_LOWER.has(words[0].replace(/[.,]+$/, '').toLowerCase())) { if (hy) hy.note('drop', words[0], 'not a name: a company suffix standing alone'); return; }
-    const name = words.join(' ');
-    const am = after.match(/^\s*\(([A-Z]{2,})\)/);
-    const saidAfter = /^\s+(said|says|told|reported|wants|argued|added|asked|wrote|stated|announced)\b/.test(after);
-    out.push({ name, s: idx, e: idx + name.length, title, alias: am ? am[1] : null, saidAfter, acr: acr && words.length === 1 });
-  };
-  const next = (idx, w) => { const rest = t.slice(idx + w.length); return idx + w.length + (rest.match(/^\s+/) || [''])[0].length; };
-  const runOf = (words, at, after) => {
-    // split at a title word — or a leading PROFESSION ("Actress Susan Sarandon" ->
-    // (Actress) "Susan Sarandon"): a capitalised human role opens a name the way a
-    // title does, and the role is not part of the name. TITLE_ROLES is the narrow,
-    // safe subset of PERSON_ROLE — professions, never noble titles ("Princess Bride"
-    // must stay one surface) and never title-ish words TITLES already owns.
-    let ti = words.findIndex(w => TITLES.has(w.replace(/\.$/, '')) || TITLE_ROLES.has(w.toLowerCase().replace(/[.,;:]+$/, '')));
-    if (ti >= 0) {
-      let idx = at; for (let i = 0; i < ti; i++) idx = next(idx, words[i]);
-      if (ti > 0) push(words.slice(0, ti), at, null, m, ' ' + words[ti]);
-      let j = ti + 1; idx = next(idx, words[ti]);
-      if (words[j] === 'of' && words[j + 1]) { idx = next(next(idx, words[j]), words[j + 1]); j += 2; while (/^(and|&)$/.test(words[j] || '') && words[j + 1]) { idx = next(next(idx, words[j]), words[j + 1]); j += 2; } }
-      push(words.slice(j), idx, words[ti], m, after);
-    } else push(words, at, null, m, after);
-  };
-  while ((m = re.exec(t))) {
-    const words = m[0].split(/\s+/); const cuts = [];
-    // REGISTER: where the next word is in the other register and the material says names here do not change register, one name
-    // stops and the next starts ("Rose DeWitt Bukater | LEONARDO DICAPRIO"). Measured by hy.registerBreak; without the prior, never cut.
-    if (hy) for (let i = 1; i < words.length; i++) if (hy.registerBreak(words[i - 1], words[i])) cuts.push({ i, why: hy.lastWhy });
-    if (!cuts.length) { runOf(words, m.index, t.slice(m.index + m[0].length)); continue; }
-    let p = m.index; const starts = words.map(w => { const s = p; p = next(p, w); return s; });
-    const bounds = [0, ...cuts.map(c => c.i), words.length];
-    hy.note('register', bounds.slice(0, -1).map((a, k) => words.slice(a, bounds[k + 1]).join(' ')).join(' | '), 'split where the register changes: ' + cuts.map(c => c.why).join('; '));
-    for (let k = 0; k + 1 < bounds.length; k++) { const a = bounds[k], b = bounds[k + 1]; runOf(words.slice(a, b), starts[a], t.slice(starts[b - 1] + words[b - 1].length)); }
-  }
-  return out;
-}
 function nameType(n, info) {
   const words = n.split(/\s+/).filter(Boolean);
   const last = words[words.length - 1] || '';
@@ -4561,7 +4258,7 @@ function analyze(corpus, htmlMap) {
     return x; });
   const sts = []; const found = []; const alias = {}; const info = {}; const HY = hdHygiene(docs);
   docs.forEach(d => { const on = hdF(d.id); const ss = splitSentences(d.text, on ? (a, b, c, x) => hdT(a, b, c, { doc: d.id, ...x }) : null); if (on) hdT('sentences', 'split', 'Split into ' + ss.length + ' statements', { doc: d.id, n: ss.length }); const hy = HY ? HY.forDoc(d, on ? (k, what, why) => hdT('names', 'hygiene', why + ' (' + qW(what) + ')', { doc: d.id }) : null) : null; if (on && !d.hasCase) hdT('names', 'gap', 'This source carries no letter case — its script has none (or it is code): the case convention that opens a name does not apply, so names are read from the source\u2019s own links, which is the material marking its own names. Where none are linked, none are claimed', { doc: d.id, linked: (d._linkNames || []).length }); ss.forEach((se, i) => {
-    const ns = d.hasCase ? hdEngineMerge(se.t, findNames(se.t, hy), d.eng, hy) : (d._linkNames || []).filter(l => l.s < se.e && l.e > se.s).map(l => ({ name: l.name, s: Math.max(0, l.s - se.s), e: Math.min(l.e, se.e) - se.s, via: 'link' }));
+    const ns = d.hasCase ? hdMasterNames(d, se) : (d._linkNames || []).filter(l => l.s < se.e && l.e > se.s).map(l => ({ name: l.name, s: Math.max(0, l.s - se.s), e: Math.min(l.e, se.e) - se.s, via: 'link' }));
     ns.forEach(n => { if (n.alias) alias[n.alias] = n.name;
       // TYPE CUES read from the statement's own words: a human role right before the
       // name ("actress Susan Sarandon") or after a copula ("was a French filmmaker")
@@ -6631,6 +6328,8 @@ class Component extends DCLogic {
   }
   componentDidMount() {
     try { window.__hdApp = this; } catch (e) {}
+    // khora's cut arrived, or the hyperlexicon kept a new alias: read again (the analysis key carries HD_CUT_VER)
+    this._hdCut = () => this.forceUpdate(); window.addEventListener('hd-cut', this._hdCut);
     // the Workspaces screen by address: #workspaces on load, or typed/linked while the page is open
     this._heroHash = () => { if (location.hash === '#workspaces' && !this._heroOpen) this.openWorkspacesHero(); };
     window.addEventListener('hashchange', this._heroHash); setTimeout(this._heroHash, 0);
@@ -8378,7 +8077,7 @@ class Component extends DCLogic {
       } catch (e) { /* fall through to the in-tab read */ }
       try {
         const M = await import(new URL('holodeck-reading.js', location.href).href);
-        const R = await (await import(new URL('holodeck-reader.js', location.href).href)).makeEngineRelationReader();
+        const { readDocument } = await import(new URL('holodeck-reader.js', location.href).href);   // khora's master pipeline
         const readings = [];
         for (const d of docs) {
           // An image is read from its measured 2D model (the middle layer): names legible in a box
@@ -8387,10 +8086,9 @@ class Component extends DCLogic {
           if (d.screen && d.screen.elements && d.screen.elements.length) {
             readings.push(M.readSighted(d.id, d.screen.elements, { readingText: d.screen.text }));
           } else {
-            const text = String(d.text || '').slice(0, 60000); const passages = M.splitPassages(text);
-            let report = { edges: [] };
-            try { report = R(passages.map(t => ({ ref: d.id, text: t }))) || report; } catch (e) { report = { edges: [] }; }
-            readings.push({ name: d.id, ...M.readDoc(d.id, text, report, { passages: passages.length }) });
+            const text = String(d.text || '').slice(0, 60000);
+            let W = null; try { W = await readDocument(text, { quality: false, selfRead: false, address: d.id }); } catch (e) { W = null; }
+            readings.push({ name: d.id, ...M.readDoc(d.id, text, { edges: (W && W.edges) || [] }, { passages: ((W && W.sentences) || []).length }) });
           }
           await new Promise(r => setTimeout(r, 0));
         }
@@ -9776,14 +9474,14 @@ class Component extends DCLogic {
     // app stays responsive instead of blocking on one giant analyze over the whole batch.
     if (this._stage && this._stage.size) {
       const folded = docs.filter(d => !this._stage.has(d.id));
-      const fkey = id + ':' + folded.map(d => d.id).join(',') + ':' + this.state.htmlVer + ':' + this.corrKey(id);
+      const fkey = id + ':' + folded.map(d => d.id).join(',') + ':' + this.state.htmlVer + ':' + this.corrKey(id) + ':' + HD_CUT_VER;
       if (this._key !== fkey) { this._key = fkey; this._A = analyze({ docs: folded }, this._html); this.applyCorrections(this._A, id); }
       const extra = {}; docs.forEach(d => { if (this._stage.has(d.id)) extra[d.id] = d; });
       const A = { ...this._A, docs, docById: { ...this._A.docById, ...extra } };
       try { window.__holodeckA = A; } catch (e) {}
       return A;
     }
-    const key = id + ':' + docs.map(d => d.id).join(',') + ':' + this.state.htmlVer + ':' + this.corrKey(id);
+    const key = id + ':' + docs.map(d => d.id).join(',') + ':' + this.state.htmlVer + ':' + this.corrKey(id) + ':' + HD_CUT_VER;
     if (this._key !== key) {
       // Reading a workspace is synchronous and takes seconds for a big one. A workspace already read this session is kept
       // (one per key), so going back to it is instant; a first visit, or a delete, paints the new list of sources at once
@@ -10183,7 +9881,8 @@ class Component extends DCLogic {
     // driven by capitals and adjacency, so shuffled text still yields "names"; what matters is how many more real text yields.
     const nullByDoc = {};
     T.docs.forEach(d => { const w = d.text.split(/\s+/).filter(Boolean); if (w.length < 8) return; let sd = 1; for (let i = 0; i < d.text.length; i++) sd = (sd * 31 + d.text.charCodeAt(i)) % 2147483647;
-      const rec = text => { const c = new Map(); splitSentences(text).forEach(se => new Set(findNames(se.t).map(n => n.name).filter(n => /\s/.test(n))).forEach(n => c.set(n, (c.get(n) || 0) + 1))); const all = [...c.values()], tot = all.reduce((a, b) => a + b, 0); return tot ? Math.round(all.filter(v => v >= 2).reduce((a, b) => a + b, 0) / tot * 100) : 0; };
+      // khora's surface organ, on the real text and on its shuffles: the share of multi-word name mentions that recur across sentences
+      const rec = text => { const all = hdSurfaceList(text).filter(x => /\s/.test(x.surface)).map(x => x.sentences || 0), tot = all.reduce((a, b) => a + b, 0); return tot ? Math.round(all.filter(v => v >= 2).reduce((a, b) => a + b, 0) / tot * 100) : 0; };
       const R = []; for (let t = 0; t < 5; t++) { const x = w.slice(); for (let i = x.length - 1; i > 0; i--) { sd = (sd * 48271) % 2147483647; const j = sd % (i + 1); [x[i], x[j]] = [x[j], x[i]]; } R.push(rec(x.join(' '))); }
       const real = rec(d.text), hi = Math.max(...R), mean = R.reduce((a, b) => a + b, 0) / R.length;
       nullByDoc[d.id] = real > hi ? 'above' : 'chance';
@@ -10597,7 +10296,9 @@ class Component extends DCLogic {
     const stMeta = st => docT(st.doc) + (A.docById[st.doc].year ? ' · ' + A.docById[st.doc].year : '');
     const selSt = st => () => this.sel('statement', st.id);
     const selN = n => () => this.sel('name', n);
-    const view = S.view;
+    // the Explore panels (Names, Assertions, Connections, Evidence overview, the rail's Map) are removed (2026-10-24): an address or a
+    // link that still names one opens the sources instead
+    const view = HD_GONE_VIEWS.has(S.view) ? 'summary' : S.view;
     const fSet = new Set(F.map(s => s.id));
 
     const _T0 = performance.now(), _PT = this._prof = {}; let _pl = _T0; const _m = k => { const n = performance.now(); _PT[k] = Math.round(n - _pl); _pl = n; };
@@ -10699,7 +10400,7 @@ class Component extends DCLogic {
       ...(seenDocs.length ? [{ label: 'Seen, not kept', n: String(seenDocs.length), desc: 'Opened, but not counted.', items: seenDocs.map(cardOf) }] : []),
       ...(hasKinds ? Object.entries(kmap).sort((a, b) => KIND_ORDER.indexOf(a[0]) - KIND_ORDER.indexOf(b[0])).map(([k, ds]) => ({ label: k, n: String(ds.length), desc: KIND_DESC[k] || '', items: ds.slice().sort((x, y) => pubMsD(x) - pubMsD(y)).map(cardOf) })) : Object.entries(gmap).sort((x, y) => (x[0] === '_') - (y[0] === '_') || y[1].docs.length - x[1].docs.length).map(([k, g]) => ({ label: g.label, n: String(g.docs.length), desc: k === '_' ? (Object.keys(distinctOf).length ? 'No difference from the rest is large enough to matter.' : keptDocs.length < 2 ? '' : 'No difference between them is large enough to matter yet.') : '', items: g.docs.map(cardOf) }))),
     ];
-    const svMode = (S.svMode && S.svMode !== 'list') ? S.svMode : 'grid', svGroup = 'tabs'; /* List was dropped: Grid for the picture, Table for the fields */ const allSrcItems = srcGroups.flatMap(g => g.items.map(it => ({ it, g: g.label })));
+    const svMode = (S.svMode && S.svMode !== 'list' && S.svMode !== 'map') ? S.svMode : 'grid', svGroup = 'tabs';  /* the Map was removed with the Explore panels (2026-10-24) */ /* List was dropped: Grid for the picture, Table for the fields */ const allSrcItems = srcGroups.flatMap(g => g.items.map(it => ({ it, g: g.label })));
     const docOfCard = it => A.docs.find(d => d.title === it.title) || null;
     const isVid = it => { const d = docByTitle.get(it.title); return !!(d && (d.medium === 'Video' || d.medium === 'Audio' || d.media)); }; const vidItems = allSrcItems.filter(x => isVid(x.it));
     const FAM = k => /^(Audit or report|Legislation|Letter|Meeting record|Contract)$/.test(k) ? 'Documents' : /^(Meeting recording|Video|Podcast|Recording)$/.test(k) ? 'Video & audio' : /^(Government page|Organisation page)$/.test(k) ? 'Official pages' : /^(News|Blog|Own article)$/.test(k) ? 'Press and commentary' : 'Other';
@@ -10764,7 +10465,7 @@ class Component extends DCLogic {
     const seg = on => ({ bg: on ? 'var(--sel2)' : 'transparent', col: on ? 'var(--ink)' : 'var(--mut)' });
     const meetVals = {};
     const svVals = { ...meetVals, srcHiddenNote: this._srcHidden ? plural(this._srcHidden, 'other source') + ' with nothing in this selection ' + (this._srcHidden === 1 ? 'is' : 'are') + ' hidden' : '', svCards: svMode === 'cards', svTable: svMode === 'table', svMap: svMode === 'map', svRefs: svMode === 'referents', svTabsOn: svGroup === 'tabs',
-      svModes: [['grid', 'Grid'], ['table', 'Table'], ['map', 'Map'], ['referents', 'Referents']].map(([k, l]) => ({ label: l, ...seg(svMode === k || (k === 'grid' && svMode === 'cards')), onClick: () => this.setState({ svMode: k }) })),
+      svModes: [['grid', 'Grid'], ['table', 'Table'], ['referents', 'Referents']].map(([k, l]) => ({ label: l, ...seg(svMode === k || (k === 'grid' && svMode === 'cards')), onClick: () => this.setState({ svMode: k }) })),
       svTabs: tabs.map(t => ({ label: t.label, n: t.n, cls: t.id === svTab ? 'on' : '', bd: t.id === svTab ? 'var(--acc2)' : 'transparent', col: t.id === svTab ? 'var(--ink)' : 'var(--mut)', onClick: () => this.setState({ svTab: t.id }) })),
       svCols: colOrder.map(k => ({ label: colMap.get(k).label + (svSort === k ? (svDir > 0 ? ' ↑' : ' ↓') : ''),
         onClick: () => this.setState({ svSort: k, svDir: svSort === k ? -svDir : (k === 'title' || k === 'publisher' || (k.startsWith('f:') && ['text', 'id'].includes(fcBy.get(k.slice(2)).type)) ? 1 : -1) }),
@@ -11240,15 +10941,11 @@ class Component extends DCLogic {
     const browseYears = [...yearCounts].sort((a, b) => b[0] - a[0]).slice(0, 50).map(([y, n]) => { const on = String(y) === curYear; return { label: String(y), n: n.toLocaleString(), on,
       bg: on ? 'var(--sel)' : 'transparent', bd: on ? 'var(--acc2)' : 'transparent', weight: on ? 600 : 500,
       onClick: () => on ? this.setF('range', null) : this.setF('range', { mode: 'happened', from: String(y), to: String(y), undated: false }) }; });
-    const onMapView = view === 'connections';
     // On the contracts address the tool menu is hidden, so the ways to explore content (not just search it)
     // live here instead: the map, the names, the assertions and the evidence overview, one click each.
-    const browseMore = HD_METRO ? [['names', 'Names'], ['records', 'Assertions'], ['overview', 'Evidence overview']].map(([id, label]) => { const on = view === id; return { label, n: id === 'names' ? String(D.nameList.length) : id === 'records' ? String(F.length) : '', on,
-      bg: on ? 'var(--sel)' : 'transparent', bd: on ? 'var(--acc2)' : 'transparent', weight: on ? 600 : 500,
-      onClick: () => this.setState({ view: id, readDoc: null, sel: null }) }; }) : [];
+    const browseMore = [];
     const browseVals = {
       browseOpen: S.browseOpen !== false, browseLabel: 'Ways in',
-      browseMap: { label: 'Map · names and their ties', n: '', title: 'The Connections map: every name placed around the one it shares the most statements with — the relativistic solar system view', bg: onMapView ? 'var(--sel)' : 'transparent', bd: onMapView ? 'var(--acc2)' : 'transparent', weight: onMapView ? 600 : 500, onClick: () => this.setState({ view: 'connections', readDoc: null, sel: null }) },
       browseMore, hasBrowseMore: browseMore.length > 0,
       hasBrowseDepts: deptAll.length > 1, browseDepts, browseDeptSearch: deptAll.length > 10, browseDeptQ: S.browseQ || '', browseDeptOnQ: e => this.setState({ browseQ: e.target.value }),
       hasBrowseYears: yearCounts.size > 1, browseYears,
@@ -11274,15 +10971,12 @@ class Component extends DCLogic {
       review: this.linkWaiting(),
       'hero:workspaces': this._wsTotals && this._wsTotals.waiting ? String(this._wsTotals.waiting) : '',
     }[id] || '');
-    const navGroups = NAVG.map(([label, items]) => ({ label, hasLabel: !!label, items: items.map(([id, lab]) => { const isScr = id.startsWith('screen:'); const on = isScr ? S.screenId === id.slice(7) : id === 'summary' ? (view === 'summary' && S.svMode !== 'map') : view === id;
+    const navGroups = NAVG.map(([label, items]) => ({ label, hasLabel: !!label, items: items.filter(([id]) => !HD_GONE_VIEWS.has(id)).map(([id, lab]) => { const isScr = id.startsWith('screen:'); const on = isScr ? S.screenId === id.slice(7) : id === 'summary' ? (view === 'summary' && S.svMode !== 'map') : view === id;
       return { id, aria: on ? 'page' : undefined, label: lab, count: id === 'fixnames' ? (this.refEdits().length ? String(this.refEdits().length) : '') : countFor(id), countColor: id === 'review' || id === 'hero:workspaces' ? 'var(--amber)' : 'var(--mut)', ...gHi(on), onClick: id === 'hero:workspaces' ? () => this.openWorkspacesHero() : id === 'fixnames' ? () => this.openFixNames() : isScr ? () => { if (this.state.screenId !== id.slice(7)) this.pushHist(); this.setState({ screenId: id.slice(7) }); } : () => { const leaveMap = id === 'summary' && S.svMode === 'map'; if (view !== id || S.readDoc || leaveMap) this.pushHist(); this.setState({ view: id, readDoc: null, sel: null, ...(leaveMap ? { svMode: 'grid' } : {}) }); } }; }) }));
     // split so Folds can sit right under The reading / Connections, inside Explore
     // the Metro contracts address is for searching: its rail offers Sources only (no Ask, no Draft)
     const navTop = HD_METRO ? navGroups[0].items.filter(g => /^sources$/i.test(String(g.label))) : navGroups[0].items; const navRead = navGroups[1]; const navExplore = navGroups[2]; const navRest = navGroups.slice(3);
-    // the rail's Explore list is one flat list (handoff): Names, Assertions, Connections, Evidence overview, Map
     const allNavItems = navGroups.flatMap(g => g.items);
-    const navExploreFlat = ['names', 'records', 'connections', 'overview'].map(id => allNavItems.find(i => i.id === id)).filter(Boolean);
-    navExploreFlat.push({ id: 'map', label: 'Map', count: '', title: 'Every name placed by how much it appears with the one you pick', aria: (view === 'summary' && !S.readDoc && S.svMode === 'map') ? 'page' : undefined, onClick: () => { this.pushHist(); this.setState({ view: 'summary', svMode: 'map', readDoc: null, sel: null }); } });
     // everything the rail used to list that the handoff takes out of it stays one click away, in the footer's Tools menu
     const toolPick = g => ({ ...g, onClick: () => { this.setState({ railToolsOpen: false }); g.onClick(); } });
     const railTools = { open: !!S.railToolsOpen, toggle: () => this.setState(st => ({ railToolsOpen: !st.railToolsOpen })), close: () => this.setState({ railToolsOpen: false }),
@@ -11446,7 +11140,7 @@ class Component extends DCLogic {
       topicsFull, topicsFullEmpty: topicsFull.length === 0, topicsFullHasPager: topicsFullPages > 1, topicsFullPageN: 'Page ' + (topicsFullPage + 1) + ' of ' + topicsFullPages + ' · ' + plural(topicsAll.length, topicsLensMode === 'referents' ? 'referent' : 'topic'),
       topicsFullHasPrev: topicsFullPage > 0, topicsFullHasNext: topicsFullPage < topicsFullPages - 1,
       onTopicsFullPrev: () => this.setState({ topicsPage: Math.max(0, topicsFullPage - 1) }), onTopicsFullNext: () => this.setState({ topicsPage: Math.min(topicsFullPages - 1, topicsFullPage + 1) }),
-      hasBrowseExtras: browseMore.length > 0 || deptAll.length > 1 || yearCounts.size > 1, railTools, navExploreFlat,
+      hasBrowseExtras: browseMore.length > 0 || deptAll.length > 1 || yearCounts.size > 1, railTools,
       topicsList, hasTopics, topicsOpen: hasTopics || entAll.length > 0 || !!activeTopicGroup || !!topicsQ, topicsLabel: topicsLensMode === 'referents' ? 'Referents · ' + entAll.length : (P.groups.length ? 'Topics · ' + P.groups.length : 'Topics'), topicsNote, hasTopicsNote, topicsStrayN, showTopicsStray, onTopicsStray,
       topicsTypes, topicsHasTypes, topicsHasEmpty, topicsEmptyText, topicsLens, topicsSearchPh, topicsType: S.topicsType || '', scope,
       topicsHasSearch, topicsSearchVal, onTopicsSearch, topicsHasPager, topicsPagerLine, onTopicsPrev, onTopicsNext, topicsHasPrev, topicsHasNext, topicsPageN: (topicsPage + 1) + ' of ' + topicsPages,

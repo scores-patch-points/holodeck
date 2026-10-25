@@ -861,6 +861,14 @@ export function makeRelationReader(organs) {
     // self-gating: it must run even when the vocabulary pass returns
     // nothing, which is by design for both dispatch modes.
     extractorsMode = "legacy",
+    // `framer` — OPTIONAL (default null: the report is byte-identical to before). (sentence, claim) -> { negated, modal, ending, dir, root } | null, the clause frame
+    // adapters/text/claim-frame.js reads from the UD parse. It is ATTACHED to each heard claim as `claim.frame`; it changes no verdict and no polarity. The extractors
+    // leave polarity "+" because a negation class is a language's own lens; the frame is where the parse's reading of "did not", "may", "terminated" and "from/to" is
+    // kept, so a consumer can see what the string-level claim could not say. Folding the frame's negation into polarity needs the material's own edges read the same way.
+    framer = null,
+    // `foldFrameNegation` — OPTIONAL (default false). With a framer AND this on, a clause the parse reads as negated ("we did not enter into") gets polarity "-" on BOTH sides of the
+    // comparison, the material's edges and the answer's claims alike, so a negated answer is judged against a positive source as contradicted, and two negations agree.
+    foldFrameNegation = false,
     verbForms = null,
     // `oovLexicon` — OPTIONAL, a Set of known verb surface forms used ONLY to
     // gate an out-of-vocabulary connector at the POS gate (discoverRelationVocab's
@@ -1640,6 +1648,18 @@ export function makeRelationReader(organs) {
       return t;
     };
 
+    const frameMemo = new Map();
+    const frameFor = (sentence, t) => {
+      if (!framer || !t) return null;
+      const k = `${sentence}\u0000${end1Of(t)}\u0000${end2Of(t)}`;
+      if (!frameMemo.has(k)) { let f = null; try { f = framer(sentence, { end1: end1Of(t), end2: end2Of(t), label: labelOf(t) }) ?? null; } catch { f = null; } frameMemo.set(k, f); }
+      return frameMemo.get(k);
+    };
+    const foldFrame = (sentence, t) => {
+      if (!foldFrameNegation || !t || t.polarity !== "+") return t;
+      return frameFor(sentence, t)?.negated ? { ...t, polarity: "-", negationFolded: "frame" } : t;
+    };
+
     const stemEq = (a, b) =>
       a === b || (Math.min(a.length, b.length) >= MIN_STEM && (a.startsWith(b) || b.startsWith(a)));
     const intersects = (a, b) => {
@@ -1752,7 +1772,7 @@ export function makeRelationReader(organs) {
             ? { ref: p.ref, start: origin.offset, end: origin.offset + origin.text.length, text: origin.text }
             : null;
         for (const t0 of triples) {
-        const t = foldNegation(t0);
+        const t = foldFrame(sentenceText, foldNegation(t0));
         const subjectEnd = endpoint(end1Of(t), true);
         const objectEnd = endpoint(end2Of(t), Boolean(createLemmatizer));
         const bucketKey = bucketOf(labelOf(t), t.polarity);
@@ -2302,7 +2322,14 @@ export function makeRelationReader(organs) {
         } catch {
           heard = [];
         }
-        for (const t of heard) report.claims.push(judge(sentence, foldNegation(t)));
+        for (const t of heard) {
+          const claim = judge(sentence, foldFrame(sentence, foldNegation(t)));
+          const f = frameFor(sentence, t);
+          if (f) claim.frame = f;
+          report.claims.push(claim);
+        }
+        // a sentence the extractors heard nothing in still has a clause frame: kept, so "we did not enter into ..." is not lost for want of a claim to hang it on
+        if (framer && !heard.length) { let f = null; try { f = framer(sentence, null) ?? null; } catch { f = null; } if (f) (report.frames ??= []).push({ sentence, frame: f }); }
 
         // The claims this tier CANNOT hear: verbs the answer uses after an
         // established surface that the material's vocabulary never measured,
@@ -2436,6 +2463,13 @@ export function makeRelationReader(organs) {
       edges: edges.map(edgeFace),
       read,
       queryReferents,
+      // WHAT THE READER ITSELF SAW (2026-10-24), so a caller never reads the passage a second time to learn it: the referent index
+      // the edges were resolved against (its admit events, resolve/represent), each passage's sentences exactly as cut above, and
+      // each passage's pronoun bindings with the surface of the being each one names. A caller that re-ran extractSurfaces +
+      // discoverReferents for "the cast" (read-process.mjs did) got a second cast the edges never saw.
+      index: { events: index.events ?? [], resolve: index.resolve, represent: index.represent },
+      sentences: passageSentences,
+      pronouns: passageBindings.map(({ bindings, bestSurface }) => (bindings ?? []).map((b) => ({ ...b, surface: bestSurface?.get(b.referentId) ?? null }))),
     };
   };
 }

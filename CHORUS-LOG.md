@@ -401,3 +401,18 @@ fast: 3 files · 6 affected tests pass · law: ok
 | Ostrom | — | unit-tree.js:247 | false-positive-on-review | a shuffled pool of boundary indices |
 | Simon/Chekhov | untested source | reading/unit-tree.js · run-units.mjs | fixed / noted | unit-tree.test.mjs pins the types, a block comment, the trees, the addresses, (b) admitting topic paragraphs and refusing fixed-width wraps; the runner is a command, smoke-tested on a throwaway set (it caught two plumbing faults: a summary crash and the Wiktionary reader's path) |
 Found by the tests before any frozen run, fixed: a trailing ";" made code lines a one-column table (a delimiter now needs two non-empty fields); statements were read across the whole text when a brace appeared anywhere (now only in blocks that hold braces); types with few units that cover little of the text (two quotations) claimed the first tree before the sentences (types covering ≥ 90% of the material now join first).
+
+## 2026-10-24 — the page's reader is khora's one core, vendored from a commit (reading-one-core, staged)
+fast: 34 files · 21 affected tests pass (+4 new in holodeck-reader.test.mjs) · full suite 688/689 on both the base branch and this one (the same one failure) · law: WARN P4 cited inside vendored khora files (khora's own law)
+| lens | citation | file:line | verdict | one line |
+| Simon/Chekhov | — | holodeck-reader.js | fixed | holodeck-reader.test.mjs imports it: priors through the core, abbreviations at the cut, stance as a removable organ, vendor --check |
+| Kondo | — | reading/lexicon.js, reading/punctuation-priors/, tools/build-punctuation-priors.mjs | fixed | moved to their homes (khora organs/lexicon.js; janus priors + scripts), not left as second copies |
+| Greenberg | — | holodeck-reader.js (foreign) | noted | a foreign read now gets its own priors and no English closed classes (the core's rule), where the page used to apply English determiners to it |
+| Ostrom | — | vendor/khora/native/kernel/reading-rules.js:45 | clean | the absent-rules gap is upstream's typed gap, unchanged |
+clean: Diaconis, Feynman, Dijkstra, Holmes, Pearl, Frankfurt, Alexander, Marshall (P4 is khora's)
+
+## 2026-10-24 — index.html cuts sentences with khora's knowledge; the hand ABBR list is gone (reading-one-core, staged)
+fast: 5 affected tests pass · suite 692/693 (the same one failure as the base) · checked in the browser: Messrs./St./Co./No./U.S./Dr./e.g. hold, furniture skipped, hard wrap joined, offsets read back
+| lens | citation | file:line | verdict | one line |
+| Greenberg | — | index.html splitSentences | fixed (disclosed) | the page's analysis reads English (prior, lexicon, Latin lower-case join); written in the code; the reading page reads other languages with their own priors |
+| Dijkstra | — | index.html hdClosedWord | clean | the hard-wrap join's closed-class test now reads the POS prior's dominant class instead of a typed word list |

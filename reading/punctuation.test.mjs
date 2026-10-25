@@ -1,7 +1,7 @@
 import test from 'node:test'; import assert from 'node:assert/strict'; import fs from 'node:fs';
 import { normsFor, scanPunctuation, containersAt, sentenceAt, moodAt, cuesFromBlankLines, cuesFromLayout, cuesFromTimings, cuesFromBlocks } from './punctuation.js';
 const ALL = JSON.parse(fs.readFileSync(new URL('./punctuation-norms.json', import.meta.url)));
-const en = JSON.parse(fs.readFileSync(new URL('./punctuation-priors/en.json', import.meta.url))).abbreviations;
+const en = JSON.parse(fs.readFileSync(new URL('../vendor/khora/native/priors/punctuation-eng.json', import.meta.url))).abbreviations;
 const scan = (t, lang, abbr = en) => scanPunctuation(t, { norms: normsFor(ALL, lang), abbreviations: new Set(abbr) });
 const roles = (r) => r.punct.map((p) => p.w + ':' + p.role).join(' ');
 

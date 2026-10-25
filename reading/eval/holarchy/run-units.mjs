@@ -28,7 +28,7 @@ const { splitSentences, deriveAbbreviations } = await imp('vendor/khora/native/a
 const { clauseSpans } = await imp('vendor/khora/native/adapters/text/clause-spans.js');
 const { scanPunctuation, loadPunctuation } = await imp('reading/punctuation.js');
 const { primeFor, gainsAt } = await imp('reading/sections.js');
-const { makeLexicon, aliasJunctions, resolveAliases } = await imp('reading/lexicon.js');
+const { makeLexicon, aliasJunctions, resolveAliases } = await imp('vendor/khora/native/organs/lexicon.js');
 
 const [, , matDir, outPath, ...rest] = process.argv;
 if (!matDir || !outPath) { console.error('usage: node run-units.mjs <holarchy-material dir> <out.json> [--draws N]'); process.exit(2); }
