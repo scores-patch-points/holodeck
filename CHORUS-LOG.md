@@ -425,3 +425,13 @@ fast: 9 files · 50 affected tests pass · full suite 694 tests, the one failure
 | Greenberg | language scope | holodeck-cut.js | noted | the header already declares SCOPE: English's priors; the dotted prior is English's too |
 | Holmes | alias identity | vendor/khora/native/the-fold/read-core.mjs | noted | khora#53 refuses an alias merge ("ports." as a form of "portraits") on the treebank's evidence, never on surface overlap |
 clean: Dijkstra, Pearl, Ostrom, Alexander, Kondo (vendored khora prose); page check: the master reading cuts "…northern ports. The fleet…" in two, no gaps, no missed priors
+
+## 2026-10-25 — the Layers view restored, on the master reading; the page opens on the sample extraction (layers-on-master, staged)
+fast: 3 files · full suite 694 tests, the one failure main has (holodeck-byo-panel) · law: WARN P3 S0 (cited by the restored view's own prose, as before 1ccc618)
+| lens | citation | file:line | verdict | one line |
+|---|---|---|---|---|
+| Holmes | identity | reading/demo.html (traceOf, referents) | noted | F1 is the master's cast; a relation end is matched to it with khora's namesCorefer, and one it does not hold is a recorded F2→F1 revision, never a merge by surface overlap |
+| Feynman | numeric constant | reading/demo.html (WORDS_ANIMATED = 700) | noted | the per-form layers animate the first 700 forms; the trace says so in a step, and the reading covers all |
+| Simon/Chekhov | untested | reading/layer-notes.js, reading/reader-view.js | noted | restored as they were before 1ccc618; checked in the browser: every tab renders, the POS switch re-runs the master read |
+| Marshall | P3 S0 | reading/demo.html | noted | the citations come back with the restored code; this diff writes no law |
+clean: Diaconis, Pearl, Ostrom, Frankfurt, Alexander, Greenberg, Kondo (the restored code as it stood; no second reader: every layer is the master's reading)
