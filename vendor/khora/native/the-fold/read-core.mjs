@@ -136,11 +136,13 @@ export function abbreviationsFor(text, { priors = null, aliases = [], abbreviati
 // prior or is refused by the text's own bare use: no answer could keep an alias, so nothing is asked. The one case the prior leaves to
 // the live giver, a dotted headword longer than 12 characters, is still asked. Measured 2026-10-25: the Holodeck asked ~500 forms per
 // long document of a giver that answers one form in ~3.5 ms, one request at a time, and every reading waited on that queue.
-const samePack = (a, b) => !!(a && b && a.pack && a.pack === b.pack && (a.snapshot ?? null) === (b.snapshot ?? null));
+// one giver: the same hyperlexicon (its head), or the same pack of one giver (its file and snapshot)
+const sameGiver = (a, b) => !!(a && b && ((a.head && a.head === b.head) || (a.pack && a.pack === b.pack && (a.snapshot ?? null) === (b.snapshot ?? null))));
 
 /** Ask the hyperlexicon about the dotted forms the priors and the text cannot settle; keep each one the text's own use allows. */
 export async function consultAliases(text, lexicon, { priors = null } = {}) {
   if (!lexicon) return { aliases: [], rows: [], giver: null, gap: "no hyperlexicon was handed to this read" };
+  const asked = lexicon.log?.length ?? 0;   // a gap is this consult's own: an earlier read's unanswered ask is not this read's
   const known = new Set([...(priors?.punctuation?.abbreviations ?? []), ...deriveAbbreviations(String(text ?? ""))].map((a) => String(a).toLowerCase()));
   // what the dotted prior already settles is not asked again
   for (const f of priors?.dotted ? dottedIn(String(text ?? ""), priors.dotted, known) : []) known.add(f.slice(0, -1).toLowerCase());
@@ -149,9 +151,9 @@ export async function consultAliases(text, lexicon, { priors = null } = {}) {
   if (priors?.dotted && priors.dottedGiver) {
     // a giver that has not answered yet is asked one form first, to learn which pack it reads
     if (!lexicon.giver) await lexicon.want([junctions.keys().next().value]);
-    if (samePack(priors.dottedGiver, lexicon.giver)) {
+    if (sameGiver(priors.dottedGiver, lexicon.giver)) {
       junctions = new Map([...junctions].filter(([f]) => f.length > 12));
-      if (!junctions.size) return { aliases: [], rows: [], giver: lexicon.giver, gap: null, settled: `the dotted-words prior is this giver's own pack (${priors.dottedGiver.pack})` };
+      if (!junctions.size) return { aliases: [], rows: [], giver: lexicon.giver, gap: null, settled: priors.dottedGiver.head ? `the dotted-words prior is this hyperlexicon's own (head ${String(priors.dottedGiver.head).slice(0, 16)})` : `the dotted-words prior is this giver's own pack (${priors.dottedGiver.pack})` };
     }
   }
   await lexicon.want(junctions.keys());
@@ -166,8 +168,8 @@ export async function consultAliases(text, lexicon, { priors = null } = {}) {
     const base = r.form.slice(0, -1);
     if (attested(base) && !attested(r.form)) Object.assign(r, { kept: false, why: `the treebank writes “${base}” as a word and never “${r.form}”` });
   }
-  const last = lexicon.log?.[lexicon.log.length - 1];
-  return { aliases: rows.filter((r) => r.kept).map((r) => r.form), rows, giver: lexicon.giver ?? null, gap: last?.gap ?? null };
+  const gap = (lexicon.log ?? []).slice(asked).find((x) => x.gap)?.gap ?? null;
+  return { aliases: rows.filter((r) => r.kept).map((r) => r.form), rows, giver: lexicon.giver ?? null, gap };
 }
 
 // ── the reader ────────────────────────────────────────────────────────────────────────────────────────────────────────────────

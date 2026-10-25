@@ -4,7 +4,7 @@
 // core is declared here and passed in as organs: its stance passes (extendRelations + sameAct), the form normaliser in front
 // of the class prior (classifyForm), and the measured language of a foreign document. Built once; every turn reads through it.
 import { makeReader, priorsFor, readDocument as readCore } from './vendor/khora/native/the-fold/read-core.mjs';
-import { makeLexicon } from './vendor/khora/native/organs/lexicon.js';
+import { makeHyperlexicon } from './vendor/khora/native/organs/lexicon.js';
 import { iso1Of } from './vendor/khora/native/the-fold/language-grammar.js';
 import { preloadPriors } from './vendor/khora/native/the-fold/prior-source.mjs';
 import { classifyForm as classifyWord } from './holodeck-surface.js'; // wraps the vendored classifyWord: the written form is normalised before lookup
@@ -239,12 +239,13 @@ export async function pageReaderOptions({ features = {}, foreign = null, priors 
   return { classifyWord, roleConfig, sameAct, extendRelations: withStance({ stance: useStance }) };
 }
 
-// the page's hyperlexicon giver: the Holodeck server's local English Wiktionary (POST /lexicon). A page served without that
-// server (Pages, a file) gets no answer, and the read says so (aliasReport.gap).
+// the page's hyperlexicon: janus's ledger, asked through its door by the Holodeck server (POST /hyperlexicon, the door's batch body).
+// One client per language for the whole page: the master pipeline's cut, the class fill and the Layers view ask the same ledger.
+// A page served without that server (Pages, a file), or a server with no door, gets no answer, and the read says so (aliasReport.gap).
 const LEXICONS = new Map();
 export function pageLexicon(lang = 'en') {
-  if (!LEXICONS.has(lang)) LEXICONS.set(lang, makeLexicon({ lang, ask: async (forms, l) => {
-    try { const r = await fetch(new URL('./lexicon', import.meta.url), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ forms, lang: l }) }); return r.ok ? await r.json() : null; } catch (e) { return null; }
+  if (!LEXICONS.has(lang)) LEXICONS.set(lang, makeHyperlexicon({ lang, door: "the Holodeck server's /hyperlexicon", ask: async (body) => {
+    try { const r = await fetch(new URL('./hyperlexicon', import.meta.url), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }); return r.ok ? await r.json() : (await r.json().catch(() => null)); } catch (e) { return null; }
   } }));
   return LEXICONS.get(lang);
 }

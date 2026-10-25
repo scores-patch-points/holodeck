@@ -589,7 +589,7 @@ const LAYERS = [
   { id:'furniture', label:'Furniture',  color:'--mut',   feature:'furniture', why:'markup / CSS / URLs blanked in place — offsets untouched' },
   { id:'read',      label:'Master read', color:'--acc',  fixed:true, why:"khora's master pipeline (read-core.mjs::readDocument) reads the text once — its language, the cut, the cast, the relations; every layer below is that one reading, shown" },
   { id:'punct',     label:'Punctuation', color:'--amber', fixed:true, why:'every mark kept, with its role: sentence ends and their mood, quotations, brackets, separators' },
-  { id:'lexicon',   label:'Hyperlexicon', color:'--acc2', feature:'lexicon', why:'forms the priors cannot settle, asked of the hyperlexicon (its local giver, English Wiktionary): an alias keeps its period, a missing class is filled' },
+  { id:'lexicon',   label:'Hyperlexicon', color:'--acc2', feature:'lexicon', why:'forms the priors cannot settle, asked of the hyperlexicon — janus\'s ledger, where the givers\' claims sit undecided beside every use in the corpus: an alias keeps its period as the givers write it; a missing class is filled from the givers, with the word\'s uses and dated span' },
   { id:'statement', label:'Statements', color:'--ink2',  fixed:true, why:'the material split into the statements it makes' },
   { id:'token',     label:'Words',      color:'--blue',  fixed:true, why:'each statement split into the forms it is made of' },
   { id:'grammar',   label:'POS',        color:'--acc',   feature:'pos', why:'each form → the classes it is ATTESTED as (Thrax over UD)' },
@@ -689,10 +689,10 @@ const ORDERS = [
 
 let PRIORS = null, READER = null, LEXICON = null, LEXICON_LONGEST = 0;
 // dictionary · Wikipedia · Wikidata: a crossing the page makes only when asked — see holodeck-lookup.js. Starts OFF.
-// THE HYPERLEXICON, open to every organ (reading/lexicon.js): its local giver is the English Wiktionary pack on this machine, read by the
-// Holodeck's own server (POST /lexicon). An organ asks only about a form the language's priors cannot settle; nothing leaves the machine.
+// THE HYPERLEXICON, open to every organ (khora organs/lexicon.js::makeHyperlexicon): janus's ledger, asked through its door by the
+// Holodeck's own server (POST /hyperlexicon). An organ asks only about a form the language's priors cannot settle.
 // one client per language the documents measure as: the giver's entries are filtered to that language's own words
-// one hyperlexicon for the page: the same giver the master pipeline asks (holodeck-reader.js::pageLexicon, the server's Wiktionary)
+// one hyperlexicon for the page: the same ledger the master pipeline asks (holodeck-reader.js::pageLexicon)
 const HLEX = pageLexicon('en');
 const LOOKUP = makeLookup({ local: HLEX });   // the page's dictionary parser reads English entries, so the class fill below is English only
 let LOOKUPS_ON = false;
@@ -807,15 +807,18 @@ function traceOf(doc, clean, W, claims, features, extraction, fill = { asked:0, 
   const X = W.aliasReport || {};
   if (features.lexicon === false) push('lexicon', 'off', `hyperlexicon layer OFF — nothing is asked live; a dotted form the priors do not know may end a sentence, and a form the class prior lacks stays a gap`, { s:0, e:0, data:{ off:true } });
   else if (X.gap) push('lexicon', 'gap', `the hyperlexicon was not reached — ${X.gap}; the cut used the priors and the text's own`, { s:0, e:0, data:X });
-  else if (X.settled) push('lexicon', 'settled', `nothing asked live: ${X.settled} — every dotted form that pack lists was settled by the prior or refused by the text's own use${fill.asked ? ` · the class fill asked about ${fill.asked.toLocaleString()} form${fill.asked === 1 ? '' : 's'} the class prior lacks` : ''}`, { s:0, e:0, data:X });
+  else if (X.settled) push('lexicon', 'settled', `nothing asked live: ${X.settled} — every dotted form its givers write was settled by the prior or refused by the text's own use${fill.asked ? ` · the class fill asked about ${fill.asked.toLocaleString()} form${fill.asked === 1 ? '' : 's'} the class prior lacks` : ''}`, { s:0, e:0, data:X });
   else {
     const rows = X.rows || [];
-    push('lexicon', 'ask', `the master asked the hyperlexicon (${(X.giver && X.giver.name) || 'its giver'}) about ${rows.length} dotted form${rows.length === 1 ? '' : 's'} the priors could not settle${fill.asked ? ` · the class fill asked about ${fill.asked.toLocaleString()} form${fill.asked === 1 ? '' : 's'} the class prior lacks` : ''}`, { s:0, e:0, data:X });
+    push('lexicon', 'ask', `the master asked the hyperlexicon (${(X.giver && X.giver.name) || 'its giver'}${X.giver && X.giver.head ? ` · head ${String(X.giver.head).slice(0, 16)}` : ''}) about ${rows.length} dotted form${rows.length === 1 ? '' : 's'} the priors could not settle${fill.asked ? ` · the class fill asked about ${fill.asked.toLocaleString()} form${fill.asked === 1 ? '' : 's'} the class prior lacks` : ''}`, { s:0, e:0, data:X });
     rows.forEach(a => { const at = clean.indexOf(a.form); push('lexicon', a.kept ? 'alias' : 'alias-refused', a.kept
       ? `“${a.form}” is one word: the hyperlexicon lists it as a form of ${(a.of || []).map(o => `“${o}”`).join(' and ')} — the period belongs to the word, so no sentence ends inside it (${a.n} place${a.n === 1 ? '' : 's'})`
       : `“${a.form}” is listed${(a.of || []).length ? ` as a form of ${a.of.map(o => `“${o}”`).join(' and ')}` : ''}, but ${a.why} — so its period may still end a sentence`, { s:at, e:at >= 0 ? at + a.form.length : 0, data:a }); });
   }
-  (fill.found || []).forEach(f => { const at = clean.indexOf(f.form); push('lexicon', 'class', `“${f.form}” → ${f.upos.length ? f.upos.join(' / ') : 'listed, with no class the reader maps'} — attested by the hyperlexicon, a witness for the class layer (the relation reader does not read it)`, { s:at, e:at >= 0 ? at + f.form.length : 0, data:f }); });
+  if (fill.gap) push('lexicon', 'gap', `the class fill could not reach the hyperlexicon — ${fill.gap}; ${fill.asked.toLocaleString()} form${fill.asked === 1 ? '' : 's'} the class prior lacks stay typed gaps`, { s:0, e:0, data:fill });
+  (fill.found || []).forEach(f => { const at = clean.indexOf(f.form), c = f.context || {}, d = c.dated || {};
+    const used = c.uses != null ? ` · the corpus uses it ${c.uses.toLocaleString()} time${c.uses === 1 ? '' : 's'} in ${(c.documents || 0).toLocaleString()} document${c.documents === 1 ? '' : 's'}${d.uses ? `, dated ${d.earliest === d.latest ? d.earliest : `${d.earliest}–${d.latest}`} (${d.uses.toLocaleString()} dated)` : ''}` : '';
+    push('lexicon', 'class', `“${f.form}” → ${f.upos.length ? f.upos.join(' / ') : 'listed, with no class the reader maps'} — the ledger's givers list it so${(c.givers || []).length ? ` (${c.givers.join(', ')})` : ''}, undecided${used}; a witness for the class layer (the relation reader does not read it)`, { s:at, e:at >= 0 ? at + f.form.length : 0, data:f }); });
 
   // ── the statements are the master's cut ──
   const sents = (W.sentences || []).map((x, i) => ({ text:x.text, offset:x.offset, order:i }));
@@ -1483,7 +1486,9 @@ function mount(T){
     if (w && !r) h += `<div class="rd0">Nothing looked up for “${esc(w)}” yet.</div>`;
     if (r){
       const d = r.dictionary, wp = r.wikipedia, wd = r.wikidata;
-      h += step(1, d && d.found ? 'ok' : 'gap', 'dictionary · Wiktionary', d && d.found ? d.entries.map(x => `<div class="ent"><b>${esc(x.heading || '')}</b> ${x.upos ? `<span class="pill">${esc(x.upos)}</span>` : '<span class="pill">no class</span>'} ${esc(x.gloss || '')}</div>`).join('') + '<div class="why">attested as these parts of speech — attestation, no frequency</div>' : `no entry${d && d.error ? ' · ' + esc(d.error) : ''}`);
+      const dc = d && d.context, dd = dc && dc.dated, ledger = !!(d && d.giver && d.giver.head);
+      const used = dc && dc.uses != null ? `<div class="why">in the ledger: used ${dc.uses.toLocaleString()} time${dc.uses === 1 ? '' : 's'} in ${(dc.documents || 0).toLocaleString()} document${dc.documents === 1 ? '' : 's'}${dd && dd.uses ? `, dated ${dd.earliest === dd.latest ? dd.earliest : `${dd.earliest}–${dd.latest}`}` : ''}${(dc.givers || []).length ? ` · givers ${esc(dc.givers.join(', '))}` : ''}</div>` : '';
+      h += step(1, d && d.found ? 'ok' : 'gap', ledger ? `dictionary · the hyperlexicon's givers (head ${esc(String(d.giver.head).slice(0, 16))})` : 'dictionary · Wiktionary', d && d.found ? d.entries.map(x => `<div class="ent"><b>${esc(x.heading || '')}</b> ${x.upos ? `<span class="pill">${esc(x.upos)}</span>` : '<span class="pill">no class</span>'} ${esc(x.gloss || '')}</div>`).join('') + `<div class="why">attested as these parts of speech — ${ledger ? 'the givers\' claims, undecided' : 'attestation, no frequency'}</div>` + used : `no entry${d && d.error ? ' · ' + esc(d.error) : ''}` + used);
       h += step(2, wp && wp.found ? (wp.disambiguation ? 'hop' : 'ok') : 'gap', 'Wikipedia', wp && wp.found ? `${link(wp.url, wp.title)} ${wp.disambiguation ? '<span class="pill">disambiguation page — not read as an entity</span>' : ''} ${wp.qid ? `<span class="pill">${esc(wp.qid)}</span>` : ''}${wp.description ? `<div class="why"><em>${esc(wp.description)}</em> — an editorial summary, not a type</div>` : ''}` : `no article${wp && wp.error ? ' · ' + esc(wp.error) : ''}`);
       h += step(3, wd && wd.found ? 'hop' : 'gap', 'Wikidata', wd && wd.found ? `<div class="why">${wd.candidates.length} entit${wd.candidates.length === 1 ? 'y' : 'ies'} for this name${wd.exact ? ` — ${wd.exact} bear${wd.exact === 1 ? 's' : ''} it exactly` : ''}. Which one this text means is identity, settled by consequence — not by the name.</div>` + wd.candidates.map(c => `<div class="ent">${link('https://www.wikidata.org/wiki/' + c.qid, c.qid)} <b>${esc(c.label || '')}</b> ${c.exact ? '<span class="pill">exact</span>' : ''}<div class="why">${esc(c.description || '')}</div></div>`).join('') : `nothing found${wd && wd.error ? ' · ' + esc(wd.error) : ''}`);
       const noms = LOOKUP.nominations(w);
@@ -2159,9 +2164,10 @@ function startTimeline(T){
   }, 40);
 }
 
-// THE CLASS FILL: a word form the class prior cannot place is asked of the same hyperlexicon the master pipeline asks (the page's
-// local giver, no network); what it lists is a witness the replay's classifier reads (LOOKUP's cache). English only: the page's
-// dictionary parser reads English entries.
+// THE CLASS FILL: a word form the class prior cannot place is asked of the same hyperlexicon the master pipeline asks — the word's
+// context in the ledger (makeHyperlexicon.context): its givers' candidates, each with the part of speech its giver wrote, and how
+// often and when the corpus uses it. What the givers list is a witness the replay's classifier reads (LOOKUP's cache). English only:
+// the page's dictionary parser reads English entries.
 async function classFill(clean, feat){
   const lang = PRIORS.lang && PRIORS.lang.confident && PRIORS.lang.lang ? PRIORS.lang.lang : 'en', pos = PRIORS.posPrior;
   if (feat.lexicon === false || !pos || lang !== 'en') return { asked:0, found:[] };
@@ -2171,14 +2177,17 @@ async function classFill(clean, feat){
     let c = null; try { c = classifyForm(w, { posPrior: pos, lemmatizer: PRIORS.lemmatizer }); } catch (e) {}
     if (!c || !c.found) gap.add(w);
   }
-  await HLEX.want(new Set([...gap, ...[...gap].map(w => w.toLowerCase())]));
+  const n0 = HLEX.log.length;
+  const ctx = await HLEX.context([...gap], { lang:'en' });   // the ledger folds case: one ask per word
   const found = [];
   for (const w of gap){
-    if (!HLEX.get(w) && !HLEX.get(w.toLowerCase())) continue;
+    const c = ctx.get(w);
+    if (!c || !c.candidatesTotal) continue;
     const rec = await LOOKUP.look(w, { only:['dictionary'], network:false });
-    if (rec && rec.dictionary && rec.dictionary.found) found.push({ form:w, upos:rec.dictionary.upos || [] });
+    if (rec && rec.dictionary && rec.dictionary.found) found.push({ form:w, upos:rec.dictionary.upos || [], context:rec.dictionary.context || null });
   }
-  return { asked:gap.size, found };
+  const g = HLEX.log.slice(n0).find(x => x.gap);
+  return { asked:gap.size, found, ...(g ? { gap:g.gap } : {}), giver:HLEX.giver };
 }
 
 async function read(text, label, feat, opt = {}){

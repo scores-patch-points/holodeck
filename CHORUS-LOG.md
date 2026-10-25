@@ -444,3 +444,11 @@ fast: 8 files · full suite 694 tests, the one failure main has (holodeck-byo-pa
 | Holmes | identity | index.html (hdTextKey) | noted | one read is shared by texts with the same length, first and last 120 characters — the key hdMasterFor already used; two such texts that differ only in the middle would share a reading |
 | Diaconis | measurement | index.html (masterReads) | noted | a read-only count on window.__holodeck for timing; it reports, it decides nothing |
 clean: Dijkstra, Pearl, Ostrom, Frankfurt, Alexander (vendored khora prose)
+
+## 2026-10-25 — the page asks the hyperlexicon through its door, not the Wiktionary pack (reading-asks-hyperlexicon)
+fast: 10 files · 43 affected tests pass · law: ok
+| lens | citation | file:line | verdict | one line |
+| Holmes | — | holodeck-lookup.js (ledgerDictionary) | fixed | the ledger's types fold case, so "Polish" drew the verb "polish" too; candidates are read as written first (a headword written exactly as asked answers alone), tested |
+| Ostrom | — | index.html (hdAbbreviations, `HD_LEX.log[last]`) | fixed | one client now serves the cut, the master and the class fill; the cut's gap is read from its own ask's entries |
+| Kondo | — | tools/serve.mjs POST /lexicon | noted | removed (nothing calls it; the eval reads the pack on its own); stashed with its recovery address |
+clean: Feynman (the 12-character cut is the givers' list's own, pre-existing), Dijkstra/Frankfurt (vendored khora, reviewed upstream in khora#56), Simon/Chekhov (vendored read-core is tested upstream)

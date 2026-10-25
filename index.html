@@ -3958,8 +3958,9 @@ Promise.all([
   import(new URL('holodeck-reader.js', location.href)).then(M => M.makeEngineRelationReader()),
 ]).then(([P, Q, R]) => { HD_PROF = P; HD_ASK = Q; HD_READER = R; }).catch(() => {});
 const hdReaderReady = () => !!(HD_PROF && HD_ASK && HD_READER);
-// khora's sentence cut and the hyperlexicon (splitSentences): the core's abbreviation knowledge, spans.js's splitter, and the lexicon
-// organ over the local server's Wiktionary (POST /lexicon). A page without that server reads with the prior and the text's own.
+// khora's sentence cut and the hyperlexicon (splitSentences): the core's abbreviation knowledge, spans.js's splitter, and the page's
+// one hyperlexicon client (holodeck-reader.js::pageLexicon: janus's ledger through the server's POST /hyperlexicon). A page without
+// that server, or a server with no door, reads with the prior and the text's own.
 let HD_CORE = null, HD_LEX = null, HD_LEX_GAP = null, HD_CUT_VER = 0;
 const hdCutChanged = () => { HD_CUT_VER++; HD_ABBR.clear(); try { window.dispatchEvent(new Event('hd-cut')); } catch (e) {} };
 // readings landing together re-cut the page once (a quarter second after the last), not once each
@@ -3971,10 +3972,10 @@ Promise.all([
   import(new URL('vendor/khora/native/adapters/text/spans.js', location.href)),
   import(new URL('vendor/khora/native/organs/lexicon.js', location.href)),
   import(new URL('vendor/khora/native/the-fold/language-context.js', location.href)),
-  import(new URL('holodeck-reader.js', location.href)).then(M => M.loadLanguage('eng')),
-]).then(([C, S, L, LC]) => {
+  import(new URL('holodeck-reader.js', location.href)).then(M => M.loadLanguage('eng').then(() => M)),
+]).then(([C, S, L, LC, R]) => {
   HD_CORE = { abbreviationsFor: C.abbreviationsFor, priorsFor: C.priorsFor, split: S.splitSentences, derive: S.deriveAbbreviations, L, surfaces: LC.extractSurfacesHeard };
-  HD_LEX = L.makeLexicon({ lang: 'en', ask: async (forms, lang) => { try { const r = await fetch(new URL('lexicon', location.href), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ forms, lang }) }); return r.ok ? await r.json() : null; } catch (e) { return null; } } });
+  HD_LEX = R.pageLexicon('en');
   hdCutChanged();
 }).catch(() => {});
 // khora's surface organ over khora's cut: the names a text the page holds no reading of (a typed question, a shuffled null) shows,
@@ -3991,15 +3992,17 @@ function hdAbbreviations(text) {
   if (HD_ABBR.has(key)) return HD_ABBR.get(key);
   const priors = HD_CORE.priorsFor('eng');
   const known = new Set([...((priors.punctuation && priors.punctuation.abbreviations) || []), ...HD_CORE.derive(text)].map(a => String(a).toLowerCase()));
-  // the dotted-words prior settles what it lists (the read-ahead the master uses), and when it is the live giver's own pack nothing
-  // else is asked live (read-core.mjs::consultAliases): a giver that has not answered yet is asked one form, to learn its pack
+  // the dotted-words prior settles what it lists (the read-ahead the master uses), and when it is the same giver's own (the same
+  // hyperlexicon head, or one pack) nothing else is asked live (read-core.mjs::consultAliases): a giver that has not answered yet is
+  // asked one form, to learn which it is
   if (priors.dotted) for (const f of HD_CORE.L.dottedIn(text, priors.dotted, known)) known.add(f.slice(0, -1).toLowerCase());
   let junc = HD_CORE.L.aliasJunctions(text, known);
   const G = HD_LEX.giver, P = priors.dottedGiver;
-  if (priors.dotted && P && G && G.pack === P.pack && (G.snapshot || null) === (P.snapshot || null)) junc = new Map([...junc].filter(([f]) => f.length > 12));
+  if (priors.dotted && P && G && ((P.head && P.head === G.head) || (P.pack && P.pack === G.pack && (G.snapshot || null) === (P.snapshot || null)))) junc = new Map([...junc].filter(([f]) => f.length > 12));
   const unasked = [...junc.keys()].filter(f => HD_LEX.get(f) === undefined);
   const ask = priors.dotted && P && !G ? unasked.slice(0, 1) : unasked;
-  if (ask.length && !HD_LEX_GAP) HD_LEX.want(ask).then(() => { const last = HD_LEX.log[HD_LEX.log.length - 1]; if (last && last.gap) HD_LEX_GAP = last.gap; else if (ask.length < unasked.length || ask.some(f => HD_LEX.get(f))) hdCutSoon(); });
+  const n0 = HD_LEX.log.length;   // this ask's own entries: the page's one client is asked by the master and the class fill too
+  if (ask.length && !HD_LEX_GAP) HD_LEX.want(ask).then(() => { const g = HD_LEX.log.slice(n0).find(x => x.gap); if (g) HD_LEX_GAP = g.gap; else if (ask.length < unasked.length || ask.some(f => HD_LEX.get(f))) hdCutSoon(); });
   const answered = new Map([...junc].filter(([f]) => HD_LEX.get(f) !== undefined));
   const aliases = HD_CORE.L.resolveAliases(HD_LEX, answered, text).filter(r => r.kept).map(r => r.form);
   const a = HD_CORE.abbreviationsFor(text, { priors, aliases });

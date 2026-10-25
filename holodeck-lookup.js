@@ -12,10 +12,12 @@
 //      the hyperlexicon as a candidate with its giver, license, address and retrieval time, and
 //      licenses nothing (external-evidence.js, kernel/hyperlexicon.js).
 //
-// LOCAL FIRST (2026-10-24). The dictionary is asked of the hyperlexicon's local giver before any network: the English
-// Wiktionary pack on this machine, through reading/lexicon.js and the dev server's POST /lexicon. A local answer needs no
-// switch, because nothing leaves the machine; it is logged with source 'dictionary (local)'. The live API is asked only for
-// a form the pack does not list, and only when the caller allows the network (the page's switch).
+// LOCAL FIRST (2026-10-24). The dictionary is asked of the hyperlexicon before any network. Since 2026-10-25 that is janus's
+// ledger itself (khora organs/lexicon.js::makeHyperlexicon, through the dev server's POST /hyperlexicon): the word's context there —
+// the givers' candidates for it, undecided, beside how often and when the corpus uses it — read as a dictionary answer. A giver
+// handed in directly (makeLexicon) is still read as before. A local answer needs no switch, because nothing leaves the machine;
+// it is logged with source 'dictionary (local)'. The live API is asked only for a form the ledger's givers do not list, and only
+// when the caller allows the network (the page's switch).
 //
 // Wikidata goes through holodeck-links.js's searchWikidata (same retry, same CORS parameter); no new
 // Wikidata client is written. fetch is injected, so the whole thing is falsified deterministically in
@@ -49,8 +51,28 @@ export function makeLookup({ fetchImpl = (...a) => fetch(...a), now = () => new 
 
   // the pack's part-of-speech names → the REST API's headings, so parseWiktionary reads a local answer exactly as a live one
   const HEADING = { noun: 'Noun', name: 'Proper noun', verb: 'Verb', adj: 'Adjective', adv: 'Adverb', prep: 'Preposition', postp: 'Postposition', pron: 'Pronoun', det: 'Determiner', article: 'Article', conj: 'Conjunction', intj: 'Interjection', num: 'Numeral', particle: 'Particle', symbol: 'Symbol' };
+  // the ledger's context for a word: its givers' candidates, each with the part of speech its giver wrote (the pack's own names, so
+  // parseWiktionary reads them as it reads a live answer) and its glosses; the corpus's uses and dated span ride along as `context`
+  async function ledgerDictionary(form) {
+    const t0 = Date.now(), w = String(form), head = () => local.giver?.head ?? 'unknown';
+    const c = (await local.context([w], { lang: 'en' })).get(w);
+    if (!c || !c.candidatesTotal) {
+      log.push({ source: 'dictionary (local)', url: `hyperlexicon:${head()}#${w}`, at: now(), status: c === undefined ? 503 : 404, ms: Date.now() - t0 });
+      return c === undefined ? null : { found: false, via: 'local', giver: local.giver ?? null, context: c };
+    }
+    log.push({ source: 'dictionary (local)', url: `hyperlexicon:${head()}#${w}`, at: now(), status: 200, ms: Date.now() - t0 });
+    // the ledger's types fold case ("Polish" and "polish" are one type), so its candidates are read as written first: a headword the
+    // givers write exactly as the form is asked, case included, answers alone; with none, every candidate of the type answers (the
+    // pack read did the same: as written, then lower-cased)
+    const exact = c.candidates.filter((x) => x.kind === 'lemma' && x.lemma === w);
+    const cands = exact.length ? exact : c.candidates;
+    const json = { en: cands.flatMap((x) => ((x.pos ?? []).length ? x.pos : [null]).map((p) => ({ partOfSpeech: HEADING[p] ?? p, definitions: ((x.gloss ?? []).length ? x.gloss : (x.of ?? []).map((o) => `form of ${o}`)).map((d) => ({ definition: d })) }))) };
+    const context = { uses: c.uses, documents: c.documents, dated: c.dated, candidatesTotal: c.candidatesTotal, givers: [...new Set(c.candidates.flatMap((x) => x.givers ?? []))] };
+    return { ...parseWiktionary(json, w), via: 'local', giver: local.giver ?? null, aliasOf: [...new Set(cands.flatMap((x) => x.of ?? []))], context: { ...context, asWritten: exact.length > 0 } };
+  }
   async function localDictionary(form) {
     if (!local) return null;
+    if (typeof local.context === 'function') return ledgerDictionary(form);
     const t0 = Date.now(), tries = [String(form)]; const low = String(form).toLowerCase(); if (low !== tries[0]) tries.push(low);
     await local.want(tries);
     for (const w of tries) {
@@ -97,7 +119,7 @@ export function makeLookup({ fetchImpl = (...a) => fetch(...a), now = () => new 
 
   /** Look a form up in the chosen sources; cached, so asking twice costs nothing. */
   async function look(form, { only = sources, force = false, network = true } = {}) {
-    // network:false — the hyperlexicon's local giver only: the dictionary, from the pack; Wikipedia and Wikidata are not asked
+    // network:false — the hyperlexicon only: the dictionary, from the ledger's givers; Wikipedia and Wikidata are not asked
     if (!network) only = only.filter((s) => s === 'dictionary');
     const key = keyOf(form); if (!key) return null;
     const have = cache.get(key);
@@ -107,7 +129,7 @@ export function makeLookup({ fetchImpl = (...a) => fetch(...a), now = () => new 
     const rec = { ...(have || {}), form: have?.form ?? form, retrievedAt: now() };
     for (const [s, v] of got) rec[s] = v;
     rec.rows = evidenceRows(form, rec, { retrievedAt: rec.retrievedAt })
-      .map((row) => (row.source === 'dictionary' && rec.dictionary?.via === 'local' ? { ...row, via: `${rec.dictionary.giver?.via ?? 'local pack'} (${rec.dictionary.giver?.pack ?? ''})`, snapshot: rec.dictionary.giver?.snapshot ?? null, aliasOf: rec.dictionary.aliasOf ?? [] } : row));
+      .map((row) => (row.source === 'dictionary' && rec.dictionary?.via === 'local' ? { ...row, via: rec.dictionary.giver?.head ? `${rec.dictionary.giver.name} (head ${String(rec.dictionary.giver.head).slice(0, 16)})` : `${rec.dictionary.giver?.via ?? 'local pack'} (${rec.dictionary.giver?.pack ?? ''})`, snapshot: rec.dictionary.giver?.snapshot ?? null, aliasOf: rec.dictionary.aliasOf ?? [], ...(rec.dictionary.context ? { context: rec.dictionary.context } : {}) } : row));
     cache.set(key, rec);
     hl = admitLookup(hl, form, rec, { retrievedAt: rec.retrievedAt });
     return rec;
