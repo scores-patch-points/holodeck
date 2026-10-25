@@ -3726,23 +3726,60 @@ async function hdPdfFigures(pdf, pageCap) {
 const HD_ENG = { url: null, downAt: 0 };
 function hdEngineHosts() { let u = null; try { u = localStorage.getItem('hd:engine'); } catch (e) {} return [u, 'http://127.0.0.1:11436', 'http://127.0.0.1:11476'].filter((x, i, a) => x && a.indexOf(x) === i); }
 const HD_MASTER_CAP = 200000;   // the most characters one read takes; a longer text is cut and the cut is said
-let HD_MW = null, HD_MW_READY = null; const HD_MW_WAIT = new Map(); let HD_MW_SEQ = 0;
-function hdMasterWorker() {
-  if (HD_MW_READY) return HD_MW_READY;
-  HD_MW_READY = new Promise((resolve) => {
-    try {
-      HD_MW = new Worker(new URL('master-reading-worker.js', location.href), { type: 'module' });
-      HD_MW.onmessage = (e) => { const m = e.data || {}; if (m.ready) return resolve(HD_MW); const w = HD_MW_WAIT.get(m.id); if (w) { HD_MW_WAIT.delete(m.id); w(m); } };
-      HD_MW.onerror = () => resolve(null);
-    } catch (e) { resolve(null); }
+// A POOL of readers: every source a workspace holds was read one after another by one worker (the Titanic sample's eight took
+// ~13 s before every name was placed, 2026-10-25). Each worker is the same master pipeline; a read goes to the least busy one.
+// Up to three, never more than the machine has cores to spare.
+const HD_MW_N = Math.max(1, Math.min(3, ((typeof navigator !== 'undefined' && navigator.hardwareConcurrency) || 2) - 1));
+let HD_MWS = null; const HD_MW_WAIT = new Map(); let HD_MW_SEQ = 0;
+function hdMasterPool() {
+  if (HD_MWS) return HD_MWS;
+  HD_MWS = Array.from({ length: HD_MW_N }, () => {
+    const slot = { w: null, busy: 0, ready: null };   // busy: 1 while it reads
+    slot.ready = new Promise((resolve) => {
+      try {
+        slot.w = new Worker(new URL('master-reading-worker.js', location.href), { type: 'module' });
+        slot.w.onmessage = (e) => { const m = e.data || {}; if (m.ready) return resolve(slot); const w = HD_MW_WAIT.get(m.id); if (w) { HD_MW_WAIT.delete(m.id); w(m); } };
+        slot.w.onerror = () => resolve(null);
+      } catch (e) { resolve(null); }
+    });
+    return slot;
   });
-  return HD_MW_READY;
+  return HD_MWS;
 }
-async function hdMasterReadText(name, text) {
-  const W = await hdMasterWorker(); if (!W) return null;
-  const id = 'm' + (++HD_MW_SEQ);
+// run `fn` over `items`, at most `n` at once (the reading pool's width): one source's read never waits on another's
+async function hdEachAtOnce(items, n, fn) {
+  let next = 0;
+  const lane = async () => { while (next < items.length) { const k = next++; await fn(items[k], k); } };
+  await Promise.all(Array.from({ length: Math.max(1, Math.min(n, items.length)) }, lane));
+}
+// A worker takes one read at a time: given several, it interleaved them and every one finished late. Reads wait here for a free
+// worker, the SHORTEST text first, so a short source's names land at once and a long one does not hold them up. A slot is null
+// when no worker could start (the page then has no master reading, and says so where it reads).
+const HD_MW_QUEUE = [];
+function hdMasterSlot(n) {
+  return new Promise((go) => { HD_MW_QUEUE.push({ n, go }); HD_MW_QUEUE.sort((a, b) => a.n - b.n); hdMasterDispatch(); });
+}
+async function hdMasterDispatch() {
+  const ready = (await Promise.all(hdMasterPool().map((s) => s.ready))).filter(Boolean);
+  if (!ready.length) { while (HD_MW_QUEUE.length) HD_MW_QUEUE.shift().go(null); return; }
+  for (const s of ready) if (!s.busy && HD_MW_QUEUE.length) { s.busy = 1; HD_MW_QUEUE.shift().go(s); }
+}
+// ONE READ PER TEXT: a source just added was read twice — by the add-time loop (engineLater) and by the cut asking for its names
+// (hdMasterFor) — so the pool held every source twice. A read in flight is shared by every caller asking for the same text.
+const HD_MW_INFLIGHT = new Map();
+const hdTextKey = (text) => { const t = String(text || ''); return t.length + '|' + t.slice(0, 120) + '|' + t.slice(-120); };
+function hdMasterReadText(name, text) {
+  const key = hdTextKey(text);
+  if (!HD_MW_INFLIGHT.has(key)) HD_MW_INFLIGHT.set(key, hdMasterReadOnce(name, text).finally(() => HD_MW_INFLIGHT.delete(key)));
+  return HD_MW_INFLIGHT.get(key);
+}
+async function hdMasterReadOnce(name, text) {
   const t0 = performance.now();
-  const m = await new Promise((resolve) => { HD_MW_WAIT.set(id, resolve); W.postMessage({ id, text: String(text || ''), cap: HD_MASTER_CAP }); });
+  const S = await hdMasterSlot(String(text || '').length); if (!S) return null;
+  const id = 'm' + (++HD_MW_SEQ);
+  let m = null;
+  try { m = await new Promise((resolve) => { HD_MW_WAIT.set(id, resolve); S.w.postMessage({ id, text: String(text || ''), cap: HD_MASTER_CAP }); }); }
+  finally { S.busy = 0; hdMasterDispatch(); }
   if (!m || m.err || !m.entry) return null;
   const E = m.entry;
   // the door's EORead@1 shape, so every caller of the engine reading reads it unchanged; spans are the master's mentions
@@ -3765,7 +3802,7 @@ function hdMasterFor(d) {
   if (!HD_MASTER_PENDING.has(key) && (d.text || '').trim()) {
     HD_MASTER_PENDING.add(key);
     setTimeout(async () => { let got = null; try { got = await hdMasterReadText(d.title || d.id, d.text); } catch (e) { got = null; }
-      HD_MASTER.set(key, got ? hdEngineCompact(got.host, got.read) : null); HD_MASTER_PENDING.delete(key); if (typeof hdCutChanged === 'function') hdCutChanged(); }, 0);
+      HD_MASTER.set(key, got ? hdEngineCompact(got.host, got.read) : null); HD_MASTER_PENDING.delete(key); hdCutSoon(); }, 0);
   }
   return null;
 }
@@ -3834,7 +3871,7 @@ const HD_KIND_RANK = { differs: 0, polarity: 1, scope: 2, absent: 3, defined: 4,
 const HD_STANDING_PLAIN = { fixed: 'always the same', 'one at a time': 'one at a time', 'many-valued': 'many values' };
 const hdEngineCompact = (host, r) => ({ host, ms: Math.round(r.ms), basis: r.basis || null, sentences: r.sentences.length, relations: r.relations.length, referents: r.referents.map(x => ({ surfaces: x.surfaces, surface: x.surface || null, routes: x.routes, grain: x.grain || null, spans: x.spans || null })).concat(r.descriptorBeings.map(b => ({ surfaces: b.surfaces, routes: ['descriptor'], grain: null }))) });
 // read-only handle for tests: the real functions, so a harness can recompute what a trace claims happened
-setTimeout(() => { try { window.__holodeck = Object.freeze({ analyze, holoKit, holoName, paradigms, holoTopics, fieldTopics, fieldCatalog, splitSentences, isJunk, readAny, hdHygiene, hdPos: w => hdPos(w), hdPosForms: () => HD_POS, hdDeclReady: () => !!HD_DECL, hdEngineReady: () => !!HD_ENGINE, hdReaderReady: () => hdReaderReady(), hdAttrReady: () => hdAttrReady(), hdHoldReady: () => hdHoldReady(), summarizeHolders: (sts, names) => (HD_ATTR ? HD_ATTR.summarizeHolders(sts, names) : null) }); } catch (e) {} }, 0);
+setTimeout(() => { try { window.__holodeck = Object.freeze({ analyze, holoKit, holoName, paradigms, holoTopics, fieldTopics, fieldCatalog, splitSentences, isJunk, readAny, hdHygiene, hdPos: w => hdPos(w), hdPosForms: () => HD_POS, hdDeclReady: () => !!HD_DECL, hdEngineReady: () => !!HD_ENGINE, hdReaderReady: () => hdReaderReady(), hdAttrReady: () => hdAttrReady(), hdHoldReady: () => hdHoldReady(), summarizeHolders: (sts, names) => (HD_ATTR ? HD_ATTR.summarizeHolders(sts, names) : null), masterReads: () => ({ read: HD_MASTER.size, pending: HD_MASTER_PENDING.size, workers: HD_MW_N }) }); } catch (e) {} }, 0);
 const hdCut = (t, n) => { t = String(t || '').replace(/\s+/g, ' ').trim(); return t.length > n ? t.slice(0, n - 1) + '…' : t; };
 // THE CUT IS KHORA'S (2026-10-24). Which dotted tokens are words is khora's knowledge, never a list on this page: the language's
 // measured punctuation prior and the text's own (read-core.mjs::abbreviationsFor), plus the aliases the hyperlexicon resolves for
@@ -3925,6 +3962,9 @@ const hdReaderReady = () => !!(HD_PROF && HD_ASK && HD_READER);
 // organ over the local server's Wiktionary (POST /lexicon). A page without that server reads with the prior and the text's own.
 let HD_CORE = null, HD_LEX = null, HD_LEX_GAP = null, HD_CUT_VER = 0;
 const hdCutChanged = () => { HD_CUT_VER++; HD_ABBR.clear(); try { window.dispatchEvent(new Event('hd-cut')); } catch (e) {} };
+// readings landing together re-cut the page once (a quarter second after the last), not once each
+let HD_CUT_SOON = null;
+const hdCutSoon = () => { clearTimeout(HD_CUT_SOON); HD_CUT_SOON = setTimeout(() => { HD_CUT_SOON = null; hdCutChanged(); }, 250); };
 const HD_ABBR = new Map();
 Promise.all([
   import(new URL('vendor/khora/native/the-fold/read-core.mjs', location.href)),
@@ -3951,9 +3991,15 @@ function hdAbbreviations(text) {
   if (HD_ABBR.has(key)) return HD_ABBR.get(key);
   const priors = HD_CORE.priorsFor('eng');
   const known = new Set([...((priors.punctuation && priors.punctuation.abbreviations) || []), ...HD_CORE.derive(text)].map(a => String(a).toLowerCase()));
-  const junc = HD_CORE.L.aliasJunctions(text, known);
+  // the dotted-words prior settles what it lists (the read-ahead the master uses), and when it is the live giver's own pack nothing
+  // else is asked live (read-core.mjs::consultAliases): a giver that has not answered yet is asked one form, to learn its pack
+  if (priors.dotted) for (const f of HD_CORE.L.dottedIn(text, priors.dotted, known)) known.add(f.slice(0, -1).toLowerCase());
+  let junc = HD_CORE.L.aliasJunctions(text, known);
+  const G = HD_LEX.giver, P = priors.dottedGiver;
+  if (priors.dotted && P && G && G.pack === P.pack && (G.snapshot || null) === (P.snapshot || null)) junc = new Map([...junc].filter(([f]) => f.length > 12));
   const unasked = [...junc.keys()].filter(f => HD_LEX.get(f) === undefined);
-  if (unasked.length && !HD_LEX_GAP) HD_LEX.want(unasked).then(() => { const last = HD_LEX.log[HD_LEX.log.length - 1]; if (last && last.gap) HD_LEX_GAP = last.gap; else if (unasked.some(f => HD_LEX.get(f))) hdCutChanged(); });
+  const ask = priors.dotted && P && !G ? unasked.slice(0, 1) : unasked;
+  if (ask.length && !HD_LEX_GAP) HD_LEX.want(ask).then(() => { const last = HD_LEX.log[HD_LEX.log.length - 1]; if (last && last.gap) HD_LEX_GAP = last.gap; else if (ask.length < unasked.length || ask.some(f => HD_LEX.get(f))) hdCutSoon(); });
   const answered = new Map([...junc].filter(([f]) => HD_LEX.get(f) !== undefined));
   const aliases = HD_CORE.L.resolveAliases(HD_LEX, answered, text).filter(r => r.kept).map(r => r.form);
   const a = HD_CORE.abbreviationsFor(text, { priors, aliases });
@@ -8012,6 +8058,16 @@ class Component extends DCLogic {
     if (!next.length) { this.toast('At least one eye stays on.'); return; }
     this.setState({ eyes: next });
   }
+  // Several documents patched at once: one save and one render. Readings landing together (the pool reads three sources at a time)
+  // each re-saved and re-folded the whole workspace, and the main thread spent the readings' gain re-folding.
+  replaceAddedDocs(patches) {
+    if (!patches || !patches.length) return;
+    const all = this.state.added, byId = new Map(patches.map(p => [p.id, p.patch]));
+    const added = { ...all };
+    for (const k of Object.keys(all)) if ((all[k] || []).some(d => byId.has(d.id))) added[k] = all[k].map(d => byId.has(d.id) ? { ...d, ...byId.get(d.id) } : d);
+    this.saveAdded(added);
+    this.setState({ added, htmlVer: this.state.htmlVer + 1 });
+  }
   replaceAddedDoc(id, patch) {
     // A document belongs to the workspace it was added to, which is not always the one on screen when a long job
     // (transcription, sound classification) finishes: the person may have switched meanwhile. Patch it where it lives.
@@ -9917,7 +9973,7 @@ class Component extends DCLogic {
     if (!docs.length) { this._engNote = all.some(d => d.eng) ? 'Every readable source already carries an engine reading.' : 'There is nothing here to re-read.'; this.setState({ engBusy: false }); if (!opts.quiet) this.toast(this._engNote); return; }
     this.setState({ engBusy: true, busy: 'Re-reading ' + plural(docs.length, 'existing source') + ' with the eoreader7 engine…' });
     let ok = 0, miss = 0;
-    for (const d of docs) { const got = await hdEngineRead(d.title, d.text); d.engTried = true; if (!got) { miss++; continue; } ok++; d.eng = hdEngineCompact(got.host, got.read); }
+    await hdEachAtOnce(docs, HD_MW_N, async (d) => { const got = await hdEngineRead(d.title, d.text); d.engTried = true; if (!got) { miss++; return; } ok++; d.eng = hdEngineCompact(got.host, got.read); });
     this.saveAdded(this.state.added); this._key = null;
     this._engNote = miss ? (ok ? ok + ' re-read by the engine; ' + miss + ' could not be reached (is the proxy up?).' : 'The engine was not reachable — start the eoreader7 proxy, or set its address above.') : 'Re-read ' + plural(ok, 'source') + ' through the engine.';
     this.setState({ engBusy: false, busy: '', htmlVer: this.state.htmlVer + 1 });
@@ -9975,17 +10031,22 @@ class Component extends DCLogic {
     const live = nd.filter(d => d.text && !d.measured);
     const engineLater = async () => {
       let ok = 0, miss = 0;
-      for (const d of live) {
+      // the landings are applied together: whatever lands within a quarter second is one save and one re-fold
+      const landed = []; let flushAt = null;
+      const land = (id, patch) => { landed.push({ id, patch }); if (!flushAt) flushAt = setTimeout(flush, 250); };
+      const flush = () => { clearTimeout(flushAt); flushAt = null; const ps = landed.splice(0); try { this.replaceAddedDocs(ps); } catch (e) {} };
+      await hdEachAtOnce(live, HD_MW_N, async (d) => {
         const t0 = T ? performance.now() - T.t0 : 0; const got = await hdEngineRead(d.title, d.text);
-        if (!got) { miss++; try { this.replaceAddedDoc(d.id, { engTried: true }); } catch (e) {} continue; }
+        if (!got) { miss++; land(d.id, { engTried: true }); return; }
         ok++; const eng = hdEngineCompact(got.host, got.read);
         if (T) { const evs = Array.isArray(got.read.events) ? got.read.events : [];
           evs.forEach(ev => T.ev.push({ ...ev, stage: 'engine', kind: 'eng-' + ev.stage + '-' + ev.kind, es: ev.stage, t: t0 + ev.t, doc: d.id, config: undefined }));
           if (!evs.length) { let t = t0; (got.read.referents || []).forEach(r => { t += 0.2; T.ev.push({ t, stage: 'engine', kind: 'eng-referent', msg: 'Engine admitted “' + hdCut((r.surfaces || [])[0], 48) + '”' + ((r.routes || []).length ? ' (' + r.routes.join(', ') + ')' : ''), doc: d.id, es: 'referent' }); });
             const rl = (got.read.relations || []).length; if (rl) { t += 0.2; T.ev.push({ t, stage: 'engine', kind: 'eng-relations', msg: 'Engine held ' + rl + ' relation' + (rl === 1 ? '' : 's'), doc: d.id, es: 'relations' }); } }
           T.ev.push({ t: performance.now() - T.t0, stage: 'engine', kind: 'eng-read', msg: 'The engine read “' + hdCut(d.title, 50) + '”: ' + eng.referents.length + ' beings, ' + eng.relations + ' relations, ' + eng.ms + ' ms (' + got.host.replace(/^https?:\/\//, '') + ')', doc: d.id }); }
-        try { this.replaceAddedDoc(d.id, { eng, engTried: true }); } catch (e) {}
-      }
+        land(d.id, { eng, engTried: true });
+      });
+      flush();
       if (miss) { const note = 'The engine (eoreader7 proxy) was not reachable, so ' + (ok ? miss + ' of ' + live.length + ' sources were' : live.length === 1 ? 'this source was' : 'these sources were') + ' read with the Holodeck’s own reader only. Start the proxy, or set its address with localStorage hd:engine.'; this._engNote = note; try { if (T) T.ev.push({ t: performance.now() - T.t0, stage: 'engine', kind: 'eng-skip', msg: note }); } catch (e) {} }
     };
     if (live.length) setTimeout(() => { engineLater().catch(e => console.warn('engine read', e)); }, 50);

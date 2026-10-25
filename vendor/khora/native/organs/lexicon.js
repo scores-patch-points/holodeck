@@ -29,9 +29,24 @@ export function makeLexicon({ ask, lang = "en" } = {}) {
   const log = [];
   let giver = null;
   const key = (f) => String(f ?? "").normalize("NFC");
+  // A form another call is already asking is waited on, not asked again. Before 2026-10-25 only an ANSWER was remembered, so a
+  // caller cutting many texts at once — the Holodeck re-cutting every source when one answer lands — asked the same forms again
+  // and again before the first answer came back (231 requests for the Titanic sample's eleven sources), and the giver's queue
+  // held up every reading that waited on it.
+  const inFlight = new Map();   // form -> the ask carrying it
   async function want(forms) {
-    const todo = [...new Set([...forms].map(key))].filter((f) => f && !cache.has(f));
-    if (!todo.length || typeof ask !== "function") return;
+    const all = [...new Set([...forms].map(key))].filter((f) => f && !cache.has(f));
+    if (!all.length || typeof ask !== "function") return;
+    const waits = new Set(all.filter((f) => inFlight.has(f)).map((f) => inFlight.get(f)));
+    const todo = all.filter((f) => !inFlight.has(f));
+    if (todo.length) {
+      const run = askAll(todo);
+      for (const f of todo) inFlight.set(f, run);
+      waits.add(run.finally(() => { for (const f of todo) if (inFlight.get(f) === run) inFlight.delete(f); }));
+    }
+    await Promise.all(waits);
+  }
+  async function askAll(todo) {
     const t0 = Date.now();
     for (let i = 0; i < todo.length; i += 400) {
       const batch = todo.slice(i, i + 400);
