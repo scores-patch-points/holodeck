@@ -340,23 +340,10 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
         </div>
       </div>
       </sc-if>
-      <sc-if value="{{ hasContent }}" hint-placeholder-val="{{ false }}">
-      <div class="hd-rsec">
-        <div class="hd-label"><span>Explore</span></div>
-        <div style="display:flex;flex-direction:column;gap:1px">
-          <sc-for list="{{ navExploreFlat }}" as="g" hint-placeholder-count="5">
-            <button class="hd-item row" aria-current="{{ g.aria }}" onClick="{{ g.onClick }}" title="{{ g.title }}"><span>{{ g.label }}</span><span class="hd-n">{{ g.count }}</span></button>
-          </sc-for>
-        </div>
-      </div>
-      </sc-if>
       <sc-if value="{{ hasBrowseExtras }}" hint-placeholder-val="{{ false }}">
       <div class="hd-rsec">
         <div class="hd-label"><span>Browse</span></div>
         <div style="display:flex;flex-direction:column;gap:1px">
-          <sc-for list="{{ browseMore }}" as="b" hint-placeholder-count="0">
-            <button class="hd-item row" onClick="{{ b.onClick }}"><span>{{ b.label }}</span><span class="hd-n">{{ b.n }}</span></button>
-          </sc-for>
           <sc-if value="{{ hasBrowseDepts }}" hint-placeholder-val="{{ false }}">
             <span style="font:600 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--dim);padding:8px 8px 4px">Departments</span>
             <sc-if value="{{ browseDeptSearch }}" hint-placeholder-val="{{ false }}"><div style="padding:0 0 4px"><input class="hd-filter" value="{{ browseDeptQ }}" onChange="{{ browseDeptOnQ }}" placeholder="Filter departments…" aria-label="Filter departments"></div></sc-if>
@@ -621,7 +608,6 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
             </sc-if>
             <sc-if value="{{ !v.summary }}" hint-placeholder-val="{{ true }}"><h1 style="margin:0;font:500 30px/1.2 var(--serif);color:var(--ink);text-wrap:pretty">{{ crumbLast.label }}</h1></sc-if>
             <p style="margin:0;color:var(--mut);font-size:15px;text-wrap:pretty;max-width:760px">{{ hdrSubShown }}{{ sr.sub }}</p>
-            <sc-if value="{{ v.names }}" hint-placeholder-val="{{ false }}"><div><button onClick="{{ onFixNames }}" title="Merge spellings, split two people, say what a name is not" style="cursor:pointer;border:1px solid var(--line2);background:none;color:var(--ink2);border-radius:8px;padding:5px 12px;font:500 13px var(--sans)" style-hover="border-color:var(--acc)">Fix names{{ fixNamesN }}</button></div></sc-if>
             <sc-if value="{{ sr.hasOthers }}" hint-placeholder-val="{{ false }}">
               <div style="display:flex;align-items:center;gap:6px 8px;flex-wrap:wrap;margin-top:4px">
                 <span style="font:400 14px var(--sans);color:var(--mut)">Also narrowed to</span>
@@ -671,7 +657,6 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
           </sc-if>
         </div>
       </sc-if>
-      <sc-if value="{{ v.overview }}" hint-placeholder-val="{{ false }}"><div id="overview-surface"></div></sc-if>
       <sc-if value="{{ v.linkSurface }}" hint-placeholder-val="{{ false }}"><div id="links-surface" style="min-width:0"></div></sc-if>
       <sc-if value="{{ v.inbox }}" hint-placeholder-val="{{ false }}"><div id="inbox-surface" style="max-width:1100px"></div></sc-if>
       <sc-if value="{{ v.summary }}" hint-placeholder-val="{{ true }}">
@@ -842,9 +827,6 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
             </section>
           </sc-for>
         </sc-if>
-        <sc-if value="{{ svMap }}" hint-placeholder-val="{{ false }}">
-          <div style="margin-top:8px;border-radius:12px;background:var(--bg);border:1px solid var(--line)">{{ graphEl }}</div>
-        </sc-if>
         <sc-if value="{{ svRefs }}" hint-placeholder-val="{{ false }}">
           <div style="margin-top:8px">{{ refEl }}</div>
         </sc-if>
@@ -987,149 +969,6 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
         <sc-if value="{{ rx.notReady }}" hint-placeholder-val="{{ false }}"><div style="border:1px dashed var(--line2);border-radius:12px;padding:18px 20px;display:flex;flex-direction:column;gap:6px"><span style="font:500 16px var(--sans);color:var(--ink)">{{ rx.wait }}</span><span style="font:400 14px/1.5 var(--sans);color:var(--mut)">{{ rx.note }}</span></div></sc-if>
       </sc-if>
 
-      <sc-if value="{{ db.on }}" hint-placeholder-val="{{ false }}">
-        <sc-if value="{{ db.notReady }}" hint-placeholder-val="{{ false }}"><div style="border:1px dashed var(--line2);border-radius:12px;padding:18px 20px;display:flex;flex-direction:column;gap:6px"><span style="font:500 16px var(--sans);color:var(--ink)">{{ db.wait }}</span><span style="font:400 14px/1.5 var(--sans);color:var(--mut)">{{ db.note }}</span></div></sc-if>
-        <sc-if value="{{ db.ready }}" hint-placeholder-val="{{ false }}">
-          <div style="display:flex;flex-direction:column;gap:14px">
-            <div style="display:flex;align-items:center;border:1px solid var(--line2);border-radius:8px;background:var(--s1)">
-              <input value="{{ db.askVal }}" onChange="{{ db.onAsk }}" onKeyDown="{{ db.onAskKey }}" placeholder="Query the records: “how many statements by frame”, “sources where kind is Audit”, “names sorted by type”" style="flex:1;min-width:0;background:transparent;border:0;color:var(--ink);font:400 14px var(--sans);padding:9px 12px;outline:none">
-              <button onClick="{{ db.runAsk }}" style="margin:3px;border:0;background:var(--acc2);color:#fff;border-radius:6px;padding:5px 14px;cursor:pointer;font:600 13px var(--sans);white-space:nowrap">Run ↵</button>
-            </div>
-            <sc-if value="{{ db.res.has }}" hint-placeholder-val="{{ false }}">
-              <section style="background:var(--s1);border:1px solid var(--line);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:10px">
-                <div style="display:flex;gap:12px;align-items:baseline;flex-wrap:wrap">
-                  <span style="font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--acc)">Query</span>
-                  <span style="font:400 14px var(--sans);color:var(--ink2);flex:1 1 240px;min-width:0">{{ db.res.said }}</span>
-                  <button onClick="{{ db.res.clear }}" style="all:unset;cursor:pointer;font:500 13px var(--sans);color:var(--mut)" style-hover="color:var(--ink)">Clear</button>
-                </div>
-                <sc-if value="{{ db.res.busy }}" hint-placeholder-val="{{ false }}"><span style="font:400 14px var(--sans);color:var(--mut)">Planning the query on this machine…</span></sc-if>
-                <sc-if value="{{ db.res.hasErr }}" hint-placeholder-val="{{ false }}"><span style="font:400 14px var(--sans);color:var(--bad)">{{ db.res.err }}</span></sc-if>
-                <sc-if value="{{ db.res.isValue }}" hint-placeholder-val="{{ false }}">
-                  <div style="display:flex;gap:14px;align-items:baseline;flex-wrap:wrap"><span style="font:600 34px var(--mono);color:var(--ink)">{{ db.res.value }}</span><span style="font:500 15px var(--sans);color:var(--mut)">{{ db.res.label }}</span></div>
-                  <sc-if value="{{ db.res.hasNote }}" hint-placeholder-val="{{ false }}"><span style="font:400 13px var(--mono);color:var(--dim)">{{ db.res.note }}</span></sc-if>
-                </sc-if>
-                <sc-if value="{{ db.res.isAgg }}" hint-placeholder-val="{{ false }}">
-                  <div style="display:flex;flex-direction:column">
-                    <span style="font:600 12px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--mut);padding-bottom:4px">{{ db.res.aggHead }}</span>
-                    <sc-for list="{{ db.res.agg }}" as="x" hint-placeholder-count="4"><div style="display:flex;justify-content:space-between;gap:12px;border-top:1px solid var(--line);padding:5px 0"><span style="font:500 14px var(--sans);color:var(--ink);min-width:0">{{ x.k }}</span><span style="font:600 13px var(--mono);color:var(--ink2);white-space:nowrap">{{ x.v }}</span></div></sc-for>
-                  </div>
-                </sc-if>
-                <sc-if value="{{ db.res.isRows }}" hint-placeholder-val="{{ false }}"><span style="font:400 14px var(--sans);color:var(--mut)">{{ db.res.rowsLine }} — shown in the table below.</span></sc-if>
-                <sc-if value="{{ db.res.isMsg }}" hint-placeholder-val="{{ false }}"><span style="font:400 14px var(--sans);color:var(--mut)">{{ db.res.msg }}</span></sc-if>
-                <span style="font:400 12px var(--mono);color:var(--dim)">{{ db.res.via }}</span>
-              </section>
-            </sc-if>
-            <div style="display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap">
-              <nav style="flex:0 0 200px;display:flex;flex-direction:column;gap:14px">
-                <sc-for list="{{ db.groups }}" as="g" hint-placeholder-count="2">
-                  <div style="display:flex;flex-direction:column;gap:2px">
-                    <span style="font:600 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mut);padding:0 10px 4px">{{ g.label }}</span>
-                    <sc-for list="{{ g.tabs }}" as="t" hint-placeholder-count="4">
-                      <button onClick="{{ t.onClick }}" style="white-space:normal;text-align:left;cursor:pointer;padding:6px 10px;border-radius:8px;background:{{ t.bg }};border:1px solid {{ t.bd }};display:flex;justify-content:space-between;align-items:baseline;gap:8px" style-hover="background:var(--s2)">
-                        <span style="font:{{ t.fw }} 14px var(--sans);color:var(--ink);min-width:0;overflow-wrap:anywhere">{{ t.name }}</span>
-                        <span style="font:500 12px var(--mono);color:var(--mut);white-space:nowrap">{{ t.n }}</span>
-                      </button>
-                    </sc-for>
-                  </div>
-                </sc-for>
-              </nav>
-              <div style="flex:1 1 460px;min-width:0;display:flex;flex-direction:column;gap:10px">
-                <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-                  <h2 style="margin:0;font:500 22px var(--serif);color:var(--ink)">{{ db.T }}</h2>
-                  <span style="font:500 12px var(--mono);color:var(--mut)">{{ db.tLine }}</span>
-                  <div style="margin-left:auto;display:flex;gap:6px">
-                    <button onClick="{{ db.onRows }}" style="cursor:pointer;padding:4px 12px;border-radius:999px;background:{{ db.rowsBtn.bg }};border:1px solid {{ db.rowsBtn.bd }};font:{{ db.rowsBtn.fw }} 13px var(--sans);color:var(--ink)">Rows</button>
-                    <button onClick="{{ db.onSchema }}" style="cursor:pointer;padding:4px 12px;border-radius:999px;background:{{ db.schemaBtn.bg }};border:1px solid {{ db.schemaBtn.bd }};font:{{ db.schemaBtn.fw }} 13px var(--sans);color:var(--ink)">How the schema was read</button>
-                  </div>
-                </div>
-                <sc-if value="{{ db.hasFound }}" hint-placeholder-val="{{ false }}"><span style="font:400 13px var(--sans);color:var(--mut)">{{ db.foundLine }}</span></sc-if>
-                <sc-if value="{{ db.showRows }}" hint-placeholder-val="{{ true }}">
-                  <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><input value="{{ db.q }}" onChange="{{ db.onQ }}" placeholder="Filter rows · words, /pattern/, or a near spelling" style="background:var(--s1);border:1px solid var(--line2);border-radius:8px;color:var(--ink);font:400 14px var(--sans);padding:7px 12px;outline:none;flex:0 1 340px;min-width:200px"><sc-if value="{{ db.hasM }}" hint-placeholder-val="{{ false }}"><span style="font:500 12px var(--mono);color:var(--acc)">{{ db.mLine }}</span></sc-if></div>
-                  <div style="overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--s1)">
-                    <div style="min-width:640px;display:flex;flex-direction:column">
-                      <div style="display:grid;grid-template-columns:{{ db.gridCols }};gap:12px;padding:9px 14px;border-bottom:1px solid var(--line2);position:sticky;top:0;background:var(--s1)">
-                        <sc-for list="{{ db.heads }}" as="h" hint-placeholder-count="5"><button onClick="{{ h.onClick }}" title="{{ h.type }}" style="all:unset;cursor:pointer;font:600 12px var(--mono);letter-spacing:.04em;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis" style-hover="color:var(--ink)">{{ h.t }}{{ h.arrow }}</button></sc-for>
-                      </div>
-                      <sc-for list="{{ db.grid }}" as="r" hint-placeholder-count="8">
-                        <button onClick="{{ r.onClick }}" style="all:unset;cursor:pointer;display:grid;grid-template-columns:{{ db.gridCols }};gap:12px;padding:8px 14px;border-top:1px solid var(--line);background:{{ r.bg }};align-items:baseline" style-hover="background:var(--s2)">
-                          <sc-for list="{{ r.cells }}" as="c" hint-placeholder-count="5">
-                            <span style="min-width:0;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">
-                              <sc-if value="{{ c.plain }}" hint-placeholder-val="{{ true }}"><span style="font:400 14px/1.4 var(--sans);color:{{ c.color }}">{{ c.t }}</span></sc-if>
-                              <sc-if value="{{ c.pill }}" hint-placeholder-val="{{ false }}"><span style="font:500 12px var(--sans);color:var(--ink2);border:1px solid var(--line2);border-radius:999px;padding:1px 8px;white-space:nowrap">{{ c.t }}</span></sc-if>
-                            </span>
-                          </sc-for>
-                        </button>
-                      </sc-for>
-                      <sc-if value="{{ db.empty }}" hint-placeholder-val="{{ false }}"><span style="padding:16px;font:400 14px var(--sans);color:var(--mut)">No rows match.</span></sc-if>
-                    </div>
-                  </div>
-                  <sc-if value="{{ db.hasMore }}" hint-placeholder-val="{{ false }}"><button onClick="{{ db.onMore }}" style="all:unset;cursor:pointer;font:500 14px var(--sans);color:var(--acc)" style-hover="text-decoration:underline">{{ db.more }}</button></sc-if>
-                </sc-if>
-                <sc-if value="{{ db.showSchema }}" hint-placeholder-val="{{ false }}">
-                  <section style="background:var(--s1);border:1px solid var(--line);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:2px">
-                    <span style="font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mut);padding-bottom:6px">Fields, and what each type was read from</span>
-                    <sc-for list="{{ db.schemaRows }}" as="f" hint-placeholder-count="5">
-                      <div style="display:grid;grid-template-columns:minmax(0,1.2fr) 90px minmax(0,2fr) auto;gap:4px 14px;align-items:baseline;border-top:1px solid var(--line);padding:7px 0">
-                        <span style="font:600 14px var(--sans);color:var(--ink);overflow-wrap:anywhere">{{ f.name }}</span>
-                        <span style="font:500 12px var(--mono);color:var(--acc)">{{ f.type }}</span>
-                        <span style="font:400 13px var(--sans);color:var(--mut)">{{ f.basis }}</span>
-                        <span style="font:400 12px var(--mono);color:var(--dim);white-space:nowrap">{{ f.cover }}</span>
-                        <sc-if value="{{ f.hasOpts }}" hint-placeholder-val="{{ false }}"><span style="grid-column:2 / -1;font:400 12px var(--mono);color:var(--dim)">{{ f.opts }}</span></sc-if>
-                      </div>
-                    </sc-for>
-                  </section>
-                  <sc-if value="{{ db.hasLinks }}" hint-placeholder-val="{{ false }}">
-                    <section style="background:var(--s1);border:1px solid var(--line);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:2px">
-                      <span style="font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mut);padding-bottom:6px">Relations, read off the links between records</span>
-                      <sc-for list="{{ db.linkRows }}" as="l" hint-placeholder-count="3"><div style="display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:14px;align-items:baseline;border-top:1px solid var(--line);padding:6px 0"><span style="font:500 14px var(--sans);color:var(--ink)">{{ l.line }}</span><span style="font:500 12px var(--mono);color:var(--acc);white-space:nowrap">{{ l.card }}</span><span style="font:400 12px var(--mono);color:var(--dim);white-space:nowrap">{{ l.n }}</span></div></sc-for>
-                    </section>
-                  </sc-if>
-                  <section style="background:var(--s1);border:1px solid var(--line);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:2px">
-                    <span style="font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mut);padding-bottom:2px">The log</span>
-                    <span style="font:400 13px/1.45 var(--sans);color:var(--mut);padding-bottom:6px">State is folded from one append-only log: a record is created, its values set, its links made. The schema readings below were appended to the same log after the data, each with the count it came from.</span>
-                    <span style="font:500 12px var(--mono);color:var(--ink2);padding-bottom:6px">{{ db.opsLine }} · {{ db.built }}</span>
-                    <sc-for list="{{ db.schemaLog }}" as="e" hint-placeholder-count="4"><div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:14px;border-top:1px solid var(--line);padding:5px 0"><span style="font:500 12px var(--mono);color:var(--ink);overflow-wrap:anywhere">DEF {{ e.path }}</span><span style="font:400 13px var(--sans);color:var(--mut)">{{ e.basis }}</span></div></sc-for>
-                  </section>
-                </sc-if>
-              </div>
-            </div>
-          </div>
-          <sc-if value="{{ db.rec.has }}" hint-placeholder-val="{{ false }}">
-            <div onClick="{{ db.rec.closeBg }}" style="position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.35);display:flex;justify-content:flex-end">
-              <aside style="width:min(440px,100%);height:100%;overflow:auto;box-sizing:border-box;background:var(--s1);border-left:1px solid var(--line2);padding:20px 22px;display:flex;flex-direction:column;gap:16px">
-                <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start">
-                  <div style="display:flex;flex-direction:column;gap:4px;min-width:0">
-                    <span style="font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--acc)">{{ db.rec.type }}</span>
-                    <span style="font:500 21px/1.3 var(--serif);color:var(--ink);text-wrap:pretty;overflow-wrap:anywhere">{{ db.rec.title }}</span>
-                  </div>
-                  <button onClick="{{ db.rec.close }}" title="Close" style="background:none;border:0;color:var(--mut);cursor:pointer;font-size:16px">✕</button>
-                </div>
-                <div style="display:flex;gap:8px;flex-wrap:wrap">
-                  <sc-if value="{{ db.rec.canOpen }}" hint-placeholder-val="{{ false }}"><button onClick="{{ db.rec.onOpen }}" style="background:var(--acc2);border:0;color:#fff;border-radius:8px;padding:6px 14px;cursor:pointer;font:600 14px var(--sans)" style-hover="background:var(--acc3)">{{ db.rec.openLabel }}</button></sc-if>
-                </div>
-                <div style="display:flex;flex-direction:column">
-                  <sc-for list="{{ db.rec.fields }}" as="f" hint-placeholder-count="4"><div style="display:grid;grid-template-columns:110px minmax(0,1fr);gap:12px;border-top:1px solid var(--line);padding:7px 0;align-items:baseline"><span style="font:500 12px var(--mono);color:var(--mut);overflow-wrap:anywhere">{{ f.k }}</span><span style="font:400 14px/1.45 var(--sans);color:var(--ink);overflow-wrap:anywhere">{{ f.v }}</span></div></sc-for>
-                </div>
-                <sc-if value="{{ db.rec.hasRel }}" hint-placeholder-val="{{ false }}">
-                  <sc-for list="{{ db.rec.rel }}" as="g" hint-placeholder-count="2">
-                    <div style="display:flex;flex-direction:column;gap:2px">
-                      <div style="display:flex;justify-content:space-between;gap:10px"><span style="font:600 12px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--mut)">{{ g.title }}</span><span style="font:500 12px var(--mono);color:var(--dim)">{{ g.n }}</span></div>
-                      <sc-for list="{{ g.items }}" as="it" hint-placeholder-count="3">
-                        <div style="display:flex;align-items:center;gap:8px;border-top:1px solid var(--line);padding:6px 0">
-                          <button onClick="{{ it.onClick }}" style="all:unset;cursor:pointer;flex:1;min-width:0;font:400 14px/1.4 var(--sans);color:var(--ink2);overflow-wrap:anywhere" style-hover="color:var(--acc)">{{ it.label }}</button>
-                          <sc-if value="{{ it.hasJump }}" hint-placeholder-val="{{ false }}"><button onClick="{{ it.onJump }}" title="Read in context" style="all:unset;cursor:pointer;flex:none;font:600 13px var(--sans);color:var(--acc)" style-hover="text-decoration:underline">↗</button></sc-if>
-                        </div>
-                      </sc-for>
-                      <sc-if value="{{ g.hasMore }}" hint-placeholder-val="{{ false }}"><span style="font:400 13px var(--sans);color:var(--dim);padding-top:2px">{{ g.more }}</span></sc-if>
-                    </div>
-                  </sc-for>
-                </sc-if>
-                <span style="font:400 12px var(--mono);color:var(--dim);overflow-wrap:anywhere">{{ db.rec.anchor }}</span>
-              </aside>
-            </div>
-          </sc-if>
-        </sc-if>
-      </sc-if>
 
       <sc-if value="{{ ak.on }}" hint-placeholder-val="{{ false }}">
         <div class="hd-workbar" data-workbar>
@@ -1982,47 +1821,6 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
         </sc-if>
       </sc-if>
 
-      <sc-if value="{{ v.names }}" hint-placeholder-val="{{ false }}">
-        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-          <sc-for list="{{ nameTable.tabs }}" as="t" hint-placeholder-count="4">
-            <button onClick="{{ t.onClick }}" style="display:flex;align-items:baseline;gap:6px;background:{{ t.bg }};border:1px solid {{ t.bd }};border-radius:999px;padding:4px 12px;cursor:pointer;font:500 14px var(--sans);color:var(--ink)" style-hover="border-color:var(--acc)">{{ t.label }}<span style="font:400 12px var(--mono);color:var(--mut)">{{ t.n }}</span></button>
-          </sc-for>
-          <input value="{{ nameTable.q }}" onChange="{{ nameTable.onQ }}" placeholder="Filter names · try Calvn, /^Metro/, or Off*" style="margin-left:auto;flex:0 1 220px;min-width:140px;background:var(--s1);border:1px solid var(--line2);border-radius:8px;color:var(--ink);font:400 14px var(--sans);padding:6px 10px;outline:none">
-          <button onClick="{{ nameTable.onFix }}" title="Rename misspelled names in bulk; merge (SYN), split (SEG) or connect (CON) names by hand" style="background:none;border:1px solid var(--line2);border-radius:8px;color:var(--ink2);cursor:pointer;font:500 13px var(--sans);padding:6px 11px;white-space:nowrap" style-hover="border-color:var(--acc)">Fix names{{ nameTable.fixN }}</button>
-        </div>
-        <sc-if value="{{ nameTable.hasM }}" hint-placeholder-val="{{ false }}"><span style="font:500 12px var(--mono);color:var(--acc)">{{ nameTable.mLine }}</span></sc-if>
-        <div style="background:var(--s1);border:1px solid var(--line);border-radius:12px;overflow:auto">
-          <table style="width:100%;border-collapse:collapse;font:400 14px var(--sans);color:var(--ink)">
-            <thead>
-              <tr style="background:var(--s2)">
-                <sc-for list="{{ nameTable.head }}" as="h" hint-placeholder-count="6">
-                  <th style="text-align:{{ h.al }};padding:0;border-bottom:1px solid var(--line2);white-space:nowrap"><button onClick="{{ h.onClick }}" style="all:unset;cursor:pointer;display:block;padding:9px 12px;font:600 12px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:{{ h.color }}" style-hover="color:var(--ink)">{{ h.label }}</button></th>
-                </sc-for>
-                <th style="text-align:left;padding:9px 12px;border-bottom:1px solid var(--line2);font:600 12px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--mut);white-space:nowrap">Most often with</th>
-                <th style="border-bottom:1px solid var(--line2)"></th>
-              </tr>
-            </thead>
-            <tbody>
-              <sc-for list="{{ nameTable.rows }}" as="r" hint-placeholder-count="8">
-                <tr onClick="{{ r.onClick }}" style="cursor:pointer;background:{{ r.bg }};border-bottom:1px solid var(--line)" style-hover="background:var(--s2)">
-                  <td style="padding:8px 12px;min-width:180px"><div style="font:600 14px var(--sans);color:var(--ink)">{{ r.name }}</div><sc-if value="{{ r.hasAka }}" hint-placeholder-val="{{ false }}"><div style="font:400 12px var(--sans);color:var(--mut)">{{ r.aka }}</div></sc-if></td>
-                  <td style="padding:8px 12px;white-space:nowrap"><span style="display:inline-flex;align-items:center;gap:6px;font:500 13px var(--sans);color:var(--ink2)"><span style="width:8px;height:8px;border-radius:50%;background:{{ r.color }}"></span>{{ r.type }}</span></td>
-                  <td style="padding:8px 12px;text-align:right;white-space:nowrap"><span style="display:inline-flex;align-items:center;gap:8px"><span style="width:70px;height:5px;border-radius:3px;background:var(--line);display:inline-block;overflow:hidden"><span style="display:block;height:5px;width:{{ r.pct }};background:{{ r.color }}"></span></span><span style="font:500 13px var(--mono);min-width:32px;display:inline-block">{{ r.mentions }}</span></span></td>
-                  <td style="padding:8px 12px;text-align:right;font:500 13px var(--mono)">{{ r.sources }}</td>
-                  <td style="padding:8px 12px;text-align:right;font:500 13px var(--mono);color:var(--ink2)">{{ r.first }}</td>
-                  <td style="padding:8px 12px;text-align:right;font:500 13px var(--mono);color:var(--ink2)">{{ r.last }}</td>
-                  <td style="padding:8px 12px;font:400 13px var(--sans);color:var(--ink2);max-width:220px">{{ r.tie }}</td>
-                  <td style="padding:8px 12px;text-align:right;white-space:nowrap"><button onClick="{{ r.onNarrow }}" style="background:none;border:1px solid var(--line2);border-radius:6px;padding:2px 9px;cursor:pointer;font:500 12px var(--sans);color:var(--ink2)" style-hover="border-color:var(--acc)">{{ r.narrowLabel }}</button> <button onClick="{{ r.onIncorrect }}" title="That's incorrect — strike this as a name" style="background:none;border:0;padding:2px 6px;cursor:pointer;font:500 12px var(--sans);color:var(--dim)" style-hover="color:var(--bad)">✕</button></td>
-                </tr>
-              </sc-for>
-            </tbody>
-          </table>
-        </div>
-        <div style="display:flex;align-items:center;gap:12px;font:400 13px var(--sans);color:var(--mut)">
-          <span>{{ nameTable.count }}</span>
-          <sc-if value="{{ nameTable.hasMore }}" hint-placeholder-val="{{ false }}"><button onClick="{{ nameTable.onMore }}" style="background:none;border:1px solid var(--line2);border-radius:8px;padding:4px 12px;cursor:pointer;font:500 13px var(--sans);color:var(--ink)" style-hover="border-color:var(--acc)">{{ nameTable.more }}</button></sc-if>
-        </div>
-      </sc-if>
 
       <sc-if value="{{ v.types }}" hint-placeholder-val="{{ false }}">
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px">
@@ -2086,105 +1884,6 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
         <sc-if value="{{ stgMore.hasMore }}" hint-placeholder-val="{{ false }}"><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><button onClick="{{ stgMore.onMore }}" style="background:none;border:1px solid var(--line2);border-radius:8px;padding:6px 12px;cursor:pointer;font:500 14px var(--sans);color:var(--ink2)" style-hover="border-color:var(--acc)">{{ stgMore.moreLabel }}</button><span style="font:400 13px var(--sans);color:var(--dim)">{{ stgMore.shown }}</span></div></sc-if><sc-if value="{{ stgMore.canLess }}" hint-placeholder-val="{{ false }}"><button onClick="{{ stgMore.onLess }}" style="all:unset;cursor:pointer;font:500 13px var(--sans);color:var(--mut)" style-hover="color:var(--ink)">Show fewer</button></sc-if>
       </sc-if>
 
-      <sc-if value="{{ v.connections }}" hint-placeholder-val="{{ false }}">
-        <sc-if value="{{ cfold.on }}" hint-placeholder-val="{{ false }}">
-          <section style="display:flex;flex-direction:column;gap:10px;background:var(--sel);border:1px solid var(--acc2);border-radius:12px;padding:14px 16px">
-            <div style="display:flex;gap:12px;align-items:baseline;flex-wrap:wrap">
-              <span style="font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--acc)">The Fold · read together</span>
-              <span style="font:500 16px var(--sans);color:var(--ink)">{{ cfold.title }}</span>
-            </div>
-            <div style="display:flex;gap:6px;flex-wrap:wrap">
-              <sc-for list="{{ cfold.sources }}" as="x" hint-placeholder-count="3"><span style="display:inline-flex;align-items:center;gap:6px;background:var(--s1);border:1px solid var(--line2);border-radius:999px;padding:2px 10px;font:500 13px var(--sans);color:var(--ink2);max-width:100%"><span class="hd-drive-ic" style="background:{{ x.color }};width:15px;height:15px;font-size:9px">{{ x.glyph }}</span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ x.title }}</span></span></sc-for>
-            </div>
-            <span style="font:400 13px/1.45 var(--sans);color:var(--mut);text-wrap:pretty">The map below is the combined content: the names these sources share, nested under the names they are tied to most. Step the Names level up or down to open or fold the groups; click a name to see every statement it sits in.</span>
-            <div style="display:flex;gap:8px;flex-wrap:wrap">
-              <button onClick="{{ cfold.onAll }}" style="background:none;border:0;padding:6px 8px;cursor:pointer;font:500 13px var(--sans);color:var(--acc)">Back to all sources</button>
-            </div>
-          </section>
-        </sc-if>
-        <sc-if value="{{ cfold.on }}" hint-placeholder-val="{{ false }}"><div style="border-radius:12px;background:var(--bg);border:1px solid var(--line)">{{ graphEl }}</div></sc-if>
-        <sc-if value="{{ !cfold.on }}" hint-placeholder-val="{{ true }}">
-        <section style="display:flex;flex-direction:column;gap:8px;background:var(--s1);border:1px solid var(--line2);border-radius:12px;padding:12px 14px">
-          <div style="display:flex;gap:10px;align-items:baseline;flex-wrap:wrap">
-            <span style="font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--acc)">Showing</span>
-            <span style="font:400 13px var(--sans);color:var(--mut);flex:1 1 200px">{{ scope.line }}</span>
-            <sc-if value="{{ scope.any }}" hint-placeholder-val="{{ false }}"><button onClick="{{ scope.reset }}" style="all:unset;cursor:pointer;font:600 13px var(--sans);color:var(--acc)" style-hover="text-decoration:underline">Clear all</button></sc-if>
-          </div>
-          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-            <input value="{{ scope.centreOn.q }}" onChange="{{ scope.centreOn.onQ }}" onKeyDown="{{ scope.centreOn.onKey }}" placeholder="Centre on a name · a near spelling or /pattern/ works" style="flex:0 1 320px;min-width:200px;background:var(--bg);border:1px solid var(--line2);border-radius:8px;color:var(--ink);padding:6px 10px;outline:none;font:400 14px var(--sans)">
-            <sc-if value="{{ scope.centreOn.hasLine }}" hint-placeholder-val="{{ false }}"><span style="flex:1 1 220px;min-width:0;font:500 12px var(--mono);color:{{ scope.centreOn.lineCol }}">{{ scope.centreOn.line }}</span></sc-if>
-            <sc-if value="{{ scope.centreOn.hasPicks }}" hint-placeholder-val="{{ false }}"><sc-for list="{{ scope.centreOn.picks }}" as="p" hint-placeholder-count="0"><button onClick="{{ p.onClick }}" style="background:var(--s2);border:1px solid var(--line2);border-radius:999px;padding:2px 10px;cursor:pointer;font:500 13px var(--sans);color:var(--ink)" style-hover="border-color:var(--acc)">{{ p.n }}</button></sc-for></sc-if>
-          </div>
-          <div style="display:flex;gap:8px;flex-wrap:wrap">
-            <sc-for list="{{ scope.rows }}" as="r" hint-placeholder-count="3">
-              <div style="display:flex;align-items:baseline;gap:8px;padding:5px 10px;border-radius:8px;border:1px solid {{ r.bd }};background:{{ r.bg }};min-width:0">
-                <span style="font:600 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--dim);white-space:nowrap">{{ r.k }}</span>
-                <span style="font:500 14px var(--sans);color:{{ r.vc }};min-width:0">{{ r.v }}</span>
-                <sc-if value="{{ r.canClear }}" hint-placeholder-val="{{ false }}"><button onClick="{{ r.onClear }}" title="Remove this filter" style="all:unset;cursor:pointer;font-size:13px;color:var(--mut);padding-left:2px" style-hover="color:var(--ink)">✕</button></sc-if>
-              </div>
-            </sc-for>
-          </div>
-        </section>
-        <div style="display:flex;flex-direction:column;gap:12px;background:var(--s1);border:1px solid var(--line);border-radius:12px;padding:16px">
-          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap">
-            <div style="display:flex;flex-direction:column;gap:4px;min-width:0;flex:1 1 320px">
-              <div style="font:600 17px var(--sans);color:var(--ink)">{{ orb.title }}</div>
-              <div style="font:400 13px/1.45 var(--sans);color:var(--mut);text-wrap:pretty">{{ orb.note }}</div>
-            </div>
-            <div style="display:flex;gap:6px;flex-wrap:wrap">
-              <sc-if value="{{ orb.canBack }}" hint-placeholder-val="{{ false }}"><button onClick="{{ orb.back }}" style="display:flex;align-items:center;gap:6px;padding:6px 11px;border-radius:8px;border:1px solid var(--line);background:var(--s1);color:var(--ink);font:500 13px var(--sans);cursor:pointer" style-hover="border-color:var(--acc2)">Back to topic</button></sc-if>
-            </div>
-          </div>
-          <div style="border-radius:10px;background:var(--bg);border:1px solid var(--line)">{{ graphEl }}</div>
-          <sc-if value="{{ tl.has }}" hint-placeholder-val="{{ true }}">
-            <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
-              <button onClick="{{ tl.play }}" style="display:flex;align-items:center;gap:6px;padding:6px 11px;border-radius:8px;border:1px solid var(--line);background:var(--s1);color:var(--ink);font:500 13px var(--sans);cursor:pointer;min-width:64px;justify-content:center" style-hover="border-color:var(--acc2)">{{ tl.playLabel }}</button>
-              <span style="font:500 12px var(--mono);color:var(--mut)">{{ tl.start }}</span>
-              <input type="range" min="{{ tl.min }}" max="{{ tl.max }}" step="1" value="{{ tl.val }}" onChange="{{ tl.onChange }}" style="flex:1 1 200px;accent-color:var(--acc2);min-width:120px"></input>
-              <span style="font:500 12px var(--mono);color:var(--mut)">{{ tl.end }}</span>
-              <span style="font:600 13px var(--sans);color:var(--ink);min-width:150px">{{ tl.label }}</span>
-            </div>
-          </sc-if>
-          <div style="display:flex;flex-direction:column;gap:8px;padding-top:12px;border-top:1px solid var(--line)">
-            <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-              <span style="font:600 13px var(--sans);color:var(--ink)">Sources <span style="font-weight:400;color:var(--mut)">· {{ srcNote }}</span></span>
-              <span style="flex:1"></span>
-              <button onClick="{{ allOn }}" style="padding:5px 11px;border-radius:8px;border:1px solid var(--line);background:var(--s1);color:var(--ink);font:500 13px var(--sans);cursor:pointer" style-hover="border-color:var(--acc2)">All on</button>
-              <button onClick="{{ srcPick.none }}" style="padding:5px 11px;border-radius:8px;border:1px solid var(--line);background:var(--s1);color:var(--ink);font:500 13px var(--sans);cursor:pointer" style-hover="border-color:var(--acc2)">None</button>
-              <button onClick="{{ srcPick.toggle }}" style="padding:5px 11px;border-radius:8px;border:1px solid var(--line2);background:var(--s1);color:var(--ink);font:500 13px var(--sans);cursor:pointer" style-hover="border-color:var(--acc2)">{{ srcPick.label }}</button>
-            </div>
-            <sc-if value="{{ srcPick.open }}" hint-placeholder-val="{{ false }}">
-              <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-                <input value="{{ srcPick.q }}" onChange="{{ srcPick.onQ }}" placeholder="Filter sources" style="flex:1 1 220px;min-width:0;background:var(--bg);border:1px solid var(--line2);border-radius:8px;color:var(--ink);padding:6px 10px;outline:none;font:400 14px var(--sans)"></input>
-                <span style="font:400 13px var(--sans);color:var(--dim)">{{ srcPick.count }} · click to switch off, double-click for only that one</span>
-              </div>
-              <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:2px 12px;max-height:280px;overflow:auto;border:1px solid var(--line);border-radius:8px;padding:6px">
-                <sc-for list="{{ srcT }}" as="s" hint-placeholder-count="5">
-                  <button onClick="{{ s.onClick }}" onDoubleClick="{{ s.onOnly }}" style="all:unset;cursor:pointer;display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:6px;color:{{ s.col }};font:500 13px var(--sans);min-width:0" style-hover="background:var(--s2)"><span style="flex:none;width:12px;height:12px;border-radius:3px;border:1.5px solid var(--acc2);background:{{ s.box }}"></span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ s.tip }}</span></button>
-                </sc-for>
-              </div>
-            </sc-if>
-          </div>
-        </div>
-        <div style="display:flex;gap:14px;flex-wrap:wrap;font:400 14px var(--sans);color:var(--mut)">
-          <span style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:50%;background:var(--pink)"></span>person</span>
-          <span style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:50%;background:var(--blue)"></span>organisation</span>
-          <span style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:50%;background:var(--green)"></span>place</span>
-          <span style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:50%;background:var(--mut)"></span>other</span>
-          <span>Lines only where two names appear together more than chance would give. Hover a name to see its ties.</span>
-        </div>
-        <h2 style="margin:4px 0 0;font:600 16px var(--sans)">Appear together</h2>
-        <sc-for list="{{ pairs }}" as="p" hint-placeholder-count="3">
-          <button onClick="{{ p.onClick }}" style="white-space:normal;text-align:left;cursor:pointer;display:flex;justify-content:space-between;gap:12px;padding:10px 14px;border-radius:10px;background:{{ p.bg }};border:1px solid {{ p.bd }}" style-hover="border-color:var(--acc2)">
-            <span style="font:600 14px var(--sans);color:var(--ink)">{{ p.a }} <span style="color:var(--dim);font-weight:400">and</span> {{ p.b }}</span>
-            <span style="font:500 13px var(--mono);color:var(--ink2)">{{ p.n }}</span>
-          </button>
-        </sc-for>
-        <sc-if value="{{ pairsMore.hasMore }}" hint-placeholder-val="{{ false }}"><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><button onClick="{{ pairsMore.onMore }}" style="background:none;border:1px solid var(--line2);border-radius:8px;padding:6px 12px;cursor:pointer;font:500 14px var(--sans);color:var(--ink2)" style-hover="border-color:var(--acc)">{{ pairsMore.moreLabel }}</button><span style="font:400 13px var(--sans);color:var(--dim)">{{ pairsMore.shown }}</span></div></sc-if><sc-if value="{{ pairsMore.canLess }}" hint-placeholder-val="{{ false }}"><button onClick="{{ pairsMore.onLess }}" style="all:unset;cursor:pointer;font:500 13px var(--sans);color:var(--mut)" style-hover="color:var(--ink)">Show fewer</button></sc-if>
-        <sc-if value="{{ noPairs }}" hint-placeholder-val="{{ false }}"><p style="color:var(--mut);margin:0">No two names appear together more often than chance would give.</p></sc-if>
-        <sc-if value="{{ hasPairsHidden }}" hint-placeholder-val="{{ false }}"><p style="color:var(--mut);margin:0;font-size:14px">{{ pairsHidden }}</p></sc-if>
-        </sc-if>
-      </sc-if>
 
       <sc-if value="{{ v.framing }}" hint-placeholder-val="{{ false }}">
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px">
@@ -3568,6 +3267,7 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
 function digammaH(x) { let r = 0; while (x < 6) { r -= 1 / x; x += 1; } const f = 1 / (x * x); return r + Math.log(x) - 0.5 / x - f * (1 / 12 - f * (1 / 120 - f * (1 / 252 - f * (1 / 240 - f / 132)))); }
 const klAdmitH = (bv, B) => Math.max(0, Math.log(B) - Math.log(bv) + digammaH(bv + 1) - digammaH(B + 1));
 const holoTokens = t => [...new Set((clean(t).toLowerCase().replace(/[\u2019']/g, '').match(/[a-z][a-z-]{2,}/g) || []).filter(w => !STOP.has(w) && !/^-|-$/.test(w)))];
+const HD_GONE_VIEWS = new Set(['names', 'records', 'connections', 'overview']);
 const VIEW_LABEL = { ask: 'Ask', fixnames: 'Fix names', topics: 'Topics', inbox: 'Inbox', overview: 'Evidence overview', summary: 'Sources', search: 'Search', names: 'Names', types: 'Types', figures: 'Figures', statements: 'Statements', connections: 'Connections', framing: 'Framing', views: 'Views', patterns: 'Patterns', surprise: 'Surprise', reader: 'Sources', profile: 'Names', draft: 'Draft', records: 'Assertions', ingest: 'Add & publish', lanes: 'Lanes', margin: 'Margin', seam: 'Seam', orbit: 'Orbit', fields: 'Fields', review: 'Review' };
 const SU_CURSORS = [
   { id: 'loo', label: 'Everything else', desc: 'Each statement against normal text plus everything the other sources in this view say, regardless of date: what this source says that nothing else in view, and nothing normal, prepares you for.' },
@@ -10650,7 +10350,9 @@ class Component extends DCLogic {
     const stMeta = st => docT(st.doc) + (A.docById[st.doc].year ? ' · ' + A.docById[st.doc].year : '');
     const selSt = st => () => this.sel('statement', st.id);
     const selN = n => () => this.sel('name', n);
-    const view = S.view;
+    // the Explore panels (Names, Assertions, Connections, Evidence overview, the rail's Map) are removed (2026-10-24): an address or a
+    // link that still names one opens the sources instead
+    const view = HD_GONE_VIEWS.has(S.view) ? 'summary' : S.view;
     const fSet = new Set(F.map(s => s.id));
 
     const _T0 = performance.now(), _PT = this._prof = {}; let _pl = _T0; const _m = k => { const n = performance.now(); _PT[k] = Math.round(n - _pl); _pl = n; };
@@ -10752,7 +10454,7 @@ class Component extends DCLogic {
       ...(seenDocs.length ? [{ label: 'Seen, not kept', n: String(seenDocs.length), desc: 'Opened, but not counted.', items: seenDocs.map(cardOf) }] : []),
       ...(hasKinds ? Object.entries(kmap).sort((a, b) => KIND_ORDER.indexOf(a[0]) - KIND_ORDER.indexOf(b[0])).map(([k, ds]) => ({ label: k, n: String(ds.length), desc: KIND_DESC[k] || '', items: ds.slice().sort((x, y) => pubMsD(x) - pubMsD(y)).map(cardOf) })) : Object.entries(gmap).sort((x, y) => (x[0] === '_') - (y[0] === '_') || y[1].docs.length - x[1].docs.length).map(([k, g]) => ({ label: g.label, n: String(g.docs.length), desc: k === '_' ? (Object.keys(distinctOf).length ? 'No difference from the rest is large enough to matter.' : keptDocs.length < 2 ? '' : 'No difference between them is large enough to matter yet.') : '', items: g.docs.map(cardOf) }))),
     ];
-    const svMode = (S.svMode && S.svMode !== 'list') ? S.svMode : 'grid', svGroup = 'tabs'; /* List was dropped: Grid for the picture, Table for the fields */ const allSrcItems = srcGroups.flatMap(g => g.items.map(it => ({ it, g: g.label })));
+    const svMode = (S.svMode && S.svMode !== 'list' && S.svMode !== 'map') ? S.svMode : 'grid', svGroup = 'tabs';  /* the Map was removed with the Explore panels (2026-10-24) */ /* List was dropped: Grid for the picture, Table for the fields */ const allSrcItems = srcGroups.flatMap(g => g.items.map(it => ({ it, g: g.label })));
     const docOfCard = it => A.docs.find(d => d.title === it.title) || null;
     const isVid = it => { const d = docByTitle.get(it.title); return !!(d && (d.medium === 'Video' || d.medium === 'Audio' || d.media)); }; const vidItems = allSrcItems.filter(x => isVid(x.it));
     const FAM = k => /^(Audit or report|Legislation|Letter|Meeting record|Contract)$/.test(k) ? 'Documents' : /^(Meeting recording|Video|Podcast|Recording)$/.test(k) ? 'Video & audio' : /^(Government page|Organisation page)$/.test(k) ? 'Official pages' : /^(News|Blog|Own article)$/.test(k) ? 'Press and commentary' : 'Other';
@@ -10817,7 +10519,7 @@ class Component extends DCLogic {
     const seg = on => ({ bg: on ? 'var(--sel2)' : 'transparent', col: on ? 'var(--ink)' : 'var(--mut)' });
     const meetVals = {};
     const svVals = { ...meetVals, srcHiddenNote: this._srcHidden ? plural(this._srcHidden, 'other source') + ' with nothing in this selection ' + (this._srcHidden === 1 ? 'is' : 'are') + ' hidden' : '', svCards: svMode === 'cards', svTable: svMode === 'table', svMap: svMode === 'map', svRefs: svMode === 'referents', svTabsOn: svGroup === 'tabs',
-      svModes: [['grid', 'Grid'], ['table', 'Table'], ['map', 'Map'], ['referents', 'Referents']].map(([k, l]) => ({ label: l, ...seg(svMode === k || (k === 'grid' && svMode === 'cards')), onClick: () => this.setState({ svMode: k }) })),
+      svModes: [['grid', 'Grid'], ['table', 'Table'], ['referents', 'Referents']].map(([k, l]) => ({ label: l, ...seg(svMode === k || (k === 'grid' && svMode === 'cards')), onClick: () => this.setState({ svMode: k }) })),
       svTabs: tabs.map(t => ({ label: t.label, n: t.n, cls: t.id === svTab ? 'on' : '', bd: t.id === svTab ? 'var(--acc2)' : 'transparent', col: t.id === svTab ? 'var(--ink)' : 'var(--mut)', onClick: () => this.setState({ svTab: t.id }) })),
       svCols: colOrder.map(k => ({ label: colMap.get(k).label + (svSort === k ? (svDir > 0 ? ' ↑' : ' ↓') : ''),
         onClick: () => this.setState({ svSort: k, svDir: svSort === k ? -svDir : (k === 'title' || k === 'publisher' || (k.startsWith('f:') && ['text', 'id'].includes(fcBy.get(k.slice(2)).type)) ? 1 : -1) }),
@@ -11293,15 +10995,11 @@ class Component extends DCLogic {
     const browseYears = [...yearCounts].sort((a, b) => b[0] - a[0]).slice(0, 50).map(([y, n]) => { const on = String(y) === curYear; return { label: String(y), n: n.toLocaleString(), on,
       bg: on ? 'var(--sel)' : 'transparent', bd: on ? 'var(--acc2)' : 'transparent', weight: on ? 600 : 500,
       onClick: () => on ? this.setF('range', null) : this.setF('range', { mode: 'happened', from: String(y), to: String(y), undated: false }) }; });
-    const onMapView = view === 'connections';
     // On the contracts address the tool menu is hidden, so the ways to explore content (not just search it)
     // live here instead: the map, the names, the assertions and the evidence overview, one click each.
-    const browseMore = HD_METRO ? [['names', 'Names'], ['records', 'Assertions'], ['overview', 'Evidence overview']].map(([id, label]) => { const on = view === id; return { label, n: id === 'names' ? String(D.nameList.length) : id === 'records' ? String(F.length) : '', on,
-      bg: on ? 'var(--sel)' : 'transparent', bd: on ? 'var(--acc2)' : 'transparent', weight: on ? 600 : 500,
-      onClick: () => this.setState({ view: id, readDoc: null, sel: null }) }; }) : [];
+    const browseMore = [];
     const browseVals = {
       browseOpen: S.browseOpen !== false, browseLabel: 'Ways in',
-      browseMap: { label: 'Map · names and their ties', n: '', title: 'The Connections map: every name placed around the one it shares the most statements with — the relativistic solar system view', bg: onMapView ? 'var(--sel)' : 'transparent', bd: onMapView ? 'var(--acc2)' : 'transparent', weight: onMapView ? 600 : 500, onClick: () => this.setState({ view: 'connections', readDoc: null, sel: null }) },
       browseMore, hasBrowseMore: browseMore.length > 0,
       hasBrowseDepts: deptAll.length > 1, browseDepts, browseDeptSearch: deptAll.length > 10, browseDeptQ: S.browseQ || '', browseDeptOnQ: e => this.setState({ browseQ: e.target.value }),
       hasBrowseYears: yearCounts.size > 1, browseYears,
@@ -11327,15 +11025,12 @@ class Component extends DCLogic {
       review: this.linkWaiting(),
       'hero:workspaces': this._wsTotals && this._wsTotals.waiting ? String(this._wsTotals.waiting) : '',
     }[id] || '');
-    const navGroups = NAVG.map(([label, items]) => ({ label, hasLabel: !!label, items: items.map(([id, lab]) => { const isScr = id.startsWith('screen:'); const on = isScr ? S.screenId === id.slice(7) : id === 'summary' ? (view === 'summary' && S.svMode !== 'map') : view === id;
+    const navGroups = NAVG.map(([label, items]) => ({ label, hasLabel: !!label, items: items.filter(([id]) => !HD_GONE_VIEWS.has(id)).map(([id, lab]) => { const isScr = id.startsWith('screen:'); const on = isScr ? S.screenId === id.slice(7) : id === 'summary' ? (view === 'summary' && S.svMode !== 'map') : view === id;
       return { id, aria: on ? 'page' : undefined, label: lab, count: id === 'fixnames' ? (this.refEdits().length ? String(this.refEdits().length) : '') : countFor(id), countColor: id === 'review' || id === 'hero:workspaces' ? 'var(--amber)' : 'var(--mut)', ...gHi(on), onClick: id === 'hero:workspaces' ? () => this.openWorkspacesHero() : id === 'fixnames' ? () => this.openFixNames() : isScr ? () => { if (this.state.screenId !== id.slice(7)) this.pushHist(); this.setState({ screenId: id.slice(7) }); } : () => { const leaveMap = id === 'summary' && S.svMode === 'map'; if (view !== id || S.readDoc || leaveMap) this.pushHist(); this.setState({ view: id, readDoc: null, sel: null, ...(leaveMap ? { svMode: 'grid' } : {}) }); } }; }) }));
     // split so Folds can sit right under The reading / Connections, inside Explore
     // the Metro contracts address is for searching: its rail offers Sources only (no Ask, no Draft)
     const navTop = HD_METRO ? navGroups[0].items.filter(g => /^sources$/i.test(String(g.label))) : navGroups[0].items; const navRead = navGroups[1]; const navExplore = navGroups[2]; const navRest = navGroups.slice(3);
-    // the rail's Explore list is one flat list (handoff): Names, Assertions, Connections, Evidence overview, Map
     const allNavItems = navGroups.flatMap(g => g.items);
-    const navExploreFlat = ['names', 'records', 'connections', 'overview'].map(id => allNavItems.find(i => i.id === id)).filter(Boolean);
-    navExploreFlat.push({ id: 'map', label: 'Map', count: '', title: 'Every name placed by how much it appears with the one you pick', aria: (view === 'summary' && !S.readDoc && S.svMode === 'map') ? 'page' : undefined, onClick: () => { this.pushHist(); this.setState({ view: 'summary', svMode: 'map', readDoc: null, sel: null }); } });
     // everything the rail used to list that the handoff takes out of it stays one click away, in the footer's Tools menu
     const toolPick = g => ({ ...g, onClick: () => { this.setState({ railToolsOpen: false }); g.onClick(); } });
     const railTools = { open: !!S.railToolsOpen, toggle: () => this.setState(st => ({ railToolsOpen: !st.railToolsOpen })), close: () => this.setState({ railToolsOpen: false }),
@@ -11499,7 +11194,7 @@ class Component extends DCLogic {
       topicsFull, topicsFullEmpty: topicsFull.length === 0, topicsFullHasPager: topicsFullPages > 1, topicsFullPageN: 'Page ' + (topicsFullPage + 1) + ' of ' + topicsFullPages + ' · ' + plural(topicsAll.length, topicsLensMode === 'referents' ? 'referent' : 'topic'),
       topicsFullHasPrev: topicsFullPage > 0, topicsFullHasNext: topicsFullPage < topicsFullPages - 1,
       onTopicsFullPrev: () => this.setState({ topicsPage: Math.max(0, topicsFullPage - 1) }), onTopicsFullNext: () => this.setState({ topicsPage: Math.min(topicsFullPages - 1, topicsFullPage + 1) }),
-      hasBrowseExtras: browseMore.length > 0 || deptAll.length > 1 || yearCounts.size > 1, railTools, navExploreFlat,
+      hasBrowseExtras: browseMore.length > 0 || deptAll.length > 1 || yearCounts.size > 1, railTools,
       topicsList, hasTopics, topicsOpen: hasTopics || entAll.length > 0 || !!activeTopicGroup || !!topicsQ, topicsLabel: topicsLensMode === 'referents' ? 'Referents · ' + entAll.length : (P.groups.length ? 'Topics · ' + P.groups.length : 'Topics'), topicsNote, hasTopicsNote, topicsStrayN, showTopicsStray, onTopicsStray,
       topicsTypes, topicsHasTypes, topicsHasEmpty, topicsEmptyText, topicsLens, topicsSearchPh, topicsType: S.topicsType || '', scope,
       topicsHasSearch, topicsSearchVal, onTopicsSearch, topicsHasPager, topicsPagerLine, onTopicsPrev, onTopicsNext, topicsHasPrev, topicsHasNext, topicsPageN: (topicsPage + 1) + ' of ' + topicsPages,
