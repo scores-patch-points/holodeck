@@ -24,8 +24,6 @@ import { gzipSync, brotliCompressSync, constants as zc } from 'node:zlib';
 import { extname, join, normalize, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { handleOcr, handleHealth } from './ocr-server/route.mjs';
-import { existsSync, readdirSync } from 'node:fs';
-import { homedir } from 'node:os';
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url));
 const PORT = Number(process.argv[2] || process.env.PORT || 8813);
@@ -128,45 +126,28 @@ function syncStatus() {
   });
 }
 
-// ── THE HYPERLEXICON'S LOCAL GIVER ─────────────────────────────────────────────────────────────────────────────────────
-// POST /lexicon {forms:[...], lang:'en'} → { giver, results: { [form]: null | [{ w, pos, senses:[{ of, tags, gloss }] }] } }
-// The English Wiktionary pack on THIS machine (the 2026-10-01 dump, built by Zenodotus scripts/wiktionary), read by Zenodotus's own
-// reader. A reading organ asks only about forms it is unsure of; the page caches and nominates every answer as a witness
-// (reading/lexicon.js). Nothing leaves the machine. No pack or no reader → 503 with the reason, and reading carries on without it.
-//   WIKTIONARY_PACK    the pack file (default: the newest English wiktionary-slim-*.pack in ~/.cache/live_priors/wiktionary)
-//   WIKTIONARY_READER  Zenodotus's lookup.mjs (default: ../Zenodotus/scripts/wiktionary/lookup.mjs beside this repository)
-const LEX_DIR = join(homedir(), '.cache', 'live_priors', 'wiktionary');
-const LEX_PACK = process.env.WIKTIONARY_PACK || (existsSync(LEX_DIR) ? (readdirSync(LEX_DIR).map((f) => f.match(/^wiktionary-slim-(\d{4}-\d{2}-\d{2})(?:-v(\d+))?\.pack$/)).filter(Boolean).sort((a, b) => a[1].localeCompare(b[1]) || Number(a[2] || 1) - Number(b[2] || 1)).map((m) => join(LEX_DIR, m[0])).pop() || '') : '');
-const LEX_READER = process.env.WIKTIONARY_READER || fileURLToPath(new URL('../../Zenodotus/scripts/wiktionary/lookup.mjs', import.meta.url));
-let lexDict = null;
-async function lexicon() {
-  if (lexDict !== null) return lexDict;
-  lexDict = false;
-  if (!LEX_PACK || !existsSync(LEX_PACK) || !existsSync(LEX_READER)) return lexDict;
-  const { Dictionary } = await import(LEX_READER);
-  lexDict = new Dictionary({ pack: LEX_PACK, learned: '/dev/null', changed: '/dev/null', delta: '/dev/null' });
-  return lexDict;
-}
-const LEX_GIVER = () => ({ name: 'English Wiktionary', edition: 'en', snapshot: (LEX_PACK.match(/(\d{4}-\d{2}-\d{2})/) || [])[1] || null, pack: LEX_PACK.split(sep).pop(), licence: 'CC BY-SA 4.0', via: 'local pack, read by Zenodotus scripts/wiktionary/lookup.mjs' });
-const lexSense = (s) => ({ of: s.of ?? null, tags: s.tags ?? [], gloss: Array.isArray(s.g) && s.g.length ? s.g[s.g.length - 1] : null });
-async function handleLexicon(req, res, url) {
+// ── THE HYPERLEXICON ───────────────────────────────────────────────────────────────────────────────────────────────────
+// POST /hyperlexicon {asks:[...]} → the door's batch answer, unchanged. The hyperlexicon is janus's ledger (janus
+// native/organs/hyperlexicon/door.mjs, on loopback): every giver's claims sit there as undecided candidates beside the concordance of
+// every use. The page asks `names` for the dotted forms at its sentence cut (kept only as the givers write them) and `context` for a
+// word its class prior cannot place (uses, dated span, the givers' candidates); the giver is the ledger, named by its head. No giver's
+// pack is read here. No door → 503 with the reason, and reading carries on with the priors and the text's own.
+//   HL_DOOR   the door (default http://127.0.0.1:11450)
+const HL_DOOR = (process.env.HL_DOOR || 'http://127.0.0.1:11450').replace(/\/$/, '');
+async function handleHyperlexicon(req, res) {
   const h = { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' };
-  let forms = url.searchParams.getAll('w'), lang = url.searchParams.get('lang') || 'en';
-  if (req.method === 'POST') {
-    const chunks = []; let n = 0;
-    for await (const c of req) { n += c.length; if (n > 1 << 20) { req.destroy(); return send(res, 413, '{"error":"too large"}', h); } chunks.push(c); }
-    try { const b = JSON.parse(Buffer.concat(chunks).toString('utf8')); forms = Array.isArray(b.forms) ? b.forms : []; lang = b.lang || lang; } catch (e) { return send(res, 400, '{"error":"body is not JSON"}', h); }
+  if (req.method !== 'POST') return send(res, 405, JSON.stringify({ gap: "POST the door's batch body: {asks:[...]}" }), h);
+  const chunks = []; let n = 0;
+  for await (const c of req) { n += c.length; if (n > 1 << 20) { req.destroy(); return send(res, 413, '{"gap":"too large"}', h); } chunks.push(c); }
+  let asks = null;
+  try { asks = JSON.parse(Buffer.concat(chunks).toString('utf8')).asks; } catch (e) { return send(res, 400, '{"gap":"body is not JSON"}', h); }
+  if (!Array.isArray(asks)) return send(res, 400, '{"gap":"no asks"}', h);
+  try {
+    const r = await fetch(`${HL_DOOR}/v1/batch`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ asks }), signal: AbortSignal.timeout(60000) });
+    return send(res, r.status, await r.text(), h);
+  } catch (e) {
+    return send(res, 503, JSON.stringify({ gap: `the hyperlexicon's door is not reachable at ${HL_DOOR}`, why: String((e && e.cause && e.cause.code) || (e && e.message) || e) }), h);
   }
-  forms = forms.filter((f) => typeof f === 'string' && f.length && f.length <= 120).slice(0, 2000);
-  const d = await lexicon();
-  if (!d) return send(res, 503, JSON.stringify({ gap: 'no local lexicon', why: !LEX_PACK || !existsSync(LEX_PACK) ? 'no Wiktionary pack on this machine' : 'the pack reader (Zenodotus scripts/wiktionary/lookup.mjs) is not beside this repository' }), h);
-  const results = {};
-  for (const f of forms) {
-    let r = null; try { r = d.resolve(f, { learn: false }); } catch (e) { r = null; }
-    const en = r && r.found ? (r.entries || []).filter((e) => e.c === lang) : [];
-    results[f] = en.length ? en.map((e) => ({ w: e.w, pos: e.p ?? null, senses: (e.s || []).map(lexSense) })) : null;
-  }
-  return send(res, 200, JSON.stringify({ giver: LEX_GIVER(), results }), h);
 }
 
 const server = createServer(async (req, res) => {
@@ -223,7 +204,7 @@ const server = createServer(async (req, res) => {
     // the text arriving; a page that fails says why and the rest still read. See tools/ocr-server/route.mjs.
     if (req.method === 'POST' && url.pathname === '/ocr') return handleOcr(req, res, url);
     if (req.method === 'GET' && url.pathname === '/ocr-health') return handleHealth(req, res);
-    if (url.pathname === '/lexicon') return handleLexicon(req, res, url);
+    if (url.pathname === '/hyperlexicon') return handleHyperlexicon(req, res);
 
     let p = decodeURIComponent(url.pathname);
     if (p.endsWith('/')) p += 'index.html';
