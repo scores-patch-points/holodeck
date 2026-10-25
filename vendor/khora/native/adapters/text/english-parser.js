@@ -409,7 +409,9 @@ export function lemmaAndFeats(lexicon, form, upos) {
   if (hit) { const [lemma, feats] = hit.split("\t"); return { lemma: upos === "PROPN" && lemma.toLowerCase() === lf ? form : lemma, feats, basis: "form" }; }
   for (const k of [3, 2, 1]) {
     const r = lexicon.suffix[`${lf.slice(-k)}|${k}|${upos}`];
-    if (r) { const [rule, feats] = r.split("\t"); const lemma = applyRule(form, rule); return { lemma: upos === "PROPN" ? form : lemma, feats, basis: `ending -${lf.slice(-k)}` }; }
+    // an ending's rule may only rewrite that ending: "best" → "good" is the whole word, not what "-est" does ("closest" was "clogood"); and a
+    // lemma left shorter than three letters is no lemma ("red" → "r")
+    if (r) { const [rule, feats] = r.split("\t"), cut = Number(rule.split(":")[0]); if (cut > k || lf.length - cut + (rule.split(":").slice(1).join(":")).length < 3) continue; const lemma = applyRule(form, rule); return { lemma: upos === "PROPN" ? form : lemma, feats, basis: `ending -${lf.slice(-k)}` }; }
   }
   return { lemma: upos === "PROPN" ? form : lf, feats: lexicon.upos[upos] ?? "_", basis: "word class" };
 }
@@ -462,6 +464,15 @@ export const CLOSED_UPOS_GIVER = "Universal Dependencies v2, u/pos: closed class
 // attests as a VERB. The morphology prior (a second giver, UniMorph English) names that lemma. The form is then held to VERB. Only an
 // UNSEEN form is touched (a seen form keeps what the treebank attests), only a lemma EWT attests as VERB counts, and no regular
 // suffix rule is added: the prior's own table is the whole of it.
+// LEMMA FROM THE MORPHOLOGY PRIOR (2026-10-22). A form EWT never saw in its class takes its lemma from an ending rule; when the morphology
+// prior (UniMorph English) lists a lemma for the form that EWT attests IN THE SAME CLASS, that lemma wins ("freshest" ADJ → "fresh",
+// "closest" → "close"): the ending rules only guess what the prior's table states.
+export function priorLemma(model, form, upos) {
+  const forms = model?.morphology?.forms; if (!forms) return null;
+  const lf = String(form).toLowerCase();
+  if (model.lexicon.form[`${lf}|${upos}`]) return null;
+  return (forms[lf] ?? []).find((l) => l !== lf && model.lexicon.form[`${l}|${upos}`]) ?? null;
+}
 export function irregularVerbLemma(model, form) {
   const forms = model?.morphology?.forms;
   if (!forms) return null;
@@ -500,6 +511,7 @@ export function analyseAttested(model, forms, { scope = "closed" } = {}) {
   const labels = labelSentence(model.labeller, heads, words, T);
   return forms.map((form, k) => {
     let { lemma, feats } = lemmaAndFeats(model.lexicon, form, tags[k]);
+    const pl = tags[k] !== "PROPN" ? priorLemma(model, form, tags[k]) : null; if (pl) lemma = pl;
     const il = tags[k] === "VERB" && irregular ? irregular(form) : null;
     if (il) lemma = il; // the second giver's lemma for an inflection the treebank never saw
     return { id: k + 1, form, lemma, upos: tags[k], xpos: "_", feats, head: heads[k + 1], deprel: labels[k + 1], deps: "_", misc: "_" };

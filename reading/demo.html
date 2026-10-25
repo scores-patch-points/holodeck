@@ -528,7 +528,7 @@ import { classifyWord, THRAX_MAP, THRAX_OUT_OF_SCOPE, THRAX_META, POS_PRIOR_META
 import { morphologyFromPrior, createLemmatizer, stemsOf } from '../vendor/khora/native/adapters/text/morphology.js';
 import { splitSentences, deriveAbbreviations } from '../vendor/khora/native/adapters/text/spans.js';
 import { tabNoteHTML, LAYER_NOTES } from './layer-notes.js';
-import { makeLexicon, aliasJunctions, resolveAliases } from './lexicon.js';
+import { makeLexicon, aliasJunctions, resolveAliases } from '../vendor/khora/native/organs/lexicon.js';
 import { buildRows, sortRows, nextSort, tableHTML as refTableHTML } from './referent-table.js';
 import { scanPunctuation, loadPunctuation, moodAt, containersAt, cuesFromBlankLines, cuesFromLayout } from './punctuation.js';
 import { tokenize } from '../vendor/khora/native/organs/source.js';
@@ -705,7 +705,7 @@ function priorsDeclared(){
     `morphology — ${PRIORS.morphRaw?.provenance?.source || 'UniMorph English'} (priors/morphology-eng.json): the lemmatizer that widens same-act, and the verb-form set${PRIORS.langIso3 ? ' — English; not applied to this document' : ''}`,
     'stance class — holodeck-reader.js (same-act widened by stance)',
     'English closed classes — determiners, negation, first person (adapters/text/priors.js)',
-    `punctuation — the language's declared norms and its measured abbreviation prior (reading/punctuation.js, punctuation-priors/${PUNCT && PUNCT.lang ? PUNCT.lang : 'en'}.json), joined to the document's own abbreviations (spans.js::deriveAbbreviations)`,
+    `punctuation — the language's declared norms and its measured abbreviation prior (reading/punctuation.js, janus priors/punctuation-{stem}.json, vendored with khora), joined to the document's own abbreviations (spans.js::deriveAbbreviations)`,
     ...(LOOKUP.count() ? [`hyperlexicon — ${LOOKUP.count()} forms looked up on request (holodeck-lookup.js → kernel/hyperlexicon.js): each witness nominated as a candidate with its giver, licence and address, none licensed; they fill class gaps in the document classifier — the relation reader does not read them`] : []),
   ];
 }

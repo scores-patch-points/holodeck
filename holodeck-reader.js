@@ -1,35 +1,28 @@
-// holodeck-reader.js — eoreader7's own relation reader, assembled for a browser tab.
-// A line-for-line port of eoreader7/native/the-fold/reader-bundle.js: the same organs, the same options,
-// the same GFP dispatch with clause-aware adjacency. The only difference is how the received priors
-// arrive (fetch instead of fs). Built once; every turn reads its passages through it.
-import { makeRelationReader } from './vendor/khora/native/organs/hypergraph.js';
-import { tokenize, blankLabelRows } from './vendor/khora/native/organs/source.js';
-import { splitSentences } from './vendor/khora/native/adapters/text/spans.js';
-import { extractSurfaces, discoverReferents, namesCorefer, diaNorm } from './vendor/khora/native/adapters/text/surfaces.js';
-import { resolvePronouns } from './vendor/khora/native/adapters/text/pronouns.js';
-import { relationExtractorsFor } from './vendor/khora/native/adapters/text/relations-language.js';
-import { dominantClass } from './vendor/khora/native/adapters/text/wordclass.js';
+// holodeck-reader.js — khora's one reader core (native/the-fold/read-core.mjs), loaded in a browser tab.
+// Since 2026-10-24 this file assembles nothing: the core is vendored from a khora commit (tools/vendor-khora.mjs) and reads
+// its priors through khora's prior door, which in a page fetches vendor/khora/native/priors. What this surface adds over the
+// core is declared here and passed in as organs: its stance passes (extendRelations + sameAct), the form normaliser in front
+// of the class prior (classifyForm), and the measured language of a foreign document. Built once; every turn reads through it.
+import { makeReader, priorsFor } from './vendor/khora/native/the-fold/read-core.mjs';
+import { preloadPriors } from './vendor/khora/native/the-fold/prior-source.mjs';
 import { classifyForm as classifyWord } from './holodeck-surface.js'; // wraps the vendored classifyWord: the written form is normalised before lookup
-import { createLemmatizer, morphologyFromPrior } from './vendor/khora/native/adapters/text/morphology.js';
 import { stanceWords } from './vendor/khora/native/organs/stance.js';
-import * as P from './vendor/khora/native/adapters/text/priors.js';
 
-const DETERMINERS = new Set([...P.DEFINITE_DETERMINERS, ...P.INDEFINITE_DETERMINERS]);
-const here = p => new URL(p, import.meta.url).href;
-let _priors = null;
-export function loadPriors() {
-  if (_priors) return _priors;
-  _priors = (async () => {
-    const get = async p => { try { const r = await fetch(here(p)); return r.ok ? await r.json() : null; } catch (e) { return null; } };
-    const [posPrior, morphRaw, posLexicon] = await Promise.all([get('./vendor/khora/native/priors/pos-eng.json'), get('./vendor/khora/native/priors/morphology-eng.json'), get('./vendor/khora/native/priors/pos-eng-lexicon.json')]);
-    if (posPrior && posLexicon) posPrior.lexicon = posLexicon; // POSLexicon@1 — classifyWord consults it only where the treebank has no entry
-    const morph = morphRaw ? morphologyFromPrior(morphRaw) : null;
-    const forms = new Set();
-    for (const k of Object.keys((morph && morph.forms) || {})) { forms.add(String(k).toLowerCase()); const v = morph.forms[k]; for (const x of Array.isArray(v) ? v : [v]) if (typeof x === 'string') forms.add(x.toLowerCase()); }
-    const lemmatizer = morph ? createLemmatizer(morph.forms, { language: morph.language }) : null;
-    return { posPrior, verbForms: forms.size ? forms : null, lemmatizer };
-  })();
-  return _priors;
+// the priors an English read takes through the door: the class prior and its lexicon, morphology, the measured punctuation
+// prior, and the ear's grammar (frame, role config, contractions). A foreign read adds its own (priorNamesFor).
+export const priorNamesFor = (stem) => [`pos-${stem}.json`, `pos-${stem}-lexicon.json`, `morphology-${stem}.json`, `punctuation-${stem}.json`, `frame-${stem}.json`, `role-config-${stem}.json`, `contractions-${stem}.json`, `proclitics-${stem}.json`, `enclitics-${stem}.json`];
+const loaded = new Map();
+// the vendored priors' own list (tools/vendor-khora.mjs writes it), so a name with no file (English has no proclitics) is never fetched
+let _names = null;
+const vendoredNames = () => _names || (_names = fetch(new URL('./vendor/khora/native/priors/names.json', import.meta.url)).then((r) => (r.ok ? r.json() : null)).then((j) => (j && Array.isArray(j.names) ? new Set(j.names) : null)).catch(() => null));
+/** Fetch a language's priors once; resolves to the core's priors for it ({ posPrior, verbForms, lemmatizer, punctuation, gaps }). */
+export function loadLanguage(stem = 'eng') {
+  if (!loaded.has(stem)) loaded.set(stem, vendoredNames().then((have) => preloadPriors(priorNamesFor(stem).filter((n) => !have || have.has(n)))).then(() => priorsFor(stem)));
+  return loaded.get(stem);
+}
+export async function loadPriors() {
+  const { posPrior, verbForms, lemmatizer } = await loadLanguage('eng');
+  return { posPrior, verbForms, lemmatizer };
 }
 // ── STANCE ─────────────────────────────────────────────────────────────────
 // A position ("X is pro Y", "X supports Y", "X opposes Y") is a relation the
@@ -84,8 +77,6 @@ function verbStanceTriples(sentence) {
 // inside a proper noun ("the Palestinian Authority") is left exactly as read.
 const PLACE_OF = { palestinian: 'Palestine', israeli: 'Israel', iranian: 'Iran', iraqi: 'Iraq', syrian: 'Syria', lebanese: 'Lebanon', yemeni: 'Yemen', egyptian: 'Egypt', jordanian: 'Jordan', saudi: 'Saudi Arabia', american: 'America', russian: 'Russia', ukrainian: 'Ukraine', chinese: 'China', indian: 'India', pakistani: 'Pakistan', afghan: 'Afghanistan', turkish: 'Turkey', kurdish: 'Kurdistan', european: 'Europe', african: 'Africa', asian: 'Asia', british: 'Britain', french: 'France', german: 'Germany', japanese: 'Japan', korean: 'Korea', mexican: 'Mexico', canadian: 'Canada', australian: 'Australia' };
 const foldStanceObject = t => { if (!stanceClass(t.label)) return t; const w = String(t.end2 || '').trim(); const p = /^[A-Za-z]+$/.test(w) && PLACE_OF[w.toLowerCase()]; return p ? { ...t, end2: p } : t; };
-let _dispatch = null;
-const dispatch = () => _dispatch || (_dispatch = relationExtractorsFor({ language: 'eng', roleConfig: null, posPrior: null, classifyWord, dominantClass }));
 // THE COMPOSED READER WAS TRIED HERE AND FALSIFIED (2026-10-02,
 // falsify-holodeck-reader.mjs): swapping in the composed reader read +3 distinct
 // relations over the dispatch reader on the holodeck's own source, but the
@@ -93,18 +84,16 @@ const dispatch = () => _dispatch || (_dispatch = relationExtractorsFor({ languag
 // regardless of word order, not reading. A swap that does not beat its own
 // shuffle is reverted, and the negative result is kept. The dispatch reader
 // (GFP, clause-aware) stands.
-const baseExtract = (text, opts) => { const d = dispatch(); return d.extractRelations(text, d.mode === 'gfp' ? { ...opts, clauseAware: true } : opts); };
-// the base reader's triples, plus the copula positions it cannot hear.
+// the core's clause-aware GFP reading, plus the copula positions it cannot hear.
 // `stance: false` drops BOTH stance passes, so a caller can show the reading
 // the base GFP reader makes on its own — the demo's layer toggles read the
 // same material with the stance class off and disclose what it costs.
-function makeExtractRelations({ stance = true } = {}) {
-  return (text, opts = {}) => { let base = []; try { base = baseExtract(text, opts) || []; } catch (e) { base = []; }
-    if (!stance) return base.map(foldStanceObject);
-    const extra = copulaStanceTriples(text).concat(base.length ? [] : verbStanceTriples(text));
-    return base.map(foldStanceObject).concat(extra.map(foldStanceObject)); };
-}
-const extractRelations = makeExtractRelations();
+const withStance = ({ stance = true } = {}) => (base) => (text, opts = {}) => {
+  let read = []; try { read = base(text, opts) || []; } catch (e) { read = []; }
+  if (!stance) return read.map(foldStanceObject);
+  const extra = copulaStanceTriples(text).concat(read.length ? [] : verbStanceTriples(text));
+  return read.map(foldStanceObject).concat(extra.map(foldStanceObject));
+};
 
 // ── READ A WHOLE CORPUS, FAST ──────────────────────────────────────────────
 // A book-sized source read as ONE passage is superlinear: the reader's
@@ -235,47 +224,23 @@ const cleanText = (s) => String(s == null ? '' : s).replace(/\s+/g, ' ').trim();
 export async function makeEngineRelationReader(extra = {}) {
   const { features = {}, foreign = null, abbreviations = null, ...rest } = extra;
   // ABBREVIATIONS (2026-10-24): the page's own knowledge of which dotted tokens are words — the language's measured prior, the
-  // document's own, and the aliases the hyperlexicon resolved ("Messrs." is a form of "Mr."). Every sentence cut the reader makes
-  // goes through it, so a relation is never read across a cut inside a word. Omitted, the splitter derives its own per passage.
-  const split = abbreviations ? (t, o = {}) => splitSentences(t, { ...o, abbreviations: o.abbreviations ?? abbreviations }) : splitSentences;
-  const { posPrior, verbForms, lemmatizer } = await loadPriors();
-  // FOREIGN: a document that measured as another language is read by the suite's own dispatch for THAT language — its POS prior, and its
-  // RoleConfig@1 where one is shipped (positional reader), else the clause-aware GFP reader. Nothing English is applied to it.
-  if (foreign) {
-    let roleConfig = null; try { const r = await fetch(new URL(`./vendor/khora/native/priors/role-config-${foreign.iso3}.json`, import.meta.url)); if (r.ok) roleConfig = await r.json(); } catch (e) {}
-    const d = relationExtractorsFor({ language: foreign.iso3, roleConfig, posPrior: foreign.posPrior, classifyWord, dominantClass });
-    Object.assign(rest, { extractRelations: (t, o) => d.extractRelations(t, d.mode === 'gfp' ? { ...o, clauseAware: true } : o), discoverRelationVocab: (...a) => d.discoverRelationVocab(...a), posPriorFor: () => foreign.posPrior });
-  }
-  // hand the composed reader its priors, once — the same received closed class
-  // the dispatch reader already uses, plus the measured role config.
-  // sameAct is widened by stance class, so "is pro" binds a source's "in
-  // support of" without either label being rewritten.
-  //
-  // FEATURES (the demo's layer toggles; every one defaults ON, so omitting
-  // `features` is byte-identical to before this option existed):
-  //   posPrior   — the class prior classifyWord reads (Thrax over UD)
-  //   morphology — the UniMorph lemmatizer that widens same-act
-  //   stance     — the two stance passes this module adds over the base reader
-  //   nounPhraseSubjects / phrasalPredicates — reader shape, passed through
-  const useMorph = features.morphology !== false && !!lemmatizer;
+  // document's own, and the aliases the hyperlexicon resolved ("Messrs." is a form of "Mr."). The core passes it to every sentence
+  // cut the reader makes. Omitted, the splitter derives its own per passage.
+  // FOREIGN: a document that measured as another language is read with THAT language's priors through the same core — its POS
+  // prior, its RoleConfig@1 where one is shipped (positional reader), else the clause-aware GFP reader. Nothing English is applied.
+  const stem = foreign?.iso3 || 'eng';
+  const priors = await loadLanguage(stem);
+  let roleConfig = null;
+  if (foreign) { try { const r = await fetch(new URL(`./vendor/khora/native/priors/role-config-${stem}.json`, import.meta.url)); if (r.ok) roleConfig = await r.json(); } catch (e) {} }
+  // FEATURES (the demo's layer toggles; every one defaults ON): posPrior, morphology, stance, nounPhraseSubjects, phrasalPredicates.
+  // sameAct is widened by stance class, so "is pro" binds a source's "in support of" without either label being rewritten.
   const useStance = features.stance !== false;
-  const usePos = features.posPrior !== false;
-  const sameAct = (a, b) => {
-    if (useStance) { const x = stanceClass(a), y = stanceClass(b); if (x && y) return x === y; }
-    return useMorph ? lemmatizer.sameAct(a, b) : String(a).toLowerCase() === String(b).toLowerCase();
-  };
-  return makeRelationReader({
-    splitSentences: split, extractSurfaces, discoverReferents, namesCorefer, diaNorm,
-    discoverRelationVocab: (...a) => dispatch().discoverRelationVocab(...a),
-    extractRelations: useStance ? extractRelations : makeExtractRelations({ stance: false }),
-    extractorsMode: 'dispatch', tokenize, posPriorFor: () => (usePos ? posPrior : null), verbForms, oovLexicon: verbForms, attestedVerbs: true,
-    determiners: DETERMINERS, definiteDeterminers: new Set(P.DEFINITE_DETERMINERS), negationWords: P.NEGATION_WORDS, firstPerson: P.FIRST_PERSON,
-    // createLemmatizer's mere presence toggles object-side form identity in
-    // endpoint(); it is passed only when a real lemmatizer exists (as before),
-    // but sameAct itself always carries the stance class.
-    ...(useMorph ? { createLemmatizer: () => ({ sameAct }), morphologyIndex: {} } : {}),
-    blankFurniture: text => blankLabelRows(text, { minRun: 4, maxCell: 60 }),
-    resolvePronouns, nounPhraseSubjects: features.nounPhraseSubjects !== false, phrasalPredicates: features.phrasalPredicates !== false, ...rest,
+  // as before the core: the stance widening rides the lemmatizer's same-act test, so with morphology off neither is passed
+  const sameAct = useStance && features.morphology !== false && priors.lemmatizer ? (a, b) => { const x = stanceClass(a), y = stanceClass(b); return x && y ? x === y : null; } : null;
+  return makeReader({
+    priors, language: stem, abbreviations, features, classifyWord, roleConfig, sameAct,
+    extendRelations: withStance({ stance: useStance }),
+    ...rest,
   });
 }
 

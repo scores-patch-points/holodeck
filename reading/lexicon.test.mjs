@@ -1,7 +1,7 @@
-// lexicon.test.mjs — the hyperlexicon client: asked once per form, aliases read from the giver, and the text's own guard.
+// lexicon.test.mjs — conformance of khora's hyperlexicon organ (native/organs/lexicon.js, vendored), as the reading page uses it.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { makeLexicon, aliasJunctions, aliasTokens, resolveAliases } from './lexicon.js';
+import { makeLexicon, aliasJunctions, aliasTokens, resolveAliases } from '../vendor/khora/native/organs/lexicon.js';
 
 // a stub giver shaped like the server's answer: "Messrs." and "in." are listed as forms of other words, "night." is not listed
 const PACK = {
