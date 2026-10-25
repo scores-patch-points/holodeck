@@ -172,7 +172,7 @@ window.fetch = (u, o) => { net.requests.push(String(u)); return _fetch(u, o); };
 import { detectLang } from '../vendor/fold-chat/fold-chat-lang.js';
 import { htmlReading, csvReading } from '../holodeck-read.js';
 import { makeEngineRelationReader, loadPriors, blankMarkup, readDocument, pageLexicon } from '../holodeck-reader.js';
-import { abbreviationsFor, priorsFor } from '../vendor/khora/native/the-fold/read-core.mjs';
+import { abbreviationsFor, priorsFor, isAbbreviationSurface } from '../vendor/khora/native/the-fold/read-core.mjs';
 import { extractSurfacesHeard } from '../vendor/khora/native/the-fold/language-context.js';
 import { extractReadings, sniffExtraction } from './extract.js';
 import { joinItems, decideJunctions, applyJunctions } from './look-joins.js';
@@ -524,7 +524,7 @@ function startTimeline(T){
       // the replay reads each prefix with the master's own organs: its cut (this read's abbreviations), its surfaces (the heard tier
       // included), its pronoun resolver, and the very reader the master read the whole text with
       T.timeline = buildReadingTimeline(T.clean, {
-        hash: sha256, diaNorm, splitSentences: (t, o = {}) => splitSentences(t, { ...o, abbreviations: o.abbreviations ?? T.abbreviations }), wordsIn, extractSurfaces: extractSurfacesHeard, discoverReferents, resolvePronouns,
+        hash: sha256, diaNorm, splitSentences: (t, o = {}) => splitSentences(t, { ...o, abbreviations: o.abbreviations ?? T.abbreviations }), wordsIn, extractSurfaces: (x, o) => extractSurfacesHeard(x, o).filter(sf => !isAbbreviationSurface(sf.surface, T.abbreviations)), discoverReferents, resolvePronouns,
         classifyAt: prefix => pos ? documentClassifier(prefix, { posPrior: pos, lemmatizer: PRIORS.lemmatizer, lookups: T.feat.lexicon === false ? null : LOOKUP.cache, memo }) : (f => classifyForm(f, { posPrior: null })),
         readClaims: prefix => mapClaims(R([{ ref:'source', text:prefix }]).read(prefix).claims, prefix),
       }, { maxSnapshots: 40 });

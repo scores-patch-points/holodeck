@@ -3544,21 +3544,12 @@ async function loadReadingIndex(force) {
 const SAMPLES = {};
 const W = s => new Set(s.split(' '));
 const STOP = W('the a an and or of to in on for with at by from as is are was were be been being will would should could may might can this that these those it its their his her they them we our you your i not no new every per than then also into over under about after before during each which who whom what when where while there here has have had do does did said says last first next more most some any all other such only just very since until because through across between within without upon a day week daily');
-const ART = W('The A An This That These Those Our Their Its His Her');
-const TITLES = W('Mayor Chef Dr Mr Mrs Ms Prof Professor Minister Director President Senator Judge Councillor Councilor Officer Captain Nurse Sir Dame Chair Chairman Chairwoman Governor Secretary Representative Commissioner Chief Gov Sen Rep Lieutenant General Admiral Sergeant Detective Inspector Superintendent Principal Coach');
-const NOT_NAMES = W('U.S U.K US UK EU EDT EST UTC GMT TEU AM PM OK TV IT Top Watch Listen Share Subscribe Transcript Download Sponsor Message Menu Search Sign Log More Read Skip Close Open Getty Images Stockphoto iStock Courtesy Photo Video Audio Advertisement Related Loading He She It They We You');
-const LEAD_WORDS = W('But And Or So Yet On In At For From To By With After Before Since When While If As Then Now Here There Why How What Who Where Also Still Even Only Just Last Next Every Some Many Most Other Such Both Each More Than');
 const PLACE_FIRST = W('Port Mount Lake Fort Cape Point Isle Gulf');
 const MONTHS = W('Jan Feb Mar Apr Jun Jul Aug Sep Sept Oct Nov Dec January February March April May June July August September October November December Monday Tuesday Wednesday Thursday Friday Saturday Sunday');
 const ORG = W('Council Authority Farms Dairy Inc Ltd LLC Company Co Department Division Agency Office Group Board Committee University Hospital School Structural Associates Partners Foundation Institute Ministry Commission Services Corporation Corp Bureau Trust Union Party Press News Times Club Team Clinic Lab Labs Industries Court Caucus Congress Administration Guard Navy Army Engineers Association Society Center Service Police Senate House Assembly Bradstreet Line Lines Marine Shipping Holdings Bank Centre Coalition Alliance Network Ministries Initiative Collaborative Partnership');
-const ORG_LOWER = new Set([...ORG].map(w => w.toLowerCase()).concat(['inc.', 'ltd.', 'corp.', 'co.', 'plc', 'gmbh', 'llp', 'lp', 'pa', 'pllc', 'inc', 'corp']));
 const PLACE = W('Bridge Avenue Street Road River Park Square City County District Station Corridor Lane Way Valley Hill Harbor Harbour Island Bay Lake Coast Airport Market Centre Plaza Quarter North South East West Point Terminal Channel Tunnel Ocean Sea States Kingdom Chile Maryland Virginia Baltimore Singapore Asia America Europe Africa Dundalk York');
 const TYPE_C = { person: 'var(--pink)', organisation: 'var(--blue)', place: 'var(--green)', other: 'var(--mut)' };
 const TYPE_L = { person: 'People', organisation: 'Organisations', place: 'Places', other: 'Other names' };
-// The narrow, safe subset of PERSON_ROLE used to SPLIT a leading profession off a
-// name ("Actress Susan Sarandon"): professions that never begin a common title, and
-// never a noble title ("Princess Bride" stays one surface) or a word TITLES already owns.
-const TITLE_ROLES = new Set(('actress actor singer songwriter musician composer pianist violinist filmmaker screenwriter playwright novelist poet essayist journalist reporter columnist editor publisher illustrator painter sculptor photographer architect designer inventor engineer scientist physicist chemist astronomer biologist historian archaeologist anthropologist sociologist psychologist economist linguist philosopher theologian lawyer attorney surgeon nurse activist feminist humanitarian revolutionary entrepreneur industrialist businessman businesswoman executive philanthropist comedian performer entertainer').split(' '));
 // EMERGENT TYPING — the relation sets kind induction types against. Small and
 // structural: a referent's own relations, with position (subject vs object) doing
 // the disambiguation ("studied" as subject -> a person; "studied at X" -> X is an
@@ -3618,7 +3609,7 @@ function hdMostLikely(text, known) {
   text = String(text || '').replace(/[ \t]+/g, ' ').replace(/\n{3,}/g, '\n\n').trim();
   if (!text) return { text: '', known: [], proposals: [] };
   const K = (known || []).filter(n => n && n.length >= 3); const Kset = new Map(); K.forEach(n => Kset.set(n.toLowerCase(), n));
-  let names = []; try { names = [...new Set(splitSentences(text).flatMap(se => findNames(se.t).map(n => n.name)))].filter(n => n.length >= 3); } catch (e) {}
+  let names = []; try { names = [...new Set(hdSurfaceList(text).map(x => x.surface))].filter(n => n.length >= 3); } catch (e) {}
   const hits = [], props = []; let out = text;
   for (const nm of names) {
     const key = nm.toLowerCase(); if (Kset.has(key)) { hits.push(Kset.get(key)); continue; }
@@ -3728,22 +3719,62 @@ async function hdPdfFigures(pdf, pageCap) {
   return out;
 }
 
-// The engine: eoreader7's POST /v1/read reads each added document through the session reader (model-free). The Holodeck
-// draws what comes back and treats its surfaces as a witness beside its own finder; it never lets them replace it.
+// THE MASTER PIPELINE reads every document on this page (2026-10-24): khora's read-core.mjs::readDocument, in a module worker
+// (master-reading-worker.js), the same call every tool makes. Its cast is the page's names — each being with the place of every
+// mention — and its relations and sentences ride with it. Nothing on the page finds a name by a rule of its own. The engine's
+// HTTP door is the same pipeline on a server; the page no longer needs it to read.
 const HD_ENG = { url: null, downAt: 0 };
 function hdEngineHosts() { let u = null; try { u = localStorage.getItem('hd:engine'); } catch (e) {} return [u, 'http://127.0.0.1:11436', 'http://127.0.0.1:11476'].filter((x, i, a) => x && a.indexOf(x) === i); }
-async function hdEngineRead(name, text) {
-  if (!HD_ENG.url && Date.now() - HD_ENG.downAt < 60000) return null;
-  for (const host of HD_ENG.url ? [HD_ENG.url] : hdEngineHosts()) {
-    hdT('engine', 'ask', 'Asking the eoreader7 engine (' + host.replace(/^https?:\/\//, '') + ') to read “' + hdCut(name, 50) + '”…');
-    const ctl = new AbortController(), timer = setTimeout(() => ctl.abort(), 20000);
+const HD_MASTER_CAP = 200000;   // the most characters one read takes; a longer text is cut and the cut is said
+let HD_MW = null, HD_MW_READY = null; const HD_MW_WAIT = new Map(); let HD_MW_SEQ = 0;
+function hdMasterWorker() {
+  if (HD_MW_READY) return HD_MW_READY;
+  HD_MW_READY = new Promise((resolve) => {
     try {
-      const r = await fetch(host + '/v1/read', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ name, text: text.slice(0, 60000) }), signal: ctl.signal });
-      const j = await r.json(); if (!r.ok || j.schema !== 'EORead@1') { if (HD_ENG.url === host) HD_ENG.url = null; continue; }
-      HD_ENG.url = host; return { host, read: j };
-    } catch (e) { if (HD_ENG.url === host) HD_ENG.url = null; } finally { clearTimeout(timer); }
+      HD_MW = new Worker(new URL('master-reading-worker.js', location.href), { type: 'module' });
+      HD_MW.onmessage = (e) => { const m = e.data || {}; if (m.ready) return resolve(HD_MW); const w = HD_MW_WAIT.get(m.id); if (w) { HD_MW_WAIT.delete(m.id); w(m); } };
+      HD_MW.onerror = () => resolve(null);
+    } catch (e) { resolve(null); }
+  });
+  return HD_MW_READY;
+}
+async function hdMasterReadText(name, text) {
+  const W = await hdMasterWorker(); if (!W) return null;
+  const id = 'm' + (++HD_MW_SEQ);
+  const t0 = performance.now();
+  const m = await new Promise((resolve) => { HD_MW_WAIT.set(id, resolve); W.postMessage({ id, text: String(text || ''), cap: HD_MASTER_CAP }); });
+  if (!m || m.err || !m.entry) return null;
+  const E = m.entry;
+  // the door's EORead@1 shape, so every caller of the engine reading reads it unchanged; spans are the master's mentions
+  return { host: 'this page · khora read-core.mjs::readDocument', read: { schema: 'EORead@1', ms: performance.now() - t0, basis: 'khora master pipeline (read-core.mjs::readDocument), in this page' + (m.cut ? ` · read the first ${m.cut.read} of ${m.cut.total} characters` : ''),
+    sentences: E.sentences || [], relations: (E.edges || []).map(e => ({ participants: [{ surface: e.end1Face || e.end1 }, { surface: e.end2Face || e.end2 }], relation: e.label, polarity: e.polarity })),
+    referents: (E.cast || []).map(c => ({ surfaces: c.allSurfaces && c.allSurfaces.length ? c.allSurfaces : [c.surface], surface: c.surface, routes: ['referent'], grain: null, spans: c.mentionSpans || [] })),
+    descriptorBeings: [], language: E.language || null, gaps: E.gaps || [] } };
+}
+async function hdEngineRead(name, text) {
+  hdT('engine', 'ask', 'Reading “' + hdCut(name, 50) + '” through khora\'s master pipeline in this page…');
+  return hdMasterReadText(name, text);
+}
+// a document with no master reading on it yet (a sample, a source added before this page read through the master) is read once,
+// after the first paint; when the read lands the page reads again (hd-cut)
+const HD_MASTER = new Map(), HD_MASTER_PENDING = new Set();
+function hdMasterFor(d) {
+  if (d.eng && d.eng.referents && d.eng.referents.every(r => Array.isArray(r.spans))) return d.eng;
+  const key = d.id + '|' + (d.text || '').length + '|' + (d.text || '').slice(0, 120) + '|' + (d.text || '').slice(-120);
+  if (HD_MASTER.has(key)) return HD_MASTER.get(key);
+  if (!HD_MASTER_PENDING.has(key) && (d.text || '').trim()) {
+    HD_MASTER_PENDING.add(key);
+    setTimeout(async () => { let got = null; try { got = await hdMasterReadText(d.title || d.id, d.text); } catch (e) { got = null; }
+      HD_MASTER.set(key, got ? hdEngineCompact(got.host, got.read) : null); HD_MASTER_PENDING.delete(key); if (typeof hdCutChanged === 'function') hdCutChanged(); }, 0);
   }
-  HD_ENG.downAt = Date.now(); return null;
+  return null;
+}
+// the names a sentence holds, as the master read them: every mention of every being in the master's cast that falls inside it
+function hdMasterNames(d, se) {
+  const eng = hdMasterFor(d); if (!eng) return [];
+  const out = [];
+  for (const r of eng.referents) for (const [a, b] of (r.spans || [])) if (a >= se.s && b <= se.e) out.push({ name: r.surface || r.surfaces[0], s: a - se.s, e: b - se.s, engine: 'khora' });
+  return out.sort((x, y) => x.s - y.s);
 }
 // THE SOURCES READ TOGETHER. The engine's own reading across a workspace (POST /v1/read-across): which source names
 // which, what the named text holds that the naming source never writes, what is spoken of and held by no source.
@@ -3801,27 +3832,9 @@ const POS_L = { NOUN: 'noun', PROPN: 'proper noun', VERB: 'verb', ADJ: 'adjectiv
 const HD_KIND_PLAIN = { differs: 'Different figures', polarity: 'Denied', scope: 'Not named', absent: 'Spoken of, not held', defined: 'Defined as', names: 'Refers to', same: 'Both state', terms: 'Same subject', cite: 'Cites' };
 const HD_KIND_RANK = { differs: 0, polarity: 1, scope: 2, absent: 3, defined: 4, names: 5, same: 6, cite: 7, terms: 8 };
 const HD_STANDING_PLAIN = { fixed: 'always the same', 'one at a time': 'one at a time', 'many-valued': 'many values' };
-const hdEngineCompact = (host, r) => ({ host, ms: Math.round(r.ms), basis: r.basis || null, sentences: r.sentences.length, relations: r.relations.length, referents: r.referents.map(x => ({ surfaces: x.surfaces, routes: x.routes, grain: x.grain || null })).concat(r.descriptorBeings.map(b => ({ surfaces: b.surfaces, routes: ['descriptor'], grain: null }))) });
-const HD_ENGM = new WeakMap();
-function hdEngineMap(eng) { let m = HD_ENGM.get(eng); if (m) return m; m = new Map(); eng.referents.forEach(r => r.surfaces.forEach(sf => { const k = sf.toLowerCase(); if (!m.has(k)) m.set(k, { surface: sf, routes: r.routes, grain: r.grain }); })); HD_ENGM.set(eng, m); return m; }
-function hdEngineMerge(t, ns, eng, hy) {
-  if (!eng || !hy) return ns;
-  const m = hdEngineMap(eng), have = new Set(ns.map(n => n.name.toLowerCase())), out = ns.slice();
-  ns.forEach(n => { const r = m.get(n.name.toLowerCase()); if (r) n.engine = r.routes.join('+'); });
-  m.forEach((r, k) => {
-    if (have.has(k)) return;
-    const words = k.split(/\s+/), desc = r.routes.includes('descriptor'), body = desc ? words.slice(1) : words;
-    if (!body.length || body.some(w => MONTHS.has(w[0].toUpperCase() + w.slice(1)))) return;
-    if (body.length === 1 && typeof ORG_LOWER !== 'undefined' && ORG_LOWER.has(body[0].replace(/[.,]+$/, ''))) return;
-    if (hy.functionOnly(body[0]) || hy.functionOnly(body[body.length - 1])) return;
-    if (!desc && body.length === 1 && hy.commonOnly(body[0])) return;
-    const re = new RegExp('(?<![\\p{L}\\p{N}])' + k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\s+/g, '\\s+') + '(?![\\p{L}\\p{N}])', 'giu'); let x;
-    while ((x = re.exec(t))) { const s0 = x.index, e0 = s0 + x[0].length; if (out.some(n => s0 < n.e && n.s < e0)) continue; out.push({ name: r.surface, s: s0, e: e0, engine: r.routes.join('+') + (r.grain ? ' · ' + r.grain : ''), engineAdded: true }); }
-  });
-  return out.sort((a, b) => a.s - b.s);
-}
+const hdEngineCompact = (host, r) => ({ host, ms: Math.round(r.ms), basis: r.basis || null, sentences: r.sentences.length, relations: r.relations.length, referents: r.referents.map(x => ({ surfaces: x.surfaces, surface: x.surface || null, routes: x.routes, grain: x.grain || null, spans: x.spans || null })).concat(r.descriptorBeings.map(b => ({ surfaces: b.surfaces, routes: ['descriptor'], grain: null }))) });
 // read-only handle for tests: the real functions, so a harness can recompute what a trace claims happened
-setTimeout(() => { try { window.__holodeck = Object.freeze({ analyze, holoKit, holoName, paradigms, holoTopics, fieldTopics, fieldCatalog, splitSentences, findNames, isJunk, readAny, hdHygiene, hdPos: w => hdPos(w), hdPosForms: () => HD_POS, hdDeclReady: () => !!HD_DECL, hdEngineReady: () => !!HD_ENGINE, hdReaderReady: () => hdReaderReady(), hdAttrReady: () => hdAttrReady(), hdHoldReady: () => hdHoldReady(), summarizeHolders: (sts, names) => (HD_ATTR ? HD_ATTR.summarizeHolders(sts, names) : null) }); } catch (e) {} }, 0);
+setTimeout(() => { try { window.__holodeck = Object.freeze({ analyze, holoKit, holoName, paradigms, holoTopics, fieldTopics, fieldCatalog, splitSentences, isJunk, readAny, hdHygiene, hdPos: w => hdPos(w), hdPosForms: () => HD_POS, hdDeclReady: () => !!HD_DECL, hdEngineReady: () => !!HD_ENGINE, hdReaderReady: () => hdReaderReady(), hdAttrReady: () => hdAttrReady(), hdHoldReady: () => hdHoldReady(), summarizeHolders: (sts, names) => (HD_ATTR ? HD_ATTR.summarizeHolders(sts, names) : null) }); } catch (e) {} }, 0);
 const hdCut = (t, n) => { t = String(t || '').replace(/\s+/g, ' ').trim(); return t.length > n ? t.slice(0, n - 1) + '…' : t; };
 // THE CUT IS KHORA'S (2026-10-24). Which dotted tokens are words is khora's knowledge, never a list on this page: the language's
 // measured punctuation prior and the text's own (read-core.mjs::abbreviationsFor), plus the aliases the hyperlexicon resolves for
@@ -3917,12 +3930,19 @@ Promise.all([
   import(new URL('vendor/khora/native/the-fold/read-core.mjs', location.href)),
   import(new URL('vendor/khora/native/adapters/text/spans.js', location.href)),
   import(new URL('vendor/khora/native/organs/lexicon.js', location.href)),
+  import(new URL('vendor/khora/native/the-fold/language-context.js', location.href)),
   import(new URL('holodeck-reader.js', location.href)).then(M => M.loadLanguage('eng')),
-]).then(([C, S, L]) => {
-  HD_CORE = { abbreviationsFor: C.abbreviationsFor, priorsFor: C.priorsFor, split: S.splitSentences, derive: S.deriveAbbreviations, L };
+]).then(([C, S, L, LC]) => {
+  HD_CORE = { abbreviationsFor: C.abbreviationsFor, priorsFor: C.priorsFor, split: S.splitSentences, derive: S.deriveAbbreviations, L, surfaces: LC.extractSurfacesHeard };
   HD_LEX = L.makeLexicon({ lang: 'en', ask: async (forms, lang) => { try { const r = await fetch(new URL('lexicon', location.href), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ forms, lang }) }); return r.ok ? await r.json() : null; } catch (e) { return null; } } });
   hdCutChanged();
 }).catch(() => {});
+// khora's surface organ over khora's cut: the names a text the page holds no reading of (a typed question, a shuffled null) shows,
+// each with how many sentences it stands in. Empty until khora's modules have loaded.
+function hdSurfaceList(text) {
+  if (!HD_CORE) return [];
+  try { const a = hdAbbreviations(text); return HD_CORE.surfaces(HD_CORE.split(String(text || ''), a ? { abbreviations: a.set } : {})); } catch (e) { return []; }
+}
 // the abbreviations for one text: what khora knows, plus the aliases the hyperlexicon has answered; unanswered dotted forms are asked
 // once, and an answer that keeps one re-reads the page. A giver that does not answer is a gap (HD_LEX_GAP), asked no further.
 function hdAbbreviations(text) {
@@ -4081,80 +4101,6 @@ const HD_REGISTER = { T: 'Capitalised', A: 'ALL-CAPS' };
 const hdRegister = w => { const m = /^\p{Lu}[\p{L}\p{M}'’]*(\p{L})$/u.exec(w); if (!m) return null;
   const es = Object.entries((HD_POS && HD_POS[w.toLowerCase()]) || {}); if (es.length && es.sort((a, b) => b[1] - a[1])[0][0] === 'NUM') return null;
   return /\p{Ll}/u.test(m[1]) ? 'T' : 'A'; };
-function findNames(t, hy) {
-  const out = [];
-  // a hyphen only continues the same capitalized word when what follows it is ALSO capitalized
-  // (Winston-Salem, Coca-Cola) -- a lowercase continuation (Atlanta-based) is a modifier, not part of the name
-  // CHOMSKY: the arrangement (a name is a run of name-letters; a referent is the fold
-  // of its surfaces) is universal — the CASE convention that opens a name is the
-  // language's, declared here (\p{Lu}, any cased script), never ASCII A-Z assumed as
-  // universal. The ASCII class silently truncated "García" to "Garc" and "Márquez" to
-  // "M", fragments that then collided and merged unrelated people.
-  const WORD = "[\\p{Lu}][\\p{L}\\p{M}'\\u2019&.]*(?:-[\\p{Lu}][\\p{L}\\p{M}'\\u2019&.]*)*";
-  const re = new RegExp(WORD + '(?:\\s+(?:of\\s+|and\\s+|&\\s+)?' + WORD + ')*', 'gu'); let m;
-  const push = (words, idx, title, m, after) => {
-    const oi = words.findIndex((w, i) => i > 0 && i < words.length - 1 && ORG.has(w.replace(/[.,]$/, '')) && (() => { const r = words.slice(i + 1); return r.length >= 1 && r.length <= 3 && r.every(x => /^[A-Z][a-z'\u2019.-]+$/.test(x) && !ORG.has(x) && !PLACE.has(x) && !TITLES.has(x.replace(/\.$/, '')) && !/^(of|and)$/.test(x)); })());
-    if (oi > 0) { let j2 = idx; for (let i = 0; i <= oi; i++) j2 = next(j2, words[i]); push(words.slice(0, oi + 1), idx, title, m, ' ' + words[oi + 1]); push(words.slice(oi + 1), j2, null, m, after); return; }
-    const ji = words.findIndex((w, i) => i > 0 && i < words.length - 1 && /^(and|&)$/.test(w) && (/^[A-Z]{2,}['\u2019]?s?$/.test(words[i - 1]) || /^[A-Z]{2,}$/.test(words[i + 1])));
-    if (ji > 0) { let j2 = idx; for (let i = 0; i <= ji; i++) j2 = next(j2, words[i]); push(words.slice(0, ji), idx, title, m, ' ' + words[ji]); push(words.slice(ji + 1), j2, null, m, after); return; }
-    for (;;) { if (!words.length) break; const w0 = words[0]; let why = null;
-      if (ART.has(w0) || LEAD_WORDS.has(w0) || /^(of|and|&)$/.test(w0)) why = '';
-      else if (hy && words.length > 1) { if (hy.nonNominal(w0)) why = qW(w0) + ' has no noun or name reading'; else if (words.length > 2 && /(^|[;:]\s*)[\s"'(]*$/.test(t.slice(0, idx)) && (() => { const cw = (after.match(/\b[A-Za-z]{4,}\b/g) || []); return cw.filter(x => x === x.toLowerCase()).length > cw.filter(x => x !== x.toLowerCase()).length; })() && !hy.namePair(w0, words[1]) && hy.ordinaryOpener(w0)) why = hy.lastWhy + ', this sentence is prose, not a title line, and ' + qW(w0 + ' ' + words[1]) + ' is never written capitalised mid-sentence'; }
-      if (why === null) break; if (why) hy.note('lead', words.join(' '), 'dropped the opening ' + qW(w0) + ': ' + why); idx = next(idx, w0); words.shift(); }
-    if (words.some(w => /^(Getty|Stockphoto|iStock|Courtesy|Transcript|Sponsor|Shutterstock|Images)$/.test(w))) return;
-    while (words.length && (/^(of|and|&)$/.test(words[words.length - 1]) || (hy && words.length > 1 && hy.functionOnly(words[words.length - 1])))) { const wl = words.pop(); if (hy && !/^(of|and|&)$/.test(wl)) hy.note('tail', words.join(' ') + ' ' + wl, 'dropped the dangling ' + qW(wl) + ': it is only ever a function word'); }
-    if (!words.length) return;
-    words[words.length - 1] = words[words.length - 1].replace(/[.,]+$/, '').replace(/['\u2019]s?$/, '');
-    if (words.length === 1 && /^(I|We|You|They|He|She|It|That|There|What|Let|Don|Won|Can|Isn|Didn|Doesn)['\u2019](ve|m|re|ll|d|s|t)$/i.test(words[0])) return;
-    if (!words[words.length - 1]) return;
-    if (hy) { const cw = words.find(w => hy.clause(w)); if (cw) { hy.note('drop', words.join(' '), 'not a name: ' + qW(cw) + ' has no noun or name reading, so this is a clause or headline'); return; } }
-    // A SHOUTED run (every word ALL-CAPS) is a name only where its words are not ordinary lowercase words. That is MEASURED, never
-    // listed: hy.capNormal asks the smallest region that differs how often each word is written capitalised mid-sentence. A lone
-    // all-caps word amid mixed case is read as an acronym, so the test applies to a run of two or more, or to a line with no lowercase
-    // at all (there the capitals say nothing about the word). A word no region has seen proves nothing, so a run holding one stays.
-    if (hy && words.every(w => /^\p{Lu}[\p{Lu}'’]+[.,;:]*$/u.test(w)) && (words.length > 1 || !/\p{Ll}/u.test(t)) && words.every(w => hy.shoutedOrdinary(w.replace(/[.,;:]+$/, '')))) { hy.note('drop', words.join(' '), 'not a name: an ALL-CAPS run of ordinary words — ' + hy.lastWhy); return; }
-    const atStart = /(^|[;:]\s*)[\s"'(]*$/.test(t.slice(0, idx));
-    if (hy && atStart && /^\s*:/.test(after) && words.every(w => hy.commonOnly(w))) { hy.note('label', words.join(' '), 'not a name: a line-opening run of common words followed by a colon is a form label'); return; }
-    const acr = /^[A-Z]{2,}$/.test(words[0]);
-    if (atStart && words.length === 1 && !title && !acr) return;
-    if (words.every(w => MONTHS.has(w) || NOT_NAMES.has(w) || TITLES.has(w.replace(/\.$/, '')) || /^(Vice|Deputy|Assistant|Acting|Interim|Senior|Chief)$/.test(w))) return;
-    if (words[0].length < 2) return;
-    // a bare company suffix is never a name on its own ("INC", "LLC", "Corp") -- it only counts inside a longer name
-    if (words.length === 1 && ORG_LOWER.has(words[0].replace(/[.,]+$/, '').toLowerCase())) { if (hy) hy.note('drop', words[0], 'not a name: a company suffix standing alone'); return; }
-    const name = words.join(' ');
-    const am = after.match(/^\s*\(([A-Z]{2,})\)/);
-    const saidAfter = /^\s+(said|says|told|reported|wants|argued|added|asked|wrote|stated|announced)\b/.test(after);
-    out.push({ name, s: idx, e: idx + name.length, title, alias: am ? am[1] : null, saidAfter, acr: acr && words.length === 1 });
-  };
-  const next = (idx, w) => { const rest = t.slice(idx + w.length); return idx + w.length + (rest.match(/^\s+/) || [''])[0].length; };
-  const runOf = (words, at, after) => {
-    // split at a title word — or a leading PROFESSION ("Actress Susan Sarandon" ->
-    // (Actress) "Susan Sarandon"): a capitalised human role opens a name the way a
-    // title does, and the role is not part of the name. TITLE_ROLES is the narrow,
-    // safe subset of PERSON_ROLE — professions, never noble titles ("Princess Bride"
-    // must stay one surface) and never title-ish words TITLES already owns.
-    let ti = words.findIndex(w => TITLES.has(w.replace(/\.$/, '')) || TITLE_ROLES.has(w.toLowerCase().replace(/[.,;:]+$/, '')));
-    if (ti >= 0) {
-      let idx = at; for (let i = 0; i < ti; i++) idx = next(idx, words[i]);
-      if (ti > 0) push(words.slice(0, ti), at, null, m, ' ' + words[ti]);
-      let j = ti + 1; idx = next(idx, words[ti]);
-      if (words[j] === 'of' && words[j + 1]) { idx = next(next(idx, words[j]), words[j + 1]); j += 2; while (/^(and|&)$/.test(words[j] || '') && words[j + 1]) { idx = next(next(idx, words[j]), words[j + 1]); j += 2; } }
-      push(words.slice(j), idx, words[ti], m, after);
-    } else push(words, at, null, m, after);
-  };
-  while ((m = re.exec(t))) {
-    const words = m[0].split(/\s+/); const cuts = [];
-    // REGISTER: where the next word is in the other register and the material says names here do not change register, one name
-    // stops and the next starts ("Rose DeWitt Bukater | LEONARDO DICAPRIO"). Measured by hy.registerBreak; without the prior, never cut.
-    if (hy) for (let i = 1; i < words.length; i++) if (hy.registerBreak(words[i - 1], words[i])) cuts.push({ i, why: hy.lastWhy });
-    if (!cuts.length) { runOf(words, m.index, t.slice(m.index + m[0].length)); continue; }
-    let p = m.index; const starts = words.map(w => { const s = p; p = next(p, w); return s; });
-    const bounds = [0, ...cuts.map(c => c.i), words.length];
-    hy.note('register', bounds.slice(0, -1).map((a, k) => words.slice(a, bounds[k + 1]).join(' ')).join(' | '), 'split where the register changes: ' + cuts.map(c => c.why).join('; '));
-    for (let k = 0; k + 1 < bounds.length; k++) { const a = bounds[k], b = bounds[k + 1]; runOf(words.slice(a, b), starts[a], t.slice(starts[b - 1] + words[b - 1].length)); }
-  }
-  return out;
-}
 function nameType(n, info) {
   const words = n.split(/\s+/).filter(Boolean);
   const last = words[words.length - 1] || '';
@@ -4312,7 +4258,7 @@ function analyze(corpus, htmlMap) {
     return x; });
   const sts = []; const found = []; const alias = {}; const info = {}; const HY = hdHygiene(docs);
   docs.forEach(d => { const on = hdF(d.id); const ss = splitSentences(d.text, on ? (a, b, c, x) => hdT(a, b, c, { doc: d.id, ...x }) : null); if (on) hdT('sentences', 'split', 'Split into ' + ss.length + ' statements', { doc: d.id, n: ss.length }); const hy = HY ? HY.forDoc(d, on ? (k, what, why) => hdT('names', 'hygiene', why + ' (' + qW(what) + ')', { doc: d.id }) : null) : null; if (on && !d.hasCase) hdT('names', 'gap', 'This source carries no letter case — its script has none (or it is code): the case convention that opens a name does not apply, so names are read from the source\u2019s own links, which is the material marking its own names. Where none are linked, none are claimed', { doc: d.id, linked: (d._linkNames || []).length }); ss.forEach((se, i) => {
-    const ns = d.hasCase ? hdEngineMerge(se.t, findNames(se.t, hy), d.eng, hy) : (d._linkNames || []).filter(l => l.s < se.e && l.e > se.s).map(l => ({ name: l.name, s: Math.max(0, l.s - se.s), e: Math.min(l.e, se.e) - se.s, via: 'link' }));
+    const ns = d.hasCase ? hdMasterNames(d, se) : (d._linkNames || []).filter(l => l.s < se.e && l.e > se.s).map(l => ({ name: l.name, s: Math.max(0, l.s - se.s), e: Math.min(l.e, se.e) - se.s, via: 'link' }));
     ns.forEach(n => { if (n.alias) alias[n.alias] = n.name;
       // TYPE CUES read from the statement's own words: a human role right before the
       // name ("actress Susan Sarandon") or after a copula ("was a French filmmaker")
@@ -9936,7 +9882,8 @@ class Component extends DCLogic {
     // driven by capitals and adjacency, so shuffled text still yields "names"; what matters is how many more real text yields.
     const nullByDoc = {};
     T.docs.forEach(d => { const w = d.text.split(/\s+/).filter(Boolean); if (w.length < 8) return; let sd = 1; for (let i = 0; i < d.text.length; i++) sd = (sd * 31 + d.text.charCodeAt(i)) % 2147483647;
-      const rec = text => { const c = new Map(); splitSentences(text).forEach(se => new Set(findNames(se.t).map(n => n.name).filter(n => /\s/.test(n))).forEach(n => c.set(n, (c.get(n) || 0) + 1))); const all = [...c.values()], tot = all.reduce((a, b) => a + b, 0); return tot ? Math.round(all.filter(v => v >= 2).reduce((a, b) => a + b, 0) / tot * 100) : 0; };
+      // khora's surface organ, on the real text and on its shuffles: the share of multi-word name mentions that recur across sentences
+      const rec = text => { const all = hdSurfaceList(text).filter(x => /\s/.test(x.surface)).map(x => x.sentences || 0), tot = all.reduce((a, b) => a + b, 0); return tot ? Math.round(all.filter(v => v >= 2).reduce((a, b) => a + b, 0) / tot * 100) : 0; };
       const R = []; for (let t = 0; t < 5; t++) { const x = w.slice(); for (let i = x.length - 1; i > 0; i--) { sd = (sd * 48271) % 2147483647; const j = sd % (i + 1); [x[i], x[j]] = [x[j], x[i]]; } R.push(rec(x.join(' '))); }
       const real = rec(d.text), hi = Math.max(...R), mean = R.reduce((a, b) => a + b, 0) / R.length;
       nullByDoc[d.id] = real > hi ? 'above' : 'chance';

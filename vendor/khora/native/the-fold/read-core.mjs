@@ -229,6 +229,9 @@ function byteOffsets(str) {
   cum[str.length] = b; return cum;
 }
 
+/** A surface that is one token this read keeps the period of (its abbreviation set): a title or a unit, not a name on its own. */
+export const isAbbreviationSurface = (surface, set) => { const t = String(surface ?? "").trim().replace(/\.$/, ""); return !!t && !/\s/.test(t) && !!set && set.has(t); };
+
 const escapeRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 /** Every place a surface stands as a whole word, longest surface first, overlaps given to the longer. The index keeps a name in
  *  its folded form ("Mr Brown" for "Mr. Brown", a lower-cased "messrs"), so a token may carry its period in the text and a
@@ -313,7 +316,9 @@ export function readWith(text, { address = null, category = null, language = nul
     for (const r of byRef.values()) {
       const surface = out.index.represent?.(r.ref) ?? [...r.surfaces].sort((a, b) => b.length - a.length)[0];
       const spans = mentionsOf(norm, r.surfaces).map(([a, b]) => [raw(a), raw(b)]);
-      const being = [...r.surfaces].some((x) => capital.has(x));
+      // a word whose period is its own (this read's abbreviations: "Messrs.", "No.", "Ltd.") is a title, a unit or a suffix the
+      // capital tier caught, not a being; standing alone it is kept with the heard rows
+      const being = [...r.surfaces].some((x) => capital.has(x) && !isAbbreviationSurface(x, abbr.set));
       // mentionsAt: UTF-8 byte offsets, the weft's address unit; mentionSpans: [start, end) character spans into the text given
       const row = { ref: r.ref, surface, allSurfaces: [...r.surfaces], mentionsAt: spans.map(([a]) => bytes[a]), mentionSpans: spans, standing: being ? "referent" : "heard" };
       (being ? cast : heardRows).push(row);
