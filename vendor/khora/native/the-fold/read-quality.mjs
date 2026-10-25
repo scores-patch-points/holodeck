@@ -52,9 +52,12 @@ export function polarityLens(language = "en", { priorsDir = null } = {}) {
   cache.set(key, lens); return lens;
 }
 
+// a form is looked up as the prior's OWN key: "constructor" or "__proto__" in a text read Object.prototype's members, and a form
+// with no counts had no top class to take (both threw, 2026-10-25, on a Titanic text that writes "constructor")
 const classOf = (pos, w) => {
-  const c = pos?.forms?.[w]; if (!c) return "";
-  return Object.entries(c).sort((a, b) => b[1] - a[1] || (a[0] < b[0] ? -1 : 1))[0][0];
+  const forms = pos?.forms; if (!forms || !Object.hasOwn(forms, w)) return "";
+  const top = Object.entries(forms[w] ?? {}).sort((a, b) => b[1] - a[1] || (a[0] < b[0] ? -1 : 1))[0];
+  return top ? top[0] : "";
 };
 
 /** Tokens of a sentence in the shape the cue model reads ({ form, upos }), contractions split the way the treebank splits them. */

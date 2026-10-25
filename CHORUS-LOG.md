@@ -435,3 +435,12 @@ fast: 3 files · full suite 694 tests, the one failure main has (holodeck-byo-pa
 | Simon/Chekhov | untested | reading/layer-notes.js, reading/reader-view.js | noted | restored as they were before 1ccc618; checked in the browser: every tab renders, the POS switch re-runs the master read |
 | Marshall | P3 S0 | reading/demo.html | noted | the citations come back with the restored code; this diff writes no law |
 clean: Diaconis, Pearl, Ostrom, Frankfurt, Alexander, Greenberg, Kondo (the restored code as it stood; no second reader: every layer is the master's reading)
+
+## 2026-10-25 — reading a workspace in seconds: a pool of readers, one read per text, khora d941c007 (reader-pool, staged)
+fast: 8 files · full suite 694 tests, the one failure main has (holodeck-byo-panel) · vendor --check 176/176
+| lens | citation | file:line | verdict | one line |
+|---|---|---|---|---|
+| Feynman | numeric constant | index.html (HD_MW_N, the 250 ms batch) | noted | at most three readers and never more than the cores to spare; a quarter second coalesces landings into one save and one re-fold — declared, a page's pacing, no reading changes with either |
+| Holmes | identity | index.html (hdTextKey) | noted | one read is shared by texts with the same length, first and last 120 characters — the key hdMasterFor already used; two such texts that differ only in the middle would share a reading |
+| Diaconis | measurement | index.html (masterReads) | noted | a read-only count on window.__holodeck for timing; it reports, it decides nothing |
+clean: Dijkstra, Pearl, Ostrom, Frankfurt, Alexander (vendored khora prose)

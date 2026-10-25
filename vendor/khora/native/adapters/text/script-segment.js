@@ -39,15 +39,34 @@ export const isUnspacedScript = (s) => UNSPACED.test(String(s ?? ""));
 
 /** Does the prior's own vocabulary live in an unspaced script? (a share of its
  * forms, measured; the prior declares no such thing) */
+// The answer is a property of the prior, so it is measured once per prior object: a reading asks it again for every language
+// context it builds (one per text it is handed), and each asking scanned every form (16,654 in English's) — measured 2026-10-25 as
+// the largest single cost of a warm read of a 60,000-character document.
+const UNSPACED_PRIORS = new WeakMap();
 export function priorIsUnspaced(posPrior, { share = 0.5 } = {}) {
+  const memo = posPrior && typeof posPrior === "object" ? (UNSPACED_PRIORS.get(posPrior) ?? UNSPACED_PRIORS.set(posPrior, new Map()).get(posPrior)) : null;
+  if (memo?.has(share)) return memo.get(share);
   const forms = Object.keys(posPrior?.forms ?? {});
-  if (forms.length < 100) return false;
-  let n = 0;
-  for (const f of forms) if (isUnspacedScript(f)) n += 1;
-  return n / forms.length >= share;
+  let out = false;
+  if (forms.length >= 100) {
+    let n = 0;
+    for (const f of forms) if (isUnspacedScript(f)) n += 1;
+    out = n / forms.length >= share;
+  }
+  memo?.set(share, out);
+  return out;
 }
 
+// one segmenter per prior object: it is pure over the prior (its lexicon and the fragment test read only `posPrior.forms`)
+const SEGMENTERS = new WeakMap();
 export function makeSegmenter(posPrior) {
+  if (posPrior && typeof posPrior === "object" && SEGMENTERS.has(posPrior)) return SEGMENTERS.get(posPrior);
+  const seg = buildSegmenter(posPrior);
+  if (posPrior && typeof posPrior === "object") SEGMENTERS.set(posPrior, seg);
+  return seg;
+}
+
+function buildSegmenter(posPrior) {
   if (!priorIsUnspaced(posPrior)) return null;
   const lex = new Set();
   let maxLen = 1;

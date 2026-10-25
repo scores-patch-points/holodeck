@@ -39,39 +39,47 @@ import { sedimentPrior, predictNext, shapeOf, lcg, shuffled } from "./continuati
 
 const freeze = (v) => Object.freeze(v);
 
-/** surprises(events, { order, alphabetSize }) — each event's bits under the ground so far (the prior grows as it reads). */
+/** surprises(events, { order, alphabetSize }) — each event's bits under the ground so far (the prior grows as it reads).
+ *  An event's probability is continuation.js::predictNext's — the longest context the ground has seen, else the alphabet —
+ *  read for that one event: each context keeps its running total, so no distribution is built per event (it was, for every event
+ *  of the stream and of every null draw, over the whole alphabet when no context matched). Counts are integers, so `n / total` is
+ *  the same number predictNext gives. */
 export function surprises(events, { order, alphabetSize = null, prime = null } = {}) {
   if (!Number.isInteger(order) || order < 1) throw new TypeError("surprises: order is declared");
   const ev = (events ?? []).map(String);
   const out = new Float64Array(ev.length);
   const alphabet = new Map();
-  const tables = new Map();
+  let alphabetTotal = 0;
+  const tables = new Map();   // k -> Map(contextKey -> { m: Map(next -> count), total })
   for (let k = 1; k <= order; k += 1) tables.set(k, new Map());
-  const prior = { order, alphabet, tables };
   const floorOf = () => 1 / ((alphabetSize ?? alphabet.size) + 1);
-  // PRIME — the ground is never empty ("no view from nowhere"): a stream the caller received from a named giver (a register's own text) is
-  // sedimented FIRST, at every grain, and produces no output. The null below shuffles only the material, never the prime.
   const sediment = (seq, i) => {
-    alphabet.set(seq[i], (alphabet.get(seq[i]) ?? 0) + 1);
+    alphabet.set(seq[i], (alphabet.get(seq[i]) ?? 0) + 1); alphabetTotal += 1;
     for (let k = 1; k <= order && i - k >= 0; k += 1) {
       const ctx = seq.slice(i - k, i).join(" "), t = tables.get(k);
-      if (!t.has(ctx)) t.set(ctx, new Map());
-      const m = t.get(ctx); m.set(seq[i], (m.get(seq[i]) ?? 0) + 1);
+      let c = t.get(ctx); if (!c) { c = { m: new Map(), total: 0 }; t.set(ctx, c); }
+      c.m.set(seq[i], (c.m.get(seq[i]) ?? 0) + 1); c.total += 1;
     }
   };
+  // the probability predictNext(prior, context) gives event `e`, looked up as predictNext looks it up: its context key joins with
+  // NUL (continuation.js KEY), while this ground has always been sedimented with " ". So a context longer than one event never
+  // answers here, and the declared order acts as 1 — the surprise cut has read that way since it was written (recorded
+  // 2026-10-25; changing it moves the cut, which is a measurement to make, not part of this speed work).
+  const probOf = (ctx, e) => {
+    for (let k = Math.min(order, ctx.length); k >= 1; k -= 1) {
+      const c = tables.get(k).get(ctx.slice(ctx.length - k).join("\u0000"));
+      if (c && c.m.size) return (c.m.get(e) ?? 0) / c.total;
+    }
+    return alphabetTotal ? (alphabet.get(e) ?? 0) / alphabetTotal : 0;
+  };
+  // PRIME — the ground is never empty ("no view from nowhere"): a stream the caller received from a named giver (a register's own text) is
+  // sedimented FIRST, at every grain, and produces no output. The null below shuffles only the material, never the prime.
   if (prime && prime.length) { const pv = prime.map(String); for (let i = 0; i < pv.length; i += 1) sediment(pv, i); }
   for (let i = 0; i < ev.length; i += 1) {
-    const p = i ? predictNext(prior, ev.slice(Math.max(0, i - order), i)) : { dist: new Map() };
-    const prob = p.dist.get(ev[i]) ?? 0;
+    const prob = i ? probOf(ev.slice(Math.max(0, i - order), i), ev[i]) : 0;
     out[i] = -Math.log2(Math.max(prob, floorOf()));
     // sediment this event into the ground, at every grain
-    alphabet.set(ev[i], (alphabet.get(ev[i]) ?? 0) + 1);
-    for (let k = 1; k <= order && i - k >= 0; k += 1) {
-      const ctx = ev.slice(i - k, i).join(" ");
-      const t = tables.get(k);
-      if (!t.has(ctx)) t.set(ctx, new Map());
-      const m = t.get(ctx); m.set(ev[i], (m.get(ev[i]) ?? 0) + 1);
-    }
+    sediment(ev, i);
   }
   return out;
 }
