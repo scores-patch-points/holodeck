@@ -6,7 +6,7 @@
 // its reading-rules.js shim). Now every one of them asks this door for a prior BY NAME, and the door is the only code that knows
 // where the bytes are:
 //   · under Node it reads the home directory (KHORA_PRIORS_DIR overrides; a vendored tree with no janus beside it reads its own
-//     native/priors copy);
+//     native/priors copy, and one with both reads janus first, then its own copy for a name janus lacks);
 //   · in a page there is no file system, so the door fetches from the vendored native/priors beside this file. A read is
 //     synchronous (the organs read priors inside synchronous calls), so a page names the files it will read and awaits
 //     `preloadPriors(names)` once, before reading. reading-rules.json is preloaded here, because three modules read it at their own
@@ -34,7 +34,10 @@ function nodeHome() {
   const janus = path.join(root, "janus", "priors");
   const vendored = path.join(here, "..", "priors");
   const dir = process.env.KHORA_PRIORS_DIR || (fs.existsSync(janus) || !fs.existsSync(vendored) ? janus : vendored);
-  return { kind: "fs", dir, base: null, root, janus: path.join(root, "janus") };
+  // a vendored tree may carry some priors beside janus and others in its own native/priors (EO-terminal does): a name the home
+  // lacks is read from there. In khora itself native/priors is the janus home, so the two are one directory.
+  const also = !process.env.KHORA_PRIORS_DIR && dir !== vendored && fs.existsSync(vendored) && fs.realpathSync(vendored) !== fs.realpathSync(dir) ? vendored : null;
+  return { kind: "fs", dir, also, base: null, root, janus: path.join(root, "janus") };
 }
 
 const HOME = IS_NODE ? nodeHome() : { kind: "fetch", dir: null, base: new URL("../priors/", import.meta.url).href, root: null, janus: null };
@@ -44,9 +47,10 @@ export function readJsonAt(dir, name) {
   try { return JSON.parse(fs.readFileSync(path.join(dir, name), "utf8")); } catch { return null; }
 }
 
+const listAt = (dir) => { try { return dir ? fs.readdirSync(dir) : []; } catch { return []; } };
 const fsSource = () => ({
-  read: (name) => readJsonAt(HOME.dir, name),
-  list: () => { try { return fs.readdirSync(HOME.dir); } catch { return []; } },
+  read: (name) => readJsonAt(HOME.dir, name) ?? (HOME.also ? readJsonAt(HOME.also, name) : null),
+  list: () => [...new Set([...listAt(HOME.dir), ...listAt(HOME.also)])],
 });
 
 // the page's source: what was fetched, by name; a read of anything else is a recorded miss

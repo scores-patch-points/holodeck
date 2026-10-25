@@ -171,14 +171,15 @@ window.fetch = (u, o) => { net.requests.push(String(u)); return _fetch(u, o); };
 
 import { detectLang } from '../vendor/fold-chat/fold-chat-lang.js';
 import { htmlReading, csvReading } from '../holodeck-read.js';
-import { makeEngineRelationReader, loadPriors, blankMarkup } from '../holodeck-reader.js';
+import { makeEngineRelationReader, loadPriors, blankMarkup, readDocument, pageLexicon } from '../holodeck-reader.js';
+import { abbreviationsFor, priorsFor } from '../vendor/khora/native/the-fold/read-core.mjs';
+import { extractSurfacesHeard } from '../vendor/khora/native/the-fold/language-context.js';
 import { extractReadings, sniffExtraction } from './extract.js';
 import { joinItems, decideJunctions, applyJunctions } from './look-joins.js';
 import { mountMap } from '../holodeck-map.js';
 import { classifyWord, THRAX_MAP, THRAX_OUT_OF_SCOPE, THRAX_META, POS_PRIOR_META } from '../vendor/khora/native/adapters/text/wordclass.js';
 import { morphologyFromPrior, createLemmatizer, stemsOf } from '../vendor/khora/native/adapters/text/morphology.js';
-import { splitSentences, deriveAbbreviations } from '../vendor/khora/native/adapters/text/spans.js';
-import { makeLexicon, aliasJunctions, resolveAliases } from '../vendor/khora/native/organs/lexicon.js';
+import { splitSentences } from '../vendor/khora/native/adapters/text/spans.js';
 import { buildRows, sortRows, nextSort, tableHTML as refTableHTML } from './referent-table.js';
 import { scanPunctuation, loadPunctuation, moodAt, containersAt, cuesFromBlankLines, cuesFromLayout } from './punctuation.js';
 import { tokenize } from '../vendor/khora/native/organs/source.js';
@@ -305,9 +306,8 @@ let PRIORS = null, READER = null, LEXICON = null, LEXICON_LONGEST = 0;
 // THE HYPERLEXICON, open to every organ (reading/lexicon.js): its local giver is the English Wiktionary pack on this machine, read by the
 // Holodeck's own server (POST /lexicon). An organ asks only about a form the language's priors cannot settle; nothing leaves the machine.
 // one client per language the documents measure as: the giver's entries are filtered to that language's own words
-const askLexicon = async (forms, lang) => { const r = await fetch('/lexicon', { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ forms, lang }) }); return r.ok ? r.json() : null; };
-const HLEXS = new Map(), hlexFor = (lang) => { if (!HLEXS.has(lang)) HLEXS.set(lang, makeLexicon({ ask: askLexicon, lang })); return HLEXS.get(lang); };
-const HLEX = hlexFor('en');
+// one hyperlexicon for the page: the same giver the master pipeline asks (holodeck-reader.js::pageLexicon, the server's Wiktionary)
+const HLEX = pageLexicon('en');
 const LOOKUP = makeLookup({ local: HLEX });   // the page's dictionary parser reads English entries, so the class fill below is English only
 let LOOKUPS_ON = false;
 const knownWord = w => !!(LEXICON && LEXICON.has(String(w).toLowerCase()));
@@ -321,21 +321,15 @@ async function ready(){
   READER = await makeEngineRelationReader();
 }
 
-// ── build the trace: run the real organs, recording each transformation ──────
-// punctuation is settled at tokenization (reading/tokenize.js): POS is only ever asked about word forms
-let ABBREV = null;   // the splitter's own abbreviation knowledge for the text being read
-let ALIASES = new Map(), LEXSTEP = null;   // dotted forms the hyperlexicon resolved as aliases of other words, and what the consult did
+// ── the trace of ONE reading: khora's master pipeline (read-core.mjs::readDocument, through holodeck-reader.js) read the document;
+// this records what it read, as steps and as an append-only EOT ledger, and adds only what the page itself owns: the punctuation
+// scan (mood and the containers a proposition nests in) and the extraction record. No organ runs here a second time.
 let PUNCT = null;    // the language's punctuation norms (declared) and its abbreviation prior (measured): reading/punctuation.js
-const abbrevOf = text => deriveAbbreviations(String(text ?? '').replace(/\r\n/g, '\n').replace(/\r/g, '\n'));
-// the document's own abbreviations (the splitter's) joined to the language's measured ones: "Dr." is one word, its dot kept, wherever it comes from
-const abbrevAll = () => new Set([...(PUNCT ? PUNCT.abbreviations : []), ...(ABBREV || []), ...ALIASES.keys()].map(x => String(x).toLowerCase()));
-// the splitter compares case-sensitively ("Dr"), the measured prior is lower case: hand it every case a title takes
-const abbrevForSplitter = () => new Set([...abbrevAll()].flatMap(a => [a, a.charAt(0).toUpperCase() + a.slice(1), a.toUpperCase()]));
-const scanOpts = (extra = {}) => ({ norms: PUNCT && PUNCT.norms, abbreviations: abbrevAll(), ...extra });
+let ABBR_NOW = new Set();   // the abbreviations the master's cut used for the text on screen (lower case), shared with the punctuation scan
+const scanOpts = (extra = {}) => ({ norms: PUNCT && PUNCT.norms, abbreviations: ABBR_NOW, ...extra });
 const wordsIn = (text, base) => scanPunctuation(text, scanOpts({ base })).words.map(({ w, s, e }) => ({ w, s, e }));
-const WORDS_ANIMATED = 700;
 
-function buildTrace(doc, clean, claims, features, extraction){
+function traceOf(doc, clean, W, claims, features, extraction){
   const ev = []; const t0 = performance.now();
   const push = (stage, kind, msg, extra) => { ev.push({ i:ev.length, t:performance.now() - t0, stage, kind, msg, ...(extra || {}) }); return ev.length - 1; };
   const analysis = doc.analysis;
@@ -348,160 +342,61 @@ function buildTrace(doc, clean, claims, features, extraction){
     extraction.readings.forEach((r, i) => push('extract', r.ok ? 'reading' : 'reading-failed', r.ok
       ? `reading ${i + 1}: ${r.extractor} → reads as words ${(r.sniff.reads * 100).toFixed(0)}% · ${r.sniff.verdict}${i === extraction.collapsed ? ' — COLLAPSED as the reading' : ''}`
       : `reading ${i + 1}: ${r.extractor} → not available (${r.why})`, { s:0, e:0, data:{ reading: r, i } }));
-    { const r = extraction.readings[extraction.collapsed]; (r && r.junctions || []).forEach((jx) => push('extract', 'startle', `startle on page ${jx.page}: ${jx.why}. Held: “${jx.spaced}” and “${jx.joined}”. Read as ${jx.decision === 'join' ? '“' + jx.joined + '”' : '“' + jx.spaced + '”'}${jx.flipped ? ' (flipped by you)' : ''} — ${jx.by}`, { s:0, e:0, data:{ junction: jx } })); }
-    if (extraction.revisions && extraction.revisions.length) push('extract', 'revision', `the collapse was revised ${extraction.revisions.length}× — append-only: ${extraction.revisions.map(v => v.extractor).join(' → ')}`, { s:0, e:0 });
   }
-
   const hash = sha256Hex(analysis);
-  const srcKey = sha256Hex(analysis).slice(0, 20);
+  const srcKey = hash.slice(0, 20);
   push('bytes', 'source', `${esc(doc.label)} · ${nBytes.toLocaleString()} bytes utf-8 · sha-256 ${hash.slice(0,20)}…`, { s:0, e:analysis.length });
+  push('read', 'master', `read by khora's master pipeline (read-core.mjs::readDocument) · language ${W.language && W.language.stem} (${W.language && W.language.source}) · ${(W.abbreviations && W.abbreviations.n) || 0} dotted forms kept as words`, { s:0, e:analysis.length, data:{ language:W.language, abbreviations:W.abbreviations } });
+  const X = W.aliasReport || {};
+  if (X.gap) push('lexicon', 'gap', `the hyperlexicon was not reached — ${X.gap}; the cut used the priors and the text's own`, { s:0, e:0, data:X });
+  else (X.rows || []).forEach(a => { const at = clean.indexOf(a.form); push('lexicon', a.kept ? 'alias' : 'alias-refused', a.kept ? `“${a.form}” is one word: the hyperlexicon lists it as ${a.of.map(o => `“${o}”`).join(' and ')} — no sentence ends inside it` : `“${a.form}” is listed, but ${a.why}`, { s:at, e:at >= 0 ? at + a.form.length : 0, data:a }); });
+  (W.gaps || []).forEach(g => push('read', 'gap', `${g.gap}: ${g.detail}`, { s:0, e:0, data:g }));
 
-  push('decode', 'text', `decoded to ${analysis.length.toLocaleString()} characters — the address space is BYTES, the reading is in characters`, { s:0, e:analysis.length });
-
-  const blanks = [];
-  if (features.furniture !== false) for (let i = 0; i < analysis.length; i++) if (analysis[i] !== ' ' && clean[i] === ' ') blanks.push(i);
-  const blankRuns = [];
-  for (const i of blanks){ const last = blankRuns[blankRuns.length - 1]; if (last && last.e === i) last.e = i + 1; else blankRuns.push({ s:i, e:i + 1 }); }
-  push('furniture', 'blank', features.furniture === false
-    ? `furniture layer OFF — the raw material goes to the reader as it stands (markup folded as content, disclosed)`
-    : blanks.length ? `blanked ${blanks.length.toLocaleString()} characters of markup/CSS/URL furniture to spaces — every offset is unchanged` : `no markup furniture found — this material is already prose, read as it stands`,
-    { s:0, e:analysis.length, data:{ runs:blankRuns } });
-
-  ABBREV = abbrevOf(clean);
-  // ── the hyperlexicon: what the priors could not settle, and what its local giver said ──
-  { const X = LEXSTEP;
-    if (!X || !X.on) push('lexicon', 'off', `hyperlexicon layer OFF — nothing is looked up; a dotted form the priors do not know may end a sentence, and a form the class prior lacks stays a gap`, { s:0, e:0, data:{ off:true } });
-    else if (X.gap) push('lexicon', 'gap', `the hyperlexicon was not reached — ${X.gap}; the reading carries on with the priors alone`, { s:0, e:0, data:X });
-    else {
-      push('lexicon', 'ask', `asked the hyperlexicon about ${X.asked.toLocaleString()} form${X.asked === 1 ? '' : 's'} the priors could not settle — ${X.junctions} possible sentence end${X.junctions === 1 ? '' : 's'} after a dotted form, ${X.posAsked} form${X.posAsked === 1 ? '' : 's'} with no class — ${X.giver.name}, the ${X.giver.snapshot} dump, on this machine · ${Math.round(X.ms)} ms`, { s:0, e:0, data:{ asked:X.asked, giver:X.giver } });
-      for (const a of X.aliases){ const at = clean.indexOf(a.form); push('lexicon', a.kept ? 'alias' : 'alias-refused', a.kept
-        ? `“${a.form}” is one word: the hyperlexicon lists it as a form of ${a.of.map(o => `“${o}”`).join(' and ')} — the period belongs to the word, so no sentence ends inside it (${a.n} place${a.n === 1 ? '' : 's'})`
-        : `“${a.form}” is listed as a form of ${a.of.map(o => `“${o}”`).join(' and ')}, but ${a.why} — so its period may still end a sentence`, { s:at, e:at >= 0 ? at + a.form.length : 0, data:a }); }
-      for (const f of X.posFound){ const at = clean.indexOf(f.form); push('lexicon', 'class', `“${f.form}” → ${f.upos.length ? f.upos.join(' / ') : 'listed, with no class the reader maps'} — attested by ${X.giver.name}, a witness for the class layer`, { s:at, e:at >= 0 ? at + f.form.length : 0, data:f }); }
-    }
-  }
-  // the splitter and the punctuation scan share ONE abbreviation knowledge: the language's measured prior joined to this text's own
-  const sents = splitSentences(clean, { abbreviations: abbrevForSplitter() });
-  sents.forEach((s, i) => push('statement', 'statement',
-    `statement ${i + 1} of ${sents.length} · bytes ${charToByte(analysis, s.offset)}–${charToByte(analysis, s.offset + s.text.length)} · “${clamp(s.text.replace(/\s+/g,' ').trim(), 74)}”`,
-    { s:s.offset, e:s.offset + s.text.length, data:{ order:i, len:sents.length } }));
-
-  const words = [];
-  const punct = [];   // PUNCT/SYM by Unicode category: their own tokens, never sent to the class prior
-  // the whole text is scanned once for punctuation: every mark kept with its role, the sentences with their mood, the containers a proposition nests in,
-  // and — for a scan, or a text with line structure — the boundaries the page's own layout supplies
+  // the statements are the master's cut
+  const sents = (W.sentences || []).map((x, i) => ({ text:x.text, offset:x.offset, order:i }));
+  push('statement', 'statements', `${sents.length} statements, cut by khora's one splitter with this read's abbreviations`, { s:0, e:0 });
+  // the page's own punctuation scan: every mark kept with its role, the mood of each sentence, the containers around a proposition
   const SCAN = scanPunctuation(clean, scanOpts({ cues: [...cuesFromBlankLines(clean), ...(doc.layout ? cuesFromLayout(doc.layout, clean) : [])] }));
-  for (const s of sents) for (const w of wordsIn(s.text, s.offset)) words.push(w);
-  for (const p of SCAN.punct) punct.push(p);
-  { const P = SCAN.structure, moods = {}; P.sentences.forEach(x => { moods[x.mood] = (moods[x.mood] || 0) + 1; });
-    push('punct', 'scan', `${SCAN.punct.length} marks kept · ${P.sentences.length} sentences (${Object.entries(moods).map(([k, v]) => v + ' ' + k).join(', ') || 'none'}) · ${P.containers.length} container${P.containers.length === 1 ? '' : 's'} · ${P.notes.abbreviations} abbreviation dot${P.notes.abbreviations === 1 ? '' : 's'} attached · norms for “${P.notes.lang || 'default'}” ${P.notes.normsKnown ? 'declared' : 'not declared — default used'}`, { s:0, e:0, data:{ moods } });
-    P.containers.slice(0, 40).forEach(c => push('punct', 'container', `${c.kind} ${c.mark} · depth ${c.depth}${c.mood ? ' · ' + c.mood : ''} · “${clamp(clean.slice(c.s, c.e).replace(/\s+/g, ' '), 56)}”`, { s:c.s, e:c.e, data:{ container:c } }));
-    P.notes.unclosed.forEach(u => push('punct', 'gap', `an opening ${u.w} that never closes — kept as a gap, not guessed at`, { s:u.s, e:u.s + 1, data:u })); }
+  const words = sents.flatMap(x => wordsIn(x.text, x.offset));   // the forms inside the master's sentences
+  const punct = SCAN.punct;
+  push('punct', 'scan', `${SCAN.punct.length} marks kept · ${SCAN.structure.containers.length} containers`, { s:0, e:0 });
 
-  const shown = words.slice(0, WORDS_ANIMATED);
-  const toks = tokenize(clean);
-  push('token', 'vocabulary', `${words.length.toLocaleString()} form occurrences · ${new Set(toks).size.toLocaleString()} distinct forms in the reader's own vocabulary`, { s:0, e:0 });
-  shown.forEach(w => push('token', 'word', `“${w.w}” · bytes ${charToByte(analysis, w.s)}–${charToByte(analysis, w.e)}`, { s:w.s, e:w.e, data:{ w:w.w } }));
-  if (words.length > WORDS_ANIMATED) push('token', 'cap', `+${(words.length - WORDS_ANIMATED).toLocaleString()} more form occurrences — the per-form layers animate the first ${WORDS_ANIMATED.toLocaleString()} (the reading covers all)`, { s:0, e:0 });
-
-  const pos = features.pos === false ? null : PRIORS.posPrior;
-  // the document's own definitions and typography settle capitalised forms the priors cannot place (candidates, with ranges)
-  const DOCC = pos ? documentClassifier(clean, { posPrior: pos, lemmatizer: PRIORS.lemmatizer, lookups: features.lexicon === false ? null : LOOKUP.cache }) : null;
-  let gaps = 0, ambiguous = 0, classified = 0;
-  shown.forEach(w => {
-    if (!pos){ push('grammar', 'off', `“${w.w}” → POS layer OFF — no class prior is read; the form is carried as a bare string`, { s:w.s, e:w.e, data:{ w:w.w, found:false, off:true } }); return; }
-    const c = DOCC ? DOCC(w.w) : classifyForm(w.w, { posPrior: pos, lemmatizer: PRIORS.lemmatizer });
-    if (!c.found){ gaps++; push('grammar', 'gap', `“${w.w}” → no entry in the class prior — a typed gap, never a guess`, { s:w.s, e:w.e, data:{ w:w.w, found:false } }); return; }
-    classified++;
-    if (c.candidates.length > 1) ambiguous++;
-    const parts = c.candidates.slice(0, 3).map(k => `${k.upos} ${k.share == null ? 'attested' : (k.share * 100).toFixed(0) + '%'}→${k.thraxClass || '—'}`).join(' · ');
-    push('grammar', 'class', `“${w.w}” → ${c.via.length ? `(looked up as “${c.form}” — ${c.via.map(v => v.step).join(' + ')}) ` : ''}${parts}${c.inferred ? ' — INFERRED from the act, not attested for this form' : ''}${c.candidates.length > 1 ? ' — ambiguous, left unresolved' : ''}`, { s:w.s, e:w.e, data:{ w:w.w, found:true, inferred:!!c.inferred, candidates:c.candidates.slice(0,3), total:c.total, form:c.form, via:c.via, attested:c.attested || null, act:c.act || null, evidence:c.evidence ? c.evidence.map(x => ({ kind:x.kind, at:x.at })) : null } });
-  });
-
-  const lem = features.morph === false ? null : PRIORS.lemmatizer;
-  let acts = 0, morphGaps = 0;
-  shown.forEach(w => {
-    if (!lem){ push('morph', 'off', `“${w.w}” → morphology layer OFF — no lemma is recovered; the form stays itself`, { s:w.s, e:w.e, data:{ w:w.w, lemmas:[], stems:[], off:true } }); return; }
-    const lf = lookupForm(w.w); const lemmas = [...lem.lemmasOf(lf)]; const stems = [...stemsOf(lf)];
-    if (!lemmas.length && !stems.length){ morphGaps++; push('morph', 'gap', `“${w.w}” → no act recovered — a form the prior does not know and the rule cannot recover stays a form`, { s:w.s, e:w.e, data:{ w:w.w, lemmas:[], stems:[] } }); return; }
-    acts++;
-    push('morph', 'act', `“${w.w}” → act {${lemmas.slice(0,3).map(l=>`“${l}”`).join(', ') || '—'}}${stems.length ? ` · rule {${stems.slice(0,2).join(', ')}}` : ''}${lemmas.length > 1 ? ' — a SET, never one chosen' : ''}`, { s:w.s, e:w.e, data:{ w:w.w, lemmas:lemmas.slice(0,4), stems:stems.slice(0,3) } });
-  });
-
-  // stance layer: count + name the positions the stance class carried
-  const stanceClaims = claims.filter(c => stanceClass(c.label));
-  push('stance', features.stance === false ? 'off' : 'on',
-    features.stance === false
-      ? `stance layer OFF — a position ("is pro", "supports") is not equated with its class; only the base reader's own verbs bind`
-      : stanceClaims.length
-        ? `${stanceClaims.length} position${stanceClaims.length === 1 ? '' : 's'} read as ${[...new Set(stanceClaims.map(c => stanceClass(c.label)))].join(' / ')} — "is pro" binds a source's "in support of" without either label rewritten`
-        : `no stance position in this material — the layer had nothing to carry`,
-    { s:0, e:0, data:{ n:stanceClaims.length } });
-
-  // ── referents ──
-  // The replay's referents are the ends of the relations read, so F1 here is read off F2. Which of them the name rule (F1's own
-  // route, cast.js: capitalised runs the text repeats) would have admitted is measured, and every other one is recorded as a
-  // REVISION: F2 added a referent F1 never had. The record is appended (the ledger's revise event), never written over.
-  // if the name rule itself cannot run, no revision is claimed: a failure of the route is not a finding about F2
-  let nameRule = null;
-  try { nameRule = [...new Set(discoverReferents(extractSurfaces(splitSentences(clean, { abbreviations: abbrevForSplitter() }), {}), {}).events.map(x => x.surface))]; } catch (e) { console.warn('the name rule did not run; no F2→F1 revision is recorded', e); }
-  const byRule = k => !nameRule || nameRule.includes(k) || nameRule.some(sf => { try { return namesCorefer(k, sf); } catch (e) { return false; } });
+  // the referents are the master's cast: the beings its edges were resolved against, each mention addressed (bytes) by the reader
   const refs = new Map();
-  for (const c of claims) for (const nm of [c.end1, c.end2]) {
-    if (!nm) continue; const k = String(nm);
-    const r = refs.get(k) || { n:k, c:0, s:c.s, e:c.e, b0:c.b0, byRule: byRule(k) };
-    r.c++; if (c.s < r.s) { r.s = c.s; r.e = c.e; r.b0 = c.b0; }
-    refs.set(k, r);
+  for (const c of (W.cast || [])) {
+    const sp = (c.mentionSpans || [])[0] || [0, 0];
+    refs.set(c.surface, { n:c.surface, c:(c.mentionSpans || []).length, s:sp[0], e:sp[1], b0:(c.mentionsAt || [])[0] ?? null, ref:c.ref });
   }
-  [...refs.values()].sort((a,b) => a.s - b.s).forEach(r => { r.ev = push('referent', 'name',
-    `referent “${r.n}” — first read at byte ${r.b0 == null ? '—' : r.b0} · stands in ${r.c} relation${r.c>1?'s':''} · ${r.byRule ? 'admitted by the name rule' : 'NOT a name the rule admits: it will come from a relation’s end (F2 revising F1)'}`, { s:r.s, e:r.e, data:r }); });
-
-  // ── relations ──
-  claims.forEach(c => {
-    const v = c.verdict, ri = ev.length;
-    push('relation', v, `${c.end1} —${c.label}→ ${c.end2} · standing: ${v === 'bound' ? 'read' : v === 'beyond-reach' ? 'beyond reach' : v === 'unbound' ? 'unbound' : v === 'contradicted' ? 'contradicted' : 'unheard'} · polarity ${c.polarity} · byte ${c.b0 == null ? '—' : c.b0}–${c.b1} · tense ${c.tense.v}`,
-      { s:c.s, e:c.e, data:c });
-    for (const nm of [c.end1, c.end2]){ const r = refs.get(String(nm)); if (!r || r.byRule || r.revised) continue; r.revised = true;
-      push('relation', 'revision', `↺ “${r.n}” — a referent the name rule had not admitted, added from this relation’s end: F2 revises F1`, { s:c.s, e:c.e, data:{ revises:r.ev, by:ri, from:'F2', to:'F1', n:r.n } }); }
-  });
-
-  // ── render ──
-  claims.slice(0, 40).forEach(c => push('render', 'order', `“${ORDERS[0].line(c)}” — English SVO · the same triple is also read SOV and VSO`, { s:c.s, e:c.e, data:c }));
+  push('referent', 'cast', `${refs.size} beings in the reader's own cast`, { s:0, e:0 });
+  claims.forEach(c => push('relation', c.verdict, `${c.end1} —${c.label}→ ${c.end2} · ${c.verdict}`, { s:c.s, e:c.e, data:c }));
 
   // ── EOT / ledger ──
   const led = new EotLedger({ artifact:'reading-demo', encoding:'utf8' });
   const srcId = led.source({ kind:'document', locator:srcKey, anchor:byteRange(0, nBytes), meta:{ label:doc.label } });
   push('ledger', 'source', `source stored once under its own bytes → ${srcId} · anchor byteRange(0, ${nBytes})`, { s:0, e:0, data:{ srcId } });
-  // a scan: every layer of reading it, from the pixels up, goes into the same log (scan-ledger.js); the layers above are recorded by the reader as they settle
+  // a scan: every layer of reading it, from the pixels up, goes into the same log (scan-ledger.js)
   const scanned = doc.layout ? recordOcr(led, srcId, doc.layout) : null;
-  if (extraction) led.event({ stage:'extract', source_id:srcId, ...(scanned ? { parent:scanned.last } : {}), transform:'container→readings', detail:{ readings: extraction.readings.map(r => r.ok ? { extractor:r.extractor, reads:r.sniff.reads, verdict:r.sniff.verdict } : { extractor:r.extractor, skipped:r.why }), collapsed: extraction.collapsed, floor: extraction.floor, revisions: extraction.revisions || [], junctions: ((extraction.readings[extraction.collapsed] || {}).junctions || []).map((jx) => ({ page: jx.page, a: jx.a, b: jx.b, spaced: jx.spaced, joined: jx.joined, scores: jx.scores, decision: jx.decision, by: jx.by, flipped: jx.flipped || 0 })) } });
-  const readEvt = led.event({ stage:'read', source_id:srcId, ...(scanned ? { parent:scanned.last } : {}), transform:'bytes→statements' });
-  push('ledger', 'event', `${readEvt} · stage read · transform bytes→statements`, { s:0, e:0, data:{ id:readEvt } });
-  led.event({ stage:'arrange', source_id:srcId, parent:readEvt, transform:'statements→tokens' });
-  if (LEXSTEP && LEXSTEP.on && !LEXSTEP.gap) LEXSTEP.aliases.filter(a => a.kept).forEach(a => led.event({ stage:'lexicon', source_id:srcId, parent:readEvt, transform:'form→alias', detail:{ form:a.form, of:a.of, places:a.n, giver:LEXSTEP.giver } }));
-  led.event({ stage:'classify', source_id:srcId, parent:readEvt, transform:'tokens→classes', detail:{ giver:features.pos === false ? null : POS_PRIOR_META.giver, ...(LOOKUP.count() ? { witnesses:`hyperlexicon — ${LOOKUP.count()} forms looked up, candidates not givers` } : {}) } });
+  if (extraction) led.event({ stage:'extract', source_id:srcId, ...(scanned ? { parent:scanned.last } : {}), transform:'container→readings', detail:{ readings: extraction.readings.map(r => r.ok ? { extractor:r.extractor, reads:r.sniff.reads, verdict:r.sniff.verdict } : { extractor:r.extractor, failed:r.why }), collapsed:extraction.collapsed } });
+  const readEvt = led.event({ stage:'read', source_id:srcId, ...(scanned ? { parent:scanned.last } : {}), transform:'bytes→statements', detail:{ reader:'khora read-core.mjs::readDocument', language:W.language, abbreviations:W.abbreviations } });
+  if (!X.gap) (X.rows || []).filter(a => a.kept).forEach(a => led.event({ stage:'lexicon', source_id:srcId, parent:readEvt, transform:'form→alias', detail:{ form:a.form, of:a.of, places:a.n, giver:X.giver } }));
   claims.forEach(c => {
     const id = led.event({ stage:'bind', source_id:srcId, parent:readEvt, unit:'relation',
       range:byteRange(c.b0 ?? 0, (c.b0 ?? 0) + (c.span ? utf8Len(c.span) : 0)),
       transform:'clause→relation', detail:{ end1:c.end1, label:c.label, end2:c.end2, polarity:c.polarity, verdict:c.verdict, confidence:confidenceOf(c).pct } });
-    push('ledger', 'bind', `${id} · bind clause→relation · byte ${c.b0 ?? 0}–${(c.b0 ?? 0) + (c.span ? utf8Len(c.span) : 0)} · “${c.end1}—${c.label}→${c.end2}”`, { s:c.s, e:c.e, data:{ id } });
-  });
-  [...refs.values()].filter(r => r.revised).forEach(r => {
-    const id = led.event({ stage:'revise', source_id:srcId, parent:readEvt, transform:'relation→referent', detail:{ of:r.n, from:'F2', to:'F1', note:'an end slot held a surface the name rule had not admitted; the relation layer added it as a referent' } });
-    push('ledger', 'revise', `${id} · revise relation→referent · “${r.n}” — F2 revised F1, appended`, { s:r.s, e:r.e, data:{ id, of:r.n } });
+    push('ledger', 'bind', `${id} · bind clause→relation · “${c.end1}—${c.label}→${c.end2}”`, { s:c.s, e:c.e, data:{ id } });
   });
   const eot = led.eot({ root:readEvt });
-  push('ledger', 'eot', `append-only Provenance@${eot.schema || 2} emitted · ${led.events.length} events · ids recomputable by anyone (evt_ + first 20 hex of sha256(value))`, { s:0, e:0 });
+  push('ledger', 'eot', `append-only Provenance@${eot.schema || 2} emitted · ${led.events.length} events`, { s:0, e:0 });
 
-  // occurrences: name → the statements it was read in (drives the solar-system
-  // bonds, the witness list and the Sources layer — all real, from the reading)
+  // occurrences: name → the statements it was read in
   const occ = new Map();
   claims.forEach((c, i) => { for (const nm of [c.end1, c.end2]) { if (!nm) continue; const k = String(nm);
     const list = occ.get(k) || (occ.set(k, []), occ.get(k));
     list.push({ doc:'source', id:i, s:c.s, e:c.e, t:c.span || analysis.slice(c.s, c.e) }); } });
 
-  return { ev, claims, refs, occ, words, punct, punctuation:SCAN.structure, shown, sents, blanks:blankRuns, gaps, ambiguous, toks, nBytes, hash, srcId, led, eot, scanPages:scanned ? scanned.pages : null, scanOcr:scanned ? scanned.last : null, doc, features, extraction, net:{ ...net }, totalMs:performance.now() - t0,
-    stats:{ words:words.length, classified, gaps, ambiguous, acts, morphGaps, positions:stanceClaims.length, blanked:blanks.length } };
+  return { ev, claims, refs, occ, words, punct, punctuation:SCAN.structure, sents, toks:words.map(w => String(w.w).toLowerCase()), gaps:null, ambiguous:null, nBytes, hash, srcId, led, eot,
+    scanPages:scanned ? scanned.pages : null, scanOcr:scanned ? scanned.last : null, doc, features, extraction, net:{ ...net }, totalMs:performance.now() - t0, weft:W,
+    stats:{ words:words.length, blanked:0 } };
 }
 
 // ── the OUTPUT: the reading as text (each sentence diagrammed) and as JSON ────
@@ -626,9 +521,10 @@ function startTimeline(T){
     try {
       const pos = T.feat.pos === false ? null : PRIORS.posPrior, R = T.R;
       const memo = new Map();   // one classification cache for every prefix of this replay
-      ABBREV = abbrevOf(T.clean);
+      // the replay reads each prefix with the master's own organs: its cut (this read's abbreviations), its surfaces (the heard tier
+      // included), its pronoun resolver, and the very reader the master read the whole text with
       T.timeline = buildReadingTimeline(T.clean, {
-        hash: sha256, diaNorm, splitSentences: (t, o = {}) => splitSentences(t, { ...o, abbreviations: o.abbreviations ?? abbrevForSplitter() }), wordsIn, extractSurfaces, discoverReferents, resolvePronouns,
+        hash: sha256, diaNorm, splitSentences: (t, o = {}) => splitSentences(t, { ...o, abbreviations: o.abbreviations ?? T.abbreviations }), wordsIn, extractSurfaces: extractSurfacesHeard, discoverReferents, resolvePronouns,
         classifyAt: prefix => pos ? documentClassifier(prefix, { posPrior: pos, lemmatizer: PRIORS.lemmatizer, lookups: T.feat.lexicon === false ? null : LOOKUP.cache, memo }) : (f => classifyForm(f, { posPrior: null })),
         readClaims: prefix => mapClaims(R([{ ref:'source', text:prefix }]).read(prefix).claims, prefix),
       }, { maxSnapshots: 40 });
@@ -637,39 +533,26 @@ function startTimeline(T){
   }, 40);
 }
 
-// Ask the hyperlexicon about what the priors cannot settle: the dotted forms standing at a possible sentence end that neither the
-// language's prior nor this text's own evidence knows, and the word forms the class prior cannot place. One batch, local only.
-async function consultLexicon(clean, feat){
-  // the language the document measured as (fold-chat-lang, confident only); the class fill uses the English parser, so it runs for English only
-  const lang = PRIORS.lang && PRIORS.lang.confident && PRIORS.lang.lang ? PRIORS.lang.lang : 'en', LEX = hlexFor(lang);
-  const step = { on: feat.lexicon !== false, lang, junctions: 0, asked: 0, aliases: [], posAsked: 0, posFound: [], ms: 0, gap: null, giver: null };
-  if (!step.on) return step;
-  const t0 = performance.now();
-  const junc = aliasJunctions(clean, abbrevAll());
-  step.junctions = [...junc.values()].reduce((a, b) => a + b, 0);
-  const pos = PRIORS.posPrior, gapForms = new Set();
-  if (pos && lang === 'en') for (const w of new Set(clean.match(/\p{L}[\p{L}'’-]*\p{L}/gu) || [])){
+// THE CLASS FILL: a word form the class prior cannot place is asked of the same hyperlexicon the master pipeline asks (the page's
+// local giver, no network); what it lists is a witness the replay's classifier reads (LOOKUP's cache). English only: the page's
+// dictionary parser reads English entries.
+async function classFill(clean, feat){
+  const lang = PRIORS.lang && PRIORS.lang.confident && PRIORS.lang.lang ? PRIORS.lang.lang : 'en', pos = PRIORS.posPrior;
+  if (feat.lexicon === false || !pos || lang !== 'en') return { asked:0, found:[] };
+  const gap = new Set();
+  for (const w of new Set(clean.match(/\p{L}[\p{L}'’-]*\p{L}/gu) || [])){
     if (w.length < 3) continue;
     let c = null; try { c = classifyForm(w, { posPrior: pos, lemmatizer: PRIORS.lemmatizer }); } catch (e) {}
-    if (!c || !c.found) gapForms.add(w);
+    if (!c || !c.found) gap.add(w);
   }
-  const ask = new Set([...junc.keys(), ...gapForms, ...[...gapForms].map(w => w.toLowerCase())]);
-  step.asked = ask.size;
-  await LEX.want(ask);
-  step.giver = LEX.giver;
-  if (!step.giver){ step.gap = 'no local lexicon answered (the Holodeck server reads the Wiktionary pack in ~/.cache/live_priors/wiktionary)'; step.ms = performance.now() - t0; return step; }
-  // an ALIAS: the giver lists the dotted form as a form of another word, and this text never writes the token without its period
-  step.aliases = resolveAliases(LEX, junc, clean);
-  for (const a of step.aliases) if (a.kept) ALIASES.set(a.form.slice(0, -1).toLowerCase(), a.of);
-  // a missing class: what the dictionary lists, nominated to the hyperlexicon as a witness (the local giver only, no network)
-  step.posAsked = gapForms.size;
-  for (const w of gapForms){
-    if (!LEX.get(w) && !LEX.get(w.toLowerCase())) continue;
+  await HLEX.want(new Set([...gap, ...[...gap].map(w => w.toLowerCase())]));
+  const found = [];
+  for (const w of gap){
+    if (!HLEX.get(w) && !HLEX.get(w.toLowerCase())) continue;
     const rec = await LOOKUP.look(w, { only:['dictionary'], network:false });
-    if (rec && rec.dictionary && rec.dictionary.found) step.posFound.push({ form: w, upos: rec.dictionary.upos || [] });
+    if (rec && rec.dictionary && rec.dictionary.found) found.push({ form:w, upos:rec.dictionary.upos || [] });
   }
-  step.ms = performance.now() - t0;
-  return step;
+  return { asked:gap.size, found };
 }
 
 async function read(text, label, feat, opt = {}){
@@ -685,15 +568,16 @@ async function read(text, label, feat, opt = {}){
   // the rail's switches, under the names the reader takes (holodeck-reader.js reads posPrior · morphology · stance · nounPhraseSubjects · phrasalPredicates):
   // until now only `stance` reached it, so switching POS, morphology, noun-phrase subjects or phrasal predicates off re-ran the display and not the relations
   const readerFeatures = { posPrior: feat.pos !== false, morphology: feat.morph !== false, stance: feat.stance !== false, nounPhraseSubjects: feat.npSubj !== false, phrasalPredicates: feat.phrasal !== false };
-  ABBREV = abbrevOf(clean); ALIASES = new Map(); LEXSTEP = await consultLexicon(clean, feat);
-  const abbreviations = abbrevForSplitter();
-  const foreign = PRIORS.posPrior !== PRIORS.posEng && PRIORS.langIso3 ? { iso3: PRIORS.langIso3, posPrior: PRIORS.posPrior } : null, R = await makeEngineRelationReader({ features: readerFeatures, foreign, abbreviations });
-  let read0 = { claims: [] };
-  try { read0 = R([{ ref:'source', text: clean }]).read(clean); } catch (e) { console.error(e); }
-  const claims = mapClaims(read0.claims, analysis);
+  // THE MASTER PIPELINE: khora's read-core.mjs::readDocument (holodeck-reader.js hands it this page's priors, hyperlexicon giver
+  // and organs). One read: the language, the cut, the cast, the relations, and the claims read back against the material.
+  const foreign = PRIORS.posPrior !== PRIORS.posEng && PRIORS.langIso3 ? { iso3: PRIORS.langIso3, posPrior: PRIORS.posPrior } : null;
+  const W = await readDocument(clean, { features: readerFeatures, foreign, lexicon: feat.lexicon === false ? null : undefined, address: lastLabel });
+  ABBR_NOW = new Set([...(W.abbreviationSet || [])].map(a => String(a).toLowerCase()));
+  const claims = mapClaims(W.claims || [], analysis);
   const doc = { label: lastLabel, analysis, truncated, layout: opt.layout || (opt.keep && opt.keep.layout) || null };
-  const T = buildTrace(doc, clean, claims, feat, opt.extraction || null);
-  T.clean = clean; T.R = R; T.feat = feat; T.lexicon = LEXSTEP;
+  const T = traceOf(doc, clean, W, claims, feat, opt.extraction || null);
+  T.clean = clean; T.R = W.reader; T.feat = feat; T.lexicon = W.aliasReport; T.abbreviations = W.abbreviationSet;
+  T.classFill = await classFill(clean, feat);
   // a proposition is held in the MOOD of its sentence (a question asks; it does not assert) and NESTED in the containers around it (speech, aside), in order
   T.claims.forEach(c => { if (c.located){ c.mood = moodAt(T.punctuation, c.s); c.holds = containersAt(T.punctuation, c.s).map(k => ({ kind:k.kind, mark:k.mark, mood:k.mood })); } });
   startTimeline(T);
@@ -742,7 +626,7 @@ async function pdfText(buf){
 // layer has established (namesCorefer). Both readings stay on the record (reading.before is the PDF's own text); a decision can be flipped.
 function junctionCtx(text){
   const counts = new Map(); for (const w of text.toLowerCase().match(/[\p{L}\p{N}'’-]+/gu) || []) counts.set(w, (counts.get(w) || 0) + 1);
-  let names = []; try { names = extractSurfaces(splitSentences(text, { abbreviations: abbrevForSplitter() })).filter((x) => x.sentences >= 2).map((x) => x.surface); } catch (e) {}
+  let names = []; try { names = extractSurfacesHeard(splitSentences(text, { abbreviations: abbreviationsFor(text, { priors: priorsFor('eng') }).set })).filter((x) => x.sentences >= 2).map((x) => x.surface); } catch (e) {}
   return { known: (w) => knownWord(w), docCount: (w) => counts.get(w) || 0, names, corefer: (a, b) => { try { return namesCorefer(a, b); } catch (e) { return false; } } };
 }
 function settleJunctions(E, startles, prior){

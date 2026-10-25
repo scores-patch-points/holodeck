@@ -19,8 +19,14 @@
 //                                     forms the priors and the text cannot settle (organs/lexicon.js)
 //   makeReader({ priors, language, abbreviations, features, ...organs }) → the relation reader (organs/hypergraph.js)
 //   relationsFor(list, opts)        → the reader's report over passages (chunked, read through the language's ear)
-//   readWith(text, opts)            → WeftEntry@4: edges, the reader's own cast with every mention's address, its sentences, its
-//                                     pronoun bindings, the clause tree, polarity, surprise, and every gap typed
+//   readDocument(text, opts)        → Promise<WeftEntry@4>: THE MASTER PIPELINE — the one call every surface makes. Asks the
+//                                     hyperlexicon handed in (opts.lexicon: an organs/lexicon.js organ over any giver) about the
+//                                     dotted forms the priors cannot settle, then readWith. Node (reading.js) hands in the local
+//                                     Wiktionary pack; a page hands in its server's; no lexicon is a typed gap on the entry.
+//   readWith(text, opts)            → WeftEntry@4 (synchronous, given the aliases; readerOptions: a surface's own organs;
+//                                     selfRead: claims with verdicts; .reader / .abbreviationSet ride it, not enumerable): edges, the reader's own cast with every mention's address (mentionsAt: UTF-8 byte
+//                                     offsets, the weft's unit; mentionSpans: character spans), its sentences and pronoun bindings
+//                                     (character offsets), the clause tree, polarity, surprise, and every gap typed
 //
 // Nothing here is a word list. The English closed classes (adapters/text/priors.js) are passed only to an English read; another
 // language without its own is a typed gap, never English applied to it (the Greenberg rule).
@@ -216,6 +222,13 @@ function toRawOffsets(raw) {
   return (i) => map[Math.min(Math.max(0, i), map.length - 1)];
 }
 
+// UTF-8 byte offset of every character position: the weft addresses a mention as `<source>#<byteOffset>` (weft.js::holonAddress)
+function byteOffsets(str) {
+  const cum = new Uint32Array(str.length + 1); let b = 0;
+  for (let i = 0; i < str.length; i++) { cum[i] = b; const c = str.charCodeAt(i); if (c < 0x80) b += 1; else if (c < 0x800) b += 2; else if (c >= 0xd800 && c <= 0xdbff && i + 1 < str.length && (str.charCodeAt(i + 1) & 0xfc00) === 0xdc00) { b += 4; cum[++i] = b; } else b += 3; }
+  cum[str.length] = b; return cum;
+}
+
 const escapeRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 /** Every place a surface stands as a whole word, longest surface first, overlaps given to the longer. The index keeps a name in
  *  its folded form ("Mr Brown" for "Mr. Brown", a lower-cased "messrs"), so a token may carry its period in the text and a
@@ -242,7 +255,7 @@ const edgeOf = (e) => ({ end1: e.end1, end1Face: e.end1Face ?? null, label: e.la
  * synchronous read cannot ask, so an async caller asks first (reading.js::readDocument does) and hands its report in as
  * `aliasReport`, which rides the entry. A short source is a typed skip, a reader failure a typed error — never silent.
  */
-export function readWith(text, { address = null, category = null, language = null, priors = null, aliases = [], abbreviations = null, quality = true, minCharacters = 200, features = {}, reader = null, aliasReport = null } = {}) {
+export function readWith(text, { address = null, category = null, language = null, priors = null, aliases = [], abbreviations = null, quality = true, minCharacters = 200, features = {}, reader = null, readerOptions = {}, selfRead = false, aliasReport = null } = {}) {
   const str = String(text ?? "");
   const bytes = utf8Length(str);
   const gaps = [];
@@ -262,19 +275,25 @@ export function readWith(text, { address = null, category = null, language = nul
     return { ...empty, sentences, skipped: "too_short" };
   }
   const t0 = Date.now();
-  let out = null, chunks = [], err = null;
+  let out = null, chunks = [], err = null, R = null, claims;
   try {
-    const R = reader ?? makeReader({ priors: pr, language: stem, abbreviations: abbr.set, features });
+    // a surface's own organs (readerOptions: classifyWord, extendRelations, sameAct, roleConfig …) join the one assembly; the
+    // abbreviations are this read's, so a surface never builds a reader beside it
+    R = reader ?? makeReader({ priors: pr, language: stem, abbreviations: abbr.set, features, ...readerOptions });
     ({ report: out, chunks } = relationsFor([{ text: str }], { reader: R, language: language ? stem : null }));
+    // selfRead: the material read back as an answer against itself, so every claim carries the reader's verdict and its span
+    if (selfRead && out?.read) claims = out.read(str)?.claims ?? [];
   } catch (e) { err = String(e?.message ?? e); }
   const raw = toRawOffsets(str);
   // each chunk's own place in the document (chunk.text is its body trimmed, so it is located inside its span)
   const norm = str.replace(/\r\n?/g, "\n");
   const bases = chunks.map((c) => { const at = norm.indexOf(c.text, Math.max(0, (c.start ?? 0) - 2)); return at >= 0 ? at : c.start ?? 0; });
-  const cuts = []; // in the reader's (newline-normalised) space, for the clause parser; `sentences` carries the caller's addresses
-  (out?.sentences ?? []).forEach((list, pi) => { for (const s of list ?? []) cuts.push({ text: s.text, offset: bases[pi] + s.offset }); });
+  // THE SENTENCES are the one cut over the WHOLE document (the reader drops a passage under 20 characters, a heading, from what it
+  // relates; the document's sentences keep it). Same splitter, same abbreviations as the reader's, so inside a passage they agree.
+  // `cuts` are in the newline-normalised space the clause parser reads; `sentences` carry the caller's addresses.
+  const cuts = splitSentences(norm, { abbreviations: abbr.set }).map((x) => ({ text: x.text, offset: x.offset }));
   const sentences = cuts.map((c, order) => ({ text: c.text, offset: raw(c.offset), order }));
-  const sentenceBase = []; { let n = 0; for (const list of out?.sentences ?? []) { sentenceBase.push(n); n += (list ?? []).length; } }
+  const sentenceAt = (at) => { let lo = 0, hi = cuts.length - 1, best = -1; while (lo <= hi) { const m = (lo + hi) >> 1; if (cuts[m].offset <= at) { best = m; lo = m + 1; } else hi = m - 1; } return best; };
   // THE CAST — the reader's own index, the beings its edges were resolved against (its ids, its floor), each with the address of
   // every mention. A being is what the capital tier names; a row the index holds only through the heard tier (a caseless nominal,
   // a common noun) is kept apart in `heard`, because the weft's company is between beings (weft.js::weftReferents) and common
@@ -284,6 +303,7 @@ export function readWith(text, { address = null, category = null, language = nul
   let cast = [], heardRows = [];
   try {
     const capital = new Set(extractSurfaces(cuts, {}).map((x) => x.surface));
+    const bytes = byteOffsets(str);
     const byRef = new Map();
     for (const ev of out?.index?.events ?? []) {
       if (ev?.type !== "DEF.admit" || !ev.referent_id || !ev.surface) continue;
@@ -294,7 +314,8 @@ export function readWith(text, { address = null, category = null, language = nul
       const surface = out.index.represent?.(r.ref) ?? [...r.surfaces].sort((a, b) => b.length - a.length)[0];
       const spans = mentionsOf(norm, r.surfaces).map(([a, b]) => [raw(a), raw(b)]);
       const being = [...r.surfaces].some((x) => capital.has(x));
-      const row = { ref: r.ref, surface, allSurfaces: [...r.surfaces], mentionsAt: spans.map(([a]) => a), mentionSpans: spans, standing: being ? "referent" : "heard" };
+      // mentionsAt: UTF-8 byte offsets, the weft's address unit; mentionSpans: [start, end) character spans into the text given
+      const row = { ref: r.ref, surface, allSurfaces: [...r.surfaces], mentionsAt: spans.map(([a]) => bytes[a]), mentionSpans: spans, standing: being ? "referent" : "heard" };
       (being ? cast : heardRows).push(row);
     }
   } catch (e) { if (!err) err = `cast_failed: ${String(e?.message ?? e)}`; }
@@ -304,7 +325,7 @@ export function readWith(text, { address = null, category = null, language = nul
   (out?.pronouns ?? []).forEach((list, pi) => {
     for (const b of list ?? []) {
       const at = bases[pi] + (b.offset ?? 0);
-      pronouns.push({ pronoun: b.pronoun, at: [raw(at), raw(at + String(b.pronoun ?? "").length)], sentence: sentenceBase[pi] + (b.sentenceOrder ?? 0), surface: b.surface ?? null, ref: b.surface ? refOf(b.surface) : null, margin: b.margin ?? null });
+      pronouns.push({ pronoun: b.pronoun, at: [raw(at), raw(at + String(b.pronoun ?? "").length)], sentence: sentenceAt(at), surface: b.surface ?? null, ref: b.surface ? refOf(b.surface) : null, margin: b.margin ?? null });
     }
   });
   // SURPRISE — the canonical cycle's second constitutive gate (SEG+EVA)
@@ -327,12 +348,32 @@ export function readWith(text, { address = null, category = null, language = nul
     } else qualityReport.clauses = { gap: nested.gap };
     qualityReport.gates = readGates({ edges, cast, text: str });
   }
-  return {
+  const entry = {
     ...empty,
     readCharacters: str.length,
     vocabulary: out?.vocabulary ?? null,
     cast, heard: heardRows, edges, clauses, quality: qualityReport, surprise,
     sentences, pronouns,
+    ...(selfRead ? { claims: claims ?? [] } : {}),
     error: err, ms: Date.now() - t0,
   };
+  // the reader this read used and its abbreviation set, for a surface that reads prefixes of the same text the same way (a replay);
+  // not enumerable, so the entry stays plain data on the wire and in the weft
+  Object.defineProperty(entry, "reader", { value: R, enumerable: false });
+  Object.defineProperty(entry, "abbreviationSet", { value: abbr.set, enumerable: false });
+  return entry;
+}
+
+/**
+ * THE MASTER PIPELINE (2026-10-24): one document in, one WeftEntry@4 out, the same in Node and in a page. The language is declared
+ * or heard; the priors are that language's (prior-source.mjs); the hyperlexicon is asked first when one is handed in; then the one
+ * reader reads the document whole. Every tool reads through this call (reading.js re-exports it with the local giver as default).
+ */
+export async function readDocument(text, { language = null, lexicon = null, priors = null, ...opts } = {}) {
+  const str = String(text ?? "");
+  const heard = language ? null : languageContextFor(str, {});
+  const stem = (language ? stemOf(language) : null) ?? (heard?.language ? stemOf(heard.language) ?? heard.language : null) ?? "eng";
+  const pr = priors ?? priorsFor(stem);
+  const c = await consultAliases(str, lexicon, { priors: pr });
+  return readWith(str, { ...opts, language, priors: pr, aliases: [...(opts.aliases ?? []), ...c.aliases], aliasReport: { giver: c.giver, rows: c.rows, gap: c.gap } });
 }

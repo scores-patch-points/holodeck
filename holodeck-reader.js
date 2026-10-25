@@ -3,7 +3,9 @@
 // its priors through khora's prior door, which in a page fetches vendor/khora/native/priors. What this surface adds over the
 // core is declared here and passed in as organs: its stance passes (extendRelations + sameAct), the form normaliser in front
 // of the class prior (classifyForm), and the measured language of a foreign document. Built once; every turn reads through it.
-import { makeReader, priorsFor } from './vendor/khora/native/the-fold/read-core.mjs';
+import { makeReader, priorsFor, readDocument as readCore } from './vendor/khora/native/the-fold/read-core.mjs';
+import { makeLexicon } from './vendor/khora/native/organs/lexicon.js';
+import { iso1Of } from './vendor/khora/native/the-fold/language-grammar.js';
 import { preloadPriors } from './vendor/khora/native/the-fold/prior-source.mjs';
 import { classifyForm as classifyWord } from './holodeck-surface.js'; // wraps the vendored classifyWord: the written form is normalised before lookup
 import { stanceWords } from './vendor/khora/native/organs/stance.js';
@@ -221,27 +223,49 @@ export async function readCorpus(docs, { reader = null, chunkChars = 60000 } = {
 
 const cleanText = (s) => String(s == null ? '' : s).replace(/\s+/g, ' ').trim();
 
-export async function makeEngineRelationReader(extra = {}) {
-  const { features = {}, foreign = null, abbreviations = null, ...rest } = extra;
-  // ABBREVIATIONS (2026-10-24): the page's own knowledge of which dotted tokens are words — the language's measured prior, the
-  // document's own, and the aliases the hyperlexicon resolved ("Messrs." is a form of "Mr."). The core passes it to every sentence
-  // cut the reader makes. Omitted, the splitter derives its own per passage.
-  // FOREIGN: a document that measured as another language is read with THAT language's priors through the same core — its POS
-  // prior, its RoleConfig@1 where one is shipped (positional reader), else the clause-aware GFP reader. Nothing English is applied.
+// THE PAGE'S OWN ORGANS, handed to khora's one assembly (never a second reader): the stance passes (extendRelations + sameAct),
+// classifyForm in front of the class prior, and a foreign document's RoleConfig@1 where one is shipped.
+// FEATURES (each defaults ON): posPrior, morphology, stance, nounPhraseSubjects, phrasalPredicates.
+// sameAct is widened by stance class, so "is pro" binds a source's "in support of" without either label being rewritten.
+export async function pageReaderOptions({ features = {}, foreign = null, priors = null } = {}) {
   const stem = foreign?.iso3 || 'eng';
-  const priors = await loadLanguage(stem);
+  const pr = priors || await loadLanguage(stem);
   let roleConfig = null;
   if (foreign) { try { const r = await fetch(new URL(`./vendor/khora/native/priors/role-config-${stem}.json`, import.meta.url)); if (r.ok) roleConfig = await r.json(); } catch (e) {} }
-  // FEATURES (the demo's layer toggles; every one defaults ON): posPrior, morphology, stance, nounPhraseSubjects, phrasalPredicates.
-  // sameAct is widened by stance class, so "is pro" binds a source's "in support of" without either label being rewritten.
   const useStance = features.stance !== false;
-  // as before the core: the stance widening rides the lemmatizer's same-act test, so with morphology off neither is passed
-  const sameAct = useStance && features.morphology !== false && priors.lemmatizer ? (a, b) => { const x = stanceClass(a), y = stanceClass(b); return x && y ? x === y : null; } : null;
-  return makeReader({
-    priors, language: stem, abbreviations, features, classifyWord, roleConfig, sameAct,
-    extendRelations: withStance({ stance: useStance }),
-    ...rest,
-  });
+  // the stance widening rides the lemmatizer's same-act test, so with morphology off neither is passed
+  const sameAct = useStance && features.morphology !== false && pr.lemmatizer ? (a, b) => { const x = stanceClass(a), y = stanceClass(b); return x && y ? x === y : null; } : null;
+  return { classifyWord, roleConfig, sameAct, extendRelations: withStance({ stance: useStance }) };
+}
+
+// the page's hyperlexicon giver: the Holodeck server's local English Wiktionary (POST /lexicon). A page served without that
+// server (Pages, a file) gets no answer, and the read says so (aliasReport.gap).
+const LEXICONS = new Map();
+export function pageLexicon(lang = 'en') {
+  if (!LEXICONS.has(lang)) LEXICONS.set(lang, makeLexicon({ lang, ask: async (forms, l) => {
+    try { const r = await fetch(new URL('./lexicon', import.meta.url), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ forms, lang: l }) }); return r.ok ? await r.json() : null; } catch (e) { return null; }
+  } }));
+  return LEXICONS.get(lang);
+}
+
+/** THE MASTER PIPELINE in this page: khora's read-core.mjs::readDocument with the page's priors (fetched through khora's prior
+ *  door), its hyperlexicon giver and its organs. Returns the WeftEntry@4 with the claims read back against the material
+ *  (selfRead), and the reader and abbreviation set it used (non-enumerable) for a replay of the same text. */
+export async function readDocument(text, { features = {}, foreign = null, lexicon, ...opts } = {}) {
+  const stem = foreign?.iso3 || 'eng';
+  const priors = await loadLanguage(stem);
+  const readerOptions = await pageReaderOptions({ features, foreign, priors });
+  const lex = lexicon === undefined ? pageLexicon(iso1Of(stem) || 'en') : lexicon;
+  return readCore(text, { language: stem, priors, lexicon: lex, readerOptions, features, selfRead: true, ...opts });
+}
+
+/** A reader with the page's organs over passages the caller chunks itself (readCorpus, the ask door). The same assembly as the
+ *  master's; `abbreviations` are the caller's (omitted, the splitter derives its own per passage). */
+export async function makeEngineRelationReader(extra = {}) {
+  const { features = {}, foreign = null, abbreviations = null, ...rest } = extra;
+  const stem = foreign?.iso3 || 'eng';
+  const priors = await loadLanguage(stem);
+  return makeReader({ priors, language: stem, abbreviations, features, ...(await pageReaderOptions({ features, foreign, priors })), ...rest });
 }
 
 // ── PERSPECTIVES (2026-10-02) ───────────────────────────────────────────────
