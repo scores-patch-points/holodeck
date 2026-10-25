@@ -4123,23 +4123,42 @@ function hdEngineMerge(t, ns, eng, hy) {
 // read-only handle for tests: the real functions, so a harness can recompute what a trace claims happened
 setTimeout(() => { try { window.__holodeck = Object.freeze({ analyze, holoKit, holoName, paradigms, holoTopics, fieldTopics, fieldCatalog, splitSentences, findNames, isJunk, readAny, hdHygiene, hdPos: w => hdPos(w), hdPosForms: () => HD_POS, hdDeclReady: () => !!HD_DECL, hdEngineReady: () => !!HD_ENGINE, hdReaderReady: () => hdReaderReady(), hdAttrReady: () => hdAttrReady(), hdHoldReady: () => hdHoldReady(), summarizeHolders: (sts, names) => (HD_ATTR ? HD_ATTR.summarizeHolders(sts, names) : null) }); } catch (e) {} }, 0);
 const hdCut = (t, n) => { t = String(t || '').replace(/\s+/g, ' ').trim(); return t.length > n ? t.slice(0, n - 1) + '…' : t; };
+// THE CUT IS KHORA'S (2026-10-24). Which dotted tokens are words is khora's knowledge, never a list on this page: the language's
+// measured punctuation prior and the text's own (read-core.mjs::abbreviationsFor), plus the aliases the hyperlexicon resolves for
+// this text (organs/lexicon.js over the local Wiktionary, asked once per new dotted form; the page re-reads when an answer lands).
+// Inside a run of lines the sentences are spans.js::splitSentences'. What stays this page's is the page itself: furniture lines
+// (a short line repeated 3+ times, a bare page number) and the hard-wrap join, whose closed-class test reads the POS prior.
+// Until khora's modules have loaded (a moment after the page opens) a run of lines is one unit, uncut, and the page reads again
+// once they arrive (hd-cut); no second splitter stands in for khora's.
+// SCOPE (Greenberg): this page's analysis reads English — the abbreviation prior and the lexicon asked are English's, and the
+// hard-wrap join's lower-case opener is a Latin-script test. A document in another language is cut with the English knowledge
+// here; the reading page (reading/demo.html) and holodeck-reader.js read it with its own language's priors.
+const HD_CLOSED = new Set(['DET', 'ADP', 'CCONJ', 'SCONJ', 'AUX', 'PART', 'PRON']);
+const hdClosedWord = w => { const c = hdPos(w); if (!c) return false; let best = null, n = -1; for (const [k, v] of Object.entries(c)) if (v > n) { n = v; best = k; } return HD_CLOSED.has(best); };
 function splitSentences(text, tr) {
-  const out = []; const re = /[^\n]+?(?:[.!?]+(?=\s|$)|(?=\n)|$)/g; let m;
-  const ABBR = /(?:\b(?:a\.m|p\.m|U\.S|U\.K|Mr|Mrs|Ms|Dr|St|Pte|Ltd|Inc|Co|No|vs|Jr|Sr|Gov|Sen|Rep|Mt|Ft|approx|etc|e\.g|i\.e)|\b[A-Z])\.$/;
+  const out = []; const lineRe = /[^\n]+/g; let m;
   // page furniture: short lines repeated 3+ times (running heads/feet) and bare page numbers
   const lc = new Map(); text.split('\n').forEach(l => { const k = l.trim(); if (k.length >= 4 && k.length <= 120) lc.set(k, (lc.get(k) || 0) + 1); });
   const FURN = k => (lc.get(k) || 0) >= 3 && !/[.!?]$/.test(k) || /^(page\s*)?\d{1,3}(\s*(of|\/)\s*\d{1,3})?$/i.test(k); let skipped = false;
-  while ((m = re.exec(text))) {
+  const blocks = [];
+  while ((m = lineRe.exec(text))) {
     const raw = m[0]; const lead = raw.length - raw.replace(/^\s+/, '').length; const tt = raw.trim();
     if (!tt) continue;
-    const s = m.index + lead, e = s + tt.length; const prev = out[out.length - 1];
-    const whole = /(^|\n)[ \t]*$/.test(text.slice(Math.max(0, s - 40), s)) && /^[ \t]*(\n|$)/.test(text.slice(e, e + 40));
-    if (whole && FURN(tt)) { skipped = true; tr && tr('sentences', 'furniture', 'Skipped page furniture “' + hdCut(tt, 60) + '” (' + (/^(page\s*)?\d/i.test(tt) ? 'a page number' : 'repeats ' + lc.get(tt) + ' times with no end punctuation') + ')', { s, e }); continue; }
-    const gapOK = /^[ \t]*\n[ \t]*$/.test(text.slice(prev ? prev.e : 0, s)) || (skipped && !!prev); skipped = false;
-    if (prev && ABBR.test(prev.t) && !/\n/.test(text.slice(prev.e, s))) { tr && tr('sentences', 'join', 'Kept going past “' + hdCut(prev.t.slice(-14), 16) + '”: an abbreviation, not a sentence end', { s: prev.s, e }); prev.e = e; prev.t = text.slice(prev.s, e); continue; }
-    // hard-wrapped line (PDF, minutes, transcripts): join when the previous line is unfinished and there's no blank line between
-    if (prev && gapOK && !/[.!?:;"”’)\]]$/.test(prev.t) && (/^[a-z(,;–—-]/.test(tt) || /\b(the|of|to|with|and|or|a|an|for|in|on|by|that|from|at|as|is|are|was|were|be|this|its|their|our)$/i.test(prev.t)) && prev.t.length + tt.length < 900) { tr && tr('sentences', 'join', 'Joined a hard-wrapped line: “' + hdCut(prev.t.slice(-24), 26) + '” continues', { s: prev.s, e }); prev.e = e; prev.t = prev.t + ' ' + tt; continue; }
-    out.push({ s, e, t: tt });
+    const s = m.index + lead, e = s + tt.length; const prev = blocks[blocks.length - 1];
+    if (FURN(tt)) { skipped = true; tr && tr('sentences', 'furniture', 'Skipped page furniture “' + hdCut(tt, 60) + '” (' + (/^(page\s*)?\d/i.test(tt) ? 'a page number' : 'repeats ' + lc.get(tt) + ' times with no end punctuation') + ')', { s, e }); continue; }
+    const gapOK = /^[ \t\r]*\n[ \t\r]*$/.test(text.slice(prev ? prev.e : 0, s)) || (skipped && !!prev); skipped = false;
+    // hard-wrapped line (PDF, minutes, transcripts): join when the previous line is unfinished and there's no blank line between —
+    // unfinished: no closing mark, and the next line opens lower-case or the previous ends on a closed-class word (the POS prior's)
+    const lastWord = prev ? (prev.text.match(/([\p{L}'’]+)\W*$/u) || [])[1] : null;
+    if (prev && gapOK && !/[.!?:;"”’)\]]$/.test(prev.text) && (/^[a-z(,;–—-]/.test(tt) || (lastWord && hdClosedWord(lastWord))) && prev.text.length + tt.length < 900) { tr && tr('sentences', 'join', 'Joined a hard-wrapped line: “' + hdCut(prev.text.slice(-24), 26) + '” continues', { s: prev.s, e }); prev.e = e; prev.text = text.slice(prev.s, e); continue; }
+    blocks.push({ s, e, text: tt });
+  }
+  const abbr = hdAbbreviations(text);
+  if (abbr && tr) tr('sentences', 'abbreviations', abbr.n + ' dotted forms kept as words (khora: the measured prior ' + abbr.prior + ', this text ' + abbr.derived + ', the hyperlexicon ' + abbr.aliases + ')', { s: 0, e: 0 });
+  for (const b of blocks) {
+    const body = b.text.replace(/\r/g, ' ');
+    const cut = HD_CORE ? HD_CORE.split(body, abbr ? { abbreviations: abbr.set } : {}) : [{ text: body, offset: 0 }];
+    for (const x of cut) { const s = b.s + x.offset, e = s + x.text.length; out.push({ s, e, t: x.text.replace(/\s*\n\s*/g, ' ') }); }
   }
   return out.filter(x => x.t.length >= 3);
 }
@@ -4189,6 +4208,38 @@ Promise.all([
   import(new URL('holodeck-reader.js', location.href)).then(M => M.makeEngineRelationReader()),
 ]).then(([P, Q, R]) => { HD_PROF = P; HD_ASK = Q; HD_READER = R; }).catch(() => {});
 const hdReaderReady = () => !!(HD_PROF && HD_ASK && HD_READER);
+// khora's sentence cut and the hyperlexicon (splitSentences): the core's abbreviation knowledge, spans.js's splitter, and the lexicon
+// organ over the local server's Wiktionary (POST /lexicon). A page without that server reads with the prior and the text's own.
+let HD_CORE = null, HD_LEX = null, HD_LEX_GAP = null, HD_CUT_VER = 0;
+const hdCutChanged = () => { HD_CUT_VER++; HD_ABBR.clear(); try { window.dispatchEvent(new Event('hd-cut')); } catch (e) {} };
+const HD_ABBR = new Map();
+Promise.all([
+  import(new URL('vendor/khora/native/the-fold/read-core.mjs', location.href)),
+  import(new URL('vendor/khora/native/adapters/text/spans.js', location.href)),
+  import(new URL('vendor/khora/native/organs/lexicon.js', location.href)),
+  import(new URL('holodeck-reader.js', location.href)).then(M => M.loadLanguage('eng')),
+]).then(([C, S, L]) => {
+  HD_CORE = { abbreviationsFor: C.abbreviationsFor, priorsFor: C.priorsFor, split: S.splitSentences, derive: S.deriveAbbreviations, L };
+  HD_LEX = L.makeLexicon({ lang: 'en', ask: async (forms, lang) => { try { const r = await fetch(new URL('lexicon', location.href), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ forms, lang }) }); return r.ok ? await r.json() : null; } catch (e) { return null; } } });
+  hdCutChanged();
+}).catch(() => {});
+// the abbreviations for one text: what khora knows, plus the aliases the hyperlexicon has answered; unanswered dotted forms are asked
+// once, and an answer that keeps one re-reads the page. A giver that does not answer is a gap (HD_LEX_GAP), asked no further.
+function hdAbbreviations(text) {
+  if (!HD_CORE) return null;
+  const key = text.length + '|' + text.slice(0, 200) + '|' + text.slice(-200);
+  if (HD_ABBR.has(key)) return HD_ABBR.get(key);
+  const priors = HD_CORE.priorsFor('eng');
+  const known = new Set([...((priors.punctuation && priors.punctuation.abbreviations) || []), ...HD_CORE.derive(text)].map(a => String(a).toLowerCase()));
+  const junc = HD_CORE.L.aliasJunctions(text, known);
+  const unasked = [...junc.keys()].filter(f => HD_LEX.get(f) === undefined);
+  if (unasked.length && !HD_LEX_GAP) HD_LEX.want(unasked).then(() => { const last = HD_LEX.log[HD_LEX.log.length - 1]; if (last && last.gap) HD_LEX_GAP = last.gap; else if (unasked.some(f => HD_LEX.get(f))) hdCutChanged(); });
+  const answered = new Map([...junc].filter(([f]) => HD_LEX.get(f) !== undefined));
+  const aliases = HD_CORE.L.resolveAliases(HD_LEX, answered, text).filter(r => r.kept).map(r => r.form);
+  const a = HD_CORE.abbreviationsFor(text, { priors, aliases });
+  HD_ABBR.set(key, a); if (HD_ABBR.size > 64) HD_ABBR.delete(HD_ABBR.keys().next().value);
+  return a;
+}
 // THE HOLDER-INDEXED READING (holodeck-holders.js): the vendored attribution
 // adapter, wired read-only. `hdPos` supplies the treebank verb prior; the
 // folded referent table (built at the end of analyze) supplies the admitted
@@ -6631,6 +6682,8 @@ class Component extends DCLogic {
   }
   componentDidMount() {
     try { window.__hdApp = this; } catch (e) {}
+    // khora's cut arrived, or the hyperlexicon kept a new alias: read again (the analysis key carries HD_CUT_VER)
+    this._hdCut = () => this.forceUpdate(); window.addEventListener('hd-cut', this._hdCut);
     // the Workspaces screen by address: #workspaces on load, or typed/linked while the page is open
     this._heroHash = () => { if (location.hash === '#workspaces' && !this._heroOpen) this.openWorkspacesHero(); };
     window.addEventListener('hashchange', this._heroHash); setTimeout(this._heroHash, 0);
@@ -9776,14 +9829,14 @@ class Component extends DCLogic {
     // app stays responsive instead of blocking on one giant analyze over the whole batch.
     if (this._stage && this._stage.size) {
       const folded = docs.filter(d => !this._stage.has(d.id));
-      const fkey = id + ':' + folded.map(d => d.id).join(',') + ':' + this.state.htmlVer + ':' + this.corrKey(id);
+      const fkey = id + ':' + folded.map(d => d.id).join(',') + ':' + this.state.htmlVer + ':' + this.corrKey(id) + ':' + HD_CUT_VER;
       if (this._key !== fkey) { this._key = fkey; this._A = analyze({ docs: folded }, this._html); this.applyCorrections(this._A, id); }
       const extra = {}; docs.forEach(d => { if (this._stage.has(d.id)) extra[d.id] = d; });
       const A = { ...this._A, docs, docById: { ...this._A.docById, ...extra } };
       try { window.__holodeckA = A; } catch (e) {}
       return A;
     }
-    const key = id + ':' + docs.map(d => d.id).join(',') + ':' + this.state.htmlVer + ':' + this.corrKey(id);
+    const key = id + ':' + docs.map(d => d.id).join(',') + ':' + this.state.htmlVer + ':' + this.corrKey(id) + ':' + HD_CUT_VER;
     if (this._key !== key) {
       // Reading a workspace is synchronous and takes seconds for a big one. A workspace already read this session is kept
       // (one per key), so going back to it is instant; a first visit, or a delete, paints the new list of sources at once

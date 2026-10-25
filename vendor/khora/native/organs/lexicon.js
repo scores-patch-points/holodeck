@@ -13,7 +13,8 @@
 //
 //   aliasJunctions(text, known)   the places a sentence could be cut after "<letters>." before a capital, where the token is not
 //                                 already known: the forms the splitter is unsure of, written with their period
-//   aliasTokens(lexicon, forms)   of those, the tokens (without the period) the giver lists as a form of another word — an ALIAS
+//   aliasTokens(lexicon, forms)   of those, the tokens (without the period) the giver lists as a form of another word, or lists
+//                                 as a headword with its period ("U.S.", "e.g.") — an ALIAS
 //   resolveAliases(lexicon, junctions, text)
 //                                 the decision per listed form: kept when the text never writes the token without its period
 //
@@ -49,27 +50,34 @@ export function makeLexicon({ ask, lang = "en" } = {}) {
   return { want, get, aliasOf, get giver() { return giver; }, log, cache, lang };
 }
 
-// "<letters>." followed by white space and a capital: a place a sentence could end, or an alias could continue.
-const JUNCTION = /(?<![\p{L}\p{N}.])(\p{L}+)\.(?=\s+\p{Lu})/gu;
+// "<letters>." followed by white space and more text: a place the splitter cuts (spans.js cuts after any terminator it is not told
+// is a word's), so a place a sentence could end or an alias could continue. A dotted initialism ("U.S.") is one form; the splitter
+// sees only its last letter run, which is what aliasTokens hands back. Before 2026-10-24 only a following capital counted, and
+// "Co. at", "No. 5", "U.S. for" were cut without the giver being asked.
+const JUNCTION = /(?<![\p{L}\p{N}.])((?:\p{L}+\.)*\p{L}+)\.(?=\s+\S)/gu;
+const escapeRe = (x) => String(x).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 /** The forms (with their period) at which the splitter is unsure: the token is not in `known` (lower case, no period). */
 export function aliasJunctions(text, known = new Set()) {
   const out = new Map();
   for (const m of String(text ?? "").matchAll(JUNCTION)) {
     const tok = m[1];
-    if (known.has(tok.toLowerCase())) continue;
+    if (known.has(tok.toLowerCase()) || known.has(tok.split(".").pop().toLowerCase())) continue;
     const form = `${tok}.`;
     out.set(form, (out.get(form) ?? 0) + 1);
   }
   return out; // form → how many junctions it stands at
 }
 
-/** The tokens (no period) whose dotted form the giver lists as a form of another word. */
+/** The tokens (no final period; "U.S" for "U.S.") whose dotted form the giver lists as a form of another word, or as a headword. */
 export function aliasTokens(lexicon, forms) {
   const out = new Map();
   for (const form of forms) {
     const of = lexicon.aliasOf(form);
-    if (of.length) out.set(form.slice(0, -1), of);
+    // the giver lists the form WITH its period as a headword ("U.S.", "e.g.") — the period is part of the word even where no
+    // form-of relation is given
+    const dotted = (lexicon.get(form) ?? []).some((e) => e.w === form);
+    if (of.length || dotted) out.set(form.slice(0, -1), of.length ? of : [form]);
   }
   return out; // token → the forms it is an alias of
 }
@@ -82,7 +90,7 @@ export function resolveAliases(lexicon, junctions, text) {
   const t = String(text ?? "");
   return [...aliasTokens(lexicon, junctions.keys())].map(([tok, of]) => {
     const n = junctions.get(`${tok}.`) ?? 0;
-    const bare = new RegExp(`(?<![\\p{L}\\p{N}])${tok}(?![\\p{L}\\p{N}.])`, "u").test(t);
+    const bare = new RegExp(`(?<![\\p{L}\\p{N}])${escapeRe(tok)}(?![\\p{L}\\p{N}.])`, "u").test(t);
     return bare ? { form: `${tok}.`, of, n, kept: false, why: `“${tok}” also stands without its period in this text` } : { form: `${tok}.`, of, n, kept: true };
   });
 }

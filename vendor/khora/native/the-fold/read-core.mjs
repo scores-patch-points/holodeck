@@ -110,7 +110,8 @@ const variants = (t) => { const s = String(t); return [s, s.toLowerCase(), s.cha
 export function abbreviationsFor(text, { priors = null, aliases = [], abbreviations = null } = {}) {
   const fromPrior = priors?.punctuation?.abbreviations ?? [];
   const derived = [...deriveAbbreviations(String(text ?? "").replace(/\r\n?/g, "\n"))];
-  const fromAliases = [...aliases].map((a) => String(a).replace(/\.$/, ""));
+  // the splitter tests the letter run before a period, so a dotted initialism ("U.S.") is kept by its last run ("S")
+  const fromAliases = [...aliases].map((a) => String(a).replace(/\.$/, "").split(".").pop()).filter(Boolean);
   const set = new Set();
   for (const t of [...fromPrior, ...derived, ...fromAliases, ...(abbreviations ?? [])]) for (const v of variants(t)) set.add(v);
   return { set, n: set.size, prior: fromPrior.length, derived: derived.length, aliases: fromAliases.length, giver: priors?.punctuation?.giver ?? null };

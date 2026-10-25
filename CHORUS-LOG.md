@@ -410,3 +410,9 @@ fast: 34 files · 21 affected tests pass (+4 new in holodeck-reader.test.mjs) ·
 | Greenberg | — | holodeck-reader.js (foreign) | noted | a foreign read now gets its own priors and no English closed classes (the core's rule), where the page used to apply English determiners to it |
 | Ostrom | — | vendor/khora/native/kernel/reading-rules.js:45 | clean | the absent-rules gap is upstream's typed gap, unchanged |
 clean: Diaconis, Feynman, Dijkstra, Holmes, Pearl, Frankfurt, Alexander, Marshall (P4 is khora's)
+
+## 2026-10-24 — index.html cuts sentences with khora's knowledge; the hand ABBR list is gone (reading-one-core, staged)
+fast: 5 affected tests pass · suite 692/693 (the same one failure as the base) · checked in the browser: Messrs./St./Co./No./U.S./Dr./e.g. hold, furniture skipped, hard wrap joined, offsets read back
+| lens | citation | file:line | verdict | one line |
+| Greenberg | — | index.html splitSentences | fixed (disclosed) | the page's analysis reads English (prior, lexicon, Latin lower-case join); written in the code; the reading page reads other languages with their own priors |
+| Dijkstra | — | index.html hdClosedWord | clean | the hard-wrap join's closed-class test now reads the POS prior's dominant class instead of a typed word list |
