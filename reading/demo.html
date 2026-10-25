@@ -988,7 +988,7 @@ function diagrammedText(T){
   Ls.push(`source     ${T.doc.label}${T.doc.truncated ? ' — read over its first 14,000 characters; the whole file is still hashed and addressed' : ''}`);
   Ls.push(`bytes      ${T.nBytes.toLocaleString()} utf-8 · sha-256 ${T.hash}`);
   Ls.push(`address    byte 0–${T.nBytes} (unit byte) · source id ${T.srcId}`);
-  Ls.push(`run        ${T.ev.length.toLocaleString()} steps · ${ms(T.totalMs)} ms · ${T.net.models} model calls · ${T.net.requests.length} network request(s), static priors only`);
+  Ls.push(`run        ${T.ev.length.toLocaleString()} steps · ${ms(T.totalMs)} ms · ${T.net.models} model calls · ${T.net.requests.length} network request(s): ${T.net.requests.filter(u => !/\/hyperlexicon$/.test(String(u))).length} static priors and code, ${T.net.requests.filter(u => /\/hyperlexicon$/.test(String(u))).length} asks of the hyperlexicon (janus's ledger, through the page's own server)`);
   Ls.push(`layers off ${Object.keys(T.features).filter(k => T.features[k] === false).join(', ') || '(none — every layer on)'}`);
   Ls.push(`reading    ${T.sents.length.toLocaleString()} statements · ${T.claims.length} propositions — ${counts.read} read · ${counts.unbound} unbound · ${counts.contradicted} contradicted · ${counts['beyond reach']} beyond reach · ${counts.unheard} unheard · ${T.refs.size} referents`);
   Ls.push(''); Ls.push('propositions — the source in reading order, each sentence with what it states'); Ls.push('-'.repeat(66));
@@ -2037,7 +2037,7 @@ function mount(T){
       `<span>ledger <b>${St.led.length.toLocaleString()}</b></span>` +
       `<span class="g">layer <b>${(L[e.stage] || {}).i + 1}</b>/${LAYERS.length} · <b>${esc((L[e.stage] || { label:e.stage }).label)}</b></span>` +
       `<span class="g">real run <b>${ms(T.totalMs)}</b> ms · model calls <b>${T.net.models}</b></span>`;
-    metaEl.textContent = `${N.toLocaleString()} steps · read in ${ms(T.totalMs)} ms · ${T.net.requests.length} network request${T.net.requests.length === 1 ? '' : 's'} (no model — static priors + any format library)` + (() => { const netN = LOOKUP.log.filter(x => !/local/.test(x.source)).length, X = T.lexicon, locN = X && X.on && !X.gap ? X.asked : 0; return (locN ? ` · ${locN.toLocaleString()} form${locN === 1 ? '' : 's'} asked of the local hyperlexicon` : '') + (netN ? ` · + ${netN} lookup request${netN === 1 ? '' : 's'} you asked for over the network (dictionary · Wikipedia · Wikidata)` : ''); })();
+    metaEl.textContent = `${N.toLocaleString()} steps · read in ${ms(T.totalMs)} ms · ${T.net.requests.length} network request${T.net.requests.length === 1 ? '' : 's'} (no model — static priors + any format library${T.net.requests.some(u => /\/hyperlexicon$/.test(String(u))) ? ' + the hyperlexicon, asked through the page\'s own server' : ''})` + (() => { const netN = LOOKUP.log.filter(x => !/local/.test(x.source)).length, X = T.lexicon, locN = X && X.on && !X.gap ? X.asked : 0; return (locN ? ` · ${locN.toLocaleString()} form${locN === 1 ? '' : 's'} asked of the local hyperlexicon` : '') + (netN ? ` · + ${netN} lookup request${netN === 1 ? '' : 's'} you asked for over the network (dictionary · Wikipedia · Wikidata)` : ''); })();
   }
 
   // ── loop ──
