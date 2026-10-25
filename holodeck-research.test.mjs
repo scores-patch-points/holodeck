@@ -425,3 +425,13 @@ test('the named thing anchors: a page about the state that never says the agency
   assert.equal(relevance(units, geo, WIDE, { key: 'g', anchors }).outside, false);
   assert.equal(relevance(units, tva, WIDE, { key: 't', anchors }).outside, true);
 });
+
+test('the research reader cuts with khora: the measured prior and a caller’s aliases, never a typed list; offsets read back', () => {
+  const t = 'In 1850 Messrs. Smith bought the mill.\nDr. Brown taught there.\r\nThe end.';
+  const plain = splitStatements(t).map((x) => x.text);
+  assert.ok(plain.includes('Dr. Brown taught there.'), 'Dr. is in the measured English prior');
+  assert.ok(plain.includes('In 1850 Messrs.'), 'FALSIFIER: Messrs. is in no prior; without an alias the cut falls after it');
+  const aliased = splitStatements(t, { abbreviations: ['Messrs'] });
+  assert.ok(aliased.some((x) => x.text === 'In 1850 Messrs. Smith bought the mill.'));
+  for (const x of aliased) assert.equal(t.slice(x.s, x.e), x.text);
+});
