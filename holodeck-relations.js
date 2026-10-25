@@ -15,6 +15,7 @@
 // pair's score beats a seeded resampling null (statements of the same size drawn from the workspace's own token
 // distribution). A value is rare by its own document frequency (idf), never by a constant.
 
+import { cutLines } from './holodeck-cut.js';
 export const LINKS_SCHEMA = 'HolodeckLinks@1';
 
 // ── the vocabulary ──────────────────────────────────────────────────────────────────────────────────────────────
@@ -636,10 +637,9 @@ export function proposeAll(A, { budget = 3e6, maxPerDoc = 400, timeMs = null } =
 // sentence when its best statement beats a resampling null — the same sentence-sized bag drawn from the workspace's
 // own token distribution — so the bar is the workspace's vocabulary, not a constant. A sentence nothing answers is
 // returned as unanswered: the margin shows that too, per sentence, as the overview builder does for a whole frame.
+// the draft's sentences are khora's cut (holodeck-cut.js), never a regex of this file's own
 export function sentencesOf(text) {
-  const out = []; const re = /[^.!?\n]+(?:[.!?]+(?=\s|$)|(?=\n)|$)/g; let m;
-  while ((m = re.exec(text))) { const raw = m[0]; const t = raw.trim(); if (t.length < 3) continue; const lead = raw.length - raw.trimStart().length; out.push({ s: m.index + lead, e: m.index + lead + t.length, text: t }); }
-  return out;
+  return cutLines(String(text ?? '')).filter((x) => x.text.length >= 3);
 }
 function scoreAll(ix, toks) {
   const acc = new Map();

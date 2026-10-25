@@ -10,6 +10,7 @@
 //      candidates. Its answer is one more amplitude, disclosed as such; it can never create a candidate the evidence did not name.
 // The amplitudes become probabilities by the Born rule, p = a²/Σa². A genre is evidence for a register, not a verdict: the result says
 // how sure it is, why, and what it could not know. A person's declaration always wins over a sniff.
+import { cutLines } from '../holodeck-cut.js';
 const TOKEN = /\p{L}{4,}/gu;
 const WORD = /[\p{L}\p{N}][\p{L}\p{N}'’]*/gu;
 // declared constants (structural; not tuned to any document)
@@ -37,7 +38,7 @@ export function sniffRegister(text, prior) {
 const strength = Math.min(1, vsum / 0.6);
   const amp = Object.fromEntries(REGISTERS.map((r) => [r, VOCAB_WEIGHT * strength * vocab[r] / vsum]));
   // 2. structure
-  const sents = src.split(/(?<=[.!?”"])\s+/).filter((s) => s.trim().length > 3);
+  const sents = cutLines(src).map((x) => x.text).filter((s) => s.trim().length > 3);   // khora's cut (holodeck-cut.js)
   const quoted = sents.filter((s) => /[“”"]/.test(s)).length / Math.max(1, sents.length);
   const fp = (words.filter((w) => /^(i|me|my|mine|myself|i['’](?:m|ve|d|ll))$/i.test(w)).length) / N;
   const qa = (src.match(/^\s*(?:Q|A|MR\.?\s+[A-Z]+|SENATOR\s+[A-Z]+|THE WITNESS)\s*[.:]/gm) ?? []).length;

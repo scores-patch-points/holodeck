@@ -3,6 +3,7 @@
 // append-only EOT ledger; this file only starts jobs, polls them, and reads that ledger back as cells.
 
 // The proxy this page talks to: the default local address, or one the person stored (a second proxy, another machine).
+import { cutLines } from './holodeck-cut.js';
 export const ER7_BASE = (() => { try { return (typeof localStorage !== 'undefined' && localStorage.getItem('fold-explorer-er7')) || 'http://127.0.0.1:11436'; } catch (e) { return 'http://127.0.0.1:11436'; } })();
 const HOLONS = ['section', 'paragraph', 'sentence'];
 
@@ -102,7 +103,7 @@ export function topicWords(planText, otherPlanTexts) { const own = words(planTex
 // four sentences about Katherine Johnson and one about bicycles, 8 words against 7: the count must be of sentences.)
 export function claimSentences(text) {
   const body = String(text || '').split(/^## Footnotes/m)[0];
-  return body.split(/\n+/).filter(l => !/^\s*-\s*["\u201c]/.test(l)).join('\n').split(/(?<=[.!?])\s+|\n+/).map(x => x.trim()).filter(x => x.split(/\s+/).length >= 4);
+  return cutLines(body.split(/\n+/).filter(l => !/^\s*-\s*["\u201c]/.test(l)).join('\n')).map(x => x.text.trim()).filter(x => x.split(/\s+/).length >= 4);   // khora's cut (holodeck-cut.js)
 }
 export function topicControl(jobs, { isFunctionWord = () => false } = {}) {
   const plans = jobs.map(j => (j.rows.find(r => r.role === 'plan') || {}).text || '');

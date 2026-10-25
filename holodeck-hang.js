@@ -24,6 +24,7 @@
 //
 // Pure except the directions store. UMD like holodeck-region.js: browser
 // global HDHang, node module.exports for the falsification trials.
+import { cutLines } from './holodeck-cut.js';
 (function (root) {
   const HANG_SCHEMA = 'EOHang@1';
   const DIRECTIONS_KEY = 'hd:hang-directions';
@@ -45,7 +46,7 @@
   function layoutLines(text) {
     const raw = String(text ?? '').split('\n').filter(l => l.trim());
     if (raw.length >= 3) return { lines: raw, segmented: false };
-    const seg = String(text ?? '').split(/(?<=[.!?。！？।])\s+/).map(s => s.trim()).filter(Boolean);
+    const seg = cutLines(String(text ?? '').replace(/\n+/g, ' ')).map(s => s.text.trim()).filter(Boolean);   // khora's cut (holodeck-cut.js)
     return { lines: seg.length ? seg : raw, segmented: raw.length < seg.length };
   }
   const nonEmpty = t => layoutLines(t).lines;

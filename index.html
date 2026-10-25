@@ -8077,7 +8077,7 @@ class Component extends DCLogic {
       } catch (e) { /* fall through to the in-tab read */ }
       try {
         const M = await import(new URL('holodeck-reading.js', location.href).href);
-        const R = await (await import(new URL('holodeck-reader.js', location.href).href)).makeEngineRelationReader();
+        const { readDocument } = await import(new URL('holodeck-reader.js', location.href).href);   // khora's master pipeline
         const readings = [];
         for (const d of docs) {
           // An image is read from its measured 2D model (the middle layer): names legible in a box
@@ -8086,10 +8086,9 @@ class Component extends DCLogic {
           if (d.screen && d.screen.elements && d.screen.elements.length) {
             readings.push(M.readSighted(d.id, d.screen.elements, { readingText: d.screen.text }));
           } else {
-            const text = String(d.text || '').slice(0, 60000); const passages = M.splitPassages(text);
-            let report = { edges: [] };
-            try { report = R(passages.map(t => ({ ref: d.id, text: t }))) || report; } catch (e) { report = { edges: [] }; }
-            readings.push({ name: d.id, ...M.readDoc(d.id, text, report, { passages: passages.length }) });
+            const text = String(d.text || '').slice(0, 60000);
+            let W = null; try { W = await readDocument(text, { quality: false, selfRead: false, address: d.id }); } catch (e) { W = null; }
+            readings.push({ name: d.id, ...M.readDoc(d.id, text, { edges: (W && W.edges) || [] }, { passages: ((W && W.sentences) || []).length }) });
           }
           await new Promise(r => setTimeout(r, 0));
         }

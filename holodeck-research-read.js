@@ -13,26 +13,13 @@
 // text.slice(st.s, st.e) === st.text.
 
 import { fold } from './holodeck-research-null.js';
-import { splitSentences, deriveAbbreviations } from './vendor/khora/native/adapters/text/spans.js';
-import PUNCT_ENG from './vendor/khora/native/priors/punctuation-eng.json' with { type: 'json' };
+import { cutLines } from './holodeck-cut.js';
 
-// THE CUT IS KHORA'S (2026-10-24): inside each line, statements are spans.js::splitSentences' — the cut every reader shares — told
-// which dotted tokens are words by English's MEASURED punctuation prior (janus priors/punctuation-eng.json, vendored as data), the
-// text's own (spans.js::deriveAbbreviations), and whatever `abbreviations` a caller hands in (the page: the hyperlexicon's aliases,
-// read-core.mjs::abbreviationsFor). The typed list that stood here (Mr|Mrs|Dr|St|Ltd|Inc|Co|No|…) is gone. A line is still the outer
-// unit: a statement never crosses a line break. SCOPE: the default prior is English's, as the rest of this reader (frameOf) is.
-const PRIOR_ABBR = (PUNCT_ENG.abbreviations || []).flatMap((t) => [t, t.charAt(0).toUpperCase() + t.slice(1), t.toUpperCase()]);
+// THE CUT IS KHORA'S (2026-10-24): statements are holodeck-cut.js::cutLines — khora's spans.js::splitSentences inside each line,
+// with English's measured punctuation prior, the text's own abbreviations and any a caller hands in (a page's hyperlexicon aliases).
+// The typed list that stood here (Mr|Mrs|Dr|St|Ltd|Inc|Co|No|…) is gone. A line is still the outer unit.
 export function splitStatements(text, { abbreviations = null } = {}) {
-  const out = []; const lineRe = /[^\n]+/g; let m;
-  const known = new Set([...PRIOR_ABBR, ...(abbreviations || []), ...deriveAbbreviations(String(text))]);
-  while ((m = lineRe.exec(text))) {
-    const line = m[0].replace(/\r/g, ' ');
-    for (const x of splitSentences(line, { abbreviations: known })) {
-      const s = m.index + x.offset, e = s + x.text.length;
-      out.push({ s, e, text: text.slice(s, e) });
-    }
-  }
-  return out;
+  return cutLines(String(text), { abbreviations });
 }
 
 const WORD = "\\p{Lu}[\\p{L}\\p{M}'’&.]*(?:-\\p{Lu}[\\p{L}\\p{M}'’&.]*)*";

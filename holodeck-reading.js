@@ -5,11 +5,11 @@
 // relation reader — the same organs the engine's POST /v1/read drives — so an uploaded source
 // lands as Referents and Bonds beside the corpus, not as names alone.
 //
-// Pure: no DOM, no navigator, no network. The relation reader is injected, so a test folds a
-// hand-made report and the page injects holodeck-reader.js's makeEngineRelationReader().
+// Pure: no DOM, no navigator, no network. The reading is handed in: the page reads each document through khora's master
+// pipeline (holodeck-reader.js::readDocument → read-core.mjs::readDocument) and passes its edges; a test folds a hand-made one.
 //
-//     const report = relationsFor(passages);   // { examined, vocabulary, edges, read }
-//     const one = readDoc('u1', text, report); // one source's block + its global cast/bonds
+//     const W = await readDocument(text);       // the master's WeftEntry@4: { edges, cast, sentences, … }
+//     const one = readDoc('u1', text, W);       // one source's block + its global cast/bonds
 //     const rix = mergeReadings([one], { from: 'workspace' }); // FoldReadingIndex@2-shaped
 //
 // Every edgeFace carries { end1, label, end2, polarity, refs } (hypergraph.js). end1/end2 are
@@ -40,24 +40,6 @@ export function readerFrame(name, forWhom = null) {
 /** A cast row carries its frame, or it is a typed gap — never a bare referent. */
 export const referentGap = (c) => ({ schema: 'EOReferentGap@1', id: 'gap:referent:' + c.id + ':no-for-whom', reason: 'no_for_whom', referent: c.id, tier: 'referent',
   detail: 'a referent is a referent only for-whom (S113); with no frame it is a view from nowhere, so it is a typed gap, never a bare admit' });
-
-/** Split a document into relation-reader passages. Paragraphs first, then long ones cut on
- *  sentence boundaries, so the vocabulary the reader measures is neither one giant blob nor a
- *  fragment per line. `max` mirrors the engine's own 60 000-character cap for the whole read. */
-export function splitPassages(text, max = 2000) {
-  const paras = String(text || '').split(/\n{2,}/).map(clean).filter(Boolean);
-  const out = [];
-  for (const p of paras) {
-    if (p.length <= max) { out.push(p); continue; }
-    let cur = '';
-    for (const s of p.split(/(?<=[.!?])\s+/)) {
-      if (cur && (cur.length + s.length + 1) > max) { out.push(cur); cur = ''; }
-      cur = cur ? cur + ' ' + s : s;
-    }
-    if (cur) out.push(cur);
-  }
-  return out.length ? out : (clean(text) ? [clean(text)] : []);
-}
 
 /** How many times a surface is written in the text: whole words for a single token, a plain
  *  case-insensitive scan for a multi-word name. This is the OHS `mentions` count's local twin. */
@@ -196,22 +178,6 @@ export function readSighted(name, elements, meta = {}) {
   });
   const source = { chunks: 1, chars: clean(meta.readingText || '').length || (elements || []).length, ops: intoBag({ INS: cast.length, CON: edges, REC: 0 }), terrain: bag(), kinds: srcKinds, cast: srcCast, bonds: srcBonds, idChurn: bag(), sighted: true, elements: (elements || []).length, geometry: (elements || []).map(e => ({ id: e.id, parent: e.parent, role: e.role, region: e.region, text: e.text || null })) };
   return { name, source, cast, bonds, encounters: 1, chars: source.chars, surfaces: cast.map(c => c.surfaces[0]) };
-}
-
-/** Read a whole workspace in one call: docs = [{ id, title, text }], relationsFor = the
- *  reader. Skips a doc with no text. Caps the whole read at `cap` characters like the engine. */
-export function readWorkspace(docs, relationsFor, opts = {}) {
-  const cap = opts.cap || 60000;
-  const out = [];
-  for (const d of docs) {
-    const text = String((d && d.text) || '').slice(0, cap);
-    if (!text.trim()) continue;
-    let report = { edges: [] };
-    try { report = relationsFor(splitPassages(text).map(t => ({ ref: d.id, text: t }))) || report; } catch (e) { report = { edges: [] }; }
-    const r = readDoc(opts.nameOf ? opts.nameOf(d) : (d.id || d.title), text, report, { passages: splitPassages(text).length, standing: opts.standing, forWhom: opts.forWhom });
-    out.push({ name: opts.nameOf ? opts.nameOf(d) : (d.id || d.title), ...r });
-  }
-  return mergeReadings(out, { from: opts.from, builtAt: opts.builtAt, ms: opts.ms });
 }
 
 export { bondKey };
