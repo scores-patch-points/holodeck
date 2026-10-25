@@ -6,6 +6,7 @@
 <title>How to read without a model — the pipeline, layer by layer</title>
 <style>
   :root{--bg:#17171a;--s1:#1c1c20;--s2:#29292e;--sel:#26272c;--sel2:#30333b;--line:#2e2e33;--line2:#3f3f46;--ink:#f4f4f6;--ink2:#c9c9d2;--mut:#9d9da8;--dim:#9494a0;--acc:#8ab4ff;--acc2:#8ab4ff;--acc3:#6d9dff;--amber:#f0b429;--blue:#8ab4ff;--green:#56d364;--pink:#e0a0c0;--date:#8ab4ff;--ok:#56d364;--bad:#f87171;--edge:#3f3f46;--hdr:rgba(23,23,26,.95);--sans:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;--mono:ui-monospace,SFMono-Regular,Menlo,monospace;--serif:Georgia,"Times New Roman",serif;color-scheme:dark}
+  :root{--f0:#9494a0;--f1:#c68bff;--f2:#56d364;--f3:#8ab4ff;--f4:#e0a0c0;--f5:#f0b429;--f6:#ff9d6e}  /* the floors, F0 units … F6 premises (reading/mhc-ladder.js) */
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 var(--sans);-webkit-font-smoothing:antialiased}
   a{color:var(--acc)}
@@ -46,19 +47,18 @@
   .top .exit{border:1px solid var(--line2)!important;border-radius:6px;padding:5px 11px!important;color:var(--ink)!important;font-weight:600}
   .top .stats{flex-basis:100%;font:12.5px var(--mono);color:var(--ink2);display:flex;gap:10px 16px;flex-wrap:wrap;padding-top:6px}
   .top .stats b{color:var(--ink);font-weight:600}.top .stats .g{color:var(--dim)}
-  .body{display:grid;grid-template-columns:minmax(300px,32%) 1fr;min-height:0}
   /* ── spine: the pipeline, with layer switches ──────────────────────────── */
-  .left{border-right:1px solid var(--line);display:grid;grid-template-rows:minmax(0,44%) minmax(0,1fr);min-height:0}
   .spine{overflow-y:auto;border-bottom:1px solid var(--line);padding:8px 10px 10px}
   .spine .h{font:600 12.5px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--dim);padding:6px 4px 8px}
-  .ly{display:grid;grid-template-columns:26px 1fr auto;gap:8px;align-items:center;border:1px solid var(--line);border-radius:9px;margin:5px 0;padding:6px 9px;background:var(--s1);cursor:default}
+  .ly{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:8px;align-items:center;border:1px solid var(--line);border-radius:9px;margin:3px 0;padding:5px 9px;background:var(--s1);cursor:pointer}
+  .ly:hover{border-color:var(--line2)}.ly:focus-visible{outline:2px solid var(--acc3);outline-offset:1px}
   .ly .n{font:600 12.5px var(--mono);color:var(--bg);background:var(--dim);border-radius:5px;padding:1px 6px;text-align:center}
   .ly.on{border-color:var(--acc3);background:#1a1f2b}
   .ly.on .n{background:var(--acc);color:#0b0d12}
   .ly.off{opacity:.55}
   .ly .lab{font-weight:600;font-size:13px}
   .ly .why{color:var(--dim);font-size:12.5px;grid-column:2 / 4;margin-top:-2px}
-  .ly .cnt{font:12.5px var(--mono);color:var(--dim)}
+  .ly .cnt{font:12.5px var(--mono);color:var(--dim);text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
   .sw{position:relative;width:36px;height:20px;border-radius:20px;background:#33333a;border:1px solid var(--line2);cursor:pointer;flex:none}
   .sw::after{content:'';position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:var(--dim);transition:.14s}
   .sw[aria-checked=true]{background:#1e3a2b;border-color:#2f6b4b}
@@ -66,6 +66,21 @@
   .sw[aria-disabled=true]{opacity:.4;cursor:not-allowed}
   .ly.cur .lab{color:var(--ink)}
   .ly.cur{box-shadow:inset 3px 0 0 var(--acc)}
+  /* ── the floors in the rail: a header per floor whose verdict fills in as the replay reaches it; under each, the layers that make its operand ── */
+  .fh{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;gap:5px 6px;align-items:center;margin:14px 0 4px;padding:3px 2px 5px;border-bottom:1px solid var(--line);cursor:pointer}
+  .spine .h + .fh{margin-top:2px}
+  .fh .f{font:600 12px var(--mono);color:var(--bg);background:var(--fc);border-radius:5px;padding:1px 7px}
+  .fh .t{min-width:0;line-height:1.3}.fh .nm{font:600 12px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--ink2);overflow-wrap:anywhere}
+  .fh .vd{font:12px var(--mono);color:var(--dim);justify-self:end;text-align:right;white-space:nowrap;line-height:1.3}
+  .fh .vd.ok{color:var(--green)}.fh .vd.bad{color:var(--amber)}.fh .vd.fail{color:var(--bad)}
+  .fh .no{font:11.5px var(--mono);color:var(--dim);margin-left:6px}
+  .fh .rv{font:11px var(--mono);color:var(--pink);margin-left:6px}
+  .fh .car{background:none;border:0;color:var(--dim);cursor:pointer;font-size:12px;padding:0 2px;min-width:22px;min-height:22px;border-radius:4px}.fh .car:hover{color:var(--ink);background:var(--s1)}
+  .fh.closed{margin-bottom:2px}
+  .fh.ahead .f{opacity:.55}
+  .fh.stage .nm::after{content:" · stage";color:var(--green);text-transform:none;letter-spacing:0}
+  .fh.cur{box-shadow:inset 3px 0 0 var(--fc)}
+  .fh:hover .nm,.fh:focus-visible .nm{color:var(--ink)}
   /* ── event log ─────────────────────────────────────────────────────────── */
   .log{display:grid;grid-template-rows:1fr auto;min-height:0}
   .rows{overflow-y:auto;position:relative;font:12.5px/24px var(--mono);min-height:0}
@@ -80,7 +95,6 @@
   .now .k{font:600 12.5px var(--mono);letter-spacing:.1em;text-transform:uppercase}
   .now p{margin:4px 0 0;font-size:14px;color:var(--ink);max-width:74ch}
   /* ── right: lens + tabs ────────────────────────────────────────────────── */
-  .right{display:grid;grid-template-rows:auto auto 1fr;min-height:0}
   .lens{border-bottom:1px solid var(--line);padding:4px 18px 12px;max-height:24vh;overflow:auto}
   .lens .doc{font:12.5px var(--mono);color:var(--dim);margin-bottom:4px;padding-top:8px}
   .lens .txt{font:15px/1.7 var(--serif);color:var(--mut);white-space:pre-wrap;max-width:92ch;word-break:break-word}
@@ -148,9 +162,6 @@
   .evt{display:grid;grid-template-columns:auto auto 1fr;gap:3px 10px;padding:4px 0;border-bottom:1px solid var(--line);font:12.5px var(--mono)}
   .evt .id{color:var(--pink)}.evt .st{color:var(--amber)}.evt .rd{color:var(--dim)}
   /* transport */
-  .bar2{border-top:1px solid var(--line);padding:6px 18px calc(12px + env(safe-area-inset-bottom,0px));display:grid;gap:8px}
-  .rib{position:relative;height:18px;cursor:pointer;touch-action:none}
-  .rib canvas{width:100%;height:100%;display:block}
   .ctl{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
   .ctl button{background:none;border:0;color:var(--mut);font:500 13px var(--sans);cursor:pointer;padding:4px 6px;border-radius:4px}
   .ctl button:hover{color:var(--ink)}.ctl .pl{color:var(--acc);font-weight:600;min-width:64px}
@@ -164,7 +175,7 @@
   .delta{margin:8px 0;border:1px solid #5c4d1d;border-radius:9px;background:#221d10;color:#f0d9a0;padding:8px 11px;font-size:13px}
   .delta b{color:#fff}
 
-  /* ── wide screens: rail | document + lanes | inspector, with the detail tabs in a drawer ── */
+  /* ── wide screens: the lanes of the current sentence ── */
   .drawer,.dh{display:contents}
   .dt,.lanes,.insp{display:none}
   .lanes .col{display:inline-grid;justify-items:center;gap:2px;padding:4px 7px 5px;border-radius:7px;cursor:pointer;min-width:38px;border:1px solid transparent}
@@ -251,64 +262,32 @@
   .insp .you{font:12.5px/1.8 var(--sans);color:var(--ink2)}.insp .you button{all:unset;cursor:pointer;color:var(--blue);text-decoration:underline;margin-left:6px;font:12.5px var(--sans)}.insp .small{font-size:12.5px;color:var(--dim)}
   .lens .txt .mn{box-shadow:inset 0 -3px 0 var(--rc);cursor:pointer}.lens .txt .mn.sel{background:color-mix(in srgb, var(--rc) 22%, transparent)}.lens .txt .pick{outline:2px dashed var(--acc);outline-offset:1px;border-radius:2px}
   /* the lens never paints outside its own box, and the tabs sit on an opaque ground, so a long line can never run under the drawer */
-  .lens{contain:paint}.drawer,.dh,#p-tabs{background:var(--bg)}.dh,#p-tabs{position:relative;z-index:2}
+  .lens{contain:paint}#p-tabs{background:var(--bg);position:relative;z-index:2}
   @media (min-width:1200px){
-    .body{grid-template-columns:300px minmax(0,1fr) minmax(340px,400px)}
-    .right{grid-template-rows:auto minmax(0,1fr) auto;min-width:0}
     .lens{max-height:46vh;padding:6px 32px 18px;overflow:auto}
     .lens .txt{font-size:19px;line-height:1.9;max-width:78ch}
     .lanes{display:block;border-top:1px solid var(--line);padding:10px 22px 12px;overflow:auto;min-height:0}
     .lanes .sent{padding:6px 0 10px;border-bottom:1px dashed var(--line)}.lanes .sent.cur{padding-top:8px}.lanes .sent:not(.cur) .col{opacity:.55}
     .lanes .w{font-size:17px}
-    .drawer{display:grid;grid-template-rows:auto 0fr;border-top:1px solid var(--line);min-height:0}
-    .drawer.open{grid-template-rows:auto minmax(0,1fr);height:42vh}
-    .dh{display:flex;align-items:stretch;min-width:0}
-    .dt{display:block;all:unset;cursor:pointer;font:600 12.5px var(--sans);color:var(--ink);padding:8px 14px;white-space:nowrap;border-right:1px solid var(--line)}
-    .dh .tabs{flex:1;border-bottom:0}
-    .drawer .pane-wrap{overflow:hidden;min-height:0}
     .insp{display:block;border-left:1px solid var(--line);overflow:auto;min-height:0}
   }
-  /* ── swappable hero panels: the reading, the details and the inspector each sit in the centre or the right slot (or are hidden) ── */
-  .lay,.slot{display:none}
-  @media (min-width:1200px){
-    .lay{display:inline-flex;align-items:baseline;gap:10px;position:relative}
-    .lay summary{cursor:pointer;color:var(--mut);font:500 13px var(--sans);padding:4px 6px;list-style:none}.lay summary:hover,.lay details[open] summary{color:var(--ink)}
-    .lay-pop{position:absolute;right:0;top:100%;z-index:60;background:var(--panel,var(--bg));border:1px solid var(--line2);border-radius:8px;padding:10px 12px;display:grid;gap:8px;min-width:220px;box-shadow:0 8px 24px rgba(0,0,0,.35)}
-    .lay-pop label{display:flex;justify-content:space-between;align-items:center;gap:12px;font:13px var(--sans);color:var(--ink2)}
-    .lay-pop select{background:var(--panel,var(--bg));color:var(--ink);border:1px solid var(--line2);border-radius:5px;padding:3px 5px;font:12.5px var(--sans)}
-    .slot{display:flex;flex-direction:column;min-height:0;min-width:0}
-    .right{display:flex;flex-direction:column;min-height:0;min-width:0}
-    .blk{display:contents}
-    .right .lens,.slot .lens{flex:0 0 auto}.right .lanes,.slot .lanes{flex:1 1 0}
-    .right .drawer,.slot .drawer{flex:0 0 auto}
-    .right .insp,.slot .insp{flex:1 1 0}
-    .slot .lens{padding:6px 16px 12px}.slot .lens .txt{font-size:16px;line-height:1.8}.slot .lanes{padding:10px 14px}
-    .right>.insp{border-left:0}.slot>.insp{border-left:0}.slot{border-left:1px solid var(--line)}
-    .only-detail>.drawer,.only-detail>.drawer.open{flex:1 1 0;height:auto;grid-template-rows:auto minmax(0,1fr)}
-    .empty-slot::after{content:"nothing here — pick a panel from \201Clayout\201D";color:var(--dim);font:13px var(--sans);padding:24px;display:block}
-  }
-  @media (max-width:900px){.body{grid-template-columns:1fr;grid-template-rows:44% 56%}.left{border-right:0;border-bottom:1px solid var(--line)}}
   header .claim{color:var(--dim);font-size:13px;margin-top:6px}
   /* ── calm: one thing at a time. What is hidden is still there for the code; the page just stops shouting it. ── */
   #app .top .stats, #app .top [data-a="toggle-all"], #app .top [data-a="reset"], #app .top [data-a="copy"]{display:none}
-  #app .left .log, #app .bar2 .key, #app .bar2 .seg, #app .bar2 label, #app .bar2 [data-a="rev"], #app .bar2 .rd{display:none}
   #app .lanes .h, #app .lanes .lg, #app .lens .doc, #app .insp .legend, #app .insp .lg{display:none}
-  /* ── on a phone the Layers view is the drawer: the layers become a swipeable row, the sentence and its lanes stay short, and the graph gets the screen ── */
+  /* ── on a phone the layers become a swipeable row, the sentence and its lanes stay short, and the graph gets the screen ── */
   @media (max-width:900px){
     #app .top{padding:8px 12px;gap:6px}#app .top .meta{display:none}#app .top h2{font-size:16px;flex-basis:100%}
     #app .top button{min-height:40px;padding:6px 12px}#app .top [data-a="dl-json"]{display:none}
-    #app .body{grid-template-columns:1fr;grid-template-rows:auto minmax(0,1fr)}
-    #app .left{border:0;border-bottom:1px solid var(--line);max-height:none}
     #app .spine{display:flex;flex-direction:row;gap:6px;overflow-x:auto;overflow-y:hidden;max-height:none;padding:8px 12px;-webkit-overflow-scrolling:touch}
     #app .spine .ly{flex:0 0 auto;margin:0;padding:8px 14px;white-space:nowrap;min-height:40px}
-    #app .right{grid-template-rows:auto auto minmax(46vh,1fr);overflow:auto}
+    #app .spine .fh{flex:0 0 auto;display:flex;align-items:center;gap:6px;margin:0;padding:8px 12px;white-space:nowrap;min-height:40px;border:1px solid var(--line);border-left:3px solid var(--fc);border-radius:9px;background:var(--s1)}
     #app .lens{max-height:22vh;overflow:auto;font-size:15px;line-height:1.7}
     #app .lanes{max-height:16vh;overflow:auto}
-    #app #p-drawer{min-height:46vh}
     #app #p-tabs{overflow-x:auto;white-space:nowrap}#app #p-tabs button{min-height:42px;flex:0 0 auto}
     #p-graph .hm-tg,#p-graph .hm-position{display:none}
     #p-graph .hm-top{left:8px;right:8px}
-    #app .bar2 button{min-height:40px;min-width:40px}
+    #app .transport button{min-height:40px;min-width:40px}
   }
   /* referents as a table — the same module as the reader's index (referent-table.js) */
   #app .rt{width:100%;border-collapse:collapse;font-size:13px}#app .rt th,#app .rt td{padding:6px 8px;text-align:left;font-weight:400;line-height:1.35;border-bottom:1px solid var(--line)}
@@ -319,7 +298,6 @@
   #app .rt .sm{display:inline-block;width:8px;height:8px;border-radius:2px;margin-left:2px}#app .rt .c-reality{text-align:center;cursor:help}
   #app .rt .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
   @media (max-width:900px){#app .rt tbody th,#app .rt tbody td,#app .rt thead th{height:40px}#app .rt .c-first{display:none}}
-  /* the Layers view keeps its drawer: Source · Words · POS · Morphology · Referents · Propositions · Render · EOT · JSON · Graph (the solar system) */
   #app .lens{overflow:auto;min-height:0}
   #app .spine .h{display:none}
   /* every section says what it is doing: the rail's notes, the tab notes, the phone's note line */
@@ -327,27 +305,39 @@
   .ly .how{display:none;grid-column:2 / 4;font-size:12px;line-height:1.45;color:var(--dim);margin-top:2px}.ly.cur .how{display:block}.ly .how b{color:var(--ink2);font-weight:600}
   .pnote{border:1px solid var(--line);border-radius:9px;padding:9px 12px;margin:0 0 12px;font-size:13.5px;line-height:1.55;background:var(--s1)}.pnote b{color:var(--ink2)}
   #p-graph-note{align-self:start;z-index:3;margin:6px 10px 0;font-size:13px;line-height:1.5}#p-graph-note .pnote{margin:0;background:var(--s1);opacity:.96}#p-graph-note summary{cursor:pointer}
-  .lnote{display:none}
-  @media (max-width:900px){
-    #app .lnote{display:block;padding:8px 14px;font-size:13px;line-height:1.5;border-bottom:1px solid var(--line);max-height:30vh;overflow:auto}#app .lnote b{color:var(--ink2)}
-    #app .spine .why,#app .spine .how,#app .spine .cnt{display:none}
-  }
+  @media (max-width:900px){ #app .spine .why,#app .spine .how,#app .spine .cnt{display:none} }
   #app .top h2{font-size:17px;font-weight:600}
   #app .lens{line-height:1.9;font-size:16px}
   #app .insp{line-height:1.55}
   #app .insp .rh2{margin-top:18px;letter-spacing:.06em}
   #app button{font-size:13px}
-  #app .left{grid-template-rows:minmax(0,1fr)}
-  #app .spine{border-bottom:0;padding:14px 14px}
-  #app .ly{grid-template-columns:1fr auto;padding:9px 12px;margin:6px 0}
+  #app .ly{padding:6px 11px;margin:3px 0}
   #app .ly .n{display:none}
-  @media (max-width:1199px){ #app .spine{max-height:26vh} #app .ly{margin:4px 0;padding:7px 12px} }
+  @media (max-width:1199px){ #app .ly{margin:4px 0;padding:7px 12px} }
 
 /* ── panels that read in one direction: the header is one line of title, then one line of controls; the rail fills its column; every tab is visible ── */
 #app .top h2{flex-basis:100%}
 #app .top .meta{flex:1 1 0;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}#app .top .sp{display:none}
-@media (min-width:901px) and (max-width:1199px){ #app .spine{max-height:none} #app .tabs{flex-wrap:wrap;overflow:visible} }
+@media (min-width:901px) and (max-width:1199px){ #app .tabs{flex-wrap:wrap;overflow:visible} }
 .pstat{display:flex;flex-wrap:wrap;gap:6px 14px;font:12.5px var(--mono);color:var(--dim);margin:0 0 12px}.pstat b{color:var(--ink);font-weight:600}
+.stage-line{font-size:14px;line-height:1.5;margin:4px 0 8px}.stage-line.dim{color:var(--dim)}
+.fold-top{margin:2px 0 10px;font-size:13px}.fold-top summary{cursor:pointer;color:var(--mut)}.fold-top summary:hover{color:var(--ink)}.fold-top ul{margin:6px 0 0 18px;padding:0;color:var(--ink2);font-size:12.5px;line-height:1.5}.fold-top li{margin:2px 0;overflow-wrap:anywhere}
+.flr{border:1px solid var(--line);border-left:3px solid var(--fc);border-radius:9px;padding:10px 12px;margin:10px 0;background:var(--s1);min-width:0}
+.flr.cur{background:#1a1f2b}.flr.stage .fhd b::after{content:" · stage";color:var(--green)}
+.flr .fhd{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline}.flr .fhd .f{font:600 12.5px var(--mono);color:var(--bg);background:var(--fc);border-radius:5px;padding:1px 7px}
+.flr .fhd b{font-size:14px}.flr .fhd .xr{font:12px var(--mono);color:var(--dim);margin-left:auto}
+.flr .vd{font:12.5px var(--mono);color:var(--dim)}.flr .vd.ok{color:var(--green)}.flr .vd.bad{color:var(--amber)}.flr .vd.fail{color:var(--bad)}
+.flr .op{color:var(--mut);font-size:13px;margin:4px 0 8px;line-height:1.45}
+.flr .chg{border-left:2px solid var(--line2);padding:4px 10px;margin:6px 0;font-size:13.5px;line-height:1.5;overflow-wrap:anywhere}.flr .chg .k{font:600 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--dim);margin-bottom:2px}
+.flr .ex{font:12.5px/1.6 var(--mono);color:var(--ink2);margin-top:4px;overflow-wrap:anywhere}.flr .ex .dim,.flr .dim{color:var(--dim)}
+.flr .lys{margin:6px 0}.flr .lys.none{font-size:12.5px;color:var(--dim);line-height:1.4}
+.flr .det{font-size:12.5px;color:var(--dim);margin:6px 0;line-height:1.45;overflow-wrap:anywhere}.flr .det b{color:var(--ink2);font-weight:600}
+.flr details.fold{margin:6px 0;font-size:13px}.flr details.fold summary{cursor:pointer;color:var(--mut)}.flr details.fold summary:hover{color:var(--ink)}
+.flr dl.defs{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;margin:6px 0 0}.flr dl.defs dt{color:var(--dim);font:12px var(--mono)}.flr dl.defs dd{margin:0;overflow-wrap:anywhere;line-height:1.45}
+.flr table.arms{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:8px}.flr .arms th{font:600 11px var(--mono);color:var(--dim);text-align:left;padding:4px 6px;border-bottom:1px solid var(--line)}
+.flr .arms td{padding:5px 6px;vertical-align:top;border-bottom:1px solid var(--line);line-height:1.4;overflow-wrap:anywhere}.flr .arms .giver{color:var(--dim);font-size:11px}.flr .arms .skip{color:var(--dim)}
+.flr .arms tr.ok .res{color:var(--green)}.flr .arms tr.bad .res{color:var(--bad)}.flr .arms tr.warn .res{color:var(--amber)}
+@media (max-width:900px){.flr .arms thead{display:none}.flr .arms tr{display:grid;grid-template-columns:1fr;gap:2px;padding:6px 0;border-bottom:1px solid var(--line)}.flr .arms td{border:0;padding:0 2px}.flr .fhd .xr{margin-left:0;flex-basis:100%}}
 /* propositions: one card per statement — the words, then what the parser made of them, then what the reading tied */
 .pc{border:1px solid var(--line);border-radius:10px;background:var(--s1);margin:0 0 10px;overflow:hidden}
 .pc.cur{border-color:var(--acc3);box-shadow:inset 3px 0 0 var(--acc)}
@@ -368,6 +358,55 @@
 .tie{display:grid;grid-template-columns:minmax(0,1fr) auto auto auto;gap:6px 14px;align-items:center;padding:2px 0}
 .tie .mono{color:var(--mut)}
 @media (max-width:700px){.pc-sec{padding-left:12px}.tie{grid-template-columns:1fr;gap:4px}}
+
+  /* ── the editor's layout: index | viewer + timeline | inspector, the transport across the bottom. Only the playhead and the viewer's marks move while it plays. ── */
+  #app{grid-template-columns:280px minmax(0,1fr);grid-template-rows:auto minmax(0,1fr) 300px auto}
+  @media (min-width:1200px){ #app{grid-template-columns:280px minmax(0,1fr) minmax(340px,400px)} }
+  @media (max-width:1199px){ #app .insp{display:none} }
+  #app .top{grid-column:1/-1;grid-row:1}
+  #app .index{grid-column:1;grid-row:2/4;border-right:1px solid var(--line);overflow:auto;min-height:0;min-width:0}
+  #app .index .spine{padding:10px 12px 14px;overflow:visible;border:0;max-height:none}
+  #app .viewer{grid-column:2;grid-row:2;display:flex;flex-direction:column;min-height:0;min-width:0}
+  #app .viewer .tabs{flex:0 0 auto}
+  #app .viewer .now{flex:0 0 auto;border-top:0;border-bottom:1px solid var(--line);min-height:0;padding:6px 18px 7px}
+  #app .viewer .now .k{font-size:11px;letter-spacing:.1em}#app .viewer .now p{margin:2px 0 0;font-size:13px;color:var(--ink2);max-width:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  #app .vbody{flex:1 1 0;min-height:0;display:flex;flex-direction:column}
+  #app #b-read{display:flex;flex-direction:column;flex:1 1 0;min-height:0}#app #b-read[hidden]{display:none}
+  #app .viewer .lens{flex:1 1 0;min-height:0;max-height:none;overflow:auto;border-bottom:0;padding:8px 26px 18px}
+  #app .viewer .lanes{display:block;flex:0 0 auto;max-height:32%;overflow:auto;border-top:1px solid var(--line);padding:8px 18px 10px}
+  #app #p-drawer{flex:1 1 0;min-height:0;display:grid;position:relative}#app #p-drawer[hidden]{display:none}#app #p-drawer>*{grid-area:1/1}
+  @media (min-width:1200px){ #app .insp{grid-column:3;grid-row:2/4;display:block;border-left:1px solid var(--line);overflow:auto;min-height:0;min-width:0} }
+  #app .timeline{grid-column:2;grid-row:3;border-top:1px solid var(--line);display:flex;flex-direction:column;min-height:0;min-width:0;background:#141417}
+  #app .tl-head{flex:0 0 auto;display:flex;align-items:center;gap:10px;padding:3px 10px;border-bottom:1px solid var(--line);font:11px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--dim)}
+  #app .tl-head .seg{margin-left:auto}
+  #app .tl-body{flex:1 1 0;min-height:0;overflow:auto;position:relative}
+  #app .tl-lanes{display:grid;grid-template-columns:168px minmax(0,1fr)}#app .tl-lanes[hidden]{display:none}
+  #app .tl-h div{height:20px;box-sizing:border-box;display:flex;align-items:center;gap:6px;padding:0 8px 0 10px;font:11.5px var(--mono);color:var(--ink2);border-bottom:1px solid #222227;white-space:nowrap;overflow:hidden;cursor:default}
+  #app .tl-h div.ax{height:18px;color:var(--dim);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase}
+  #app .tl-h div.fl{cursor:pointer}#app .tl-h div.fl.empty{cursor:default;color:var(--dim)}#app .tl-h div.fl:focus-visible{outline:2px solid var(--acc3);outline-offset:-2px}
+  #app .tl-h div.sub{padding-left:30px;color:var(--mut)}
+  #app .tl-h .dot{width:8px;height:8px;border-radius:2px;flex:none}#app .tl-h .car{width:10px;flex:none;color:var(--dim)}
+  #app .rib{position:relative;cursor:pointer;touch-action:none;height:60px}#app .rib canvas{width:100%;height:100%;display:block}
+  #app .log{display:grid;grid-template-rows:minmax(0,1fr);height:100%;min-height:0}#app .log[hidden]{display:none}
+  #app .transport{grid-column:1/-1;grid-row:4;display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:6px 14px calc(8px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--line)}
+  #app .transport .seg,#app .tl-head .seg{display:inline-flex;gap:0;margin-left:6px;border:1px solid var(--line2);border-radius:6px;overflow:hidden}
+  #app .seg button{border-radius:0;font-size:12px;padding:4px 9px;min-height:30px;background:none;border:0;color:var(--mut);cursor:pointer}
+  #app .seg button[aria-pressed=true]{background:var(--sel);color:var(--ink)}
+  #app .transport .rd{margin-left:auto}
+  #app .lnote,#app .key{display:none}
+  @media (max-width:900px){
+    #app{grid-template-columns:1fr;grid-template-rows:auto auto minmax(0,1fr) 190px auto}
+    #app .index{grid-column:1;grid-row:2;border-right:0;border-bottom:1px solid var(--line);overflow:visible}
+    #app .index .spine{padding:8px 12px;overflow-x:auto;overflow-y:hidden}
+    #app .spine .fg{display:contents}#app .spine .fg[hidden]{display:none}#app .spine .fh .car{display:none}
+    #app .viewer{grid-column:1;grid-row:3}
+    #app .viewer .lens{padding:8px 16px 14px}
+    #app .timeline{grid-column:1;grid-row:4}
+    #app .tl-lanes{grid-template-columns:118px minmax(0,1fr)}
+    #app .transport{grid-column:1;grid-row:5}
+    #app .insp{display:none}
+    #app .top h2{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  }
 </style>
 </head>
 <body>
@@ -390,6 +429,7 @@
       <button data-s="dossier">sample 2</button>
       <button data-s="history">sample 3</button>
       <button id="exsrc" title="Three sources on one ship">ship</button>
+      <button data-doc="Report" title="A whole document, read end to end: the Board of Trade’s 1912 report on the loss of the Titanic (about 64,000 characters), from the Holodeck’s own published sample set">whole document</button>
     </span>
     <span id="model" class="badge live" hidden>model calls: 0</span>
   </div>
@@ -402,17 +442,6 @@
   <div class="top">
     <h2 id="p-title">how it was read</h2>
     <span class="meta" id="p-meta"></span><span class="sp"></span>
-    <span class="lay" id="lay">
-      <button type="button" data-lay="swap" title="Swap the centre and right panels">⇄ swap</button>
-      <details><summary title="Choose what each panel shows">layout</summary>
-        <div class="lay-pop">
-          <label>Reading <select data-blk="read"></select></label>
-          <label>Details <select data-blk="detail"></select></label>
-          <label>Inspector <select data-blk="insp"></select></label>
-          <button type="button" data-lay="reset">reset layout</button>
-        </div>
-      </details>
-    </span>
     <button type="button" class="f" data-a="toggle-all" title="Switch every optional layer off or on">all layers</button>
     <button type="button" data-a="reset" title="Back to every layer on">reset</button>
     <button type="button" data-a="copy">Copy trace (JSON)</button>
@@ -422,102 +451,63 @@
     <span class="stats" id="p-stats"></span>
     <div class="delta" id="p-delta" hidden></div>
   </div>
-  <div class="body">
-    <div class="left">
-      <div class="spine" id="spine"></div>
-      <div class="lnote" id="p-lnote" aria-live="polite"></div>
-      <div class="log">
-        <div class="rows" tabindex="0"><div class="sz"></div></div>
-        <div class="now" id="p-now"></div>
-      </div>
+  <!-- the editor's four panes: the index of floors and layers (fixed), the viewer (the text at the playhead), the timeline (one lane per layer), the inspector (the selection) — and the transport -->
+  <aside class="index" id="p-index" aria-label="Index — the floors, and the layers that make each">
+    <div class="spine" id="spine"></div>
+  </aside>
+  <main class="viewer" id="p-viewer" aria-label="Viewer">
+    <div class="tabs" id="p-tabs" role="tablist" aria-label="View">
+      <button type="button" data-tab="text" role="tab" aria-selected="true">Text</button>
+      <button type="button" data-tab="source" role="tab" aria-selected="false">Source</button>
+      <button type="button" data-tab="floors" role="tab" aria-selected="false">Floors</button>
+      <button type="button" data-tab="words" role="tab" aria-selected="false">Words</button>
+      <button type="button" data-tab="pos" role="tab" aria-selected="false">POS</button>
+      <button type="button" data-tab="morph" role="tab" aria-selected="false">Morphology</button>
+      <button type="button" data-tab="refs" role="tab" aria-selected="false">Referents</button>
+      <button type="button" data-tab="props" role="tab" aria-selected="false">Propositions</button>
+      <button type="button" data-tab="render" role="tab" aria-selected="false">Render</button>
+      <button type="button" data-tab="eot" role="tab" aria-selected="false">EOT</button>
+      <button type="button" data-tab="json" role="tab" aria-selected="false">JSON</button>
+      <button type="button" data-tab="graph" role="tab" aria-selected="false">Graph</button>
     </div>
-    <div class="right">
-      <div class="blk" id="b-read" data-blk="read">
+    <div class="now" id="p-now"></div>
+    <div class="vbody">
+      <div class="blk" id="b-read">
         <div class="lens" id="p-lens"></div>
         <div class="lanes" id="p-lanes" aria-label="The current sentence, lane by lane"></div>
       </div>
-      <div class="drawer" id="p-drawer" data-blk="detail">
-        <div class="dh">
-          <button type="button" class="dt" id="p-dt" aria-expanded="false" title="Show or hide the detail views">▸ Details</button>
-          <div class="tabs" id="p-tabs" role="tablist" aria-label="View">
-            <button type="button" data-tab="source" role="tab" aria-selected="true">Source</button>
-            <button type="button" data-tab="words" role="tab" aria-selected="false">Words</button>
-            <button type="button" data-tab="pos" role="tab" aria-selected="false">POS</button>
-            <button type="button" data-tab="morph" role="tab" aria-selected="false">Morphology</button>
-            <button type="button" data-tab="refs" role="tab" aria-selected="false">Referents</button>
-            <button type="button" data-tab="props" role="tab" aria-selected="false">Propositions</button>
-            <button type="button" data-tab="render" role="tab" aria-selected="false">Render</button>
-            <button type="button" data-tab="eot" role="tab" aria-selected="false">EOT</button>
-            <button type="button" data-tab="json" role="tab" aria-selected="false">JSON</button>
-            <button type="button" data-tab="graph" role="tab" aria-selected="false">Graph</button>
-          </div>
-        </div>
-        <div class="pane-wrap">
-          <div class="pane" id="p-pane"></div>
-          <div id="p-graph-note" hidden></div>
-          <div class="pane graph-host" id="p-graph" hidden></div>
-        </div>
+      <div class="pane-wrap" id="p-drawer" hidden>
+        <div class="pane" id="p-pane"></div>
+        <div id="p-graph-note" hidden></div>
+        <div class="pane graph-host" id="p-graph" hidden></div>
       </div>
     </div>
-    <div class="slot" id="slot-b"><aside class="insp" id="p-insp" data-blk="insp" aria-label="Inspector — why this step"></aside></div>
-  </div>
-  <div id="park" hidden></div>
-  <div class="bar2">
-    <div class="rib" title="Drag to scrub"><canvas></canvas></div>
-    <div class="ctl">
-      <button type="button" data-a="start" title="First event (Home)">|◀</button>
-      <button type="button" data-a="back" title="One event back (←)">◀|</button>
-      <button type="button" data-a="rev" title="Rewind (J)">◀◀</button>
-      <button type="button" data-a="play" class="pl" title="Play / pause (Space)">▶ Play</button>
-      <button type="button" data-a="fwd" title="One event forward (→)">|▶</button>
-      <span class="seg" role="group" aria-label="Clock">
-        <button type="button" data-a="steps" aria-pressed="true">Steps</button>
-        <button type="button" data-a="real" aria-pressed="false">Real time</button>
-      </span>
-      <label style="display:flex;align-items:center" title="Speed"><select id="p-speed"></select></label>
-      <span class="rd" id="p-rd"></span>
+  </main>
+  <aside class="insp" id="p-insp" aria-label="Inspector — the selected step"></aside>
+  <section class="timeline" id="p-timeline" aria-label="Timeline — one lane per layer">
+    <div class="tl-head"><span>lanes · <span id="p-clockname">steps</span></span>
+      <span class="seg tl-mode" role="group" aria-label="Timeline view"><button type="button" data-tl="lanes" aria-pressed="true">Lanes</button><button type="button" data-tl="list" aria-pressed="false">List</button></span></div>
+    <div class="tl-body">
+      <div class="tl-lanes" id="p-tl"><div class="tl-h" id="p-tlh"></div><div class="rib" title="Drag to scrub"><canvas></canvas></div></div>
+      <div class="log" id="p-log" hidden><div class="rows" tabindex="0"><div class="sz"></div></div></div>
     </div>
-    <div class="key" id="p-key"></div>
+  </section>
+  <div class="transport ctl">
+    <button type="button" data-a="start" title="First event (Home)">|◀</button>
+    <button type="button" data-a="back" title="One event back (←)">◀|</button>
+    <button type="button" data-a="rev" title="Rewind (J)">◀◀</button>
+    <button type="button" data-a="play" class="pl" title="Play / pause (Space)">▶ Play</button>
+    <button type="button" data-a="fwd" title="One event forward (→)">|▶</button>
+    <span class="seg" role="group" aria-label="Clock">
+      <button type="button" data-a="steps" aria-pressed="true">Steps</button>
+      <button type="button" data-a="real" aria-pressed="false">Real time</button>
+    </span>
+    <label style="display:flex;align-items:center" title="Speed"><select id="p-speed"></select></label>
+    <span class="rd" id="p-rd"></span>
   </div>
+  <div class="key" id="p-key" hidden></div>
+  <div class="lnote" id="p-lnote" hidden></div>
 </div>
-
-<script>
-// Swappable panels (wide screens): each of the reading, the details and the inspector sits in the centre slot, the
-// right slot, or is hidden. Blocks are moved, never rebuilt, so every renderer keeps its element and its listeners.
-(() => {
-  const KEY = 'holodeck-demo-layout', DEF = { read:'a', detail:'a', insp:'b' }, ORDER = ['read', 'detail', 'insp'];
-  const NAME = { a:'Centre', b:'Right', h:'Hidden' };
-  const app = document.getElementById('app'), lay = document.getElementById('lay'); if (!app || !lay) return;
-  const slots = { a: app.querySelector('.right'), b: document.getElementById('slot-b'), h: document.getElementById('park') };
-  const blk = { read: document.getElementById('b-read'), detail: document.getElementById('p-drawer'), insp: document.getElementById('p-insp') };
-  const wide = matchMedia('(min-width:1200px)');
-  let L = { ...DEF };
-  try { const v = JSON.parse(localStorage.getItem(KEY) || 'null'); if (v && ORDER.every(k => 'abh'.includes(v[k]))) L = v; } catch (e) {}
-  const save = () => { try { localStorage.setItem(KEY, JSON.stringify(L)); } catch (e) {} };
-  const sels = [...lay.querySelectorAll('select')];
-  sels.forEach(sel => { sel.innerHTML = ['a', 'b', 'h'].map(v => `<option value="${v}">${NAME[v]}</option>`).join(''); });
-  function place(){
-    const use = wide.matches ? L : DEF;
-    ORDER.forEach(k => slots[use[k]].appendChild(blk[k]));
-    for (const id of ['a', 'b']){
-      const here = ORDER.filter(k => use[k] === id);
-      slots[id].classList.toggle('only-detail', here.length === 1 && here[0] === 'detail');
-      slots[id].classList.toggle('empty-slot', !here.length);
-    }
-    sels.forEach(sel => { sel.value = L[sel.dataset.blk]; });
-    window.dispatchEvent(new Event('resize'));
-  }
-  lay.addEventListener('change', e => { const sel = e.target.closest('select'); if (!sel) return; L[sel.dataset.blk] = sel.value; save(); place(); });
-  lay.addEventListener('click', e => {
-    const b = e.target.closest('[data-lay]'); if (!b) return;
-    if (b.dataset.lay === 'swap') ORDER.forEach(k => { if (L[k] !== 'h') L[k] = L[k] === 'a' ? 'b' : 'a'; });
-    else L = { ...DEF };
-    save(); place();
-  });
-  wide.addEventListener('change', place);
-  place();
-})();
-</script>
 <script type="module">
 // ─────────────────────────────────────────────────────────────────────────────
 // "No model was called" is MEASURED: every network request this page makes is
@@ -537,7 +527,8 @@ import { mountMap } from '../holodeck-map.js';
 import { classifyWord, THRAX_MAP, THRAX_OUT_OF_SCOPE, THRAX_META, POS_PRIOR_META } from '../vendor/khora/native/adapters/text/wordclass.js';
 import { morphologyFromPrior, createLemmatizer, stemsOf } from '../vendor/khora/native/adapters/text/morphology.js';
 import { splitSentences, deriveAbbreviations } from '../vendor/khora/native/adapters/text/spans.js';
-import { layerNoteHTML, tabNoteHTML, LAYER_NOTES } from './layer-notes.js';
+import { tabNoteHTML, LAYER_NOTES } from './layer-notes.js';
+import { makeLexicon, aliasJunctions, resolveAliases } from './lexicon.js';
 import { buildRows, sortRows, nextSort, tableHTML as refTableHTML } from './referent-table.js';
 import { scanPunctuation, loadPunctuation, moodAt, containersAt, cuesFromBlankLines, cuesFromLayout } from './punctuation.js';
 import { tokenize } from '../vendor/khora/native/organs/source.js';
@@ -556,6 +547,10 @@ import { makeSameBeing } from '../vendor/khora/native/adapters/text/corpus-ident
 import { browserOcr, loadPdfjs } from '../holodeck-ocr.js';
 import { recordOcr } from './scan-ledger.js';
 import { sha256Hex, stableProvenanceId, byteRange, EotLedger } from '../vendor/fold-chat/fold-chat-eot.js';
+import { runLadder, runPriorArms, materialOf, FLOORS, PRIORS_OF, PRIOR_NOTE } from './mhc-ladder.js';
+import { statusWord, cleanDetail, ARM_ROWS, armOutcome } from './floor-words.js';
+import { orderOf } from '../vendor/khora/native/the-fold/mhc.js';
+import { isClaimRef } from '../vendor/khora/native/organs/nesting.js';
 
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]));
@@ -582,6 +577,7 @@ const LAYERS = [
   { id:'decode',    label:'Decode',     color:'--pink',  fixed:true, why:'utf-8 bytes → characters; the address space stays bytes' },
   { id:'furniture', label:'Furniture',  color:'--mut',   feature:'furniture', why:'markup / CSS / URLs blanked in place — offsets untouched' },
   { id:'punct',     label:'Punctuation', color:'--amber', fixed:true, why:'every mark kept, with its role: sentence ends and their mood, quotations, brackets, separators' },
+  { id:'lexicon',   label:'Hyperlexicon', color:'--acc2', feature:'lexicon', why:'forms the priors cannot settle, asked of the hyperlexicon (its local giver, English Wiktionary): an alias keeps its period, a missing class is filled' },
   { id:'statement', label:'Statements', color:'--ink2',  fixed:true, why:'the material split into the statements it makes' },
   { id:'token',     label:'Words',      color:'--blue',  fixed:true, why:'each statement split into the forms it is made of' },
   { id:'grammar',   label:'POS',        color:'--acc',   feature:'pos', why:'each form → the classes it is ATTESTED as (Thrax over UD)' },
@@ -598,7 +594,27 @@ const L = {}; LAYERS.forEach((l, i) => L[l.id] = { i, ...l });
 const CK = {}; LAYERS.forEach((l, i) => CK[l.id] = i);
 const FEATURE_OF = {}; LAYERS.forEach(l => { if (l.feature) FEATURE_OF[l.feature] = l.id; });
 const OPTIONAL = LAYERS.filter(l => l.feature).map(l => l.feature);
-const DEFAULT_FEATURES = { furniture:true, pos:true, morph:true, stance:true, npSubj:true, phrasal:true };
+const DEFAULT_FEATURES = { furniture:true, lexicon:true, pos:true, morph:true, stance:true, npSubj:true, phrasal:true };
+
+// ── THE FLOORS over the pipeline: the fold's own ladder (reading/mhc-ladder.js), scored with the MHC's discipline. ──
+// Each layer sits at the floor whose operand it makes. The layers that classify forms by a received prior (POS,
+// morphology, stance) sit with F0: they say what a unit's forms carry and arrange nothing. Render re-orders an F2
+// arrangement and makes no new operand. F3's judge is the verdict each relation carries, read in the Relations
+// layer — no layer of its own. F4, F5 and F6 have no layer on this page, and the rail shows those rungs empty:
+// that is the finding about this pipeline, not a gap in the drawing.
+const FLOOR_OF_LAYER = { extract:'F0', bytes:'F0', decode:'F0', furniture:'F0', punct:'F0', lexicon:'F0', statement:'F0', token:'F0', grammar:'F0', morph:'F0', stance:'F0', referent:'F1', relation:'F2', np:'F2', phrasal:'F2', render:'F2', ledger:null };
+const FLOOR_COLOR = { 'F0':'--f0', 'F1':'--f1', 'F2':'--f2', 'F3':'--f3', 'F4':'--f4', 'F5':'--f5', 'F6':'--f6' };
+const FLOOR_NOTE = {   // what the rail says where a floor has no layer of its own
+  'F3': 'no layer of its own — the verdict each relation carries (bound · contradicted · unbound), read back against the material',
+  'F4': 'no layer on this page — nothing here puts a claim in an end slot',
+  'F5': 'no layer on this page — the ladder reads notes across sources; this view reads one',
+  'F6': 'no layer on this page — nothing here composes from premises',
+};
+const floorIdx = h => FLOORS.findIndex(f => f.floor === h);
+// click a layer in the rail: the replay jumps to its first event and the drawer opens on the tab that shows its work
+const TAB_OF_LAYER = { extract:'text', bytes:'text', decode:'text', furniture:'text', punct:'text', lexicon:'words', statement:'text', token:'words', grammar:'pos', morph:'morph', stance:'props', referent:'refs', relation:'props', np:'props', phrasal:'props', render:'render', ledger:'eot' };
+const shortVerdict = w => String(w || '').split(' — ')[0];
+const floorId = h => 'fl-' + String(h).replace(/^F/, '').replace('½', 'h');
 
 // the stance class, re-declared here (same shape as the organ) so the page can
 // COUNT and LABEL the positions the stance layer carried, never to change them.
@@ -660,7 +676,13 @@ const ORDERS = [
 
 let PRIORS = null, READER = null, LEXICON = null, LEXICON_LONGEST = 0;
 // dictionary · Wikipedia · Wikidata: a crossing the page makes only when asked — see holodeck-lookup.js. Starts OFF.
-const LOOKUP = makeLookup();
+// THE HYPERLEXICON, open to every organ (reading/lexicon.js): its local giver is the English Wiktionary pack on this machine, read by the
+// Holodeck's own server (POST /lexicon). An organ asks only about a form the language's priors cannot settle; nothing leaves the machine.
+// one client per language the documents measure as: the giver's entries are filtered to that language's own words
+const askLexicon = async (forms, lang) => { const r = await fetch('/lexicon', { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ forms, lang }) }); return r.ok ? r.json() : null; };
+const HLEXS = new Map(), hlexFor = (lang) => { if (!HLEXS.has(lang)) HLEXS.set(lang, makeLexicon({ ask: askLexicon, lang })); return HLEXS.get(lang); };
+const HLEX = hlexFor('en');
+const LOOKUP = makeLookup({ local: HLEX });   // the page's dictionary parser reads English entries, so the class fill below is English only
 let LOOKUPS_ON = false;
 const knownWord = w => !!(LEXICON && LEXICON.has(String(w).toLowerCase()));
 async function ready(){
@@ -673,13 +695,64 @@ async function ready(){
   READER = await makeEngineRelationReader();
 }
 
+// ── THE LADDER on this reading: reading/mhc-ladder.js::runLadder, on the SAME reader the replay ran ─────────────
+// READING-POLICY P3: the run states which priors the reader was handed — as loadPriors and makeEngineRelationReader hand them over.
+function priorsDeclared(){
+  return [
+    PRIORS.langIso3
+      ? `part of speech — priors/pos-${PRIORS.langIso3}.json, the document's measured language (${PRIORS.lang && PRIORS.lang.lang}); no lemmatizer for it`
+      : `part of speech — ${POS_PRIOR_META.giver} (priors/pos-eng.json), with its lexicon consulted where the treebank has no entry (priors/pos-eng-lexicon.json)`,
+    `morphology — ${PRIORS.morphRaw?.provenance?.source || 'UniMorph English'} (priors/morphology-eng.json): the lemmatizer that widens same-act, and the verb-form set${PRIORS.langIso3 ? ' — English; not applied to this document' : ''}`,
+    'stance class — holodeck-reader.js (same-act widened by stance)',
+    'English closed classes — determiners, negation, first person (adapters/text/priors.js)',
+    `punctuation — the language's declared norms and its measured abbreviation prior (reading/punctuation.js, punctuation-priors/${PUNCT && PUNCT.lang ? PUNCT.lang : 'en'}.json), joined to the document's own abbreviations (spans.js::deriveAbbreviations)`,
+    ...(LOOKUP.count() ? [`hyperlexicon — ${LOOKUP.count()} forms looked up on request (holodeck-lookup.js → kernel/hyperlexicon.js): each witness nominated as a candidate with its giver, licence and address, none licensed; they fill class gaps in the document classifier — the relation reader does not read them`] : []),
+  ];
+}
+// The discrimination arms need material that does NOT support the task: a built-in sample of different content, never the material itself.
+function controlFor(analysis){
+  const key = analysis.includes(SAMPLES.history.slice(0, 40)) ? 'positions' : 'history';
+  return { key, material: materialOf([{ key, label: 'sample · ' + key, text: SAMPLES[key] }]) };
+}
+// The blanked text, cut into addressed passages, with the control beside it; every rung's declared task with its three arms.
+// It starts after the reading is on screen. LADDER_CHARS is the view's own reading cap (LIMIT), so a whole document is scored whole;
+// the Floors tab says when a cap cut.
+// The verdicts are the READER's ceiling on this material, not a property of the text: the same text under another reader scores otherwise.
+const LADDER_CHARS = 80000;
+function startLadder(T, R, clean, { readerFeatures = {}, foreign = null, abbreviations = null } = {}){
+  T.ladder = { state:'running' };
+  setTimeout(async () => {
+    const t0 = performance.now();
+    let Lr = null, material = null;
+    try {
+      const text = clean.length > LADDER_CHARS ? clean.slice(0, LADDER_CHARS) : clean;
+      material = materialOf([{ key:'text', label:T.doc.label, text }]);
+      const ctl = controlFor(text);
+      Lr = await runLadder({ material, control: ctl.material, READER: R, priors: priorsDeclared(), reader: R(material.passages) });
+      Lr.ms = Math.round(performance.now() - t0); Lr.controlKey = ctl.key; Lr.material = material; Lr.cut = clean.length - text.length;
+      T.ladder = { state:'done', L: Lr, priors:'running' };
+    } catch (err) { console.error(err); T.ladder = { state:'failed', error: String(err && err.message || err) }; }
+    if (T.onLadder) T.onLadder();
+    if (!Lr) return;
+    // the prior-withheld arm: the same reader built without one prior at a time (the rail's own switches), the floor's task run again.
+    // A finding about each prior — earned its keep here, or added nothing — never a change to a floor's verdict.
+    const t1 = performance.now();
+    try {
+      await runPriorArms(Lr, { material, withhold: async key => makeEngineRelationReader({ features: { ...readerFeatures, [key]: false }, foreign, abbreviations }) });
+      Lr.priorMs = Math.round(performance.now() - t1); T.ladder.priors = 'done';
+    } catch (err) { console.error(err); T.ladder.priors = 'failed'; T.ladder.priorError = String(err && err.message || err); }
+    if (T.onLadder) T.onLadder();
+  }, 80);
+}
+
 // ── build the trace: run the real organs, recording each transformation ──────
 // punctuation is settled at tokenization (reading/tokenize.js): POS is only ever asked about word forms
 let ABBREV = null;   // the splitter's own abbreviation knowledge for the text being read
+let ALIASES = new Map(), LEXSTEP = null;   // dotted forms the hyperlexicon resolved as aliases of other words, and what the consult did
 let PUNCT = null;    // the language's punctuation norms (declared) and its abbreviation prior (measured): reading/punctuation.js
 const abbrevOf = text => deriveAbbreviations(String(text ?? '').replace(/\r\n/g, '\n').replace(/\r/g, '\n'));
 // the document's own abbreviations (the splitter's) joined to the language's measured ones: "Dr." is one word, its dot kept, wherever it comes from
-const abbrevAll = () => new Set([...(PUNCT ? PUNCT.abbreviations : []), ...(ABBREV || [])].map(x => String(x).toLowerCase()));
+const abbrevAll = () => new Set([...(PUNCT ? PUNCT.abbreviations : []), ...(ABBREV || []), ...ALIASES.keys()].map(x => String(x).toLowerCase()));
 // the splitter compares case-sensitively ("Dr"), the measured prior is lower case: hand it every case a title takes
 const abbrevForSplitter = () => new Set([...abbrevAll()].flatMap(a => [a, a.charAt(0).toUpperCase() + a.slice(1), a.toUpperCase()]));
 const scanOpts = (extra = {}) => ({ norms: PUNCT && PUNCT.norms, abbreviations: abbrevAll(), ...extra });
@@ -719,6 +792,18 @@ function buildTrace(doc, clean, claims, features, extraction){
     { s:0, e:analysis.length, data:{ runs:blankRuns } });
 
   ABBREV = abbrevOf(clean);
+  // ── the hyperlexicon: what the priors could not settle, and what its local giver said ──
+  { const X = LEXSTEP;
+    if (!X || !X.on) push('lexicon', 'off', `hyperlexicon layer OFF — nothing is looked up; a dotted form the priors do not know may end a sentence, and a form the class prior lacks stays a gap`, { s:0, e:0, data:{ off:true } });
+    else if (X.gap) push('lexicon', 'gap', `the hyperlexicon was not reached — ${X.gap}; the reading carries on with the priors alone`, { s:0, e:0, data:X });
+    else {
+      push('lexicon', 'ask', `asked the hyperlexicon about ${X.asked.toLocaleString()} form${X.asked === 1 ? '' : 's'} the priors could not settle — ${X.junctions} possible sentence end${X.junctions === 1 ? '' : 's'} after a dotted form, ${X.posAsked} form${X.posAsked === 1 ? '' : 's'} with no class — ${X.giver.name}, the ${X.giver.snapshot} dump, on this machine · ${Math.round(X.ms)} ms`, { s:0, e:0, data:{ asked:X.asked, giver:X.giver } });
+      for (const a of X.aliases){ const at = clean.indexOf(a.form); push('lexicon', a.kept ? 'alias' : 'alias-refused', a.kept
+        ? `“${a.form}” is one word: the hyperlexicon lists it as a form of ${a.of.map(o => `“${o}”`).join(' and ')} — the period belongs to the word, so no sentence ends inside it (${a.n} place${a.n === 1 ? '' : 's'})`
+        : `“${a.form}” is listed as a form of ${a.of.map(o => `“${o}”`).join(' and ')}, but ${a.why} — so its period may still end a sentence`, { s:at, e:at >= 0 ? at + a.form.length : 0, data:a }); }
+      for (const f of X.posFound){ const at = clean.indexOf(f.form); push('lexicon', 'class', `“${f.form}” → ${f.upos.length ? f.upos.join(' / ') : 'listed, with no class the reader maps'} — attested by ${X.giver.name}, a witness for the class layer`, { s:at, e:at >= 0 ? at + f.form.length : 0, data:f }); }
+    }
+  }
   // the splitter and the punctuation scan share ONE abbreviation knowledge: the language's measured prior joined to this text's own
   const sents = splitSentences(clean, { abbreviations: abbrevForSplitter() });
   sents.forEach((s, i) => push('statement', 'statement',
@@ -745,7 +830,7 @@ function buildTrace(doc, clean, claims, features, extraction){
 
   const pos = features.pos === false ? null : PRIORS.posPrior;
   // the document's own definitions and typography settle capitalised forms the priors cannot place (candidates, with ranges)
-  const DOCC = pos ? documentClassifier(clean, { posPrior: pos, lemmatizer: PRIORS.lemmatizer, lookups: LOOKUP.cache }) : null;
+  const DOCC = pos ? documentClassifier(clean, { posPrior: pos, lemmatizer: PRIORS.lemmatizer, lookups: features.lexicon === false ? null : LOOKUP.cache }) : null;
   let gaps = 0, ambiguous = 0, classified = 0;
   shown.forEach(w => {
     if (!pos){ push('grammar', 'off', `“${w.w}” → POS layer OFF — no class prior is read; the form is carried as a bare string`, { s:w.s, e:w.e, data:{ w:w.w, found:false, off:true } }); return; }
@@ -778,21 +863,30 @@ function buildTrace(doc, clean, claims, features, extraction){
     { s:0, e:0, data:{ n:stanceClaims.length } });
 
   // ── referents ──
+  // The replay's referents are the ends of the relations read, so F1 here is read off F2. Which of them the name rule (F1's own
+  // route, cast.js: capitalised runs the text repeats) would have admitted is measured, and every other one is recorded as a
+  // REVISION: F2 added a referent F1 never had. The record is appended (the ledger's revise event), never written over.
+  // if the name rule itself cannot run, no revision is claimed: a failure of the route is not a finding about F2
+  let nameRule = null;
+  try { nameRule = [...new Set(discoverReferents(extractSurfaces(splitSentences(clean, { abbreviations: abbrevForSplitter() }), {}), {}).events.map(x => x.surface))]; } catch (e) { console.warn('the name rule did not run; no F2→F1 revision is recorded', e); }
+  const byRule = k => !nameRule || nameRule.includes(k) || nameRule.some(sf => { try { return namesCorefer(k, sf); } catch (e) { return false; } });
   const refs = new Map();
   for (const c of claims) for (const nm of [c.end1, c.end2]) {
     if (!nm) continue; const k = String(nm);
-    const r = refs.get(k) || { n:k, c:0, s:c.s, e:c.e, b0:c.b0 };
+    const r = refs.get(k) || { n:k, c:0, s:c.s, e:c.e, b0:c.b0, byRule: byRule(k) };
     r.c++; if (c.s < r.s) { r.s = c.s; r.e = c.e; r.b0 = c.b0; }
     refs.set(k, r);
   }
-  [...refs.values()].sort((a,b) => a.s - b.s).forEach(r => push('referent', 'name',
-    `referent “${r.n}” — first read at byte ${r.b0 == null ? '—' : r.b0} · stands in ${r.c} relation${r.c>1?'s':''}`, { s:r.s, e:r.e, data:r }));
+  [...refs.values()].sort((a,b) => a.s - b.s).forEach(r => { r.ev = push('referent', 'name',
+    `referent “${r.n}” — first read at byte ${r.b0 == null ? '—' : r.b0} · stands in ${r.c} relation${r.c>1?'s':''} · ${r.byRule ? 'admitted by the name rule' : 'NOT a name the rule admits: it will come from a relation’s end (F2 revising F1)'}`, { s:r.s, e:r.e, data:r }); });
 
   // ── relations ──
   claims.forEach(c => {
-    const v = c.verdict;
+    const v = c.verdict, ri = ev.length;
     push('relation', v, `${c.end1} —${c.label}→ ${c.end2} · standing: ${v === 'bound' ? 'read' : v === 'beyond-reach' ? 'beyond reach' : v === 'unbound' ? 'unbound' : v === 'contradicted' ? 'contradicted' : 'unheard'} · polarity ${c.polarity} · byte ${c.b0 == null ? '—' : c.b0}–${c.b1} · tense ${c.tense.v}`,
       { s:c.s, e:c.e, data:c });
+    for (const nm of [c.end1, c.end2]){ const r = refs.get(String(nm)); if (!r || r.byRule || r.revised) continue; r.revised = true;
+      push('relation', 'revision', `↺ “${r.n}” — a referent the name rule had not admitted, added from this relation’s end: F2 revises F1`, { s:c.s, e:c.e, data:{ revises:r.ev, by:ri, from:'F2', to:'F1', n:r.n } }); }
   });
 
   // ── render ──
@@ -808,12 +902,17 @@ function buildTrace(doc, clean, claims, features, extraction){
   const readEvt = led.event({ stage:'read', source_id:srcId, ...(scanned ? { parent:scanned.last } : {}), transform:'bytes→statements' });
   push('ledger', 'event', `${readEvt} · stage read · transform bytes→statements`, { s:0, e:0, data:{ id:readEvt } });
   led.event({ stage:'arrange', source_id:srcId, parent:readEvt, transform:'statements→tokens' });
-  led.event({ stage:'classify', source_id:srcId, parent:readEvt, transform:'tokens→classes', detail:{ giver:features.pos === false ? null : POS_PRIOR_META.giver } });
+  if (LEXSTEP && LEXSTEP.on && !LEXSTEP.gap) LEXSTEP.aliases.filter(a => a.kept).forEach(a => led.event({ stage:'lexicon', source_id:srcId, parent:readEvt, transform:'form→alias', detail:{ form:a.form, of:a.of, places:a.n, giver:LEXSTEP.giver } }));
+  led.event({ stage:'classify', source_id:srcId, parent:readEvt, transform:'tokens→classes', detail:{ giver:features.pos === false ? null : POS_PRIOR_META.giver, ...(LOOKUP.count() ? { witnesses:`hyperlexicon — ${LOOKUP.count()} forms looked up, candidates not givers` } : {}) } });
   claims.forEach(c => {
     const id = led.event({ stage:'bind', source_id:srcId, parent:readEvt, unit:'relation',
       range:byteRange(c.b0 ?? 0, (c.b0 ?? 0) + (c.span ? utf8Len(c.span) : 0)),
       transform:'clause→relation', detail:{ end1:c.end1, label:c.label, end2:c.end2, polarity:c.polarity, verdict:c.verdict, confidence:confidenceOf(c).pct } });
     push('ledger', 'bind', `${id} · bind clause→relation · byte ${c.b0 ?? 0}–${(c.b0 ?? 0) + (c.span ? utf8Len(c.span) : 0)} · “${c.end1}—${c.label}→${c.end2}”`, { s:c.s, e:c.e, data:{ id } });
+  });
+  [...refs.values()].filter(r => r.revised).forEach(r => {
+    const id = led.event({ stage:'revise', source_id:srcId, parent:readEvt, transform:'relation→referent', detail:{ of:r.n, from:'F2', to:'F1', note:'an end slot held a surface the name rule had not admitted; the relation layer added it as a referent' } });
+    push('ledger', 'revise', `${id} · revise relation→referent · “${r.n}” — F2 revised F1, appended`, { s:r.s, e:r.e, data:{ id, of:r.n } });
   });
   const eot = led.eot({ root:readEvt });
   push('ledger', 'eot', `append-only Provenance@${eot.schema || 2} emitted · ${led.events.length} events · ids recomputable by anyone (evt_ + first 20 hex of sha256(value))`, { s:0, e:0 });
@@ -909,7 +1008,7 @@ const REAL_SPEEDS = [[1,'1×'],[0.1,'1/10×'],[0.01,'1/100×'],[0.001,'1/1,000×
 let cur = null, inst = null, BASELINE = null, LAYERS_SEEN = false;
 let features = { ...DEFAULT_FEATURES };
 let lastRaw = '', lastLabel = '';
-let LAST_TAB = 'source', LAST_INSP = 'reading';
+let LAST_TAB = 'text', LAST_INSP = 'why';
 
 function openTrace(T){ return openReader(T); }
 // the reading, in three panels (reading/reader-view.js): what was read · the selected thing · where it came from
@@ -918,8 +1017,8 @@ function openTrace(T){ return openReader(T); }
 function showLayers(){
   if (!cur) return null; if (inst) inst.close();
   const rv = $('rv'); if (rv) rv.classList.remove('on');
-  const first = !LAYERS_SEEN; LAYERS_SEEN = true; if (first) LAST_TAB = 'graph';   // the first time, open on the relative solar system
-  inst = mount(cur.T); if (first && inst.setTab) inst.setTab('graph'); return inst;
+  LAYERS_SEEN = true;
+  inst = mount(cur.T); return inst;
 }
 document.addEventListener('click', (e) => { if (e.target.closest && e.target.closest('[data-a="to-reader"]') && inst) inst.close(); });
 function openReader(T, keep = null){
@@ -956,6 +1055,7 @@ function mount(T){
   const statsEl = $('p-stats'), metaEl = $('p-meta'), rc = app.querySelector('.rib canvas'), rdEl = $('p-rd'), speedSel = $('p-speed'), keyEl = $('p-key'), spineEl = $('spine');
   $('p-title').textContent = T.doc.label;
   keyEl.innerHTML = LAYERS.map(l => `<span><i style="background:var(${l.color})"></i>${esc(l.label)}</span>`).join('');
+  let closed = false; T.onLadder = () => { if (!closed){ tlCache = null; render(false); } };
 
   // ── clock ──
   let real = false, dir = 0, pos = 0, k = 0, speed = 8, last = performance.now(), raf = 0;
@@ -967,7 +1067,7 @@ function mount(T){
     speedSel.value = String(speed);
     app.querySelector('[data-a=steps]').setAttribute('aria-pressed', String(!real));
     app.querySelector('[data-a=real]').setAttribute('aria-pressed', String(real)); }
-  const setClock = r => { real = r; pos = clockOf(k); fillSpeeds(); drawRibbon(); };
+  const setClock = r => { real = r; pos = clockOf(k); fillSpeeds(); const cn = $('p-clockname'); if (cn) cn.textContent = r ? 'real time' : 'steps'; tlCache = null; drawRibbon(); };
   const seek = i => { k = Math.max(0, Math.min(N - 1, i)); pos = clockOf(k); render(true); };
   const setDir = d => { dir = d; app.querySelector('[data-a=play]').textContent = dir === 1 ? '❚❚ Pause' : '▶ Play'; app.querySelector('[data-a=rev]').textContent = dir === -1 ? '❚❚' : '◀◀'; last = performance.now(); };
 
@@ -982,37 +1082,76 @@ function mount(T){
     else if (e.stage === 'morph'){ S.morph.push(e.data); mk('m'); }
     else if (e.stage === 'stance'){ S.stance = (e.data && e.data.n) || 0; }
     else if (e.stage === 'referent'){ S.refs.set(e.data.n, e.data); mk('nm'); }
-    else if (e.stage === 'relation'){ S.rels.push(e.data); mk('r'); }
+    else if (e.stage === 'relation' && e.kind !== 'revision'){ S.rels.push(e.data); mk('r'); }
+    else if (e.stage === 'relation'){ /* a revision record on the relation lane: counted on the floor it revised, not as an arrangement */ }
     else if (e.stage === 'ledger'){ S.led.push(e); }
     if (e.stage === 'furniture' && e.data && e.data.runs) e.data.runs.forEach(r => S.marks.push({ s:r.s, e:r.e, cls:'fu', stage:'furniture' }));
   }
   let S = null, sk = -1;
   function stateAt(i){ if (!S || i < sk){ S = fresh(); sk = -1; } while (sk < i) apply(S, ev[++sk]); return S; }
 
-  // ── spine (layers + switches) ──
-  function renderSpine(St, e){
-    const active = e.stage;
-    spineEl.innerHTML = `<div class="h">the pipeline — switch a layer off and the reading re-runs</div>` + LAYERS.map(l => {
+  // ── spine: the floors, each with the layers that make its operand, and the switches ──
+  // a floor's verdict fills in once the replay has reached it — the first event of a layer at that floor or above; a floor
+  // no layer makes (F3 up) fills at the first ledger event, since the record is written after the reading
+  const floorOfEv = i => FLOOR_OF_LAYER[ev[i].stage] || null;
+  const firstLedger = ev.findIndex(e => e.stage === 'ledger');
+  const reachAt = FLOORS.map((f, fi) => { const j = ev.findIndex((e, i) => floorOfEv(i) && floorIdx(floorOfEv(i)) >= fi); return j >= 0 ? j : firstLedger >= 0 ? firstLedger : N - 1; });
+  const ladderOf = () => (T.ladder && T.ladder.state === 'done' ? T.ladder.L : null);
+  // revisions received per floor: every event whose data.revises points at an operand on that floor (the record counts as a floor of its own)
+  let revN = -1, revCount = {}, revMsgs = {};
+  function revisions(){ if (revN === N) return revCount; revCount = {}; revMsgs = {};
+    for (let i = 0; i < N; i++){ const d = ev[i].data; if (!d || d.revises == null || !ev[d.revises]) continue; const fl = FLOOR_OF_LAYER[ev[d.revises].stage] || 'record'; revCount[fl] = (revCount[fl] || 0) + 1; (revMsgs[fl] = revMsgs[fl] || []).push(ev[i].msg); }
+    revN = N; return revCount; }
+  const verdictClass = it => (!it ? '' : it.status === 'passed' ? 'ok' : it.status === 'failed' ? 'fail' : 'bad');
+  function floorVerdict(h){
+    const Ld = T.ladder;
+    if (!Ld || Ld.state === 'running') return { word:'scoring…', cls:'' };
+    if (Ld.state === 'failed') return { word:'the ladder did not run', cls:'fail' };
+    const f = Ld.L.floors.floors.find(x => x.floor === h), it = f && f.items[0];
+    return { word: statusWord(it), cls: verdictClass(it) };
+  }
+  const noteOf = id => (LAYER_NOTES[id] || {}).what || (L[id] || {}).why || '';
+  function buildIndex(){
+    const byFloor = new Map(FLOORS.map(f => [f.floor, []])), record = [];
+    LAYERS.forEach(l => { const h = FLOOR_OF_LAYER[l.id]; (h ? byFloor.get(h) : record).push(l); });
+    const row = l => {
       const on = l.fixed || T.features[l.feature] !== false;
-      const cnt = layerCount(l.id, St);
-      const cur = l.id === active;
-      const sw = l.fixed ? ''
-        : `<span class="sw" role="switch" tabindex="0" aria-checked="${on}" data-feature="${l.feature}" title="switch ${esc(l.label)} ${on ? 'off' : 'on'} — the reading re-runs"></span>`;
-      return `<div class="ly ${cur ? 'cur' : ''} ${on ? '' : 'off'}"><span class="n">${l.i + 1}</span><span class="lab" style="color:var(${l.color})">${esc(l.label)}</span>${sw}${layerNoteHTML(l.id, { full:cur })}<span class="cnt" style="grid-column:2/3">${cnt}</span></div>`;
-    }).join('');
-    { const n = LAYER_NOTES[active], lab = (L[active] || {}).label, ln = $('p-lnote'); if (ln) ln.innerHTML = n ? `<b>${esc(lab)}</b> ${esc(n.what)} <span class="dim"><b>Rests on</b> ${esc(n.rests)} <b>Cannot decide</b> ${esc(n.cannot)}</span>` : ''; }
+      const sw = l.fixed ? '' : `<span class="sw" role="switch" tabindex="0" aria-checked="${on}" data-feature="${l.feature}" title="switch ${esc(l.label)} ${on ? 'off' : 'on'} — the reading re-runs"></span>`;
+      return `<div class="ly ${on ? '' : 'off'}" data-layer="${l.id}" role="button" tabindex="0" title="${esc(noteOf(l.id))}"><span class="lab" style="color:var(${l.color})">${esc(l.label)}</span><span class="cnt"></span>${sw}</div>`;
+    };
+    const head = f => { const layers = byFloor.get(f.floor), closed = idxClosed.has(f.floor);
+      return `<div class="fh ${closed ? 'closed' : ''}" data-floor="${esc(f.floor)}" style="--fc:var(${FLOOR_COLOR[f.floor]})" role="button" tabindex="0" title="${esc(f.operand)} — open in the Floors tab"><span class="f">${esc(f.floor)}</span><span class="t"><span class="nm">${esc(f.name)}</span><span class="rv" hidden></span>${layers.length ? '' : '<span class="no">no layer</span>'}</span><span class="vd"></span>${layers.length ? `<button type="button" class="car" data-fold="${esc(f.floor)}" aria-expanded="${!closed}" aria-label="${closed ? 'show' : 'hide'} the layers of ${esc(f.floor)}">${closed ? '▸' : '▾'}</button>` : ''}</div>`; };
+    spineEl.innerHTML = `<div class="h">the floors, and the layers that make each — switch a layer off and the reading re-runs</div>`
+      + FLOORS.map(f => head(f) + `<div class="fg" data-fg="${esc(f.floor)}"${idxClosed.has(f.floor) ? ' hidden' : ''}>${byFloor.get(f.floor).map(row).join('')}</div>`).join('')
+      + `<div class="fh rec" style="--fc:var(--dim)" title="the record every floor appends to"><span class="f">∀</span><span class="t"><span class="nm">the record</span></span><span class="vd">every floor appends</span></div>` + record.map(row).join('');
     wireSwitches();
-    if (wide.matches){ const c = spineEl.querySelector('.ly.cur'); if (c){ const top = c.offsetTop, h = spineEl.clientHeight; if (top < spineEl.scrollTop || top + c.offsetHeight > spineEl.scrollTop + h) spineEl.scrollTop = Math.max(0, top - h / 3); } }
+  }
+  function updateIndex(St, e){
+    const active = e.stage, curFloor = FLOOR_OF_LAYER[active] || null, Ld = ladderOf(), stage = Ld ? Ld.floors.stage.stage : null;
+    spineEl.querySelectorAll('.ly[data-layer]').forEach(el => {
+      const id = el.dataset.layer; el.classList.toggle('cur', id === active);
+      const c = el.querySelector('.cnt'), html = layerCount(id, St); if (c.innerHTML !== html) c.innerHTML = html;
+    });
+    FLOORS.forEach((f, fi) => {
+      const el = spineEl.querySelector(`.fh[data-floor="${CSS.escape(f.floor)}"]`); if (!el) return;
+      el.classList.toggle('cur', curFloor === f.floor); el.classList.toggle('stage', stage === f.floor);
+      const reached = k >= reachAt[fi]; el.classList.toggle('ahead', !reached);
+      const v = reached ? floorVerdict(f.floor) : null, vd = el.querySelector('.vd'), word = v ? shortVerdict(v.word) : '', cls = 'vd ' + (v ? v.cls : '');
+      if (vd.textContent !== word) vd.textContent = word; if (vd.className !== cls) vd.className = cls;
+      if (v) el.title = `${f.operand} — ${v.word} — open in the Floors tab`;
+      const rv = el.querySelector('.rv'), n = revisions()[f.floor] || 0, txt = '↺ ' + n; rv.hidden = !n; if (rv.textContent !== txt){ rv.textContent = txt; rv.title = `${n} revision${n === 1 ? '' : 's'} from a higher floor — drawn as arrows on the timeline`; }
+    });
   }
   function layerCount(key, St){
     switch (key){
       case 'extract': { const X = T.extraction; if (!X) return 'text — no container'; const js = (X.readings[X.collapsed] || {}).junctions || [], nj = js.filter((x) => x.decision === 'join').length; return `${esc((X.readings[X.collapsed] || {}).extractor || '—')} · ${X.held} reading${X.held === 1 ? '' : 's'} held${js.length ? ` · ${js.length} startle${js.length === 1 ? '' : 's'}, ${nj} joined` : ''}`; }
-      case 'bytes': return esc(T.doc.label) + ' · ' + T.nBytes.toLocaleString() + ' bytes';
+      case 'bytes': return T.nBytes.toLocaleString() + ' bytes';
       case 'decode': return T.doc.analysis.length.toLocaleString() + ' chars';
       case 'furniture': return T.features.furniture === false ? 'off' : (T.blanks.length ? T.blanks.length.toLocaleString() + ' chars blanked' : 'nothing to blank');
+      case 'lexicon': { const X = T.lexicon; if (!X || !X.on) return 'off'; if (X.gap) return 'not reached'; const k = X.aliases.filter(a => a.kept).length; return `${X.asked.toLocaleString()} asked · ${k} alias${k === 1 ? '' : 'es'} · ${X.posFound.length} classes`; }
       case 'punct': { const P = T.punctuation || { sentences:[], containers:[] }, q = P.sentences.filter(x => x.mood === 'interrogative').length, x2 = P.sentences.filter(x => x.mood === 'exclamative').length; return (T.punct ? T.punct.length : 0) + ' marks · ' + P.sentences.length + ' sentences' + (q ? ' · ' + q + ' ask' : '') + (x2 ? ' · ' + x2 + ' exclaim' : '') + (P.containers.length ? ' · ' + P.containers.length + ' nested' : ''); }
       case 'statement': return T.sents.length + ' statements';
-      case 'token': return St.tokens.length.toLocaleString() + ' forms';
+      case 'token': return St.tokens.length.toLocaleString() + (T.words.length > WORDS_ANIMATED ? ' of ' + T.words.length.toLocaleString() : '') + ' forms';
       case 'grammar': return T.features.pos === false ? 'off' : (St.grammar.length.toLocaleString() + ' classified · ' + T.gaps + ' gaps · ' + T.ambiguous + ' ambiguous');
       case 'morph': return T.features.morph === false ? 'off' : St.morph.length.toLocaleString() + ' acts';
       case 'stance': return T.features.stance === false ? 'off' : St.stance + ' positions';
@@ -1036,7 +1175,7 @@ function mount(T){
       h += `<div class="row-ev${i === k ? ' cur' : i > k ? ' fut' : ''}" data-i="${i}" style="top:${i*RH}px" title="${esc(e.msg)}"><span class="t">${ms(e.t)}</span><span class="st" style="color:var(${S0.color})">${esc(S0.label)}</span><span>${esc(e.msg)}</span></div>`; }
     sz.innerHTML = h;
     const e = ev[k], S0 = L[e.stage] || { label:e.stage, color:'--dim' }, dt = k ? e.t - ev[k-1].t : e.t;
-    nowEl.innerHTML = `<div class="k" style="color:var(${S0.color})">layer ${S0.i + 1} of ${LAYERS.length} · ${esc(S0.label)} · ${esc(e.kind)} · +${ms(dt)} ms</div><p>${esc(e.msg)}</p>`;
+    nowEl.innerHTML = `<div class="k" style="color:var(${S0.color})">layer ${S0.i + 1} of ${LAYERS.length} · ${esc(S0.label)} · ${FLOOR_OF_LAYER[e.stage] || 'the record'} · ${esc(e.kind)} · +${ms(dt)} ms</div><p>${esc(e.msg)}</p>`;
   }
   bind(rowsEl, 'scroll', () => { if (!dir) renderLog(false); });
   bind(rowsEl, 'click', e => { const r = e.target.closest('.row-ev'); if (r){ setDir(0); seek(+r.dataset.i); } });
@@ -1084,7 +1223,7 @@ function mount(T){
   bind(lens, 'click', e2 => { const sel = getSelection(); if (sel && !sel.isCollapsed) return; const m = e2.target.closest('[data-ref]'); if (m) pivotTo(m.dataset.ref, m.dataset.mid); });
 
   // ── wide screens: the sentence lane by lane, and the inspector for the selected step ──
-  const lanesEl = $('p-lanes'), inspEl = $('p-insp'), drawer = $('p-drawer'), dtBtn = $('p-dt');
+  const lanesEl = $('p-lanes'), inspEl = $('p-insp');
   const wide = matchMedia('(min-width:1200px)');
   const TOK = [], tokAt = new Map(), lookupIdx = [];
   ev.forEach((e, i) => {
@@ -1092,8 +1231,6 @@ function mount(T){
     else if (e.stage === 'grammar' && e.s != null && tokAt.get(e.s)){ const t = tokAt.get(e.s); t.g = e.data; t.ig = i; lookupIdx.push(i); }
     else if (e.stage === 'morph' && e.s != null && tokAt.get(e.s)){ const t = tokAt.get(e.s); t.m = e.data; t.im = i; lookupIdx.push(i); }
   });
-  const setDrawer = on => { drawer.classList.toggle('open', on); dtBtn.setAttribute('aria-expanded', String(on)); dtBtn.textContent = (on ? '▾' : '▸') + ' Details'; };
-  bind(dtBtn, 'click', () => setDrawer(!drawer.classList.contains('open')));
   const classLabel = g => { if (!g || !g.found) return null; const c = g.candidates[0]; return c ? c.upos : null; };
   function renderLanes(e){
     const at = e.s != null ? e.s : (T.sents[0] ? T.sents[0].offset : 0);
@@ -1160,11 +1297,11 @@ function mount(T){
     // the last few lookups, each a way back
     let j = lookupIdx.length; { let lo = 0, hi = lookupIdx.length; while (lo < hi){ const m = (lo + hi) >> 1; if (lookupIdx[m] <= k) lo = m + 1; else hi = m; } j = lo; }
     const recent = lookupIdx.slice(Math.max(0, j - 7), j).reverse().map(i => { const x = ev[i]; const g = x.data || {}; const out = x.stage === 'grammar' ? (g.found ? classLabel(g) + (g.via && g.via.length ? ' ·' + (g.via.find(v => ['lexicon','shape','lemma','document-evidence'].includes(v.step)) || g.via[0]).step.replace('document-evidence','doc') : '') : 'gap') : ((g.lemmas && g.lemmas[0]) || (g.stems && g.stems[0]) || '—'); return `<div class="r" data-i="${i}"><span>${x.stage === 'grammar' ? 'class' : 'act'}</span><b>${esc(g.w)}</b><span>→ ${esc(out)}</span></div>`; }).join('');
-    return `<div class="ih"><div class="k" style="color:var(${S0.color})">layer ${S0.i + 1} of ${LAYERS.length} · ${esc(S0.label)} · ${esc(e.kind)} · +${ms(dt)} ms</div><div class="ttl">${ttl}</div><div class="sub">${e.s != null && e.e != null && e.e > e.s ? 'characters ' + e.s.toLocaleString() + '–' + e.e.toLocaleString() + ' · ' : ''}step ${(k + 1).toLocaleString()} of ${N.toLocaleString()}</div></div>${body}${recent ? `<div class="rec"><div class="n" style="font:600 12.5px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--dim);padding-bottom:4px">recent lookups</div>${recent}</div>` : ''}`;
+    return `<div class="ih"><div class="k" style="color:var(${S0.color})">layer ${S0.i + 1} of ${LAYERS.length} · ${esc(S0.label)} · ${FLOOR_OF_LAYER[e.stage] || 'the record'} · ${esc(e.kind)} · +${ms(dt)} ms</div><div class="ttl">${ttl}</div><div class="sub">${e.s != null && e.e != null && e.e > e.s ? 'characters ' + e.s.toLocaleString() + '–' + e.e.toLocaleString() + ' · ' : ''}step ${(k + 1).toLocaleString()} of ${N.toLocaleString()}</div></div>${body}${recent ? `<div class="rec"><div class="n" style="font:600 12.5px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--dim);padding-bottom:4px">recent lookups</div>${recent}</div>` : ''}`;
   }
   bind(inspEl, 'click', ev2 => { const r = ev2.target.closest('.r'); if (r){ setDir(0); seek(+r.dataset.i); } });
   // ── the reading over time: the WHOLE text is always on screen; what changes is the READING of it ──
-  const INSP_TABS = [['reading', 'Reading'], ['referents', 'Referents'], ['plain', 'Plain'], ['diagram', 'Diagrammed'], ['json', 'JSON'], ['why', 'Why this step']];
+  const INSP_TABS = [['why', 'Why this step'], ['floor', 'Floor'], ['reading', 'Reading'], ['referents', 'Referents'], ['plain', 'Plain'], ['diagram', 'Diagrammed'], ['json', 'JSON'], ['lookup', 'Look up']];
   let inspTab = LAST_INSP, tf = -1, tfTimer = 0, lastViewKey = '';
   // ── referents: ids, the fold at the frontier, and what the person has appended on top of it ──
   const overlay = T.overlay || (T.overlay = []);   // a person's own INS / CON / SYN events — the reader's log is never edited
@@ -1261,6 +1398,8 @@ function mount(T){
   function renderInsp(e){
     const tabs = `<div class="itabs" role="tablist" aria-label="Right panel">${INSP_TABS.map(([id, lab]) => `<button type="button" role="tab" data-itab="${id}" aria-selected="${id === inspTab}">${lab}</button>`).join('')}</div>`;
     if (inspTab === 'why'){ lastViewKey = ''; inspEl.innerHTML = tabs + whyHTML(e); return; }
+    if (inspTab === 'floor'){ lastViewKey = ''; const Lr = ladderOf(), h = FLOOR_OF_LAYER[e.stage] || (Lr && Lr.floors.stage.stage) || 'F0', fi = Math.max(0, floorIdx(h));
+      inspEl.innerHTML = tabs + `<div class="rd">${!T.ladder || T.ladder.state === 'running' ? '<p class="dim">scoring the floors on this reading…</p>' : T.ladder.state === 'failed' ? `<p>the ladder did not run: <span class="mono">${esc(T.ladder.error)}</span></p>` : floorBlock(FLOORS[fi], fi, Lr, h)}</div>`; return; }
     if (inspTab === 'referents'){ const key = `refs|${T.timeline ? tfIdx() : 'x'}|${overlay.length}|${selRef}|${selMention}|${selSpan ? selSpan.s + '-' + selSpan.e : ''}|${refSort.key}${refSort.dir}|${LOOKUP.count()}`; if (key === lastViewKey && inspEl.querySelector('.rtw')) return; lastViewKey = key; const keep = inspEl.scrollTop; inspEl.innerHTML = tabs + `<div class="rd refv">${refsHTML()}</div>`; inspEl.scrollTop = keep; return; }
     if (inspTab === 'lookup'){ lastViewKey = ''; const keep = inspEl.scrollTop, had = (inspEl.querySelector('#lk-in') || {}).value; inspEl.innerHTML = tabs + `<div class="rd lkv">${lookupHTML(e)}</div>`; inspEl.scrollTop = keep; return; }
     const key = `${inspTab}|${T.timeline ? tfIdx() : 'x'}|${tfTimer ? 'p' : ''}`;
@@ -1289,7 +1428,8 @@ function mount(T){
     let h = `<div class="lkt"><label class="lksw"><input type="checkbox" data-lkon ${on ? 'checked' : ''}> Allow lookups over the network</label>
       <div class="why">Sends only the word to <span class="mono">en.wiktionary.org</span>, <span class="mono">en.wikipedia.org</span> and <span class="mono">www.wikidata.org</span>. It is off until you switch it on; each request is listed below and counted in the page’s network total.</div>
       <div class="lkq"><input type="text" id="lk-in" value="${esc(w)}" placeholder="a word or a name" spellcheck="false"><button type="button" data-lk="look" ${on ? '' : 'disabled'}>Look up</button></div>
-      <div class="lkq"><button type="button" data-lk="batch" ${on && un.length ? '' : 'disabled'}>Look up the ${un.length} form${un.length === 1 ? '' : 's'} this reading could not place</button></div>
+      <div class="lkq"><button type="button" data-lk="batch" ${on && un.length ? '' : 'disabled'}>Look up ${un.length > 12 ? 'the first 12 of ' : ''}the ${un.length} form${un.length === 1 ? '' : 's'} this reading could not place</button>${un.length > 12 ? `<button type="button" data-lk="all" ${on ? '' : 'disabled'} title="dictionary and Wikipedia only; one form at a time, every request listed">Look up all ${un.length}</button>` : ''}</div>
+      ${LOOKUP.count() ? `<div class="lkq"><button type="button" data-lk="reread" title="the same text read again, the class gaps now filled where a witness answered — the reading re-runs in this browser">Re-read with the ${LOOKUP.count()} looked up</button></div>` : ''}
       ${lkBusy ? `<div class="why mono">${esc(lkBusy)}</div>` : ''}</div>`;
     if (w && !r) h += `<div class="rd0">Nothing looked up for “${esc(w)}” yet.</div>`;
     if (r){
@@ -1304,10 +1444,12 @@ function mount(T){
     return h;
   }
   const rebuildTL = () => { T.timeline = null; lastViewKey = ''; renderInsp(ev[k]); startTimeline(T); };
-  async function doLook(words){
+  // the batch asks the dictionary and Wikipedia only: Wikidata is identity, settled by consequence, never fetched unasked
+  const BATCH_SOURCES = ['dictionary', 'wikipedia'];
+  async function doLook(words, only = null){
     if (!LOOKUPS_ON) return;
     let i = 0;
-    for (const w of words){ i++; lkBusy = `looking up “${w}” (${i} of ${words.length})…`; lastViewKey = ''; renderInsp(ev[k]); try { await LOOKUP.look(w); } catch (err) { console.error(err); } }
+    for (const w of words){ i++; lkBusy = `looking up “${w}” (${i} of ${words.length})…`; lastViewKey = ''; renderInsp(ev[k]); try { await LOOKUP.look(w, only ? { only } : undefined); } catch (err) { console.error(err); } }
     lkBusy = `${words.length} looked up — re-reading with what came back…`; lastViewKey = ''; renderInsp(ev[k]);
     rebuildTL(); lkBusy = '';
   }
@@ -1315,8 +1457,18 @@ function mount(T){
   bind(inspEl, 'click', ev2 => {
     const b = ev2.target.closest('[data-lk]'); if (!b || b.disabled) return;
     if (b.dataset.lk === 'look'){ const w = bareWord((inspEl.querySelector('#lk-in') || {}).value); if (w){ selWord = w; doLook([w]); } }
-    else if (b.dataset.lk === 'batch') doLook(unplacedForms().slice(0, 12));
+    else if (b.dataset.lk === 'batch') doLook(unplacedForms().slice(0, 12), BATCH_SOURCES);
+    else if (b.dataset.lk === 'all') doLook(unplacedForms(), BATCH_SOURCES);
+    else if (b.dataset.lk === 'reread') rereadWithLookups();
   });
+  // the same text read again with the witnesses in the classifier's cache: the POS layer's gaps close where a witness answered,
+  // the ledger's classify event names the hyperlexicon beside the prior, and the reader view states the delta
+  async function rereadWithLookups(){
+    const prev = T, n = LOOKUP.count(), found = [...LOOKUP.cache.values()].filter(r => r.dictionary && r.dictionary.found).length;
+    lkBusy = `re-reading with the ${n} looked up…`; lastViewKey = ''; renderInsp(ev[k]);
+    const T2 = await read(lastRaw, lastLabel, features, { animate:false, layout: prev.doc.layout, keep:{ layout: prev.doc.layout } });
+    if (T2 && cur){ cur.state.delta = `${n} form${n === 1 ? '' : 's'} looked up (dictionary · Wikipedia), ${found} answered by the dictionary — class gaps on the animated forms ${prev.gaps} → ${T2.gaps}, names ${prev.refs.size} → ${T2.refs.size}, claims ${prev.claims.length} → ${T2.claims.length}. The reading re-ran in this browser; the witnesses are nominated to the hyperlexicon, none licensed.`; cur.render(); }
+  }
 
 
   // ── Referents: a TABLE of beings (hash ids) — each a row; a row opens its profile; its spans are CON'd to it, never what it is ──
@@ -1446,7 +1598,7 @@ function mount(T){
     const nodes = [...St.refs.values()].map(r => ({ n:r.n, c:r.c, mine:true, st:'fold' }));
     const edges = St.rels.map(c => ({ a:String(c.end1), b:String(c.end2), c:1, mine:true, neg:c.polarity === '-' }));
     const hot = new Set([e && e.data && e.data.end1, e && e.data && e.data.end2, e && e.data && e.data.n].filter(Boolean).map(String));
-    const hotPairs = (e && e.stage === 'relation' && e.data) ? [[String(e.data.end1), String(e.data.end2)]] : [];
+    const hotPairs = (e && e.stage === 'relation' && e.kind !== 'revision' && e.data) ? [[String(e.data.end1), String(e.data.end2)]] : [];
     const cursor = (e && e.data && (e.data.n || e.data.end1)) ? String(e.data.n || e.data.end1) : null;
     return { nodes, edges, docs:[{ id:'source', title:T.doc.label }], occ:T.occ, odd:new Map(), hot, hotPairs, cursor, sel:graphSel, sig:`${St.refs.size}:${St.rels.length}:${graphSel || ''}` };
   }
@@ -1465,17 +1617,20 @@ function mount(T){
   let tab = LAST_TAB;
   let wordsKey = '', wordsSort = { key: 'n', dir: -1 };
   const tabBtns = [...app.querySelectorAll('#p-tabs [data-tab]')];
-  function setTab(t){ LAST_TAB = t; tab = t; if (wide.matches) setDrawer(true); tabBtns.forEach(b => b.setAttribute('aria-selected', String(b.dataset.tab === t))); render(false); }
+  function setTab(t){ LAST_TAB = t; tab = t; tabBtns.forEach(b => b.setAttribute('aria-selected', String(b.dataset.tab === t))); render(false); }
   tabBtns.forEach(b => bind(b, 'click', () => setTab(b.dataset.tab)));
   tabBtns.forEach(b => b.setAttribute('aria-selected', String(b.dataset.tab === tab)));
 
   function renderPane(St, e){
     LAST = [St, e]; if (tab === 'props') ensureTuples();
-    const hot = e.stage === 'relation' ? e.data : null;
+    const textTab = tab === 'text'; $('b-read').hidden = !textTab; $('p-drawer').hidden = textTab;
+    if (textTab) return;   // the viewer shows the text at the playhead, and the current sentence lane by lane
+    const hot = e.stage === 'relation' && e.kind !== 'revision' ? e.data : null;
     const graph = tab === 'graph';
     $('p-graph').hidden = !graph; pane.hidden = graph; { const gn = $('p-graph-note'); gn.hidden = !graph; if (graph) gn.innerHTML = tabNoteHTML('graph', { collapsed:true }); }
     if (graph){ map.set(mapData(St, e)); return; }
     if (tab === 'source') pane.innerHTML = sourcePane(St, hot);
+    else if (tab === 'floors') pane.innerHTML = floorsPane(St, e);
     else if (tab === 'words'){ const sig = 'W' + T.words.length + '|' + wordsSort.key + wordsSort.dir; if (sig !== wordsKey){ wordsKey = sig; pane.innerHTML = tabNoteHTML('words') + wordsPane(); wireSort(); } return; }
     else if (tab === 'pos') pane.innerHTML = posPane(St);
     else if (tab === 'morph') pane.innerHTML = morphPane(St);
@@ -1484,8 +1639,83 @@ function mount(T){
     else if (tab === 'render') pane.innerHTML = renderPaneHTML();
     else if (tab === 'eot') pane.innerHTML = eotPane(St);
     else if (tab === 'json') pane.innerHTML = `<pre class="json">${esc(JSON.stringify(readingJSON(T), null, 2))}</pre>`;
-    pane.insertAdjacentHTML('afterbegin', tabNoteHTML(tab));
+    pane.insertAdjacentHTML('afterbegin', tabNoteHTML(tab, tab === 'floors' ? { collapsed:true } : undefined));
     wireReopen(pane);
+  }
+
+  // ── the Floors tab: the stage and where it stops, then each floor as the change it made of the floor below, with its three arms ──
+  function floorsPane(St, e){
+    const Ld = T.ladder;
+    if (!Ld || Ld.state === 'running') return `<div class="h">the floors</div><p class="stage-line dim">scoring this reading on the floor ladder — every rung's declared task with its three control arms, run by the same reader as the replay over the text cut into addressed passages…</p>`;
+    if (Ld.state === 'failed') return `<div class="h">the floors</div><p class="stage-line">the ladder did not run: <span class="mono">${esc(Ld.error)}</span></p>`;
+    const Lr = Ld.L, S = Lr.floors.stage, curFloor = FLOOR_OF_LAYER[e.stage] || null, chars = Lr.material.text.length;
+    const capF = S.cappedBy ? Lr.floors.floors.find(x => x.floor === S.cappedBy.floor) : null, capIt = capF && capF.items[0];
+    return `<div class="h">the floors — this reader's ceiling on this material, not a property of the text</div>
+      <div class="stage-line">${S.stage ? `stage <b style="color:var(${FLOOR_COLOR[S.stage]})">${esc(S.stage)} · ${esc(S.stageName)}</b>` : '<b>no floor passed</b>'}${capF ? ` — stops at <b>${esc(capF.floor)} · ${esc(capF.name)}</b>: ${esc(statusWord(capIt))}` : ' — every floor passed'}${S.isolated.length ? `. Passed above the gap, not counted: ${S.isolated.map(x => esc(x.floor)).join(', ')}` : ''}</div>
+      ${Lr.report && Lr.report.priors && Lr.report.priors.injected ? `<details class="fold-top"><summary>the priors the reader was handed (${Lr.report.priors.injected.length}) — declared before the run</summary><ul>${Lr.report.priors.injected.map(x => `<li>${esc(x)}</li>`).join('')}</ul></details>` : ''}
+      <div class="pstat"><span>scored in <b>${Lr.ms.toLocaleString()}</b> ms, no model</span><span>control <b>${esc(Lr.controlKey)}</b></span><span>${Lr.cut ? `the first <b>${chars.toLocaleString()}</b> of ${(chars + Lr.cut).toLocaleString()} chars` : `<b>${chars.toLocaleString()}</b> chars`}</span><span>axiom 1 <b>${Lr.floors.axiom1.held ? 'held' : 'broken'}</b></span></div>`
+      + FLOORS.map((f, fi) => floorBlock(f, fi, Lr, curFloor)).join('');
+  }
+  function floorBlock(f, fi, Lr, curFloor){
+    const fl = Lr.floors.floors[fi], it = fl.items[0], dec = Lr.floors.declared.find(d => d.floor === f.floor);
+    const layers = LAYERS.filter(l => FLOOR_OF_LAYER[l.id] === f.floor);
+    const below = fi === 0 ? 'the byte stream (S0), not itself a floor' : `${FLOORS[fi - 1].floor} · ${FLOORS[fi - 1].name}`;
+    const xref = f.commons != null ? `≈ Commons ${f.commons} · ${orderOf(f.commons).name}` : 'no Commons order';
+    const word = statusWord(it), phrase = word.includes(' — ') ? word.slice(word.indexOf(' — ') + 3) : '';
+    const capped = Lr.floors.stage.cappedBy && Lr.floors.stage.cappedBy.floor === f.floor;
+    return `<section class="flr ${curFloor === f.floor ? 'cur' : ''} ${Lr.floors.stage.stage === f.floor ? 'stage' : ''}" id="${floorId(f.floor)}" style="--fc:var(${FLOOR_COLOR[f.floor]})">
+      <div class="fhd"><span class="f">${esc(f.floor)}</span><b>${esc(f.name)}</b><span class="vd ${verdictClass(it)}">${esc(shortVerdict(word))}</span><span class="xr">${esc(xref)}</span></div>
+      <div class="op">${esc(f.operand)}</div>
+      <div class="chg"><div class="k">what this floor made of ${esc(below)}</div>${floorChange(f.floor, Lr)}</div>
+      ${layers.length ? `<div class="lys">${layers.map(l => `<span class="chip" style="color:var(${l.color})">${CK[l.id] + 1} · ${esc(l.label)}</span>`).join('')}</div>` : `<div class="lys none">${esc(FLOOR_NOTE[f.floor] || 'no layer on this page')}</div>`}
+      ${it && it.status !== 'passed' ? `<div class="det">${phrase ? `<b>${esc(phrase)}.</b> ` : ''}${esc(cleanDetail(it.detail || ''))}</div>` : ''}
+      ${dec ? `<details class="fold"><summary>the task — declared before it ran</summary><dl class="defs"><dt>task</dt><dd>${esc(dec.name)}</dd><dt>organizes</dt><dd>${esc(dec.organizes)}</dd><dt>organ</dt><dd class="mono">${esc(dec.organ)}</dd><dt>stages used</dt><dd>${esc(dec.stages.join(' · '))}</dd></dl></details>` : ''}
+      ${it ? `<details class="fold"${capped ? ' open' : ''}><summary>the three control arms — each must fail${it.arms ? '' : ' (not run)'}</summary>${armsTable(it, fi)}</details>` : ''}
+      ${priorsFold(f, Lr)}
+      ${revisionsLine(f.floor)}
+    </section>`;
+  }
+  // the three control arms, each as what it skipped (⊘): the floor below withheld, the parts re-coordinated at random, the control text — and what the reader did without it
+  function armsTable(it, fi){
+    const below = fi === 0 ? 'the cut rule withheld — S0 alone' : `${FLOORS[fi - 1].floor} withheld — the floor below, alone`;
+    const rows = ARM_ROWS.map(([key, what, giver]) => { const a = it.arms && it.arms[key], o = armOutcome(a);
+      return `<tr class="${o.cls}"><td><span class="skip">⊘</span> ${esc(key === 'lowerOrder' ? below : what)}<br><span class="giver">${esc(giver)}</span></td><td class="res">${esc(o.res)}${esc(o.draws)}</td><td class="dim">${esc(a && a.detail || '')}</td></tr>`; }).join('');
+    return `<table class="arms"><thead><tr><th>skipped</th><th>result</th><th>what it did</th></tr></thead><tbody>${rows}</tbody></table>`;
+  }
+  // the priors this floor consumes, each withheld once and the task run again (mhc-ladder.js::runPriorArms) — a finding about the prior, not the floor
+  function priorsFold(f, Lr){
+    const declared = PRIORS_OF[f.floor] || [], st = T.ladder && T.ladder.priors, rows = Lr.priorArms && Lr.priorArms[f.floor];
+    if (!declared.length) return `<div class="det">priors consumed: ${esc(PRIOR_NOTE[f.floor] || 'none')}</div>`;
+    const body = rows
+      ? `<table class="arms"><thead><tr><th>prior withheld</th><th>result</th><th>what happened</th></tr></thead><tbody>${rows.map(a => `<tr class="${a.withheld ? (a.completed ? 'warn' : 'ok') : ''}"><td><span class="skip">⊘</span> ${esc(a.what)}</td><td class="res">${esc(a.word)}</td><td class="dim">${esc(a.detail || '')}</td></tr>`).join('')}</tbody></table>`
+      : `<p class="dim">${st === 'running' ? 'withholding each prior and running the task again…' : st === 'failed' ? `the arm did not run: ${esc(T.ladder.priorError || '')}` : 'not run'}</p>`;
+    return `<details class="fold" open><summary>the priors this floor consumes — each withheld (${declared.length})${Lr.priorMs != null && f.floor === 'F0' ? ` · ${Lr.priorMs.toLocaleString()} ms for the ladder` : ''}</summary>${body}</details>`;
+  }
+  function revisionsLine(h){
+    const n = revisions()[h] || 0; if (!n) return '';
+    const msgs = (revMsgs[h] || []).slice(0, 3);
+    return `<div class="det">↺ <b>revised from above, ${n} time${n === 1 ? '' : 's'}</b> — appended to the record, drawn as arrows on the timeline:<br>${msgs.map(m => esc(m.replace(/^↺ /, ''))).join('<br>')}${n > 3 ? `<br>… ${n - 3} more` : ''}</div>`;
+  }
+  // what each floor made, on this text — counted from the same reader, index and specimens the rungs ran on (mhc-ladder.js::viewsOf), never restated
+  function floorChange(h, Lr){
+    const V = Lr.views, n = x => Number(x || 0).toLocaleString(), pl = (x, w) => `${n(x)} ${w}${Number(x) === 1 ? '' : 's'}`;
+    const ex = (xs, f, cap = 3) => xs.length ? `<div class="ex">${xs.slice(0, cap).map(f).join('<br>')}${xs.length > cap ? `<br><span class="dim">… ${n(xs.length - cap)} more</span>` : ''}</div>` : '';
+    const q = x => { const t = String(x); return `“${esc(t.length > 90 ? t.slice(0, 88) + '…' : t)}”`; };
+    switch (h){
+      case 'F0': { const u = V.units; return `<b>${pl(u.n, 'unit')}</b>, cut where the text breaks; ${n(u.reopen)} of ${n(u.n)} re-open by byte address to exactly their own text${u.inWord ? `; ${pl(u.inWord, 'cut')} inside a word` : ''}${u.overlap ? `; ${n(u.overlap)} overlap` : ''}.` + ex(u.rows || [], r => `bytes ${n(r.b0)}–${n(r.b1)} ${q(r.text)}`, 2); }
+      case 'F1': { const R = V.referents, forms = R.reduce((t, g) => t + g.surfaces.length, 0), A = V.corefAgreement || {};
+        return (R.length ? `<b>${pl(R.length, 'being')}</b> from ${pl(forms, 'name form')} — a word is a being only where the text writes it as a name.` : '<b>no beings</b> — no name form in this text was admitted as one.')
+          + (A.shouldMerge || A.shouldWithhold ? ` Variant pairs merged ${n(A.didMerge)} of ${n(A.shouldMerge)}; near-miss pairs held apart ${n((A.shouldWithhold || 0) - (A.wronglyMerged || []).length)} of ${n(A.shouldWithhold)}.` : '')
+          + ex(R.filter(g => g.surfaces.length >= 2), g => `${esc(g.name)} ← ${g.surfaces.map(q).join(', ')}`); }
+      case 'F2': { const E = V.edges; return (E.length ? `<b>${pl(E.length, 'arrangement')}</b> — who did what to whom — over the beings${V.slots.length ? `; ${pl(V.slots.length, 'open slot')}, the widest holding ${n(V.slots[0].fillers.length)}` : ''}.` : '<b>no arrangements</b> — no sentence gave a who-did-what-to-whom tied to beings.') + ex(E, x => `${esc(x.subject)} —${esc(x.verb)}→ ${esc(x.object)}`); }
+      case 'F3': { const C = T.claims, vs = C.reduce((m, c) => (m[c.verdict] = (m[c.verdict] || 0) + 1, m), {});
+        return (C.length ? `the replay's <b>${pl(C.length, 'relation')}</b>, each read back against the material by the same reader: ${Object.entries(vs).map(([kk, v]) => `${n(v)} ${esc(kk)}`).join(' · ')}.` : '<b>nothing to judge</b> — no relation was read.')
+          + (V.grid ? `<div class="ex">specimen ${q(V.grid.claim)} · the same claim with a subject nobody is: ${q(V.grid.absentClaim)}</div>` : ''); }
+      case 'F4': { const E = V.edges, nested = E.filter(x => isClaimRef(x.end1) || isClaimRef(x.end2)).length; return `<b>${n(nested)}</b> of ${pl(E.length, 'edge')} hold a claim in an end slot — the reader puts surfaces there, so who-says-what is never kept apart from what is so.`; }
+      case 'F5': { const M = V.merges || []; return `<b>${pl((V.systems || []).length, 'source reader')}</b>; a note is corroborated at ${n(V.premiseFloor.sources)} distinct sources${M.length ? `; ${pl(M.length, 'merge')} measured` : ''}.` + ex(M, m => `${esc(m.edge.subject)} —${esc(m.edge.verb)}→ ${esc(m.edge.object)}: ${pl(m.readings.length, 'reading')}, held by ${n(m.holds)}`); }
+      case 'F6': { const P = (V.premises && V.premises.premises) || []; return `<b>${pl(P.length, 'premise')}</b> at a floor of ${n(V.premiseFloor.sources)} sources (instrument independence not required: ${n(V.premiseFloor.instruments)}); composition needs a declarations register this page does not hold.`; }
+    }
+    return '';
   }
   const standingOf = c => standingOfClaim(c);
 
@@ -1644,7 +1874,7 @@ function mount(T){
   function reopen(i){
     const c = T.claims[i]; if (!c) return;
     const id = T.led.event({ stage:'revisit', source_id:T.srcId, transform:'assertion→revision', detail:{ of:`${c.end1}—${c.label}→${c.end2}`, act:'reopened', note:'standing held open for re-reading' } });
-    ev.push({ i:ev.length, t:performance.now() - (T.ev._t0 || 0), stage:'ledger', kind:'revisit', msg:`${id} · revisit assertion→revision · “${c.end1}—${c.label}→${c.end2}” reopened — the standing is held open`, s:c.s, e:c.e, data:{ id, revisits:i } });
+    ev.push({ i:ev.length, t:performance.now() - (T.ev._t0 || 0), stage:'ledger', kind:'revisit', msg:`${id} · revisit assertion→revision · “${c.end1}—${c.label}→${c.end2}” reopened — the standing is held open`, s:c.s, e:c.e, data:{ id, revisits:i, revises: ev.findIndex(x => x.stage === 'relation' && x.data === c), from:'record', to:'F2' } });
     if (!T.reopened) T.reopened = new Map(); T.reopened.set(i, id);
     N = ev.length; render(true);
   }
@@ -1668,12 +1898,70 @@ function mount(T){
     scope.querySelectorAll('[data-flip]').forEach(b => b.addEventListener('click', () => flipJunction(+b.dataset.flip)));
   }
 
-  // ── ribbon ──
-  let dpr = 1;
-  function size(){ dpr = window.devicePixelRatio || 1; const q = rc.getBoundingClientRect(); rc.width = Math.max(1, q.width * dpr); rc.height = Math.max(1, q.height * dpr); drawRibbon(); }
-  function drawRibbon(){ const g = rc.getContext('2d'), w = rc.width, h = rc.height; if (!w) return; g.clearRect(0, 0, w, h); const mp = maxPos();
-    for (let i = 0; i < N; i++){ const x0 = clockOf(i) / mp * w, x1 = i + 1 < N ? clockOf(i + 1) / mp * w : w; g.fillStyle = cssVar((L[ev[i].stage] || { color:'--dim' }).color); g.globalAlpha = 0.85; g.fillRect(x0, h * 0.22, Math.max(1, x1 - x0), h * 0.56); }
-    g.globalAlpha = 1; const x = pos / mp * w; g.fillStyle = cssVar('--ink'); g.fillRect(x - dpr, 0, 2 * dpr, h); }
+  // ── timeline: one lane per layer under its floor (a floor collapses to a summary lane; a floor with no layer is a dashed empty lane),
+  // the record last. The lanes are drawn once into a cache; each frame blits it and draws the playhead. Scrub by pointer, as before.
+  let dpr = 1, tlCache = null, lanes = [];
+  const LANE_H = 20, AX_H = 18, tlh = $('p-tlh');
+  const collapsed = new Set(FLOORS.filter(f => LAYERS.filter(l => FLOOR_OF_LAYER[l.id] === f.floor).length > 4).map(f => f.floor));
+  const idxClosed = new Set();   // floors folded in the index — the user's, kept for this mount
+  function laneModel(){
+    lanes = [];
+    for (const f of FLOORS){
+      const ls = LAYERS.filter(l => FLOOR_OF_LAYER[l.id] === f.floor), open = ls.length > 0 && !collapsed.has(f.floor);
+      lanes.push({ kind:'floor', floor:f.floor, label:`${f.floor} ${f.name}`, color:FLOOR_COLOR[f.floor], stages:ls.map(l => l.id), empty:!ls.length, open });
+      if (open) for (const l of ls) lanes.push({ kind:'layer', floor:f.floor, label:l.label, color:l.color, stages:[l.id] });
+    }
+    lanes.push({ kind:'record', floor:null, label:'the record · EOT', color:'--green', stages:['ledger'] });
+  }
+  function renderLaneHeads(){
+    laneModel();
+    tlh.innerHTML = `<div class="ax">lanes</div>` + lanes.map(ln => ln.kind === 'floor'
+      ? `<div class="fl ${ln.empty ? 'empty' : ''}" data-tlf="${esc(ln.floor)}" ${ln.empty ? '' : 'role="button" tabindex="0"'} title="${ln.empty ? esc(FLOOR_NOTE[ln.floor] || 'no layer on this page') : (ln.open ? 'collapse' : 'expand')}"><span class="car">${ln.empty ? '' : ln.open ? '▾' : '▸'}</span><span class="dot" style="background:var(${ln.color})"></span>${esc(ln.label)}</div>`
+      : `<div class="${ln.kind === 'layer' ? 'sub' : ''}"><span class="dot" style="background:var(${ln.color})"></span>${esc(ln.label)}</div>`).join('');
+    rib.style.height = (AX_H + lanes.length * LANE_H) + 'px'; tlCache = null; size();
+  }
+  function size(){ dpr = window.devicePixelRatio || 1; const q = rc.getBoundingClientRect(); rc.width = Math.max(1, q.width * dpr); rc.height = Math.max(1, q.height * dpr); tlCache = null; drawRibbon(); }
+  function drawRibbon(){
+    const g = rc.getContext('2d'), w = rc.width, h = rc.height; if (!w || !lanes.length) return; const mp = maxPos();
+    const key = [w, h, real, N, lanes.map(l => l.label).join(','), !!ladderOf()].join('|');
+    if (!tlCache || tlCache.key !== key){
+      const c = document.createElement('canvas'); c.width = w; c.height = h; const q = c.getContext('2d');
+      const byStage = new Map(); ev.forEach((e, i) => { const arr = byStage.get(e.stage) || []; arr.push(i); byStage.set(e.stage, arr); });
+      const Ld = ladderOf(), passed = new Set(Ld ? Ld.floors.floors.filter(f => f.status === 'passed').map(f => f.floor) : []);
+      const line = cssVar('--line'), dim = cssVar('--dim');
+      q.font = `${Math.round(10 * dpr)}px ${cssVar('--mono')}`; q.textBaseline = 'middle';
+      const ticks = 6;
+      for (let t = 0; t <= ticks; t++){
+        const p = mp * t / ticks, x = p / mp * w, lab = real ? ms(p) + ' ms' : (t === ticks ? N : Math.round(p)).toLocaleString();
+        q.textAlign = t === 0 ? 'left' : t === ticks ? 'right' : 'center'; q.fillStyle = dim; q.fillText(lab, x + (t === 0 ? 3 * dpr : t === ticks ? -3 * dpr : 0), AX_H * dpr / 2);
+        q.fillStyle = line; q.fillRect(Math.min(x, w - dpr), AX_H * dpr - 4 * dpr, dpr, 4 * dpr);
+      }
+      q.fillStyle = line; q.fillRect(0, AX_H * dpr - dpr, w, dpr);
+      lanes.forEach((ln, li) => {
+        const y0 = (AX_H + li * LANE_H) * dpr;
+        q.globalAlpha = 0.5; q.fillStyle = line; q.fillRect(0, y0 + LANE_H * dpr - dpr, w, dpr); q.globalAlpha = 1;
+        if (ln.empty){ q.strokeStyle = cssVar('--line2'); q.lineWidth = dpr; q.setLineDash([4 * dpr, 6 * dpr]); q.beginPath(); q.moveTo(0, y0 + LANE_H * dpr / 2); q.lineTo(w, y0 + LANE_H * dpr / 2); q.stroke(); q.setLineDash([]); return; }
+        q.fillStyle = cssVar(ln.color); q.globalAlpha = ln.kind === 'floor' ? (passed.has(ln.floor) ? 0.95 : 0.45) : 0.8;
+        for (const st of ln.stages) for (const i of (byStage.get(st) || [])){ const x0 = clockOf(i) / mp * w, x1 = i + 1 < N ? clockOf(i + 1) / mp * w : w; q.fillRect(x0, y0 + 4 * dpr, Math.max(dpr, x1 - x0), (LANE_H - 8) * dpr); }
+        q.globalAlpha = 1;
+      });
+      // revisions: an arrow from the event that revised back to the operand it revised, on whatever lane each sits in
+      const laneOf = st => { if (st === 'ledger') return lanes.length - 1; let li = lanes.findIndex(l => l.kind === 'layer' && l.stages[0] === st); if (li < 0) li = lanes.findIndex(l => l.kind === 'floor' && l.floor === FLOOR_OF_LAYER[st]); return li; };
+      q.strokeStyle = cssVar('--pink'); q.fillStyle = cssVar('--pink'); q.lineWidth = 1.5 * dpr; q.globalAlpha = 0.9;
+      for (let i = 0; i < N; i++){ const d = ev[i].data; if (!d || d.revises == null || d.revises < 0 || d.revises >= N) continue;
+        const a = laneOf(ev[i].stage), b = laneOf(ev[d.revises].stage); if (a < 0 || b < 0) continue;
+        const x0 = clockOf(i) / mp * w, y0 = (AX_H + a * LANE_H + LANE_H / 2) * dpr, x1 = clockOf(d.revises) / mp * w, y1 = (AX_H + b * LANE_H + LANE_H / 2) * dpr;
+        const cx = (x0 + x1) / 2, cy = Math.min(y0, y1) - LANE_H * dpr * 0.8;
+        q.beginPath(); q.moveTo(x0, y0); q.quadraticCurveTo(cx, cy, x1, y1); q.stroke();
+        const ang = Math.atan2(y1 - cy, x1 - cx), L6 = 6 * dpr;
+        q.beginPath(); q.moveTo(x1, y1); q.lineTo(x1 - L6 * Math.cos(ang - 0.45), y1 - L6 * Math.sin(ang - 0.45)); q.lineTo(x1 - L6 * Math.cos(ang + 0.45), y1 - L6 * Math.sin(ang + 0.45)); q.closePath(); q.fill(); }
+      q.globalAlpha = 1;
+      tlCache = { key, c };
+    }
+    g.clearRect(0, 0, w, h); g.drawImage(tlCache.c, 0, 0);
+    const x = pos / mp * w; g.fillStyle = cssVar('--ink'); g.fillRect(x - dpr, 0, 2 * dpr, h);
+    g.beginPath(); g.moveTo(x - 6 * dpr, 0); g.lineTo(x + 6 * dpr, 0); g.lineTo(x, 8 * dpr); g.closePath(); g.fill();
+  }
   const scrub = e => { const r = rc.getBoundingClientRect(); const f = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)); setDir(0); pos = f * maxPos(); k = idxAt(pos); render(true); };
   let dragging = false; const rib = app.querySelector('.rib');
   bind(rib, 'pointerdown', e => { dragging = true; e.target.setPointerCapture && e.target.setPointerCapture(e.pointerId); scrub(e); });
@@ -1683,9 +1971,9 @@ function mount(T){
   // ── render ──
   function render(follow){
     const St = stateAt(k), e = ev[k];
-    renderSpine(St, e); renderLog(follow); renderLens(St); if (wide.matches){ renderLanes(e); renderInsp(e); } renderPane(St, e); map.set(mapData(St, e)); drawRibbon(); updateStats(St, e);
+    updateIndex(St, e); renderLog(follow); renderLens(St); if (wide.matches){ renderLanes(e); renderInsp(e); } renderPane(St, e); map.set(mapData(St, e)); drawRibbon(); updateStats(St, e);
     rdEl.textContent = (real ? 't = ' + ms(pos) + ' of ' + ms(ev[N-1].t) + ' ms' : 'step ' + (k + 1).toLocaleString() + ' of ' + N.toLocaleString())
-      + ' · layer ' + ((L[e.stage] || {}).i + 1) + '/' + LAYERS.length + ' · real ' + ms(e.t) + ' ms';
+      + ' · layer ' + ((L[e.stage] || {}).i + 1) + '/' + LAYERS.length + ' · ' + (FLOOR_OF_LAYER[e.stage] || 'the record') + ' · real ' + ms(e.t) + ' ms';
   }
   function updateStats(St, e){
     statsEl.innerHTML =
@@ -1696,7 +1984,7 @@ function mount(T){
       `<span>ledger <b>${St.led.length.toLocaleString()}</b></span>` +
       `<span class="g">layer <b>${(L[e.stage] || {}).i + 1}</b>/${LAYERS.length} · <b>${esc((L[e.stage] || { label:e.stage }).label)}</b></span>` +
       `<span class="g">real run <b>${ms(T.totalMs)}</b> ms · model calls <b>${T.net.models}</b></span>`;
-    metaEl.textContent = `${N.toLocaleString()} steps · read in ${ms(T.totalMs)} ms · ${T.net.requests.length} network request${T.net.requests.length === 1 ? '' : 's'} (no model — static priors + any format library)` + (LOOKUP.log.length ? ` · + ${LOOKUP.log.length} lookup request${LOOKUP.log.length === 1 ? '' : 's'} you asked for (dictionary · Wikipedia · Wikidata)` : '');
+    metaEl.textContent = `${N.toLocaleString()} steps · read in ${ms(T.totalMs)} ms · ${T.net.requests.length} network request${T.net.requests.length === 1 ? '' : 's'} (no model — static priors + any format library)` + (() => { const netN = LOOKUP.log.filter(x => !/local/.test(x.source)).length, X = T.lexicon, locN = X && X.on && !X.gap ? X.asked : 0; return (locN ? ` · ${locN.toLocaleString()} form${locN === 1 ? '' : 's'} asked of the local hyperlexicon` : '') + (netN ? ` · + ${netN} lookup request${netN === 1 ? '' : 's'} you asked for over the network (dictionary · Wikipedia · Wikidata)` : ''); })();
   }
 
   // ── loop ──
@@ -1715,6 +2003,11 @@ function mount(T){
     });
   }
   const onClick = e => {
+    const fold = e.target.closest('.fh .car[data-fold]'); if (fold){ const f = fold.dataset.fold; if (idxClosed.has(f)) idxClosed.delete(f); else idxClosed.add(f); const closed = idxClosed.has(f), g = spineEl.querySelector(`.fg[data-fg="${CSS.escape(f)}"]`); if (g) g.hidden = closed; fold.textContent = closed ? '▸' : '▾'; fold.setAttribute('aria-expanded', String(!closed)); fold.setAttribute('aria-label', `${closed ? 'show' : 'hide'} the layers of ${f}`); fold.closest('.fh').classList.toggle('closed', closed); return; }
+    const tf = e.target.closest('[data-tlf]'); if (tf){ const f = tf.dataset.tlf; if (LAYERS.some(l => FLOOR_OF_LAYER[l.id] === f)){ if (collapsed.has(f)) collapsed.delete(f); else collapsed.add(f); renderLaneHeads(); } return; }
+    const tm = e.target.closest('.tl-mode [data-tl]'); if (tm){ const list = tm.dataset.tl === 'list'; $('p-tl').hidden = list; $('p-log').hidden = !list; app.querySelectorAll('.tl-mode [data-tl]').forEach(x => x.setAttribute('aria-pressed', String(x === tm))); if (list) renderLog(true); else size(); return; }
+    const fh = e.target.closest('.fh[data-floor]'); if (fh){ setTab('floors'); const el = pane.querySelector('#' + floorId(fh.dataset.floor)); if (el) pane.scrollTop += el.getBoundingClientRect().top - pane.getBoundingClientRect().top - 8; return; }
+    const ly = e.target.closest('.ly[data-layer]'); if (ly && !e.target.closest('.sw')){ const id = ly.dataset.layer, j = ev.findIndex(x => x.stage === id); setDir(0); if (j >= 0) seek(j); setTab(TAB_OF_LAYER[id] || 'source'); return; }
     const rs = e.target.closest('[data-rsort]'); if (rs){ refTabSort = nextSort(refTabSort, rs.dataset.rsort); render(false); return; }
     const rr = e.target.closest('#p-pane .rt tbody tr[data-sel]'); if (rr){ try { graphSel = JSON.parse(rr.dataset.sel).ref; } catch (er) { graphSel = null; } setTab('graph'); return; }
     const a = e.target.closest('[data-a]'); if (!a) return; const act = a.dataset.a;
@@ -1728,18 +2021,19 @@ function mount(T){
     else if (act === 'dl-json'){ download(`${slugOf(T)}-reading.json`, JSON.stringify(readingJSON(T), null, 2), 'application/json'); a.textContent = 'Saved'; setTimeout(() => { a.textContent = '⤓ Reading (JSON)'; }, 1400); } };
   const onKey = e => { if (e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') return;
     if (!app.classList.contains('on')) return;
+    if (e.key === 'Enter' && e.target && e.target.closest && e.target.closest('.fh[data-floor], .ly[data-layer], [data-tlf]')){ e.preventDefault(); e.target.click(); return; }
     if (e.key === 'Escape') close(); else if (e.key === ' '){ e.preventDefault(); setDir(dir ? 0 : 1); }
     else if (e.key === 'ArrowLeft'){ setDir(0); seek(k - 1); } else if (e.key === 'ArrowRight'){ setDir(0); seek(k + 1); }
     else if (e.key === 'j' || e.key === 'J') setDir(-1); else if (e.key === 'k' || e.key === 'K') setDir(0); else if (e.key === 'l' || e.key === 'L') setDir(1);
     else if (e.key === 'Home'){ setDir(0); seek(0); } else if (e.key === 'End'){ setDir(0); seek(N - 1); } };
-  function close(){ ac.abort(); stopTL(); try { ro.disconnect(); } catch (e) {} cancelAnimationFrame(raf); try { map.destroy && map.destroy(); } catch (e) {} app.classList.remove('on'); inst = null; const rv = $('rv'); if (rv && cur) rv.classList.add('on'); }
+  function close(){ closed = true; T.onLadder = null; ac.abort(); stopTL(); try { ro.disconnect(); } catch (e) {} cancelAnimationFrame(raf); try { map.destroy && map.destroy(); } catch (e) {} app.classList.remove('on'); inst = null; const rv = $('rv'); if (rv && cur) rv.classList.add('on'); }
   const ro = new ResizeObserver(() => size());
   bind(app, 'click', onClick);
   bind(document, 'keydown', onKey);
   bind(speedSel, 'change', () => { speed = +speedSel.value; });
 
   T.ev._t0 = performance.now();
-  fillSpeeds(); ro.observe(app.querySelector('.right')); size();
+  buildIndex(); renderLaneHeads(); fillSpeeds(); ro.observe(app.querySelector('.timeline')); size();
   seek(0);
   if (!matchMedia('(prefers-reduced-motion: reduce)').matches) setDir(1);
   raf = requestAnimationFrame(loop);
@@ -1805,13 +2099,48 @@ function startTimeline(T){
       const memo = new Map();   // one classification cache for every prefix of this replay
       ABBREV = abbrevOf(T.clean);
       T.timeline = buildReadingTimeline(T.clean, {
-        hash: sha256, diaNorm, splitSentences, wordsIn, extractSurfaces, discoverReferents, resolvePronouns,
-        classifyAt: prefix => pos ? documentClassifier(prefix, { posPrior: pos, lemmatizer: PRIORS.lemmatizer, lookups: LOOKUP.cache, memo }) : (f => classifyForm(f, { posPrior: null })),
+        hash: sha256, diaNorm, splitSentences: (t, o = {}) => splitSentences(t, { ...o, abbreviations: o.abbreviations ?? abbrevForSplitter() }), wordsIn, extractSurfaces, discoverReferents, resolvePronouns,
+        classifyAt: prefix => pos ? documentClassifier(prefix, { posPrior: pos, lemmatizer: PRIORS.lemmatizer, lookups: T.feat.lexicon === false ? null : LOOKUP.cache, memo }) : (f => classifyForm(f, { posPrior: null })),
         readClaims: prefix => mapClaims(R([{ ref:'source', text:prefix }]).read(prefix).claims, prefix),
       }, { maxSnapshots: 40 });
     } catch (err) { console.error(err); T.timeline = { schema:'EOReadingTimeline@1', sentences:[], words:[], snapshots:[], revisions:[], error:String(err && err.message || err) }; }
     if (T.onTimeline) T.onTimeline();
   }, 40);
+}
+
+// Ask the hyperlexicon about what the priors cannot settle: the dotted forms standing at a possible sentence end that neither the
+// language's prior nor this text's own evidence knows, and the word forms the class prior cannot place. One batch, local only.
+async function consultLexicon(clean, feat){
+  // the language the document measured as (fold-chat-lang, confident only); the class fill uses the English parser, so it runs for English only
+  const lang = PRIORS.lang && PRIORS.lang.confident && PRIORS.lang.lang ? PRIORS.lang.lang : 'en', LEX = hlexFor(lang);
+  const step = { on: feat.lexicon !== false, lang, junctions: 0, asked: 0, aliases: [], posAsked: 0, posFound: [], ms: 0, gap: null, giver: null };
+  if (!step.on) return step;
+  const t0 = performance.now();
+  const junc = aliasJunctions(clean, abbrevAll());
+  step.junctions = [...junc.values()].reduce((a, b) => a + b, 0);
+  const pos = PRIORS.posPrior, gapForms = new Set();
+  if (pos && lang === 'en') for (const w of new Set(clean.match(/\p{L}[\p{L}'’-]*\p{L}/gu) || [])){
+    if (w.length < 3) continue;
+    let c = null; try { c = classifyForm(w, { posPrior: pos, lemmatizer: PRIORS.lemmatizer }); } catch (e) {}
+    if (!c || !c.found) gapForms.add(w);
+  }
+  const ask = new Set([...junc.keys(), ...gapForms, ...[...gapForms].map(w => w.toLowerCase())]);
+  step.asked = ask.size;
+  await LEX.want(ask);
+  step.giver = LEX.giver;
+  if (!step.giver){ step.gap = 'no local lexicon answered (the Holodeck server reads the Wiktionary pack in ~/.cache/live_priors/wiktionary)'; step.ms = performance.now() - t0; return step; }
+  // an ALIAS: the giver lists the dotted form as a form of another word, and this text never writes the token without its period
+  step.aliases = resolveAliases(LEX, junc, clean);
+  for (const a of step.aliases) if (a.kept) ALIASES.set(a.form.slice(0, -1).toLowerCase(), a.of);
+  // a missing class: what the dictionary lists, nominated to the hyperlexicon as a witness (the local giver only, no network)
+  step.posAsked = gapForms.size;
+  for (const w of gapForms){
+    if (!LEX.get(w) && !LEX.get(w.toLowerCase())) continue;
+    const rec = await LOOKUP.look(w, { only:['dictionary'], network:false });
+    if (rec && rec.dictionary && rec.dictionary.found) step.posFound.push({ form: w, upos: rec.dictionary.upos || [] });
+  }
+  step.ms = performance.now() - t0;
+  return step;
 }
 
 async function read(text, label, feat, opt = {}){
@@ -1824,16 +2153,22 @@ async function read(text, label, feat, opt = {}){
   const truncated = raw.length > LIMIT;
   const clean = feat.furniture === false ? analysis : blankMarkup(analysis);
   // a non-English document's relations are read against ITS language's prior (the suite's dispatch reader picks the extractor from it)
-  const foreign = PRIORS.posPrior !== PRIORS.posEng && PRIORS.langIso3 ? { iso3: PRIORS.langIso3, posPrior: PRIORS.posPrior } : null, R = await makeEngineRelationReader({ features: feat, foreign });
+  // the rail's switches, under the names the reader takes (holodeck-reader.js reads posPrior · morphology · stance · nounPhraseSubjects · phrasalPredicates):
+  // until now only `stance` reached it, so switching POS, morphology, noun-phrase subjects or phrasal predicates off re-ran the display and not the relations
+  const readerFeatures = { posPrior: feat.pos !== false, morphology: feat.morph !== false, stance: feat.stance !== false, nounPhraseSubjects: feat.npSubj !== false, phrasalPredicates: feat.phrasal !== false };
+  ABBREV = abbrevOf(clean); ALIASES = new Map(); LEXSTEP = await consultLexicon(clean, feat);
+  const abbreviations = abbrevForSplitter();
+  const foreign = PRIORS.posPrior !== PRIORS.posEng && PRIORS.langIso3 ? { iso3: PRIORS.langIso3, posPrior: PRIORS.posPrior } : null, R = await makeEngineRelationReader({ features: readerFeatures, foreign, abbreviations });
   let read0 = { claims: [] };
   try { read0 = R([{ ref:'source', text: clean }]).read(clean); } catch (e) { console.error(e); }
   const claims = mapClaims(read0.claims, analysis);
   const doc = { label: lastLabel, analysis, truncated, layout: opt.layout || (opt.keep && opt.keep.layout) || null };
   const T = buildTrace(doc, clean, claims, feat, opt.extraction || null);
-  T.clean = clean; T.R = R; T.feat = feat;
+  T.clean = clean; T.R = R; T.feat = feat; T.lexicon = LEXSTEP;
   // a proposition is held in the MOOD of its sentence (a question asks; it does not assert) and NESTED in the containers around it (speech, aside), in order
   T.claims.forEach(c => { if (c.located){ c.mood = moodAt(T.punctuation, c.s); c.holds = containersAt(T.punctuation, c.s).map(k => ({ kind:k.kind, mark:k.mark, mood:k.mood })); } });
   startTimeline(T);
+  startLadder(T, R, clean, { readerFeatures, foreign, abbreviations });
   if (!BASELINE) BASELINE = T;
   $('model').textContent = `model calls: ${T.net.models}`;
   if (opt.animate !== false){ openTrace(T); }
@@ -2014,6 +2349,23 @@ drop.addEventListener('drop', async ev => { const f = ev.dataTransfer.files && e
 $('read').addEventListener('click', () => run(ta.value, 'pasted text'));
 $('clear').addEventListener('click', () => { ta.value = ''; });
 $('samples').addEventListener('click', e => { const s = e.target.dataset.s; if (s){ ta.value = SAMPLES[s]; run(SAMPLES[s], 'Sample extraction'); } });
+// a WHOLE document: the Holodeck's own published sample set (holodeck-samples), one account read end to end — nothing cut, every prior loaded
+const WHOLE_URL = 'https://scores-patch-points.github.io/holodeck-samples/titanic-1912/readings.json';
+let WHOLE = null;
+async function wholeDocument(type){
+  if (!WHOLE){ const r = await fetch(WHOLE_URL); if (!r.ok) throw new Error(`HTTP ${r.status} from the sample set`); WHOLE = (await r.json()).readings || []; }
+  const d = WHOLE.find(x => x.type === type) || WHOLE[0]; if (!d) return null;
+  // DOMParser documents are inert: no script runs and no image loads
+  const text = new DOMParser().parseFromString(String(d.html || ''), 'text/html').body.textContent.replace(/[ \t]+/g, ' ').replace(/\n{3,}/g, '\n\n').trim();
+  return { label: d.title, text };
+}
+$('samples').addEventListener('click', async e => {
+  const b = e.target.closest('[data-doc]'); if (!b) return;
+  b.disabled = true; const was = b.textContent; b.textContent = 'fetching…';
+  try { const d = await wholeDocument(b.dataset.doc); if (d){ ta.value = d.text; await run(d.text, d.label); } }
+  catch (err) { alert('The whole document could not be fetched: ' + (err && err.message || err)); }
+  finally { b.disabled = false; b.textContent = was; }
+});
 
 // The document's language is MEASURED (the suite's own detector: script, then words and character n-grams; it abstains rather than guess),
 // and its part-of-speech prior is that language's, from the same shipped priors. English stays the default and the fallback.
@@ -2029,7 +2381,7 @@ async function priorFor(text){
 async function run(text, label, opt = {}){
   try { await priorFor(text); } catch (e) { console.warn('language prior', e); }
   const btn = $('read'); const was = btn.textContent; btn.textContent = 'reading…'; btn.disabled = true;
-  features = { ...DEFAULT_FEATURES }; BASELINE = null; LAST_TAB = 'source';
+  features = { ...DEFAULT_FEATURES }; BASELINE = null; LAST_TAB = 'text';
   const d = $('p-delta'); if (d) d.hidden = true; const r = $('refuse'); if (r) r.hidden = true;
   try { await read(text, label, features, { animate:true, extraction: opt.extraction || null, layout: opt.layout || null }); }
   catch (err){ alert('The reading failed: ' + (err && err.message || err)); console.error(err); }
@@ -2048,7 +2400,7 @@ const SOURCES = mountSources($('sources'), { makeDeps: corpusDeps, openInReader:
 $('addsrc').addEventListener('click', () => SOURCES.addCurrent());
 $('exsrc').addEventListener('click', () => SOURCES.example());
 const OFFLINE = startOffline();   // silent: it only makes the files local; nothing on the page announces it
-window.__demo = { offline: OFFLINE, sources: SOURCES, view: () => cur, read, run, json:() => (cur ? readingJSON(cur.T) : null), text:() => (cur ? diagrammedText(cur.T) : null), current:() => (cur ? cur.T : null), features:() => features, net };
+window.__demo = { offline: OFFLINE, sources: SOURCES, view: () => cur, read, run, wholeDocument, lookup: LOOKUP, json:() => (cur ? readingJSON(cur.T) : null), text:() => (cur ? diagrammedText(cur.T) : null), current:() => (cur ? cur.T : null), features:() => features, net };
 </script>
 </body>
 </html>
