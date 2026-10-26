@@ -5,7 +5,8 @@
 // of the class prior (classifyForm), and the measured language of a foreign document. Built once; every turn reads through it.
 import { makeReader, priorsFor, readDocument as readCore } from './vendor/khora/native/the-fold/read-core.mjs';
 import { makeHyperlexicon } from './vendor/khora/native/organs/lexicon.js';
-import { iso1Of } from './vendor/khora/native/the-fold/language-grammar.js';
+import { iso1Of, stemOf } from './vendor/khora/native/the-fold/language-grammar.js';
+import { languageContextFor } from './vendor/khora/native/the-fold/language-context.js';
 import { preloadPriors } from './vendor/khora/native/the-fold/prior-source.mjs';
 import { classifyForm as classifyWord } from './holodeck-surface.js'; // wraps the vendored classifyWord: the written form is normalised before lookup
 import { stanceWords } from './vendor/khora/native/organs/stance.js';
@@ -228,15 +229,17 @@ const cleanText = (s) => String(s == null ? '' : s).replace(/\s+/g, ' ').trim();
 // classifyForm in front of the class prior, and a foreign document's RoleConfig@1 where one is shipped.
 // FEATURES (each defaults ON): posPrior, morphology, stance, nounPhraseSubjects, phrasalPredicates.
 // sameAct is widened by stance class, so "is pro" binds a source's "in support of" without either label being rewritten.
-export async function pageReaderOptions({ features = {}, foreign = null, priors = null } = {}) {
-  const stem = foreign?.iso3 || 'eng';
+export async function pageReaderOptions({ features = {}, foreign = null, priors = null, stem: readStem = null } = {}) {
+  const stem = foreign?.iso3 || readStem || 'eng';
   const pr = priors || await loadLanguage(stem);
   let roleConfig = null;
   if (foreign) { try { const r = await fetch(new URL(`./vendor/khora/native/priors/role-config-${stem}.json`, import.meta.url)); if (r.ok) roleConfig = await r.json(); } catch (e) {} }
-  const useStance = features.stance !== false;
+  // The stance passes are English (their classes and the copula construction are English words): they join an English read
+  // only. A read in another language gets none, never English triples laid over its text (the Isthmus: no English codec).
+  const useStance = features.stance !== false && stem === 'eng';
   // the stance widening rides the lemmatizer's same-act test, so with morphology off neither is passed
   const sameAct = useStance && features.morphology !== false && pr.lemmatizer ? (a, b) => { const x = stanceClass(a), y = stanceClass(b); return x && y ? x === y : null; } : null;
-  return { classifyWord, roleConfig, sameAct, extendRelations: withStance({ stance: useStance }) };
+  return { classifyWord, roleConfig, sameAct, extendRelations: stem === 'eng' ? withStance({ stance: useStance }) : null };
 }
 
 // the page's hyperlexicon: janus's ledger, asked through its door by the Holodeck server (POST /hyperlexicon, the door's batch body).
@@ -254,11 +257,19 @@ export function pageLexicon(lang = 'en') {
  *  door), its hyperlexicon giver and its organs. Returns the WeftEntry@4 with the claims read back against the material
  *  (selfRead), and the reader and abbreviation set it used (non-enumerable) for a replay of the same text. */
 export async function readDocument(text, { features = {}, foreign = null, lexicon, ...opts } = {}) {
-  const stem = foreign?.iso3 || 'eng';
+  // THE ISTHMUS (khora native/docs/THE-ISTHMUS.md): the material chooses the codec. A language is DECLARED (`foreign`) or HEARD
+  // by the core from the text's own words; neither is the core's disclosed default (English, with a `language_default` gap).
+  // This page never declares English on a document's behalf (it did: every master read was labelled "declared" eng).
+  const declared = foreign?.iso3 || null;
+  if (!declared) await loadLanguage('eng'); // the default's priors are on hand, so a default read is a whole read
+  const heard = declared ? null : languageContextFor(String(text ?? ''), {});
+  const stem = declared || (heard?.language ? stemOf(heard.language) || heard.language : 'eng');
   const priors = await loadLanguage(stem);
-  const readerOptions = await pageReaderOptions({ features, foreign, priors });
-  const lex = lexicon === undefined ? pageLexicon(iso1Of(stem) || 'en') : lexicon;
-  return readCore(text, { language: stem, priors, lexicon: lex, readerOptions, features, selfRead: true, ...opts });
+  const readerOptions = await pageReaderOptions({ features, foreign, priors, stem });
+  // the hyperlexicon is filed per language: a stem with no two-letter code has none (a typed gap in the core), never English's
+  const code = iso1Of(stem);
+  const lex = lexicon === undefined ? (code ? pageLexicon(code) : null) : lexicon;
+  return readCore(text, { language: declared, priors, lexicon: lex, readerOptions, features, selfRead: true, ...opts });
 }
 
 /** A reader with the page's organs over passages the caller chunks itself (readCorpus, the ask door). The same assembly as the
