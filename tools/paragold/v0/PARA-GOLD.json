@@ -1,0 +1,781 @@
+{
+ "schema": "ParaGold@0",
+ "created": "2026-11-03",
+ "lens": "a statement is equivalent to another when it answers the same question with the same quantity, standing and referent",
+ "kinds": {
+  "same": "equivalent for answering the question",
+  "other": "not equivalent: different figure, quantity, standing or referent",
+  "contained": "the first entails the second, not the reverse"
+ },
+ "sources": [
+  {
+   "id": "apollo-nasa",
+   "raw_sha256": "cfe42a9112395114e462c070a47a19b50203bfa2c229b820f43996b94568ab93",
+   "text_sha256": "d971bd119eec6aaa9d0406ae89002ee1a17aec52e94595f27301280388b8a510",
+   "text_bytes": 10526,
+   "source": "US government page (public domain)",
+   "url": "https://www.nasa.gov/history/apollo-11-mission-overview/",
+   "retrieved": "2026-11-03",
+   "how": "curl, visible text of <main>, see extract.py"
+  },
+  {
+   "id": "cumb-army-284227",
+   "raw_sha256": "e07a007fa9a8deb343f5a010c157cd76b179108afe49f8addc73eefc327ad379",
+   "text_sha256": "4f9806b0cb7346743b5d75f2a0a397ffd61f0a3bef158e159b7b0e8fef6fc663",
+   "text_bytes": 16322,
+   "source": "US government page (public domain)",
+   "url": "https://www.army.mil/article/284227/managing_the_cumberland_river_how_the_corps_works_to_reduce_flood_risk",
+   "retrieved": "2026-11-03",
+   "how": "curl, visible text of <main>, see extract.py"
+  },
+  {
+   "id": "cumb-army-286019",
+   "raw_sha256": "ad4cf23fe59e383f65e0565a9474b56c0d2e816685706d102049ac89d2ea5999",
+   "text_sha256": "506986ffbc00d61091b458e909f773f7f1b99b32a81d13a7d638ad0c7b1cc23b",
+   "text_bytes": 11644,
+   "source": "US government page (public domain)",
+   "url": "https://www.army.mil/article/286019/cumberland_river_intertwined_with_story_of_u_s_army_corps_of_engineers",
+   "retrieved": "2026-11-03",
+   "how": "curl, visible text of <main>, see extract.py"
+  },
+  {
+   "id": "hoover-kid",
+   "raw_sha256": "ccc7d0cfb403c82d9429e9e5ea2ff7e8a577889a27eb6873e66a69d9674f8c98",
+   "text_sha256": "39e118d49c5af72d18235f5f87f9f1c1c484f42cb9efe3f75fbd45f293d0e820",
+   "text_bytes": 4017,
+   "source": "US government page (public domain)",
+   "url": "https://www.usbr.gov/lc/hooverdam/educate/kidfacts.html",
+   "retrieved": "2026-11-03",
+   "how": "curl, visible text of <main>, see extract.py"
+  },
+  {
+   "id": "hoover-nps",
+   "raw_sha256": "5fd022e3c8a1fb9e64c53dcaf69e2072fe276a4de8eef288efa364b1555a7044",
+   "text_sha256": "98be5f552b04c1dcc550dddb4286ee206cfc66de730c1f886ac5f25956e68faf",
+   "text_bytes": 5717,
+   "source": "US government page (public domain)",
+   "url": "https://www.nps.gov/lake/learn/historyculture/hoover-and-davis-dams.htm",
+   "retrieved": "2026-11-03",
+   "how": "curl, visible text of <main>, see extract.py"
+  },
+  {
+   "id": "hoover-project",
+   "raw_sha256": "93b04c233364bd8e2ae1a1fafd0357aa5c72da1ef7c72b97900eefb90834dc1a",
+   "text_sha256": "2c379a5a519f54403dc5037efc948c6393d674a7ec8cf4ee2260ed1298cfe980",
+   "text_bytes": 3657,
+   "source": "US government page (public domain)",
+   "url": "https://www.usbr.gov/projects/index.php?id=122",
+   "retrieved": "2026-11-03",
+   "how": "curl, visible text of <main>, see extract.py"
+  },
+  {
+   "id": "jeff-fact",
+   "raw_sha256": "f0d702b888a0dad70180111dbe4a58be80954925d41fcf79fe3ba82bd76cd1a8",
+   "text_sha256": "48a74963bbbf44bb497650fc04f9889608ba42a42311d6026205780b854fcd18",
+   "text_bytes": 4625,
+   "source": "US government page (public domain)",
+   "url": "https://www.nps.gov/jeff/planyourvisit/gateway-arch-fact-sheet.htm",
+   "retrieved": "2026-11-03",
+   "how": "curl, visible text of <main>, see extract.py"
+  },
+  {
+   "id": "jeff-height",
+   "raw_sha256": "295ef6bbfdc1a9cff55a126adbacdb5c792c2d91df931537d1a5e0811db7a1fd",
+   "text_sha256": "0e1467efa08ad1d552f347d223f5e53f42fdd097c10cefdfe152c658079d3ec3",
+   "text_bytes": 1908,
+   "source": "US government page (public domain)",
+   "url": "https://www.nps.gov/jeff/planyourvisit/arch-height.htm",
+   "retrieved": "2026-11-03",
+   "how": "curl, visible text of <main>, see extract.py"
+  },
+  {
+   "id": "miss-nps",
+   "raw_sha256": "13572cbae89e6186aaaa0d80d9d6640b2e4ace9a0d0be7301a1ba9c4f44af13f",
+   "text_sha256": "2d153dfda387330959458379fe79f52705375214461a57bad4d06492a76d600a",
+   "text_bytes": 10601,
+   "source": "US government page (public domain)",
+   "url": "https://www.nps.gov/miss/riverfacts.htm",
+   "retrieved": "2026-11-03",
+   "how": "curl, visible text of <main>, see extract.py"
+  },
+  {
+   "id": "moru-heads",
+   "raw_sha256": "1eeb0525eec7cfac1fccd1aa30353e2b1ab412c50a0e6f705ad6794948e8e385",
+   "text_sha256": "e21a3dc7dc3f00a7870df187c64ae770a5708587afd23a678b309bca25818624",
+   "text_bytes": 1263,
+   "source": "US government page (public domain)",
+   "url": "https://www.nps.gov/moru/learn/kidsyouth/how-big-are-the-heads.htm",
+   "retrieved": "2026-11-03",
+   "how": "curl, visible text of <main>, see extract.py"
+  },
+  {
+   "id": "moru-student",
+   "raw_sha256": "eb2ccf47a13719c7cadfb1dd9895e2f4cc44e8a56a7ce2b7f68c4e2a77e8f537",
+   "text_sha256": "8cd01bb026f13df0688bfed34b5ba0de801e76c0a276c81301c24709074227e6",
+   "text_bytes": 10266,
+   "source": "US government page (public domain)",
+   "url": "https://www.nps.gov/moru/learn/kidsyouth/student-guide.htm",
+   "retrieved": "2026-11-03",
+   "how": "curl, visible text of <main>, see extract.py"
+  },
+  {
+   "id": "stli-nps",
+   "raw_sha256": "f81554d17621f32f0361023398e5aa4011c75017112f041eea04376448d4324d",
+   "text_sha256": "a2edff46910f896bc9f58a2e2b16dc8a70dcc281e5ae209a10115a6ff4a818d0",
+   "text_bytes": 2542,
+   "source": "US government page (public domain)",
+   "url": "https://www.nps.gov/stli/learn/historyculture/statue-statistics.htm",
+   "retrieved": "2026-11-03",
+   "how": "curl, visible text of <main>, see extract.py"
+  },
+  {
+   "id": "wiki-Apollo_11",
+   "raw_sha256": "c1e597978680cd20e2fd102f7234c95b9ad6b7d12a5c840a4f680ecc612bf36d",
+   "text_sha256": "8d231da94502a54e0e45db2aa3b4210760b44f9e82e8c5ccd82c1db212937170",
+   "text_bytes": 81284,
+   "source": "English Wikipedia (CC BY-SA 4.0)",
+   "title": "Apollo 11",
+   "revid": 1381597284,
+   "revision_timestamp": "2026-10-23T15:51:43Z",
+   "how": "MediaWiki API action=query prop=extracts explaintext=1"
+  },
+  {
+   "id": "wiki-Concorde",
+   "raw_sha256": "4aa47c1a2d83f5cf380498316c3fff765c8c78dc20d7682884c99fab70405dad",
+   "text_sha256": "745380f4371c9e6d58e0ec8c06bd2944688cda14cee8e6500d921684336e025b",
+   "text_bytes": 68943,
+   "source": "English Wikipedia (CC BY-SA 4.0)",
+   "title": "Concorde",
+   "revid": 1383026099,
+   "revision_timestamp": "2026-10-31T16:06:27Z",
+   "how": "MediaWiki API action=query prop=extracts explaintext=1"
+  },
+  {
+   "id": "wiki-Cumberland_River",
+   "raw_sha256": "9e1e57ba2171c726e78a4bba1aba1ea1c1287a40df350e563bbcd53733be8029",
+   "text_sha256": "0cc678c13eef526c3ad86d9417f28b884d381415ac15e660a6c2c80db6c02646",
+   "text_bytes": 5758,
+   "source": "English Wikipedia (CC BY-SA 4.0)",
+   "title": "Cumberland River",
+   "revid": 1383085298,
+   "revision_timestamp": "2026-10-31T22:33:54Z",
+   "how": "MediaWiki API action=query prop=extracts explaintext=1"
+  },
+  {
+   "id": "wiki-Eiffel_Tower",
+   "raw_sha256": "d2292fe99cc4397b6cb99720eebcab5ac7c25e0f0ae50b5c231f730ae1f4aa4c",
+   "text_sha256": "c050b63d0f7c08e379f235676f865f828b05927f58b67407096b22731c43b84f",
+   "text_bytes": 45102,
+   "source": "English Wikipedia (CC BY-SA 4.0)",
+   "title": "Eiffel Tower",
+   "revid": 1383208616,
+   "revision_timestamp": "2026-11-01T15:22:00Z",
+   "how": "MediaWiki API action=query prop=extracts explaintext=1"
+  },
+  {
+   "id": "wiki-Gateway_Arch",
+   "raw_sha256": "b4398e9247f5f96c6ccba5e9c201afe3162c150ac9e4ce868ed8881052615e5e",
+   "text_sha256": "fbfa41f6f695aa148745f51758ace5842c67411fd8d3352a118a9f1f4abfb516",
+   "text_bytes": 60993,
+   "source": "English Wikipedia (CC BY-SA 4.0)",
+   "title": "Gateway Arch",
+   "revid": 1382104430,
+   "revision_timestamp": "2026-10-26T16:56:53Z",
+   "how": "MediaWiki API action=query prop=extracts explaintext=1"
+  },
+  {
+   "id": "wiki-Hoover_Dam",
+   "raw_sha256": "787f50bd3e7c773af430e63ba8c71b0a842fa2e4228b4021a8aab937a6cb8e10",
+   "text_sha256": "ed85f73be20f1b61c814fe18dd664eb0ec3d1fb96d2f522658f06e94bd05ef88",
+   "text_bytes": 51567,
+   "source": "English Wikipedia (CC BY-SA 4.0)",
+   "title": "Hoover Dam",
+   "revid": 1377555785,
+   "revision_timestamp": "2026-09-30T00:18:51Z",
+   "how": "MediaWiki API action=query prop=extracts explaintext=1"
+  },
+  {
+   "id": "wiki-Mississippi_River",
+   "raw_sha256": "9d675dd69315aad048eadb50bf8e3ca25e3c623dd42a2b1843ce4c93488aeda0",
+   "text_sha256": "aa8cfc8347df96665d4cc1c33740d6311dcb024e27bd75717ab158dc2ea6c3da",
+   "text_bytes": 62117,
+   "source": "English Wikipedia (CC BY-SA 4.0)",
+   "title": "Mississippi River",
+   "revid": 1383447685,
+   "revision_timestamp": "2026-11-02T19:07:44Z",
+   "how": "MediaWiki API action=query prop=extracts explaintext=1"
+  },
+  {
+   "id": "wiki-Mount_Rushmore",
+   "raw_sha256": "0eecc143fa395d23ebdf18859d41732bb56fd452bd0a3f7bf25471d171bea57c",
+   "text_sha256": "b60b8a60d4bdede3c83ec97100e9ac80405f89887cfb44ca4b1b8c373930c02b",
+   "text_bytes": 43830,
+   "source": "English Wikipedia (CC BY-SA 4.0)",
+   "title": "Mount Rushmore",
+   "revid": 1382230073,
+   "revision_timestamp": "2026-10-27T12:43:30Z",
+   "how": "MediaWiki API action=query prop=extracts explaintext=1"
+  },
+  {
+   "id": "wiki-Statue_of_Liberty",
+   "raw_sha256": "3a1fdff0bb0c9700a1812d559ebce2993177c3690be7ceb921b2957a900424a8",
+   "text_sha256": "7fa68cf0f4edbe21884d98684fff8f552d59534e6ea773580335596d3635e588",
+   "text_bytes": 62548,
+   "source": "English Wikipedia (CC BY-SA 4.0)",
+   "title": "Statue of Liberty",
+   "revid": 1383531030,
+   "revision_timestamp": "2026-11-03T04:59:03Z",
+   "how": "MediaWiki API action=query prop=extracts explaintext=1"
+  }
+ ],
+ "pairs": [
+  {
+   "id": "s01",
+   "kind": "same",
+   "question": "How tall is the Gateway Arch?",
+   "a": {
+    "doc": "jeff-fact",
+    "start": 728,
+    "end": 754,
+    "text": "Maximum Height\n630' (192m)"
+   },
+   "b": {
+    "doc": "wiki-Gateway_Arch",
+    "start": 0,
+    "end": 52,
+    "text": "The Gateway Arch is a 630-foot-tall (192 m) monument"
+   },
+   "note": ""
+  },
+  {
+   "id": "s02",
+   "kind": "same",
+   "question": "How long is the Cumberland River?",
+   "a": {
+    "doc": "cumb-army-284227",
+    "start": 1535,
+    "end": 1744,
+    "text": "The Cumberland River is an expansive waterway stretching 688 miles from its headwaters in Eastern Kentucky, flowing through Tennessee, and ultimately joining the Ohio River near Smithland, in Western Kentucky."
+   },
+   "b": {
+    "doc": "wiki-Cumberland_River",
+    "start": 72,
+    "end": 203,
+    "text": "The 688-mile-long (1,107 km) river drains almost 18,000 square miles (47,000 km2) of southern Kentucky and north-central Tennessee."
+   },
+   "note": "the second statement also states a drainage area; equal on the asked length"
+  },
+  {
+   "id": "s03",
+   "kind": "same",
+   "question": "How long is the Cumberland River?",
+   "a": {
+    "doc": "cumb-army-286019",
+    "start": 5094,
+    "end": 5383,
+    "text": "For more than 100 years after achieving the nation’s independence, American pioneers had to navigate along parts of the 688-mile Cumberland River in Kentucky and Tennessee in shallow draft boats or on larger vessels during high-water periods to trade goods in communities like Nashville."
+   },
+   "b": {
+    "doc": "wiki-Cumberland_River",
+    "start": 72,
+    "end": 203,
+    "text": "The 688-mile-long (1,107 km) river drains almost 18,000 square miles (47,000 km2) of southern Kentucky and north-central Tennessee."
+   },
+   "note": "the first states the length in passing; equal on the asked length"
+  },
+  {
+   "id": "s04",
+   "kind": "same",
+   "question": "How high is Mount Rushmore above sea level?",
+   "a": {
+    "doc": "moru-student",
+    "start": 2159,
+    "end": 2259,
+    "text": "Borglum liked the idea, and scouted out a broad wall of exposed granite on 5,725 foot Mount Rushmore"
+   },
+   "b": {
+    "doc": "wiki-Mount_Rushmore",
+    "start": 1158,
+    "end": 1233,
+    "text": "Its elevation at its highest point is 5,725 feet (1,745 m) above sea level."
+   },
+   "note": ""
+  },
+  {
+   "id": "s05",
+   "kind": "same",
+   "question": "How tall are the heads at Mount Rushmore?",
+   "a": {
+    "doc": "moru-heads",
+    "start": 667,
+    "end": 763,
+    "text": "The head of George Washington is 60 feet (18.3 m) tall with a nose that is 21 feet (6.4 m) tall."
+   },
+   "b": {
+    "doc": "wiki-Mount_Rushmore",
+    "start": 448,
+    "end": 625,
+    "text": "The sculpture features 60-foot-tall (18 m) depictions of the heads of four United States presidents: George Washington, Thomas Jefferson, Theodore Roosevelt, and Abraham Lincoln"
+   },
+   "note": "the first also states a nose length; equal on the asked head height"
+  },
+  {
+   "id": "s06",
+   "kind": "same",
+   "question": "When did work on Mount Rushmore begin?",
+   "a": {
+    "doc": "moru-student",
+    "start": 1051,
+    "end": 1096,
+    "text": "Work commenced officially on October 4, 1927."
+   },
+   "b": {
+    "doc": "wiki-Mount_Rushmore",
+    "start": 11127,
+    "end": 11172,
+    "text": "Between October 4, 1927, and October 31, 1941"
+   },
+   "note": "the second also states the end date"
+  },
+  {
+   "id": "s07",
+   "kind": "same",
+   "question": "How wide is the widest part of the Mississippi River?",
+   "a": {
+    "doc": "miss-nps",
+    "start": 3410,
+    "end": 3528,
+    "text": "The widest part of the Mississippi can be found at Lake Winnibigoshish near Bena, MN, where it is wider than 11 miles."
+   },
+   "b": {
+    "doc": "wiki-Mississippi_River",
+    "start": 7170,
+    "end": 7345,
+    "text": "The Upper Mississippi has a number of natural and artificial lakes, with its widest point being Lake Winnibigoshish, near Grand Rapids, Minnesota, over 11 miles (18 km) across"
+   },
+   "note": ""
+  },
+  {
+   "id": "s08",
+   "kind": "same",
+   "question": "How much concrete was used in total at Hoover Dam?",
+   "a": {
+    "doc": "hoover-nps",
+    "start": 2039,
+    "end": 2154,
+    "text": "Over the next five years, over 4.4 million cubic yards of concrete and 88 million pounds of plated steel were used."
+   },
+   "b": {
+    "doc": "hoover-project",
+    "start": 1422,
+    "end": 1552,
+    "text": "The dam contains 3.25 million cubic yards of concrete; total concrete in the dam and appurtenant works is 4.4 million cubic yards."
+   },
+   "note": "the second also states 3.25 million for the dam alone; equal on the asked total, 4.4 million"
+  },
+  {
+   "id": "s09",
+   "kind": "same",
+   "question": "How many steps are in each leg of the Gateway Arch?",
+   "a": {
+    "doc": "jeff-fact",
+    "start": 4235,
+    "end": 4256,
+    "text": "Number of stairs\n1076"
+   },
+   "b": {
+    "doc": "wiki-Gateway_Arch",
+    "start": 43677,
+    "end": 43730,
+    "text": "two sets of 1,076-step emergency stairs (one per leg)"
+   },
+   "note": ""
+  },
+  {
+   "id": "o01",
+   "kind": "other",
+   "question": "How tall is the Gateway Arch?",
+   "a": {
+    "doc": "jeff-fact",
+    "start": 728,
+    "end": 754,
+    "text": "Maximum Height\n630' (192m)"
+   },
+   "b": {
+    "doc": "jeff-fact",
+    "start": 665,
+    "end": 727,
+    "text": "Outer Width - Outside North Leg to Outer South Leg\n630' (192m)"
+   },
+   "note": "same figure (630 ft), different quantity: width, not height"
+  },
+  {
+   "id": "o02",
+   "kind": "other",
+   "question": "How tall is the Gateway Arch?",
+   "a": {
+    "doc": "jeff-fact",
+    "start": 728,
+    "end": 754,
+    "text": "Maximum Height\n630' (192m)"
+   },
+   "b": {
+    "doc": "wiki-Gateway_Arch",
+    "start": 12810,
+    "end": 12955,
+    "text": "At submission, Saarinen's plans laid out the arch at 569 feet (173 m) tall and 592 feet (180 m) wide from center to center of the triangle bases."
+   },
+   "note": "a different figure: an earlier plan, 569 ft"
+  },
+  {
+   "id": "o03",
+   "kind": "other",
+   "question": "How long is the Mississippi River?",
+   "a": {
+    "doc": "miss-nps",
+    "start": 2210,
+    "end": 2404,
+    "text": "The Mississippi River is the second longest river in North America, flowing 2,350 miles from its source at Lake Itasca through the center of the continental United States to the Gulf of America."
+   },
+   "b": {
+    "doc": "wiki-Mississippi_River",
+    "start": 158,
+    "end": 329,
+    "text": "From its traditional source of Lake Itasca in northern Minnesota, it flows generally south for 2,340 miles (3,770 km) to the Mississippi River Delta in the Gulf of Mexico."
+   },
+   "note": "two independent sources give 2,350 and 2,340 miles; the NPS page itself lists 2,300 and 2,320"
+  },
+  {
+   "id": "o04",
+   "kind": "other",
+   "question": "How much concrete is in Hoover Dam?",
+   "a": {
+    "doc": "hoover-kid",
+    "start": 1455,
+    "end": 1521,
+    "text": "There is enough concrete in Hoover Dam (4 1/2 million cubic yards)"
+   },
+   "b": {
+    "doc": "hoover-project",
+    "start": 1422,
+    "end": 1475,
+    "text": "The dam contains 3.25 million cubic yards of concrete"
+   },
+   "note": "different figures: 4.5 million vs 3.25 million (the sources count different things)"
+  },
+  {
+   "id": "o05",
+   "kind": "other",
+   "question": "How long were Armstrong and Aldrin on the Moon's surface?",
+   "a": {
+    "doc": "apollo-nasa",
+    "start": 6492,
+    "end": 6564,
+    "text": "Armstrong and Aldrin spent 21 hours, 36 minutes on the moon’s surface."
+   },
+   "b": {
+    "doc": "apollo-nasa",
+    "start": 6382,
+    "end": 6440,
+    "text": "The entire EVA phase lasted more than two-and-a-half hours"
+   },
+   "note": "different quantity: the moonwalk, not the stay on the surface"
+  },
+  {
+   "id": "o06",
+   "kind": "other",
+   "question": "How long is the Cumberland River?",
+   "a": {
+    "doc": "cumb-army-284227",
+    "start": 1535,
+    "end": 1744,
+    "text": "The Cumberland River is an expansive waterway stretching 688 miles from its headwaters in Eastern Kentucky, flowing through Tennessee, and ultimately joining the Ohio River near Smithland, in Western Kentucky."
+   },
+   "b": {
+    "doc": "cumb-army-286019",
+    "start": 6392,
+    "end": 6646,
+    "text": "Sharp, who served as Nashville District Operations assistant chief, noted that with the 15 low-lift lock and dam projects, they provided a dependable six-foot and usually nine-foot channel from the mouth of the river to Nashville, approximately 190 miles"
+   },
+   "note": "different quantity: the reach from the mouth to Nashville"
+  },
+  {
+   "id": "o07",
+   "kind": "other",
+   "question": "How tall are the heads at Mount Rushmore?",
+   "a": {
+    "doc": "moru-heads",
+    "start": 667,
+    "end": 763,
+    "text": "The head of George Washington is 60 feet (18.3 m) tall with a nose that is 21 feet (6.4 m) tall."
+   },
+   "b": {
+    "doc": "wiki-Mount_Rushmore",
+    "start": 8683,
+    "end": 8772,
+    "text": "Borglum's original plan was to make the carvings in 490-foot-high (150 m) granite pillars"
+   },
+   "note": "a plan for pillars, not the heads"
+  },
+  {
+   "id": "o08",
+   "kind": "other",
+   "question": "How much did the Concorde programme cost?",
+   "a": {
+    "doc": "wiki-Concorde",
+    "start": 187,
+    "end": 329,
+    "text": "Studies began in 1954 and a UK–France treaty followed in 1962, as the programme cost was estimated at £70 million (£1.77 billion in 2025)."
+   },
+   "b": {
+    "doc": "wiki-Concorde",
+    "start": 1208,
+    "end": 1307,
+    "text": "Delays and cost overruns pushed costs to £1.5–2.1 billion in 1976 (£12–16.7 billion in 2025)."
+   },
+   "note": "an estimate (70 million pounds) against the later outturn (1.5 to 2.1 billion); different figure and standing"
+  },
+  {
+   "id": "r01",
+   "kind": "other",
+   "question": "How tall is the Gateway Arch?",
+   "a": {
+    "doc": "jeff-fact",
+    "start": 728,
+    "end": 754,
+    "text": "Maximum Height\n630' (192m)"
+   },
+   "b": {
+    "doc": "stli-nps",
+    "start": 691,
+    "end": 725,
+    "text": "Top of base to torch\n151'1\"\n46.05m"
+   },
+   "note": "different referent: the Statue of Liberty"
+  },
+  {
+   "id": "r02",
+   "kind": "other",
+   "question": "How high is Mount Rushmore above sea level?",
+   "a": {
+    "doc": "wiki-Mount_Rushmore",
+    "start": 1158,
+    "end": 1233,
+    "text": "Its elevation at its highest point is 5,725 feet (1,745 m) above sea level."
+   },
+   "b": {
+    "doc": "wiki-Mount_Rushmore",
+    "start": 28780,
+    "end": 28855,
+    "text": "The tallest mountain in the region is Black Elk Peak (7,242 ft or 2,207 m)."
+   },
+   "note": "different referent: Black Elk Peak"
+  },
+  {
+   "id": "r03",
+   "kind": "other",
+   "question": "How long is the Mississippi River?",
+   "a": {
+    "doc": "miss-nps",
+    "start": 2210,
+    "end": 2404,
+    "text": "The Mississippi River is the second longest river in North America, flowing 2,350 miles from its source at Lake Itasca through the center of the continental United States to the Gulf of America."
+   },
+   "b": {
+    "doc": "cumb-army-284227",
+    "start": 1535,
+    "end": 1744,
+    "text": "The Cumberland River is an expansive waterway stretching 688 miles from its headwaters in Eastern Kentucky, flowing through Tennessee, and ultimately joining the Ohio River near Smithland, in Western Kentucky."
+   },
+   "note": "different referent: the Cumberland River"
+  },
+  {
+   "id": "r04",
+   "kind": "other",
+   "question": "How tall is the Statue of Liberty?",
+   "a": {
+    "doc": "stli-nps",
+    "start": 691,
+    "end": 725,
+    "text": "Top of base to torch\n151'1\"\n46.05m"
+   },
+   "b": {
+    "doc": "jeff-height",
+    "start": 1290,
+    "end": 1402,
+    "text": "The Gateway Arch is 75 feet taller than the Washington Monument and over twice as tall as the Statue of Liberty."
+   },
+   "note": "the second is about the Arch, and gives no height for the Statue"
+  },
+  {
+   "id": "c01",
+   "kind": "contained",
+   "question": "How long were Armstrong and Aldrin on the Moon's surface?",
+   "a": {
+    "doc": "apollo-nasa",
+    "start": 6492,
+    "end": 6564,
+    "text": "Armstrong and Aldrin spent 21 hours, 36 minutes on the moon’s surface."
+   },
+   "b": {
+    "doc": "wiki-Apollo_11",
+    "start": 1561,
+    "end": 1638,
+    "text": "After more than 21 hours on the surface, they rejoined Collins in lunar orbit"
+   },
+   "note": "21 h 36 min entails \"more than 21 hours\"; the reverse does not hold"
+  }
+ ],
+ "binding": [
+  {
+   "id": "b01",
+   "doc": "wiki-Eiffel_Tower",
+   "start": 123,
+   "end": 231,
+   "text": "It is named after the engineer Gustave Eiffel, whose company designed and built the tower from 1887 to 1889.",
+   "surface": "It",
+   "referent": "Eiffel Tower",
+   "note": "pronoun, with other names in the sentence"
+  },
+  {
+   "id": "b02",
+   "doc": "wiki-Eiffel_Tower",
+   "start": 662,
+   "end": 708,
+   "text": "The tower received 5,889,000 visitors in 2022.",
+   "surface": "The tower",
+   "referent": "Eiffel Tower",
+   "note": "definite description"
+  },
+  {
+   "id": "b03",
+   "doc": "wiki-Eiffel_Tower",
+   "start": 831,
+   "end": 969,
+   "text": "It was designated a monument historique in 1964, and was named part of a UNESCO World Heritage Site (\"Paris, Banks of the Seine\") in 1991.",
+   "surface": "It",
+   "referent": "Eiffel Tower",
+   "note": "pronoun"
+  },
+  {
+   "id": "b04",
+   "doc": "wiki-Eiffel_Tower",
+   "start": 970,
+   "end": 1094,
+   "text": "The tower is 330 metres (1,083 ft) tall, about the same height as an 81-storey building, and the tallest structure in Paris.",
+   "surface": "The tower",
+   "referent": "Eiffel Tower",
+   "note": "definite description"
+  },
+  {
+   "id": "b05",
+   "doc": "wiki-Eiffel_Tower",
+   "start": 1395,
+   "end": 1494,
+   "text": "It was the first structure in the world to surpass both the 200-metre and 300-metre mark in height.",
+   "surface": "It",
+   "referent": "Eiffel Tower",
+   "note": "pronoun"
+  },
+  {
+   "id": "b06",
+   "doc": "wiki-Eiffel_Tower",
+   "start": 1762,
+   "end": 1851,
+   "text": "The tower has three levels for visitors, with restaurants on the first and second levels.",
+   "surface": "The tower",
+   "referent": "Eiffel Tower",
+   "note": "definite description"
+  },
+  {
+   "id": "b07",
+   "doc": "wiki-Eiffel_Tower",
+   "start": 2674,
+   "end": 2851,
+   "text": "It was envisaged after discussion about a suitable centrepiece for the proposed 1889 Exposition Universelle, a world's fair to celebrate the centennial of the French Revolution.",
+   "surface": "It",
+   "referent": "Eiffel Tower",
+   "note": "pronoun"
+  },
+  {
+   "id": "b08",
+   "doc": "wiki-Eiffel_Tower",
+   "start": 5467,
+   "end": 5574,
+   "text": "He later established a separate company to manage the tower, putting up half the necessary capital himself.",
+   "surface": "He",
+   "referent": "Gustave Eiffel",
+   "note": "personal pronoun; the center has shifted from the tower to its engineer"
+  },
+  {
+   "id": "b09",
+   "doc": "wiki-Eiffel_Tower",
+   "start": 7098,
+   "end": 7443,
+   "text": "It came to a head as work began at the Champ de Mars: a \"Committee of Three Hundred\" (one member for each metre of the tower's height) was formed, led by the prominent architect Charles Garnier and including some of the most important figures of the arts, such as William-Adolphe Bouguereau, Guy de Maupassant, Charles Gounod and Jules Massenet.",
+   "surface": "It",
+   "referent": "the debate about architecture and engineering (not the tower)",
+   "note": "pronoun whose referent is the preceding sentence, not the attended topic"
+  },
+  {
+   "id": "b10",
+   "doc": "wiki-Concorde",
+   "start": 838,
+   "end": 997,
+   "text": "It is powered by four Rolls-Royce/Snecma Olympus 593 turbojets with variable engine intake ramps, and reheat for take-off and acceleration to supersonic speed.",
+   "surface": "It",
+   "referent": "Concorde",
+   "note": "pronoun"
+  },
+  {
+   "id": "b11",
+   "doc": "wiki-Concorde",
+   "start": 998,
+   "end": 1097,
+   "text": "Constructed from aluminium, it was the first airliner to have analogue fly-by-wire flight controls.",
+   "surface": "it",
+   "referent": "Concorde",
+   "note": "pronoun after a participial phrase"
+  },
+  {
+   "id": "b12",
+   "doc": "wiki-Concorde",
+   "start": 1098,
+   "end": 1207,
+   "text": "The airliner had transatlantic range while supercruising at twice the speed of sound for 75% of the distance.",
+   "surface": "The airliner",
+   "referent": "Concorde",
+   "note": "definite description with a different head noun"
+  },
+  {
+   "id": "b13",
+   "doc": "wiki-Concorde",
+   "start": 1790,
+   "end": 1999,
+   "text": "Its only competitor was the Tupolev Tu-144, carrying passengers from November 1977 until a May 1978 crash, while a potential competitor, the Boeing 2707, was cancelled in 1971 before any prototypes were built.",
+   "surface": "Its",
+   "referent": "Concorde",
+   "note": "possessive pronoun"
+  },
+  {
+   "id": "b14",
+   "doc": "wiki-Concorde",
+   "start": 544,
+   "end": 662,
+   "text": "On 9 October 1975, it received its French certificate of airworthiness, and was certified by the UK CAA on 5 December.",
+   "surface": "it",
+   "referent": "Concorde",
+   "note": "pronoun"
+  },
+  {
+   "id": "b15",
+   "doc": "wiki-Cumberland_River",
+   "start": 204,
+   "end": 377,
+   "text": "The river flows generally west from a source in the Appalachian Mountains to its confluence with the Ohio River near Paducah, Kentucky, and the mouth of the Tennessee River.",
+   "surface": "The river",
+   "referent": "Cumberland River",
+   "note": "definite description"
+  }
+ ]
+}
