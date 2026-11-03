@@ -14,6 +14,8 @@
   GET /contract/<token>/pdf           the filed PDF: local copy, else archive.org twin, else ePAV; cached
   GET /contract/<token>/thumb.jpg     first page as a small JPEG (made once, cached)
   GET /contract/<token>/layout        the pages' text with its boxes (build_layouts.py): paints before the PDF arrives
+  GET /contract/<token>/where?q=      the page and box where a phrase sits (from the PDF's own words; OCR layer when there is one)
+  GET /contract/<token>/page/<n>.jpg  that page rendered (?w= width), made once
   GET /contract/<token>/related       what this contract is related to: vendor, signers, similar topics, department, prior/next
   GET /export.csv?<filters>           every contract matching the filters as CSV (UTF-8 with BOM, opens in Excel)
   GET /pivot?rows=&cols=&measure=&<filters>   a pivot table computed here: rows x cols of count / sum / avg / max amount / vendors
@@ -396,6 +398,62 @@ def thumb_path(tok):
         _thumb_miss[tok] = time.time() + 600   # don't re-fetch a PDF that is not there yet on every card paint
         return None
 
+# ---- where a phrase sits on the page ---------------------------------------------------------------------------------------
+# /where finds the phrase in the PDF's own words (poppler's pdftotext -bbox: every word with its box) — the OCR-layered copy when
+# searchable.py has made one, else the captured file — and answers with the page and the box, normalised to the page, so a card can
+# draw the page and mark the place. A scan with no text layer has no words to find: it answers found=[] and says so, rather than
+# guess a position. /page/<n>.jpg is that page rendered (pdftoppm), made once and kept beside the thumbnails.
+_where = {}
+_WORD = re.compile(r'<word xMin="([\d.]+)" yMin="([\d.]+)" xMax="([\d.]+)" yMax="([\d.]+)">(.*?)</word>')
+_PAGE = re.compile(r'<page width="([\d.]+)" height="([\d.]+)">')
+
+def _pdf_for_text(tok):
+    sp = os.path.join(SEARCHABLE, tok + '.pdf')
+    return (sp, 'ocr-layer') if os.path.exists(sp) else (pdf_path(tok), 'text-layer')
+
+def where(tok, q, limit=6):
+    q = ' '.join((q or '').lower().split())
+    if len(q) < 3: raise ValueError('q needs at least 3 characters')
+    k = (tok, q, os.path.exists(os.path.join(SEARCHABLE, tok + '.pdf')))
+    if k in _where: return _where[k]
+    src, source = _pdf_for_text(tok)
+    if not src: return {'token': tok, 'found': [], 'pages': None, 'source': None, 'note': 'no PDF yet'}
+    try: xml = subprocess.run(['pdftotext', '-bbox', src, '-'], capture_output=True, timeout=60, check=True).stdout.decode('utf-8', 'replace')
+    except Exception as e: return {'token': tok, 'found': [], 'pages': None, 'source': source, 'note': 'could not read the PDF text: %s' % str(e)[:80]}
+    import html as _h
+    found, pages, withtext = [], 0, 0
+    for pg in xml.split('<page ')[1:]:
+        pages += 1; pm = _PAGE.match('<page ' + pg)
+        if not pm: continue
+        W, Hh = float(pm.group(1)), float(pm.group(2))
+        ws = [(float(a), float(b), float(c), float(d), _h.unescape(t)) for a, b, c, d, t in _WORD.findall(pg)]
+        if not ws: continue
+        withtext += 1
+        low = [w[4].lower() for w in ws]; text = ' '.join(low); i = text.find(q)
+        while i >= 0 and len(found) < limit:
+            lo = text.count(' ', 0, i); hi = lo + q.count(' ')                         # the words the match covers
+            if hi < len(ws):
+                sel = ws[lo:hi + 1]; x0, y0, x1, y1 = min(s[0] for s in sel), min(s[1] for s in sel), max(s[2] for s in sel), max(s[3] for s in sel)
+                found.append({'page': pages, 'w': W, 'h': Hh, 'box': [round(x0 / W, 4), round(y0 / Hh, 4), round((x1 - x0) / W, 4), round((y1 - y0) / Hh, 4)], 'text': ' '.join(w[4] for w in sel)})
+            i = text.find(q, i + len(q))
+    r = {'token': tok, 'found': found, 'pages': pages, 'pages_with_text': withtext, 'source': source}
+    if not found: r['note'] = 'no match in the PDF\'s own words; a scanned page has no text layer here, so its position needs the OCR layer (searchable.py)' if source == 'text-layer' else 'no match in the OCR layer'
+    if len(_where) > 500: _where.clear()
+    _where[k] = r
+    return r
+
+def page_jpg(tok, n, width=480):
+    n = max(1, min(int(n), 2000)); width = max(120, min(int(width), 1200))
+    dst = os.path.join(THUMBS, '%s-p%d-%d.jpg' % (tok, n, width))
+    if os.path.exists(dst): return dst
+    src = pdf_path(tok)
+    if not src: return None
+    with _thumb_sem:
+        if os.path.exists(dst): return dst
+        try: subprocess.run(['pdftoppm', '-jpeg', '-jpegopt', 'quality=74', '-f', str(n), '-l', str(n), '-scale-to-x', str(width), '-scale-to-y', '-1', '-singlefile', src, dst[:-4]], check=True, timeout=60, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        except Exception: return None
+    return dst if os.path.exists(dst) else None
+
 def pdf_bytes(tok):
     cp = os.path.join(CACHE, tok + '.pdf')
     if os.path.exists(cp): return open(cp, 'rb').read(), 'cache'
@@ -441,7 +499,14 @@ class H(BaseHTTPRequestHandler):
                 try: return self.send(200, ft_search(p), t0=t0)
                 except ValueError as e: return self.send(400, {'error': str(e)}, t0=t0)
                 except (sqlite3.Error, ImportError) as e: return self.send(503, {'error': 'full-text index unavailable: %s' % e}, t0=t0)
-            m = re.match(r'^/contract/([A-Za-z0-9]+)(/pdf|/thumb\.jpg|/layout|/related)?$', path)
+            m = re.match(r'^/contract/([A-Za-z0-9]+)(/pdf|/thumb\.jpg|/layout|/related|/where|/page/\d+\.jpg)?$', path)
+            if m and TOK.match(m.group(1)) and m.group(2) == '/where':
+                try: return self.send(200, where(m.group(1), (p.get('q') or [''])[0]), extra={'Cache-Control': 'public, max-age=300'}, t0=t0)
+                except ValueError as e: return self.send(400, {'error': str(e)}, t0=t0)
+            if m and TOK.match(m.group(1)) and (m.group(2) or '').startswith('/page/'):
+                n = int(re.search(r'\d+', m.group(2)).group()); jp = page_jpg(m.group(1), n, (p.get('w') or ['480'])[0])
+                if not jp: return self.send(404, {'error': 'no such page'}, extra={'Cache-Control': 'public, max-age=60'}, t0=t0)
+                return self.send(200, open(jp, 'rb').read(), 'image/jpeg', {'Cache-Control': 'public, max-age=604800, immutable'}, t0=t0)
             if m and TOK.match(m.group(1)):
                 if m.group(2) == '/related':
                     r = related(m.group(1))

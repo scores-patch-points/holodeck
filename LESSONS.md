@@ -354,3 +354,12 @@ Find on a scanned PDF said "no matches" because it searched only the PDF's own t
 included: offer "N in the text" when the view finds none, open the text with every match marked, and key the repaint on the text's length
 so a count is never taken from the passage the full text replaced. Embedding an invisible OCR layer into the PDF itself is the
 complement, written beside the captured file (`searchable/<token>.pdf`, served on `?layer=ocr`) so the filed document is never altered.
+
+## 43. Draw a position only when something found one
+The search-result designs mark where a phrase sits on its page. The position comes from the PDF's own words (poppler's `pdftotext -bbox`:
+every word with its box), the OCR-layered copy when one exists, and is normalised to the page so the card can crop to it. A scan with no
+text layer has no words to find: the VM answers "not found" with the reason and the card shows page 1 and says so, never a box placed by
+guess (the mock-up's boxes were hand-placed). A response keyed by URL is cached by the proxy for its whole lifetime: version the request
+(`?v=2`) when its meaning changes, or a fix looks like it did nothing ("of 71 pages" survived a deploy).
+The same result rows feed all three views (Cards, In context, Concept map); the names beside a phrase are the reader's own, with its own
+types and colours, so nothing about who or what is typed into the view.

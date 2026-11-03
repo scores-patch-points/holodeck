@@ -28,6 +28,9 @@ export const related = tok => get('/contract/' + encodeURIComponent(tok) + '/rel
 // the reader opens the copy with an OCR text layer (selectable, findable words on every scanned page); the API falls back
 // to the captured PDF when no layered copy has been made yet
 export const pdfUrl = tok => API + '/contract/' + encodeURIComponent(tok) + '/pdf?layer=ocr';
+// where a phrase sits: the page and box, from the PDF's own words (the VM's /where); and that page as a picture
+export const where = (tok, q) => get('/contract/' + encodeURIComponent(tok) + '/where?' + new URLSearchParams({ q, v: 2 }));
+export const pagePic = (tok, n, w = 480) => API + '/contract/' + encodeURIComponent(tok) + '/page/' + n + '.jpg?w=' + w;
 export async function page({ dept = '', q = '', sort = 'party', offset = 0, limit = 200 } = {}) {
   if (q.trim().length >= 3) {   // a search is a full-text search: every character of every contract, tolerant of OCR slips
     try { return await get('/search?' + new URLSearchParams({ q: q.trim(), dept, offset, limit: Math.min(limit, 100), per: 12 })); }
@@ -60,6 +63,8 @@ export function toDoc(r) {
     ...(r.expires ? { expires: r.expires } : {}),
     note: 'Metro Nashville contract ' + (r.number || r.token) + (r.department ? ', ' + r.department : '') + ' · served by the VM',
     vm: true,
+    // a search row also carries where the phrase was found (the passages, how often, how it matched)
+    ...(r.hits ? { token: r.token, hits: r.hits, hitTotal: r.hit_total || r.hits.length, hitKinds: r.kinds || {} } : {}),
   };
 }
 

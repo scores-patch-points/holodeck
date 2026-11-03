@@ -838,6 +838,9 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
         <sc-if value="{{ svRefs }}" hint-placeholder-val="{{ false }}">
           <div style="margin-top:8px">{{ refEl }}</div>
         </sc-if>
+        <sc-if value="{{ svRes }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-top:8px">{{ resEl }}</div>
+        </sc-if>
         <sc-if value="{{ drv.empty }}" hint-placeholder-val="{{ false }}"><div style="padding:36px 8px;font:400 15px var(--sans);color:var(--mut);text-align:center">{{ drv.emptyText }}</div></sc-if>
         <sc-if value="{{ svGrid }}" hint-placeholder-val="{{ true }}">
           <div class="hd-drive-grid">
@@ -5892,6 +5895,18 @@ function ReferentsView(p) {
   return R.createElement('div', { ref: host, style: { position: 'relative', minHeight: '320px' } });
 }
 
+// The results of a search, three ways (holodeck-results-view.js): Cards, In context, Concept map. Mounted like the Referents view.
+function ResultsView(p) {
+  const R = React, host = R.useRef(null), ctl = R.useRef(null), cur = R.useRef(p); cur.current = p;
+  R.useEffect(() => { let dead = false;
+    import(new URL('holodeck-results-view.js', location.href).href).then(M => { if (dead || !host.current) return;
+      ctl.current = M.mountResultsView(host.current, { onOpen: id => cur.current.onOpen(id), whereOf: d => cur.current.whereOf(d), pageUrl: (d, n, w) => cur.current.pageUrl(d, n, w) }); ctl.current.set(cur.current.data, cur.current.mode); })
+      .catch(e => console.warn('holodeck results view', e));
+    return () => { dead = true; if (ctl.current) ctl.current.destroy(); ctl.current = null; }; }, []);
+  R.useEffect(() => { if (ctl.current) ctl.current.set(p.data, p.mode); });
+  return R.createElement('div', { ref: host, style: { position: 'relative', minHeight: '240px' } });
+}
+
 const SAY_RE = '(?:said|says|told|wrote|writes|argued|added|stated|states|announced|asked|testified|explained|noted|claimed|contends|replied|responded)';
 function whoSays(st, A) {
   if (st._who !== undefined) return st._who;
@@ -10492,7 +10507,9 @@ class Component extends DCLogic {
       ...(seenDocs.length ? [{ label: 'Seen, not kept', n: String(seenDocs.length), desc: 'Opened, but not counted.', items: seenDocs.map(cardOf) }] : []),
       ...(hasKinds ? Object.entries(kmap).sort((a, b) => KIND_ORDER.indexOf(a[0]) - KIND_ORDER.indexOf(b[0])).map(([k, ds]) => ({ label: k, n: String(ds.length), desc: KIND_DESC[k] || '', items: ds.slice().sort((x, y) => pubMsD(x) - pubMsD(y)).map(cardOf) })) : Object.entries(gmap).sort((x, y) => (x[0] === '_') - (y[0] === '_') || y[1].docs.length - x[1].docs.length).map(([k, g]) => ({ label: g.label, n: String(g.docs.length), desc: k === '_' ? (Object.keys(distinctOf).length ? 'No difference from the rest is large enough to matter.' : keptDocs.length < 2 ? '' : 'No difference between them is large enough to matter yet.') : '', items: g.docs.map(cardOf) }))),
     ];
-    const svMode = (S.svMode && S.svMode !== 'list' && S.svMode !== 'map') ? S.svMode : 'grid', svGroup = 'tabs';  /* the Map was removed with the Explore panels (2026-10-24) */ /* List was dropped: Grid for the picture, Table for the fields */ const allSrcItems = srcGroups.flatMap(g => g.items.map(it => ({ it, g: g.label })));
+    const vmFind = !!(HD_METRO && this._vm && (this._vm.q || '').trim().length >= 3);   // a search is on: its results can be read three ways
+    let svMode = (S.svMode && S.svMode !== 'list' && S.svMode !== 'map') ? S.svMode : 'grid'; const svGroup = 'tabs';
+    if (vmFind && (svMode === 'grid' || svMode === 'cards')) svMode = 'rcards'; else if (!vmFind && /^r(cards|context|map)$/.test(svMode)) svMode = 'grid';  /* the Map was removed with the Explore panels (2026-10-24) */ /* List was dropped: Grid for the picture, Table for the fields */ const allSrcItems = srcGroups.flatMap(g => g.items.map(it => ({ it, g: g.label })));
     const docOfCard = it => A.docs.find(d => d.title === it.title) || null;
     const isVid = it => { const d = docByTitle.get(it.title); return !!(d && (d.medium === 'Video' || d.medium === 'Audio' || d.media)); }; const vidItems = allSrcItems.filter(x => isVid(x.it));
     const FAM = k => /^(Audit or report|Legislation|Letter|Meeting record|Contract)$/.test(k) ? 'Documents' : /^(Meeting recording|Video|Podcast|Recording)$/.test(k) ? 'Video & audio' : /^(Government page|Organisation page)$/.test(k) ? 'Official pages' : /^(News|Blog|Own article)$/.test(k) ? 'Press and commentary' : 'Other';
@@ -10557,7 +10574,7 @@ class Component extends DCLogic {
     const seg = on => ({ bg: on ? 'var(--sel2)' : 'transparent', col: on ? 'var(--ink)' : 'var(--mut)' });
     const meetVals = {};
     const svVals = { ...meetVals, srcHiddenNote: this._srcHidden ? plural(this._srcHidden, 'other source') + ' with nothing in this selection ' + (this._srcHidden === 1 ? 'is' : 'are') + ' hidden' : '', svCards: svMode === 'cards', svTable: svMode === 'table', svMap: svMode === 'map', svRefs: svMode === 'referents', svTabsOn: svGroup === 'tabs',
-      svModes: [['grid', 'Grid'], ['table', 'Table'], ['referents', 'Referents']].map(([k, l]) => ({ label: l, ...seg(svMode === k || (k === 'grid' && svMode === 'cards')), onClick: () => this.setState({ svMode: k }) })),
+      svModes: (vmFind ? [['rcards', 'Cards'], ['rcontext', 'In context'], ['rmap', 'Concept map'], ['table', 'Table'], ['referents', 'Referents']] : [['grid', 'Grid'], ['table', 'Table'], ['referents', 'Referents']]).map(([k, l]) => ({ label: l, ...seg(svMode === k || (k === 'grid' && svMode === 'cards')), onClick: () => this.setState({ svMode: k }) })),
       svTabs: (tabs.length > 2 ? tabs : []).map(t => ({ /* one kind of source only: "All" and that family are the same list, so neither tab is shown */ label: t.label, n: t.n, cls: t.id === svTab ? 'on' : '', bd: t.id === svTab ? 'var(--acc2)' : 'transparent', col: t.id === svTab ? 'var(--ink)' : 'var(--mut)', onClick: () => this.setState({ svTab: t.id }) })),
       svCols: colOrder.map(k => ({ label: colMap.get(k).label + (svSort === k ? (svDir > 0 ? ' ↑' : ' ↓') : ''),
         onClick: () => this.setState({ svSort: k, svDir: svSort === k ? -svDir : (k === 'title' || k === 'publisher' || (k.startsWith('f:') && ['text', 'id'].includes(fcBy.get(k.slice(2)).type)) ? 1 : -1) }),
@@ -10719,6 +10736,8 @@ class Component extends DCLogic {
     _m('statements'); // connections
     const pairs = D.edgeList.map(e => { const h = hi(isSel('pair', e.a + '|' + e.b)); return { a: e.a, b: e.b, n: plural(e.sts.length, 'statement'), bg: h.bg, bd: h.bd, onClick: () => this.sel('pair', e.a + '|' + e.b) }; });
     const graphEl = (view === 'connections' || svMode === 'map') ? this.graph(D, selName, F, A) : null;
+    const resEl = (view === 'summary' && /^r(cards|context|map)$/.test(svMode)) ? React.createElement(ResultsView, { data: this.resultsView(A, D), mode: svMode.slice(1), onOpen: id => this.read(id),
+      whereOf: d => { const V = this._vm; return V.M.where(d.token, V.q.trim()); }, pageUrl: (d, n, w) => this._vm.M.pagePic(d.token, n, w) }) : null;
     const refEl = (view === 'summary' && svMode === 'referents') ? React.createElement(ReferentsView, { data: this.referentsView(A, D), onOpen: n => this.openProfile(n), onRead: (doc, id) => this.read(doc, id) }) : null;
     const orbX = view === 'connections' ? this.orbitUi(A, selName) : { orb: {}, tl: {}, srcT: [] };
 
@@ -11192,7 +11211,7 @@ class Component extends DCLogic {
     return {
       ...this._extra,
       ...svVals,
-      refEl,
+      refEl, resEl, svRes: /^r(cards|context|map)$/.test(svMode),
       sourceKindsUseful: tabs.length > 2, showSourceGroupLabels: svVals.svCardGroups.length > 1, hasGaps: false, /* "What to check" hidden for now; restore with gaps.length > 0 */ toolsOpen: this._toolsOpen !== false || ['names', 'records', 'connections', 'ingest'].includes(view), timeFilterActive: !!f.range, timeControlLabel: f.range ? 'Time filter · active' : 'Filter by time',
       srcGroups: svVals.svCardGroups.map(g => ({ ...g, ...this.capL('sg:' + g.label, g.items, 60) })),
       hasPairsHidden: D.edgeHidden > 0, pairsHidden: plural(D.edgeHidden, 'other pair') + ' share a statement only once, or no more often than chance would give, so ' + (D.edgeHidden === 1 ? 'it is' : 'they are') + ' left out.',
@@ -11633,6 +11652,21 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
   // order, then byte offset) — "as they appear". The profile is the workspace's own
   // induced one (holodeck-profile.js); the first-appearance quote is the earliest
   // statement that names it.
+  // The rows the results view draws: per result contract, the passages the phrase was found in (from the VM), and the names the
+  // reader found in those passages with how many statements each shares with them — the engine's own names and types, nothing typed.
+  resultsView(A, D) {
+    const V = this._vm, q = ((V && V.q) || '').trim(), ql = q.toLowerCase();
+    if (this._resView && this._resView.D === D && this._resView.q === q) return this._resView.r;
+    const vm = A.docs.filter(d => d.vm && d.hits);
+    const dup = new Map(); vm.forEach(d => dup.set(d.contractNo, (dup.get(d.contractNo) || 0) + 1));
+    const docs = vm.map(d => ({
+      id: d.id, token: d.token || d.id.replace(/^nash-/, ''), title: d.title, year: d.year, number: d.contractNo, dept: d.dept, thumb: d.thumb,
+      short: (d.contractNo || d.token) + (dup.get(d.contractNo) > 1 && d.dept ? ' · ' + d.dept.split(' ')[0].slice(0, 10) : ''),
+      hitTotal: d.hitTotal || d.hits.length, hits: d.hits,
+      ents: D.nameList.map(n => { const k = n.sts.reduce((c, st) => c + (st.doc === d.id ? 1 : 0), 0), nl = n.name.toLowerCase(); return k && !nl.includes(ql) && !ql.includes(nl) ? { name: n.name, color: TYPE_C[n.type] || 'var(--mut)', n: k } : null; })
+        .filter(Boolean).sort((a, b) => b.n - a.n || a.name.localeCompare(b.name)).slice(0, 10) }));
+    const r = { q, docs }; this._resView = { D, q, r }; return r;
+  }
   referentsView(A, D) {
     const ready = !!(_hdProf && _hdProf.buildFromTriples);
     if (this._refView && this._refView.D === D && this._refView.ready === ready) return this._refView.r;
