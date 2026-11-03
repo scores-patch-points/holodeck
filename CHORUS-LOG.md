@@ -452,3 +452,12 @@ fast: 10 files · 43 affected tests pass · law: ok
 | Ostrom | — | index.html (hdAbbreviations, `HD_LEX.log[last]`) | fixed | one client now serves the cut, the master and the class fill; the cut's gap is read from its own ask's entries |
 | Kondo | — | tools/serve.mjs POST /lexicon | noted | removed (nothing calls it; the eval reads the pack on its own); stashed with its recovery address |
 clean: Feynman (the 12-character cut is the givers' list's own, pre-existing), Dijkstra/Frankfurt (vendored khora, reviewed upstream in khora#56), Simon/Chekhov (vendored read-core is tested upstream)
+
+## 2026-11-03 — Ask: figures bound to the question's own word (layer 1) + usage substrate (layer 2) (ask-bound-figures, working)
+fast: 3 files · 10 affected tests pass · law: ok (0 citations)
+| lens | citation | file:line | verdict | one line |
+| Feynman | swallowed error | index.html:4205 | fixed | substrate fetch `.catch(() => {})` → typed gap `USAGE_GAP`, carried in the Ask's note |
+| Alexander | composition seam | index.html:10202 | fixed | async substrate not in the Ask cache key: a question asked before load stayed ungated; key now carries the substrate head |
+| Feynman | declared constants | index.html BIND_WORDS=3, BIND_MIN=2 | noted | lens declarations, not measured; disclosed in comments and README |
+| Dijkstra | stem identity | index.html qStem | noted | binding matches by the Ask's existing English stemmer; substrate is English-ground only (README) |
+clean: Diaconis (null measured: control 2 vs 16,088 pairs), Holmes (name words only excluded, no merge), Pearl (best offset kept, no double count), Kondo (nothing stray)
