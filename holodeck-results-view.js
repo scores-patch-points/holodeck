@@ -2,8 +2,7 @@
 //
 //   cards    each result as a card: the page the phrase sits on (marked), the sentence around it, and what it appears with
 //   context  each result as a row: the page, the passage, and a small graph of the phrase and the names around it
-//   map      every result on one concept map (the phrase in the middle, names around it, documents outside), with an
-//            inspector for the one you click
+//   (the Concept map is the Holodeck's own map engine, mounted by the page: holodeck-map.js)
 //
 // DOM only, like holodeck-referents-view.js: no data work lives here. The page hands over `data` (the rows, with the passages the
 // phrase was found in and the names the reader found beside it); a position on the page comes from the VM (`where`) and is drawn only
@@ -44,21 +43,6 @@ const CSS = `
 .rv .rv-row .rv-page{height:200px;border:1px solid var(--line);border-radius:8px}
 .rv .rv-graph{background:var(--bg);border-radius:10px;min-height:200px;display:flex;align-items:center;justify-content:center}
 .rv .rv-graph svg{width:100%;max-width:360px;height:auto;max-height:230px;display:block;margin:0 auto}
-.rv .rv-map{display:grid;grid-template-columns:minmax(0,1fr) minmax(260px,340px);gap:20px;align-items:start}
-.rv .rv-mapbox{background:var(--s1);border:1px solid var(--line);border-radius:14px;overflow:hidden}
-.rv .rv-mapbox svg{width:100%;height:auto;display:block}
-.rv .rv-mapbox{background:var(--bg)}
-.rv .rv-ent{cursor:default;transition:opacity .12s} .rv .rv-edge{transition:opacity .12s,stroke-opacity .12s}
-.rv svg.rv-hov .rv-edge{opacity:.12} .rv svg.rv-hov .rv-edge.rv-on{opacity:1;stroke-opacity:.95;stroke-width:2.6}
-.rv svg.rv-hov .rv-ent{opacity:.25!important} .rv svg.rv-hov .rv-ent.rv-on{opacity:1!important}
-.rv .rv-doc rect{transition:stroke .12s}
-.rv .rv-doc:hover rect,.rv .rv-doc:focus rect{stroke:var(--acc)}
-.rv .rv-doc:focus{outline:none}
-.rv .rv-legend{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center;padding:10px 14px;border-top:1px solid var(--line);color:var(--mut);font-size:12.5px}
-.rv .rv-legend span{display:inline-flex;align-items:center;gap:6px}
-.rv .rv-legend i{display:inline-block;width:10px;height:10px;border-radius:50%}
-.rv .rv-legend i.rv-lg-line{width:18px;height:0;border-top:3px solid var(--acc);border-radius:0;opacity:.6}
-.rv .rv-legend i.rv-lg-badge{background:var(--acc)}
 .rv .rv-insp{padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
 .rv .rv-insp .rv-page{height:150px;border:1px solid var(--line);border-radius:8px}
 .rv .rv-loc{font-variant-numeric:tabular-nums}
@@ -67,12 +51,10 @@ const CSS = `
 .rv .rv-row .rv-lab .rv-loc{font:inherit}
 .rv .rv-more{color:var(--mut);font-size:12.5px;margin-top:10px}
 .rv svg text{font-family:var(--sans)}
-.rv .rv-doc{cursor:pointer}
 .rv .rv-open{align-self:flex-start;background:none;border:1px solid var(--line2);border-radius:8px;color:var(--acc);cursor:pointer;font:500 13px var(--sans);padding:5px 12px}
 @container (max-width:760px){
   .rv .rv-row{grid-template-columns:110px minmax(0,1fr)}
   .rv .rv-row .rv-graph{grid-column:1 / -1}
-  .rv .rv-map{grid-template-columns:minmax(0,1fr)}
 }
 @container (max-width:420px){ .rv .rv-row{grid-template-columns:minmax(0,1fr)} .rv .rv-row .rv-page{height:170px} .rv .rv-row .rv-pgx{display:inline} }
 `;
@@ -202,64 +184,11 @@ export function mountResultsView(host, opts = {}) {
           h('div', { class: 'rv-sub' }, relation(d, data.docs))), localGraph(d))))];
   }
 
-  // every result, every name, on one map; click a document to read it in the inspector, hover a name to follow it
-  function map() {
-    const docs = data.docs.slice(0, 12), W = 720, H = 600, cx = 360, cy = 300, ink = 'var(--ink)';
-    const dang = docs.map((_, i) => -Math.PI / 2 + i * 2 * Math.PI / docs.length), dpos = dang.map(a => [cx + 272 * Math.cos(a), cy + 236 * Math.sin(a)]);
-    const cur = docs[Math.min(sel, docs.length - 1)], curNames = new Set(cur.ents.map(e => e.name));
-    // the names: the ones most shared (a name that is one word said twice, "Axon Axon", is not a name); each remembers which documents hold it
-    const tot = new Map();
-    docs.forEach((d, i) => d.ents.forEach(e => { if (new Set(e.name.toLowerCase().split(/\s+/)).size < 2 && e.name.split(/\s+/).length > 1) return;
-      const t = tot.get(e.name) || { ...e, n: 0, by: new Map() }; t.n += e.n; t.by.set(i, e.n); tot.set(e.name, t); }));
-    const ents = [...tot.values()].sort((a, b) => b.n - a.n || a.name.localeCompare(b.name)).slice(0, 8), m = ents.length;
-    // order them round the ring by the direction of the documents that hold them (a circular mean): a name sits between its documents
-    ents.forEach(e => { let x = 0, y = 0; e.by.forEach((n, i) => { x += Math.cos(dang[i]) * n; y += Math.sin(dang[i]) * n; }); e.ang = Math.atan2(y, x); });
-    ents.sort((a, b) => a.ang - b.ang); const a0 = m ? ents[0].ang : 0, rx = 112 + 6 * m, ry = 88 + 5 * m, maxN = Math.max(1, ...ents.map(e => e.n));
-    ents.forEach((e, k) => { const a = a0 + k * 2 * Math.PI / m; e.x = cx + rx * Math.cos(a); e.y = cy + ry * Math.sin(a); e.fs = 11.5 + 2 * (e.n / maxN); });
-    const svg = s('svg', { viewBox: '0 0 ' + W + ' ' + H, role: 'img', 'aria-label': 'Concept map of the results' });
-    const guide = (rx2, ry2) => s('ellipse', { cx, cy, rx: rx2, ry: ry2, fill: 'none', stroke: 'var(--line)', 'stroke-dasharray': '3 6' });
-    svg.append(guide(rx, ry), guide(272, 236));
-    const edge = (x1, y1, x2, y2, attrs) => { const mx = (x1 + x2) / 2 + (cx - (x1 + x2) / 2) * .22, my = (y1 + y2) / 2 + (cy - (y1 + y2) / 2) * .22;
-      return s('path', { d: 'M' + x1.toFixed(1) + ' ' + y1.toFixed(1) + ' Q' + mx.toFixed(1) + ' ' + my.toFixed(1) + ' ' + x2.toFixed(1) + ' ' + y2.toFixed(1), fill: 'none', 'stroke-linecap': 'round', class: 'rv-edge', ...attrs }); };
-    ents.forEach((e, k) => svg.append(s('line', { x1: cx, y1: cy, x2: e.x, y2: e.y, stroke: curNames.has(e.name) ? 'var(--acc)' : 'var(--line2)', 'stroke-opacity': curNames.has(e.name) ? .45 : .5, 'stroke-dasharray': '2 4', class: 'rv-spoke' })));
-    docs.forEach((d, i) => ents.forEach((e, k) => { const n = e.by.get(i); if (!n) return; const on = i === sel;
-      svg.append(edge(dpos[i][0], dpos[i][1], e.x, e.y, { stroke: on ? e.color : 'var(--line2)', 'stroke-opacity': on ? .8 : .45, 'stroke-width': on ? 1.5 + n * .7 : 1, 'data-e': k, 'data-d': i, 'data-on': on ? 1 : 0 })); }));
-    ents.forEach((e, k) => { const mine = curNames.has(e.name), w = Math.min(176, e.name.length * 6.6 * (e.fs / 12) + 34), hgt = 14 + e.fs;
-      const g = s('g', { class: 'rv-ent', 'data-e': k, opacity: mine ? 1 : .32, tabindex: 0 }, s('title', null, e.name + ' · ' + plural(e.n, 'statement') + (e.label ? ' · ' + e.label : '')),
-        s('rect', { x: e.x - w / 2, y: e.y - hgt / 2, width: w, height: hgt, rx: hgt / 2, fill: tint(e.color, 15), stroke: e.color, 'stroke-opacity': mine ? .55 : .15, 'stroke-width': 1.2 }),
-        s('circle', { cx: e.x - w / 2 + 12, cy: e.y, r: 3.6, fill: e.color }), s('text', { x: e.x + 7, y: e.y + e.fs * .35, 'text-anchor': 'middle', 'font-size': e.fs, 'font-weight': 500, fill: ink }, clip(e.name, 24)));
-      g.addEventListener('mouseenter', () => follow(svg, k)); g.addEventListener('mouseleave', () => follow(svg, -1)); g.addEventListener('focus', () => follow(svg, k)); g.addEventListener('blur', () => follow(svg, -1)); svg.append(g); });
-    const qw = Math.min(220, data.q.length * 9 + 40);
-    svg.append(s('g', null, s('rect', { x: cx - qw / 2, y: cy - 19, width: qw, height: 38, rx: 19, fill: 'var(--rv-hl)', stroke: 'var(--acc)', 'stroke-width': 2.2 }), s('text', { x: cx, y: cy + 5.5, 'text-anchor': 'middle', 'font-size': 16, 'font-weight': 700, fill: ink }, clip(data.q, 26))));
-    docs.forEach((d, i) => { const [x, y] = dpos[i], on = i === sel, line2 = [d.dept ? clip(d.dept, 18) : '', d.year || ''].filter(Boolean).join(' · ');
-      const g = s('g', { class: 'rv-doc', tabindex: 0, role: 'button', 'aria-label': d.title, 'aria-pressed': on }, s('title', null, d.title + (d.dept ? ' — ' + d.dept : '')),
-        s('rect', { x: x - 82, y: y - 27, width: 164, height: 54, rx: 12, fill: on ? tint('var(--acc)', 12) : 'var(--s1)', stroke: on ? 'var(--acc)' : 'var(--line2)', 'stroke-width': on ? 2.4 : 1.4 }),
-        s('text', { x, y: y - 4, 'text-anchor': 'middle', 'font-size': 14, 'font-weight': 700, fill: ink }, clip(d.number || d.short, 18)),
-        s('text', { x, y: y + 15, 'text-anchor': 'middle', 'font-size': 11.5, fill: 'var(--mut)' }, line2),
-        s('circle', { cx: x + 82, cy: y - 27, r: 11, fill: 'var(--acc)' }), s('text', { x: x + 82, y: y - 23, 'text-anchor': 'middle', 'font-size': 10.5, 'font-weight': 700, fill: '#fff' }, d.hitTotal > 99 ? '99+' : d.hitTotal));
-      const pick = () => { sel = i; paint(); }; g.addEventListener('click', pick); g.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(); } }); svg.append(g); });
-    const types = new Map(); ents.forEach(e => { if (e.label) types.set(e.label, e.color); });
-    const legend = h('div', { class: 'rv-legend' }, [...types].map(([l, c]) => h('span', null, h('i', { style: 'background:' + c }), l)), h('span', null, h('i', { class: 'rv-lg-line' }), 'statements shared'), h('span', null, h('i', { class: 'rv-lg-badge' }), 'mentions'),
-      h('span', { class: 'rv-sub' }, 'Hover a name to follow it · click a document to read it'));
-    const insp = h('div', { class: 'rv-insp' }, h('div', { class: 'rv-lab' }, 'Selected'), title(cur), sub(cur), pageArt(cur, 150), cur.hits[0] ? passage(cur.hits[0]) : null,
-      h('div', { class: 'rv-lab', style: 'border-top:1px solid var(--line);padding-top:10px' }, 'Appears with'), chips(cur.ents), h('div', { class: 'rv-sub' }, relation(cur, docs)),
-      h('button', { class: 'rv-open', onclick: () => opts.onOpen && opts.onOpen(cur.id) }, 'Open contract →'));
-    return [h('div', { class: 'rv-sum' }, h('span', null, h('b', null, data.docs.length), ' found'), h('span', null, 'Where the phrase sits, and the names it connects to.')),
-      h('div', { class: 'rv-map' }, h('div', { class: 'rv-mapbox' }, svg, legend), insp),
-      data.docs.length > docs.length ? h('div', { class: 'rv-more' }, 'Showing the first ' + docs.length + ' of ' + data.docs.length.toLocaleString() + ' on the map; the other views list them all.') : null];
-  }
-  // follow one name: its lines stand out, everything else steps back
-  function follow(svg, k) {
-    svg.classList.toggle('rv-hov', k >= 0);
-    svg.querySelectorAll('.rv-edge').forEach(p => p.classList.toggle('rv-on', k >= 0 && +p.getAttribute('data-e') === k));
-    svg.querySelectorAll('.rv-ent').forEach(g => g.classList.toggle('rv-on', k >= 0 && +g.getAttribute('data-e') === k));
-  }
-
   function paint() {
     if (dead || !data) return;
     root.replaceChildren();
     if (!data.docs.length) { root.append(h('div', { class: 'rv-none', style: 'padding:24px 4px' }, 'No contract has “' + data.q + '” in it.')); return; }
-    root.append(...(mode === 'context' ? context() : mode === 'map' ? map() : cards()).filter(Boolean));
+    root.append(...(mode === 'context' ? context() : cards()).filter(Boolean));
   }
   return {
     set(d, m) { const key = JSON.stringify([d.q, d.docs.map(x => x.id + ':' + x.ents.length + ':' + x.hitTotal)]); const changed = !data || data._key !== key || m !== mode;

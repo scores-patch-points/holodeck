@@ -369,3 +369,11 @@ text layer exists, so the card says "page unknown" with a "Find page" button tha
 and asks again until the page is known; never build one per card, a search lists dozens. On the map: order the names round the ring by the
 direction of the documents that hold them (a circular mean) so a name sits between its documents, draw the selected document's lines strongly and
 the rest as hairlines, and check the layout by measuring it (no two boxes overlap, nothing outside the frame, labels whole).
+
+## 44. When the engine exists, feed it; do not draw another map
+A hand-drawn SVG "concept map" (curved lines, hand-placed rings) took three rounds to stop looking wrong. The Holodeck already has the map: `holodeck-map.js`,
+which the Connections view mounts, with distance from the reference point = shared statements, rings in halving steps, names grouped by kind and nested by
+ties, and layers from sources down to statements. A search's Concept map is that engine fed the same `{nodes, edges, docs, occ}`: the searched phrase as a
+node tied to every name it appears beside, names tied to each other only when they share more statements than chance (`dmdCo`, the rule Connections uses).
+Pass no forced centre: the phrase is the most-connected name, so the engine centres it and opens its busiest level by itself; forcing the name left it
+collapsed to one ring. The names arrive a few seconds after load (the reader works them out), so judge the map after they have.

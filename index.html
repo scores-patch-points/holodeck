@@ -10736,7 +10736,7 @@ class Component extends DCLogic {
     _m('statements'); // connections
     const pairs = D.edgeList.map(e => { const h = hi(isSel('pair', e.a + '|' + e.b)); return { a: e.a, b: e.b, n: plural(e.sts.length, 'statement'), bg: h.bg, bd: h.bd, onClick: () => this.sel('pair', e.a + '|' + e.b) }; });
     const graphEl = (view === 'connections' || svMode === 'map') ? this.graph(D, selName, F, A) : null;
-    const resEl = (view === 'summary' && /^r(cards|context|map)$/.test(svMode)) ? React.createElement(ResultsView, { data: this.resultsView(A, D), mode: svMode.slice(1), onOpen: id => this.read(id),
+    const resEl = (view === 'summary' && svMode === 'rmap') ? this.resultsMap(A, D) : (view === 'summary' && /^r(cards|context)$/.test(svMode)) ? React.createElement(ResultsView, { data: this.resultsView(A, D), mode: svMode.slice(1), onOpen: id => this.read(id),
       whereOf: (d, build) => { const V = this._vm; return V.M.where(d.token, V.q.trim(), (d.hits && d.hits[0] && d.hits[0].text) || '', build); }, pageUrl: (d, n, w) => this._vm.M.pagePic(d.token, n, w) }) : null;
     const refEl = (view === 'summary' && svMode === 'referents') ? React.createElement(ReferentsView, { data: this.referentsView(A, D), onOpen: n => this.openProfile(n), onRead: (doc, id) => this.read(doc, id) }) : null;
     const orbX = view === 'connections' ? this.orbitUi(A, selName) : { orb: {}, tl: {}, srcT: [] };
@@ -11710,6 +11710,32 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
       M = this._mapMemo = { key, nodes: pool.map(n => ({ n: n.name, c: n.sts.length, color: TYPE_C[n.type], type: n.type })), edges, occ: new Map(pool.map(n => [n.name, n.sts.map(x => ({ doc: x.doc, id: x.id, t: short(x.text, 240) }))])) };
     }
     return h(MapView, { height: onlyDoc ? '460px' : 'max(560px, calc(100vh - 170px))', onWitness: o => this.read(o.doc, o.id), data: { sig: M.key, nodes: M.nodes, edges: M.edges, docs, occ: M.occ, sel: selName || null }, onProfile: id => this.setState({ sel: { type: 'name', id }, selAll: false, pfIdx: 0, pfAll: false, view: 'profile', readDoc: null }) });
+  }
+
+  // The Concept map of a search is the Holodeck's own map engine (holodeck-map.js, the one Connections uses): the searched phrase is the
+  // body in the middle, every name the reader found sits by how many statements it shares with it (and with the other names, more than
+  // chance would give, the same rule as Connections), and the layers open from the sources down to the statements. Click a name for the
+  // statements it sits in, a statement to read it. Nothing about the placement is chosen here: it is the engine's.
+  resultsMap(A, D) {
+    const h = React.createElement, V = this._vm, q = ((V && V.q) || '').trim(), ql = q.toLowerCase();
+    const docs = A.docs.filter(d => d.vm && d.hits && this._cnt.has(d.id)).map(d => ({ id: d.id, title: d.title }));
+    const ids = new Set(docs.map(d => d.id)), F = A.sts.filter(st => ids.has(st.doc));
+    const hit = F.filter(st => String(st.text).toLowerCase().includes(ql));
+    const pool = D.nameList.filter(n => holoName(n.name, A) && !n.name.toLowerCase().includes(ql) && !ql.includes(n.name.toLowerCase())).slice(0, 120);
+    if (!pool.length && !hit.length) return h('p', { style: { color: 'var(--mut)', margin: '12px' } }, 'No names to connect.');
+    const key = 'res|' + q + '|' + pool.map(n => n.name + ':' + n.sts.length).join('|') + '#' + F.length + '#' + docs.map(d => d.id).join(',');
+    let M = this._resMapMemo;
+    if (!M || M.key !== key) {
+      const S = pool.map(n => new Set(n.sts.map(x => x.id))), H = new Set(hit.map(x => x.id)), edges = [];
+      pool.forEach((n, i) => { let k = 0; S[i].forEach(v => { if (H.has(v)) k++; }); if (k) edges.push({ a: q, b: n.name, c: k }); });   // the phrase to every name it appears beside
+      for (let i = 0; i < pool.length; i++) for (let j = i + 1; j < pool.length; j++) { const a = S[i], b = S[j]; let k = 0; const [sm, lg] = a.size < b.size ? [a, b] : [b, a]; sm.forEach(v => { if (lg.has(v)) k++; }); if (k && dmdCo(k, a.size, b.size, F.length)) edges.push({ a: pool[i].name, b: pool[j].name, c: k }); }
+      M = this._resMapMemo = { key,
+        nodes: [{ n: q, c: Math.max(1, hit.length), color: 'var(--amber)', type: 'phrase' }, ...pool.map(n => ({ n: n.name, c: n.sts.length, color: TYPE_C[n.type], type: n.type }))], edges,
+        occ: new Map([[q, hit.map(x => ({ doc: x.doc, id: x.id, t: short(x.text, 240) }))], ...pool.map(n => [n.name, n.sts.map(x => ({ doc: x.doc, id: x.id, t: short(x.text, 240) }))])]) };
+    }
+    return h(MapView, { height: 'max(520px, calc(100vh - 250px))', onWitness: o => this.read(o.doc, o.id),
+      onProfile: id => { if (id !== q) this.setState({ sel: { type: 'name', id }, selAll: false, pfIdx: 0, pfAll: false, view: 'profile', readDoc: null }); },
+      data: { sig: M.key, nodes: M.nodes, edges: M.edges, docs, occ: M.occ, sel: null } });   // no forced name: the engine centres the most-connected one (the phrase ties to every name) and opens its busiest level
   }
 
   orbitUi(A, selName) {
