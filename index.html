@@ -10737,7 +10737,7 @@ class Component extends DCLogic {
     const pairs = D.edgeList.map(e => { const h = hi(isSel('pair', e.a + '|' + e.b)); return { a: e.a, b: e.b, n: plural(e.sts.length, 'statement'), bg: h.bg, bd: h.bd, onClick: () => this.sel('pair', e.a + '|' + e.b) }; });
     const graphEl = (view === 'connections' || svMode === 'map') ? this.graph(D, selName, F, A) : null;
     const resEl = (view === 'summary' && /^r(cards|context|map)$/.test(svMode)) ? React.createElement(ResultsView, { data: this.resultsView(A, D), mode: svMode.slice(1), onOpen: id => this.read(id),
-      whereOf: d => { const V = this._vm; return V.M.where(d.token, V.q.trim()); }, pageUrl: (d, n, w) => this._vm.M.pagePic(d.token, n, w) }) : null;
+      whereOf: (d, build) => { const V = this._vm; return V.M.where(d.token, V.q.trim(), (d.hits && d.hits[0] && d.hits[0].text) || '', build); }, pageUrl: (d, n, w) => this._vm.M.pagePic(d.token, n, w) }) : null;
     const refEl = (view === 'summary' && svMode === 'referents') ? React.createElement(ReferentsView, { data: this.referentsView(A, D), onOpen: n => this.openProfile(n), onRead: (doc, id) => this.read(doc, id) }) : null;
     const orbX = view === 'connections' ? this.orbitUi(A, selName) : { orb: {}, tl: {}, srcT: [] };
 
@@ -11663,7 +11663,7 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
       id: d.id, token: d.token || d.id.replace(/^nash-/, ''), title: d.title, year: d.year, number: d.contractNo, dept: d.dept, thumb: d.thumb,
       short: (d.contractNo || d.token) + (dup.get(d.contractNo) > 1 && d.dept ? ' · ' + d.dept.split(' ')[0].slice(0, 10) : ''),
       hitTotal: d.hitTotal || d.hits.length, hits: d.hits,
-      ents: D.nameList.map(n => { const k = n.sts.reduce((c, st) => c + (st.doc === d.id ? 1 : 0), 0), nl = n.name.toLowerCase(); return k && !nl.includes(ql) && !ql.includes(nl) ? { name: n.name, color: TYPE_C[n.type] || 'var(--mut)', n: k } : null; })
+      ents: D.nameList.map(n => { const k = n.sts.reduce((c, st) => c + (st.doc === d.id ? 1 : 0), 0), nl = n.name.toLowerCase(); return k && !nl.includes(ql) && !ql.includes(nl) ? { name: n.name, color: TYPE_C[n.type] || 'var(--mut)', label: (TYPE_L[n.type] || 'Names').replace(/s$/, ''), n: k } : null; })
         .filter(Boolean).sort((a, b) => b.n - a.n || a.name.localeCompare(b.name)).slice(0, 10) }));
     const r = { q, docs }; this._resView = { D, q, r }; return r;
   }

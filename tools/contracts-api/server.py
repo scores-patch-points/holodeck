@@ -14,7 +14,9 @@
   GET /contract/<token>/pdf           the filed PDF: local copy, else archive.org twin, else ePAV; cached
   GET /contract/<token>/thumb.jpg     first page as a small JPEG (made once, cached)
   GET /contract/<token>/layout        the pages' text with its boxes (build_layouts.py): paints before the PDF arrives
-  GET /contract/<token>/where?q=      the page and box where a phrase sits (from the PDF's own words; OCR layer when there is one)
+  GET /contract/<token>/where?q=&ctx=&build=1
+                                      the page and box where a phrase sits (the PDF's own words; the OCR layer when there is one). ctx = the passage it was
+                                      read in, so the page is that passage's. build=1 starts the OCR text layer for a scan (one at a time).
   GET /contract/<token>/page/<n>.jpg  that page rendered (?w= width), made once
   GET /contract/<token>/related       what this contract is related to: vendor, signers, similar topics, department, prior/next
   GET /export.csv?<filters>           every contract matching the filters as CSV (UTF-8 with BOM, opens in Excel)
@@ -411,17 +413,38 @@ def _pdf_for_text(tok):
     sp = os.path.join(SEARCHABLE, tok + '.pdf')
     return (sp, 'ocr-layer') if os.path.exists(sp) else (pdf_path(tok), 'text-layer')
 
-def where(tok, q, limit=6):
+HERE = os.path.dirname(os.path.abspath(__file__))
+PYV = os.environ.get('CONTRACTS_PY', '/mnt/watch/nashville-legistar-archive/.venv/bin/python')
+_layer_jobs = {}
+
+def layer_state(tok):
+    """ready: an OCR-layered copy exists; building: its job is running; none."""
+    if os.path.exists(os.path.join(SEARCHABLE, tok + '.pdf')): return 'ready'
+    j = _layer_jobs.get(tok)
+    return 'building' if j and j.poll() is None else 'none'
+
+def build_layer(tok):
+    """Start the OCR text layer for one contract (searchable.py), only when asked, one at a time: each is minutes of OCR."""
+    st = layer_state(tok)
+    if st != 'none': return st
+    if any(j.poll() is None for j in _layer_jobs.values()): return 'busy'
+    try: _layer_jobs[tok] = subprocess.Popen(['nice', '-n', '12', PYV, os.path.join(HERE, 'searchable.py'), '--token', tok, '--workers', '1'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, cwd=HERE)
+    except OSError: return 'none'
+    return 'building'
+
+def where(tok, q, ctx='', build=False, keep=6):
+    """Where `q` sits in the PDF's own words. `ctx` is the passage it was read in: the page whose words share the most with it
+    comes first, so the page number belongs to THAT passage, not just to some mention of the phrase."""
     q = ' '.join((q or '').lower().split())
     if len(q) < 3: raise ValueError('q needs at least 3 characters')
-    k = (tok, q, os.path.exists(os.path.join(SEARCHABLE, tok + '.pdf')))
-    if k in _where: return _where[k]
+    ls = layer_state(tok); k = (tok, q, hash(ctx), ls)
+    if k in _where and not (build and not _where[k]['found'] and ls == 'none'): return _where[k]
     src, source = _pdf_for_text(tok)
-    if not src: return {'token': tok, 'found': [], 'pages': None, 'source': None, 'note': 'no PDF yet'}
+    if not src: return {'token': tok, 'found': [], 'pages': None, 'source': None, 'layer': ls, 'note': 'no PDF yet'}
     try: xml = subprocess.run(['pdftotext', '-bbox', src, '-'], capture_output=True, timeout=60, check=True).stdout.decode('utf-8', 'replace')
-    except Exception as e: return {'token': tok, 'found': [], 'pages': None, 'source': source, 'note': 'could not read the PDF text: %s' % str(e)[:80]}
+    except Exception as e: return {'token': tok, 'found': [], 'pages': None, 'source': source, 'layer': ls, 'note': 'could not read the PDF text: %s' % str(e)[:80]}
     import html as _h
-    found, pages, withtext = [], 0, 0
+    cw = set(re.findall(r'[a-z0-9]{3,}', (ctx or '').lower())[:80]); matches, pages, withtext = [], 0, 0
     for pg in xml.split('<page ')[1:]:
         pages += 1; pm = _PAGE.match('<page ' + pg)
         if not pm: continue
@@ -430,14 +453,21 @@ def where(tok, q, limit=6):
         if not ws: continue
         withtext += 1
         low = [w[4].lower() for w in ws]; text = ' '.join(low); i = text.find(q)
-        while i >= 0 and len(found) < limit:
+        if i < 0 or len(matches) >= 80: continue
+        pw = set(re.findall(r'[a-z0-9]{3,}', text)) if cw else None
+        score = round(len(cw & pw) / len(cw), 3) if cw else 0
+        while i >= 0 and len(matches) < 80:
             lo = text.count(' ', 0, i); hi = lo + q.count(' ')                         # the words the match covers
             if hi < len(ws):
                 sel = ws[lo:hi + 1]; x0, y0, x1, y1 = min(s[0] for s in sel), min(s[1] for s in sel), max(s[2] for s in sel), max(s[3] for s in sel)
-                found.append({'page': pages, 'w': W, 'h': Hh, 'box': [round(x0 / W, 4), round(y0 / Hh, 4), round((x1 - x0) / W, 4), round((y1 - y0) / Hh, 4)], 'text': ' '.join(w[4] for w in sel)})
+                matches.append({'page': pages, 'w': W, 'h': Hh, 'box': [round(x0 / W, 4), round(y0 / Hh, 4), round((x1 - x0) / W, 4), round((y1 - y0) / Hh, 4)], 'text': ' '.join(w[4] for w in sel), 'score': score})
             i = text.find(q, i + len(q))
-    r = {'token': tok, 'found': found, 'pages': pages, 'pages_with_text': withtext, 'source': source}
-    if not found: r['note'] = 'no match in the PDF\'s own words; a scanned page has no text layer here, so its position needs the OCR layer (searchable.py)' if source == 'text-layer' else 'no match in the OCR layer'
+    matches.sort(key=lambda m: (-m['score'], m['page']))
+    r = {'token': tok, 'found': matches[:keep], 'matches': len(matches), 'pages': pages, 'pages_with_text': withtext, 'source': source, 'layer': ls}
+    if not matches:
+        r['scanned'] = source == 'text-layer'
+        r['note'] = 'no match in the PDF\'s own words; a scanned page has no text layer here, so its position needs the OCR layer' if source == 'text-layer' else 'no match in the OCR layer'
+        if build and source == 'text-layer': r['layer'] = build_layer(tok)
     if len(_where) > 500: _where.clear()
     _where[k] = r
     return r
@@ -501,7 +531,10 @@ class H(BaseHTTPRequestHandler):
                 except (sqlite3.Error, ImportError) as e: return self.send(503, {'error': 'full-text index unavailable: %s' % e}, t0=t0)
             m = re.match(r'^/contract/([A-Za-z0-9]+)(/pdf|/thumb\.jpg|/layout|/related|/where|/page/\d+\.jpg)?$', path)
             if m and TOK.match(m.group(1)) and m.group(2) == '/where':
-                try: return self.send(200, where(m.group(1), (p.get('q') or [''])[0]), extra={'Cache-Control': 'public, max-age=300'}, t0=t0)
+                try:
+                    r = where(m.group(1), (p.get('q') or [''])[0], (p.get('ctx') or [''])[0][:800], (p.get('build') or [''])[0] in ('1', 'true'))
+                    # a located phrase is stable; "not found / building" changes as the text layer is made, so it is never cached
+                    return self.send(200, r, extra={'Cache-Control': 'public, max-age=300' if r['found'] else 'no-store'}, t0=t0)
                 except ValueError as e: return self.send(400, {'error': str(e)}, t0=t0)
             if m and TOK.match(m.group(1)) and (m.group(2) or '').startswith('/page/'):
                 n = int(re.search(r'\d+', m.group(2)).group()); jp = page_jpg(m.group(1), n, (p.get('w') or ['480'])[0])

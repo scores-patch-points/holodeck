@@ -29,7 +29,8 @@ export const related = tok => get('/contract/' + encodeURIComponent(tok) + '/rel
 // to the captured PDF when no layered copy has been made yet
 export const pdfUrl = tok => API + '/contract/' + encodeURIComponent(tok) + '/pdf?layer=ocr';
 // where a phrase sits: the page and box, from the PDF's own words (the VM's /where); and that page as a picture
-export const where = (tok, q) => get('/contract/' + encodeURIComponent(tok) + '/where?' + new URLSearchParams({ q, v: 2 }));
+// ctx = the passage the phrase was read in, so the page returned is that passage's; build = also start the OCR text layer for a scan
+export const where = (tok, q, ctx = '', build = false) => get('/contract/' + encodeURIComponent(tok) + '/where?' + new URLSearchParams({ q, v: 3, ...(ctx ? { ctx: ctx.slice(0, 600) } : {}), ...(build ? { build: 1 } : {}) }));
 export const pagePic = (tok, n, w = 480) => API + '/contract/' + encodeURIComponent(tok) + '/page/' + n + '.jpg?w=' + w;
 export async function page({ dept = '', q = '', sort = 'party', offset = 0, limit = 200 } = {}) {
   if (q.trim().length >= 3) {   // a search is a full-text search: every character of every contract, tolerant of OCR slips

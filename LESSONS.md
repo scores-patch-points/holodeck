@@ -363,3 +363,9 @@ guess (the mock-up's boxes were hand-placed). A response keyed by URL is cached 
 (`?v=2`) when its meaning changes, or a fix looks like it did nothing ("of 71 pages" survived a deploy).
 The same result rows feed all three views (Cards, In context, Concept map); the names beside a phrase are the reader's own, with its own
 types and colours, so nothing about who or what is typed into the view.
+The page number belongs to the PASSAGE, not to the phrase: pass the passage with the request and take the page whose words share the most with it
+(one contract: the definitions passage is on page 51, the warranty passage on page 70, same phrase). A scan has no words to find until its OCR
+text layer exists, so the card says "page unknown" with a "Find page" button that builds the layer on request, one at a time (minutes of OCR),
+and asks again until the page is known; never build one per card, a search lists dozens. On the map: order the names round the ring by the
+direction of the documents that hold them (a circular mean) so a name sits between its documents, draw the selected document's lines strongly and
+the rest as hairlines, and check the layout by measuring it (no two boxes overlap, nothing outside the frame, labels whole).
