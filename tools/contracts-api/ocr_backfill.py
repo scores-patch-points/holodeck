@@ -13,8 +13,8 @@ Reads from the pipeline's src/ (extract_text, contract_extract, live) and data d
 ocr-done.jsonl so a contract that cannot be read is recorded once, not retried every run.
 
 Order: departments with the fewest unread contracts first, so whole departments finish early.
-Pages: the first --max-pages pages by default (parties, term, amount, signatures sit there), recorded as
-pages_read/pages_total so a partial read says so. --max-pages 0 reads every page.
+Pages: every page by default. --max-pages N limits a run to the first N and records pages_read/pages_total so a partial
+read says so; read_complete.py finishes any contract that was left partial.
 
 Usage: ocr_backfill.py [--workers 6] [--limit N] [--dept NAME ...] [--max-pages 12] [--retry-failed]
 """
@@ -103,7 +103,7 @@ def candidates(args):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--workers', type=int, default=6); ap.add_argument('--limit', type=int, default=0)
-    ap.add_argument('--dept', action='append'); ap.add_argument('--max-pages', type=int, default=12)
+    ap.add_argument('--dept', action='append'); ap.add_argument('--max-pages', type=int, default=0)   # 0 = every page: a partial read hides text from search (see read_complete.py)
     ap.add_argument('--retry-failed', action='store_true')
     args = ap.parse_args()
     cands = candidates(args)

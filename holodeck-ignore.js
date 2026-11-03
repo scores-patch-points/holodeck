@@ -58,6 +58,7 @@ export function planIgnores(text, { pages = 1 } = {}) {
   const kept = lines.map(l => blank.has(norm(l)) ? ' '.repeat(l.length) : l).join('\n');
   // MINT the falsifiable rule tschichold would: what recurs is furniture.
   const rule = { schema: 'IgnoreRule@1', id: 'ig' + Date.now().toString(36), at: new Date().toISOString(), kind: 'recurring-line', primitive: 'templateLines', table: ignored.map(x => x.text).slice(0, 20), evidence: ignored[0].evidence, claim: 'a line that recurs in a document is furniture, not material', falsifier: 'a recurring line a person confirms is material (e.g. a required form field) falsifies this rule', standing: 'disclosed' };
-  try { const a = rules(); a.push(rule); localStorage.setItem(LS, JSON.stringify(a)); } catch (e) {}
+  // the same table minted again (the same contract opened twice, or a stamp shared by a whole collection) is the same rule: not stored twice
+  try { const a = rules(); const same = JSON.stringify(rule.table); if (!a.some(r => r.kind === rule.kind && JSON.stringify(r.table) === same)) { a.push(rule); localStorage.setItem(LS, JSON.stringify(a)); } } catch (e) {}
   return { ignored, kept, removed: ignored.length, rule };
 }

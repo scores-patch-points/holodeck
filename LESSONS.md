@@ -296,3 +296,61 @@ Falsifying control: a clean PDF must not call the converter; a converter's readi
 extractor's by the measure; a missing or broken converter is a held, skipped reading, never fatal; and
 the reading must be identical however the spaces were set. A reading surprised by its material's
 presentation is not yet stable.
+
+## 33. Test "we search the whole thing" with a phrase you know is in it
+The contract search returned 0 for "evidence.com". Grepping the VM's full extracted text found it in a 171-page contract, on
+pages 134 and 135. The index held only header fields and the reader's findings (328 for a 524,600-character contract), and the API
+served the first 60,000 characters of text. Falsify coverage the way a person would: pick a phrase from the full text, ask the
+search, and when it fails, measure the gap (here 45.6% of all extracted text lay past the first 60,000 characters of its contract,
+7,722 contracts). A count of "documents ingested" says nothing about what is searchable.
+
+## 34. A text layer that is only a stamp is not a text layer
+OCR ran only when a page's text layer was under 60 characters. Metro's scans carry "DocuSign Envelope ID: ... ARCHIVE" (66
+characters) on every page, so their bodies were never read: 15% of pages in a 300-PDF sample, one 78-page contract holding 5,437
+characters. A page needs OCR when its layer is short (under 400) AND images cover most of it (`extract_text.needs_ocr`). Ask what a
+layer holds, not how long it is. Likewise a contract with 200 characters of text was skipped by the OCR lane although 100 of its
+112 pages were blank to the extractor.
+
+## 35. Append what you read late; never rewrite what offsets already point at
+Everything downstream (findings, ledger rows, the full-text index) addresses text by character offset. Late reads (the pages past
+the first 12, the stamped scans) are appended after the existing text with the same page joiner, and only the rows whose start is
+past the old end are added, so every earlier offset holds. Keep a coverage line per contract (pages read of pages total, characters,
+pages OCR'd) and let a failed attempt write to it without overwriting the "partly read" state, or a failure hides the gap.
+
+## 36. A failure that reads "this is a cover sheet" is not a failure
+All 63 contracts the OCR gave up on were one-page placeholders ("Recorded in Metropolitan Clerk's Office", "see referenced
+legislation", a title slip). The content is not in the system; there is nothing to retry. Classify them with the reason and count them
+as accounted for, so "100% ingested" has a definition: every page read, or a named reason the document has none.
+
+## 37. Typo-tolerant search: pigeonhole the trigrams, and fold only character for character
+A trigram index plus a bounded edit-distance check finds "indemnifcation" and "lndemnification" in "Indemnification". For k edits
+split the query into k+1 non-overlapping pieces and look up each piece's rarest trigram: one edit damages one piece, so a true match
+cannot be missed. Fold OCR confusions only where the length is kept (1, |, i, ! to l; 0 to o) so an offset in the folded text is an
+offset in the original; two-for-one slips (rn for m, vv for w) are left to edit distance. Exact first, widen only when exact finds
+fewer than a few contracts, and label every hit by how it matched (exact, OCR variant, together, close match).
+
+## 38. Explain a match where it is, and do it on the server that found it
+A result that says only "this contract matched" sends the person to hunt. The server returns, per contract, the passages that matched,
+how (phrase, words together, word, same root) and the clause they sit in, so a page of results is one request instead of one fetch
+per row. The explaining module is shared by the API and the tests so they cannot disagree.
+
+## 39. When there is room for one of rail or panel, give it to the content
+At 860px the reader showed a rail, the contract and a Source panel, and the contract (the hero) got a third of the width. Between
+the phone width and the width where all three fit, fold the rail to its strip while reading and put the Source details behind a
+button that docks them on request. A topic opened from a list should dock beside the list, not replace it: the person keeps their place.
+
+## 40. A read-only workspace removes the write paths, not just the buttons
+Dropping a file, pasting a link, the omni box, Add source, Rename, Comment and Merge all added or changed sources. Hide them in the
+workspace (one `html[data-metro]` rule and a `.hd-write` class) AND refuse them in the handlers (drop, paste, openAdd), and keep the
+workspace's own sources out of what was added locally. Hiding alone leaves a keyboard or a drag.
+
+## 41. A recurring stamp is furniture: blank it with the faculty that exists
+"ARCHIVE" is on every page (171 of 171 in one contract). The ignore faculty already blanks a short line that recurs on at least half the
+pages, length-preserving and disclosed; it needs the page count, so the API returns it, and with no count nothing is blanked. A
+standing rule minted twice for the same table is the same rule, stored once.
+
+## 42. A search must hand its query to the reader, and the reader must hold what the search found
+Find on a scanned PDF said "no matches" because it searched only the PDF's own text layer. The contract's text holds every page, OCR
+included: offer "N in the text" when the view finds none, open the text with every match marked, and key the repaint on the text's length
+so a count is never taken from the passage the full text replaced. Embedding an invisible OCR layer into the PDF itself is the
+complement, written beside the captured file (`searchable/<token>.pdf`, served on `?layer=ocr`) so the filed document is never altered.

@@ -1,0 +1,13 @@
+[Unit]
+Description=Metro contract DB - read the scanned pages of newly ingested contracts (gap lane, bounded per run)
+
+[Service]
+Type=oneshot
+User=admin
+WorkingDirectory=/mnt/watch/contracts-api
+# the one-off bulk run (read_complete.py --gaps --workers 3) may still be going; never overlap it
+ExecCondition=/bin/sh -c '! pgrep -f "[r]ead_complete.py --gaps --workers 3"'
+ExecStart=/mnt/watch/nashville-legistar-archive/.venv/bin/python /mnt/watch/contracts-api/read_complete.py --gaps --remote --workers 2 --limit 300
+TimeoutStartSec=3300
+Nice=12
+IOSchedulingClass=idle

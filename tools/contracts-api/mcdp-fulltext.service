@@ -1,0 +1,11 @@
+[Unit]
+Description=Metro contract DB - bring the full-text index up to date (only contracts whose text changed)
+
+[Service]
+Type=oneshot
+User=admin
+WorkingDirectory=/mnt/watch/contracts-api
+ExecStart=/mnt/watch/nashville-legistar-archive/.venv/bin/python /mnt/watch/contracts-api/fulltext.py build
+TimeoutStartSec=3000
+Nice=12
+IOSchedulingClass=idle

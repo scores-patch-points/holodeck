@@ -123,6 +123,8 @@ button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visi
 .hd-rail .hd-workspace{padding-top:4px!important}
 .hd-rail input.hd-filter{padding-top:6px;padding-bottom:6px}
 @media(max-width:720px){.hd-rail .hd-railfoot{display:none!important}.hd-rail.menu-open .hd-railfoot{display:flex!important;order:5}}
+/* below 720px the rail stacks above the content and its crumb line already says where you are: one trail, not two */
+@media(max-width:720px){.hd-main>nav[aria-label="Breadcrumb"]{display:none!important}}
 .hd-drive-bar{display:flex;flex-direction:column;gap:12px}
 .hd-drive-top{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .hd-drive-crumb{display:flex;align-items:center;gap:6px;font:500 20px var(--sans);color:var(--ink);min-width:0}
@@ -135,7 +137,9 @@ button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visi
 /* the direct Metro contracts address shows that content only: no workspace switcher, no adding sources */
 html[data-metro] .hd-workspace,html[data-metro] .hd-topadd,html[data-metro] .hd-railadd,html[data-metro] .hd-drive-add{display:none!important}
 /* ...and for searching only: no ask-or-paste box, no model settings, no folders, no tool menu */
-html[data-metro] .hd-drive-search,html[data-metro] .hd-settings,html[data-metro] [data-nav="folders"],html[data-metro] [data-nav="explore"]{display:none!important}
+html[data-metro] .hd-drive-search,html[data-metro] .hd-settings,html[data-metro] [data-nav="folders"],html[data-metro] [data-nav="explore"],html[data-metro] [data-nav="topics"]{display:none!important}
+/* read-only: the reader's write actions are not offered on Metro contracts */
+html[data-metro] .hd-write{display:none!important}
 .hd-chip{all:unset;cursor:pointer;border:1px solid var(--line2);border-radius:8px;padding:5px 12px;font:500 13px var(--sans);color:var(--ink2);white-space:nowrap}
 .hd-chip:hover{background:var(--s2)}
 .hd-chip.on{background:var(--sel);border-color:var(--acc2);color:var(--ink)}
@@ -217,7 +221,7 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
 .hd-drive-top,.hd-drive-tools{display:contents}
 .hd-drive-crumb{order:1;flex:none;font-size:17px}
 .hd-drive-crumb button{padding:2px 8px}
-.hd-drive-top>span:nth-child(2){order:2;flex:1 1 60px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12.5px!important}
+.hd-drive-top>span:nth-child(2){order:2;flex:1 1 60px;min-width:0;white-space:normal;line-height:1.35;font-size:12.5px!important}
 .hd-drive-search{order:3;flex:1 1 140px;max-width:420px;margin-left:auto;padding:6px 14px}
 .hd-drive-top>button:not(.hd-drive-add){order:4;flex:none}
 .hd-drive-top>.hd-drive-add{order:4;flex:none;display:none;padding:6px 14px}
@@ -326,7 +330,7 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
         </sc-for>
       </div>
       <sc-if value="{{ railTopicsShow }}" hint-placeholder-val="{{ false }}">
-      <div class="hd-rsec">
+      <div class="hd-rsec" data-nav="topics">
         <div class="hd-label"><span>Topics</span><span class="hd-n">{{ topicsCountLabel }}</span></div>
         <sc-if value="{{ topicsHasSearch }}" hint-placeholder-val="{{ false }}"><input class="hd-filter" value="{{ topicsSearchVal }}" onChange="{{ onTopicsSearch }}" placeholder="Filter topics…" aria-label="Filter topics"></sc-if>
         <div style="display:flex;flex-direction:column;gap:1px">
@@ -347,7 +351,7 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
           <sc-if value="{{ hasBrowseDepts }}" hint-placeholder-val="{{ false }}">
             <span style="font:600 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--dim);padding:8px 8px 4px">Departments</span>
             <sc-if value="{{ browseDeptSearch }}" hint-placeholder-val="{{ false }}"><div style="padding:0 0 4px"><input class="hd-filter" value="{{ browseDeptQ }}" onChange="{{ browseDeptOnQ }}" placeholder="Filter departments…" aria-label="Filter departments"></div></sc-if>
-            <div style="max-height:230px;overflow:auto;display:flex;flex-direction:column;gap:1px">
+            <div style="max-height:max(230px, calc(100vh - 430px));overflow:auto;display:flex;flex-direction:column;gap:1px">
               <sc-for list="{{ browseDepts }}" as="d" hint-placeholder-count="4">
                 <button class="hd-item row" onClick="{{ d.onClick }}" title="Show only this department"><span>{{ d.label }}</span><span class="hd-n">{{ d.n }}</span></button>
               </sc-for>
@@ -575,7 +579,7 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
             <input ref="{{ heroRef }}" onKeyDown="{{ onHeroKey }}" placeholder="Ask a question, paste a link, or paste text" style="flex:1;min-width:0;background:transparent;border:0;color:var(--ink);font:400 16px var(--sans);padding:12px 14px;outline:none">
             <button onClick="{{ onHeroGo }}" style="flex:none;border:0;background:var(--acc2);color:#fff;border-radius:9px;padding:10px 16px;cursor:pointer;font:600 15px var(--sans)">Ask ↵</button>
           </div>
-          <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center">
+          <div class="hd-topadd" style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center">
             <button onClick="{{ openAdd }}" style="background:none;border:1px solid var(--line2);border-radius:8px;padding:8px 16px;cursor:pointer;font:500 14px var(--sans);color:var(--ink2)" style-hover="border-color:var(--acc)">Upload or paste a file</button>
           </div>
         </div>
@@ -688,8 +692,12 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
               <input type="search" value="{{ drv.vmQ }}" onInput="{{ drv.onVmQ }}" placeholder="Search every contract: vendor, number, text…" title="Searches all contracts on the VM, not only the ones shown" style="background:var(--s2);border:1px solid var(--line2);border-radius:8px;color:var(--ink);font:500 13px var(--sans);padding:5px 10px;outline:none;min-width:200px;flex:1 1 220px">
               <span style="font:400 12px var(--sans);color:var(--mut);white-space:nowrap">{{ drv.vmNote }}</span>
               <sc-if value="{{ drv.vmMoreOn }}" hint-placeholder-val="{{ false }}"><button class="hd-chip" onClick="{{ drv.onVmMore }}">Load more</button></sc-if>
-              <a class="hd-chip" href="{{ drv.vmCsvUrl }}" title="Every contract matching the department and search above, as a CSV" style="text-decoration:none">Export CSV</a>
-              <a class="hd-chip" href="{{ drv.vmReportsUrl }}" title="Pivot tables over these contracts" style="text-decoration:none">Reports</a>
+              <details class="hd-drive-menu"><summary title="Export these contracts, or open pivot reports over them" style="width:auto;padding:0 11px;border:1px solid var(--line2);border-radius:8px;font:500 13px var(--sans);height:30px">More</summary>
+                <div class="hd-drive-menu-panel" style="min-width:220px;padding:6px;display:flex;flex-direction:column;gap:2px">
+                  <a class="hd-item" href="{{ drv.vmCsvUrl }}" title="Every contract matching the department and search above, as a CSV" style="text-decoration:none;padding:6px 8px">Export CSV</a>
+                  <a class="hd-item" href="{{ drv.vmReportsUrl }}" title="Pivot tables over these contracts" style="text-decoration:none;padding:6px 8px">Reports</a>
+                </div>
+              </details>
             </sc-if>
             <sc-if value="{{ drv.hasDept }}" hint-placeholder-val="{{ false }}">
               <select value="{{ drv.deptVal }}" onChange="{{ drv.onDept }}" title="Show one department's contracts" style="background:var(--s2);border:1px solid var(--line2);border-radius:8px;color:var(--ink);font:500 13px var(--sans);padding:5px 8px;outline:none"><sc-for list="{{ drv.deptOpts }}" as="o" hint-placeholder-count="4"><option value="{{ o.v }}">{{ o.l }}</option></sc-for></select>
@@ -2366,21 +2374,22 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
                 </div>
               </sc-if>
             </div>
-            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;flex:none">
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;flex:0 1 auto;min-width:0;max-width:100%">
               <div style="display:flex;border:1px solid var(--line2);border-radius:8px;overflow:hidden">
                 <button onClick="{{ modeOriginal }}" style="border:0;padding:6px 12px;cursor:pointer;font:500 14px var(--sans);background:{{ modeO.bg }};color:{{ modeO.color }}">{{ modeO.label }}</button>
+                <button onClick="{{ modePlain }}" title="The text read from this source — its text layer, or OCR for a scan — every page, searchable" style="border:0;padding:6px 12px;cursor:pointer;font:500 14px var(--sans);background:{{ modeP.bg }};color:{{ modeP.color }}">Extracted</button>
                 <button onClick="{{ modeMap }}" title="The names in this source and the ties between them, nested into groups" style="border:0;padding:6px 12px;cursor:pointer;font:500 14px var(--sans);background:{{ modeMp.bg }};color:{{ modeMp.color }}">Map</button>
                 <sc-if value="{{ hasScreen }}" hint-placeholder-val="{{ false }}"><button onClick="{{ modeScreen }}" title="The measured 2D model drawn on the image: every region, coloured by role" style="border:0;padding:6px 12px;cursor:pointer;font:500 14px var(--sans);background:{{ modeSc.bg }};color:{{ modeSc.color }}">Regions</button></sc-if>
                 <sc-if value="{{ showRestated }}" hint-placeholder-val="{{ true }}"><button onClick="{{ modeRestated }}" title="The contract's stated facts, then the document restated from its own structure: no model, every clause from the text" style="border:0;padding:6px 12px;cursor:pointer;font:500 14px var(--sans);background:{{ modeS.bg }};color:{{ modeS.color }}">Extracted</button></sc-if>
               </div>
               <sc-if value="{{ readerHasUrl }}" hint-placeholder-val="{{ false }}"><a href="{{ readerUrl }}" target="_blank" rel="noopener" style="font:500 14px var(--sans);white-space:nowrap">{{ readerSourceLabel }}</a></sc-if>
-              <sc-if value="{{ readerCanMergeTx }}" hint-placeholder-val="{{ false }}"><button onClick="{{ onReaderMergeTx }}" title="Merge another transcript of this recording into this one — .srt, .vtt, .txt, .md or .json; they are compared word by word" style="background:none;border:1px solid var(--line2);border-radius:8px;padding:5px 12px;cursor:pointer;font:500 13px var(--sans);color:var(--ink2);white-space:nowrap" style-hover="border-color:var(--acc)">Merge a transcript…</button></sc-if>
-              <button onClick="{{ onReaderRenameStart }}" title="Rename this source" style="background:none;border:1px solid var(--line2);border-radius:8px;padding:5px 12px;cursor:pointer;font:500 13px var(--sans);color:var(--ink2);white-space:nowrap" style-hover="border-color:var(--acc)">✎ Rename</button>
+              <sc-if value="{{ readerCanMergeTx }}" hint-placeholder-val="{{ false }}"><button class="hd-write" onClick="{{ onReaderMergeTx }}" title="Merge another transcript of this recording into this one — .srt, .vtt, .txt, .md or .json; they are compared word by word" style="background:none;border:1px solid var(--line2);border-radius:8px;padding:5px 12px;cursor:pointer;font:500 13px var(--sans);color:var(--ink2);white-space:nowrap" style-hover="border-color:var(--acc)">Merge a transcript…</button></sc-if>
+              <button class="hd-write" onClick="{{ onReaderRenameStart }}" title="Rename this source" style="background:none;border:1px solid var(--line2);border-radius:8px;padding:5px 12px;cursor:pointer;font:500 13px var(--sans);color:var(--ink2);white-space:nowrap" style-hover="border-color:var(--acc)">✎ Rename</button>
               <sc-if value="{{ readerCanDelete }}" hint-placeholder-val="{{ false }}">
                 <sc-if value="{{ readerNoDelAsk }}" hint-placeholder-val="{{ true }}"><button onClick="{{ onReaderAskDelete }}" title="Delete this source and its stored copy from this browser" style="background:none;border:1px solid var(--line2);border-radius:8px;padding:5px 12px;cursor:pointer;font:500 13px var(--sans);color:var(--ink2);white-space:nowrap" style-hover="border-color:var(--bad)">Delete</button></sc-if>
                 <sc-if value="{{ readerDelAsk }}" hint-placeholder-val="{{ false }}"><button onClick="{{ onReaderDelete }}" title="This can't be undone" style="background:var(--bad);border:1px solid var(--bad);color:#fff;border-radius:8px;padding:5px 12px;cursor:pointer;font:600 13px var(--sans);white-space:nowrap">Delete for good</button><button onClick="{{ onReaderCancelDelete }}" style="background:none;border:0;color:var(--mut);cursor:pointer;font:500 13px var(--sans);padding:7px 6px">Keep it</button></sc-if>
               </sc-if>
-              <button onClick="{{ onReaderComment }}" title="Comment on this source — end-to-end encrypted, visible only to the people in this repo" style="background:none;border:1px solid var(--line2);border-radius:8px;padding:5px 12px;cursor:pointer;font:500 13px var(--sans);color:var(--ink2);white-space:nowrap" style-hover="border-color:var(--acc)">💬 Comment{{ readerCommentBadge }}</button>
+              <button class="hd-write" onClick="{{ onReaderComment }}" title="Comment on this source — end-to-end encrypted, visible only to the people in this repo" style="background:none;border:1px solid var(--line2);border-radius:8px;padding:5px 12px;cursor:pointer;font:500 13px var(--sans);color:var(--ink2);white-space:nowrap" style-hover="border-color:var(--acc)">💬 Comment{{ readerCommentBadge }}</button>
             </div>
           </div>
           <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:9px 18px;border-top:1px solid var(--line);background:var(--s2)">
@@ -2401,6 +2410,7 @@ th.hd-drop{box-shadow:inset 3px 0 0 var(--acc);background:var(--sel)!important}
                 <div class="hd-find" role="search">
                   <input ref="{{ rdFind.inpRef }}" value="{{ rdFind.q }}" onChange="{{ rdFind.onQ }}" onKeyDown="{{ rdFind.onKey }}" placeholder="Find in this source" aria-label="Find in this source">
                   <span class="hd-find-n" aria-live="polite">{{ rdFind.count }}</span>
+                  <sc-if value="{{ rdFind.inText }}" hint-placeholder-val="{{ false }}"><button class="hd-find-b" onClick="{{ rdFind.showText }}" style="width:auto;padding:0 8px;white-space:nowrap;color:var(--acc)">{{ rdFind.inTextLabel }}</button></sc-if>
                   <button class="hd-find-b" onClick="{{ rdFind.prev }}" disabled="{{ rdFind.none }}" title="Previous match (Shift+Enter)" aria-label="Previous match">↑</button>
                   <button class="hd-find-b" onClick="{{ rdFind.next }}" disabled="{{ rdFind.none }}" title="Next match (Enter)" aria-label="Next match">↓</button>
                   <button class="hd-find-b" onClick="{{ rdFind.close }}" title="Close (Esc)" aria-label="Close find">✕</button>
@@ -3418,6 +3428,14 @@ const loadMeta = () => { try { return JSON.parse(localStorage.getItem('fold-expl
 // The side panel is fixed full-height at the right edge; it's used whenever the reader column keeps at least the panel's own width (250 nav + 40 padding + panel + reader >= panel), else a bottom sheet.
 const SIDE_PANEL_W = 360;
 const SIDE_PANEL_MIN_VW = 250 + 40 + SIDE_PANEL_W + SIDE_PANEL_W;
+// Below SIDE_PANEL_MIN_VW the panel still docks beside the content as long as the rail folds to its 40px strip: a topic
+// opened from a list leaves the list in view, so nothing is lost by looking. Only below this width (a phone) does the
+// panel swap in full screen with Back.
+const SIDE_PANEL_NARROW_VW = 40 + SIDE_PANEL_W + SIDE_PANEL_W;
+// Between the two widths there is room for the content and ONE of rail or panel. Reading is the hero, so while reading the
+// rail folds to its strip (the expand button brings it back: railPeek), and so does it while a panel is open over a list.
+const compactVw = () => { const vw = typeof window !== 'undefined' ? window.innerWidth : 1e4; return vw > SIDE_PANEL_NARROW_VW && vw < SIDE_PANEL_MIN_VW; };
+const railFolded = (S, view) => compactVw() && !S.railPeek && (view === 'reader' || !!S.sel);
 const KIND_ORDER = ['Audit or report', 'Contract', 'Legislation', 'Meeting record', 'Meeting recording', 'Recording', 'Letter', 'Government page', 'News', 'Podcast', 'Blog', 'Own article', 'Organisation page', 'Not yet located', 'Source'];
 const KIND_DESC = {
   'Audit or report': 'Formal findings, with their own figures and risk ratings.', 'Legislation': 'Bills, amendments and code as filed, with their action history.',
@@ -6430,7 +6448,9 @@ class Component extends DCLogic {
     window.addEventListener('message', this._onMsg);
     this._onBrUp = () => { if (this._br) this.commitBrush(); }; window.addEventListener('mouseup', this._onBrUp);
     try { if (window.opener && /#ingest/.test(location.hash)) window.opener.postMessage({ type: 'fold-ready' }, '*'); } catch (x) {}
-    this._h = {
+    // The Metro contracts workspace is read-only: nothing can be dropped or pasted in as a new source
+    if (HD_METRO) this._h = { enter: () => {}, leave: () => {}, over: e => { e.preventDefault(); if (e.dataTransfer) e.dataTransfer.dropEffect = 'none'; }, drop: e => { e.preventDefault(); }, paste: () => {} };
+    else this._h = {
       enter: e => { this._c++; if (!this.state.dragging) this.setState({ dragging: true }); },
       leave: e => { this._c = Math.max(0, this._c - 1); if (!this._c) this.setState({ dragging: false }); },
       over: e => { e.preventDefault(); },
@@ -6823,7 +6843,7 @@ class Component extends DCLogic {
     };
   }
   async loadHtml() {
-    const id = this.corpusId(); const docs = this.baseDocs(id).concat(this.state.added[id] || []);
+    const id = this.corpusId(); const docs = this.baseDocs(id).concat(id === 'metro-vm' ? [] : (this.state.added[id] || []));
     this._loading = this._loading || {}; const todo = docs.filter(d => (d.wiki || d.hasHtml) && this._html[d.id] === undefined && !this._loading[d.id]);
     if (!todo.length) return;
     if (todo.some(d => d.wiki)) this.setState({ busy: 'Loading the full articles from Wikipedia…' });
@@ -9304,7 +9324,10 @@ class Component extends DCLogic {
   paintFind() {
     const S = this.state;
     if (!S.findOpen || !S.findQ || !this.findAvail()) { this._findPaintKey = null; this.findClear(); return; }
-    const key = [S.readDoc, S.readMode, S.findQ, S.findI, this._rKey, S.htmlVer].join('|');
+    // the doc's text length is in the key: a contract's full text can land after find was set (the search opens it), and the
+    // count must be taken from the text that is on screen, not the passage it replaced
+    const rd = this._A && this._A.docById && this._A.docById[S.readDoc];
+    const key = [S.readDoc, S.readMode, S.findQ, S.findI, this._rKey, S.htmlVer, rd ? String(rd.text || '').length : 0].join('|');
     if (this._findPaintKey === key) return;        // nothing that shapes the ranges moved: leave the highlights as they are
     this._findPaintKey = key; this.findClear();
     const ranges = this._findR = this.findRanges(S.findQ);
@@ -9330,6 +9353,11 @@ class Component extends DCLogic {
     const S = this.state; const N = S.findN || 0, i = S.findI || 0;
     return { avail: this.findAvail(), open: !!S.findOpen, closed: !S.findOpen, q: S.findQ || '',
       count: !S.findQ ? '' : (N ? (i + 1) + ' of ' + N : 'no matches'), none: N === 0,
+      // the page view only holds the pages it has drawn (and a scan's PDF holds no text at all); the contract's text holds every
+      // page, OCR included. When the view finds nothing the text has, say how many and open the text.
+      ...(() => { const d0 = S.findQ && N === 0 && S.readMode !== 'plain' && this._A && this._A.docById[S.readDoc];
+        let n = 0; if (d0) { const t = String(d0.text || '').toLowerCase(), q = S.findQ.toLowerCase(); for (let k = t.indexOf(q); k >= 0 && n < 999; k = t.indexOf(q, k + q.length)) n++; }
+        return { inText: n > 0, inTextLabel: n + ' in the text →', showText: () => this.setState({ readMode: 'plain', findI: 0 }) }; })(),
       inpRef: el => { this._findInp = el; },
       onQ: e => { const q = e.target.value; this._findR = q ? this.findRanges(q) : []; this.setState({ findQ: q, findI: 0, findN: this._findR.length }); },
       onKey: e => { if (e.key === 'Enter') { e.preventDefault(); this.findStep(e.shiftKey ? -1 : 1); } else if (e.key === 'Escape') { e.preventDefault(); this.findClose(); } },
@@ -9527,7 +9555,7 @@ class Component extends DCLogic {
   corpusId() { return this.state.corpus || 'custom'; }
   baseDocs(id) { return SAMPLES[id] ? SAMPLES[id].docs : []; }
   analysis() {
-    const id = this.corpusId(); const seenU = new Set(); const docs = this.baseDocs(id).concat(this.state.added[id] || []).map(withPdfSrc).filter(d => { const u = d.url && d.url.replace(/^https?:\/\/(www\.)?/, '').replace(/[#?].*$/, '').replace(/\/$/, '').toLowerCase(); if (!u || d.ohsId) { if (u) seenU.add(u); return true; } if (seenU.has(u)) return false; seenU.add(u); return true; });
+    const id = this.corpusId(); const seenU = new Set(); const docs = this.baseDocs(id).concat(id === 'metro-vm' ? [] : (this.state.added[id] || [])).map(withPdfSrc)   /* Metro contracts are read-only: only what the VM serves */.filter(d => { const u = d.url && d.url.replace(/^https?:\/\/(www\.)?/, '').replace(/[#?].*$/, '').replace(/\/$/, '').toLowerCase(); if (!u || d.ohsId) { if (u) seenU.add(u); return true; } if (seenU.has(u)) return false; seenU.add(u); return true; });
     // Progressive ingest: while sources are staged (stored, not yet folded), analyze only the folded set and return
     // their graph with the staged docs appended as bare sources — Sources renders the moment a file lands, and the
     // app stays responsive instead of blocking on one giant analyze over the whole batch.
@@ -10530,7 +10558,7 @@ class Component extends DCLogic {
     const meetVals = {};
     const svVals = { ...meetVals, srcHiddenNote: this._srcHidden ? plural(this._srcHidden, 'other source') + ' with nothing in this selection ' + (this._srcHidden === 1 ? 'is' : 'are') + ' hidden' : '', svCards: svMode === 'cards', svTable: svMode === 'table', svMap: svMode === 'map', svRefs: svMode === 'referents', svTabsOn: svGroup === 'tabs',
       svModes: [['grid', 'Grid'], ['table', 'Table'], ['referents', 'Referents']].map(([k, l]) => ({ label: l, ...seg(svMode === k || (k === 'grid' && svMode === 'cards')), onClick: () => this.setState({ svMode: k }) })),
-      svTabs: tabs.map(t => ({ label: t.label, n: t.n, cls: t.id === svTab ? 'on' : '', bd: t.id === svTab ? 'var(--acc2)' : 'transparent', col: t.id === svTab ? 'var(--ink)' : 'var(--mut)', onClick: () => this.setState({ svTab: t.id }) })),
+      svTabs: (tabs.length > 2 ? tabs : []).map(t => ({ /* one kind of source only: "All" and that family are the same list, so neither tab is shown */ label: t.label, n: t.n, cls: t.id === svTab ? 'on' : '', bd: t.id === svTab ? 'var(--acc2)' : 'transparent', col: t.id === svTab ? 'var(--ink)' : 'var(--mut)', onClick: () => this.setState({ svTab: t.id }) })),
       svCols: colOrder.map(k => ({ label: colMap.get(k).label + (svSort === k ? (svDir > 0 ? ' ↑' : ' ↓') : ''),
         onClick: () => this.setState({ svSort: k, svDir: svSort === k ? -svDir : (k === 'title' || k === 'publisher' || (k.startsWith('f:') && ['text', 'id'].includes(fcBy.get(k.slice(2)).type)) ? 1 : -1) }),
         // the column's key; dragging is done with pointer events (installColDrag), never the browser's native drag,
@@ -10608,8 +10636,9 @@ class Component extends DCLogic {
       onFltAdd: () => fltSet(HD_FLT.addCond(fltRoot, [])), onFltAddGroup: () => fltSet(HD_FLT.addGroup(fltRoot, [])), onFltClear: () => this.setState({ svFlt: fcDept ? HD_FLT.addCond(HD_FLT.newGroup('and'), [], fcDept) : HD_FLT.newGroup('and') }),
       isVm: vmOn, vmCsvUrl: vmOn ? this._vm.M.API + '/export.csv?' + new URLSearchParams([['dept', this._vm.dept], ['q', this._vm.q]].filter(x => x[1])) : '',
       vmReportsUrl: vmOn ? 'reports.html#' + encodeURIComponent(JSON.stringify({ rows: this._vm.dept ? 'vendor' : 'department', cols: 'year', measure: 'count', dept: this._vm.dept || '', q: this._vm.q || '', f: [] })) : '',
-      vmQ: vmOn ? this._vm.q : '', onVmQ: e => this.vmLoad({ q: e.target.value }), vmNote: vmOn ? (this._vm.loading ? 'Loading…' : (dvRows.length !== this._vm.offset ? dvRows.length.toLocaleString() + ' shown of ' : '') + this._vm.offset.toLocaleString() + ' loaded · ' + this._vm.total.toLocaleString() + ' in all') : '', vmMoreOn: vmOn && this._vm.offset < this._vm.total, onVmMore: () => this.vmLoad({ more: true }),
-      hasDept: vmOn ? this._vm.depts.length > 1 : deptVals.length > 1, deptVal: vmOn ? this._vm.dept : ( dIdx >= 0 && fltRoot.items[dIdx].o === 'is' ? fltRoot.items[dIdx].v : ''), deptOpts: vmOn ? [{ v: '', l: 'All departments (' + this._vm.depts.reduce((n, d) => n + d.n, 0).toLocaleString() + ')' }, ...this._vm.depts.slice().sort((a, b) => a.department.localeCompare(b.department)).map(d => ({ v: d.department, l: d.department + ' (' + d.n.toLocaleString() + ')' }))] : [{ v: '', l: 'All departments' }, ...deptVals.map(o => ({ v: o.v, l: o.v + ' (' + o.n + ')' }))],
+      vmQ: vmOn ? this._vm.q : '', onVmQ: e => this.vmLoad({ q: e.target.value }), vmNote: vmOn ? (this._vm.loading ? 'Loading…' : (dvRows.length !== this._vm.offset ? dvRows.length.toLocaleString() + ' shown · ' : '')
+        + (this._vm.offset >= this._vm.total ? this._vm.total.toLocaleString() + (this._vm.q ? ' found' : ' contracts') : this._vm.offset.toLocaleString() + ' of ' + this._vm.total.toLocaleString())) : '', vmMoreOn: vmOn && this._vm.offset < this._vm.total, onVmMore: () => this.vmLoad({ more: true }),
+      hasDept: vmOn ? this._vm.depts.length > 1 : deptVals.length > 1, deptVal: vmOn ? this._vm.dept : ( dIdx >= 0 && fltRoot.items[dIdx].o === 'is' ? fltRoot.items[dIdx].v : ''), deptOpts: vmOn ? [{ v: '', l: 'All departments' }, ...this._vm.depts.slice().sort((a, b) => a.department.localeCompare(b.department)).map(d => ({ v: d.department, l: d.department + ' (' + d.n.toLocaleString() + ')' }))] : [{ v: '', l: 'All departments' }, ...deptVals.map(o => ({ v: o.v, l: o.v + ' (' + o.n + ')' }))],
       onDept: vmOn ? (e => this.vmLoad({ dept: e.target.value })) : e => { const v = e.target.value; fltSet(dIdx >= 0 ? HD_FLT.patch(fltRoot, [dIdx], { o: 'is', v }) : HD_FLT.patch(HD_FLT.addCond(fltRoot, [], fcDept), [fltRoot.items.length], { v })); },
       fieldPick: FC.fields.map(f => ({ label: f.label, tag: f.type, cover: f.n + ' of ' + A.docs.length, on: fcSel.includes(f.key), tip: (fcPinned.includes(f.key) ? 'Explicit field, always shown. ' : '') + 'Written ' + f.surface + ' · ' + f.distinct + ' distinct values',
         onToggle: () => { if (fcPinned.includes(f.key)) return; const cur = fcSel.includes(f.key) ? fcSel.filter(k => k !== f.key) : [...fcSel, f.key]; try { localStorage.setItem('holodeck-sv-fields', JSON.stringify(cur)); } catch (e) {} this.setState({ svFields: cur }); } })),
@@ -10797,7 +10826,7 @@ class Component extends DCLogic {
       : ['lanes', 'margin', 'seam', 'orbit', 'fields', 'review'].includes(view) ? { eyebrow: 'Links', title: VIEW_LABEL[view], sub: 'Sources read together by relation, not by type.', color: 'var(--acc)' }
       : view === 'draft' ? { eyebrow: 'Draft', title: 'Claims and the excerpts behind them', sub: 'Private to this browser — pinned passages keep their source.', color: 'var(--acc)' }
       : c ? { eyebrow: c.row + (this.props.showTerrainNames ? ' · ' + c.terrain : ''), title: c.label, sub: c.question, color: c.color }
-      : { eyebrow: 'Sources', title: this.corpusName(), sub: plural(docsIn.length, 'document') + ' · ' + plural(F.length, 'statement') + ' · ' + plural(D.nameList.length, 'name') + ' · ' + plural(figCount, 'figure') + '.' + (A.docs.length && !docsIn.length ? ' ' + plural(A.docs.length, 'link') + ' saved; none could be read yet.' : ''), color: 'var(--acc)' };
+      : { eyebrow: 'Sources', title: this.corpusName(), sub: [[docsIn.length, 'document'], [F.length, 'statement'], [D.nameList.length, 'name'], [figCount, 'figure']].filter(([n], i) => n || i === 0).map(([n, w]) => plural(n, w)).join(' · ') + '.' + (A.docs.length && !docsIn.length ? ' ' + plural(A.docs.length, 'link') + ' saved; none could be read yet.' : ''), color: 'var(--acc)' };
 
     // chips — each chip is position 2 (filter) + position 3 (what-counts: for-whom)
     const chip = (key, k, v, onClear) => ({ key, k, v, w: this.fwLabel(key), onClear });
@@ -11211,17 +11240,19 @@ class Component extends DCLogic {
       toggleTheme: () => { const th = S.theme === 'dark' ? 'light' : 'dark'; try { localStorage.setItem('fold-explorer-theme', th); } catch (e) {} this.setState({ theme: th }); },
       workspaceClass: S.akFocus && view === 'ask' ? 'hd-workspace-surface hd-focus' : 'hd-workspace-surface',
       /* below 720px the rail stacks over the content and its collapse button is hidden (the Menu button replaces it), so it is always "open" there */
-      railOpen: S.railOpen || (typeof window !== 'undefined' && window.innerWidth <= 720),
-      shellCls: S.railOpen || (typeof window !== 'undefined' && window.innerWidth <= 720) ? '' : 'rail-closed',
+      railOpen: (S.railOpen && !railFolded(S, view)) || (typeof window !== 'undefined' && window.innerWidth <= 720),
+      shellCls: (S.railOpen && !railFolded(S, view)) || (typeof window !== 'undefined' && window.innerWidth <= 720) ? '' : 'rail-closed',
       railCls: S.railMenu ? 'menu-open' : '', railMenu: !!S.railMenu, railMenuLabel: S.railMenu ? '✕ Menu' : '☰ Menu',
       toggleRailMenu: () => this.setState({ railMenu: !this.state.railMenu }),
       /* a pick made inside the open menu (a topic, a tool) closes it so the result is what you see; pager arrows (data-keep) and form fields leave it open */
       onRailClick: e => { try { if (!this.state.railMenu || !e || !e.target || !e.target.closest) return; const b = e.target.closest('nav button'); if (b && !b.closest('.hd-primary') && !b.hasAttribute('data-keep')) this.setState({ railMenu: false }); } catch (x) {} },
-      railIcon: S.railOpen ? '‹' : '›', railTitle: S.railOpen ? 'Collapse' : 'Expand',
-      railStyle: S.railOpen
+      railIcon: S.railOpen && !railFolded(S, view) ? '‹' : '›', railTitle: S.railOpen && !railFolded(S, view) ? 'Collapse' : 'Expand',
+      railStyle: S.railOpen && !railFolded(S, view)
         ? 'flex:0 0 220px;position:sticky;top:0;height:100vh;overflow:auto;box-sizing:border-box;border-right:1px solid var(--line);background:var(--s1);padding:10px 12px 14px;display:flex;flex-direction:column;gap:8px'
         : 'flex:0 0 40px;position:sticky;top:0;height:100vh;overflow:hidden;box-sizing:border-box;border-right:1px solid var(--line);background:var(--s1);padding:16px 8px 20px;display:flex;flex-direction:column;gap:18px',
-      toggleRail: () => { const open = !S.railOpen; try { localStorage.setItem('fold-explorer-rail', open ? '1' : '0'); } catch (e) {} this.setState({ railOpen: open }); },
+      toggleRail: () => { if (railFolded(S, view)) return this.setState({ railPeek: true, railOpen: true });   // a folded rail opens on request
+        if (S.railPeek) return this.setState({ railPeek: false });
+        const open = !S.railOpen; try { localStorage.setItem('fold-explorer-rail', open ? '1' : '0'); } catch (e) {} this.setState({ railOpen: open }); },
       themeIcon: S.theme === 'dark' ? '☀' : '☾', themeTitle: S.theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode',
       dragging: S.dragging, isBusy: !!S.busy, busy: S.busy,
       onCorpus: e => this.setState({ corpus: e.target.value, view: 'summary', sel: null, f: {}, readDoc: null, folder: null, folderDraft: '' }),
@@ -11232,12 +11263,13 @@ class Component extends DCLogic {
       hasFilters: chips.length > 0 && view !== 'search', chips, srcTuple, clearAll: () => this.setState(s => ({ f: {}, fw: {}, q: '', ...(s.view === 'search' ? { view: s.prevView || 'summary' } : {}) })),
       filterCount: F.length.toLocaleString() + ' of ' + A.sts.length.toLocaleString() + ' statements',
       ts: this.timeStrip(A, F),
-      openAdd: () => { this._add = null; this.addState().baseAdded = (S.added[cid] || []).length; this.setState({ showAdd: true }); }, closeAdd: () => this.setState({ showAdd: false }),
+      openAdd: () => { if (HD_METRO) return;   // read-only workspace: no new sources
+        this._add = null; this.addState().baseAdded = (S.added[cid] || []).length; this.setState({ showAdd: true }); }, closeAdd: () => this.setState({ showAdd: false }),
       closeAddBg: e => { if (e.target === e.currentTarget) this.setState({ showAdd: false }); },
       isEmpty, showWelcome: isEmpty && view !== 'ask', hasContent: !isEmpty, v: V, hdr,
       docCards, gaps: [] /* hidden with hasGaps */, nameGroups, nameTable, typeBlocks, measures, noMeasures: !measures.length, ...(() => { const c = this.capL('stg', stGroups, 8); return { stGroups: c.items.map(g => ({ ...g, ...this.capL('stg:' + g.title, g.items, 4) })), stgMore: c }; })(),
       graphEl, timeInfo, ...orbX, ...(() => { const c = this.capL('pairs', pairs, 12); return { pairs: c.items, pairsMore: c }; })(), noPairs: !pairs.length, frameCols: frameCols.map(c => ({ ...c, ...this.capL('fr:' + c.label, c.items, 5) })), timeBars, ...(() => { const c = this.capL('topics', topicChips, 24); return { topicChips: c.items, topicMore: c }; })(), ...(() => { const c = this.capL('srcbars', [...sourceBars].sort((a, b) => +b.n - +a.n), 12); return { sourceBars: c.items, srcBarMore: c }; })(), shapes, noShapes: !shapes.length, hasRoutine: (this._routineN || 0) > 0, routineLine: plural(this._routineN || 0, 'routine agreement') + ' hidden: repeated by several sources, but about names and words that appear together in most sources anyway.', holds, breaks, noBreaks: !breaks.length,
-      showOmni: view !== 'summary' || isEmpty, bodyPad: view === 'summary' && !isEmpty ? '8px 20px 16px' : '20px',
+      showOmni: !HD_METRO && (view !== 'summary' || isEmpty), bodyPad:   /* the omni box adds sources (paste a link): not in the read-only Metro workspace */ view === 'summary' && !isEmpty ? '8px 20px 16px' : '20px',
       showFilterLayers: FILTER_LAYERS, hdrSubShown: view === 'summary' ? '' : (hdr.sub || ''),
       hdrShow: !isEmpty && view !== 'summary' && !(view === 'connections' && S.foldBand) && view !== 'reader' && view !== 'profile' && view !== 'ask' && view !== 'draft' && view !== 'inbox',
       crumbsAll: crumbs, crumbStrip: !isEmpty && crumbs.length > 1 && !(!isEmpty && view !== 'summary' && !(view === 'connections' && S.foldBand) && view !== 'reader' && view !== 'profile' && view !== 'ask' && view !== 'draft' && view !== 'inbox') && !(view === 'summary' && S.svMode !== 'map'),
@@ -11357,9 +11389,9 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
       })(),
       rParas, showPos: S.showPos, togglePos: () => this.setState({ showPos: !S.showPos }), closeReader: () => this.goBack(),
       ...(() => { const det = this.details(A, F, D); const pf = this.profileVals(A, det); pf.noProfile = !pf.has;
-        const narrow = typeof window !== 'undefined' && window.innerWidth < SIDE_PANEL_MIN_VW; this._narrow = narrow;
+        const narrow = typeof window !== 'undefined' && window.innerWidth <= SIDE_PANEL_NARROW_VW; this._narrow = narrow;
         const sidePanelStyle = narrow
-          // narrow: the profile/detail SWAPS IN as a full-screen view (with a Back button), it is not a bottom sheet
+          // narrow (a phone): the profile/detail SWAPS IN as a full-screen view (with a Back button), it is not a bottom sheet
           ? 'position:fixed;inset:0;overflow:auto;z-index:45;background:var(--bg);padding:14px 16px 32px;display:flex;flex-direction:column;gap:12px;box-sizing:border-box'
           : 'position:fixed;top:0;right:0;bottom:0;width:' + SIDE_PANEL_W + 'px;overflow:auto;z-index:30;background:var(--s1);border-left:1px solid var(--line2);padding:20px 20px 28px;display:flex;flex-direction:column;gap:12px;box-sizing:border-box';
         // the panel is ALWAYS offered: a name in the reader, a topic in any view — but not on the
@@ -11371,8 +11403,11 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
         // Reading a source also selects it. On a narrow window that auto-selection must not raise the full-screen
         // profile over the contract itself: the contract shows first, the profile is one tap away (Details) and
         // Back returns to the contract. An explicit selection (a name, a statement) still swaps in the profile.
-        const docSelOnly = narrow && view === 'reader' && !!S.readDoc && !!S.sel && S.sel.type === 'doc' && S.sel.id === S.readDoc && !S.narrowDetail;
-        side.narrowDetailBtn = narrow && view === 'reader' && !!S.readDoc && (docSelOnly || !S.sel);
+        // and the same below SIDE_PANEL_MIN_VW: the contract keeps the width, its Source details are one tap away and dock when asked
+        const roomy = !narrow && !compactVw();
+        const docSelOnly = !roomy && view === 'reader' && !!S.readDoc && !!S.sel && S.sel.type === 'doc' && S.sel.id === S.readDoc && !S.narrowDetail;
+        side.narrowDetailBtn = !roomy && view === 'reader' && !!S.readDoc && (docSelOnly || !S.sel);
+        if (docSelOnly) side.colPad = '';   // the panel is not shown, so the content keeps its whole width
         side.openDetail = () => this.setState({ sel: { type: 'doc', id: S.readDoc }, narrowDetail: true });
         return pf.has || view === 'draft' || view === 'profile' || docSelOnly ? { ...det, ...side, hasSel: false, noSel: true, pf } : { ...det, ...side, pf }; })(),
       heroRef: r => { this._hero = r; }, onHeroKey: e => { if (e.key === 'Enter') { const v = (e.target.value || '').trim(); if (v) { if (isOmniUrl(v)) omniOpen(v); else omniGo(v); } } },
@@ -11529,13 +11564,18 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
       const rows = j.rows.map(r => have.get('nash-' + r.token) || V.M.toDoc(r));
       SAMPLES['metro-vm'].docs = more ? cur.concat(rows.filter(d => !have.has(d.id))) : rows;
       V.total = j.total; V.offset = off + j.rows.length;
+      // the search is also the reader's find: open any result and every place the query appears is marked and steppable
+      const q = (V.q || '').trim();
+      if (!more && q.length >= 3) this.setState({ findQ: q, findOpen: true, findI: 0, findN: 0 });
+      else if (!more && V._findQ && this.state.findQ === V._findQ) this.setState({ findQ: '', findOpen: false, findI: 0, findN: 0 });
+      V._findQ = q.length >= 3 ? q : '';
     } catch (e) { try { this.toast('Could not reach the contracts service (' + e.message + ').'); } catch (x) {} }
     if (this._vm === V) { V.loading = false; this._key = null; this.forceUpdate(); }
   }
   // a contract named by address that is not on the loaded page: fetch it and put it first
   async vmEnsure(id) {
     const V = this._vm, L = SAMPLES['metro-vm'].docs; if (!V || L.some(d => d.id === id)) return;
-    try { const j = await V.M.detail(id.replace(/^nash-/, '')); const d = V.M.toDoc(j); d.text = V.M.textOf(j); d.readState = j.read || ''; d._read = true; L.unshift(d); this._key = null; this.forceUpdate(); } catch (e) {}
+    try { const j = await V.M.detail(id.replace(/^nash-/, '')); const d = V.M.toDoc(j); const R = await V.M.readText(j); d.text = R.text; d.ignored = R.ignored; d.readState = j.read || ''; d._read = true; L.unshift(d); this._key = null; this.forceUpdate(); } catch (e) {}
   }
   // what a contract is related to (vendor, signers, similar topics, its vendor's prior/next), from the VM: the reader
   // holds one page of contracts, the relations live across all of them
@@ -11584,7 +11624,7 @@ modeSum: { bg: S.readMode === 'summary' ? 'var(--sel)' : 'transparent', color: S
     const V = this._vm, d = V && SAMPLES['metro-vm'] && SAMPLES['metro-vm'].docs.find(x => x.id === id);
     if (!d || !d.vm || d._read) return;
     d._read = true;
-    try { const j = await V.M.detail(id.replace(/^nash-/, '')); d.text = V.M.textOf(j); if (j.epav_url) d.url = j.epav_url; this._key = null; this.setState(st => ({ htmlVer: st.htmlVer + 1 })); } catch (e) { d._read = false; }
+    try { const j = await V.M.detail(id.replace(/^nash-/, '')); const R = await V.M.readText(j); d.text = R.text; d.ignored = R.ignored; if (j.epav_url) d.url = j.epav_url; this._key = null; this.setState(st => ({ htmlVer: st.htmlVer + 1 })); } catch (e) { d._read = false; }
   }
   corpusName() { const id = this.corpusId(); return id === 'custom' ? 'Your content' : SAMPLES[id] ? SAMPLES[id].name.replace(/\s*·\s*GitHub$/i, '') : loadWorkspaceNames()[id] || 'Your content'; }
 

@@ -5,7 +5,7 @@ After=network.target
 [Service]
 User=admin
 WorkingDirectory=/mnt/watch/contracts-api
-ExecStart=/mnt/watch/nashville-legistar-archive/.venv/bin/python /mnt/watch/contracts-api/ocr_backfill.py --workers 6 --max-pages 12
+ExecStart=/mnt/watch/nashville-legistar-archive/.venv/bin/python /mnt/watch/contracts-api/ocr_backfill.py --workers 6
 Restart=on-failure
 RestartSec=60
 Nice=12

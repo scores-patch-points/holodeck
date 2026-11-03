@@ -6,6 +6,10 @@
   GET /contracts?dept=&q=&sort=&limit=&offset=
                                       rows + total. q is full-text over the contract's party, number,
                                       description AND the verbatim text the reading lane extracted.
+                                      &explain=1 adds, per row, the passages that matched and how (explain_rows).
+  GET /search?q=&dept=&limit=&offset=&fuzzy=
+                                      full text: every character of every contract (fulltext.py). Exact phrase first; if that finds
+                                      fewer than 3 contracts, words-together and close matches (OCR slips). Rows carry hits[].
   GET /contract/<token>               metadata + the reading lane's observations (clauses, figures …)
   GET /contract/<token>/pdf           the filed PDF: local copy, else archive.org twin, else ePAV; cached
   GET /contract/<token>/thumb.jpg     first page as a small JPEG (made once, cached)
@@ -31,6 +35,7 @@ UA = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chr
 TOK = re.compile(r'^[A-Za-z0-9]{3,32}$')
 THUMBS = os.environ.get('CONTRACTS_THUMBS', '/mnt/watch/contracts-api/thumbs')
 LAYOUT = os.environ.get('CONTRACTS_LAYOUT', '/mnt/watch/contracts-api/layout')
+SEARCHABLE = os.environ.get('CONTRACTS_SEARCHABLE', '/mnt/watch/contracts-api/searchable')
 os.makedirs(CACHE, exist_ok=True); os.makedirs(THUMBS, exist_ok=True)
 
 def extracted_text(ident, limit):
@@ -119,6 +124,66 @@ def match_tokens(m):
         r = _mt[k] = sorted(ids)
     return r
 
+
+# ---- Why a contract matched: the explanation is made here, next to the index, so a result page is ONE request ----------
+# The index decides WHICH contracts match (match_tokens). explain=1 adds, per row, the passages that made it match and how:
+#   phrase    the whole query, verbatim            together  every word, whole, in the one passage (not in order / not adjacent)
+#   word      the single query word, whole         family    same root via the index's stemmer (indemnify ~ indemnification), or a prefix
+# A passage is one reading-lane observation (a clause, figure, line ...) or one header field (vendor, number, description, department).
+_RANK = {'phrase': 0, 'together': 1, 'word': 2, 'family': 3}
+_SUFFIX = ('ifications', 'ification', 'ifying', 'ified', 'ifies', 'ify', 'ations', 'ation', 'ings', 'ing', 'ies', 'ied', 'es', 'ed', 's')
+_CTX, _PER_ROW = 110, 3
+
+def _terms(q): return [w.lower().rstrip('.-') for w in re.findall(r'[\w][\w.\-]*', q or '', re.U)[:8] if w.rstrip('.-')]
+def _stem(w):
+    for s in _SUFFIX:
+        if len(w) - len(s) >= 4 and w.endswith(s): return w[:-len(s)]
+    return w
+
+def classify(text, terms):
+    """(type, marks) for `text` against the query terms, or None when no term is in it. marks are [start, end, type] in `text`."""
+    marks, whole = [], set()
+    for i, t in enumerate(terms):
+        for m in re.finditer(r'(?<!\w)' + re.escape(t) + r'(?!\w)', text, re.I): marks.append([m.start(), m.end(), 'word']); whole.add(i)
+        if i in whole: continue
+        st = _stem(t)   # the last term is a prefix match in the index, so it is looked for as a prefix even when short
+        if len(st) >= 4 or i == len(terms) - 1:
+            for m in re.finditer(r'(?<!\w)' + re.escape(st) + r'\w*', text, re.I): marks.append([m.start(), m.end(), 'family'])
+    if not marks: return None
+    phrase = re.search(r'\s+'.join(re.escape(t) for t in terms), text, re.I) if len(terms) > 1 else None
+    if phrase: return 'phrase', [[phrase.start(), phrase.end(), 'phrase']]
+    if len(whole) == len(terms): return ('word' if len(terms) == 1 else 'together'), marks
+    return 'family', marks
+
+def _snippet(text, marks):
+    a = max(0, min(m[0] for m in marks) - _CTX); b = min(len(text), max(m[1] for m in marks) + _CTX)
+    if b - a > 2 * _CTX + 160: b = a + 2 * _CTX + 160   # long passages: keep the first match in view
+    marks = [[m[0] - a, m[1] - a, m[2]] for m in marks if m[0] >= a and m[1] <= b]
+    return {'text': text[a:b], 'marks': marks, 'before': a > 0, 'after': b < len(text)}
+
+def explain_rows(rows, q):
+    """Adds to each row: matches (best 3 passages, strongest first), match_total, match_counts {type: n}, header (matched header fields)."""
+    terms = _terms(q); m = fts(q)
+    if not terms or not m or not rows: return
+    by = {r['token']: r for r in rows}
+    for r in rows:
+        r['matches'] = []; r['match_counts'] = {}; r['header'] = []
+        for field in ('party', 'number', 'description', 'department'):
+            h = classify(r.get(field) or '', terms)
+            if h: r['header'].append({'field': field, 'type': h[0], 'text': r[field], 'marks': h[1]})
+    sql = 'SELECT o.token, o.kind, o.verbatim, o.fields, bm25(obs_fts) AS s FROM obs_fts f JOIN obs o ON o.id = f.rowid WHERE obs_fts MATCH ? AND o.token IN (%s) ORDER BY s' % ','.join('?' * len(by))
+    for x in conn().execute(sql, [m] + list(by)):
+        r = by[x['token']]; h = classify(x['verbatim'] or '', terms)
+        if not h: continue
+        r['match_counts'][h[0]] = r['match_counts'].get(h[0], 0) + 1
+        try: fl = json.loads(x['fields'] or '{}')
+        except ValueError: fl = {}
+        r['matches'].append({'type': h[0], 'kind': x['kind'], 'clause': fl.get('clause') or '', 'section': fl.get('section') or '', 'rank': x['s'], **_snippet(x['verbatim'], h[1])})
+    for r in rows:
+        r['matches'].sort(key=lambda z: (_RANK[z['type']], z['rank']))
+        r['match_total'] = len(r['matches']); r['matches'] = r['matches'][:_PER_ROW]
+        for z in r['matches']: z.pop('rank', None)
+
 _rc = {}
 def search(p):
     """Cached per (query, index build): the same department page is asked for again and again."""
@@ -140,7 +205,46 @@ def _search(p):
     for x in rs:
         r = row(x); r['obs'] = x['obs_n'] or 0; r['gist'] = x['gist'] or ''; r['read'] = x['read'] or ''; r['amount'] = x['amount'] or None
         out.append(r)
+    if (p.get('explain') or [''])[0] in ('1', 'true') and (p.get('q') or [''])[0].strip(): explain_rows(out, p['q'][0])
     return {'total': total, 'offset': offset, 'limit': limit, 'rows': out}
+
+# ---- full-text search (fulltext.py): every character of every contract, tolerant of OCR slips ------------------------------
+# /contracts above searches the header and the reader's findings. /search searches the whole extracted text, so a phrase buried
+# on page 134 is found, and a dropped or misread letter still matches. Ordered by how often the phrase occurs in the contract.
+FT = os.environ.get('CONTRACTS_FULLTEXT', '/mnt/watch/contracts-api/fulltext.db')
+_ftl = threading.local(); _fc = {}
+def ft_conn():
+    c = getattr(_ftl, 'c', None)
+    if c is None:
+        import fulltext
+        c = _ftl.c = fulltext.open_db(FT, DB)
+    return c
+
+def ft_search(p):
+    import fulltext
+    q = (p.get('q') or [''])[0].strip()
+    if len(q) < 3: raise ValueError('q needs at least 3 characters')
+    tok = (p.get('token') or [''])[0]
+    if tok:                                                            # one contract: all of its matches (the side panel)
+        if not TOK.match(tok): raise ValueError('bad token')
+        return fulltext.contract_hits(ft_conn(), tok, q, max(1, min(int((p.get('per') or ['60'])[0]), 200)))
+    limit = max(1, min(int((p.get('limit') or ['50'])[0]), 100)); offset = max(0, int((p.get('offset') or ['0'])[0]))
+    dept = (p.get('dept') or [''])[0]; fz = (p.get('fuzzy') or [''])[0]
+    fuzzy = True if fz in ('1', 'true') else False if fz in ('0', 'false') else None
+    per = max(1, min(int((p.get('per') or ['3'])[0]), 20))           # passages carried per contract
+    k = (q, limit, offset, dept, fuzzy, per, int(time.time() // 300))  # cached for five minutes; the index grows as contracts are read
+    r = _fc.get(k)
+    if r is None:
+        if len(_fc) > 200: _fc.clear()
+        found = fulltext.search_contracts(ft_conn(), q, limit, offset, dept, fuzzy, per)
+        toks = [x['token'] for x in found['rows']]
+        meta = {x['token']: x for x in conn().execute('SELECT c.*, g.obs_n, g.read' + FROM + ' WHERE c.token IN (%s)' % ','.join('?' * len(toks)), toks)} if toks else {}
+        rows = []
+        for x in found['rows']:
+            m = meta.get(x['token'])
+            if m: d = row(m); d.update(hits=x['hits'], hit_total=x['hit_total'], kinds=x['kinds']); rows.append(d)
+        r = _fc[k] = {'total': found['total'], 'approx': found['approx'], 'offset': offset, 'limit': limit, 'rows': rows}
+    return r
 
 def export_csv(p):
     sort = SORTS.get((p.get('sort') or ['party'])[0], SORTS['party'])
@@ -238,9 +342,22 @@ def detail(tok):
     obs = c.execute('SELECT kind, a, b, verbatim, fields FROM obs WHERE token=? ORDER BY a LIMIT 1000', (tok,)).fetchall()
     out = row(x); out['epav_url'] = x['epav_url']
     out['observations'] = [{'kind': o['kind'], 'at': [o['a'], o['b']], 'verbatim': o['verbatim'], 'fields': json.loads(o['fields'] or '{}')} for o in obs]
-    out['text'] = extracted_text(x['identifier'], 60000)
+    out['text'] = extracted_text(x['identifier'], 4000000)   # the whole text: search finds matches anywhere, so the reader must hold all of it
     out['read'] = 'ledger' if obs else ('text' if out['text'] else '')
+    out['pages'] = pages_of(tok)
     return out
+
+def pages_of(tok):
+    """How many pages the filed PDF has: the layout build counted them; else count the page objects of the cached PDF. The
+    reader needs it to tell a stamp (a short line on most pages) from a heading that merely repeats. None when unknown."""
+    try:
+        with open(os.path.join(LAYOUT, tok + '.json'), encoding='utf-8') as f: n = json.load(f).get('total')
+        if n: return int(n)
+    except (OSError, ValueError): pass
+    try:
+        with open(os.path.join(CACHE, tok + '.pdf'), 'rb') as f: n = len(re.findall(rb'/Type\s*/Page(?![s\w])', f.read()))
+        return n or None
+    except OSError: return None
 
 def grab(url, timeout=25):
     try:
@@ -320,6 +437,10 @@ class H(BaseHTTPRequestHandler):
                 fn = 'metro-contracts' + ('-' + re.sub(r'[^A-Za-z0-9]+', '-', dn).strip('-').lower() if dn else '') + '.csv'
                 return self.send(200, text.encode('utf-8'), 'text/csv; charset=utf-8', {'Content-Disposition': 'attachment; filename="%s"' % fn, 'X-Rows': str(n), 'Cache-Control': 'no-store'}, t0=t0)
             if path == '/contracts': return self.send(200, search(p), t0=t0)
+            if path == '/search':
+                try: return self.send(200, ft_search(p), t0=t0)
+                except ValueError as e: return self.send(400, {'error': str(e)}, t0=t0)
+                except (sqlite3.Error, ImportError) as e: return self.send(503, {'error': 'full-text index unavailable: %s' % e}, t0=t0)
             m = re.match(r'^/contract/([A-Za-z0-9]+)(/pdf|/thumb\.jpg|/layout|/related)?$', path)
             if m and TOK.match(m.group(1)):
                 if m.group(2) == '/related':
@@ -334,6 +455,11 @@ class H(BaseHTTPRequestHandler):
                     if not tp: return self.send(404, {'error': 'no thumbnail yet'}, extra={'Cache-Control': 'public, max-age=300'}, t0=t0)
                     return self.send(200, open(tp, 'rb').read(), 'image/jpeg', {'Cache-Control': 'public, max-age=604800, immutable'}, t0=t0)
                 if m.group(2):
+                    # ?layer=ocr: the copy with an invisible OCR text layer on its scanned pages (searchable.py), when one has been
+                    # made; the captured PDF otherwise. The captured file is never altered, and is what is served without the flag.
+                    sp = os.path.join(SEARCHABLE, m.group(1) + '.pdf')
+                    if (p.get('layer') or [''])[0] == 'ocr' and os.path.exists(sp):
+                        return self.send(200, open(sp, 'rb').read(), 'application/pdf', {'X-Source': 'ocr-layer', 'X-Text-Layer': 'ocr', 'Cache-Control': 'public, max-age=3600'}, t0=t0)
                     b, via = pdf_bytes(m.group(1))
                     if not b: return self.send(404, {'error': 'no PDF for ' + m.group(1) + ' yet (not on archive.org or ePAV)'}, t0=t0)
                     return self.send(200, b, 'application/pdf', {'X-Source': via, 'Cache-Control': 'public, max-age=86400'}, t0=t0)

@@ -21,7 +21,7 @@
   td { padding:9px 8px; border-bottom:1px solid var(--line); vertical-align:top; }
   tr.row { cursor:pointer; } tr.row:hover { background:var(--s1); }
   .num { font-family:var(--mono); font-size:13px; white-space:nowrap; }
-  .tag { font:600 11px var(--mono); padding:1px 6px; border-radius:99px; border:1px solid var(--line); color:var(--mut); }
+  .tag { font:600 11px var(--mono); padding:1px 6px; border-radius:99px; border:1px solid var(--line); color:var(--mut); white-space:nowrap; }
   .tag.ok { color:var(--ok); border-color:var(--ok); }
   .pager { display:flex; gap:10px; align-items:center; padding:14px 0; color:var(--mut); }
   button { font:inherit; color:var(--ink); background:var(--s1); border:1px solid var(--line); border-radius:8px; padding:6px 12px; cursor:pointer; }
@@ -35,6 +35,22 @@
   .obs { border-left:3px solid var(--line); padding:4px 10px; margin:8px 0; font-size:14px; }
   .obs b { font:600 11px var(--mono); text-transform:uppercase; color:var(--mut); display:block; }
   .err { color:var(--bad); padding:16px 0; }
+  /* content-match explanations: every kind of match has a label AND a distinct mark style, so colour is never the only cue */
+  tr.hits td { padding:0 8px 12px; border-bottom:1px solid var(--line); }
+  tr.hits.has-prev { } tr.row.has-hits td { border-bottom:0; }
+  .hit { margin:6px 0 0; padding:6px 10px; border-left:3px solid var(--line); font-size:13.5px; line-height:1.5; color:var(--ink); word-break:break-word; }
+  .hit .why { display:flex; gap:6px; flex-wrap:wrap; align-items:center; margin-bottom:2px; font:600 11px var(--mono); text-transform:uppercase; letter-spacing:.03em; color:var(--mut); }
+  .hit .ctx { font:11px var(--mono); text-transform:none; letter-spacing:0; }
+  .hit.k-phrase { border-left-color:var(--ok); } .hit.k-near { border-left-color:#b36bd9; } .hit.k-word { border-left-color:var(--acc); } .hit.k-family { border-left-color:#d9a21e; } .hit.k-meta { border-left-color:var(--mut); }
+  mark { color:inherit; border-radius:3px; padding:0 1px; }
+  mark.m-phrase { background:rgba(40,170,100,.35); font-weight:700; }
+  mark.m-word { background:rgba(100,120,255,.30); font-weight:600; }
+  mark.m-family { background:transparent; border-bottom:2px dashed #d9a21e; }
+  mark.m-near { background:rgba(179,107,217,.22); border-bottom:2px dotted #b36bd9; }
+  .more, .status { color:var(--mut); font-size:12.5px; margin:6px 0 0; }
+  .ftl { display:flex; gap:6px; align-items:center; font-size:13px; color:var(--mut); white-space:nowrap; cursor:pointer; }
+  .ftl input { padding:0; margin:0; }
+  .legend { display:flex; gap:14px; flex-wrap:wrap; color:var(--mut); font-size:12.5px; padding:8px 0; }
   @media (max-width:640px) { .hide-s { display:none; } }
 </style>
 </head>
@@ -43,6 +59,7 @@
   <h1>Metro contracts</h1>
   <select id="dept" aria-label="Department"><option value="">All departments</option></select>
   <input id="q" type="search" placeholder="Search vendor, number, description, or contract text" aria-label="Search">
+  <label class="ftl" title="Search every character of every contract, tolerant of OCR slips. Off: headers and the reader's findings only."><input type="checkbox" id="ft" checked> Full text</label>
   <span class="meta" id="meta"></span>
 </header>
 <main>
@@ -52,6 +69,12 @@
     </tr></thead>
     <tbody id="rows"></tbody>
   </table>
+  <div id="legend" class="legend" hidden>
+    <span><mark class="m-phrase">exact phrase</mark> the whole query, verbatim</span>
+    <span><mark class="m-near">together</mark> every word, close by but not in order</span>
+    <span><mark class="m-word">word</mark> a query word on its own</span>
+    <span><mark class="m-family">word family</mark> same root (indemnify → indemnification)</span>
+  </div>
   <div id="err" class="err" hidden></div>
   <div class="pager"><button id="prev">← Prev</button><span id="range"></span><button id="next">Next →</button></div>
 </main>
@@ -64,10 +87,147 @@
 // every call is a lookup. ?api= overrides the base for testing.
 const API = new URLSearchParams(location.search).get('api') || 'https://watch.hyphae.social/contracts-api';
 const PAGE = 50;
-const S = { dept: '', q: '', sort: 'party', offset: 0, total: 0 };
+const S = { dept: '', q: '', sort: 'party', offset: 0, total: 0, ft: true };
 const $ = id => document.getElementById(id);
 const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 let seq = 0;
+
+// ---- Content matching: why does this contract match the query, and where? -------------------------------------
+// The VM decides which contracts match; here each match is explained from the contract's own text. Four kinds, strongest first:
+//   phrase  the whole query appears verbatim   near   every query word appears within NEAR chars, in any order
+//   word    one query word, as a whole word    family a word sharing a query word's root (indemnify → indemnification)
+// Header fields (vendor, number, description, department) are checked the same way and reported as "in the header".
+const NEAR = 300, CTX = 110, SHOW = 3;
+const RANK = { phrase: 0, near: 1, word: 2, family: 3 };
+const LABEL = { phrase: 'exact phrase', near: 'together', word: 'word', family: 'word family' };
+const reEsc = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+const SUFFIX = ['ifications', 'ification', 'ifying', 'ified', 'ifies', 'ify', 'ations', 'ation', 'ings', 'ing', 'ies', 'ied', 'es', 'ed', 's'];
+function stem(w) { for (const s of SUFFIX) if (w.length - s.length >= 4 && w.endsWith(s)) return w.slice(0, -s.length); return w; }
+function parseQuery(q) {
+  const phrases = [], terms = [];
+  q.replace(/"([^"]+)"|(\S+)/g, (_, p, w) => { if (p) { phrases.push(p.trim().toLowerCase()); p.toLowerCase().split(/\s+/).forEach(x => x.length > 1 && terms.push(x)); } else if (w.length > 1) terms.push(w.toLowerCase().replace(/^\W+|\W+$/g, '')); });
+  const uniq = [...new Set(terms.filter(Boolean))];
+  const whole = !phrases.length && uniq.length > 1 ? uniq.join(' ') : '';
+  return { phrases: [...phrases, ...(whole ? [whole] : [])], terms: uniq };
+}
+const phraseRe = p => new RegExp(p.split(/\s+/).map(reEsc).join('\\s+'), 'gi');
+// All matches in `text` as {type, at:[a,b], marks:[[a,b,type]...]}, un-deduplicated.
+function findMatches(text, Q) {
+  const out = [], positions = [];   // positions: every term hit, for the "together" pass
+  for (const p of Q.phrases) for (const m of text.matchAll(phraseRe(p))) out.push({ type: 'phrase', at: [m.index, m.index + m[0].length], marks: [[m.index, m.index + m[0].length, 'phrase']] });
+  Q.terms.forEach((t, i) => {
+    for (const m of text.matchAll(new RegExp('\\b' + reEsc(t) + '\\b', 'gi'))) { const h = { type: 'word', at: [m.index, m.index + m[0].length], marks: [[m.index, m.index + m[0].length, 'word']] }; out.push(h); positions.push({ i, a: h.at[0], b: h.at[1], type: 'word' }); }
+    const st = stem(t);
+    if (st.length >= 4) for (const m of text.matchAll(new RegExp('\\b' + reEsc(st) + '[a-z]*', 'gi'))) {
+      if (m[0].toLowerCase() === t) continue;
+      const h = { type: 'family', at: [m.index, m.index + m[0].length], marks: [[m.index, m.index + m[0].length, 'family']], word: m[0] }; out.push(h); positions.push({ i, a: h.at[0], b: h.at[1], type: 'family' });
+    }
+  });
+  if (Q.terms.length > 1) {   // sliding window: shortest stretch holding every distinct query word (exact or same-root)
+    positions.sort((x, y) => x.a - y.a);
+    const need = Q.terms.length, have = new Map(); let l = 0, lastEnd = -1;
+    for (let r = 0; r < positions.length; r++) {
+      have.set(positions[r].i, (have.get(positions[r].i) || 0) + 1);
+      while (have.size === need) {
+        if (positions[r].b - positions[l].a <= NEAR && positions[l].a >= lastEnd) {
+          const win = positions.slice(l, r + 1);
+          out.push({ type: 'near', at: [win[0].a, positions[r].b], marks: win.map(w => [w.a, w.b, 'near']) }); lastEnd = positions[r].b; l = r + 1; have.clear(); break;
+        }
+        const k = positions[l].i; have.set(k, have.get(k) - 1); if (!have.get(k)) have.delete(k); l++;
+      }
+    }
+  }
+  return out;
+}
+// Best match first; matches whose snippets overlap collapse into the strongest one.
+function rankMatches(ms) {
+  ms.sort((x, y) => RANK[x.type] - RANK[y.type] || x.at[0] - y.at[0]);
+  const kept = [];
+  for (const m of ms) if (!kept.some(k => m.at[0] < k.at[1] + CTX && m.at[1] > k.at[0] - CTX)) kept.push(m);
+  return kept;
+}
+function explain(d, Q) {
+  // The API returns at most 60,000 characters of text per contract, but the reader's findings reach further into long ones;
+  // append those findings so a match past the cap is still found (and labelled as such).
+  const cap = (d.text || '').length, tail = (d.observations || []).filter(o => o.at && o.at[0] >= cap && o.verbatim);
+  const text = (d.text || '') + (tail.length ? '\n' + tail.map(o => o.verbatim).join('\n') : '');
+  const body = rankMatches(findMatches(text, Q)).map(m => { if (m.at[0] > cap) return { ...m, ctx: 'a reader finding past the text shown' }; const ob = (d.observations || []).find(o => o.at && o.at[0] <= m.at[0] && m.at[0] < o.at[1] && o.kind !== 'date'); return { ...m, ctx: ob ? ob.kind + (ob.fields && ob.fields.clause ? ': ' + ob.fields.clause : ob.fields && ob.fields.section ? ' · ' + ob.fields.section : '') : '' }; });
+  const head = [];
+  for (const [label, val] of [['vendor', d.party], ['number', d.number], ['description', d.description], ['department', d.department]]) {
+    if (!val) continue; const best = rankMatches(findMatches(val, Q))[0];
+    if (best) head.push({ field: label, val, ...best });
+  }
+  return { text, body, head, counts: body.reduce((c, m) => (c[m.type] = (c[m.type] || 0) + 1, c), {}) };
+}
+function marked(text, a, b, marks) {   // slice [a,b) of text with the marks inside it highlighted, whitespace collapsed
+  let html = '', pos = a;
+  for (const [s, e, t] of marks.slice().sort((x, y) => x[0] - y[0])) { if (s < pos) continue; html += esc(text.slice(pos, s)) + '<mark class="m-' + t + '">' + esc(text.slice(s, e)) + '</mark>'; pos = e; }
+  return html.replace(/\s+/g, ' ') + esc(text.slice(pos, b)).replace(/\s+/g, ' ');
+}
+function hitHtml(text, m) {
+  const a = Math.max(0, m.at[0] - CTX), b = Math.min(text.length, m.at[1] + CTX);
+  return '<div class="hit k-' + m.type + '"><div class="why"><span>' + LABEL[m.type] + (m.word ? ' · “' + esc(m.word) + '”' : '') + '</span>' + (m.ctx ? '<span class="ctx">in ' + esc(m.ctx) + '</span>' : '') + '</div>' + (a > 0 ? '… ' : '') + marked(text, a, b, m.marks) + (b < text.length ? ' …' : '') + '</div>';
+}
+function headHtml(h) { return '<div class="hit k-meta"><div class="why"><span>' + LABEL[h.type] + ' · in the header</span><span class="ctx">' + h.field + '</span></div>' + marked(h.val, 0, h.val.length, h.marks) + '</div>'; }
+const summary = c => Object.keys(RANK).filter(k => c[k]).map(k => c[k] + ' ' + LABEL[k]).join(' · ');
+function hitsHtml(d, ex, limit) {
+  const shown = ex.body.slice(0, limit);
+  return ex.head.map(headHtml).join('') + shown.map(m => hitHtml(ex.text, m)).join('')
+    + (ex.body.length ? '<div class="more">' + ex.body.length + ' passage' + (ex.body.length > 1 ? 's' : '') + ' in the text: ' + summary(ex.counts) + (ex.body.length > shown.length ? ' — open the contract to see all' : '') + '</div>'
+      : ex.head.length ? '' : '<div class="status">Matched by the search index, but no passage in the extracted text lines up with these exact words (OCR noise, or a looser match).</div>');
+}
+// The VM explains its own matches (explain=1: r.matches, r.header, r.match_counts), so a result page is one request.
+// An API that predates that leaves r.matches undefined, and the rows fall back to explaining themselves from each contract's text.
+const srvType = t => t === 'together' ? 'near' : t;
+function srvHitsHtml(r) {
+  const head = (r.header || []).map(h => headHtml({ field: h.field, val: h.text, type: srvType(h.type), marks: h.marks.map(([a, b, t]) => [a, b, srvType(t)]) })).join('');
+  const body = (r.matches || []).map(m => {
+    const t = srvType(m.type), ctx = m.clause ? 'clause: ' + m.clause : m.section ? m.kind + ' · ' + m.section : m.kind;
+    return '<div class="hit k-' + t + '"><div class="why"><span>' + LABEL[t] + '</span>' + (ctx ? '<span class="ctx">in ' + esc(ctx) + '</span>' : '') + '</div>'
+      + (m.before ? '… ' : '') + marked(m.text, 0, m.text.length, m.marks.map(([a, b, mt]) => [a, b, srvType(mt)])) + (m.after ? ' …' : '') + '</div>';
+  }).join('');
+  const counts = Object.fromEntries(Object.entries(r.match_counts || {}).map(([k, n]) => [srvType(k), n]));
+  const tail = r.match_total ? '<div class="more">' + r.match_total + ' passage' + (r.match_total > 1 ? 's' : '') + ' matched: ' + summary(counts) + (r.match_total > r.matches.length ? ' — open the contract to see all' : '') + '</div>' : '';
+  return head + body + tail || '<div class="status">Matched on the contract as a whole; no single passage holds these words together.</div>';
+}
+// Full-text hits (/search): every character of the contract. kind: exact | folded | together | fuzzy:<edits>.
+const FT_LEGEND = '<span><mark class="m-phrase">exact</mark> the characters, as typed</span><span><mark class="m-word">OCR variant</mark> same, with 1/l/i/0/o confusions folded</span>'
+  + '<span><mark class="m-near">together</mark> every word within a few lines, any order</span><span><mark class="m-family">close match</mark> within a few edits: a dropped or misread letter</span>';
+const FINDINGS_LEGEND = document.getElementById('legend').innerHTML;
+const ftStyle = k => k === 'exact' ? 'phrase' : k === 'folded' ? 'word' : k === 'together' ? 'near' : 'family';
+const ftLabel = k => k === 'exact' ? 'exact' : k === 'folded' ? 'OCR variant' : k === 'together' ? 'together' : 'close match · ' + k.split(':')[1] + (k.split(':')[1] === '1' ? ' edit' : ' edits');
+function ftHitHtml(h) {
+  const st = ftStyle(h.kind);
+  return '<div class="hit k-' + st + '"><div class="why"><span>' + esc(ftLabel(h.kind)) + '</span><span class="ctx">character ' + h.a.toLocaleString() + '</span></div>'
+    + (h.before ? '… ' : '') + marked(h.text, 0, h.text.length, h.marks.map(([a, b]) => [a, b, st])) + (h.after ? ' …' : '') + '</div>';
+}
+function ftHitsRow(r) {
+  const kinds = Object.entries(r.kinds || {}).sort((a, b) => a[0].localeCompare(b[0])).map(([k, n]) => n + ' ' + ftLabel(k)).join(' · ');
+  const more = r.hit_total > (r.hits || []).length ? ' — open the contract to see all' : '';
+  return '<tr class="hits row srv" data-t="' + r.token + '"><td colspan="5">' + (r.hits || []).map(ftHitHtml).join('')
+    + '<div class="more">' + r.hit_total + ' match' + (r.hit_total > 1 ? 'es' : '') + ' in the full text: ' + kinds + more + '</div></td></tr>';
+}
+function hitsRow(r) {
+  return r.matches !== undefined
+    ? '<tr class="hits row srv" data-t="' + r.token + '"><td colspan="5">' + srvHitsHtml(r) + '</td></tr>'
+    : '<tr class="hits row" data-t="' + r.token + '"><td colspan="5"><div class="status">Finding where it matches…</div></td></tr>';
+}
+// Details are fetched lazily, a few at a time, and cached so the side panel opens instantly afterwards.
+const DETAILS = new Map(); let inflight = 0; const waiting = [];
+function detailOf(tok) {
+  if (!DETAILS.has(tok)) DETAILS.set(tok, new Promise(res => { waiting.push(() => get('/contract/' + tok).then(res, () => res(null)).finally(() => { inflight--; pump(); })); pump(); }));
+  return DETAILS.get(tok);
+}
+function pump() { while (inflight < 4 && waiting.length) { inflight++; waiting.shift()(); } }
+function explainRows(my) {
+  const Q = parseQuery(S.q); if (!Q.terms.length) return;
+  document.querySelectorAll('tr.hits:not(.srv)').forEach(async tr => {
+    const d = await detailOf(tr.dataset.t);
+    if (my !== seq) return;
+    if (!d) { tr.firstChild.innerHTML = '<div class="status">Could not read this contract’s text.</div>'; return; }
+    tr.firstChild.innerHTML = hitsHtml(d, explain(d, Q), SHOW);
+  });
+}
 
 async function get(path) {
   const t0 = performance.now();
@@ -75,20 +235,27 @@ async function get(path) {
   if (!r.ok) throw new Error((await r.json().catch(() => ({}))).error || 'HTTP ' + r.status);
   const j = await r.json(); j._ms = Math.round(performance.now() - t0); return j;
 }
-function readUrl() { const p = new URLSearchParams(location.hash.slice(1)); S.dept = p.get('dept') || ''; S.q = p.get('q') || ''; S.sort = p.get('sort') || 'party'; S.offset = +(p.get('o') || 0); }
-function writeUrl() { const p = new URLSearchParams(); if (S.dept) p.set('dept', S.dept); if (S.q) p.set('q', S.q); if (S.sort !== 'party') p.set('sort', S.sort); if (S.offset) p.set('o', S.offset); history.replaceState(null, '', '#' + p); }
+function readUrl() { const p = new URLSearchParams(location.hash.slice(1)); S.dept = p.get('dept') || ''; S.q = p.get('q') || ''; S.sort = p.get('sort') || 'party'; S.offset = +(p.get('o') || 0); S.ft = p.get('ft') !== '0'; }
+function writeUrl() { const p = new URLSearchParams(); if (!S.ft) p.set('ft', '0'); if (S.dept) p.set('dept', S.dept); if (S.q) p.set('q', S.q); if (S.sort !== 'party') p.set('sort', S.sort); if (S.offset) p.set('o', S.offset); history.replaceState(null, '', '#' + p); }
 
 async function load() {
   const my = ++seq; writeUrl();
-  const qs = new URLSearchParams({ dept: S.dept, q: S.q, sort: S.sort, limit: PAGE, offset: S.offset });
+  const qs = new URLSearchParams({ dept: S.dept, q: S.q, sort: S.sort, limit: PAGE, offset: S.offset, explain: 1 });
   try {
-    const j = await get('/contracts?' + qs);
+    const searching = !!parseQuery(S.q).terms.length;
+    let j, ftOn = searching && S.ft && S.q.length >= 3;
+    if (ftOn) {   // the whole text of every contract; an API without /search falls back to headers + findings
+      try { j = await get('/search?' + new URLSearchParams({ q: S.q, dept: S.dept, limit: PAGE, offset: S.offset })); } catch (e) { if (my === seq) ftOn = false; else return; }
+    }
+    if (!ftOn) j = await get('/contracts?' + qs);
     if (my !== seq) return;
     S.total = j.total; $('err').hidden = true;
-    $('rows').innerHTML = j.rows.map(r => '<tr class="row" data-t="' + r.token + '"><td>' + esc(r.party) + '<div class="hide-s" style="color:var(--mut);font-size:12px">' + esc(r.department) + '</div></td><td class="num">' + esc(r.number) + '</td><td class="hide-s">' + esc(r.description) + '</td><td class="num hide-s">' + esc(r.expires) + '</td><td>' + (r.archived ? '<span class="tag ok">on archive.org</span>' : '<span class="tag">pending</span>') + '</td></tr>').join('') || '<tr><td colspan="5" style="color:var(--mut);padding:24px 8px">No contracts match.</td></tr>';
-    $('range').textContent = j.total ? (S.offset + 1) + '–' + Math.min(S.offset + PAGE, j.total) + ' of ' + j.total.toLocaleString() : '0';
+    $('legend').hidden = !searching; $('legend').innerHTML = ftOn ? FT_LEGEND : FINDINGS_LEGEND;
+    $('rows').innerHTML = j.rows.map(r => '<tr class="row' + (searching ? ' has-hits' : '') + '" data-t="' + r.token + '"><td>' + esc(r.party) + '<div class="hide-s" style="color:var(--mut);font-size:12px">' + esc(r.department) + '</div></td><td class="num">' + esc(r.number) + '</td><td class="hide-s">' + esc(r.description) + '</td><td class="num hide-s">' + esc(r.expires) + '</td><td>' + (r.archived ? '<span class="tag ok">on archive.org</span>' : '<span class="tag">pending</span>') + '</td></tr>' + (searching ? (ftOn ? ftHitsRow(r) : hitsRow(r)) : '')).join('') || '<tr><td colspan="5" style="color:var(--mut);padding:24px 8px">No contracts match.</td></tr>';
+    $('range').textContent = j.total ? (S.offset + 1) + '–' + Math.min(S.offset + PAGE, j.total) + ' of ' + j.total.toLocaleString() + (j.approx ? ' (close matches are a sample)' : '') : '0';
     $('prev').disabled = S.offset === 0; $('next').disabled = S.offset + PAGE >= j.total;
-    $('meta').textContent = j._ms + ' ms';
+    $('meta').textContent = j._ms + ' ms' + (ftOn ? ' · full text' : '');
+    if (searching && !ftOn) explainRows(my);
   } catch (e) { if (my === seq) { $('err').hidden = false; $('err').textContent = 'Could not load contracts (' + e.message + ').'; } }
 }
 
@@ -96,11 +263,16 @@ async function openDetail(tok) {
   $('detail').classList.add('open'); $('detail').setAttribute('aria-hidden', 'false');
   $('dtitle').textContent = 'Loading…'; $('dbody').innerHTML = '';
   try {
-    const d = await get('/contract/' + tok);
+    const d = await detailOf(tok); if (!d) throw new Error('could not load');
+    const Q = parseQuery(S.q); let fh = null, ex = null;
+    if (Q.terms.length && S.ft && S.q.length >= 3) { try { fh = await get('/search?' + new URLSearchParams({ q: S.q, token: tok, per: 60 })); } catch (e) { fh = null; } }
+    if (!fh && Q.terms.length) ex = explain(d, Q);
     $('dtitle').textContent = (d.party || tok) + (d.number ? ' — ' + d.number : '');
     const byKind = {}; d.observations.forEach(o => (byKind[o.kind || 'text'] = byKind[o.kind || 'text'] || []).push(o));
     $('dbody').innerHTML = '<p style="color:var(--mut)">' + esc(d.department) + ' · ' + esc(d.description) + (d.expires ? ' · expires ' + esc(d.expires) : '') + '</p>'
       + '<p><a href="' + API + '/contract/' + tok + '/pdf" target="_blank" rel="noopener">Open PDF in a new tab ↗</a>' + (d.archive_url ? ' · <a href="' + esc(d.archive_url) + '" target="_blank" rel="noopener">archive.org ↗</a>' : '') + '</p>'
+      + (fh ? '<h3 style="font:600 14px var(--sans);margin:18px 0 4px">Where “' + esc(S.q) + '” matches in the full text (' + fh.hit_total + ')</h3>' + (fh.hits.map(ftHitHtml).join('') || '<p class="status">No match in this contract’s text.</p>') + (fh.hit_total > fh.hits.length ? '<p class="more">First ' + fh.hits.length + ' of ' + fh.hit_total + '.</p>' : '')
+        : ex ? '<h3 style="font:600 14px var(--sans);margin:18px 0 4px">Where “' + esc(S.q) + '” matches</h3>' + hitsHtml(d, ex, 40) : '')
       + '<iframe src="' + API + '/contract/' + tok + '/pdf" title="Contract PDF"></iframe>'
       + '<h3 style="font:600 14px var(--sans);margin:18px 0 4px">What the reader found (' + d.observations.length + ')</h3>'
       + (d.observations.length ? Object.entries(byKind).map(([k, os]) => os.map(o => '<div class="obs"><b>' + esc(k) + (o.fields && o.fields.section ? ' · ' + esc(o.fields.section) : '') + '</b>' + esc(o.verbatim).slice(0, 600) + '</div>').join('')).join('') : '<p style="color:var(--mut)">Not read yet.</p>');
@@ -110,6 +282,7 @@ async function openDetail(tok) {
 let tmr;
 $('q').addEventListener('input', e => { clearTimeout(tmr); tmr = setTimeout(() => { S.q = e.target.value.trim(); S.offset = 0; load(); }, 160); });
 $('dept').addEventListener('change', e => { S.dept = e.target.value; S.offset = 0; load(); });
+$('ft').addEventListener('change', e => { S.ft = e.target.checked; S.offset = 0; load(); });
 $('prev').addEventListener('click', () => { S.offset = Math.max(0, S.offset - PAGE); load(); window.scrollTo(0, 0); });
 $('next').addEventListener('click', () => { S.offset += PAGE; load(); window.scrollTo(0, 0); });
 document.querySelector('thead').addEventListener('click', e => { const s = e.target.dataset.sort; if (s) { S.sort = s; S.offset = 0; load(); } });
@@ -118,7 +291,7 @@ $('dclose').addEventListener('click', () => { $('detail').classList.remove('open
 document.addEventListener('keydown', e => { if (e.key === 'Escape') $('dclose').click(); });
 
 (async () => {
-  readUrl(); $('q').value = S.q;
+  readUrl(); $('q').value = S.q; $('ft').checked = S.ft;
   try {
     const ds = await get('/departments');
     $('dept').innerHTML = '<option value="">All departments (' + ds.reduce((n, d) => n + d.n, 0).toLocaleString() + ')</option>' + ds.slice().sort((a, b) => a.department.localeCompare(b.department)).map(d => '<option value="' + esc(d.department) + '">' + esc(d.department) + ' (' + d.n.toLocaleString() + ')</option>').join('');

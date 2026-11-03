@@ -1,0 +1,10 @@
+[Unit]
+Description=Full-text index cadence: every 30 minutes, so text added by the OCR lanes is searchable within the hour
+
+[Timer]
+OnBootSec=20min
+OnUnitActiveSec=30min
+Persistent=true
+
+[Install]
+WantedBy=timers.target
