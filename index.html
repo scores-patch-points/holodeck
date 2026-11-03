@@ -4198,6 +4198,51 @@ function findFigures(t) {
   }
   return out;
 }
+// ── LAYER 2: THE USAGE SUBSTRATE (usage-substrate.json, SUBSTRATE-3). Which measure nouns a question's word selects in use: counted over
+// hyperlexicon v1 at offsets ±1..±3, kept only where word order made a difference (paired test against the same documents shuffled), the
+// numerals nominated by a giver and licensed by use. No unit is named in this code: the file is the record, with its head and its null.
+// Not read is a typed gap, never silence: USAGE_GAP says why, and the Ask's note carries it.
+let USAGE = null, USAGE_GAP = 'not read yet';
+try { fetch('usage-substrate.json').then(r => (r.ok ? r.json() : Promise.reject(new Error('HTTP ' + r.status)))).then(j => { if (j && j.selects) { USAGE = j; USAGE_GAP = null; } else USAGE_GAP = 'no selects in the file'; }).catch(e => { USAGE_GAP = String((e && e.message) || e); }); } catch (e) { USAGE_GAP = String((e && e.message) || e); }
+// The measure nouns the question's words select, strongest first: Map(noun -> { q, strength, at, count }).
+function usageSelects(words, U = USAGE) { const m = new Map(); if (!U || !U.selects) return m;
+  for (const q of words) for (const [w, p, c, at] of (U.selects[q] || [])) { const b = m.get(w); if (!b || p > b.strength) m.set(w, { q, strength: p, at, count: c }); }
+  return m; }
+// The question words that may bind a figure (layer 1's gate): a stem binds when some word of it selects at least two measure nouns in use.
+// "long", "height", "cost" do; "fleet", "flying", "increasing" select nothing and bind nothing. No substrate: no gate.
+const BIND_MIN = 2;
+function bindableStems(stem, U = USAGE) { if (!U || !U.selects) return null; const s = new Set();
+  for (const [q, v] of Object.entries(U.selects)) if (v.length >= BIND_MIN) s.add(stem(q)); return s; }
+// The word a figure is counted in: the last word of its own raw text ("688 miles" -> miles, "£90 million" -> million).
+const unitWordOf = g => { const ws = String(g.raw || '').toLowerCase().match(/\p{L}+/gu); return ws ? ws[ws.length - 1] : ''; };
+// ── A FIGURE BOUND TO THE QUESTION'S OWN WORD (layer 1: no lexicon, no unit list). "How long is the river?" is answered by the number
+// the statement itself binds to "long": "688-mile-long", "330 metres (1,083 ft) tall", "cost him 5 guineas". The word must stand within
+// BIND_WORDS words after the number (a parenthetical restating it is stepped over and kept with it) or before it, inside one clause,
+// with no other number between. `stem` folds a word the way the question's terms were folded; `skip` holds the question's name words
+// ("river" in "the Cumberland River" binds nothing). Pure: text in, the bound figures out, each with the statement's own words as `raw`.
+const BIND_WORDS = 3;
+function boundFigures(t, terms, stem, skip = new Set(), fw = new Set(), isDate = () => false) {
+  const out = []; if (!terms.size) return out;
+  const tok = []; const re = /([$£€]\s?)?\d{1,3}(?:,\d{3})+(?:\.\d+)?|([$£€]\s?)?\d+(?:\.\d+)?|\p{L}[\p{L}'’]*|[()]|[.;:!?,]/gu; let m;
+  while ((m = re.exec(t))) { const v = m[0], k = /\d/.test(v) ? 'num' : v === '(' || v === ')' ? v : v === ',' ? 'comma' : /^[.;:!?]$/.test(v) ? 'stop' : 'word';
+    if (k === 'stop' && v === '.' && /\d/.test(t[m.index + 1] || '')) continue;
+    tok.push({ v, k, s: m.index, e: m.index + v.length }); }
+  const hit = w => { const x = w.toLowerCase(); return !skip.has(x) && terms.has(stem(x)); };
+  const claimed = new Set(); const nums = tok.map((n, i) => i).filter(i => tok[i].k === 'num' && !(tok[i].s > 0 && /[\p{L}\d\[.]/u.test(t[tok[i].s - 1])) && !(tok[i + 1] && isDate(tok[i + 1].v)) && !(tok[i - 1] && isDate(tok[i - 1].v)) && !(/^\d{4}$/.test(tok[i].v) && +tok[i].v >= 1900 && +tok[i].v <= 2099));
+  const after = new Set();
+  nums.forEach(i => { const n = tok[i];
+    // after: step over a parenthetical (its numbers restate this one); stop at a clause end or another number
+    let words = 0, depth = 0, end = n.e;
+    for (let j = i + 1; j < tok.length && words < BIND_WORDS; j++) { const x = tok[j];
+      if (x.k === '(') { depth++; continue; } if (x.k === ')') { if (depth) { depth--; end = x.e; continue; } break; } if (depth) continue;
+      if (x.k === 'stop' || x.k === 'num' || x.k === 'comma') break;
+      words++; if (hit(x.v) && !claimed.has(j)) { claimed.add(j); after.add(i); out.push({ raw: t.slice(n.s, x.e), value: parseFloat(n.v.replace(/[^\d.]/g, '')), term: x.v.toLowerCase(), side: 'after', s: n.s, e: x.e }); return; } end = x.e; }
+  });
+  nums.forEach(i => { const n = tok[i]; if (after.has(i)) return; let words = 0;
+    for (let j = i - 1; j >= 0 && words < BIND_WORDS; j--) { const x = tok[j]; if (x.k === 'stop' || x.k === 'num' || x.k === 'comma' || x.k === '(' || x.k === ')') break;
+      words++; if (hit(x.v) && !claimed.has(j)) { claimed.add(j); const nx = t.slice(n.e).match(/^[\s-]*(\p{L}+)/u); out.push({ raw: t.slice(x.s, n.e + (nx && !fw.has(nx[1].toLowerCase()) ? nx[0].length : 0)), value: parseFloat(n.v.replace(/[^\d.]/g, '')), term: x.v.toLowerCase(), side: 'before', s: x.s, e: n.e }); return; } } });
+  return out;
+}
 function findDates(t) {
   const out = []; const tr = /\b\d{1,2}:\d{2}(?::\d{2})?(?:\s*[ap]\.m\.)?/g; let tm;
   while ((tm = tr.exec(t))) out.push({ raw: tm[0].trim(), s: tm.index, e: tm.index + tm[0].trim().length, year: null });
@@ -10155,7 +10200,7 @@ class Component extends DCLogic {
   qaVals(A, F, qv, view) {
     const off = { qa: { isRel: false, isAns: false, noAnswer: false } };
     const rel = PARSE_REL(qv), isQ = IS_Q(qv); if (view !== 'search' || (!rel && !isQ)) return off;
-    const key = qv + '|' + F.length + '|' + (this._cnt ? this._cnt.size : 0) + '|' + (this.state.qaN || 0) + '|' + this.activePins().map(p => p.stId).join(',');
+    const key = qv + '|' + (USAGE ? USAGE.head : 'no-usage') + '|' + F.length + '|' + (this._cnt ? this._cnt.size : 0) + '|' + (this.state.qaN || 0) + '|' + this.activePins().map(p => p.stId).join(',');
     if (this._qa && this._qa.key === key && this._qa.A === A) return this._qa.out;
     const pool = F.filter(st => !st.ref && (!this._cnt || this._cnt.has(st.doc)));
     const toks = pool.map(st => new Set(st.text.toLowerCase().split(/[^a-z0-9]+/).filter(Boolean).map(qStem)));
@@ -10201,6 +10246,10 @@ class Component extends DCLogic {
       const ql = qv.toLowerCase(); const orig = {};
       const terms = [...new Set(ql.split(/[^a-z0-9]+/).filter(w => w && !QW.has(w) && !(/^\s*(what|which|how)\b/i.test(ql) && /^(find|finds|found|findings?|observations?)$/.test(w)) && (w.length >= 3 || /\d/.test(w))).map(w => { const s = qStem(w); orig[s] = orig[s] || w; return s; }))];
       const qNames = new Set(Object.values(A.names).filter(n => [n.name, ...(n.aliases || [])].some(f => { f = f.toLowerCase(); return f.length >= 3 && new RegExp('\\b' + f.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b').test(ql); })).map(n => n.name));
+      // layer 1: a figure the statement binds to one of the question's own words (boundFigures) — no lexicon, no unit list
+      const nameWords = new Set([...qNames].flatMap(n => [n, ...((A.names[n] || {}).aliases || [])]).flatMap(f => f.toLowerCase().split(/[^\p{L}\d]+/u)).filter(Boolean));
+      const gate = this._gateU === USAGE ? this._gate : (this._gateU = USAGE, this._gate = bindableStems(qStem)); const bindTerms = new Set(gate ? terms.filter(w => gate.has(w)) : terms), boundOf = new Map(), bound = st => { let b = boundOf.get(st); if (!b) boundOf.set(st, b = boundFigures(st.text, bindTerms, qStem, nameWords, QW, w => MONTHS.has(w))); return b; };
+      const qSel = usageSelects([...new Set([...terms.map(w => orig[w] || w), ...terms])]), picked = st => st.figs.filter(g => qSel.has(unitWordOf(g)));
       let want = /^when\b|\bwhat (year|date|day|month|time)\b/.test(ql) ? 'date' : /\bhow (much|many|long|big|far|often)\b|\bwhat (was|is|were|are) the (cost|amount|number|total|price|budget)/.test(ql) ? 'fig' : /^(who|whom|whose)\b|\bwho\b/.test(ql) ? 'who' : /^where\b|\bwhere\b/.test(ql) ? 'place' : '';
       { const sr = this.state.stripRead; if (!want && sr && sr.domain) want = sr.domain === 'Existence' ? 'who' : sr.domain === 'Structure' ? 'fig' : ''; }
       const df = {}; terms.forEach(w => { df[w] = 0; }); toks.forEach(T => terms.forEach(w => { if (T.has(w)) df[w]++; }));
@@ -10212,18 +10261,23 @@ class Component extends DCLogic {
         const viaTitle = wantFind && !FIND_RE.test(st.text) ? [] : terms.filter(w => !T.has(w) && tk.has(w)); if (!hitT.length && !nh && !(viaTitle.length && (wantFind ? FIND_RE.test(st.text) : false))) return;
         let sc = hitT.reduce((a, w) => a + idf(w), 0) + viaTitle.reduce((a, w) => a + 0.6 * idf(w), 0) + nh * maxI; const cov = terms.length ? (hitT.length + 0.6 * viaTitle.length) / terms.length : 1; sc *= 0.4 + 0.6 * cov;
         const others = st.names.filter(n => !qNames.has(n)).map(n => A.names[n]).filter(Boolean);
-        if (want === 'date' && st.dates.length) sc *= 1.35; if (want === 'fig' && st.figs.length) sc *= 1.35;
+        if (want === 'date' && st.dates.length) sc *= 1.35; if (bound(st).length) sc *= 1.6; else if (qSel.size ? picked(st).length : (want === 'fig' && st.figs.length)) sc *= 1.35;
         if (want === 'who' && others.some(n => n.type === 'person' || n.type === 'organisation')) sc *= 1.25; if (want === 'place' && others.some(n => n.type === 'place')) sc *= 1.25;
         if (BP.has(st.id)) sc *= 0.2; if (FRAG(st)) sc *= 0.45; if (wantFind) sc *= FIND_RE.test(st.text) ? 1.6 : 0.35;
         sc /= 1 + Math.max(0, T.size - 45) / 90; scored.push({ st, sc }); });
       scored.sort((a, b) => b.sc - a.sc);
+      const anyBound = scored.slice(0, 12).some(x => bound(x.st).length), anyPicked = !anyBound && qSel.size > 0 && scored.slice(0, 12).some(x => picked(x.st).length);
       const seen = new Set(), perDoc = {}, top = [];
       for (const x of scored) { const k = clean(x.st.text).toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 120); if (seen.has(k)) continue; seen.add(k); perDoc[x.st.doc] = (perDoc[x.st.doc] || 0) + 1; if (perDoc[x.st.doc] > 2) continue; top.push(x); if (top.length >= 5) break; }
       const agg = {}; const add = (label, color, x) => { if (!label) return; const a = agg[label] || (agg[label] = { label, color, w: 0, sts: [], docs: new Set() }); if (a.sts.includes(x.st)) return; a.w += x.sc; a.sts.push(x.st); a.docs.add(x.st.doc); };
       scored.slice(0, 12).forEach(x => { const st = x.st;
         if (want === 'date') st.dates.forEach(g => add(clean(g.raw || st.text.slice(g.s, g.e)), 'var(--date)', x));
-        if (want === 'fig') st.figs.forEach(g => add(String(g.raw || g.text || g.value), 'var(--amber)', x));
+        if (anyBound) bound(st).forEach(g => add(g.raw, 'var(--amber)', x));
+        else if (anyPicked) picked(st).forEach(g => add(String(g.raw), 'var(--amber)', x));
+        else if (want === 'fig') st.figs.forEach(g => add(String(g.raw || g.text || g.value), 'var(--amber)', x));
         if (want === 'who' || want === 'place') st.names.forEach(n => { const N0 = A.names[n]; if (!N0 || qNames.has(n)) return; if (want === 'place' ? N0.type === 'place' : (N0.type === 'person' || N0.type === 'organisation')) add(n, TYPE_C[N0.type], x); }); });
+      const boundTerms = [...new Set(scored.slice(0, 12).flatMap(x => bound(x.st).map(g => g.term)))];
+      const pickTerms = [...new Set(scored.slice(0, 12).flatMap(x => picked(x.st).map(g => qSel.get(unitWordOf(g)).q)))];
       const cands = Object.values(agg).sort((a, b) => b.w - a.w).slice(0, 5).map(a => ({ label: a.label, color: a.color, meta: plural(a.sts.length, 'statement') + ' · ' + plural(a.docs.size, 'source'), onClick: () => this.read(a.sts[0].doc, a.sts[0].id) }));
       const tset = new Set(terms); const forms = [...qNames].flatMap(n => [n, ...((A.names[n] || {}).aliases || [])]);
       const missing = terms.filter(w => !df[w]).map(w => orig[w]);
@@ -10235,8 +10289,8 @@ class Component extends DCLogic {
             items: list.map(r => { const parts = (r.fields || []).flatMap(f => (f.paras || []).flatMap(p => p.parts || [])); const first = parts.slice(0, 2).map(p => p.t).join(' ').trim(); const st = parts.length ? stOf(parts[0].t) : null;
               return { label: r.token, title: r.title, first: first ? short(first, 220) : '', hasFirst: !!first, onClick: st ? () => this.read(d.id, st.id) : (parts[0] && parts[0].onClick) || (() => this.read(d.id)), ...(st ? this.pinF(st) : { onPin: () => {}, pinLabel: '', pinColor: 'transparent' }) }; }) }); }); }
       out = { qa: { isRel: false, isAns: top.length > 0, hasSeries: series.length > 0, series, seriesTitle: series.length > 1 ? 'Findings as each of ' + series.length + ' documents lists them' : 'Findings as the document lists them', noAnswer: !top.length, noNote: 'No statement shares enough words or names with the question. Try naming a person, organisation, place or document in it.',
-        note: 'Quoted from the sources, ranked by how many of the question’s words and names each statement shares, rarer words counting more' + (want ? ', favouring statements that contain ' + { date: 'a date', fig: 'a figure', who: 'a person or organisation', place: 'a place' }[want] : '') + '.',
-        hasCands: cands.length > 0, cands, candTitle: { date: 'Dates in the closest statements', fig: 'Figures in the closest statements', who: 'Named in the closest statements', place: 'Places in the closest statements' }[want] || '',
+        note: 'Quoted from the sources, ranked by how many of the question’s words and names each statement shares, rarer words counting more' + (want ? ', favouring statements that contain ' + { date: 'a date', fig: 'a figure', who: 'a person or organisation', place: 'a place' }[want] : '') + '.' + (USAGE ? '' : ' (The usage substrate is not loaded: ' + USAGE_GAP + '; figures are bound to the question’s own words only.)'),
+        hasCands: cands.length > 0, cands, candTitle: anyBound ? 'Figures the sources state as “' + boundTerms.join('”, “') + '”' : anyPicked ? 'Figures in units “' + pickTerms.join('”, “') + '” takes in use' : { date: 'Dates in the closest statements', fig: 'Figures in the closest statements', who: 'Named in the closest statements', place: 'Places in the closest statements' }[want] || '',
         passages: top.map(x => ({ parts: partsOf(x.st, tset, forms), ...meta(x.st), ...this.pinF(x.st), onRead: () => this.read(x.st.doc, x.st.id) })),
         hasMissing: missing.length > 0 && top.length > 0, missing: 'In no statement: ' + missing.join(', ') } };
     }
