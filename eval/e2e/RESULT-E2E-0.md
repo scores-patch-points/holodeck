@@ -60,3 +60,7 @@ Not wired, and why:
 ## Reproduce
 
 `node tools/serve.mjs 8814`, `node eval/e2e/collector.mjs 8815`, load `index.html` with the arm's switches, run `drive.js`; the `ref` arm is `origin/main`'s `index.html` and `master-reading-worker.js` over this branch's tree. Raw files must not exist beforehand (the collector refuses a second write).
+
+## Addendum (2026-11-04, after the run): trailing punctuation in cast surfaces
+
+A peer session reported that cast-identity 29cfe25 can leave a trailing apostrophe in a being's surface after a possessive ("Sydney Harbour Bridge'"), which would break any match by name. I checked after the run, read-only, by reading the 21 texts through khora `readDocument` with `castIdentity: true` (assembled commit a47d23c, same priors) and scanning every cast surface and alias for a leading or trailing character that is not a letter, digit, space, closing bracket or quote: **none found in these 21 texts.** This does not cover the page's worker path byte for byte, only the same reader; no arm was changed or re-run. The peer also reports the repair was neutral for the binder on its own exam and that it bound one expletive "It" and some name fragments; on this set the `cast` arm changed no answer (8/27 as base) and the binder-alone and both arms bound 394 and 442 statements, so I cannot say whether any of those were such cases.
