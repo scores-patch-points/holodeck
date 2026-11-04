@@ -498,7 +498,7 @@ export const ARCHONS = Object.freeze([
     work: "The architect of universal grammar and the autonomy of syntax: a sentence can be structurally perfect and semantically empty — 'colorless green ideas sleep furiously.' Structure is earned regardless of content, and a language's particular grammar is a declared overlay on that structure, never the universal itself. The dispatch: all cognition reads GFP-shaped (end1-label-end2, typed by cell); English-SVO — or any positional role grammar — comes online only when a measured RoleConfig@1 declares it for that language.",
     source: "Syntactic Structures (1957); Aspects of the Theory of Syntax (1965); Cartesian Linguistics (1966)",
     credit: "Noam Chomsky — the arrangement is universal; a role grammar is declared, never the default ('colorless green ideas sleep furiously', Syntactic Structures, 1957).",
-    topics: ["language", "grammar", "syntax", "universal grammar", "svo", "gfp", "arrangement", "role", "linguistic", "universal", "autonomy", "morphology"],
+    topics: ["language", "grammar", "syntax", "universal grammar", "svo", "gfp", "arrangement", "role", "linguistic", "universal", "autonomy", "morphology", "isthmus", "codec", "decode", "encode", "omnilingual", "omnimodal", "eot", "translation", "multilingual"],
   },
   {
     handle: "sullivan",

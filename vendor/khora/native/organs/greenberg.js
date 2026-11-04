@@ -75,6 +75,32 @@
 //      whole-mechanism verdict cannot answer what a mixed- or
 //      caseless-script segment needs).
 //
+//   5. english_codec_default — the Isthmus shape (native/docs/THE-ISTHMUS.md,
+//      2026-10-26). Any material reaches EOT only through ITS codec; a
+//      language with no codec is a typed gap, never the English codec
+//      (THE-READING-PIPELINE.md:36-39). Three lexical forms, each reported
+//      with `form`:
+//        param_default — `lang = "en"` / `language = "eng"` as a parameter
+//                        or destructure default (read-atoms.js's
+//                        `readAtoms({ lang = "en" })`, the default the
+//                        meaning stage read through for seven PRs);
+//        fallback      — `?? "eng"` / `|| "en"` after whatever was declared
+//                        or heard;
+//        literal       — `language: "eng"` / `lang: "en"` hard-wired at a
+//                        call (english-parser.js's `toEot(s, { language:
+//                        "eng" })`): the codec chosen by the code, not by
+//                        the material.
+//      Shape 2 caught only `language == null … || "eng"`; these three forms
+//      are how the defect actually shipped, and shape 2 saw none of them.
+//   6. english_word_pattern — a regex that decides by matching English words
+//      under an ASCII `\b` (`/\bplus\b/`, `/\bwhat('s| is)\b/`,
+//      `/\bfunctions?\b/`) or an anchored alternation of lowercase words
+//      (`/^(what|is|are|the)$/`). In JS `\b` is ASCII-only even with the
+//      `u` flag (S34), and a word list is one language's lexicon standing in
+//      for the codec's reading. A mechanism scoped to English and DECLARED
+//      as such is S89's licensed case — the context attached says whether it
+//      is; this organ never decides.
+//
 // Deliberately NOT attempted: real AST parsing. Every other structural organ
 // in this ladder (salzter.js parses a real AST for Python) has a reason to;
 // this one's four shapes are lexical — a character class, a field name, a
@@ -93,6 +119,21 @@ const ENGLISH_DEFAULT =
 const SVO_FIELD = /\.(subject|verb|object)\b|\b(subject|verb|object)\s*:/g;
 const SVO_EXCLUDE = /\btypeof\b|\binstanceof\b|\bObject\.|new\s+Object\b/;
 const LATIN_PUNCT_CHARCLASS = /\[\.\!\?/;
+// Shape 5. The English codec names: ISO 639-1/3, the word, and the en-US tag.
+const EN_VALUE = String.raw`["'](?:en|eng|english|en-US|en_US)["']`;
+const LANG_IDENT = String.raw`\b(?:lang|language|langCode|lang_code|locale|lng)\b`;
+const CODEC_PARAM_DEFAULT = new RegExp(String.raw`${LANG_IDENT}\s*(?<![=!<>])=(?!=)\s*${EN_VALUE}`, "i");
+const CODEC_FALLBACK = new RegExp(String.raw`(?:\?\?|\|\|)\s*${EN_VALUE}`, "i");
+const CODEC_LITERAL = new RegExp(String.raw`${LANG_IDENT}\s*:\s*${EN_VALUE}`, "i");
+// `<html lang="en">` in a template is the DOCUMENT's declared language (an
+// HTML attribute the page's author sets), not a codec chosen for material.
+// Measured on a 12-hit sample of khora: 3 of 12 were this, so it is excluded.
+const HTML_LANG_ATTR = /<[a-z][\w-]*\b[^>]*\blang\s*=\s*\\?["']/i;
+// Shape 6. In the SOURCE text `\b` is a backslash and a b; a word of two or
+// more lowercase ASCII letters follows it (optionally inside a group), or an
+// anchored group alternates three or more lowercase words.
+const WORD_UNDER_ASCII_B = /\\b\(?(?:\?:)?[a-z]{2,}/;
+const ANCHORED_WORD_LIST = /\^\((?:\?:)?[a-z]{2,}(?:\|[a-z']{1,}){2,}\)/;
 
 function splitLines(source) {
   return String(source ?? "").split(/\r\n|\r|\n/);
@@ -197,12 +238,47 @@ export function scanLatinPunctuationOnly(source, file) {
   return out;
 }
 
+export function scanEnglishCodecDefault(source, file) {
+  const lines = splitLines(source);
+  const out = [];
+  lines.forEach((line, i) => {
+    if (isCommentOnly(line)) return;
+    // Shape 2 already owns `language == null … || "eng"`; one line, one finding.
+    if (ENGLISH_DEFAULT.test(line)) return;
+    if (HTML_LANG_ATTR.test(line)) return;
+    const form = CODEC_PARAM_DEFAULT.test(line)
+      ? "param_default"
+      : CODEC_FALLBACK.test(line)
+        ? "fallback"
+        : CODEC_LITERAL.test(line)
+          ? "literal"
+          : null;
+    if (!form) return;
+    out.push(withContext("english_codec_default", file, lines, i, { form, law: ["Isthmus", "S89"] }));
+  });
+  return out;
+}
+
+export function scanEnglishWordPattern(source, file) {
+  const lines = splitLines(source);
+  const out = [];
+  lines.forEach((line, i) => {
+    if (isCommentOnly(line)) return;
+    const form = WORD_UNDER_ASCII_B.test(line) ? "ascii_word_boundary" : ANCHORED_WORD_LIST.test(line) ? "anchored_word_list" : null;
+    if (!form) return;
+    out.push(withContext("english_word_pattern", file, lines, i, { form, law: ["Isthmus", "S34", "S89"] }));
+  });
+  return out;
+}
+
 export function scanSource(source, file) {
   return [
     ...scanCapitalizationUnguarded(source, file),
     ...scanSilentEnglishDefault(source, file),
     ...scanSvoFieldLeak(source, file),
     ...scanLatinPunctuationOnly(source, file),
+    ...scanEnglishCodecDefault(source, file),
+    ...scanEnglishWordPattern(source, file),
   ];
 }
 
@@ -217,26 +293,73 @@ export function summarize(findings) {
   for (const f of findings) {
     byRule[f.rule] = byRule[f.rule] ?? { total: 0, needs_review: 0, low: 0, bridging: 0, needs_migration: 0 };
     byRule[f.rule].total += 1;
-    const key = f.confidence ?? "needs_review";
+    const key = f.form ?? f.confidence ?? "needs_review";
     byRule[f.rule][key] = (byRule[f.rule][key] ?? 0) + 1;
   }
   return byRule;
 }
 
+// A directory is walked for source files (JS and TS alike: foldcode's plugin
+// is TypeScript, and the shapes are lexical). node_modules, .git and build
+// output are skipped; test files are skipped unless --tests, because a
+// fixture that DECLARES English for an English sentence is the licensed case.
+const SOURCE_EXT = /\.(?:m?js|cjs|tsx?)$/;
+const SKIP_DIR = new Set(["node_modules", ".git", "dist", "build", ".turbo", ".next", "coverage"]);
+const TEST_FILE = /\.(?:test|spec)\.[cm]?[jt]sx?$/;
+
+export async function collectSources(paths, { tests = false } = {}) {
+  const { readFile, readdir, stat } = await import("node:fs/promises");
+  const { join } = await import("node:path");
+  const fileTexts = {};
+  async function visit(p, top) {
+    let st;
+    try {
+      st = await stat(p);
+    } catch (err) {
+      if (top) throw err;
+      return; // a dangling link inside a walked tree is not source
+    }
+    if (st.isDirectory()) {
+      for (const name of await readdir(p)) {
+        if (SKIP_DIR.has(name)) continue;
+        await visit(join(p, name), false);
+      }
+      return;
+    }
+    // A file named on the command line is always read; a walked one only if it is source.
+    if (!top && (!SOURCE_EXT.test(p) || (!tests && TEST_FILE.test(p)))) return;
+    if (st.size > 2_000_000) return; // a bundle or a generated table, not a mechanism
+    fileTexts[p] = await readFile(p, "utf8");
+  }
+  for (const p of paths) await visit(p, true);
+  return fileTexts;
+}
+
 async function main(argv) {
-  const { readFile } = await import("node:fs/promises");
-  const paths = argv.slice(2);
+  const args = argv.slice(2);
+  const flag = (name) => args.includes(name);
+  const ruleArg = args.indexOf("--rule");
+  const only = ruleArg >= 0 ? args[ruleArg + 1] : null;
+  const paths = args.filter((a, i) => !a.startsWith("--") && !(ruleArg >= 0 && i === ruleArg + 1));
   if (paths.length === 0) {
-    console.error("usage: node native/organs/greenberg.js <file> [file...]");
+    console.error("usage: node native/organs/greenberg.js [--tests] [--summary] [--json] [--rule <rule>] <file|dir> [...]");
     process.exit(2);
   }
-  const fileTexts = {};
-  for (const p of paths) fileTexts[p] = await readFile(p, "utf8");
-  const findings = scanFiles(fileTexts);
-  for (const f of findings) {
-    console.log(`${f.file}:${f.line} [${f.rule}/${f.confidence}] ${f.excerpt}`);
+  const fileTexts = await collectSources(paths, { tests: flag("--tests") });
+  let findings = scanFiles(fileTexts);
+  if (only) findings = findings.filter((f) => f.rule === only);
+  if (flag("--json")) {
+    console.log(JSON.stringify({ files: Object.keys(fileTexts).length, summary: summarize(findings), findings }, null, 2));
+    return;
   }
-  console.log("");
+  if (!flag("--summary")) {
+    for (const f of findings) {
+      const tag = f.form ?? f.confidence ?? "witness";
+      console.log(`${f.file}:${f.line} [${f.rule}/${tag}] ${f.excerpt}`);
+    }
+    console.log("");
+  }
+  console.log(`files scanned: ${Object.keys(fileTexts).length}`);
   console.log(JSON.stringify(summarize(findings), null, 2));
 }
 
