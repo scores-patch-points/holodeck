@@ -23,7 +23,7 @@ Run 2026-11-04, once, against `PREREG-E2E-0.md` (sha256 `bf93d579d16bcea153ff4fe
 | cast (`castIdentity`) | 8 | 10 | 3 | 5 |
 | binder | 8 | 11 | 3 | 5 |
 | both | 8 | 11 | 3 | 5 |
-| shuffle (control) | see below | 10 | 3 | 5 |
+| shuffle (control) | 8 | 10 | 3 | 5 |
 
 Right in every arm (8): n01, n15, v01, v02, v08, x01, x02, x03. No question changed SF in any arm. The Cumberland (v02, x01), Eiffel (n01, x02) and Concorde cost (x03) questions, the three known failures, are all answered correctly by **base** already: the figure binding (PR 29) fixed them, and the layers add nothing there.
 Binder stats (`both`): 442 of 5472 statements carry a binding, 1079 carry a typed gap (binder alone: 394 / 1122). Gap reasons in the binder-alone arm: center_not_carried 227, center_elsewhere 147, description_unbound 333, capitalised_name_open_word 121, description_below_floor 104, pronoun_no_margin 85, description_off_topic 72, capitalised_unknown_name 58, description_weak_word 53, expletive_or_cleft 24, description_no_margin 12, inside_cast_mention 4, pronoun_no_candidate 1. All stayed gaps; none became a name.
