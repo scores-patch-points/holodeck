@@ -1,0 +1,516 @@
+{
+ "schema": "GoldE2E@0",
+ "labelled": "2026-11-04, by the session that wrote the pre-registration, before any scored run; one labeller",
+ "rules": {
+  "stratum": "PD = every gold sentence lacks the question's subject name and begins with a neuter pronoun/possessive or a definite description of the subject; N = otherwise",
+  "figure_match": "the first candidate label of the Ask, lower-cased, commas between digits removed, tokenised into numbers and words; it matches when ALL tokens of at least one alternative in figs are among its tokens; figs=[] means the figure is not scored (statement only)",
+  "statement_match": "the first answer passage, whitespace-normalised, is in a gold document and contains a gold string, or (if 20+ characters) is contained in one"
+ },
+ "items": [
+  {
+   "id": "n01",
+   "q": "How tall is the Eiffel Tower?",
+   "gold": [
+    {
+     "doc": "wiki-Eiffel_Tower",
+     "contains": "The tower is 330 metres (1,083 ft) tall"
+    }
+   ],
+   "figs": [
+    [
+     "330"
+    ]
+   ],
+   "stratum": "PD"
+  },
+  {
+   "id": "n02",
+   "q": "How wide is the base of the Eiffel Tower?",
+   "gold": [
+    {
+     "doc": "wiki-Eiffel_Tower",
+     "contains": "Its base is square, measuring 125 metres"
+    }
+   ],
+   "figs": [
+    [
+     "125"
+    ]
+   ],
+   "stratum": "PD"
+  },
+  {
+   "id": "n03",
+   "q": "How many steps does it take to climb the Eiffel Tower?",
+   "gold": [
+    {
+     "doc": "wiki-Eiffel_Tower",
+     "contains": "The climb from ground level to the first level is over 300 steps"
+    }
+   ],
+   "figs": [
+    [
+     "300"
+    ],
+    [
+     "600"
+    ]
+   ],
+   "stratum": "N"
+  },
+  {
+   "id": "n04",
+   "q": "How many people visited the Eiffel Tower in 2022?",
+   "gold": [
+    {
+     "doc": "wiki-Eiffel_Tower",
+     "contains": "The tower received 5,889,000 visitors in 2022"
+    }
+   ],
+   "figs": [
+    [
+     "5889000"
+    ]
+   ],
+   "stratum": "PD"
+  },
+  {
+   "id": "n05",
+   "q": "When was the Statue of Liberty dedicated?",
+   "gold": [
+    {
+     "doc": "wiki-Statue_of_Liberty",
+     "contains": "The statue was dedicated on October 28, 1886"
+    }
+   ],
+   "figs": [
+    [
+     "october",
+     "28",
+     "1886"
+    ]
+   ],
+   "stratum": "PD"
+  },
+  {
+   "id": "n06",
+   "q": "What did the Gateway Arch cost to build?",
+   "gold": [
+    {
+     "doc": "wiki-Gateway_Arch",
+     "contains": "Construction began on February 12, 1963, and was completed on October 28, 1965"
+    }
+   ],
+   "figs": [
+    [
+     "13"
+    ]
+   ],
+   "stratum": "N"
+  },
+  {
+   "id": "n07",
+   "q": "When did the Gateway Arch open to the public?",
+   "gold": [
+    {
+     "doc": "wiki-Gateway_Arch",
+     "contains": "The monument opened to the public on June 10, 1967"
+    }
+   ],
+   "figs": [
+    [
+     "june",
+     "10",
+     "1967"
+    ]
+   ],
+   "stratum": "PD"
+  },
+  {
+   "id": "n08",
+   "q": "How many tourists visit Hoover Dam each year?",
+   "gold": [
+    {
+     "doc": "wiki-Hoover_Dam",
+     "contains": "Hoover Dam is a major tourist attraction, with 7 million tourists a year"
+    }
+   ],
+   "figs": [
+    [
+     "7"
+    ]
+   ],
+   "stratum": "N"
+  },
+  {
+   "id": "n09",
+   "q": "How many people died building Hoover Dam?",
+   "gold": [
+    {
+     "doc": "wiki-Hoover_Dam",
+     "contains": "Its construction was the result of a massive effort involving thousands of workers"
+    }
+   ],
+   "figs": [
+    [
+     "96"
+    ]
+   ],
+   "stratum": "PD"
+  },
+  {
+   "id": "n10",
+   "q": "How many passengers could Concorde carry?",
+   "gold": [
+    {
+     "doc": "wiki-Concorde",
+     "contains": "Concorde is an aircraft design with a narrow fuselage"
+    }
+   ],
+   "figs": [
+    [
+     "92",
+     "128"
+    ]
+   ],
+   "stratum": "N"
+  },
+  {
+   "id": "n11",
+   "q": "How fast did Concorde fly?",
+   "gold": [
+    {
+     "doc": "wiki-Concorde",
+     "contains": "The airliner had transatlantic range while supercruising"
+    }
+   ],
+   "figs": [],
+   "stratum": "PD"
+  },
+  {
+   "id": "n12",
+   "q": "When did Concorde enter service?",
+   "gold": [
+    {
+     "doc": "wiki-Concorde",
+     "contains": "Concorde entered service on 21 January 1976"
+    }
+   ],
+   "figs": [
+    [
+     "21",
+     "january",
+     "1976"
+    ]
+   ],
+   "stratum": "N"
+  },
+  {
+   "id": "n13",
+   "q": "How long did Armstrong and Aldrin spend walking on the Moon?",
+   "gold": [
+    {
+     "doc": "wiki-Apollo_11",
+     "contains": "Together they spent around two and a half hours walking on the surface"
+    }
+   ],
+   "figs": [],
+   "stratum": "N"
+  },
+  {
+   "id": "n14",
+   "q": "How many people watched the Moon landing broadcast?",
+   "gold": [
+    {
+     "doc": "wiki-Apollo_11",
+     "contains": "Armstrong's moonwalk was broadcast live to an estimated 600 million viewers"
+    }
+   ],
+   "figs": [
+    [
+     "600"
+    ]
+   ],
+   "stratum": "N"
+  },
+  {
+   "id": "n15",
+   "q": "How large is the memorial park at Mount Rushmore?",
+   "gold": [
+    {
+     "doc": "wiki-Mount_Rushmore",
+     "contains": "Mount Rushmore attracts more than two million visitors annually"
+    }
+   ],
+   "figs": [
+    [
+     "1278"
+    ]
+   ],
+   "stratum": "N"
+  },
+  {
+   "id": "n16",
+   "q": "How long is the Mississippi River?",
+   "gold": [
+    {
+     "doc": "wiki-Mississippi_River",
+     "contains": "From its traditional source of Lake Itasca in northern Minnesota, it flows generally south for 2,340 miles"
+    }
+   ],
+   "figs": [
+    [
+     "2340"
+    ]
+   ],
+   "stratum": "N"
+  },
+  {
+   "id": "v01",
+   "q": "How tall is the Gateway Arch?",
+   "gold": [
+    {
+     "doc": "jeff-fact",
+     "contains": "Maximum Height 630' (192m)"
+    },
+    {
+     "doc": "wiki-Gateway_Arch",
+     "contains": "The Gateway Arch is a 630-foot-tall (192 m) monument"
+    }
+   ],
+   "figs": [
+    [
+     "630"
+    ],
+    [
+     "192"
+    ]
+   ],
+   "stratum": "N"
+  },
+  {
+   "id": "v02",
+   "q": "How long is the Cumberland River?",
+   "gold": [
+    {
+     "doc": "cumb-army-284227",
+     "contains": "The Cumberland River is an expansive waterway stretching 688 miles from its headwaters in Eastern Kentucky, flowing through Tennessee, and ultimately joining the Ohio River near Smithland, in Western Kentucky."
+    },
+    {
+     "doc": "wiki-Cumberland_River",
+     "contains": "The 688-mile-long (1,107 km) river drains almost 18,000 square miles (47,000 km2) of southern Kentucky and north-central Tennessee."
+    },
+    {
+     "doc": "cumb-army-286019",
+     "contains": "For more than 100 years after achieving the nation’s independence, American pioneers had to navigate along parts of the 688-mile Cumberland River in Kentucky and Tennessee in shallow draft boats or on larger vessels during high-water periods to trade goods in communities like Nashville."
+    }
+   ],
+   "figs": [
+    [
+     "688"
+    ]
+   ],
+   "stratum": "N"
+  },
+  {
+   "id": "v03",
+   "q": "How high is Mount Rushmore above sea level?",
+   "gold": [
+    {
+     "doc": "moru-student",
+     "contains": "Borglum liked the idea, and scouted out a broad wall of exposed granite on 5,725 foot Mount Rushmore"
+    },
+    {
+     "doc": "wiki-Mount_Rushmore",
+     "contains": "Its elevation at its highest point is 5,725 feet (1,745 m) above sea level."
+    }
+   ],
+   "figs": [
+    [
+     "5725"
+    ],
+    [
+     "1745"
+    ]
+   ],
+   "stratum": "N"
+  },
+  {
+   "id": "v04",
+   "q": "How tall are the heads at Mount Rushmore?",
+   "gold": [
+    {
+     "doc": "moru-heads",
+     "contains": "The head of George Washington is 60 feet (18.3 m) tall with a nose that is 21 feet (6.4 m) tall."
+    },
+    {
+     "doc": "wiki-Mount_Rushmore",
+     "contains": "The sculpture features 60-foot-tall (18 m) depictions of the heads of four United States presidents: George Washington, Thomas Jefferson, Theodore Roosevelt, and Abraham Lincoln"
+    }
+   ],
+   "figs": [
+    [
+     "60"
+    ],
+    [
+     "18"
+    ]
+   ],
+   "stratum": "N"
+  },
+  {
+   "id": "v05",
+   "q": "When did work on Mount Rushmore begin?",
+   "gold": [
+    {
+     "doc": "moru-student",
+     "contains": "Work commenced officially on October 4, 1927."
+    },
+    {
+     "doc": "wiki-Mount_Rushmore",
+     "contains": "Between October 4, 1927, and October 31, 1941"
+    }
+   ],
+   "figs": [
+    [
+     "october",
+     "4",
+     "1927"
+    ]
+   ],
+   "stratum": "N"
+  },
+  {
+   "id": "v06",
+   "q": "How wide is the widest part of the Mississippi River?",
+   "gold": [
+    {
+     "doc": "miss-nps",
+     "contains": "The widest part of the Mississippi can be found at Lake Winnibigoshish near Bena, MN, where it is wider than 11 miles."
+    },
+    {
+     "doc": "wiki-Mississippi_River",
+     "contains": "The Upper Mississippi has a number of natural and artificial lakes, with its widest point being Lake Winnibigoshish, near Grand Rapids, Minnesota, over 11 miles (18 km) across"
+    }
+   ],
+   "figs": [
+    [
+     "11"
+    ]
+   ],
+   "stratum": "N"
+  },
+  {
+   "id": "v07",
+   "q": "How much concrete was used in total at Hoover Dam?",
+   "gold": [
+    {
+     "doc": "hoover-nps",
+     "contains": "Over the next five years, over 4.4 million cubic yards of concrete and 88 million pounds of plated steel were used."
+    },
+    {
+     "doc": "hoover-project",
+     "contains": "The dam contains 3.25 million cubic yards of concrete; total concrete in the dam and appurtenant works is 4.4 million cubic yards."
+    }
+   ],
+   "figs": [
+    [
+     "4.4"
+    ]
+   ],
+   "stratum": "N"
+  },
+  {
+   "id": "v08",
+   "q": "How many steps are in each leg of the Gateway Arch?",
+   "gold": [
+    {
+     "doc": "jeff-fact",
+     "contains": "Number of stairs 1076"
+    },
+    {
+     "doc": "wiki-Gateway_Arch",
+     "contains": "two sets of 1,076-step emergency stairs (one per leg)"
+    }
+   ],
+   "figs": [
+    [
+     "1076"
+    ]
+   ],
+   "stratum": "N"
+  },
+  {
+   "id": "x01",
+   "q": "How long is the Cumberland River?",
+   "note": "known Ask failure (offered \"18,000 square\"); same question text as v02, narrower gold (the wiki sentence only)",
+   "gold": [
+    {
+     "doc": "wiki-Cumberland_River",
+     "contains": "The 688-mile-long (1,107 km) river drains almost 18,000 square miles"
+    }
+   ],
+   "figs": [
+    [
+     "688"
+    ]
+   ],
+   "stratum": "PD"
+  },
+  {
+   "id": "x02",
+   "q": "How tall is the Eiffel Tower?",
+   "note": "known Ask failure; same question text as n01, gold labelled again from the text (the 324 m sentence is NOT gold: it is the height after later additions)",
+   "gold": [
+    {
+     "doc": "wiki-Eiffel_Tower",
+     "contains": "The tower is 330 metres (1,083 ft) tall"
+    }
+   ],
+   "figs": [
+    [
+     "330"
+    ],
+    [
+     "1083"
+    ]
+   ],
+   "stratum": "PD"
+  },
+  {
+   "id": "x03",
+   "q": "How much did the Concorde programme cost?",
+   "note": "known Ask failure; both the estimate (GBP 70 million) and the outturn (GBP 1.5-2.1 billion) count",
+   "gold": [
+    {
+     "doc": "wiki-Concorde",
+     "contains": "as the programme cost was estimated at £70 million"
+    },
+    {
+     "doc": "wiki-Concorde",
+     "contains": "The original programme cost estimate was £70 million in 1962"
+    },
+    {
+     "doc": "wiki-Concorde",
+     "contains": "the programme eventually cost between £1.5 and £2.1 billion in 1976"
+    },
+    {
+     "doc": "wiki-Concorde",
+     "contains": "Delays and cost overruns pushed costs to £1.5–2.1 billion in 1976"
+    }
+   ],
+   "figs": [
+    [
+     "70"
+    ],
+    [
+     "1.5"
+    ],
+    [
+     "2.1"
+    ]
+   ],
+   "stratum": "N"
+  }
+ ]
+}

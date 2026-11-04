@@ -427,3 +427,11 @@ export const SUBORDINATING_CONJUNCTIONS = Object.freeze(new Set([
   "after", "before", "unless", "until", "though",
 ]));
 export const SUBORDINATING_CONJUNCTIONS_META = Object.freeze({ giver: "lang/en", scope: "opens a subordinate clause; says nothing about where it ends" });
+
+/**
+ * The neuter third-person singular — a closed grammatical class, "it" with its possessive and reflexive. Registered apart from
+ * THIRD_PERSON_SINGULAR on purpose: that table is the gendered, person-class register the he/she resolver reads, and adding to it would move
+ * what those pronouns bind to. These three are what adapters/text/attention-binder.js binds to the ATTENDED non-person referent.
+ */
+export const NEUTER_THIRD_PERSON = Object.freeze(new Set(["it", "its", "itself"]));
+export const NEUTER_THIRD_PERSON_META = Object.freeze({ giver: "lang/en", scope: null });

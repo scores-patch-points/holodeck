@@ -1,0 +1,33 @@
+{
+ "schema": "QSet@1",
+ "created": "2026-11-03",
+ "note": "24 questions over the 21 frozen PARA-GOLD v0 texts. Written by the parent session, by hand, before any retrieval was run. 'v0' questions take their gold spans from the PARA-GOLD same pairs (the whole same-class); 'new' questions name the doc and the first words of the one sentence that states the answer. Gold is the labelled sentence(s) only: other sentences in the pool may also answer, and count as misses for every method alike.",
+ "new": [
+  {"id": "n01", "q": "How tall is the Eiffel Tower?", "doc": "wiki-Eiffel_Tower", "gold_start": ["The tower is 330 metres (1,083 ft) tall"]},
+  {"id": "n02", "q": "How wide is the base of the Eiffel Tower?", "doc": "wiki-Eiffel_Tower", "gold_start": ["Its base is square, measuring 125 metres"]},
+  {"id": "n03", "q": "How many steps does it take to climb the Eiffel Tower?", "doc": "wiki-Eiffel_Tower", "gold_start": ["The climb from ground level to the first level is over 300 steps"]},
+  {"id": "n04", "q": "How many people visited the Eiffel Tower in 2022?", "doc": "wiki-Eiffel_Tower", "gold_start": ["The tower received 5,889,000 visitors in 2022"]},
+  {"id": "n05", "q": "When was the Statue of Liberty dedicated?", "doc": "wiki-Statue_of_Liberty", "gold_start": ["The statue was dedicated on October 28, 1886"]},
+  {"id": "n06", "q": "What did the Gateway Arch cost to build?", "doc": "wiki-Gateway_Arch", "gold_start": ["Construction began on February 12, 1963, and was completed on October 28, 1965"]},
+  {"id": "n07", "q": "When did the Gateway Arch open to the public?", "doc": "wiki-Gateway_Arch", "gold_start": ["The monument opened to the public on June 10, 1967"]},
+  {"id": "n08", "q": "How many tourists visit Hoover Dam each year?", "doc": "wiki-Hoover_Dam", "gold_start": ["Hoover Dam is a major tourist attraction, with 7 million tourists a year"]},
+  {"id": "n09", "q": "How many people died building Hoover Dam?", "doc": "wiki-Hoover_Dam", "gold_start": ["Its construction was the result of a massive effort involving thousands of workers"]},
+  {"id": "n10", "q": "How many passengers could Concorde carry?", "doc": "wiki-Concorde", "gold_start": ["Concorde is an aircraft design with a narrow fuselage"]},
+  {"id": "n11", "q": "How fast did Concorde fly?", "doc": "wiki-Concorde", "gold_start": ["The airliner had transatlantic range while supercruising"]},
+  {"id": "n12", "q": "When did Concorde enter service?", "doc": "wiki-Concorde", "gold_start": ["Concorde entered service on 21 January 1976"]},
+  {"id": "n13", "q": "How long did Armstrong and Aldrin spend walking on the Moon?", "doc": "wiki-Apollo_11", "gold_start": ["Together they spent around two and a half hours walking on the surface"]},
+  {"id": "n14", "q": "How many people watched the Moon landing broadcast?", "doc": "wiki-Apollo_11", "gold_start": ["Armstrong's moonwalk was broadcast live to an estimated 600 million viewers"]},
+  {"id": "n15", "q": "How large is the memorial park at Mount Rushmore?", "doc": "wiki-Mount_Rushmore", "gold_start": ["Mount Rushmore attracts more than two million visitors annually"]},
+  {"id": "n16", "q": "How long is the Mississippi River?", "doc": "wiki-Mississippi_River", "gold_start": ["From its traditional source of Lake Itasca in northern Minnesota, it flows generally south for 2,340 miles"]}
+ ],
+ "v0": [
+  {"id": "v01", "q": "How tall is the Gateway Arch?", "pairs": ["s01"]},
+  {"id": "v02", "q": "How long is the Cumberland River?", "pairs": ["s02", "s03"]},
+  {"id": "v03", "q": "How high is Mount Rushmore above sea level?", "pairs": ["s04"]},
+  {"id": "v04", "q": "How tall are the heads at Mount Rushmore?", "pairs": ["s05"]},
+  {"id": "v05", "q": "When did work on Mount Rushmore begin?", "pairs": ["s06"]},
+  {"id": "v06", "q": "How wide is the widest part of the Mississippi River?", "pairs": ["s07"]},
+  {"id": "v07", "q": "How much concrete was used in total at Hoover Dam?", "pairs": ["s08"]},
+  {"id": "v08", "q": "How many steps are in each leg of the Gateway Arch?", "pairs": ["s09"]}
+ ]
+}

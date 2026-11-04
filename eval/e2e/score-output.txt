@@ -1,0 +1,248 @@
+{
+ "summary": {
+  "ref": {
+   "all_SF": 8,
+   "all_S": 10,
+   "PD_SF": 3,
+   "N_SF": 5,
+   "n": 27,
+   "PD_n": 9
+  },
+  "base": {
+   "all_SF": 8,
+   "all_S": 10,
+   "PD_SF": 3,
+   "N_SF": 5,
+   "n": 27,
+   "PD_n": 9
+  },
+  "cast": {
+   "all_SF": 8,
+   "all_S": 10,
+   "PD_SF": 3,
+   "N_SF": 5,
+   "n": 27,
+   "PD_n": 9
+  },
+  "binder": {
+   "all_SF": 8,
+   "all_S": 11,
+   "PD_SF": 3,
+   "N_SF": 5,
+   "n": 27,
+   "PD_n": 9
+  },
+  "both": {
+   "all_SF": 8,
+   "all_S": 11,
+   "PD_SF": 3,
+   "N_SF": 5,
+   "n": 27,
+   "PD_n": 9
+  },
+  "shuffle": {
+   "all_SF": 8,
+   "all_S": 10,
+   "PD_SF": 3,
+   "N_SF": 5,
+   "n": 27,
+   "PD_n": 9
+  }
+ },
+ "verdict": {
+  "B1_no_regression": {
+   "lost": [],
+   "pass": true
+  },
+  "won": [],
+  "B2_gain": {
+   "base_PD": 3,
+   "both_PD": 3,
+   "gain": 0,
+   "pass": false,
+   "untestable": []
+  },
+  "B3_control": {
+   "both_PD": 3,
+   "shuffle_PD": 3,
+   "margin": 0,
+   "pass": false
+  },
+  "U5_off_unchanged": {
+   "identical": true,
+   "statements_ref": 5472,
+   "statements_base": 5472
+  }
+ },
+ "rawFacts": {
+  "ref": {
+   "switches": null,
+   "statements": 5472,
+   "masterReads": {
+    "read": 21,
+    "pending": 0,
+    "workers": 3
+   },
+   "statementsWithBinding": 0,
+   "statementsWithTypedGap": 0,
+   "gapsByReason": {},
+   "ms": 28718
+  },
+  "base": {
+   "switches": {
+    "castIdentity": false,
+    "binder": false,
+    "shuffle": null
+   },
+   "statements": 5472,
+   "masterReads": {
+    "read": 21,
+    "pending": 0,
+    "workers": 3
+   },
+   "statementsWithBinding": 0,
+   "statementsWithTypedGap": 0,
+   "gapsByReason": {},
+   "ms": 72278
+  },
+  "cast": {
+   "switches": {
+    "castIdentity": true,
+    "binder": false,
+    "shuffle": null
+   },
+   "statements": 5472,
+   "masterReads": {
+    "read": 21,
+    "pending": 0,
+    "workers": 3
+   },
+   "statementsWithBinding": 0,
+   "statementsWithTypedGap": 0,
+   "gapsByReason": {},
+   "ms": 284193
+  },
+  "binder": {
+   "switches": {
+    "castIdentity": false,
+    "binder": true,
+    "shuffle": null
+   },
+   "statements": 5472,
+   "masterReads": {
+    "read": 21,
+    "pending": 0,
+    "workers": 3
+   },
+   "statementsWithBinding": 394,
+   "statementsWithTypedGap": 1122,
+   "gapsByReason": {
+    "description_unbound": 333,
+    "description_off_topic": 72,
+    "capitalised_unknown_name": 58,
+    "pronoun_no_margin": 85,
+    "center_elsewhere": 147,
+    "center_not_carried": 227,
+    "expletive_or_cleft": 24,
+    "capitalised_name_open_word": 121,
+    "description_below_floor": 104,
+    "description_weak_word": 53,
+    "pronoun_no_candidate": 1,
+    "inside_cast_mention": 4,
+    "description_no_margin": 12
+   },
+   "ms": 322436
+  },
+  "both": {
+   "switches": {
+    "castIdentity": true,
+    "binder": true,
+    "shuffle": null
+   },
+   "statements": 5472,
+   "masterReads": {
+    "read": 21,
+    "pending": 0,
+    "workers": 3
+   },
+   "statementsWithBinding": 442,
+   "statementsWithTypedGap": 1079,
+   "gapsByReason": {
+    "description_off_topic": 67,
+    "capitalised_name_open_word": 149,
+    "description_unbound": 322,
+    "center_elsewhere": 148,
+    "center_not_carried": 202,
+    "expletive_or_cleft": 24,
+    "pronoun_no_margin": 85,
+    "description_below_floor": 97,
+    "capitalised_unknown_name": 23,
+    "description_no_margin": 9,
+    "pronoun_no_candidate": 1,
+    "description_weak_word": 54,
+    "inside_cast_mention": 3,
+    "capitalised_name_not_candidate": 1
+   },
+   "ms": 529178
+  },
+  "shuffle": {
+   "switches": {
+    "castIdentity": true,
+    "binder": true,
+    "shuffle": 1
+   },
+   "statements": 5472,
+   "masterReads": {
+    "read": 21,
+    "pending": 0,
+    "workers": 3
+   },
+   "statementsWithBinding": 442,
+   "statementsWithTypedGap": 1079,
+   "gapsByReason": {
+    "description_off_topic": 67,
+    "capitalised_name_open_word": 149,
+    "description_unbound": 322,
+    "center_elsewhere": 148,
+    "center_not_carried": 202,
+    "expletive_or_cleft": 24,
+    "pronoun_no_margin": 85,
+    "description_below_floor": 97,
+    "capitalised_unknown_name": 23,
+    "description_no_margin": 9,
+    "pronoun_no_candidate": 1,
+    "description_weak_word": 54,
+    "inside_cast_mention": 3,
+    "capitalised_name_not_candidate": 1
+   },
+   "ms": 790254
+  }
+ }
+}
+n01  PD ref:SF base:SF cast:SF binder:SF both:SF shuffle:SF | How tall is the Eiffel Tower?
+n02  PD ref:-- base:-- cast:-- binder:-- both:-- shuffle:-- | How wide is the base of the Eiffel Tower?
+n03  N ref:-- base:-- cast:-- binder:-- both:-- shuffle:-- | How many steps does it take to climb the Eiffel Tower?
+n04  PD ref:-- base:-- cast:-- binder:-- both:-- shuffle:-- | How many people visited the Eiffel Tower in 2022?
+n05  PD ref:-- base:-- cast:-- binder:S- both:S- shuffle:-- | When was the Statue of Liberty dedicated?
+n06  N ref:-- base:-- cast:-- binder:-- both:-- shuffle:-- | What did the Gateway Arch cost to build?
+n07  PD ref:-- base:-- cast:-- binder:-- both:-- shuffle:-- | When did the Gateway Arch open to the public?
+n08  N ref:S- base:S- cast:S- binder:S- both:S- shuffle:S- | How many tourists visit Hoover Dam each year?
+n09  PD ref:-- base:-- cast:-- binder:-- both:-- shuffle:-- | How many people died building Hoover Dam?
+n10  N ref:-- base:-- cast:-- binder:-- both:-- shuffle:-- | How many passengers could Concorde carry?
+n11  PD ref:-- base:-- cast:-- binder:-- both:-- shuffle:-- | How fast did Concorde fly?
+n12  N ref:S- base:S- cast:S- binder:S- both:S- shuffle:S- | When did Concorde enter service?
+n13  N ref:-- base:-- cast:-- binder:-- both:-- shuffle:-- | How long did Armstrong and Aldrin spend walking on the Moon?
+n14  N ref:-- base:-- cast:-- binder:-- both:-- shuffle:-- | How many people watched the Moon landing broadcast?
+n15  N ref:SF base:SF cast:SF binder:SF both:SF shuffle:SF | How large is the memorial park at Mount Rushmore?
+n16  N ref:-- base:-- cast:-- binder:-- both:-- shuffle:-- | How long is the Mississippi River?
+v01  N ref:SF base:SF cast:SF binder:SF both:SF shuffle:SF | How tall is the Gateway Arch?
+v02  N ref:SF base:SF cast:SF binder:SF both:SF shuffle:SF | How long is the Cumberland River?
+v03  N ref:-- base:-- cast:-- binder:-- both:-- shuffle:-- | How high is Mount Rushmore above sea level?
+v04  N ref:-- base:-- cast:-- binder:-- both:-- shuffle:-- | How tall are the heads at Mount Rushmore?
+v05  N ref:-- base:-- cast:-- binder:-- both:-- shuffle:-- | When did work on Mount Rushmore begin?
+v06  N ref:-- base:-- cast:-- binder:-- both:-- shuffle:-- | How wide is the widest part of the Mississippi River?
+v07  N ref:-- base:-- cast:-- binder:-- both:-- shuffle:-- | How much concrete was used in total at Hoover Dam?
+v08  N ref:SF base:SF cast:SF binder:SF both:SF shuffle:SF | How many steps are in each leg of the Gateway Arch?
+x01  PD ref:SF base:SF cast:SF binder:SF both:SF shuffle:SF | How long is the Cumberland River?
+x02  PD ref:SF base:SF cast:SF binder:SF both:SF shuffle:SF | How tall is the Eiffel Tower?
+x03  N ref:SF base:SF cast:SF binder:SF both:SF shuffle:SF | How much did the Concorde programme cost?
