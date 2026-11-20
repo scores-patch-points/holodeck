@@ -3319,7 +3319,7 @@ function holoRun(stream, alpha, keep, base) {
 // surprise view and the ingest replay, so the replay folds statements by exactly the rules the surprise view uses.
 function holoKit(A, opt) { const cur = opt.cur; const srcShort = opt.srcShort;
   const NEG = /\b(not|no|never|denied|denies|den(y|ies)|without|failed to|did not|does not|was not|were not|has not|have not|isn’t|wasn’t|didn’t|doesn’t|won’t|cannot|can’t)\b/i;
-  const namesOf = st => [...new Set(st.names.filter(n => holoName(n, A) && (/\s/.test(n) || /^[A-Z]{2,}$/.test(n))))].slice(0, 8);
+  const namesOf = st => [...new Set((st.attended && _hdL34 ? st.names.concat(_hdL34.boundNames(st)) : st.names).filter(n => holoName(n, A) && (/\s/.test(n) || /^[A-Z]{2,}$/.test(n))))].slice(0, 8);
   // ── THE BEING FROM THE SOURCE'S OWN READING, NEVER A SPAN (docs/SOURCE-CONTRADICTION-PREREG.md R3) ──────────
   // A pronoun-bearing statement ("815 … were drowned") names no referent, so its figure would be anchorless and
   // dropped. The being a pronominal statement is about is the SOURCE'S OWN referent — the admitted being the source
@@ -3746,6 +3746,10 @@ async function hdPdfFigures(pdf, pageCap) {
 // HTTP door is the same pipeline on a server; the page no longer needs it to read.
 const HD_ENG = { url: null, downAt: 0 };
 function hdEngineHosts() { let u = null; try { u = localStorage.getItem('hd:engine'); } catch (e) {} return [u, 'http://127.0.0.1:11436', 'http://127.0.0.1:11476'].filter((x, i, a) => x && a.indexOf(x) === i); }
+// LAYERS 3 AND 4 (holodeck-layers34.js), opt-in and OFF: ?castIdentity=1 repairs the reader's cast; ?binder=1 lets the Ask use the attention
+// binder's bindings (typed gaps stay gaps). With both off nothing below runs and the page is unchanged.
+const HD_L34 = (() => { try { const q = new URLSearchParams(location.search), on = k => { const v = q.get(k); if (v !== null) return v === '1' || v === 'true'; try { const x = localStorage.getItem('hd:' + k); return x === '1' || x === 'true'; } catch (e) { return false; } }, sh = q.get('binderShuffle'); return { castIdentity: on('castIdentity'), binder: on('binder'), shuffle: sh !== null && /^\d+$/.test(sh) ? Number(sh) : null }; } catch (e) { return { castIdentity: false, binder: false, shuffle: null }; } })();
+let _hdL34 = null; try { window.__hdL34Sw = HD_L34; } catch (e) {} window.__hdL34Ready = (HD_L34.binder ? import(new URL('holodeck-layers34.js', location.href).href).then(M => { _hdL34 = M; try { window.__hdApp && window.__hdApp.forceUpdate(); } catch (e) {} }).catch(() => {}) : Promise.resolve());
 const HD_MASTER_CAP = 200000;   // the most characters one read takes; a longer text is cut and the cut is said
 // A POOL of readers: every source a workspace holds was read one after another by one worker (the Titanic sample's eight took
 // ~13 s before every name was placed, 2026-10-25). Each worker is the same master pipeline; a read goes to the least busy one.
@@ -3799,7 +3803,7 @@ async function hdMasterReadOnce(name, text) {
   const S = await hdMasterSlot(String(text || '').length); if (!S) return null;
   const id = 'm' + (++HD_MW_SEQ);
   let m = null;
-  try { m = await new Promise((resolve) => { HD_MW_WAIT.set(id, resolve); S.w.postMessage({ id, text: String(text || ''), cap: HD_MASTER_CAP }); }); }
+  try { m = await new Promise((resolve) => { HD_MW_WAIT.set(id, resolve); S.w.postMessage({ id, text: String(text || ''), cap: HD_MASTER_CAP, ...(HD_L34.castIdentity ? { castIdentity: true } : {}), ...(HD_L34.binder ? { binder: true } : {}) }); }); }
   finally { S.busy = 0; hdMasterDispatch(); }
   if (!m || m.err || !m.entry) return null;
   const E = m.entry;
@@ -3807,7 +3811,7 @@ async function hdMasterReadOnce(name, text) {
   return { host: 'this page · khora read-core.mjs::readDocument', read: { schema: 'EORead@1', ms: performance.now() - t0, basis: 'khora master pipeline (read-core.mjs::readDocument), in this page' + (m.cut ? ` · read the first ${m.cut.read} of ${m.cut.total} characters` : ''),
     sentences: E.sentences || [], relations: (E.edges || []).map(e => ({ participants: [{ surface: e.end1Face || e.end1 }, { surface: e.end2Face || e.end2 }], relation: e.label, polarity: e.polarity })),
     referents: (E.cast || []).map(c => ({ surfaces: c.allSurfaces && c.allSurfaces.length ? c.allSurfaces : [c.surface], surface: c.surface, routes: ['referent'], grain: null, spans: c.mentionSpans || [] })),
-    descriptorBeings: [], language: E.language || null, gaps: E.gaps || [] } };
+    descriptorBeings: [], language: E.language || null, gaps: E.gaps || [], ...(m.attended ? { attended: m.attended } : {}) } };
 }
 async function hdEngineRead(name, text) {
   hdT('engine', 'ask', 'Reading “' + hdCut(name, 50) + '” through khora\'s master pipeline in this page…');
@@ -3890,7 +3894,7 @@ const POS_L = { NOUN: 'noun', PROPN: 'proper noun', VERB: 'verb', ADJ: 'adjectiv
 const HD_KIND_PLAIN = { differs: 'Different figures', polarity: 'Denied', scope: 'Not named', absent: 'Spoken of, not held', defined: 'Defined as', names: 'Refers to', same: 'Both state', terms: 'Same subject', cite: 'Cites' };
 const HD_KIND_RANK = { differs: 0, polarity: 1, scope: 2, absent: 3, defined: 4, names: 5, same: 6, cite: 7, terms: 8 };
 const HD_STANDING_PLAIN = { fixed: 'always the same', 'one at a time': 'one at a time', 'many-valued': 'many values' };
-const hdEngineCompact = (host, r) => ({ host, ms: Math.round(r.ms), basis: r.basis || null, sentences: r.sentences.length, relations: r.relations.length, referents: r.referents.map(x => ({ surfaces: x.surfaces, surface: x.surface || null, routes: x.routes, grain: x.grain || null, spans: x.spans || null })).concat(r.descriptorBeings.map(b => ({ surfaces: b.surfaces, routes: ['descriptor'], grain: null }))) });
+const hdEngineCompact = (host, r) => ({ host, ms: Math.round(r.ms), basis: r.basis || null, sentences: r.sentences.length, relations: r.relations.length, referents: r.referents.map(x => ({ surfaces: x.surfaces, surface: x.surface || null, routes: x.routes, grain: x.grain || null, spans: x.spans || null })).concat(r.descriptorBeings.map(b => ({ surfaces: b.surfaces, routes: ['descriptor'], grain: null }))), ...(r.attended ? { attended: r.attended } : {}) });
 // read-only handle for tests: the real functions, so a harness can recompute what a trace claims happened
 setTimeout(() => { try { window.__holodeck = Object.freeze({ analyze, holoKit, holoName, paradigms, holoTopics, fieldTopics, fieldCatalog, splitSentences, isJunk, readAny, hdHygiene, hdPos: w => hdPos(w), hdPosForms: () => HD_POS, hdDeclReady: () => !!HD_DECL, hdEngineReady: () => !!HD_ENGINE, hdReaderReady: () => hdReaderReady(), hdAttrReady: () => hdAttrReady(), hdHoldReady: () => hdHoldReady(), summarizeHolders: (sts, names) => (HD_ATTR ? HD_ATTR.summarizeHolders(sts, names) : null), masterReads: () => ({ read: HD_MASTER.size, pending: HD_MASTER_PENDING.size, workers: HD_MW_N }) }); } catch (e) {} }, 0);
 const hdCut = (t, n) => { t = String(t || '').replace(/\s+/g, ' ').trim(); return t.length > n ? t.slice(0, n - 1) + '…' : t; };
@@ -4525,6 +4529,7 @@ function analyze(corpus, htmlMap) {
     st.names = [...set];
     st.names.forEach(n => { (names[n] = names[n] || { name: n, sts: [], docs: new Set() }); names[n].sts.push(st.id); names[n].docs.add(st.doc); });
     const d = docs.find(x => x.id === st.doc);
+    if (HD_L34.binder && _hdL34 && d.hasCase) _hdL34.attachAttended(st, hdMasterFor(d), canonOf, HD_L34);
     const y = st.dates.find(x => x.year);
     st.year = d.year || (y ? y.year : null);
     st.ownDate = st.dates.length > 0;
@@ -10299,7 +10304,7 @@ class Component extends DCLogic {
       const Np = pool.length || 1, idf = w => Math.log(1 + Np / (df[w] + 0.5)); const maxI = Math.max(1, ...terms.map(idf));
       const scored = []; const BP = this.boilerplate(A); const wantFind = !/^\s*(did|does|do|is|was|were|has|have|had)\b/i.test(qv) && (/\b(find|found|findings?|observations?)\b/i.test(qv) || /\bwhat (problems?|issues?|concerns?|went wrong)\b/i.test(qv));
       const FIND_RE = /\b(we (found|noted|observed|identified)|observation [A-Z]\b|did not|does not|were not|was not|has not|have not|lacks?|lacked|no (documentation|evidence|policy|process)|not (always|consistently|properly))\b/i;
-      pool.forEach((st, i) => { const T = toks[i]; let hitT = terms.filter(w => T.has(w)); const nh = st.names.filter(n => qNames.has(n)).length;
+      pool.forEach((st, i) => { const T = toks[i]; let hitT = terms.filter(w => T.has(w)); const nh = st.names.filter(n => qNames.has(n)).length + (st.attended && _hdL34 ? _hdL34.boundNames(st).filter(n => qNames.has(n) && !st.names.includes(n)).length : 0);  // a name the binder bound to this statement's "it" or description counts once, never twice
         const TT = this._ttA === A ? this._titleToks : (this._ttA = A, this._titleToks = new Map()); let tk = TT.get(st.doc); if (!tk) { tk = new Set(((A.docById[st.doc] || {}).title || '').toLowerCase().split(/[^a-z0-9]+/).filter(Boolean).map(qStem)); TT.set(st.doc, tk); }
         const viaTitle = wantFind && !FIND_RE.test(st.text) ? [] : terms.filter(w => !T.has(w) && tk.has(w)); if (!hitT.length && !nh && !(viaTitle.length && (wantFind ? FIND_RE.test(st.text) : false))) return;
         let sc = hitT.reduce((a, w) => a + idf(w), 0) + viaTitle.reduce((a, w) => a + 0.6 * idf(w), 0) + nh * maxI; const cov = terms.length ? (hitT.length + 0.6 * viaTitle.length) / terms.length : 1; sc *= 0.4 + 0.6 * cov;

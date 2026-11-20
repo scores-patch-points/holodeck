@@ -1,0 +1,1855 @@
+{
+ "summary": {
+  "ref": {
+   "all_SF": 8,
+   "all_S": 10,
+   "PD_SF": 3,
+   "N_SF": 5,
+   "n": 27,
+   "PD_n": 9
+  },
+  "base": {
+   "all_SF": 8,
+   "all_S": 10,
+   "PD_SF": 3,
+   "N_SF": 5,
+   "n": 27,
+   "PD_n": 9
+  },
+  "cast": {
+   "all_SF": 8,
+   "all_S": 10,
+   "PD_SF": 3,
+   "N_SF": 5,
+   "n": 27,
+   "PD_n": 9
+  },
+  "binder": {
+   "all_SF": 8,
+   "all_S": 11,
+   "PD_SF": 3,
+   "N_SF": 5,
+   "n": 27,
+   "PD_n": 9
+  },
+  "both": {
+   "all_SF": 8,
+   "all_S": 11,
+   "PD_SF": 3,
+   "N_SF": 5,
+   "n": 27,
+   "PD_n": 9
+  },
+  "shuffle": {
+   "all_SF": 8,
+   "all_S": 10,
+   "PD_SF": 3,
+   "N_SF": 5,
+   "n": 27,
+   "PD_n": 9
+  }
+ },
+ "verdict": {
+  "B1_no_regression": {
+   "lost": [],
+   "pass": true
+  },
+  "won": [],
+  "B2_gain": {
+   "base_PD": 3,
+   "both_PD": 3,
+   "gain": 0,
+   "pass": false,
+   "untestable": []
+  },
+  "B3_control": {
+   "both_PD": 3,
+   "shuffle_PD": 3,
+   "margin": 0,
+   "pass": false
+  },
+  "U5_off_unchanged": {
+   "identical": true,
+   "statements_ref": 5472,
+   "statements_base": 5472
+  }
+ },
+ "rawFacts": {
+  "ref": {
+   "switches": null,
+   "statements": 5472,
+   "masterReads": {
+    "read": 21,
+    "pending": 0,
+    "workers": 3
+   },
+   "statementsWithBinding": 0,
+   "statementsWithTypedGap": 0,
+   "gapsByReason": {},
+   "ms": 28718
+  },
+  "base": {
+   "switches": {
+    "castIdentity": false,
+    "binder": false,
+    "shuffle": null
+   },
+   "statements": 5472,
+   "masterReads": {
+    "read": 21,
+    "pending": 0,
+    "workers": 3
+   },
+   "statementsWithBinding": 0,
+   "statementsWithTypedGap": 0,
+   "gapsByReason": {},
+   "ms": 72278
+  },
+  "cast": {
+   "switches": {
+    "castIdentity": true,
+    "binder": false,
+    "shuffle": null
+   },
+   "statements": 5472,
+   "masterReads": {
+    "read": 21,
+    "pending": 0,
+    "workers": 3
+   },
+   "statementsWithBinding": 0,
+   "statementsWithTypedGap": 0,
+   "gapsByReason": {},
+   "ms": 284193
+  },
+  "binder": {
+   "switches": {
+    "castIdentity": false,
+    "binder": true,
+    "shuffle": null
+   },
+   "statements": 5472,
+   "masterReads": {
+    "read": 21,
+    "pending": 0,
+    "workers": 3
+   },
+   "statementsWithBinding": 394,
+   "statementsWithTypedGap": 1122,
+   "gapsByReason": {
+    "description_unbound": 333,
+    "description_off_topic": 72,
+    "capitalised_unknown_name": 58,
+    "pronoun_no_margin": 85,
+    "center_elsewhere": 147,
+    "center_not_carried": 227,
+    "expletive_or_cleft": 24,
+    "capitalised_name_open_word": 121,
+    "description_below_floor": 104,
+    "description_weak_word": 53,
+    "pronoun_no_candidate": 1,
+    "inside_cast_mention": 4,
+    "description_no_margin": 12
+   },
+   "ms": 322436
+  },
+  "both": {
+   "switches": {
+    "castIdentity": true,
+    "binder": true,
+    "shuffle": null
+   },
+   "statements": 5472,
+   "masterReads": {
+    "read": 21,
+    "pending": 0,
+    "workers": 3
+   },
+   "statementsWithBinding": 442,
+   "statementsWithTypedGap": 1079,
+   "gapsByReason": {
+    "description_off_topic": 67,
+    "capitalised_name_open_word": 149,
+    "description_unbound": 322,
+    "center_elsewhere": 148,
+    "center_not_carried": 202,
+    "expletive_or_cleft": 24,
+    "pronoun_no_margin": 85,
+    "description_below_floor": 97,
+    "capitalised_unknown_name": 23,
+    "description_no_margin": 9,
+    "pronoun_no_candidate": 1,
+    "description_weak_word": 54,
+    "inside_cast_mention": 3,
+    "capitalised_name_not_candidate": 1
+   },
+   "ms": 529178
+  },
+  "shuffle": {
+   "switches": {
+    "castIdentity": true,
+    "binder": true,
+    "shuffle": 1
+   },
+   "statements": 5472,
+   "masterReads": {
+    "read": 21,
+    "pending": 0,
+    "workers": 3
+   },
+   "statementsWithBinding": 442,
+   "statementsWithTypedGap": 1079,
+   "gapsByReason": {
+    "description_off_topic": 67,
+    "capitalised_name_open_word": 149,
+    "description_unbound": 322,
+    "center_elsewhere": 148,
+    "center_not_carried": 202,
+    "expletive_or_cleft": 24,
+    "pronoun_no_margin": 85,
+    "description_below_floor": 97,
+    "capitalised_unknown_name": 23,
+    "description_no_margin": 9,
+    "pronoun_no_candidate": 1,
+    "description_weak_word": 54,
+    "inside_cast_mention": 3,
+    "capitalised_name_not_candidate": 1
+   },
+   "ms": 790254
+  }
+ },
+ "perQuestion": {
+  "ref": [
+   {
+    "id": "n01",
+    "stratum": "PD",
+    "S": true,
+    "F": true,
+    "SF": true,
+    "top": "The tower is 330 metres (1,083 ft) tall, about the same height as an 81-storey building, and the tallest struc",
+    "fig": "330 metres (1,083 ft) tall",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "n02",
+    "stratum": "PD",
+    "S": false,
+    "F": false,
+    "SF": false,
+    "top": "A bust of Gustave Eiffel by Antoine Bourdelle was unveiled at the base of the north leg on 2 May 1929.",
+    "fig": null,
+    "figMode": ""
+   },
+   {
+    "id": "n03",
+    "stratum": "N",
+    "S": false,
+    "F": false,
+    "SF": false,
+    "top": "The tower was an instant success with the public, and nearly 30,000 visitors made the 1,710-step climb to the ",
+    "fig": "1,710-step",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "n04",
+    "stratum": "PD",
+    "S": false,
+    "F": false,
+    "SF": false,
+    "top": "The Eiffel Tower is the most visited monument with an entrance fee in the world: 6.91 million people ascended ",
+    "fig": "6.91 million people",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "n05",
+    "stratum": "PD",
+    "S": false,
+    "F": false,
+    "SF": false,
+    "top": "The Gateway Arch is 75 feet taller than the Washington Monument and over twice as tall as the Statue of Libert",
+    "fig": "July",
+    "figMode": "Dates in the closest s"
+   },
+   {
+    "id": "n06",
+    "stratum": "N",
+    "S": false,
+    "F": false,
+    "SF": false,
+    "top": "The Gateway Arch is a 630-foot-tall (192 m) monument in St. Louis, Missouri, United States.",
+    "fig": null,
+    "figMode": ""
+   },
+   {
+    "id": "n07",
+    "stratum": "PD",
+    "S": false,
+    "F": false,
+    "SF": false,
+    "top": "The Gateway Arch was expected to open to the public by 1964, but in 1967 the public relations agency stopped f",
+    "fig": "1967",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "n08",
+    "stratum": "N",
+    "S": true,
+    "F": false,
+    "SF": false,
+    "top": "Hoover Dam is a major tourist attraction, with 7 million tourists a year.",
+    "fig": "619,763 tourists visited",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "n09",
+    "stratum": "PD",
+    "S": false,
+    "F": true,
+    "SF": false,
+    "top": "96 men died during their work in constructing Hoover Dam.",
+    "fig": "96 men died",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "n10",
+    "stratum": "N",
+    "S": false,
+    "F": false,
+    "SF": false,
+    "top": "Landing Concorde required a minimum of 6,000 feet (1,800 m) runway length; the shortest runway Concorde ever l",
+    "fig": "6,000 feet",
+    "figMode": "Figures in the closest"
+   },
+   {
+    "id": "n11",
+    "stratum": "PD",
+    "S": false,
+    "F": null,
+    "SF": false,
+    "top": "Concorde was the first airliner to have a fly-by-wire flight-control system (in this case, analogue); the avio",
+    "fig": null,
+    "figMode": ""
+   },
+   {
+    "id": "n12",
+    "stratum": "N",
+    "S": true,
+    "F": false,
+    "SF": false,
+    "top": "Concorde entered service on 21 January 1976 with Air France from Paris-Roissy and British Airways from London ",
+    "fig": "January",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "n13",
+    "stratum": "N",
+    "S": false,
+    "F": null,
+    "SF": false,
+    "top": "Then Armstrong walked 196 feet (60 m) from the LM to take photographs at the rim of Little West Crater while A",
+    "fig": "walked 196 feet",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "n14",
+    "stratum": "N",
+    "S": false,
+    "F": false,
+    "SF": false,
+    "top": "An estimated 650 million people watched Armstrong’s televised image and heard his voice describe the event as ",
+    "fig": "650 million people",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "n15",
+    "stratum": "N",
+    "S": true,
+    "F": true,
+    "SF": true,
+    "top": "Mount Rushmore attracts more than two million visitors annually to the memorial park which covers 1,278 acres ",
+    "fig": "park which covers 1,278 acres",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "n16",
+    "stratum": "N",
+    "S": false,
+    "F": false,
+    "SF": false,
+    "top": "A more comprehensive discussion of the history of the upper Mississippi River, and specifically, the 72 mile l",
+    "fig": "72 mile long",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "v01",
+    "stratum": "N",
+    "S": true,
+    "F": true,
+    "SF": true,
+    "top": "The Gateway Arch is a 630-foot-tall (192 m) monument in St. Louis, Missouri, United States.",
+    "fig": "630-foot-tall",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "v02",
+    "stratum": "N",
+    "S": true,
+    "F": true,
+    "SF": true,
+    "top": "The 688-mile-long (1,107 km) river drains almost 18,000 square miles (47,000 km2) of southern Kentucky and nor",
+    "fig": "688-mile-long",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "v03",
+    "stratum": "N",
+    "S": false,
+    "F": true,
+    "SF": false,
+    "top": "The top of Mount Rushmore is 5,725 feet above sea level.",
+    "fig": "5,725 feet (1,745 m) above",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "v04",
+    "stratum": "N",
+    "S": false,
+    "F": true,
+    "SF": false,
+    "top": "If the 60-foot heads carved on the face of Mount Rushmore had bodies, the giants would stand about 465 feet ta",
+    "fig": "60-foot heads",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "v05",
+    "stratum": "N",
+    "S": false,
+    "F": false,
+    "SF": false,
+    "top": "The Presidential Trail is a 0.6-mile (1 km) loop trail that begins at and returns to the Visitor Center, and i",
+    "fig": "1923",
+    "figMode": "Dates in the closest s"
+   },
+   {
+    "id": "v06",
+    "stratum": "N",
+    "S": false,
+    "F": false,
+    "SF": false,
+    "top": "The Mississippi River drains an area of about 3.2 million square kilometers (1.2 million square miles) includi",
+    "fig": "parts of 31 states",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "v07",
+    "stratum": "N",
+    "S": false,
+    "F": false,
+    "SF": false,
+    "top": "A total of 3,250,000 cubic yards (2,480,000 cubic meters) of concrete was used in the dam before concrete pour",
+    "fig": "total of 3,250,000 cubic",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "v08",
+    "stratum": "N",
+    "S": true,
+    "F": true,
+    "SF": true,
+    "top": "There are three modes of transportation up the arch: two sets of 1,076-step emergency stairs (one per leg), a ",
+    "fig": "1,076-step",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "x01",
+    "stratum": "PD",
+    "S": true,
+    "F": true,
+    "SF": true,
+    "top": "The 688-mile-long (1,107 km) river drains almost 18,000 square miles (47,000 km2) of southern Kentucky and nor",
+    "fig": "688-mile-long",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "x02",
+    "stratum": "PD",
+    "S": true,
+    "F": true,
+    "SF": true,
+    "top": "The tower is 330 metres (1,083 ft) tall, about the same height as an 81-storey building, and the tallest struc",
+    "fig": "330 metres (1,083 ft) tall",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "x03",
+    "stratum": "N",
+    "S": true,
+    "F": true,
+    "SF": true,
+    "top": "The original programme cost estimate was £70 million in 1962, (£1.77 billion in 2024).",
+    "fig": "cost estimate was £70 million",
+    "figMode": "Figures the sources st"
+   }
+  ],
+  "base": [
+   {
+    "id": "n01",
+    "stratum": "PD",
+    "S": true,
+    "F": true,
+    "SF": true,
+    "top": "The tower is 330 metres (1,083 ft) tall, about the same height as an 81-storey building, and the tallest struc",
+    "fig": "330 metres (1,083 ft) tall",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "n02",
+    "stratum": "PD",
+    "S": false,
+    "F": false,
+    "SF": false,
+    "top": "A bust of Gustave Eiffel by Antoine Bourdelle was unveiled at the base of the north leg on 2 May 1929.",
+    "fig": null,
+    "figMode": ""
+   },
+   {
+    "id": "n03",
+    "stratum": "N",
+    "S": false,
+    "F": false,
+    "SF": false,
+    "top": "The tower was an instant success with the public, and nearly 30,000 visitors made the 1,710-step climb to the ",
+    "fig": "1,710-step",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "n04",
+    "stratum": "PD",
+    "S": false,
+    "F": false,
+    "SF": false,
+    "top": "The Eiffel Tower is the most visited monument with an entrance fee in the world: 6.91 million people ascended ",
+    "fig": "6.91 million people",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "n05",
+    "stratum": "PD",
+    "S": false,
+    "F": false,
+    "SF": false,
+    "top": "The Gateway Arch is 75 feet taller than the Washington Monument and over twice as tall as the Statue of Libert",
+    "fig": "July",
+    "figMode": "Dates in the closest s"
+   },
+   {
+    "id": "n06",
+    "stratum": "N",
+    "S": false,
+    "F": false,
+    "SF": false,
+    "top": "The Gateway Arch is a 630-foot-tall (192 m) monument in St. Louis, Missouri, United States.",
+    "fig": null,
+    "figMode": ""
+   },
+   {
+    "id": "n07",
+    "stratum": "PD",
+    "S": false,
+    "F": false,
+    "SF": false,
+    "top": "The Gateway Arch was expected to open to the public by 1964, but in 1967 the public relations agency stopped f",
+    "fig": "1967",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "n08",
+    "stratum": "N",
+    "S": true,
+    "F": false,
+    "SF": false,
+    "top": "Hoover Dam is a major tourist attraction, with 7 million tourists a year.",
+    "fig": "619,763 tourists visited",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "n09",
+    "stratum": "PD",
+    "S": false,
+    "F": true,
+    "SF": false,
+    "top": "96 men died during their work in constructing Hoover Dam.",
+    "fig": "96 men died",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "n10",
+    "stratum": "N",
+    "S": false,
+    "F": false,
+    "SF": false,
+    "top": "Landing Concorde required a minimum of 6,000 feet (1,800 m) runway length; the shortest runway Concorde ever l",
+    "fig": "6,000 feet",
+    "figMode": "Figures in the closest"
+   },
+   {
+    "id": "n11",
+    "stratum": "PD",
+    "S": false,
+    "F": null,
+    "SF": false,
+    "top": "Concorde was the first airliner to have a fly-by-wire flight-control system (in this case, analogue); the avio",
+    "fig": null,
+    "figMode": ""
+   },
+   {
+    "id": "n12",
+    "stratum": "N",
+    "S": true,
+    "F": false,
+    "SF": false,
+    "top": "Concorde entered service on 21 January 1976 with Air France from Paris-Roissy and British Airways from London ",
+    "fig": "January",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "n13",
+    "stratum": "N",
+    "S": false,
+    "F": null,
+    "SF": false,
+    "top": "Then Armstrong walked 196 feet (60 m) from the LM to take photographs at the rim of Little West Crater while A",
+    "fig": "walked 196 feet",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "n14",
+    "stratum": "N",
+    "S": false,
+    "F": false,
+    "SF": false,
+    "top": "An estimated 650 million people watched Armstrong’s televised image and heard his voice describe the event as ",
+    "fig": "650 million people",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "n15",
+    "stratum": "N",
+    "S": true,
+    "F": true,
+    "SF": true,
+    "top": "Mount Rushmore attracts more than two million visitors annually to the memorial park which covers 1,278 acres ",
+    "fig": "park which covers 1,278 acres",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "n16",
+    "stratum": "N",
+    "S": false,
+    "F": false,
+    "SF": false,
+    "top": "A more comprehensive discussion of the history of the upper Mississippi River, and specifically, the 72 mile l",
+    "fig": "72 mile long",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "v01",
+    "stratum": "N",
+    "S": true,
+    "F": true,
+    "SF": true,
+    "top": "The Gateway Arch is a 630-foot-tall (192 m) monument in St. Louis, Missouri, United States.",
+    "fig": "630-foot-tall",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "v02",
+    "stratum": "N",
+    "S": true,
+    "F": true,
+    "SF": true,
+    "top": "The 688-mile-long (1,107 km) river drains almost 18,000 square miles (47,000 km2) of southern Kentucky and nor",
+    "fig": "688-mile-long",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "v03",
+    "stratum": "N",
+    "S": false,
+    "F": true,
+    "SF": false,
+    "top": "The top of Mount Rushmore is 5,725 feet above sea level.",
+    "fig": "5,725 feet (1,745 m) above",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "v04",
+    "stratum": "N",
+    "S": false,
+    "F": true,
+    "SF": false,
+    "top": "If the 60-foot heads carved on the face of Mount Rushmore had bodies, the giants would stand about 465 feet ta",
+    "fig": "60-foot heads",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "v05",
+    "stratum": "N",
+    "S": false,
+    "F": false,
+    "SF": false,
+    "top": "The Presidential Trail is a 0.6-mile (1 km) loop trail that begins at and returns to the Visitor Center, and i",
+    "fig": "1923",
+    "figMode": "Dates in the closest s"
+   },
+   {
+    "id": "v06",
+    "stratum": "N",
+    "S": false,
+    "F": false,
+    "SF": false,
+    "top": "The Mississippi River drains an area of about 3.2 million square kilometers (1.2 million square miles) includi",
+    "fig": "parts of 31 states",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "v07",
+    "stratum": "N",
+    "S": false,
+    "F": false,
+    "SF": false,
+    "top": "A total of 3,250,000 cubic yards (2,480,000 cubic meters) of concrete was used in the dam before concrete pour",
+    "fig": "total of 3,250,000 cubic",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "v08",
+    "stratum": "N",
+    "S": true,
+    "F": true,
+    "SF": true,
+    "top": "There are three modes of transportation up the arch: two sets of 1,076-step emergency stairs (one per leg), a ",
+    "fig": "1,076-step",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "x01",
+    "stratum": "PD",
+    "S": true,
+    "F": true,
+    "SF": true,
+    "top": "The 688-mile-long (1,107 km) river drains almost 18,000 square miles (47,000 km2) of southern Kentucky and nor",
+    "fig": "688-mile-long",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "x02",
+    "stratum": "PD",
+    "S": true,
+    "F": true,
+    "SF": true,
+    "top": "The tower is 330 metres (1,083 ft) tall, about the same height as an 81-storey building, and the tallest struc",
+    "fig": "330 metres (1,083 ft) tall",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "x03",
+    "stratum": "N",
+    "S": true,
+    "F": true,
+    "SF": true,
+    "top": "The original programme cost estimate was £70 million in 1962, (£1.77 billion in 2024).",
+    "fig": "cost estimate was £70 million",
+    "figMode": "Figures the sources st"
+   }
+  ],
+  "cast": [
+   {
+    "id": "n01",
+    "stratum": "PD",
+    "S": true,
+    "F": true,
+    "SF": true,
+    "top": "The tower is 330 metres (1,083 ft) tall, about the same height as an 81-storey building, and the tallest struc",
+    "fig": "330 metres (1,083 ft) tall",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "n02",
+    "stratum": "PD",
+    "S": false,
+    "F": false,
+    "SF": false,
+    "top": "The rings, which measure 95 feet (29 m) wide and 43 feet (13 m) high, were initially installed for the Games a",
+    "fig": "95 feet (29 m) wide",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "n03",
+    "stratum": "N",
+    "S": false,
+    "F": false,
+    "SF": false,
+    "top": "The tower was an instant success with the public, and nearly 30,000 visitors made the 1,710-step climb to the ",
+    "fig": "1,710-step",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "n04",
+    "stratum": "PD",
+    "S": false,
+    "F": false,
+    "SF": false,
+    "top": "The Eiffel Tower is the most visited monument with an entrance fee in the world: 6.91 million people ascended ",
+    "fig": "6.91 million people",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "n05",
+    "stratum": "PD",
+    "S": false,
+    "F": false,
+    "SF": false,
+    "top": "The Gateway Arch is 75 feet taller than the Washington Monument and over twice as tall as the Statue of Libert",
+    "fig": "October",
+    "figMode": "Dates in the closest s"
+   },
+   {
+    "id": "n06",
+    "stratum": "N",
+    "S": false,
+    "F": false,
+    "SF": false,
+    "top": "In July 1998, funding for an arch lighting system was approved by St. Louis's Gateway Foundation, which agreed",
+    "fig": "cost $225,000",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "n07",
+    "stratum": "PD",
+    "S": false,
+    "F": false,
+    "SF": false,
+    "top": "The Gateway Arch was expected to open to the public by 1964, but in 1967 the public relations agency stopped f",
+    "fig": "1967",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "n08",
+    "stratum": "N",
+    "S": true,
+    "F": false,
+    "SF": false,
+    "top": "Hoover Dam is a major tourist attraction, with 7 million tourists a year.",
+    "fig": "619,763 tourists visited",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "n09",
+    "stratum": "PD",
+    "S": false,
+    "F": true,
+    "SF": false,
+    "top": "96 men died during their work in constructing Hoover Dam.",
+    "fig": "96 men died",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "n10",
+    "stratum": "N",
+    "S": false,
+    "F": false,
+    "SF": false,
+    "top": "Landing Concorde required a minimum of 6,000 feet (1,800 m) runway length; the shortest runway Concorde ever l",
+    "fig": "6,000 feet",
+    "figMode": "Figures in the closest"
+   },
+   {
+    "id": "n11",
+    "stratum": "PD",
+    "S": false,
+    "F": null,
+    "SF": false,
+    "top": "Concorde was the first airliner to have a fly-by-wire flight-control system (in this case, analogue); the avio",
+    "fig": null,
+    "figMode": ""
+   },
+   {
+    "id": "n12",
+    "stratum": "N",
+    "S": true,
+    "F": false,
+    "SF": false,
+    "top": "Concorde entered service on 21 January 1976 with Air France from Paris-Roissy and British Airways from London ",
+    "fig": "January",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "n13",
+    "stratum": "N",
+    "S": false,
+    "F": null,
+    "SF": false,
+    "top": "Armstrong became the first human to walk on the Moon approximately six hours after landing, followed by Aldrin",
+    "fig": "walked 196 feet",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "n14",
+    "stratum": "N",
+    "S": false,
+    "F": false,
+    "SF": false,
+    "top": "On July 19, 2019, the Google Doodle paid tribute to the Apollo 11 Moon landing, complete with a link to an ani",
+    "fig": "11 Moon landing",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "n15",
+    "stratum": "N",
+    "S": true,
+    "F": true,
+    "SF": true,
+    "top": "Mount Rushmore attracts more than two million visitors annually to the memorial park which covers 1,278 acres ",
+    "fig": "park which covers 1,278 acres",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "n16",
+    "stratum": "N",
+    "S": false,
+    "F": false,
+    "SF": false,
+    "top": "On the lower Mississippi, from Baton Rouge to the mouth of the Mississippi, the navigation depth is 45 feet (1",
+    "fig": "72 mile long",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "v01",
+    "stratum": "N",
+    "S": true,
+    "F": true,
+    "SF": true,
+    "top": "The Gateway Arch is a 630-foot-tall (192 m) monument in St. Louis, Missouri, United States.",
+    "fig": "630-foot-tall",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "v02",
+    "stratum": "N",
+    "S": true,
+    "F": true,
+    "SF": true,
+    "top": "The 688-mile-long (1,107 km) river drains almost 18,000 square miles (47,000 km2) of southern Kentucky and nor",
+    "fig": "688-mile-long",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "v03",
+    "stratum": "N",
+    "S": false,
+    "F": true,
+    "SF": false,
+    "top": "The top of Mount Rushmore is 5,725 feet above sea level.",
+    "fig": "5,725 feet (1,745 m) above",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "v04",
+    "stratum": "N",
+    "S": false,
+    "F": true,
+    "SF": false,
+    "top": "If the 60-foot heads carved on the face of Mount Rushmore had bodies, the giants would stand about 465 feet ta",
+    "fig": "60-foot heads",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "v05",
+    "stratum": "N",
+    "S": false,
+    "F": false,
+    "SF": false,
+    "top": "The Presidential Trail is a 0.6-mile (1 km) loop trail that begins at and returns to the Visitor Center, and i",
+    "fig": "1941",
+    "figMode": "Dates in the closest s"
+   },
+   {
+    "id": "v06",
+    "stratum": "N",
+    "S": false,
+    "F": false,
+    "SF": false,
+    "top": "The widest navigable section in the shipping channel of the Mississippi is Lake Pepin, where the channel is ap",
+    "fig": "2 miles wide",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "v07",
+    "stratum": "N",
+    "S": false,
+    "F": false,
+    "SF": false,
+    "top": "A total of 3,250,000 cubic yards (2,480,000 cubic meters) of concrete was used in the dam before concrete pour",
+    "fig": "total of 3,250,000 cubic",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "v08",
+    "stratum": "N",
+    "S": true,
+    "F": true,
+    "SF": true,
+    "top": "There are three modes of transportation up the arch: two sets of 1,076-step emergency stairs (one per leg), a ",
+    "fig": "1,076-step",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "x01",
+    "stratum": "PD",
+    "S": true,
+    "F": true,
+    "SF": true,
+    "top": "The 688-mile-long (1,107 km) river drains almost 18,000 square miles (47,000 km2) of southern Kentucky and nor",
+    "fig": "688-mile-long",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "x02",
+    "stratum": "PD",
+    "S": true,
+    "F": true,
+    "SF": true,
+    "top": "The tower is 330 metres (1,083 ft) tall, about the same height as an 81-storey building, and the tallest struc",
+    "fig": "330 metres (1,083 ft) tall",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "x03",
+    "stratum": "N",
+    "S": true,
+    "F": true,
+    "SF": true,
+    "top": "The original programme cost estimate was £70 million in 1962, (£1.77 billion in 2024).",
+    "fig": "cost estimate was £70 million",
+    "figMode": "Figures the sources st"
+   }
+  ],
+  "binder": [
+   {
+    "id": "n01",
+    "stratum": "PD",
+    "S": true,
+    "F": true,
+    "SF": true,
+    "top": "The tower is 330 metres (1,083 ft) tall, about the same height as an 81-storey building, and the tallest struc",
+    "fig": "330 metres (1,083 ft) tall",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "n02",
+    "stratum": "PD",
+    "S": false,
+    "F": false,
+    "SF": false,
+    "top": "A bust of Gustave Eiffel by Antoine Bourdelle was unveiled at the base of the north leg on 2 May 1929.",
+    "fig": null,
+    "figMode": ""
+   },
+   {
+    "id": "n03",
+    "stratum": "N",
+    "S": false,
+    "F": false,
+    "SF": false,
+    "top": "The tower was an instant success with the public, and nearly 30,000 visitors made the 1,710-step climb to the ",
+    "fig": "1,710-step",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "n04",
+    "stratum": "PD",
+    "S": false,
+    "F": false,
+    "SF": false,
+    "top": "The Eiffel Tower is the most visited monument with an entrance fee in the world: 6.91 million people ascended ",
+    "fig": "6.91 million people",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "n05",
+    "stratum": "PD",
+    "S": true,
+    "F": false,
+    "SF": false,
+    "top": "The statue was dedicated on October 28, 1886.",
+    "fig": "July",
+    "figMode": "Dates in the closest s"
+   },
+   {
+    "id": "n06",
+    "stratum": "N",
+    "S": false,
+    "F": false,
+    "SF": false,
+    "top": "The Gateway Arch is a 630-foot-tall (192 m) monument in St. Louis, Missouri, United States.",
+    "fig": null,
+    "figMode": ""
+   },
+   {
+    "id": "n07",
+    "stratum": "PD",
+    "S": false,
+    "F": false,
+    "SF": false,
+    "top": "The Gateway Arch was expected to open to the public by 1964, but in 1967 the public relations agency stopped f",
+    "fig": "1967",
+    "figMode": "Dates in the closest s"
+   },
+   {
+    "id": "n08",
+    "stratum": "N",
+    "S": true,
+    "F": false,
+    "SF": false,
+    "top": "Hoover Dam is a major tourist attraction, with 7 million tourists a year.",
+    "fig": "619,763 tourists visited",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "n09",
+    "stratum": "PD",
+    "S": false,
+    "F": true,
+    "SF": false,
+    "top": "96 men died during their work in constructing Hoover Dam.",
+    "fig": "96 men died",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "n10",
+    "stratum": "N",
+    "S": false,
+    "F": false,
+    "SF": false,
+    "top": "Landing Concorde required a minimum of 6,000 feet (1,800 m) runway length; the shortest runway Concorde ever l",
+    "fig": "6,000 feet",
+    "figMode": "Figures in the closest"
+   },
+   {
+    "id": "n11",
+    "stratum": "PD",
+    "S": false,
+    "F": null,
+    "SF": false,
+    "top": "Concorde was the first airliner to have a fly-by-wire flight-control system (in this case, analogue); the avio",
+    "fig": null,
+    "figMode": ""
+   },
+   {
+    "id": "n12",
+    "stratum": "N",
+    "S": true,
+    "F": false,
+    "SF": false,
+    "top": "Concorde entered service on 21 January 1976 with Air France from Paris-Roissy and British Airways from London ",
+    "fig": "January",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "n13",
+    "stratum": "N",
+    "S": false,
+    "F": null,
+    "SF": false,
+    "top": "Then Armstrong walked 196 feet (60 m) from the LM to take photographs at the rim of Little West Crater while A",
+    "fig": "walked 196 feet",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "n14",
+    "stratum": "N",
+    "S": false,
+    "F": false,
+    "SF": false,
+    "top": "An estimated 650 million people watched Armstrong’s televised image and heard his voice describe the event as ",
+    "fig": "650 million people",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "n15",
+    "stratum": "N",
+    "S": true,
+    "F": true,
+    "SF": true,
+    "top": "Mount Rushmore attracts more than two million visitors annually to the memorial park which covers 1,278 acres ",
+    "fig": "park which covers 1,278 acres",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "n16",
+    "stratum": "N",
+    "S": false,
+    "F": false,
+    "SF": false,
+    "top": "A more comprehensive discussion of the history of the upper Mississippi River, and specifically, the 72 mile l",
+    "fig": "72 mile long",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "v01",
+    "stratum": "N",
+    "S": true,
+    "F": true,
+    "SF": true,
+    "top": "The Gateway Arch is a 630-foot-tall (192 m) monument in St. Louis, Missouri, United States.",
+    "fig": "630-foot-tall",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "v02",
+    "stratum": "N",
+    "S": true,
+    "F": true,
+    "SF": true,
+    "top": "The 688-mile-long (1,107 km) river drains almost 18,000 square miles (47,000 km2) of southern Kentucky and nor",
+    "fig": "688-mile-long",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "v03",
+    "stratum": "N",
+    "S": false,
+    "F": true,
+    "SF": false,
+    "top": "The top of Mount Rushmore is 5,725 feet above sea level.",
+    "fig": "5,725 feet (1,745 m) above",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "v04",
+    "stratum": "N",
+    "S": false,
+    "F": true,
+    "SF": false,
+    "top": "If the 60-foot heads carved on the face of Mount Rushmore had bodies, the giants would stand about 465 feet ta",
+    "fig": "60-foot heads",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "v05",
+    "stratum": "N",
+    "S": false,
+    "F": false,
+    "SF": false,
+    "top": "The Presidential Trail is a 0.6-mile (1 km) loop trail that begins at and returns to the Visitor Center, and i",
+    "fig": "1923",
+    "figMode": "Dates in the closest s"
+   },
+   {
+    "id": "v06",
+    "stratum": "N",
+    "S": false,
+    "F": false,
+    "SF": false,
+    "top": "The Mississippi River drains an area of about 3.2 million square kilometers (1.2 million square miles) includi",
+    "fig": "parts of 31 states",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "v07",
+    "stratum": "N",
+    "S": false,
+    "F": false,
+    "SF": false,
+    "top": "A total of 3,250,000 cubic yards (2,480,000 cubic meters) of concrete was used in the dam before concrete pour",
+    "fig": "total of 3,250,000 cubic",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "v08",
+    "stratum": "N",
+    "S": true,
+    "F": true,
+    "SF": true,
+    "top": "There are three modes of transportation up the arch: two sets of 1,076-step emergency stairs (one per leg), a ",
+    "fig": "1,076-step",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "x01",
+    "stratum": "PD",
+    "S": true,
+    "F": true,
+    "SF": true,
+    "top": "The 688-mile-long (1,107 km) river drains almost 18,000 square miles (47,000 km2) of southern Kentucky and nor",
+    "fig": "688-mile-long",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "x02",
+    "stratum": "PD",
+    "S": true,
+    "F": true,
+    "SF": true,
+    "top": "The tower is 330 metres (1,083 ft) tall, about the same height as an 81-storey building, and the tallest struc",
+    "fig": "330 metres (1,083 ft) tall",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "x03",
+    "stratum": "N",
+    "S": true,
+    "F": true,
+    "SF": true,
+    "top": "The original programme cost estimate was £70 million in 1962, (£1.77 billion in 2024).",
+    "fig": "cost estimate was £70 million",
+    "figMode": "Figures the sources st"
+   }
+  ],
+  "both": [
+   {
+    "id": "n01",
+    "stratum": "PD",
+    "S": true,
+    "F": true,
+    "SF": true,
+    "top": "The tower is 330 metres (1,083 ft) tall, about the same height as an 81-storey building, and the tallest struc",
+    "fig": "330 metres (1,083 ft) tall",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "n02",
+    "stratum": "PD",
+    "S": false,
+    "F": false,
+    "SF": false,
+    "top": "The tower and its image have been in the public domain since 1993, 70 years after Eiffel's death.",
+    "fig": "95 feet (29 m) wide",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "n03",
+    "stratum": "N",
+    "S": false,
+    "F": false,
+    "SF": false,
+    "top": "The tower was an instant success with the public, and nearly 30,000 visitors made the 1,710-step climb to the ",
+    "fig": "1,710-step",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "n04",
+    "stratum": "PD",
+    "S": false,
+    "F": false,
+    "SF": false,
+    "top": "The Eiffel Tower is the most visited monument with an entrance fee in the world: 6.91 million people ascended ",
+    "fig": "6.91 million people",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "n05",
+    "stratum": "PD",
+    "S": true,
+    "F": false,
+    "SF": false,
+    "top": "The statue was dedicated on October 28, 1886.",
+    "fig": "October",
+    "figMode": "Dates in the closest s"
+   },
+   {
+    "id": "n06",
+    "stratum": "N",
+    "S": false,
+    "F": false,
+    "SF": false,
+    "top": "In July 1998, funding for an arch lighting system was approved by St. Louis's Gateway Foundation, which agreed",
+    "fig": "cost $225,000",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "n07",
+    "stratum": "PD",
+    "S": false,
+    "F": false,
+    "SF": false,
+    "top": "The Gateway Arch was expected to open to the public by 1964, but in 1967 the public relations agency stopped f",
+    "fig": "1967",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "n08",
+    "stratum": "N",
+    "S": true,
+    "F": false,
+    "SF": false,
+    "top": "Hoover Dam is a major tourist attraction, with 7 million tourists a year.",
+    "fig": "619,763 tourists visited",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "n09",
+    "stratum": "PD",
+    "S": false,
+    "F": true,
+    "SF": false,
+    "top": "96 men died during their work in constructing Hoover Dam.",
+    "fig": "96 men died",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "n10",
+    "stratum": "N",
+    "S": false,
+    "F": false,
+    "SF": false,
+    "top": "Landing Concorde required a minimum of 6,000 feet (1,800 m) runway length; the shortest runway Concorde ever l",
+    "fig": "6,000 feet",
+    "figMode": "Figures in the closest"
+   },
+   {
+    "id": "n11",
+    "stratum": "PD",
+    "S": false,
+    "F": null,
+    "SF": false,
+    "top": "Concorde was the first airliner to have a fly-by-wire flight-control system (in this case, analogue); the avio",
+    "fig": null,
+    "figMode": ""
+   },
+   {
+    "id": "n12",
+    "stratum": "N",
+    "S": true,
+    "F": false,
+    "SF": false,
+    "top": "Concorde entered service on 21 January 1976 with Air France from Paris-Roissy and British Airways from London ",
+    "fig": "January",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "n13",
+    "stratum": "N",
+    "S": false,
+    "F": null,
+    "SF": false,
+    "top": "Armstrong became the first human to walk on the Moon approximately six hours after landing, followed by Aldrin",
+    "fig": "walked 196 feet",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "n14",
+    "stratum": "N",
+    "S": false,
+    "F": false,
+    "SF": false,
+    "top": "On July 19, 2019, the Google Doodle paid tribute to the Apollo 11 Moon landing, complete with a link to an ani",
+    "fig": "11 Moon landing",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "n15",
+    "stratum": "N",
+    "S": true,
+    "F": true,
+    "SF": true,
+    "top": "Mount Rushmore attracts more than two million visitors annually to the memorial park which covers 1,278 acres ",
+    "fig": "park which covers 1,278 acres",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "n16",
+    "stratum": "N",
+    "S": false,
+    "F": false,
+    "SF": false,
+    "top": "On the lower Mississippi, from Baton Rouge to the mouth of the Mississippi, the navigation depth is 45 feet (1",
+    "fig": "72 mile long",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "v01",
+    "stratum": "N",
+    "S": true,
+    "F": true,
+    "SF": true,
+    "top": "The Gateway Arch is a 630-foot-tall (192 m) monument in St. Louis, Missouri, United States.",
+    "fig": "630-foot-tall",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "v02",
+    "stratum": "N",
+    "S": true,
+    "F": true,
+    "SF": true,
+    "top": "The 688-mile-long (1,107 km) river drains almost 18,000 square miles (47,000 km2) of southern Kentucky and nor",
+    "fig": "688-mile-long",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "v03",
+    "stratum": "N",
+    "S": false,
+    "F": true,
+    "SF": false,
+    "top": "The top of Mount Rushmore is 5,725 feet above sea level.",
+    "fig": "5,725 feet (1,745 m) above",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "v04",
+    "stratum": "N",
+    "S": false,
+    "F": true,
+    "SF": false,
+    "top": "If the 60-foot heads carved on the face of Mount Rushmore had bodies, the giants would stand about 465 feet ta",
+    "fig": "60-foot heads",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "v05",
+    "stratum": "N",
+    "S": false,
+    "F": false,
+    "SF": false,
+    "top": "The Presidential Trail is a 0.6-mile (1 km) loop trail that begins at and returns to the Visitor Center, and i",
+    "fig": "1941",
+    "figMode": "Dates in the closest s"
+   },
+   {
+    "id": "v06",
+    "stratum": "N",
+    "S": false,
+    "F": false,
+    "SF": false,
+    "top": "The widest navigable section in the shipping channel of the Mississippi is Lake Pepin, where the channel is ap",
+    "fig": "parts of 32 U",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "v07",
+    "stratum": "N",
+    "S": false,
+    "F": false,
+    "SF": false,
+    "top": "A total of 3,250,000 cubic yards (2,480,000 cubic meters) of concrete was used in the dam before concrete pour",
+    "fig": "total of 3,250,000 cubic",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "v08",
+    "stratum": "N",
+    "S": true,
+    "F": true,
+    "SF": true,
+    "top": "There are three modes of transportation up the arch: two sets of 1,076-step emergency stairs (one per leg), a ",
+    "fig": "1,076-step",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "x01",
+    "stratum": "PD",
+    "S": true,
+    "F": true,
+    "SF": true,
+    "top": "The 688-mile-long (1,107 km) river drains almost 18,000 square miles (47,000 km2) of southern Kentucky and nor",
+    "fig": "688-mile-long",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "x02",
+    "stratum": "PD",
+    "S": true,
+    "F": true,
+    "SF": true,
+    "top": "The tower is 330 metres (1,083 ft) tall, about the same height as an 81-storey building, and the tallest struc",
+    "fig": "330 metres (1,083 ft) tall",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "x03",
+    "stratum": "N",
+    "S": true,
+    "F": true,
+    "SF": true,
+    "top": "The original programme cost estimate was £70 million in 1962, (£1.77 billion in 2024).",
+    "fig": "cost estimate was £70 million",
+    "figMode": "Figures the sources st"
+   }
+  ],
+  "shuffle": [
+   {
+    "id": "n01",
+    "stratum": "PD",
+    "S": true,
+    "F": true,
+    "SF": true,
+    "top": "The tower is 330 metres (1,083 ft) tall, about the same height as an 81-storey building, and the tallest struc",
+    "fig": "330 metres (1,083 ft) tall",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "n02",
+    "stratum": "PD",
+    "S": false,
+    "F": false,
+    "SF": false,
+    "top": "The rings, which measure 95 feet (29 m) wide and 43 feet (13 m) high, were initially installed for the Games a",
+    "fig": "95 feet (29 m) wide",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "n03",
+    "stratum": "N",
+    "S": false,
+    "F": false,
+    "SF": false,
+    "top": "The tower was an instant success with the public, and nearly 30,000 visitors made the 1,710-step climb to the ",
+    "fig": "1,710-step",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "n04",
+    "stratum": "PD",
+    "S": false,
+    "F": false,
+    "SF": false,
+    "top": "The Eiffel Tower is the most visited monument with an entrance fee in the world: 6.91 million people ascended ",
+    "fig": "6.91 million people",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "n05",
+    "stratum": "PD",
+    "S": false,
+    "F": false,
+    "SF": false,
+    "top": "The Gateway Arch is 75 feet taller than the Washington Monument and over twice as tall as the Statue of Libert",
+    "fig": "October",
+    "figMode": "Dates in the closest s"
+   },
+   {
+    "id": "n06",
+    "stratum": "N",
+    "S": false,
+    "F": false,
+    "SF": false,
+    "top": "Although Pittsburgh-Des Moines Steel initially refused to pursue what it considered a precarious venture, the ",
+    "fig": "cost $225,000",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "n07",
+    "stratum": "PD",
+    "S": false,
+    "F": false,
+    "SF": false,
+    "top": "The Gateway Arch was expected to open to the public by 1964, but in 1967 the public relations agency stopped f",
+    "fig": "1967",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "n08",
+    "stratum": "N",
+    "S": true,
+    "F": false,
+    "SF": false,
+    "top": "Hoover Dam is a major tourist attraction, with 7 million tourists a year.",
+    "fig": "619,763 tourists visited",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "n09",
+    "stratum": "PD",
+    "S": false,
+    "F": true,
+    "SF": false,
+    "top": "96 men died during their work in constructing Hoover Dam.",
+    "fig": "96 men died",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "n10",
+    "stratum": "N",
+    "S": false,
+    "F": false,
+    "SF": false,
+    "top": "Landing Concorde required a minimum of 6,000 feet (1,800 m) runway length; the shortest runway Concorde ever l",
+    "fig": "6,000 feet",
+    "figMode": "Figures in the closest"
+   },
+   {
+    "id": "n11",
+    "stratum": "PD",
+    "S": false,
+    "F": null,
+    "SF": false,
+    "top": "Concorde was the first airliner to have a fly-by-wire flight-control system (in this case, analogue); the avio",
+    "fig": null,
+    "figMode": ""
+   },
+   {
+    "id": "n12",
+    "stratum": "N",
+    "S": true,
+    "F": false,
+    "SF": false,
+    "top": "Concorde entered service on 21 January 1976 with Air France from Paris-Roissy and British Airways from London ",
+    "fig": "January",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "n13",
+    "stratum": "N",
+    "S": false,
+    "F": null,
+    "SF": false,
+    "top": "Armstrong became the first human to walk on the Moon approximately six hours after landing, followed by Aldrin",
+    "fig": "walked 196 feet",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "n14",
+    "stratum": "N",
+    "S": false,
+    "F": false,
+    "SF": false,
+    "top": "On July 19, 2019, the Google Doodle paid tribute to the Apollo 11 Moon landing, complete with a link to an ani",
+    "fig": "11 Moon landing",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "n15",
+    "stratum": "N",
+    "S": true,
+    "F": true,
+    "SF": true,
+    "top": "Mount Rushmore attracts more than two million visitors annually to the memorial park which covers 1,278 acres ",
+    "fig": "park which covers 1,278 acres",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "n16",
+    "stratum": "N",
+    "S": false,
+    "F": false,
+    "SF": false,
+    "top": "The Des Moines Rapids were about 11 miles (18 km) long and just above the mouth of the Des Moines River at Keo",
+    "fig": "11 miles (18 km) long",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "v01",
+    "stratum": "N",
+    "S": true,
+    "F": true,
+    "SF": true,
+    "top": "The Gateway Arch is a 630-foot-tall (192 m) monument in St. Louis, Missouri, United States.",
+    "fig": "630-foot-tall",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "v02",
+    "stratum": "N",
+    "S": true,
+    "F": true,
+    "SF": true,
+    "top": "The 688-mile-long (1,107 km) river drains almost 18,000 square miles (47,000 km2) of southern Kentucky and nor",
+    "fig": "688-mile-long",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "v03",
+    "stratum": "N",
+    "S": false,
+    "F": true,
+    "SF": false,
+    "top": "The top of Mount Rushmore is 5,725 feet above sea level.",
+    "fig": "5,725 feet (1,745 m) above",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "v04",
+    "stratum": "N",
+    "S": false,
+    "F": true,
+    "SF": false,
+    "top": "If the 60-foot heads carved on the face of Mount Rushmore had bodies, the giants would stand about 465 feet ta",
+    "fig": "60-foot heads",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "v05",
+    "stratum": "N",
+    "S": false,
+    "F": false,
+    "SF": false,
+    "top": "The Presidential Trail is a 0.6-mile (1 km) loop trail that begins at and returns to the Visitor Center, and i",
+    "fig": "1941",
+    "figMode": "Dates in the closest s"
+   },
+   {
+    "id": "v06",
+    "stratum": "N",
+    "S": false,
+    "F": false,
+    "SF": false,
+    "top": "The widest navigable section in the shipping channel of the Mississippi is Lake Pepin, where the channel is ap",
+    "fig": "parts of 32 U",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "v07",
+    "stratum": "N",
+    "S": false,
+    "F": false,
+    "SF": false,
+    "top": "A total of 3,250,000 cubic yards (2,480,000 cubic meters) of concrete was used in the dam before concrete pour",
+    "fig": "total of 3,250,000 cubic",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "v08",
+    "stratum": "N",
+    "S": true,
+    "F": true,
+    "SF": true,
+    "top": "There are three modes of transportation up the arch: two sets of 1,076-step emergency stairs (one per leg), a ",
+    "fig": "1,076-step",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "x01",
+    "stratum": "PD",
+    "S": true,
+    "F": true,
+    "SF": true,
+    "top": "The 688-mile-long (1,107 km) river drains almost 18,000 square miles (47,000 km2) of southern Kentucky and nor",
+    "fig": "688-mile-long",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "x02",
+    "stratum": "PD",
+    "S": true,
+    "F": true,
+    "SF": true,
+    "top": "The tower is 330 metres (1,083 ft) tall, about the same height as an 81-storey building, and the tallest struc",
+    "fig": "330 metres (1,083 ft) tall",
+    "figMode": "Figures the sources st"
+   },
+   {
+    "id": "x03",
+    "stratum": "N",
+    "S": true,
+    "F": true,
+    "SF": true,
+    "top": "The original programme cost estimate was £70 million in 1962, (£1.77 billion in 2024).",
+    "fig": "cost estimate was £70 million",
+    "figMode": "Figures the sources st"
+   }
+  ]
+ }
+}

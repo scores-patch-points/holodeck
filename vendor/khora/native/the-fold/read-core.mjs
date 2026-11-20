@@ -37,17 +37,25 @@ import { splitSentences, deriveAbbreviations } from "../adapters/text/spans.js";
 import { GRAMMAR_MIN_SHARE } from "../adapters/text/grain-typing.js";
 import { extractSurfaces, discoverReferents, namesCorefer, diaNorm } from "../adapters/text/surfaces.js";
 import { withEar } from "../adapters/text/active-ear.js";
-import { resolvePronouns } from "../adapters/text/pronouns.js";
+import { resolvePronouns, resolvePronounsByPresence } from "../adapters/text/pronouns.js";
 import { relationExtractorsFor } from "../adapters/text/relations-language.js";
 import { classifyWord, dominantClass } from "../adapters/text/wordclass.js";
 import { createLemmatizer, morphologyFromPrior } from "../adapters/text/morphology.js";
 import * as P from "../adapters/text/priors.js";
 import { aliasJunctions, resolveAliases, dottedIn } from "../organs/lexicon.js";
+import { consultNonPersonal } from "../adapters/text/non-personal.js";
+import { buildReferentLedger } from "../adapters/text/reading-referents.js";
+import { renderCard } from "../adapters/text/folded-card.js";
+import { createDeclensionFolder } from "../adapters/text/declension.js";
 import { extractSurfacesHeard, languageContextFor } from "./language-context.js";
+import { formUsageFor, formUsageOf, usedMostlyAsOther } from "../adapters/text/form-usage.js";
+import { conventionOf, conventionsGap } from "../adapters/text/conventions.js";
 import { stemOf } from "./language-grammar.js";
 import { tokenEvents, surpriseCut } from "./surprise-gate.mjs";
 import { applyPolarity, readGates, nestedClauses, scopePolarity } from "./read-quality.mjs";
 import { priorJson, priorGeneration } from "./prior-source.mjs";
+import { figuresOf } from "../adapters/text/figure-period.en.js";
+import { castIdentity as castIdentityPass } from "../organs/cast-identity.js";
 
 export const READ_CORE = Object.freeze({
   schema: "ReadCore@1",
@@ -60,7 +68,7 @@ export const READ_CORE = Object.freeze({
 // ── priors ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 
 /** The received priors, from data handed in. Data-gated: an absent piece leaves that leg bare (exact match), never a guess. */
-export function buildPriors({ pos = null, posLexicon = null, morphology = null, unimorph = null, punctuation = null, dotted = null, stem = null } = {}) {
+export function buildPriors({ pos = null, posLexicon = null, morphology = null, unimorph = null, punctuation = null, dotted = null, conventions = null, stem = null } = {}) {
   // a copy, so the class lexicon rides this reader's prior and never the shared one other organs read
   const posPrior = pos ? (posLexicon ? { ...pos, lexicon: posLexicon } : pos) : null;
   const morph = morphology ? morphologyFromPrior(morphology) : null;
@@ -88,7 +96,7 @@ export function buildPriors({ pos = null, posLexicon = null, morphology = null, 
   if (!lemmatizer) gaps.push({ gap: "no_morphology", stem, detail: `no morphology prior for ${stem ?? "?"}: verbs match exactly` });
   if (!punctuation) gaps.push({ gap: "no_punctuation_prior", stem, detail: `punctuation-${stem ?? "?"}.json absent: abbreviations come from the text and the hyperlexicon only` });
   if (!dotted) gaps.push({ gap: "no_dotted_prior", stem, detail: `dotted-${stem ?? "?"}.json absent: only the live hyperlexicon knows the words written with their period` });
-  return { stem, posPrior, verbForms: forms.size ? forms : null, lemmatizer, punctuation: punctuation ?? null, dotted: dotted ? new Set(dotted.words || []) : null, dottedGiver: dotted?.giver ?? null, gaps };
+  return { stem, posPrior, verbForms: forms.size ? forms : null, lemmatizer, punctuation: punctuation ?? null, dotted: dotted ? new Set(dotted.words || []) : null, dottedGiver: dotted?.giver ?? null, conventions: conventions ?? null, gaps };
 }
 
 const priorCache = new Map();
@@ -104,6 +112,7 @@ export function priorsFor(language = "eng") {
     morphology: priorJson(`morphology-${stem}.json`),
     punctuation: priorJson(`punctuation-${stem}.json`),
     dotted: priorJson(`dotted-${stem}.json`),
+    conventions: priorJson(`conventions-${stem}.json`),
   });
   if (priorCache.size > 16) priorCache.clear();
   priorCache.set(key, built);
@@ -273,7 +282,7 @@ const escapeRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 /** Every place a surface stands as a whole word, longest surface first, overlaps given to the longer. The index keeps a name in
  *  its folded form ("Mr Brown" for "Mr. Brown", a lower-cased "messrs"), so a token may carry its period in the text and a
  *  folded surface matches without case. */
-function mentionsOf(text, surfaces) {
+export function mentionsOf(text, surfaces) {
   const hits = [];
   for (const s of [...surfaces].sort((a, b) => b.length - a.length)) {
     if (!s) continue;
@@ -290,12 +299,37 @@ function mentionsOf(text, surfaces) {
 const edgeOf = (e) => ({ end1: e.end1, end1Face: e.end1Face ?? null, label: e.label, end2: e.end2, end2Face: e.end2Face ?? null, polarity: e.polarity ?? null, refs: e.refs ?? null, spans: e.spans ?? null, assertion: e.assertion ?? null });
 
 /**
+ * The organs the declension fold adds to the reader, or {} (and a typed gap) when it cannot run. `option` is true (read the language's prior by name) or { prior } (a caller's own).
+ * Pure given its inputs; the gate is the part-of-speech prior's own count (form-usage.js::formUsageOf, form-usage.js::usedMostlyAsOther): a form it has seen used significantly more as a non-nominal than as a nominal (an exact tail at a fair coin, the capital's own test) is not folded.
+ */
+export function declensionOrgansFor(option, { stem, pr, discoverReferents: discover, namesCorefer: corefer, gaps, report }) {
+  if (!option) return {};
+  const prior = option === true ? priorJson(`declension-${stem}.json`) : option.prior ?? null;
+  const folder = createDeclensionFolder(prior);
+  if (folder.gap) { gaps.push({ gap: folder.gap.reason, stem, detail: folder.gap.detail }); report({ stem, folded: false, why: folder.gap.reason }); return {}; }
+  const usage = formUsageOf(pr?.posPrior);
+  if (!usage) { gaps.push({ gap: "declension_ungated", stem, detail: `no part-of-speech prior for ${stem}: the fold would join pronouns and verbs with the names, so it is not run` }); report({ stem, folded: false, why: "declension_ungated" }); return {}; }
+  const memo = new Map();
+  const functional = (t) => { let v = memo.get(t); if (v === undefined) { v = usedMostlyAsOther(usage(t)); memo.set(t, v); } return v; };
+  const sameStem = (a, b) => !functional(a) && !functional(b) && folder.sameStem(a, b);
+  report({ stem, folded: true, giver: prior.provenance?.giver ?? null, gate: { prior: pr.posPrior?.provenance?.giver ?? null, rule: "a form the part-of-speech prior uses significantly more (exact tail at a fair coin, alpha 0.05) as other than as NOUN, PROPN or ADJ is not folded; a form it has not seen, or seen too few times to say, is" } });
+  return {
+    discoverReferents: (s, o = {}) => discover(s, { ...o, sameStem }),
+    namesCorefer: (a, b, o = {}) => corefer(a, b, { ...(typeof o === "function" ? { sameStem: o } : o), sameStem }),
+  };
+}
+
+/**
  * Read one document into a WeftEntry@4. `language` is declared (any BCP-47/ISO name) or, when null, heard from the text; neither
  * gives the repo's default, English, and says so. `aliases` are the dotted forms the hyperlexicon resolved (consultAliases) — the
  * synchronous read cannot ask, so an async caller asks first (reading.js::readDocument does) and hands its report in as
  * `aliasReport`, which rides the entry. A short source is a typed skip, a reader failure a typed error — never silent.
  */
-export function readWith(text, { address = null, category = null, language = null, priors = null, aliases = [], abbreviations = null, quality = true, minCharacters = 200, features = {}, reader = null, readerOptions = {}, selfRead = false, aliasReport = null } = {}) {
+export function readWith(text, { address = null, category = null, language = null, priors = null, aliases = [], abbreviations = null, quality = true, minCharacters = 200, features = {}, reader = null, readerOptions = {}, selfRead = false, aliasReport = null, rowsOf = null, referents = false, declension = null, card = false, castIdentity = false } = {}) {
+  // `readerOptions.formUsage` is the cast's own, not an organ of the reader, so it is taken out before the reader is assembled: the
+  // treebank's measured use of a capitalised form the text never writes lower-case (adapters/text/form-usage.js). A caller's own
+  // wins; null turns it off.
+  const { formUsage: callerUsage, pronounPresence, ...readerOrgans } = readerOptions ?? {};
   const str = String(text ?? "");
   const bytes = utf8Length(str);
   const gaps = [];
@@ -315,11 +349,17 @@ export function readWith(text, { address = null, category = null, language = nul
     return { ...empty, sentences, skipped: "too_short" };
   }
   const t0 = Date.now();
-  let out = null, chunks = [], err = null, R = null, claims;
+  let out = null, chunks = [], err = null, R = null, claims, declensionReport = null;
   try {
     // a surface's own organs (readerOptions: classifyWord, extendRelations, sameAct, roleConfig …) join the one assembly; the
     // abbreviations are this read's, so a surface never builds a reader beside it
-    R = reader ?? makeReader({ priors: pr, language: stem, abbreviations: abbr.set, features, ...readerOptions });
+    // THE DECLENSION FOLD (opt-in, `declension: true` or `{ prior }`; off, nothing here runs and the entry is byte-identical): "Пьер", "Пьера" and "Пьеру" are one name in different cases. The language's
+    // declension prior (UniMorph rules, janus/priors/declension-<stem>.json; adapters/text/declension.js) answers pairwise whether one observed form reaches another, and the index
+    // and the pronoun pass consult it through the organs they already take (discoverReferents, namesCorefer: no second reader). Ungated it also folds pronouns and verbs the capital tier admitted
+    // ("Он"/"Она", "Приехала"/"Приехал"), so a form the language's own part-of-speech prior uses more often as something other than a noun, a name or an adjective is refused:
+    // the gate is that prior's count (form-usage.js), a form it has not seen is not refused, and with no part-of-speech prior the fold is not run, with a typed gap.
+    const declensionOrgans = declensionOrgansFor(declension, { stem, pr, discoverReferents, namesCorefer, gaps, report: (r) => { declensionReport = r; } });
+    R = reader ?? makeReader({ priors: pr, language: stem, abbreviations: abbr.set, features, ...declensionOrgans, ...readerOrgans });
     ({ report: out, chunks } = relationsFor([{ text: str }], { reader: R, language: language ? stem : null }));
     // selfRead: the material read back as an answer against itself, so every claim carries the reader's verdict and its span
     if (selfRead && out?.read) claims = out.read(str)?.claims ?? [];
@@ -333,6 +373,18 @@ export function readWith(text, { address = null, category = null, language = nul
   // `cuts` are in the newline-normalised space the clause parser reads; `sentences` carry the caller's addresses.
   const cuts = splitSentences(norm, { abbreviations: abbr.set }).map((x) => ({ text: x.text, offset: x.offset }));
   const sentences = cuts.map((c, order) => ({ text: c.text, offset: raw(c.offset), order }));
+  // THE PARSE, handed in by the surface (opt-in; nothing here loads a parser, so this module stays page-safe). `rowsOf(sentenceText)` returns that sentence's
+  // dependency rows (UD: id, form, lemma, upos, feats, head, deprel) from whatever universal parser the surface holds (reading.js hands in grammar-en / grammar-ud
+  // by the language this read decided). The rows ride the entry beside the sentences they parse, so a layer above (atoms, the stage) reads the ONE parse and the
+  // one cut instead of cutting and parsing again. A sentence the parser cannot read is a typed gap on the entry, never a silent hole.
+  let parsed = null;
+  if (typeof rowsOf === "function") {
+    parsed = sentences.map((x, order) => {
+      try { const rows = rowsOf(x.text); if (Array.isArray(rows) && rows.length) return { order, offset: x.offset, text: x.text, rows }; gaps.push({ gap: "parse_empty", detail: `sentence ${order} parsed to no rows` }); }
+      catch (e) { gaps.push({ gap: "parse_failed", detail: `sentence ${order}: ${String(e?.message ?? e).slice(0, 80)}` }); }
+      return { order, offset: x.offset, text: x.text, rows: null };
+    });
+  }
   const sentenceAt = (at) => { let lo = 0, hi = cuts.length - 1, best = -1; while (lo <= hi) { const m = (lo + hi) >> 1; if (cuts[m].offset <= at) { best = m; lo = m + 1; } else hi = m - 1; } return best; };
   // THE CAST — the reader's own index, the beings its edges were resolved against (its ids, its floor), each with the address of
   // every mention. A being is what the capital tier names; a row the index holds only through the heard tier (a caseless nominal,
@@ -340,9 +392,25 @@ export function readWith(text, { address = null, category = null, language = nul
   // nouns are not beings. SCOPE (Greenberg): the capital tier is a cased-script test. In a caseless script it names nothing, so
   // every row is `heard` and the cast is empty, as the second cast this replaced also was; in German, where every noun is
   // capitalised, every noun is a being. A being test that holds across scripts is owed, not implied.
-  let cast = [], heardRows = [];
+  // TYPED GAP (2026-10-27, found by the Referents session and routed by the omnilingual check; owner: the referent-read session, branch referent-read):
+  // `mentionsOf` bounds a mention by \p{L} on both sides, so in a script written without spaces (a zh probe) every row gets zero spans and the cast
+  // is empty. Not fixed here: it changes the cast's output for every language and needs its own registration. Suggested fix: take the mention
+  // boundaries from the language's tokenizer adapter (Intl.Segmenter), not the regex.
+  let cast = [], heardRows = [], formUsageReport = null, identity = null;
+  const identityRows = [];
   try {
-    const capital = new Set(extractSurfaces(cuts, {}).map((x) => x.surface));
+    // A capital is a convention of the language (conventions.js): form-usage.js decides, per language, whether it has a ledgered convention to read by
+    // (English). Another language, or no pos prior (a typed gap already: `no_pos_prior`), reads the capital tier exactly as it was.
+    // The language must be KNOWN (declared with a filed stem, or heard): a language with no stem filed is read with the English priors as a typed gap
+    // (`unknown_language`, `language_default`), and an English treebank's counts say nothing of a Turkish or Swahili capital.
+    const languageKnown = languageRead.source === "declared" || languageRead.source === "heard";
+    const formUsage = callerUsage !== undefined ? callerUsage : languageKnown ? formUsageFor(stem, pr.posPrior) : null;
+    const verdicts = formUsage ? { undecided: [], separated: [] } : null;
+    const capitalSurfaces = extractSurfaces(cuts, formUsage ? { formUsage, verdicts } : {});
+    const capital = new Set(capitalSurfaces.map((x) => x.surface));
+    // what the treebank's use refused, kept beside the entry (not enumerable: the wire stays what it was) so the rule is auditable
+    // the conventions this branch reads by, cited from their one home (janus priors/conventions-<stem>.json); a gap is typed here, not on the wire
+    if (formUsage) formUsageReport = { conventions: ["capital-marks-a-name", "treebank-attests-a-forms-use"].map((s) => conventionOf(pr.conventions, s)).filter(Boolean), gap: conventionsGap(pr.conventions), giver: "UD_English-EWT (pos-eng.json)", refused: extractSurfaces(cuts, {}).map((x) => x.surface).filter((s) => !capital.has(s) && !verdicts.undecided.some((u) => u.surface === s)), undecided: verdicts.undecided, separated: verdicts.separated };
     const bytes = byteOffsets(str);
     const byRef = new Map();
     for (const ev of out?.index?.events ?? []) {
@@ -352,13 +420,26 @@ export function readWith(text, { address = null, category = null, language = nul
     }
     for (const r of byRef.values()) {
       const surface = out.index.represent?.(r.ref) ?? [...r.surfaces].sort((a, b) => b.length - a.length)[0];
-      const spans = mentionsOf(norm, r.surfaces).map(([a, b]) => [raw(a), raw(b)]);
+      const spansN = mentionsOf(norm, r.surfaces);
+      const spans = spansN.map(([a, b]) => [raw(a), raw(b)]);
       // a word whose period is its own (this read's abbreviations: "Messrs.", "No.", "Ltd.") is a title, a unit or a suffix the
       // capital tier caught, not a being; standing alone it is kept with the heard rows
       const being = [...r.surfaces].some((x) => capital.has(x) && !isAbbreviationSurface(x, abbr.set));
       // mentionsAt: UTF-8 byte offsets, the weft's address unit; mentionSpans: [start, end) character spans into the text given
       const row = { ref: r.ref, surface, allSurfaces: [...r.surfaces], mentionsAt: spans.map(([a]) => bytes[a]), mentionSpans: spans, standing: being ? "referent" : "heard" };
       (being ? cast : heardRows).push(row);
+      if (castIdentity && being) identityRows.push({ ref: r.ref, surfaces: [...r.surfaces], spans: spansN, standing: "referent", represent: surface });
+    }
+    // ONE NAME, ONE BEING (opt-in, `castIdentity: true | { rescue, claims, lead, unmerge, fold, spans }`; off, none of this runs and the entry is byte-identical): the cast
+    // repaired by structural rules and the text's own evidence (organs/cast-identity.js). The rows are rebuilt the way they were built above.
+    if (castIdentity) {
+      const connectorOk = (t) => { const c = classifyWord(t, { posPrior: pr.posPrior }); if (!c.found || !(c.total > 0)) return null; const share = (tags) => c.candidates.filter((x) => tags.includes(x.upos)).reduce((n, x) => n + x.count, 0) * 2 >= c.total; return share(["CCONJ", "SCONJ"]) ? false : share(["ADP", "DET", "PART"]) ? true : null; };
+      identity = castIdentityPass({ text: norm, rows: identityRows, mentionsOf, abbreviations: abbr.set, connectorOk, commonNoun: (t) => { const c = classifyWord(String(t).toLowerCase(), { posPrior: pr.posPrior }); if (!c.found || !(c.total > 0)) return false; const n = (u) => c.candidates.filter((x) => x.upos === u).reduce((a, x) => a + x.count, 0); return n("NOUN") > n("PROPN"); }, nominalOk: (t) => { const u = formUsageOf(pr.posPrior)?.(String(t).toLowerCase()); return !u || !usedMostlyAsOther(u); }, options: castIdentity === true ? {} : castIdentity });
+      cast = identity.rows.map((r) => {
+        const keep = r.represent && r.surfaces.includes(r.represent) ? r.represent : [...r.surfaces].sort((a, b) => b.length - a.length)[0];
+        const spans = r.spans.map(([a, b]) => [raw(a), raw(b)]);
+        return { ref: r.ref, surface: keep, allSurfaces: [...r.surfaces], mentionsAt: spans.map(([a]) => bytes[a]), mentionSpans: spans, standing: "referent" };
+      });
     }
   } catch (e) { if (!err) err = `cast_failed: ${String(e?.message ?? e)}`; }
   // THE PRONOUNS — each binding the reader made, addressed in the document, naming the cast row it binds
@@ -370,6 +451,44 @@ export function readWith(text, { address = null, category = null, language = nul
       pronouns.push({ pronoun: b.pronoun, at: [raw(at), raw(at + String(b.pronoun ?? "").length)], sentence: sentenceAt(at), surface: b.surface ?? null, ref: b.surface ? refOf(b.surface) : null, margin: b.margin ?? null });
     }
   });
+  if (identity) for (const p of pronouns) if (p.ref && identity.refMap.has(p.ref)) p.ref = identity.refMap.get(p.ref);
+  // THE PRESENCE RUNG (readerOptions.pronounPresence = { window, boost, feed, floor, margin, locality }; opt-in, every dial declared, off = absent and then
+  // nothing below runs and the entry is what it was): the pronouns of the resolver's own class bound by decayed presence over the beings of THIS cast
+  // (adapters/text/pronouns.js::resolvePronounsByPresence, PREREG-PRESENCE.md), beside the shipped resolver's `entry.pronouns`, which it does not touch.
+  let pronounsPresence = null, presenceInputs = null;
+  if (pronounPresence && typeof pronounPresence === "object") {
+    pronounsPresence = [];
+    try {
+      const refSurface = new Map(), surfaceToRef = new Map();
+      for (const c of cast) { refSurface.set(c.ref, c.surface); for (const x of c.allSurfaces) surfaceToRef.set(x, c.ref); }
+      let np = [];
+      try { if (typeof readerOrgans.nonPersonalOf === "function") np = readerOrgans.nonPersonalOf(surfaceToRef) ?? []; } catch { np = []; }
+      const mentions = cast.flatMap((c) => (c.mentionSpans ?? []).map(([a, b]) => ({ ref: c.ref, start: a, end: b })));
+      presenceInputs = { sentences, mentions, nonPersonal: np };   // kept beside the entry (not enumerable) so a caller can re-run the pure rung on the same inputs
+      const r = resolvePronounsByPresence(sentences, mentions, { ...pronounPresence, nonPersonal: np });
+      for (const b of r.bindings) pronounsPresence.push({ pronoun: b.pronoun, at: [b.offset, b.offset + b.pronoun.length], sentence: b.sentenceOrder, surface: refSurface.get(b.referentId) ?? null, ref: b.referentId, mechanism: b.mechanism, activation: b.activation, margin: b.margin });
+      for (const g of r.gaps) gaps.push(g);
+    } catch (e) { gaps.push({ gap: "pronoun_presence_failed", detail: String(e?.message ?? e).slice(0, 120) }); }
+  }
+  // THE UNBOUND PRONOUNS (readerOptions.pronounGaps === true; default off, and then nothing below runs and the entry is what it was): every pronoun of the
+  // resolver's own class this read did not bind, as a typed item addressed like entry.pronouns, with the reason, the regime that ran and the beings the
+  // resolver had in hand. A gap the resolver filed, a frame it did not read, a passage with no being to bind to: none is a silent drop any more.
+  let pronounGaps = null;
+  if (readerOrgans.pronounGaps === true) {
+    pronounGaps = [];
+    (out?.pronounGaps ?? []).forEach((list, pi) => {
+      for (const g of list ?? []) {
+        const at = bases[pi] + (g.offset ?? 0);
+        pronounGaps.push({
+          pronoun: g.pronoun, at: [raw(at), raw(at + String(g.pronoun ?? "").length)], sentence: sentenceAt(at),
+          reason: g.reason, regime: g.regime ?? "none",
+          candidates: (g.candidates ?? []).map((c) => ({ ref: c.surface ? refOf(c.surface) : null, surface: c.surface ?? null, score: c.score ?? null })),
+          detail: g.detail ?? null,
+        });
+      }
+    });
+    pronounGaps.sort((a, b) => a.at[0] - b.at[0]);
+  }
   // SURPRISE — the canonical cycle's second constitutive gate (SEG+EVA)
   let surprise = null;
   try { surprise = surpriseCut(tokenEvents(str)); } catch (e) { if (!err) err = `surprise_failed: ${String(e?.message ?? e)}`; }
@@ -396,6 +515,11 @@ export function readWith(text, { address = null, category = null, language = nul
     vocabulary: out?.vocabulary ?? null,
     cast, heard: heardRows, edges, clauses, quality: qualityReport, surprise,
     sentences, pronouns,
+    ...(pronounsPresence ? { pronounsPresence } : {}),
+    ...(pronounGaps ? { pronounGaps } : {}),
+    // OPT-IN (features.figures): the money figures of the document with the period and sign each is about, as atoms with addresses (adapters/text/figure-period.en.js); absent, the entry is exactly what it was
+    ...(features.figures ? { figures: stem === "eng" ? figuresOf(str, { sentences, timePrior: priorJson("time-prior.json") }) : { figures: [], gaps: [{ gap: "figures_english_only", detail: `the period binder reads English; this read is ${stem}` }] } } : {}),
+    ...(parsed ? { parse: parsed } : {}),
     ...(selfRead ? { claims: claims ?? [] } : {}),
     error: err, ms: Date.now() - t0,
   };
@@ -403,6 +527,28 @@ export function readWith(text, { address = null, category = null, language = nul
   // not enumerable, so the entry stays plain data on the wire and in the weft
   Object.defineProperty(entry, "reader", { value: R, enumerable: false });
   Object.defineProperty(entry, "abbreviationSet", { value: abbr.set, enumerable: false });
+  Object.defineProperty(entry, "formUsageReport", { value: formUsageReport, enumerable: false });
+  if (presenceInputs) Object.defineProperty(entry, "presenceInputs", { value: presenceInputs, enumerable: false });
+  // THE REFERENT LEDGER (opt-in, `referents: true`; off, the entry is byte-identical to before): the same reading projected onto referents, each inserted once and
+  // addressed by its event, a span only its address, an edge between referents per statement; what the spans cannot decide is a typed gap (adapters/text/reading-referents.js).
+  if (referents) {
+    try {
+      const L = buildReferentLedger({ text: str, source: address, cast, heard: heardRows, pronouns, edges, sentences, chunks, bases, norm, toRaw: raw, abbreviations: abbr.set });
+      entry.referents = L.ledger;
+      for (const g of L.gaps) gaps.push(g);
+    } catch (e) { gaps.push({ gap: "referents_failed", detail: String(e?.message ?? e).slice(0, 160) }); }
+  }
+  // THE FOLDED CARD (opt-in, `card: true`, needs `referents: true`; off, the entry is byte-identical): a NON-ENUMERABLE entry.renderCard(referentId, opts) that renders one referent's fold as plain
+  // information with a private map to its addresses (adapters/text/folded-card.js). It is a method of the entry and not a field of it, so the entry on the wire is unchanged.
+  if (card) {
+    if (!entry.referents) gaps.push({ gap: "card_needs_referents", detail: "card: true renders from the referent ledger; read with referents: true" });
+    else {
+      const decPrior = declension ? (declension === true ? priorJson(`declension-${stem}.json`) : declension.prior ?? null) : null;
+      Object.defineProperty(entry, "renderCard", { value: (referentId, o = {}) => renderCard(entry, referentId, { declension: decPrior ? { prior: decPrior } : null, ...o }), enumerable: false });
+    }
+  }
+  if (declension) entry.declension = declensionReport;
+  if (identity) { entry.castIdentity = identity.report; for (const g of identity.report.gaps) gaps.push(g); }
   return entry;
 }
 
@@ -417,5 +563,10 @@ export async function readDocument(text, { language = null, lexicon = null, prio
   const stem = (language ? stemOf(language) : null) ?? (heard?.language ? stemOf(heard.language) ?? heard.language : null) ?? "eng";
   const pr = priors ?? priorsFor(stem);
   const c = await consultAliases(str, lexicon, { priors: pr });
-  return readWith(str, { ...opts, language, priors: pr, aliases: [...(opts.aliases ?? []), ...c.aliases], aliasReport: { giver: c.giver, rows: c.rows, gap: c.gap, ...(c.settled ? { settled: c.settled } : {}) } });
+  // the same lexicon is asked a second thing, once: which of the text's words are common nouns, and which time names, so the
+  // pronoun resolver is told who is NOT a person (adapters/text/non-personal.js). No lexicon, no ask: the read is what it was.
+  // A caller's own readerOptions.nonPersonalOf wins over the givers'.
+  const np = lexicon ? await consultNonPersonal(str, lexicon, { timePrior: priorJson("time-prior.json"), language: stem }) : null;
+  const readerOptions = np?.nonPersonalOf ? { nonPersonalOf: np.nonPersonalOf, ...(opts.readerOptions ?? {}) } : opts.readerOptions;
+  return readWith(str, { ...opts, ...(readerOptions ? { readerOptions } : {}), language, priors: pr, aliases: [...(opts.aliases ?? []), ...c.aliases], aliasReport: { giver: c.giver, rows: c.rows, gap: c.gap, ...(c.settled ? { settled: c.settled } : {}), ...(np ? { nonPersonal: np.report } : {}) } });
 }

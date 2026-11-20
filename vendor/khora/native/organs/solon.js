@@ -40,6 +40,13 @@
 //              never the default. Watches the language dispatch
 //              (relations-language.js): all cognition reads GFP-shaped;
 //              English-SVO comes online only when declared. (live)
+//              Keeper of THE ISTHMUS (docs/THE-ISTHMUS.md): every material
+//              crosses at one place — its codec decodes it into EOT, reasoning
+//              happens in EOT, the target's codec encodes it back out; no
+//              codec is a typed gap, never the English one. Greenberg's
+//              shapes 5–6 are his enforcement arm. Ratified by the person
+//              2026-10-26. (charter live; the crossing itself not yet joined
+//              to a door — see the charter's own table)
 //   panini     the pronunciation — the sound a REFERENT carries, never a
 //              surface string (P11/P38). Watches the heard stratum
 //              (PronunciationPrior@1, live_priors): homophones flagged

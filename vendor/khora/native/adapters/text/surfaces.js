@@ -211,6 +211,17 @@ export const namesCorefer = (a, b, opts) => {
 const CAP_TOKEN = /^[\p{Lu}][\p{L}'’]*$/u;
 const LOWER_TOKEN = /^[\p{Ll}][\p{L}'’]*$/u;
 
+// A CAPTION CUE IS NOT A WORD. Auto-captions and transcripts interleave bracketed
+// cues with the speech: "[laughter]", "[music]", "[applause]", and a clock like
+// "[0:05:01]". A sentence that opens with one — "[laughter] >> Oh, it's easy." —
+// has its real first word at token 1, so that word read as a mid-sentence
+// capital and a bare opener ("Oh", "Getting", "With Oracle") was admitted as a
+// being (found 2026-11-03 reading a 148 KB Oracle summit transcript: 59 events,
+// openers among them). The cue is recognised by SHAPE alone, no list of cues:
+// square brackets around either a clock or lowercase words only. A bracketed
+// capitalised name ("[Pierre]", an editor's insertion) is not a cue and is kept.
+const CAPTION_CUE = /\[(?:\d{1,2}(?::\d{2}){1,2}|\p{Ll}[\p{Ll}\s,'’-]{0,40})\]/gu;
+
 // A one-sided 95% significance resolution — declared, the same standing as
 // this codebase's other Born-gate quantiles (e.g. nul-adjacent 0.95
 // thresholds elsewhere): a stated resolution for a statistical test, not a
@@ -272,6 +283,7 @@ const logBinomialTailAtHalf = (k, n) => {
  * can never clear it (not enough evidence either way), where the same
  * split at high volume would.
  */
+const TWIN_TIED = Object.freeze(["name", "function word"]);
 const capitalisationIsSignificant = (cap, lower) => {
   const n = cap + lower;
   return Math.exp(logBinomialTailAtHalf(cap, n)) < CAP_SIG_ALPHA;
@@ -598,7 +610,9 @@ export const accumulateSurfaceEvidence = (sentences, evidence, { abbreviations =
     // question for splitSentences), and the Война-и-мир side's LEADING
     // junk (an opening quote or dash leads the NEXT token — a boundary the
     // trailing-only check cannot see).
-    const rawToks = sent.text.split(/\s+/);
+    // The cue becomes a letterless token: it is no word (so it never holds token 0), and, like any
+    // letterless token below, it breaks a capitalised run rather than bridging the two names around it.
+    const rawToks = sent.text.replace(CAPTION_CUE, " — ").split(/\s+/).filter(Boolean);
     const toks = [];
     const breaksAfter = [];
     const leadingJunk = [];
@@ -696,7 +710,7 @@ export const accumulateSurfaceEvidence = (sentences, evidence, { abbreviations =
   return evidence;
 };
 
-export const surfacesFromEvidence = (evidence, { functionWords = null, abbreviations = null, minGlyphs = 2 } = {}) => {
+export const surfacesFromEvidence = (evidence, { functionWords = null, abbreviations = null, minGlyphs = 2, formUsage = null, verdicts = null } = {}) => {
   const { capCounts, lowerCounts, sentenceIndex, lowerSentenceIndex } = evidence;
   const abbrev = abbreviations ? new Set(abbreviations) : null;
   // The physics filter (eoreader5, measured): a NAME essentially never appears
@@ -721,6 +735,7 @@ export const surfacesFromEvidence = (evidence, { functionWords = null, abbreviat
   // coin than chance alone would produce AT THIS WORD'S OWN SAMPLE SIZE —
   // derived per candidate from its own two counts, not a fixed shared band.
   const surfaces = [];
+  let runHeads = null;
   for (const [surface, cap] of capCounts) {
     const words = surface.split(/\s+/);
     // Numbers and single glyphs, per the two orthographic facts above.
@@ -744,6 +759,23 @@ export const surfacesFromEvidence = (evidence, { functionWords = null, abbreviat
       //   being BY RECURRENCE AND COMPANY ALONE — capitalisation is *a*
       //   signal, not *the* signal (THE-CASE-FREE-CAST, 2026-10-09).
       if (lower > 0 && cap > 0 && !capitalisationIsSignificant(cap, lower)) continue;
+      // A CAPITAL IS A CONVENTION, AND A WORD THE TEXT NEVER WRITES LOWER-CASE GIVES THE TEST NOTHING TO STAND ON (the nomos row
+      // "capital-marks-a-name", janus priors/conventions-eng.json, read by adapters/text/conventions.js). Where the received treebank has measured how this form is USED
+      // (`formUsage(surface)` → { nominal, other }, adapters/text/form-usage.js), the SAME test is asked of that use: the word is refused
+      // when its non-nominal uses (a verb, an adverb, an interjection …) are more than its nominal uses plus the text's own capitals
+      // balance, exactly as the two-sided case above asks it of capitals and lower-case. A form the treebank has not seen is undecided
+      // and stays a candidate. Absent `formUsage`, this is not asked: byte-identical to before.
+      if (lower === 0 && cap > 0 && typeof formUsage === "function") {
+        const u = formUsage(surface);
+        if (u?.twin) {
+          // A TWIN (a name AND a function word, both attested by the prior beyond its base rates) is not decided by counts the case-folded key mostly
+          // spends on the other reading: it is returned UNDECIDED with the tied set named, and a gap is never a hit (PREREG-TWIN.md). The text's own
+          // evidence can separate them: the form heading a capitalised run ("US Army") stays a candidate. `verdicts` is a sink the caller may hand in.
+          runHeads ??= new Set([...capCounts.keys()].filter((k) => /\s/.test(k)).map((k) => k.split(/\s+/)[0]));
+          if (runHeads.has(surface)) verdicts?.separated.push({ surface, tied: TWIN_TIED, nominal: u.nominal, other: u.other, capitals: cap });
+          else { verdicts?.undecided.push({ surface, tied: TWIN_TIED, nominal: u.nominal, other: u.other, capitals: cap }); continue; }
+        } else if (u && u.other > 0 && capitalisationIsSignificant(u.other, u.nominal + cap)) continue;
+      }
     }
     surfaces.push({ surface, mentions: cap, sentences: sentenceIndex.get(surface).size });
   }

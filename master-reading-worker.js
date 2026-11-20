@@ -4,15 +4,18 @@
 //   in:  { id, text, cap }   cap: the most characters read (a longer text is cut, and the cut is said)
 //   out: { id, entry, cut } · { id, err } · { ready: true }
 import { readDocument } from './holodeck-reader.js';
+// opt-in layers 3 and 4 (holodeck-layers34.js): loaded only when a switch is on, so a page with both off never touches them
+const layers = async () => import('./holodeck-layers34.js');
 
 self.onmessage = async (e) => {
-  const { id, text = '', cap = 0 } = e.data || {};
+  const { id, text = '', cap = 0, castIdentity = false, binder = false } = e.data || {};
   try {
     const t = String(text);
     const cut = cap && t.length > cap ? { read: cap, total: t.length } : null;
     // names and relations only: the clause tree (a 16 MB parser) and the self-read claims are not asked for here
-    const W = await readDocument(cut ? t.slice(0, cap) : t, { quality: false, selfRead: false, address: id });
-    postMessage({ id, entry: JSON.parse(JSON.stringify(W)), cut });
+    const W = await readDocument(cut ? t.slice(0, cap) : t, { quality: false, selfRead: false, address: id, ...(castIdentity ? { castIdentity: true } : {}) });
+    const attended = binder ? (await layers()).attendedOf(W, true) : null;
+    postMessage({ id, entry: JSON.parse(JSON.stringify(W)), cut, ...(attended ? { attended } : {}) });
   } catch (err) {
     postMessage({ id, err: String((err && err.message) || err) });
   }

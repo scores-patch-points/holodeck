@@ -83,7 +83,7 @@
 
 import { tokens, codeOf, recall, encodeFrame } from "../../memory/activation.js";
 import { adjudicate, nullAdjudicate, CONTEST_VERDICTS } from "../../kernel/contest.js";
-import { createActivation } from "../../kernel/activation.js";
+import { createActivation, gammaFor } from "../../kernel/activation.js";
 import { THIRD_PERSON_SINGULAR, THIRD_PERSON_SINGULAR_META, CLAUSE_OPENERS } from "./priors.js";
 
 // The cell this organ occupies on the operator grid (engine/operators.js):
@@ -367,6 +367,10 @@ export const resolvePronouns = (
     completion = DEFAULT_COMPLETION,
     topEdges = DEFAULT_TOP_EDGES,
     edgeSlots = DEFAULT_EDGE_SLOTS,
+    // `trace` (default false): make every pronoun of the class the call did NOT bind answerable. The gaps then carry the referents the activation scored
+    // (`candidates`), and a pronoun in a frame the refused regime did not read, which files no gap of its own, is returned in `unread`. Off, the
+    // returned object is byte for byte what it was.
+    trace: traceGaps = false,   // bound to `traceGaps`: `trace` is already the name of each frame's code inside the loop below
     // Referent ids the CALLER already knows are not persons — an
     // organisation, a narrating apparatus, anything typed outside the range
     // a third-person-singular personal pronoun could ever legitimately
@@ -538,6 +542,7 @@ export const resolvePronouns = (
 
   const bindings = [];
   const gaps = [];
+  const unread = [];
   let framesWithPronouns = 0;
   let framesCoPresent = 0;
 
@@ -728,6 +733,7 @@ export const resolvePronouns = (
             coPresent: verdictOut.contested,
             barApplied: verdictOut.barApplied,
             detail: verdictOut.detail,
+            ...(traceGaps ? { candidates: [...referentScore].sort((a, b) => b[1] - a[1]).map(([ref, score]) => ({ ref, score })) } : {}),
           });
           continue;
         }
@@ -750,6 +756,20 @@ export const resolvePronouns = (
               ? "one-hop activation recall over the already-admitted cast, adjudicated against co-present names at the contested bar (kernel/contest.js)"
               : "one-hop activation recall over the already-admitted cast",
           },
+        });
+      }
+    }
+
+    else if (traceGaps && pronounHits.length > 0) {
+      for (const hit of pronounHits) {
+        unread.push({
+          reason: "frame_not_read",
+          tier: "engine",
+          sentenceOrder: sentence.order,
+          offset: (sentence.offset ?? 0) + hit.index,
+          pronoun: hit.token,
+          coPresent: [...named],
+          detail: "the refused regime does not read a frame that carries a name beside the pronoun; nothing was attempted, which is not the same fact as nothing being found",
         });
       }
     }
@@ -795,6 +815,7 @@ export const resolvePronouns = (
   return {
     bindings,
     gaps,
+    ...(traceGaps ? { unread } : {}),
     regime: {
       name: adjudicated ? "adjudicated" : "refused",
       criterion: nullTest ? { kind: "permutation-null", draws: nullTest.draws, alpha: nullTest.alpha, seed: nullTest.seed } : { kind: "constant-margin", minMargin },
@@ -947,4 +968,104 @@ export const resolvePronounsByActivation = (
   }
 
   return { bindings, gaps };
+};
+
+/**
+ * THE PRESENCE RUNG (2026-10-27, PREREG-PRESENCE.md): bind the third-person singular pronouns of the resolver's own class by DECAYED PRESENCE over the
+ * beings the reader's cast holds, the way `kernel/activation.js` (READING-POLICY P1, "activation decays") reads a thing in time. The shipped resolver's
+ * "activation" is associative recall of vocabulary with no recency term, no mention count and no grammatical role (memory/activation.js); this is the
+ * rung that was missing, as an opt-in beside it. Pure: no model, no parse, no list.
+ *
+ *   sentences  [{ text, offset }]            the entry's own sentences, offsets in the same space as `mentions`
+ *   mentions   [{ ref, start, end }]         every mention of every cast being
+ *   options    { window, boost, feed, floor, margin, locality, nonPersonal, language, pronounClass }
+ *
+ * Time is the sentence (the unit the kernel ticks in). A mention fires its being: +`boost` when it is the first cast mention of its sentence (a POSITION
+ * PROXY for the grammatical subject, not a parse), else +1; its presence at a later sentence is `value * gammaFor(window)^distance` (`window: null` is the
+ * kernel's undecayed control). A mention earlier in the pronoun's own sentence counts at distance 0, one after it does not. Candidates are the beings with
+ * presence > 0, minus the non-personal ones and, for a CLEAN pronoun, those the resolver's own causal, clause-local gender evidence contradicts. Bind to the
+ * highest iff its presence >= `floor` and `(top - second) / top >= margin` (a lone candidate has margin 1, as kernel/contest.js); ties go to the more recent
+ * mention. `feed: 1` re-fires a being this rung bound. `locality: true` (the legacy `namedScope: "local"`) lets the SOLE being named in the pronoun's own clause
+ * (not non-personal, gender-compatible) decide first, with no arithmetic.
+ *
+ * Every dial is declared; none is defaulted: how wide the present is, how faint still binds and how far a candidate must lead are the caller's to say, with a
+ * reason. A language with no pronoun prior returns no binding and one typed gap.
+ * @returns {{bindings: Array<object>, gaps: Array<object>}}
+ */
+export const resolvePronounsByPresence = (sentences, mentions, options = {}) => {
+  const { window, boost, feed, floor, margin, locality = false, nonPersonal, language = "en", pronounClass = undefined } = options;
+  if (window !== null && (!Number.isFinite(window) || window <= 1)) throw new TypeError("resolvePronounsByPresence: window is declared (a number above 1, or null for the undecayed control)");
+  if (!Number.isFinite(boost) || boost <= 0) throw new TypeError("resolvePronounsByPresence: boost is declared and positive (1 weighs every mention alike)");
+  if (feed !== 0 && feed !== 1) throw new TypeError("resolvePronounsByPresence: feed is declared, 0 or 1");
+  if (!Number.isFinite(floor) || floor < 0) throw new TypeError("resolvePronounsByPresence: floor is declared (how faint still binds)");
+  if (!Number.isFinite(margin) || margin < 0 || margin > 1) throw new TypeError("resolvePronounsByPresence: margin is declared, in [0, 1]");
+  if (pronounClass === undefined && !pronounPriorFor(language)) {
+    return { bindings: [], gaps: [{ reason: "no_pronoun_prior_for_language", tier: "engine", language, detail: `no pronoun prior is declared for language "${language}" — nothing was attempted, which is not the same fact as nothing being found` }] };
+  }
+  const cls = pronounClass !== undefined
+    ? (pronounClass instanceof Map ? pronounClass : normalizePronounClass(pronounClass))
+    : normalizePronounClass(pronounPriorFor(language).table);
+  const np = nonPersonal instanceof Set ? nonPersonal : new Set(nonPersonal ?? []);
+  const gamma = window === null ? 1 : gammaFor(window);
+
+  const order = [...(sentences ?? [])].map((x, i) => ({ text: String(x.text ?? ""), offset: x.offset ?? 0, i }));
+  const sentOf = (pos) => { let lo = 0, hi = order.length - 1, r = -1; while (lo <= hi) { const m = (lo + hi) >> 1; if (order[m].offset <= pos) { r = m; lo = m + 1; } else hi = m - 1; } return r; };
+  const bySent = new Map();
+  for (const m of mentions ?? []) {
+    const si = sentOf(m.start);
+    if (si < 0 || m.start >= order[si].offset + order[si].text.length) continue;
+    (bySent.get(si) ?? bySent.set(si, []).get(si)).push({ kind: "m", ref: m.ref, pos: m.start, rel: m.start - order[si].offset });
+  }
+  for (const [, list] of bySent) { list.sort((a, b) => a.pos - b.pos); if (list.length) list[0].first = true; }
+
+  const state = new Map(); // ref -> { v, t, pos }
+  const presence = (ref, t) => { const c = state.get(ref); return c ? c.v * gamma ** (t - c.t) : 0; };
+  const fire = (ref, t, w, pos) => { state.set(ref, { v: presence(ref, t) + w, t, pos }); };
+  const evidence = new Map(); // ref -> { m, f }: the resolver's own causal, clause-local gender evidence
+  const genderOf = (r) => { const e = evidence.get(r); if (!e) return "unknown"; if (e.m > 0 && e.f === 0) return "m"; if (e.f > 0 && e.m === 0) return "f"; return "unknown"; };
+  const compatible = (r, hit) => !hit.clean || genderOf(r) === "unknown" || genderOf(r) === hit.gender;
+
+  const bindings = [];
+  for (const sent of order) {
+    const mentionsHere = bySent.get(sent.i) ?? [];
+    const hits = findInClass(sent.text, cls).map((h) => ({ kind: "p", pos: sent.offset + h.index, rel: h.index, hit: h }));
+    const events = [...mentionsHere, ...hits].sort((a, b) => a.pos - b.pos || (a.kind === "m" ? -1 : 1));
+    for (const e of events) {
+      if (e.kind === "m") { fire(e.ref, sent.i, e.first ? boost : 1, e.pos); continue; }
+      const hit = e.hit;
+      let chosen = null, mechanism = null, top = null, margined = null;
+      if (locality && mentionsHere.length) {
+        const inClause = [...new Set(mentionsHere.filter((m) => sameClause(sent.text, m.rel, e.rel)).map((m) => m.ref))];
+        if (inClause.length === 1 && !np.has(inClause[0]) && compatible(inClause[0], hit)) { chosen = inClause[0]; mechanism = "locality"; }
+      }
+      if (!chosen) {
+        const cands = [];
+        for (const [ref, c] of state) {
+          if (np.has(ref) || !compatible(ref, hit)) continue;
+          const a = presence(ref, sent.i);
+          if (a > 0) cands.push([ref, a, c.pos]);
+        }
+        cands.sort((x, y) => y[1] - x[1] || y[2] - x[2] || (x[0] < y[0] ? -1 : 1));
+        if (!cands.length) continue;
+        top = cands[0][1];
+        const second = cands[1]?.[1] ?? 0;
+        if (top < floor) continue;
+        margined = (top - second) / top;
+        if (margined < margin) continue;
+        chosen = cands[0][0]; mechanism = "presence";
+      }
+      bindings.push({ referentId: chosen, sentenceOrder: sent.i, offset: e.pos, pronoun: hit.token, gender: hit.gender, activation: top, margin: margined, mechanism });
+      if (feed) fire(chosen, sent.i, 1, e.pos);
+    }
+    // gender evidence from this sentence informs LATER sentences only, by the resolver's own rule (one being named beside the pronoun, in its own clause)
+    const named = new Set(mentionsHere.map((m) => m.ref));
+    if (named.size === 1 && hits.length) {
+      const [only] = named;
+      const rels = mentionsHere.filter((m) => m.ref === only).map((m) => m.rel);
+      const ev = evidence.get(only) ?? { m: 0, f: 0 };
+      for (const h of hits) if (rels.some((r) => sameClause(sent.text, r, h.rel))) ev[h.hit.gender]++;
+      evidence.set(only, ev);
+    }
+  }
+  return { bindings, gaps: [] };
 };
